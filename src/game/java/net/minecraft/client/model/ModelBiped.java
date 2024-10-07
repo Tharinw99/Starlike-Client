@@ -4,22 +4,25 @@ import net.lax1dude.eaglercraft.v1_8.opengl.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -73,9 +76,12 @@ public class ModelBiped extends ModelBase {
 		this.bipedLeftLeg.setRotationPoint(1.9F, 12.0F + parFloat1, 0.0F);
 	}
 
-	/**+
-	 * Sets the models various rotation angles then renders the
-	 * model.
+	public void postRenderArm(float f) {
+		this.bipedRightArm.postRender(f);
+	}
+
+	/**
+	 * + Sets the models various rotation angles then renders the model.
 	 */
 	public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
 		this.setRotationAngles(f, f1, f2, f3, f4, f5, entity);
@@ -112,12 +118,33 @@ public class ModelBiped extends ModelBase {
 		GlStateManager.popMatrix();
 	}
 
-	/**+
-	 * Sets the model's various rotation angles. For bipeds, par1
-	 * and par2 are used for animating the movement of arms and
-	 * legs, where par1 represents the time(so that arms and legs
-	 * swing back and forth) and par2 represents how "far" arms and
-	 * legs can swing at most.
+	public void setInvisible(boolean invisible) {
+		this.bipedHead.showModel = invisible;
+		this.bipedHeadwear.showModel = invisible;
+		this.bipedBody.showModel = invisible;
+		this.bipedRightArm.showModel = invisible;
+		this.bipedLeftArm.showModel = invisible;
+		this.bipedRightLeg.showModel = invisible;
+		this.bipedLeftLeg.showModel = invisible;
+	}
+
+	public void setModelAttributes(ModelBase model) {
+		super.setModelAttributes(model);
+		if (model instanceof ModelBiped) {
+			ModelBiped modelbiped = (ModelBiped) model;
+			this.heldItemLeft = modelbiped.heldItemLeft;
+			this.heldItemRight = modelbiped.heldItemRight;
+			this.isSneak = modelbiped.isSneak;
+			this.aimedBow = modelbiped.aimedBow;
+		}
+
+	}
+
+	/**
+	 * + Sets the model's various rotation angles. For bipeds, par1 and par2 are
+	 * used for animating the movement of arms and legs, where par1 represents the
+	 * time(so that arms and legs swing back and forth) and par2 represents how
+	 * "far" arms and legs can swing at most.
 	 */
 	public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float var6, Entity var7) {
 		this.bipedHead.rotateAngleY = f3 / 57.295776F;
@@ -224,31 +251,5 @@ public class ModelBiped extends ModelBase {
 		}
 
 		copyModelAngles(this.bipedHead, this.bipedHeadwear);
-	}
-
-	public void setModelAttributes(ModelBase model) {
-		super.setModelAttributes(model);
-		if (model instanceof ModelBiped) {
-			ModelBiped modelbiped = (ModelBiped) model;
-			this.heldItemLeft = modelbiped.heldItemLeft;
-			this.heldItemRight = modelbiped.heldItemRight;
-			this.isSneak = modelbiped.isSneak;
-			this.aimedBow = modelbiped.aimedBow;
-		}
-
-	}
-
-	public void setInvisible(boolean invisible) {
-		this.bipedHead.showModel = invisible;
-		this.bipedHeadwear.showModel = invisible;
-		this.bipedBody.showModel = invisible;
-		this.bipedRightArm.showModel = invisible;
-		this.bipedLeftArm.showModel = invisible;
-		this.bipedRightLeg.showModel = invisible;
-		this.bipedLeftLeg.showModel = invisible;
-	}
-
-	public void postRenderArm(float f) {
-		this.bipedRightArm.postRender(f);
 	}
 }

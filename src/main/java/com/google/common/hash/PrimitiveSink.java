@@ -27,6 +27,11 @@ import com.google.common.annotations.Beta;
 @Beta
 public interface PrimitiveSink {
 	/**
+	 * Puts a boolean into this sink.
+	 */
+	PrimitiveSink putBoolean(boolean b);
+
+	/**
 	 * Puts a byte into this sink.
 	 *
 	 * @param b a byte
@@ -57,9 +62,19 @@ public interface PrimitiveSink {
 	PrimitiveSink putBytes(byte[] bytes, int off, int len);
 
 	/**
-	 * Puts a short into this sink.
+	 * Puts a character into this sink.
 	 */
-	PrimitiveSink putShort(short s);
+	PrimitiveSink putChar(char c);
+
+	/**
+	 * Puts a double into this sink.
+	 */
+	PrimitiveSink putDouble(double d);
+
+	/**
+	 * Puts a float into this sink.
+	 */
+	PrimitiveSink putFloat(float f);
 
 	/**
 	 * Puts an int into this sink.
@@ -72,24 +87,14 @@ public interface PrimitiveSink {
 	PrimitiveSink putLong(long l);
 
 	/**
-	 * Puts a float into this sink.
+	 * Puts a short into this sink.
 	 */
-	PrimitiveSink putFloat(float f);
+	PrimitiveSink putShort(short s);
 
 	/**
-	 * Puts a double into this sink.
+	 * Puts a string into this sink using the given charset.
 	 */
-	PrimitiveSink putDouble(double d);
-
-	/**
-	 * Puts a boolean into this sink.
-	 */
-	PrimitiveSink putBoolean(boolean b);
-
-	/**
-	 * Puts a character into this sink.
-	 */
-	PrimitiveSink putChar(char c);
+	PrimitiveSink putString(CharSequence charSequence, Charset charset);
 
 	/**
 	 * Puts each 16-bit code unit from the {@link CharSequence} into this sink.
@@ -97,9 +102,4 @@ public interface PrimitiveSink {
 	 * @since 15.0 (since 11.0 as putString(CharSequence))
 	 */
 	PrimitiveSink putUnencodedChars(CharSequence charSequence);
-
-	/**
-	 * Puts a string into this sink using the given charset.
-	 */
-	PrimitiveSink putString(CharSequence charSequence, Charset charset);
 }

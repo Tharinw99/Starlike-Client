@@ -26,6 +26,8 @@ import com.google.common.annotations.GwtCompatible;
 @GwtCompatible(serializable = true)
 final class PairwiseEquivalence<T> extends Equivalence<Iterable<T>> implements Serializable {
 
+	private static final long serialVersionUID = 1;
+
 	final Equivalence<? super T> elementEquivalence;
 
 	PairwiseEquivalence(Equivalence<? super T> elementEquivalence) {
@@ -74,6 +76,4 @@ final class PairwiseEquivalence<T> extends Equivalence<Iterable<T>> implements S
 	public String toString() {
 		return elementEquivalence + ".pairwise()";
 	}
-
-	private static final long serialVersionUID = 1;
 }

@@ -16,22 +16,25 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -45,23 +48,28 @@ public class BlockNote extends BlockContainer {
 		this.setCreativeTab(CreativeTabs.tabRedstone);
 	}
 
-	/**+
-	 * Called when a neighboring block changes.
+	/**
+	 * + Returns a new instance of a block's tile entity class. Called on placing
+	 * the block.
 	 */
-	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState var3, Block var4) {
-		boolean flag = world.isBlockPowered(blockpos);
-		TileEntity tileentity = world.getTileEntity(blockpos);
-		if (tileentity instanceof TileEntityNote) {
-			TileEntityNote tileentitynote = (TileEntityNote) tileentity;
-			if (tileentitynote.previousRedstoneState != flag) {
-				if (flag) {
-					tileentitynote.triggerNote(world, blockpos);
-				}
+	public TileEntity createNewTileEntity(World var1, int var2) {
+		return new TileEntityNote();
+	}
 
-				tileentitynote.previousRedstoneState = flag;
-			}
+	private String getInstrument(int id) {
+		if (id < 0 || id >= INSTRUMENTS.size()) {
+			id = 0;
 		}
 
+		return (String) INSTRUMENTS.get(id);
+	}
+
+	/**
+	 * + The type of render function called. 3 for standard block models, 2 for
+	 * TESR's, 1 for liquids, -1 is no render
+	 */
+	public int getRenderType() {
+		return 3;
 	}
 
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState var3, EntityPlayer entityplayer,
@@ -91,25 +99,8 @@ public class BlockNote extends BlockContainer {
 		}
 	}
 
-	/**+
-	 * Returns a new instance of a block's tile entity class. Called
-	 * on placing the block.
-	 */
-	public TileEntity createNewTileEntity(World var1, int var2) {
-		return new TileEntityNote();
-	}
-
-	private String getInstrument(int id) {
-		if (id < 0 || id >= INSTRUMENTS.size()) {
-			id = 0;
-		}
-
-		return (String) INSTRUMENTS.get(id);
-	}
-
-	/**+
-	 * Called on both Client and Server when World#addBlockEvent is
-	 * called
+	/**
+	 * + Called on both Client and Server when World#addBlockEvent is called
 	 */
 	public boolean onBlockEventReceived(World world, BlockPos blockpos, IBlockState var3, int i, int j) {
 		float f = (float) Math.pow(2.0D, (double) (j - 12) / 12.0D);
@@ -120,11 +111,22 @@ public class BlockNote extends BlockContainer {
 		return true;
 	}
 
-	/**+
-	 * The type of render function called. 3 for standard block
-	 * models, 2 for TESR's, 1 for liquids, -1 is no render
+	/**
+	 * + Called when a neighboring block changes.
 	 */
-	public int getRenderType() {
-		return 3;
+	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState var3, Block var4) {
+		boolean flag = world.isBlockPowered(blockpos);
+		TileEntity tileentity = world.getTileEntity(blockpos);
+		if (tileentity instanceof TileEntityNote) {
+			TileEntityNote tileentitynote = (TileEntityNote) tileentity;
+			if (tileentitynote.previousRedstoneState != flag) {
+				if (flag) {
+					tileentitynote.triggerNote(world, blockpos);
+				}
+
+				tileentitynote.previousRedstoneState = flag;
+			}
+		}
+
 	}
 }

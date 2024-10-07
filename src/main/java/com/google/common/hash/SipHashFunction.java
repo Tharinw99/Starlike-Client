@@ -35,60 +35,6 @@ import javax.annotation.Nullable;
  */
 final class SipHashFunction extends AbstractStreamingHashFunction implements Serializable {
 
-	// The number of compression rounds.
-	private final int c;
-	// The number of finalization rounds.
-	private final int d;
-	// Two 64-bit keys (represent a single 128-bit key).
-	private final long k0;
-	private final long k1;
-
-	/**
-	 * @param c  the number of compression rounds (must be positive)
-	 * @param d  the number of finalization rounds (must be positive)
-	 * @param k0 the first half of the key
-	 * @param k1 the second half of the key
-	 */
-	SipHashFunction(int c, int d, long k0, long k1) {
-		checkArgument(c > 0, "The number of SipRound iterations (c=%s) during Compression must be positive.", c);
-		checkArgument(d > 0, "The number of SipRound iterations (d=%s) during Finalization must be positive.", d);
-		this.c = c;
-		this.d = d;
-		this.k0 = k0;
-		this.k1 = k1;
-	}
-
-	@Override
-	public int bits() {
-		return 64;
-	}
-
-	@Override
-	public Hasher newHasher() {
-		return new SipHasher(c, d, k0, k1);
-	}
-
-	// TODO(user): Implement and benchmark the hashFoo() shortcuts.
-
-	@Override
-	public String toString() {
-		return "Hashing.sipHash" + c + "" + d + "(" + k0 + ", " + k1 + ")";
-	}
-
-	@Override
-	public boolean equals(@Nullable Object object) {
-		if (object instanceof SipHashFunction) {
-			SipHashFunction other = (SipHashFunction) object;
-			return (c == other.c) && (d == other.d) && (k0 == other.k0) && (k1 == other.k1);
-		}
-		return false;
-	}
-
-	@Override
-	public int hashCode() {
-		return (int) (getClass().hashCode() ^ c ^ d ^ k0 ^ k1);
-	}
-
 	private static final class SipHasher extends AbstractStreamingHasher {
 		private static final int CHUNK_SIZE = 8;
 
@@ -127,20 +73,6 @@ final class SipHashFunction extends AbstractStreamingHashFunction implements Ser
 		}
 
 		@Override
-		protected void process(ByteBuffer buffer) {
-			b += CHUNK_SIZE;
-			processM(buffer.getLong());
-		}
-
-		@Override
-		protected void processRemaining(ByteBuffer buffer) {
-			b += buffer.remaining();
-			for (int i = 0; buffer.hasRemaining(); i += 8) {
-				finalM ^= (buffer.get() & 0xFFL) << i;
-			}
-		}
-
-		@Override
 		public HashCode makeHash() {
 			// End with a byte encoding the positive integer b mod 256.
 			finalM ^= b << 56;
@@ -152,10 +84,24 @@ final class SipHashFunction extends AbstractStreamingHashFunction implements Ser
 			return HashCode.fromLong(v0 ^ v1 ^ v2 ^ v3);
 		}
 
+		@Override
+		protected void process(ByteBuffer buffer) {
+			b += CHUNK_SIZE;
+			processM(buffer.getLong());
+		}
+
 		private void processM(long m) {
 			v3 ^= m;
 			sipRound(c);
 			v0 ^= m;
+		}
+
+		@Override
+		protected void processRemaining(ByteBuffer buffer) {
+			b += buffer.remaining();
+			for (int i = 0; buffer.hasRemaining(); i += 8) {
+				finalM ^= (buffer.get() & 0xFFL) << i;
+			}
 		}
 
 		private void sipRound(int iterations) {
@@ -179,4 +125,59 @@ final class SipHashFunction extends AbstractStreamingHashFunction implements Ser
 	}
 
 	private static final long serialVersionUID = 0L;
+	// The number of compression rounds.
+	private final int c;
+	// The number of finalization rounds.
+	private final int d;
+
+	// Two 64-bit keys (represent a single 128-bit key).
+	private final long k0;
+
+	private final long k1;
+
+	/**
+	 * @param c  the number of compression rounds (must be positive)
+	 * @param d  the number of finalization rounds (must be positive)
+	 * @param k0 the first half of the key
+	 * @param k1 the second half of the key
+	 */
+	SipHashFunction(int c, int d, long k0, long k1) {
+		checkArgument(c > 0, "The number of SipRound iterations (c=%s) during Compression must be positive.", c);
+		checkArgument(d > 0, "The number of SipRound iterations (d=%s) during Finalization must be positive.", d);
+		this.c = c;
+		this.d = d;
+		this.k0 = k0;
+		this.k1 = k1;
+	}
+
+	// TODO(user): Implement and benchmark the hashFoo() shortcuts.
+
+	@Override
+	public int bits() {
+		return 64;
+	}
+
+	@Override
+	public boolean equals(@Nullable Object object) {
+		if (object instanceof SipHashFunction) {
+			SipHashFunction other = (SipHashFunction) object;
+			return (c == other.c) && (d == other.d) && (k0 == other.k0) && (k1 == other.k1);
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return (int) (getClass().hashCode() ^ c ^ d ^ k0 ^ k1);
+	}
+
+	@Override
+	public Hasher newHasher() {
+		return new SipHasher(c, d, k0, k1);
+	}
+
+	@Override
+	public String toString() {
+		return "Hashing.sipHash" + c + "" + d + "(" + k0 + ", " + k1 + ")";
+	}
 }

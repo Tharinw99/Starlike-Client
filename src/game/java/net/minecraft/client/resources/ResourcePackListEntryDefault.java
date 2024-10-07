@@ -13,22 +13,25 @@ import net.minecraft.client.resources.data.PackMetadataSection;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -53,8 +56,20 @@ public class ResourcePackListEntryDefault extends ResourcePackListEntry {
 				dynamictexture);
 	}
 
-	protected int func_183019_a() {
-		return 1;
+	protected boolean func_148307_h() {
+		return false;
+	}
+
+	protected boolean func_148308_f() {
+		return false;
+	}
+
+	protected boolean func_148309_e() {
+		return false;
+	}
+
+	protected boolean func_148310_d() {
+		return false;
 	}
 
 	protected String func_148311_a() {
@@ -73,22 +88,6 @@ public class ResourcePackListEntryDefault extends ResourcePackListEntry {
 		return EnumChatFormatting.RED + "Missing " + "pack.mcmeta" + " :(";
 	}
 
-	protected boolean func_148309_e() {
-		return false;
-	}
-
-	protected boolean func_148308_f() {
-		return false;
-	}
-
-	protected boolean func_148314_g() {
-		return false;
-	}
-
-	protected boolean func_148307_h() {
-		return false;
-	}
-
 	protected String func_148312_b() {
 		return "Default";
 	}
@@ -97,8 +96,12 @@ public class ResourcePackListEntryDefault extends ResourcePackListEntry {
 		this.mc.getTextureManager().bindTexture(this.resourcePackIcon);
 	}
 
-	protected boolean func_148310_d() {
+	protected boolean func_148314_g() {
 		return false;
+	}
+
+	protected int func_183019_a() {
+		return 1;
 	}
 
 	@Override

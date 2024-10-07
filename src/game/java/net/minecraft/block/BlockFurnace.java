@@ -1,7 +1,6 @@
 package net.minecraft.block;
 
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
-
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyDirection;
@@ -22,30 +21,58 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class BlockFurnace extends BlockContainer {
 	public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
-	private final boolean isBurning;
 	private static boolean keepInventory;
+
+	public static void setState(boolean active, World worldIn, BlockPos pos) {
+		IBlockState iblockstate = worldIn.getBlockState(pos);
+		TileEntity tileentity = worldIn.getTileEntity(pos);
+		keepInventory = true;
+		if (active) {
+			worldIn.setBlockState(pos,
+					Blocks.lit_furnace.getDefaultState().withProperty(FACING, iblockstate.getValue(FACING)), 3);
+			worldIn.setBlockState(pos,
+					Blocks.lit_furnace.getDefaultState().withProperty(FACING, iblockstate.getValue(FACING)), 3);
+		} else {
+			worldIn.setBlockState(pos,
+					Blocks.furnace.getDefaultState().withProperty(FACING, iblockstate.getValue(FACING)), 3);
+			worldIn.setBlockState(pos,
+					Blocks.furnace.getDefaultState().withProperty(FACING, iblockstate.getValue(FACING)), 3);
+		}
+
+		keepInventory = false;
+		if (tileentity != null) {
+			tileentity.validate();
+			worldIn.setTileEntity(pos, tileentity);
+		}
+
+	}
+
+	private final boolean isBurning;
 
 	protected BlockFurnace(boolean isBurning) {
 		super(Material.rock);
@@ -53,36 +80,127 @@ public class BlockFurnace extends BlockContainer {
 		this.isBurning = isBurning;
 	}
 
-	/**+
-	 * Get the Item that this Block should drop when harvested.
+	public void breakBlock(World world, BlockPos blockpos, IBlockState iblockstate) {
+		if (!keepInventory) {
+			TileEntity tileentity = world.getTileEntity(blockpos);
+			if (tileentity instanceof TileEntityFurnace) {
+				InventoryHelper.dropInventoryItems(world, blockpos, (TileEntityFurnace) tileentity);
+				world.updateComparatorOutputLevel(blockpos, this);
+			}
+		}
+
+		super.breakBlock(world, blockpos, iblockstate);
+	}
+
+	protected BlockState createBlockState() {
+		return new BlockState(this, new IProperty[] { FACING });
+	}
+
+	/**
+	 * + Returns a new instance of a block's tile entity class. Called on placing
+	 * the block.
+	 */
+	public TileEntity createNewTileEntity(World var1, int var2) {
+		return new TileEntityFurnace();
+	}
+
+	public int getComparatorInputOverride(World world, BlockPos blockpos) {
+		return Container.calcRedstone(world.getTileEntity(blockpos));
+	}
+
+	public Item getItem(World var1, BlockPos var2) {
+		return Item.getItemFromBlock(Blocks.furnace);
+	}
+
+	/**
+	 * + Get the Item that this Block should drop when harvested.
 	 */
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
 		return Item.getItemFromBlock(Blocks.furnace);
+	}
+
+	/**
+	 * + Convert the BlockState into the correct metadata value
+	 */
+	public int getMetaFromState(IBlockState iblockstate) {
+		return ((EnumFacing) iblockstate.getValue(FACING)).getIndex();
+	}
+
+	/**
+	 * + The type of render function called. 3 for standard block models, 2 for
+	 * TESR's, 1 for liquids, -1 is no render
+	 */
+	public int getRenderType() {
+		return 3;
+	}
+
+	/**
+	 * + Possibly modify the given BlockState before rendering it on an Entity
+	 * (Minecarts, Endermen, ...)
+	 */
+	public IBlockState getStateForEntityRender(IBlockState var1) {
+		return this.getDefaultState().withProperty(FACING, EnumFacing.SOUTH);
+	}
+
+	/**
+	 * + Convert the given metadata into a BlockState for this Block
+	 */
+	public IBlockState getStateFromMeta(int i) {
+		EnumFacing enumfacing = EnumFacing.getFront(i);
+		if (enumfacing.getAxis() == EnumFacing.Axis.Y) {
+			enumfacing = EnumFacing.NORTH;
+		}
+
+		return this.getDefaultState().withProperty(FACING, enumfacing);
+	}
+
+	public boolean hasComparatorInputOverride() {
+		return true;
+	}
+
+	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState var3, EntityPlayer entityplayer,
+			EnumFacing var5, float var6, float var7, float var8) {
+		if (world.isRemote) {
+			return true;
+		} else {
+			TileEntity tileentity = world.getTileEntity(blockpos);
+			if (tileentity instanceof TileEntityFurnace) {
+				entityplayer.displayGUIChest((TileEntityFurnace) tileentity);
+				entityplayer.triggerAchievement(StatList.field_181741_Y);
+			}
+
+			return true;
+		}
 	}
 
 	public void onBlockAdded(World world, BlockPos blockpos, IBlockState iblockstate) {
 		this.setDefaultFacing(world, blockpos, iblockstate);
 	}
 
-	private void setDefaultFacing(World worldIn, BlockPos pos, IBlockState state) {
-		if (!worldIn.isRemote) {
-			Block block = worldIn.getBlockState(pos.north()).getBlock();
-			Block block1 = worldIn.getBlockState(pos.south()).getBlock();
-			Block block2 = worldIn.getBlockState(pos.west()).getBlock();
-			Block block3 = worldIn.getBlockState(pos.east()).getBlock();
-			EnumFacing enumfacing = (EnumFacing) state.getValue(FACING);
-			if (enumfacing == EnumFacing.NORTH && block.isFullBlock() && !block1.isFullBlock()) {
-				enumfacing = EnumFacing.SOUTH;
-			} else if (enumfacing == EnumFacing.SOUTH && block1.isFullBlock() && !block.isFullBlock()) {
-				enumfacing = EnumFacing.NORTH;
-			} else if (enumfacing == EnumFacing.WEST && block2.isFullBlock() && !block3.isFullBlock()) {
-				enumfacing = EnumFacing.EAST;
-			} else if (enumfacing == EnumFacing.EAST && block3.isFullBlock() && !block2.isFullBlock()) {
-				enumfacing = EnumFacing.WEST;
-			}
+	/**
+	 * + Called by ItemBlocks just before a block is actually set in the world, to
+	 * allow for adjustments to the IBlockstate
+	 */
+	public IBlockState onBlockPlaced(World var1, BlockPos var2, EnumFacing var3, float var4, float var5, float var6,
+			int var7, EntityLivingBase entitylivingbase) {
+		return this.getDefaultState().withProperty(FACING, entitylivingbase.getHorizontalFacing().getOpposite());
+	}
 
-			worldIn.setBlockState(pos, state.withProperty(FACING, enumfacing), 2);
+	/**
+	 * + Called by ItemBlocks after a block is set in the world, to allow post-place
+	 * logic
+	 */
+	public void onBlockPlacedBy(World world, BlockPos blockpos, IBlockState iblockstate,
+			EntityLivingBase entitylivingbase, ItemStack itemstack) {
+		world.setBlockState(blockpos,
+				iblockstate.withProperty(FACING, entitylivingbase.getHorizontalFacing().getOpposite()), 2);
+		if (itemstack.hasDisplayName()) {
+			TileEntity tileentity = world.getTileEntity(blockpos);
+			if (tileentity instanceof TileEntityFurnace) {
+				((TileEntityFurnace) tileentity).setCustomInventoryName(itemstack.getDisplayName());
+			}
 		}
+
 	}
 
 	public void randomDisplayTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom random) {
@@ -114,139 +232,24 @@ public class BlockFurnace extends BlockContainer {
 		}
 	}
 
-	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState var3, EntityPlayer entityplayer,
-			EnumFacing var5, float var6, float var7, float var8) {
-		if (world.isRemote) {
-			return true;
-		} else {
-			TileEntity tileentity = world.getTileEntity(blockpos);
-			if (tileentity instanceof TileEntityFurnace) {
-				entityplayer.displayGUIChest((TileEntityFurnace) tileentity);
-				entityplayer.triggerAchievement(StatList.field_181741_Y);
+	private void setDefaultFacing(World worldIn, BlockPos pos, IBlockState state) {
+		if (!worldIn.isRemote) {
+			Block block = worldIn.getBlockState(pos.north()).getBlock();
+			Block block1 = worldIn.getBlockState(pos.south()).getBlock();
+			Block block2 = worldIn.getBlockState(pos.west()).getBlock();
+			Block block3 = worldIn.getBlockState(pos.east()).getBlock();
+			EnumFacing enumfacing = (EnumFacing) state.getValue(FACING);
+			if (enumfacing == EnumFacing.NORTH && block.isFullBlock() && !block1.isFullBlock()) {
+				enumfacing = EnumFacing.SOUTH;
+			} else if (enumfacing == EnumFacing.SOUTH && block1.isFullBlock() && !block.isFullBlock()) {
+				enumfacing = EnumFacing.NORTH;
+			} else if (enumfacing == EnumFacing.WEST && block2.isFullBlock() && !block3.isFullBlock()) {
+				enumfacing = EnumFacing.EAST;
+			} else if (enumfacing == EnumFacing.EAST && block3.isFullBlock() && !block2.isFullBlock()) {
+				enumfacing = EnumFacing.WEST;
 			}
 
-			return true;
+			worldIn.setBlockState(pos, state.withProperty(FACING, enumfacing), 2);
 		}
-	}
-
-	public static void setState(boolean active, World worldIn, BlockPos pos) {
-		IBlockState iblockstate = worldIn.getBlockState(pos);
-		TileEntity tileentity = worldIn.getTileEntity(pos);
-		keepInventory = true;
-		if (active) {
-			worldIn.setBlockState(pos,
-					Blocks.lit_furnace.getDefaultState().withProperty(FACING, iblockstate.getValue(FACING)), 3);
-			worldIn.setBlockState(pos,
-					Blocks.lit_furnace.getDefaultState().withProperty(FACING, iblockstate.getValue(FACING)), 3);
-		} else {
-			worldIn.setBlockState(pos,
-					Blocks.furnace.getDefaultState().withProperty(FACING, iblockstate.getValue(FACING)), 3);
-			worldIn.setBlockState(pos,
-					Blocks.furnace.getDefaultState().withProperty(FACING, iblockstate.getValue(FACING)), 3);
-		}
-
-		keepInventory = false;
-		if (tileentity != null) {
-			tileentity.validate();
-			worldIn.setTileEntity(pos, tileentity);
-		}
-
-	}
-
-	/**+
-	 * Returns a new instance of a block's tile entity class. Called
-	 * on placing the block.
-	 */
-	public TileEntity createNewTileEntity(World var1, int var2) {
-		return new TileEntityFurnace();
-	}
-
-	/**+
-	 * Called by ItemBlocks just before a block is actually set in
-	 * the world, to allow for adjustments to the IBlockstate
-	 */
-	public IBlockState onBlockPlaced(World var1, BlockPos var2, EnumFacing var3, float var4, float var5, float var6,
-			int var7, EntityLivingBase entitylivingbase) {
-		return this.getDefaultState().withProperty(FACING, entitylivingbase.getHorizontalFacing().getOpposite());
-	}
-
-	/**+
-	 * Called by ItemBlocks after a block is set in the world, to
-	 * allow post-place logic
-	 */
-	public void onBlockPlacedBy(World world, BlockPos blockpos, IBlockState iblockstate,
-			EntityLivingBase entitylivingbase, ItemStack itemstack) {
-		world.setBlockState(blockpos,
-				iblockstate.withProperty(FACING, entitylivingbase.getHorizontalFacing().getOpposite()), 2);
-		if (itemstack.hasDisplayName()) {
-			TileEntity tileentity = world.getTileEntity(blockpos);
-			if (tileentity instanceof TileEntityFurnace) {
-				((TileEntityFurnace) tileentity).setCustomInventoryName(itemstack.getDisplayName());
-			}
-		}
-
-	}
-
-	public void breakBlock(World world, BlockPos blockpos, IBlockState iblockstate) {
-		if (!keepInventory) {
-			TileEntity tileentity = world.getTileEntity(blockpos);
-			if (tileentity instanceof TileEntityFurnace) {
-				InventoryHelper.dropInventoryItems(world, blockpos, (TileEntityFurnace) tileentity);
-				world.updateComparatorOutputLevel(blockpos, this);
-			}
-		}
-
-		super.breakBlock(world, blockpos, iblockstate);
-	}
-
-	public boolean hasComparatorInputOverride() {
-		return true;
-	}
-
-	public int getComparatorInputOverride(World world, BlockPos blockpos) {
-		return Container.calcRedstone(world.getTileEntity(blockpos));
-	}
-
-	public Item getItem(World var1, BlockPos var2) {
-		return Item.getItemFromBlock(Blocks.furnace);
-	}
-
-	/**+
-	 * The type of render function called. 3 for standard block
-	 * models, 2 for TESR's, 1 for liquids, -1 is no render
-	 */
-	public int getRenderType() {
-		return 3;
-	}
-
-	/**+
-	 * Possibly modify the given BlockState before rendering it on
-	 * an Entity (Minecarts, Endermen, ...)
-	 */
-	public IBlockState getStateForEntityRender(IBlockState var1) {
-		return this.getDefaultState().withProperty(FACING, EnumFacing.SOUTH);
-	}
-
-	/**+
-	 * Convert the given metadata into a BlockState for this Block
-	 */
-	public IBlockState getStateFromMeta(int i) {
-		EnumFacing enumfacing = EnumFacing.getFront(i);
-		if (enumfacing.getAxis() == EnumFacing.Axis.Y) {
-			enumfacing = EnumFacing.NORTH;
-		}
-
-		return this.getDefaultState().withProperty(FACING, enumfacing);
-	}
-
-	/**+
-	 * Convert the BlockState into the correct metadata value
-	 */
-	public int getMetaFromState(IBlockState iblockstate) {
-		return ((EnumFacing) iblockstate.getValue(FACING)).getIndex();
-	}
-
-	protected BlockState createBlockState() {
-		return new BlockState(this, new IProperty[] { FACING });
 	}
 }

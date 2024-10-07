@@ -62,7 +62,7 @@ import org.apache.commons.lang3.function.FailableBooleanSupplier;
  *
  * <pre>
  * {@code
- *   Functions.accept((m) -> m.invoke(o,args));
+ * Functions.accept((m) -> m.invoke(o, args));
  * }
  * </pre>
  *

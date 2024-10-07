@@ -34,6 +34,9 @@ import com.google.common.annotations.GwtIncompatible;
 @GwtCompatible(serializable = true, emulated = true)
 public final class HashMultiset<E> extends AbstractMapBasedMultiset<E> {
 
+	@GwtIncompatible("Not needed in emulated source.")
+	private static final long serialVersionUID = 0;
+
 	/**
 	 * Creates a new, empty {@code HashMultiset} using the default initial capacity.
 	 */
@@ -75,6 +78,14 @@ public final class HashMultiset<E> extends AbstractMapBasedMultiset<E> {
 		super(Maps.<E, Count>newHashMapWithExpectedSize(distinctElements));
 	}
 
+	@GwtIncompatible("java.io.ObjectInputStream")
+	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+		stream.defaultReadObject();
+		int distinctElements = Serialization.readCount(stream);
+		setBackingMap(Maps.<E, Count>newHashMapWithExpectedSize(distinctElements));
+		Serialization.populateMultiset(this, stream, distinctElements);
+	}
+
 	/**
 	 * @serialData the number of distinct elements, the first element, its count,
 	 *             the second element, its count, and so on
@@ -84,15 +95,4 @@ public final class HashMultiset<E> extends AbstractMapBasedMultiset<E> {
 		stream.defaultWriteObject();
 		Serialization.writeMultiset(this, stream);
 	}
-
-	@GwtIncompatible("java.io.ObjectInputStream")
-	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
-		stream.defaultReadObject();
-		int distinctElements = Serialization.readCount(stream);
-		setBackingMap(Maps.<E, Count>newHashMapWithExpectedSize(distinctElements));
-		Serialization.populateMultiset(this, stream, distinctElements);
-	}
-
-	@GwtIncompatible("Not needed in emulated source.")
-	private static final long serialVersionUID = 0;
 }

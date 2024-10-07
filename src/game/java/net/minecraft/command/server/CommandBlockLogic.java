@@ -1,10 +1,10 @@
 package net.minecraft.command.server;
 
-import net.lax1dude.eaglercraft.v1_8.netty.ByteBuf;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.Callable;
+
+import net.lax1dude.eaglercraft.v1_8.netty.ByteBuf;
 import net.minecraft.command.CommandResultStats;
 import net.minecraft.command.ICommandManager;
 import net.minecraft.command.ICommandSender;
@@ -18,78 +18,117 @@ import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ReportedException;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public abstract class CommandBlockLogic implements ICommandSender {
-	/**+
-	 * The formatting for the timestamp on commands run.
+	/**
+	 * + The formatting for the timestamp on commands run.
 	 */
 	private static final SimpleDateFormat timestampFormat = new SimpleDateFormat("HH:mm:ss");
 	private int successCount;
 	private boolean trackOutput = true;
-	/**+
-	 * The previously run command.
+	/**
+	 * + The previously run command.
 	 */
 	private IChatComponent lastOutput = null;
-	/**+
-	 * The command stored in the command block.
+	/**
+	 * + The command stored in the command block.
 	 */
 	private String commandStored = "";
-	/**+
-	 * The custom name of the command block. (defaults to "@")
+	/**
+	 * + The custom name of the command block. (defaults to "@")
 	 */
 	private String customName = "@";
 	private final CommandResultStats resultStats = new CommandResultStats();
 
-	/**+
-	 * returns the successCount int.
+	/**
+	 * + Send a chat message to the CommandSender
 	 */
-	public int getSuccessCount() {
-		return this.successCount;
+	public void addChatMessage(IChatComponent ichatcomponent) {
+		if (this.trackOutput && this.getEntityWorld() != null && !this.getEntityWorld().isRemote) {
+			this.lastOutput = (new ChatComponentText("[" + timestampFormat.format(new Date()) + "] "))
+					.appendSibling(ichatcomponent);
+			this.updateCommand();
+		}
+
 	}
 
-	/**+
-	 * Returns the lastOutput.
+	/**
+	 * + Returns {@code true} if the CommandSender is allowed to execute the
+	 * command, {@code false} if not
+	 */
+	public boolean canCommandSenderUseCommand(int i, String var2) {
+		return i <= 2;
+	}
+
+	public abstract int func_145751_f();
+
+	public abstract void func_145757_a(ByteBuf var1);
+
+	/**
+	 * + Returns the command of the command block.
+	 */
+	public String getCommand() {
+		return this.commandStored;
+	}
+
+	public CommandResultStats getCommandResultStats() {
+		return this.resultStats;
+	}
+
+	/**
+	 * + Get the formatted ChatComponent that will be used for the sender's username
+	 * in chat
+	 */
+	public IChatComponent getDisplayName() {
+		return new ChatComponentText(this.getName());
+	}
+
+	/**
+	 * + Returns the lastOutput.
 	 */
 	public IChatComponent getLastOutput() {
 		return this.lastOutput;
 	}
 
-	/**+
-	 * Stores data to NBT format.
+	/**
+	 * + Gets the name of this command sender (usually username, but possibly
+	 * "Rcon")
 	 */
-	public void writeDataToNBT(NBTTagCompound tagCompound) {
-		tagCompound.setString("Command", this.commandStored);
-		tagCompound.setInteger("SuccessCount", this.successCount);
-		tagCompound.setString("CustomName", this.customName);
-		tagCompound.setBoolean("TrackOutput", this.trackOutput);
-		if (this.lastOutput != null && this.trackOutput) {
-			tagCompound.setString("LastOutput", IChatComponent.Serializer.componentToJson(this.lastOutput));
-		}
-
-		this.resultStats.writeStatsToNBT(tagCompound);
+	public String getName() {
+		return this.customName;
 	}
 
-	/**+
-	 * Reads NBT formatting and stored data into variables.
+	/**
+	 * + returns the successCount int.
+	 */
+	public int getSuccessCount() {
+		return this.successCount;
+	}
+
+	/**
+	 * + Reads NBT formatting and stored data into variables.
 	 */
 	public void readDataFromNBT(NBTTagCompound nbt) {
 		this.commandStored = nbt.getString("Command");
@@ -109,27 +148,42 @@ public abstract class CommandBlockLogic implements ICommandSender {
 		this.resultStats.readStatsFromNBT(nbt);
 	}
 
-	/**+
-	 * Returns {@code true} if the CommandSender is allowed to
-	 * execute the command, {@code false} if not
+	/**
+	 * + Returns true if the command sender should be sent feedback about executed
+	 * commands
 	 */
-	public boolean canCommandSenderUseCommand(int i, String var2) {
-		return i <= 2;
+	public boolean sendCommandFeedback() {
+		MinecraftServer minecraftserver = MinecraftServer.getServer();
+		return minecraftserver == null
+				|| minecraftserver.worldServers[0].getGameRules().getBoolean("commandBlockOutput");
 	}
 
-	/**+
-	 * Sets the command.
+	/**
+	 * + Sets the command.
 	 */
 	public void setCommand(String command) {
 		this.commandStored = command;
 		this.successCount = 0;
 	}
 
-	/**+
-	 * Returns the command of the command block.
-	 */
-	public String getCommand() {
-		return this.commandStored;
+	public void setCommandStat(CommandResultStats.Type commandresultstats$type, int i) {
+		this.resultStats.func_179672_a(this, commandresultstats$type, i);
+	}
+
+	public void setLastOutput(IChatComponent lastOutputMessage) {
+		this.lastOutput = lastOutputMessage;
+	}
+
+	public void setName(String parString1) {
+		this.customName = parString1;
+	}
+
+	public void setTrackOutput(boolean shouldTrackOutput) {
+		this.trackOutput = shouldTrackOutput;
+	}
+
+	public boolean shouldTrackOutput() {
+		return this.trackOutput;
 	}
 
 	public void trigger(World worldIn) {
@@ -165,70 +219,6 @@ public abstract class CommandBlockLogic implements ICommandSender {
 
 	}
 
-	/**+
-	 * Gets the name of this command sender (usually username, but
-	 * possibly "Rcon")
-	 */
-	public String getName() {
-		return this.customName;
-	}
-
-	/**+
-	 * Get the formatted ChatComponent that will be used for the
-	 * sender's username in chat
-	 */
-	public IChatComponent getDisplayName() {
-		return new ChatComponentText(this.getName());
-	}
-
-	public void setName(String parString1) {
-		this.customName = parString1;
-	}
-
-	/**+
-	 * Send a chat message to the CommandSender
-	 */
-	public void addChatMessage(IChatComponent ichatcomponent) {
-		if (this.trackOutput && this.getEntityWorld() != null && !this.getEntityWorld().isRemote) {
-			this.lastOutput = (new ChatComponentText("[" + timestampFormat.format(new Date()) + "] "))
-					.appendSibling(ichatcomponent);
-			this.updateCommand();
-		}
-
-	}
-
-	/**+
-	 * Returns true if the command sender should be sent feedback
-	 * about executed commands
-	 */
-	public boolean sendCommandFeedback() {
-		MinecraftServer minecraftserver = MinecraftServer.getServer();
-		return minecraftserver == null
-				|| minecraftserver.worldServers[0].getGameRules().getBoolean("commandBlockOutput");
-	}
-
-	public void setCommandStat(CommandResultStats.Type commandresultstats$type, int i) {
-		this.resultStats.func_179672_a(this, commandresultstats$type, i);
-	}
-
-	public abstract void updateCommand();
-
-	public abstract int func_145751_f();
-
-	public abstract void func_145757_a(ByteBuf var1);
-
-	public void setLastOutput(IChatComponent lastOutputMessage) {
-		this.lastOutput = lastOutputMessage;
-	}
-
-	public void setTrackOutput(boolean shouldTrackOutput) {
-		this.trackOutput = shouldTrackOutput;
-	}
-
-	public boolean shouldTrackOutput() {
-		return this.trackOutput;
-	}
-
 	public boolean tryOpenEditCommandBlock(EntityPlayer playerIn) {
 		if (!playerIn.capabilities.isCreativeMode) {
 			return false;
@@ -241,7 +231,20 @@ public abstract class CommandBlockLogic implements ICommandSender {
 		}
 	}
 
-	public CommandResultStats getCommandResultStats() {
-		return this.resultStats;
+	public abstract void updateCommand();
+
+	/**
+	 * + Stores data to NBT format.
+	 */
+	public void writeDataToNBT(NBTTagCompound tagCompound) {
+		tagCompound.setString("Command", this.commandStored);
+		tagCompound.setInteger("SuccessCount", this.successCount);
+		tagCompound.setString("CustomName", this.customName);
+		tagCompound.setBoolean("TrackOutput", this.trackOutput);
+		if (this.lastOutput != null && this.trackOutput) {
+			tagCompound.setString("LastOutput", IChatComponent.Serializer.componentToJson(this.lastOutput));
+		}
+
+		this.resultStats.writeStatsToNBT(tagCompound);
 	}
 }

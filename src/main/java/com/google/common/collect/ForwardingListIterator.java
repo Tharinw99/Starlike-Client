@@ -38,12 +38,12 @@ public abstract class ForwardingListIterator<E> extends ForwardingIterator<E> im
 	}
 
 	@Override
-	protected abstract ListIterator<E> delegate();
-
-	@Override
 	public void add(E element) {
 		delegate().add(element);
 	}
+
+	@Override
+	protected abstract ListIterator<E> delegate();
 
 	@Override
 	public boolean hasPrevious() {

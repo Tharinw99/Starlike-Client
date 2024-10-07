@@ -49,11 +49,10 @@ import com.google.common.escape.Escapers;
 @Beta
 @GwtCompatible
 public class XmlEscapers {
-	private XmlEscapers() {
-	}
-
 	private static final char MIN_ASCII_CONTROL_CHAR = 0x00;
+
 	private static final char MAX_ASCII_CONTROL_CHAR = 0x1F;
+	private static final Escaper XML_ESCAPER;
 
 	// For each xxxEscaper() method, please add links to external reference pages
 	// that are considered authoritative for the behavior of that escaper.
@@ -65,60 +64,10 @@ public class XmlEscapers {
 	// <a href="http://www.w3.org/TR/2008/REC-xml-20081126/#charsets">2.2</a> of
 	// the XML specification.
 
-	/**
-	 * Returns an {@link Escaper} instance that escapes special characters in a
-	 * string so it can safely be included in an XML document as element content.
-	 * See section
-	 * <a href="http://www.w3.org/TR/2008/REC-xml-20081126/#syntax">2.4</a> of the
-	 * XML specification.
-	 *
-	 * <p>
-	 * <b>Note</b>: Double and single quotes are not escaped, so it is <b>not
-	 * safe</b> to use this escaper to escape attribute values. Use
-	 * {@link #xmlContentEscaper} if the output can appear in element content or
-	 * {@link #xmlAttributeEscaper} in attribute values.
-	 *
-	 * <p>
-	 * This escaper does not escape non-ASCII characters to their numeric character
-	 * references (NCR). Any non-ASCII characters appearing in the input will be
-	 * preserved in the output. Specifically "\r" (carriage return) is preserved in
-	 * the output, which may result in it being silently converted to "\n" when the
-	 * XML is parsed.
-	 *
-	 * <p>
-	 * This escaper does not treat surrogate pairs specially and does not perform
-	 * Unicode validation on its input.
-	 */
-	public static Escaper xmlContentEscaper() {
-		return XML_CONTENT_ESCAPER;
-	}
-
-	/**
-	 * Returns an {@link Escaper} instance that escapes special characters in a
-	 * string so it can safely be included in XML document as an attribute value.
-	 * See section
-	 * <a href="http://www.w3.org/TR/2008/REC-xml-20081126/#AVNormalize">3.3.3</a>
-	 * of the XML specification.
-	 *
-	 * <p>
-	 * This escaper does not escape non-ASCII characters to their numeric character
-	 * references (NCR). However, horizontal tab {@code '\t'}, line feed
-	 * {@code '\n'} and carriage return {@code '\r'} are escaped to a corresponding
-	 * NCR {@code "&#x9;"}, {@code "&#xA;"}, and {@code "&#xD;"} respectively. Any
-	 * other non-ASCII characters appearing in the input will be preserved in the
-	 * output.
-	 *
-	 * <p>
-	 * This escaper does not treat surrogate pairs specially and does not perform
-	 * Unicode validation on its input.
-	 */
-	public static Escaper xmlAttributeEscaper() {
-		return XML_ATTRIBUTE_ESCAPER;
-	}
-
-	private static final Escaper XML_ESCAPER;
 	private static final Escaper XML_CONTENT_ESCAPER;
+
 	private static final Escaper XML_ATTRIBUTE_ESCAPER;
+
 	static {
 		Escapers.Builder builder = Escapers.builder();
 		// The char values \uFFFE and \uFFFF are explicitly not allowed in XML
@@ -153,5 +102,59 @@ public class XmlEscapers {
 		builder.addEscape('\n', "&#xA;");
 		builder.addEscape('\r', "&#xD;");
 		XML_ATTRIBUTE_ESCAPER = builder.build();
+	}
+
+	/**
+	 * Returns an {@link Escaper} instance that escapes special characters in a
+	 * string so it can safely be included in XML document as an attribute value.
+	 * See section
+	 * <a href="http://www.w3.org/TR/2008/REC-xml-20081126/#AVNormalize">3.3.3</a>
+	 * of the XML specification.
+	 *
+	 * <p>
+	 * This escaper does not escape non-ASCII characters to their numeric character
+	 * references (NCR). However, horizontal tab {@code '\t'}, line feed
+	 * {@code '\n'} and carriage return {@code '\r'} are escaped to a corresponding
+	 * NCR {@code "&#x9;"}, {@code "&#xA;"}, and {@code "&#xD;"} respectively. Any
+	 * other non-ASCII characters appearing in the input will be preserved in the
+	 * output.
+	 *
+	 * <p>
+	 * This escaper does not treat surrogate pairs specially and does not perform
+	 * Unicode validation on its input.
+	 */
+	public static Escaper xmlAttributeEscaper() {
+		return XML_ATTRIBUTE_ESCAPER;
+	}
+
+	/**
+	 * Returns an {@link Escaper} instance that escapes special characters in a
+	 * string so it can safely be included in an XML document as element content.
+	 * See section
+	 * <a href="http://www.w3.org/TR/2008/REC-xml-20081126/#syntax">2.4</a> of the
+	 * XML specification.
+	 *
+	 * <p>
+	 * <b>Note</b>: Double and single quotes are not escaped, so it is <b>not
+	 * safe</b> to use this escaper to escape attribute values. Use
+	 * {@link #xmlContentEscaper} if the output can appear in element content or
+	 * {@link #xmlAttributeEscaper} in attribute values.
+	 *
+	 * <p>
+	 * This escaper does not escape non-ASCII characters to their numeric character
+	 * references (NCR). Any non-ASCII characters appearing in the input will be
+	 * preserved in the output. Specifically "\r" (carriage return) is preserved in
+	 * the output, which may result in it being silently converted to "\n" when the
+	 * XML is parsed.
+	 *
+	 * <p>
+	 * This escaper does not treat surrogate pairs specially and does not perform
+	 * Unicode validation on its input.
+	 */
+	public static Escaper xmlContentEscaper() {
+		return XML_CONTENT_ESCAPER;
+	}
+
+	private XmlEscapers() {
 	}
 }

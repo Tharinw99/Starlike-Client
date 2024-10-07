@@ -52,10 +52,15 @@ public class ByteBufOutputStream extends OutputStream implements DataOutput {
 	}
 
 	/**
-	 * Returns the number of written bytes by this stream so far.
+	 * Returns the buffer where this stream is writing data.
 	 */
-	public int writtenBytes() {
-		return buffer.writerIndex() - startIndex;
+	public ByteBuf buffer() {
+		return buffer;
+	}
+
+	@Override
+	public void write(byte[] b) throws IOException {
+		buffer.writeBytes(b);
 	}
 
 	@Override
@@ -65,11 +70,6 @@ public class ByteBufOutputStream extends OutputStream implements DataOutput {
 		}
 
 		buffer.writeBytes(b, off, len);
-	}
-
-	@Override
-	public void write(byte[] b) throws IOException {
-		buffer.writeBytes(b);
 	}
 
 	@Override
@@ -136,9 +136,9 @@ public class ByteBufOutputStream extends OutputStream implements DataOutput {
 	}
 
 	/**
-	 * Returns the buffer where this stream is writing data.
+	 * Returns the number of written bytes by this stream so far.
 	 */
-	public ByteBuf buffer() {
-		return buffer;
+	public int writtenBytes() {
+		return buffer.writerIndex() - startIndex;
 	}
 }

@@ -36,14 +36,6 @@ public final class ImmutableClassToInstanceMap<B> extends ForwardingMap<Class<? 
 		implements ClassToInstanceMap<B>, Serializable {
 
 	/**
-	 * Returns a new builder. The generated builder is equivalent to the builder
-	 * created by the {@link Builder} constructor.
-	 */
-	public static <B> Builder<B> builder() {
-		return new Builder<B>();
-	}
-
-	/**
 	 * A builder for creating immutable class-to-instance maps. Example:
 	 * 
 	 * <pre>
@@ -64,7 +56,21 @@ public final class ImmutableClassToInstanceMap<B> extends ForwardingMap<Class<? 
 	 * @since 2.0 (imported from Google Collections Library)
 	 */
 	public static final class Builder<B> {
+		private static <B, T extends B> T cast(Class<T> type, B value) {
+			return Primitives.wrap(type).cast(value);
+		}
+
 		private final ImmutableMap.Builder<Class<? extends B>, B> mapBuilder = ImmutableMap.builder();
+
+		/**
+		 * Returns a new immutable class-to-instance map containing the entries provided
+		 * to this builder.
+		 *
+		 * @throws IllegalArgumentException if duplicate keys were added
+		 */
+		public ImmutableClassToInstanceMap<B> build() {
+			return new ImmutableClassToInstanceMap<B>(mapBuilder.build());
+		}
 
 		/**
 		 * Associates {@code key} with {@code value} in the built map. Duplicate keys
@@ -91,20 +97,14 @@ public final class ImmutableClassToInstanceMap<B> extends ForwardingMap<Class<? 
 			}
 			return this;
 		}
+	}
 
-		private static <B, T extends B> T cast(Class<T> type, B value) {
-			return Primitives.wrap(type).cast(value);
-		}
-
-		/**
-		 * Returns a new immutable class-to-instance map containing the entries provided
-		 * to this builder.
-		 *
-		 * @throws IllegalArgumentException if duplicate keys were added
-		 */
-		public ImmutableClassToInstanceMap<B> build() {
-			return new ImmutableClassToInstanceMap<B>(mapBuilder.build());
-		}
+	/**
+	 * Returns a new builder. The generated builder is equivalent to the builder
+	 * created by the {@link Builder} constructor.
+	 */
+	public static <B> Builder<B> builder() {
+		return new Builder<B>();
 	}
 
 	/**

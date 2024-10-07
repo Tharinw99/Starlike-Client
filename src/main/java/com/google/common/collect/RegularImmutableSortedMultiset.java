@@ -45,30 +45,9 @@ final class RegularImmutableSortedMultiset<E> extends ImmutableSortedMultiset<E>
 	}
 
 	@Override
-	Entry<E> getEntry(int index) {
-		return Multisets.immutableEntry(elementSet.asList().get(index), counts[offset + index]);
-	}
-
-	@Override
-	public Entry<E> firstEntry() {
-		return getEntry(0);
-	}
-
-	@Override
-	public Entry<E> lastEntry() {
-		return getEntry(length - 1);
-	}
-
-	@Override
 	public int count(@Nullable Object element) {
 		int index = elementSet.indexOf(element);
 		return (index == -1) ? 0 : counts[index + offset];
-	}
-
-	@Override
-	public int size() {
-		long size = cumulativeCounts[offset + length] - cumulativeCounts[offset];
-		return Ints.saturatedCast(size);
 	}
 
 	@Override
@@ -77,13 +56,13 @@ final class RegularImmutableSortedMultiset<E> extends ImmutableSortedMultiset<E>
 	}
 
 	@Override
-	public ImmutableSortedMultiset<E> headMultiset(E upperBound, BoundType boundType) {
-		return getSubMultiset(0, elementSet.headIndex(upperBound, checkNotNull(boundType) == CLOSED));
+	public Entry<E> firstEntry() {
+		return getEntry(0);
 	}
 
 	@Override
-	public ImmutableSortedMultiset<E> tailMultiset(E lowerBound, BoundType boundType) {
-		return getSubMultiset(elementSet.tailIndex(lowerBound, checkNotNull(boundType) == CLOSED), length);
+	Entry<E> getEntry(int index) {
+		return Multisets.immutableEntry(elementSet.asList().get(index), counts[offset + index]);
 	}
 
 	ImmutableSortedMultiset<E> getSubMultiset(int from, int to) {
@@ -100,7 +79,28 @@ final class RegularImmutableSortedMultiset<E> extends ImmutableSortedMultiset<E>
 	}
 
 	@Override
+	public ImmutableSortedMultiset<E> headMultiset(E upperBound, BoundType boundType) {
+		return getSubMultiset(0, elementSet.headIndex(upperBound, checkNotNull(boundType) == CLOSED));
+	}
+
+	@Override
 	boolean isPartialView() {
 		return offset > 0 || length < counts.length;
+	}
+
+	@Override
+	public Entry<E> lastEntry() {
+		return getEntry(length - 1);
+	}
+
+	@Override
+	public int size() {
+		long size = cumulativeCounts[offset + length] - cumulativeCounts[offset];
+		return Ints.saturatedCast(size);
+	}
+
+	@Override
+	public ImmutableSortedMultiset<E> tailMultiset(E lowerBound, BoundType boundType) {
+		return getSubMultiset(elementSet.tailIndex(lowerBound, checkNotNull(boundType) == CLOSED), length);
 	}
 }

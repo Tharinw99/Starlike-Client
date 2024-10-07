@@ -7,22 +7,25 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -52,28 +55,51 @@ public class EntityTNTPrimed extends Entity {
 		this.tntPlacedBy = parEntityLivingBase;
 	}
 
-	protected void entityInit() {
-	}
-
-	/**+
-	 * returns if this entity triggers Block.onEntityWalking on the
-	 * blocks they walk on. used for spiders and wolves to prevent
-	 * them from trampling crops
-	 */
-	protected boolean canTriggerWalking() {
-		return false;
-	}
-
-	/**+
-	 * Returns true if other Entities should be prevented from
-	 * moving through this Entity.
+	/**
+	 * + Returns true if other Entities should be prevented from moving through this
+	 * Entity.
 	 */
 	public boolean canBeCollidedWith() {
 		return !this.isDead;
 	}
 
-	/**+
-	 * Called to update the entity's position/logic.
+	/**
+	 * + returns if this entity triggers Block.onEntityWalking on the blocks they
+	 * walk on. used for spiders and wolves to prevent them from trampling crops
+	 */
+	protected boolean canTriggerWalking() {
+		return false;
+	}
+
+	protected void entityInit() {
+	}
+
+	private void explode() {
+		float f = 4.0F;
+		this.worldObj.createExplosion(this, this.posX, this.posY + (double) (this.height / 16.0F), this.posZ, f, true);
+	}
+
+	protected float getEaglerDynamicLightsValueSimple(float partialTicks) {
+		float f = super.getEaglerDynamicLightsValueSimple(partialTicks);
+		if (fuse / 5 % 2 == 0) {
+			f = Math.min(f + 0.75f, 1.25f);
+		}
+		return f;
+	}
+
+	public float getEyeHeight() {
+		return 0.0F;
+	}
+
+	/**
+	 * + returns null or the entityliving it was placed or ignited by
+	 */
+	public EntityLivingBase getTntPlacedBy() {
+		return this.tntPlacedBy;
+	}
+
+	/**
+	 * + Called to update the entity's position/logic.
 	 */
 	public void onUpdate() {
 		this.prevPosX = this.posX;
@@ -103,36 +129,11 @@ public class EntityTNTPrimed extends Entity {
 
 	}
 
-	private void explode() {
-		float f = 4.0F;
-		this.worldObj.createExplosion(this, this.posX, this.posY + (double) (this.height / 16.0F), this.posZ, f, true);
-	}
-
-	/**+
-	 * (abstract) Protected helper method to write subclass entity
-	 * data to NBT.
-	 */
-	protected void writeEntityToNBT(NBTTagCompound nbttagcompound) {
-		nbttagcompound.setByte("Fuse", (byte) this.fuse);
-	}
-
-	/**+
-	 * (abstract) Protected helper method to read subclass entity
-	 * data from NBT.
+	/**
+	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
 	protected void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		this.fuse = nbttagcompound.getByte("Fuse");
-	}
-
-	/**+
-	 * returns null or the entityliving it was placed or ignited by
-	 */
-	public EntityLivingBase getTntPlacedBy() {
-		return this.tntPlacedBy;
-	}
-
-	public float getEyeHeight() {
-		return 0.0F;
 	}
 
 	protected void renderDynamicLightsEaglerAt(double entityX, double entityY, double entityZ, double renderX,
@@ -146,11 +147,10 @@ public class EntityTNTPrimed extends Entity {
 		}
 	}
 
-	protected float getEaglerDynamicLightsValueSimple(float partialTicks) {
-		float f = super.getEaglerDynamicLightsValueSimple(partialTicks);
-		if (fuse / 5 % 2 == 0) {
-			f = Math.min(f + 0.75f, 1.25f);
-		}
-		return f;
+	/**
+	 * + (abstract) Protected helper method to write subclass entity data to NBT.
+	 */
+	protected void writeEntityToNBT(NBTTagCompound nbttagcompound) {
+		nbttagcompound.setByte("Fuse", (byte) this.fuse);
 	}
 }

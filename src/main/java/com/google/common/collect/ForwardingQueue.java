@@ -55,8 +55,18 @@ public abstract class ForwardingQueue<E> extends ForwardingCollection<E> impleme
 	protected abstract Queue<E> delegate();
 
 	@Override
+	public E element() {
+		return delegate().element();
+	}
+
+	@Override
 	public boolean offer(E o) {
 		return delegate().offer(o);
+	}
+
+	@Override
+	public E peek() {
+		return delegate().peek();
 	}
 
 	@Override
@@ -67,16 +77,6 @@ public abstract class ForwardingQueue<E> extends ForwardingCollection<E> impleme
 	@Override
 	public E remove() {
 		return delegate().remove();
-	}
-
-	@Override
-	public E peek() {
-		return delegate().peek();
-	}
-
-	@Override
-	public E element() {
-		return delegate().element();
 	}
 
 	/**

@@ -1,35 +1,38 @@
 package net.minecraft.client.audio;
 
 import java.util.List;
-import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 
 import com.google.common.collect.Lists;
 
+import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import net.minecraft.util.ResourceLocation;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class SoundEventAccessorComposite implements ISoundEventAccessor<SoundPoolEntry> {
-	/**+
-	 * A composite (List) of ISoundEventAccessors
+	/**
+	 * + A composite (List) of ISoundEventAccessors
 	 */
 	private final List<ISoundEventAccessor<SoundPoolEntry>> soundPool = Lists.newArrayList();
 	private final EaglercraftRandom rnd = new EaglercraftRandom();
@@ -46,14 +49,8 @@ public class SoundEventAccessorComposite implements ISoundEventAccessor<SoundPoo
 		this.category = category;
 	}
 
-	public int getWeight() {
-		int i = 0;
-
-		for (int j = 0, l = this.soundPool.size(); j < l; ++j) {
-			i += this.soundPool.get(j).getWeight();
-		}
-
-		return i;
+	public void addSoundToEventPool(ISoundEventAccessor<SoundPoolEntry> sound) {
+		this.soundPool.add(sound);
 	}
 
 	public SoundPoolEntry cloneEntry() {
@@ -78,15 +75,21 @@ public class SoundEventAccessorComposite implements ISoundEventAccessor<SoundPoo
 		}
 	}
 
-	public void addSoundToEventPool(ISoundEventAccessor<SoundPoolEntry> sound) {
-		this.soundPool.add(sound);
+	public SoundCategory getSoundCategory() {
+		return this.category;
 	}
 
 	public ResourceLocation getSoundEventLocation() {
 		return this.soundLocation;
 	}
 
-	public SoundCategory getSoundCategory() {
-		return this.category;
+	public int getWeight() {
+		int i = 0;
+
+		for (int j = 0, l = this.soundPool.size(); j < l; ++j) {
+			i += this.soundPool.get(j).getWeight();
+		}
+
+		return i;
 	}
 }

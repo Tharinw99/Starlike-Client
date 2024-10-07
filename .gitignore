@@ -1,5 +1,7 @@
 .gradle
 .settings
+.classpath
+.project
 build
 bin
 proxyServer/bin
@@ -13,8 +15,14 @@ desktopRuntime/_eagstorage*
 desktopRuntime/filesystem/*
 desktopRuntime/downloads/*
 desktopRuntime/screenshots/*
+
 javascript/assets.epk
 javascript/classes.js
 javascript/classes.js.map
 javascript/Starlike_Client_Offline.html
-/.metadata/
+javascript/Starlike_Client_Offline_Signed.html
+javascript/Starlike_Client_Offline_Signed.html.cert
+javascript/Starlike_Client_Offline_Signed.html.dat
+
+.metadata
+

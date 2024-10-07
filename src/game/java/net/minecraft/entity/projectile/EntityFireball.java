@@ -17,22 +17,25 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -53,24 +56,6 @@ public abstract class EntityFireball extends Entity {
 	public EntityFireball(World worldIn) {
 		super(worldIn);
 		this.setSize(1.0F, 1.0F);
-	}
-
-	protected void entityInit() {
-	}
-
-	/**+
-	 * Checks if the entity is in range to render by using the past
-	 * in distance and comparing it to its average edge length * 64
-	 * * renderDistanceWeight Args: distance
-	 */
-	public boolean isInRangeToRenderDist(double d0) {
-		double d1 = this.getEntityBoundingBox().getAverageEdgeLength() * 4.0D;
-		if (Double.isNaN(d1)) {
-			d1 = 4.0D;
-		}
-
-		d1 = d1 * 64.0D;
-		return d0 < d1 * d1;
 	}
 
 	public EntityFireball(World worldIn, double x, double y, double z, double accelX, double accelY, double accelZ) {
@@ -108,8 +93,93 @@ public abstract class EntityFireball extends Entity {
 		this.accelerationZ = accelZ / d0 * 0.1D;
 	}
 
-	/**+
-	 * Called to update the entity's position/logic.
+	/**
+	 * + Called when the entity is attacked.
+	 */
+	public boolean attackEntityFrom(DamageSource damagesource, float var2) {
+		if (this.isEntityInvulnerable(damagesource)) {
+			return false;
+		} else {
+			this.setBeenAttacked();
+			if (damagesource.getEntity() != null) {
+				Vec3 vec3 = damagesource.getEntity().getLookVec();
+				if (vec3 != null) {
+					this.motionX = vec3.xCoord;
+					this.motionY = vec3.yCoord;
+					this.motionZ = vec3.zCoord;
+					this.accelerationX = this.motionX * 0.1D;
+					this.accelerationY = this.motionY * 0.1D;
+					this.accelerationZ = this.motionZ * 0.1D;
+				}
+
+				if (damagesource.getEntity() instanceof EntityLivingBase) {
+					this.shootingEntity = (EntityLivingBase) damagesource.getEntity();
+				}
+
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
+
+	/**
+	 * + Returns true if other Entities should be prevented from moving through this
+	 * Entity.
+	 */
+	public boolean canBeCollidedWith() {
+		return true;
+	}
+
+	protected void entityInit() {
+	}
+
+	/**
+	 * + Gets how bright this entity is.
+	 */
+	public float getBrightness(float var1) {
+		return 1.0F;
+	}
+
+	public int getBrightnessForRender(float var1) {
+		return 15728880;
+	}
+
+	public float getCollisionBorderSize() {
+		return 1.0F;
+	}
+
+	protected float getEaglerDynamicLightsValueSimple(float partialTicks) {
+		return 1.0f;
+	}
+
+	/**
+	 * + Return the motion factor for this projectile. The factor is multiplied by
+	 * the original motion.
+	 */
+	protected float getMotionFactor() {
+		return 0.95F;
+	}
+
+	/**
+	 * + Checks if the entity is in range to render by using the past in distance
+	 * and comparing it to its average edge length * 64 * renderDistanceWeight Args:
+	 * distance
+	 */
+	public boolean isInRangeToRenderDist(double d0) {
+		double d1 = this.getEntityBoundingBox().getAverageEdgeLength() * 4.0D;
+		if (Double.isNaN(d1)) {
+			d1 = 4.0D;
+		}
+
+		d1 = d1 * 64.0D;
+		return d0 < d1 * d1;
+	}
+
+	protected abstract void onImpact(MovingObjectPosition var1);
+
+	/**
+	 * + Called to update the entity's position/logic.
 	 */
 	public void onUpdate() {
 		if (this.worldObj.isRemote || (this.shootingEntity == null || !this.shootingEntity.isDead)
@@ -231,34 +301,8 @@ public abstract class EntityFireball extends Entity {
 		}
 	}
 
-	/**+
-	 * Return the motion factor for this projectile. The factor is
-	 * multiplied by the original motion.
-	 */
-	protected float getMotionFactor() {
-		return 0.95F;
-	}
-
-	protected abstract void onImpact(MovingObjectPosition var1);
-
-	/**+
-	 * (abstract) Protected helper method to write subclass entity
-	 * data to NBT.
-	 */
-	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
-		nbttagcompound.setShort("xTile", (short) this.xTile);
-		nbttagcompound.setShort("yTile", (short) this.yTile);
-		nbttagcompound.setShort("zTile", (short) this.zTile);
-		ResourceLocation resourcelocation = (ResourceLocation) Block.blockRegistry.getNameForObject(this.inTile);
-		nbttagcompound.setString("inTile", resourcelocation == null ? "" : resourcelocation.toString());
-		nbttagcompound.setByte("inGround", (byte) (this.inGround ? 1 : 0));
-		nbttagcompound.setTag("direction",
-				this.newDoubleNBTList(new double[] { this.motionX, this.motionY, this.motionZ }));
-	}
-
-	/**+
-	 * (abstract) Protected helper method to read subclass entity
-	 * data from NBT.
+	/**
+	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		this.xTile = nbttagcompound.getShort("xTile");
@@ -282,60 +326,17 @@ public abstract class EntityFireball extends Entity {
 
 	}
 
-	/**+
-	 * Returns true if other Entities should be prevented from
-	 * moving through this Entity.
+	/**
+	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
-	public boolean canBeCollidedWith() {
-		return true;
-	}
-
-	public float getCollisionBorderSize() {
-		return 1.0F;
-	}
-
-	/**+
-	 * Called when the entity is attacked.
-	 */
-	public boolean attackEntityFrom(DamageSource damagesource, float var2) {
-		if (this.isEntityInvulnerable(damagesource)) {
-			return false;
-		} else {
-			this.setBeenAttacked();
-			if (damagesource.getEntity() != null) {
-				Vec3 vec3 = damagesource.getEntity().getLookVec();
-				if (vec3 != null) {
-					this.motionX = vec3.xCoord;
-					this.motionY = vec3.yCoord;
-					this.motionZ = vec3.zCoord;
-					this.accelerationX = this.motionX * 0.1D;
-					this.accelerationY = this.motionY * 0.1D;
-					this.accelerationZ = this.motionZ * 0.1D;
-				}
-
-				if (damagesource.getEntity() instanceof EntityLivingBase) {
-					this.shootingEntity = (EntityLivingBase) damagesource.getEntity();
-				}
-
-				return true;
-			} else {
-				return false;
-			}
-		}
-	}
-
-	/**+
-	 * Gets how bright this entity is.
-	 */
-	public float getBrightness(float var1) {
-		return 1.0F;
-	}
-
-	protected float getEaglerDynamicLightsValueSimple(float partialTicks) {
-		return 1.0f;
-	}
-
-	public int getBrightnessForRender(float var1) {
-		return 15728880;
+	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
+		nbttagcompound.setShort("xTile", (short) this.xTile);
+		nbttagcompound.setShort("yTile", (short) this.yTile);
+		nbttagcompound.setShort("zTile", (short) this.zTile);
+		ResourceLocation resourcelocation = (ResourceLocation) Block.blockRegistry.getNameForObject(this.inTile);
+		nbttagcompound.setString("inTile", resourcelocation == null ? "" : resourcelocation.toString());
+		nbttagcompound.setByte("inGround", (byte) (this.inGround ? 1 : 0));
+		nbttagcompound.setTag("direction",
+				this.newDoubleNBTList(new double[] { this.motionX, this.motionY, this.motionZ }));
 	}
 }

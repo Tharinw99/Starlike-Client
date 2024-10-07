@@ -1,9 +1,12 @@
 package net.minecraft.client.gui.achievement;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_DEPTH_BUFFER_BIT;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_GEQUAL;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_LEQUAL;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ONE_MINUS_SRC_ALPHA;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_SRC_ALPHA;
 
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
-
 import net.lax1dude.eaglercraft.v1_8.Mouse;
 import net.lax1dude.eaglercraft.v1_8.PointerInputAbstraction;
 import net.lax1dude.eaglercraft.v1_8.minecraft.EaglerTextureAtlasSprite;
@@ -26,22 +29,25 @@ import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -80,22 +86,9 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter {
 				* 24 - short2 / 2);
 	}
 
-	/**+
-	 * Adds the buttons (and other controls) to the screen in
-	 * question. Called when the GUI is displayed and when the
-	 * window resizes, the buttonList is cleared beforehand.
-	 */
-	public void initGui() {
-		this.mc.getNetHandler()
-				.addToSendQueue(new C16PacketClientStatus(C16PacketClientStatus.EnumState.REQUEST_STATS));
-		this.buttonList.clear();
-		this.buttonList.add(new GuiOptionButton(1, this.width / 2 + 24, this.height / 2 + 74, 80, 20,
-				I18n.format("gui.done", new Object[0])));
-	}
-
-	/**+
-	 * Called by the controls from the buttonList when activated.
-	 * (Mouse pressed for buttons)
+	/**
+	 * + Called by the controls from the buttonList when activated. (Mouse pressed
+	 * for buttons)
 	 */
 	protected void actionPerformed(GuiButton parGuiButton) {
 		if (!this.loadingAchievements) {
@@ -106,92 +99,12 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter {
 		}
 	}
 
-	protected int getCloseKey() {
-		return this.mc.gameSettings.keyBindInventory.getKeyCode();
-	}
-
-	/**+
-	 * Draws the screen and all the components in it. Args : mouseX,
-	 * mouseY, renderPartialTicks
+	/**
+	 * + Returns true if this GUI should pause the game when it is displayed in
+	 * single-player
 	 */
-	public void drawScreen(int i, int j, float f) {
-		if (this.loadingAchievements) {
-			this.drawDefaultBackground();
-			this.drawCenteredString(this.fontRendererObj, I18n.format("multiplayer.downloadingStats", new Object[0]),
-					this.width / 2, this.height / 2, 16777215);
-			this.drawCenteredString(this.fontRendererObj,
-					lanSearchStates[(int) (Minecraft.getSystemTime() / 150L % (long) lanSearchStates.length)],
-					this.width / 2, this.height / 2 + this.fontRendererObj.FONT_HEIGHT * 2, 16777215);
-		} else {
-			if (PointerInputAbstraction.getVCursorButtonDown(0)) {
-				int k = (this.width - this.field_146555_f) / 2;
-				int l = (this.height - this.field_146557_g) / 2;
-				int i1 = k + 8;
-				int j1 = l + 17;
-				if ((this.field_146554_D == 0 || this.field_146554_D == 1) && i >= i1 && i < i1 + 224 && j >= j1
-						&& j < j1 + 155) {
-					if (this.field_146554_D == 0) {
-						this.field_146554_D = 1;
-					} else {
-						this.field_146567_u -= (double) ((float) (i - this.field_146563_h) * this.field_146570_r);
-						this.field_146566_v -= (double) ((float) (j - this.field_146564_i) * this.field_146570_r);
-						this.field_146565_w = this.field_146569_s = this.field_146567_u;
-						this.field_146573_x = this.field_146568_t = this.field_146566_v;
-					}
-
-					this.field_146563_h = i;
-					this.field_146564_i = j;
-				}
-			} else {
-				this.field_146554_D = 0;
-			}
-
-			int k1 = Mouse.getDWheel();
-			float f4 = this.field_146570_r;
-			if (k1 < 0) {
-				this.field_146570_r += 0.25F;
-			} else if (k1 > 0) {
-				this.field_146570_r -= 0.25F;
-			}
-
-			this.field_146570_r = MathHelper.clamp_float(this.field_146570_r, 1.0F, 2.0F);
-			if (this.field_146570_r != f4) {
-				float f6 = f4 - this.field_146570_r;
-				float f5 = f4 * (float) this.field_146555_f;
-				float f1 = f4 * (float) this.field_146557_g;
-				float f2 = this.field_146570_r * (float) this.field_146555_f;
-				float f3 = this.field_146570_r * (float) this.field_146557_g;
-				this.field_146567_u -= (double) ((f2 - f5) * 0.5F);
-				this.field_146566_v -= (double) ((f3 - f1) * 0.5F);
-				this.field_146565_w = this.field_146569_s = this.field_146567_u;
-				this.field_146573_x = this.field_146568_t = this.field_146566_v;
-			}
-
-			if (this.field_146565_w < (double) field_146572_y) {
-				this.field_146565_w = (double) field_146572_y;
-			}
-
-			if (this.field_146573_x < (double) field_146571_z) {
-				this.field_146573_x = (double) field_146571_z;
-			}
-
-			if (this.field_146565_w >= (double) field_146559_A) {
-				this.field_146565_w = (double) (field_146559_A - 1);
-			}
-
-			if (this.field_146573_x >= (double) field_146560_B) {
-				this.field_146573_x = (double) (field_146560_B - 1);
-			}
-
-			this.drawDefaultBackground();
-			this.drawAchievementScreen(i, j, f);
-			GlStateManager.disableLighting();
-			GlStateManager.disableDepth();
-			this.drawTitle();
-			GlStateManager.disableLighting();
-			GlStateManager.enableDepth();
-		}
-
+	public boolean doesGuiPauseGame() {
+		return !this.loadingAchievements;
 	}
 
 	public void doneLoading() {
@@ -199,32 +112,6 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter {
 			this.loadingAchievements = false;
 		}
 
-	}
-
-	/**+
-	 * Called from the main game loop to update the screen.
-	 */
-	public void updateScreen() {
-		if (!this.loadingAchievements) {
-			this.field_146569_s = this.field_146567_u;
-			this.field_146568_t = this.field_146566_v;
-			double d0 = this.field_146565_w - this.field_146567_u;
-			double d1 = this.field_146573_x - this.field_146566_v;
-			if (d0 * d0 + d1 * d1 < 4.0D) {
-				this.field_146567_u += d0;
-				this.field_146566_v += d1;
-			} else {
-				this.field_146567_u += d0 * 0.85D;
-				this.field_146566_v += d1 * 0.85D;
-			}
-
-		}
-	}
-
-	protected void drawTitle() {
-		int i = (this.width - this.field_146555_f) / 2;
-		int j = (this.height - this.field_146557_g) / 2;
-		this.fontRendererObj.drawString(I18n.format("gui.achievements", new Object[0]), i + 15, j + 5, 4210752);
 	}
 
 	protected void drawAchievementScreen(int parInt1, int parInt2, float parFloat1) {
@@ -475,16 +362,135 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter {
 		RenderHelper.disableStandardItemLighting();
 	}
 
+	/**
+	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
+	 * renderPartialTicks
+	 */
+	public void drawScreen(int i, int j, float f) {
+		if (this.loadingAchievements) {
+			this.drawDefaultBackground();
+			this.drawCenteredString(this.fontRendererObj, I18n.format("multiplayer.downloadingStats", new Object[0]),
+					this.width / 2, this.height / 2, 16777215);
+			this.drawCenteredString(this.fontRendererObj,
+					lanSearchStates[(int) (Minecraft.getSystemTime() / 150L % (long) lanSearchStates.length)],
+					this.width / 2, this.height / 2 + this.fontRendererObj.FONT_HEIGHT * 2, 16777215);
+		} else {
+			if (PointerInputAbstraction.getVCursorButtonDown(0)) {
+				int k = (this.width - this.field_146555_f) / 2;
+				int l = (this.height - this.field_146557_g) / 2;
+				int i1 = k + 8;
+				int j1 = l + 17;
+				if ((this.field_146554_D == 0 || this.field_146554_D == 1) && i >= i1 && i < i1 + 224 && j >= j1
+						&& j < j1 + 155) {
+					if (this.field_146554_D == 0) {
+						this.field_146554_D = 1;
+					} else {
+						this.field_146567_u -= (double) ((float) (i - this.field_146563_h) * this.field_146570_r);
+						this.field_146566_v -= (double) ((float) (j - this.field_146564_i) * this.field_146570_r);
+						this.field_146565_w = this.field_146569_s = this.field_146567_u;
+						this.field_146573_x = this.field_146568_t = this.field_146566_v;
+					}
+
+					this.field_146563_h = i;
+					this.field_146564_i = j;
+				}
+			} else {
+				this.field_146554_D = 0;
+			}
+
+			int k1 = Mouse.getDWheel();
+			float f4 = this.field_146570_r;
+			if (k1 < 0) {
+				this.field_146570_r += 0.25F;
+			} else if (k1 > 0) {
+				this.field_146570_r -= 0.25F;
+			}
+
+			this.field_146570_r = MathHelper.clamp_float(this.field_146570_r, 1.0F, 2.0F);
+			if (this.field_146570_r != f4) {
+				float f6 = f4 - this.field_146570_r;
+				float f5 = f4 * (float) this.field_146555_f;
+				float f1 = f4 * (float) this.field_146557_g;
+				float f2 = this.field_146570_r * (float) this.field_146555_f;
+				float f3 = this.field_146570_r * (float) this.field_146557_g;
+				this.field_146567_u -= (double) ((f2 - f5) * 0.5F);
+				this.field_146566_v -= (double) ((f3 - f1) * 0.5F);
+				this.field_146565_w = this.field_146569_s = this.field_146567_u;
+				this.field_146573_x = this.field_146568_t = this.field_146566_v;
+			}
+
+			if (this.field_146565_w < (double) field_146572_y) {
+				this.field_146565_w = (double) field_146572_y;
+			}
+
+			if (this.field_146573_x < (double) field_146571_z) {
+				this.field_146573_x = (double) field_146571_z;
+			}
+
+			if (this.field_146565_w >= (double) field_146559_A) {
+				this.field_146565_w = (double) (field_146559_A - 1);
+			}
+
+			if (this.field_146573_x >= (double) field_146560_B) {
+				this.field_146573_x = (double) (field_146560_B - 1);
+			}
+
+			this.drawDefaultBackground();
+			this.drawAchievementScreen(i, j, f);
+			GlStateManager.disableLighting();
+			GlStateManager.disableDepth();
+			this.drawTitle();
+			GlStateManager.disableLighting();
+			GlStateManager.enableDepth();
+		}
+
+	}
+
+	protected void drawTitle() {
+		int i = (this.width - this.field_146555_f) / 2;
+		int j = (this.height - this.field_146557_g) / 2;
+		this.fontRendererObj.drawString(I18n.format("gui.achievements", new Object[0]), i + 15, j + 5, 4210752);
+	}
+
 	private EaglerTextureAtlasSprite func_175371_a(Block parBlock) {
 		return Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes()
 				.getTexture(parBlock.getDefaultState());
 	}
 
-	/**+
-	 * Returns true if this GUI should pause the game when it is
-	 * displayed in single-player
+	protected int getCloseKey() {
+		return this.mc.gameSettings.keyBindInventory.getKeyCode();
+	}
+
+	/**
+	 * + Adds the buttons (and other controls) to the screen in question. Called
+	 * when the GUI is displayed and when the window resizes, the buttonList is
+	 * cleared beforehand.
 	 */
-	public boolean doesGuiPauseGame() {
-		return !this.loadingAchievements;
+	public void initGui() {
+		this.mc.getNetHandler()
+				.addToSendQueue(new C16PacketClientStatus(C16PacketClientStatus.EnumState.REQUEST_STATS));
+		this.buttonList.clear();
+		this.buttonList.add(new GuiOptionButton(1, this.width / 2 + 24, this.height / 2 + 74, 80, 20,
+				I18n.format("gui.done", new Object[0])));
+	}
+
+	/**
+	 * + Called from the main game loop to update the screen.
+	 */
+	public void updateScreen() {
+		if (!this.loadingAchievements) {
+			this.field_146569_s = this.field_146567_u;
+			this.field_146568_t = this.field_146566_v;
+			double d0 = this.field_146565_w - this.field_146567_u;
+			double d1 = this.field_146573_x - this.field_146566_v;
+			if (d0 * d0 + d1 * d1 < 4.0D) {
+				this.field_146567_u += d0;
+				this.field_146566_v += d1;
+			} else {
+				this.field_146567_u += d0 * 0.85D;
+				this.field_146566_v += d1 * 0.85D;
+			}
+
+		}
 	}
 }

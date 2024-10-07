@@ -41,27 +41,44 @@ import com.google.common.annotations.GwtIncompatible;
 @Beta
 public final class Enums {
 
-	private Enums() {
-	}
+	private static final class StringConverter<T extends Enum<T>> extends Converter<String, T> implements Serializable {
 
-	/**
-	 * Returns a {@link Function} that maps an {@link Enum} name to the associated
-	 * {@code Enum} constant. The {@code Function} will return {@code null} if the
-	 * {@code Enum} constant does not exist.
-	 *
-	 * @param enumClass the {@link Class} of the {@code Enum} declaring the constant
-	 *                  values
-	 * @deprecated Use {@link Enums#stringConverter} instead. Note that the string
-	 *             converter has slightly different behavior: it throws
-	 *             {@link IllegalArgumentException} if the enum constant does not
-	 *             exist rather than returning {@code null}. It also converts
-	 *             {@code null} to {@code null} rather than throwing
-	 *             {@link NullPointerException}. This method is scheduled for
-	 *             removal in Guava 18.0.
-	 */
-	@Deprecated
-	public static <T extends Enum<T>> Function<String, T> valueOfFunction(Class<T> enumClass) {
-		return new ValueOfFunction<T>(enumClass);
+		private static final long serialVersionUID = 0L;
+
+		private final Class<T> enumClass;
+
+		StringConverter(Class<T> enumClass) {
+			this.enumClass = checkNotNull(enumClass);
+		}
+
+		@Override
+		protected String doBackward(T enumValue) {
+			return enumValue.name();
+		}
+
+		@Override
+		protected T doForward(String value) {
+			return Enum.valueOf(enumClass, value);
+		}
+
+		@Override
+		public boolean equals(@Nullable Object object) {
+			if (object instanceof StringConverter) {
+				StringConverter<?> that = (StringConverter<?>) object;
+				return this.enumClass.equals(that.enumClass);
+			}
+			return false;
+		}
+
+		@Override
+		public int hashCode() {
+			return enumClass.hashCode();
+		}
+
+		@Override
+		public String toString() {
+			return "Enums.stringConverter(" + enumClass.getName() + ".class)";
+		}
 	}
 
 	/**
@@ -69,6 +86,8 @@ public final class Enums {
 	 * or {@code null} if the constant does not exist.
 	 */
 	private static final class ValueOfFunction<T extends Enum<T>> implements Function<String, T>, Serializable {
+
+		private static final long serialVersionUID = 0;
 
 		private final Class<T> enumClass;
 
@@ -99,8 +118,20 @@ public final class Enums {
 		public String toString() {
 			return "Enums.valueOf(" + enumClass + ")";
 		}
+	}
 
-		private static final long serialVersionUID = 0;
+	@GwtIncompatible("java.lang.ref.WeakReference")
+	private static final Map<Class<? extends Enum<?>>, Map<String, WeakReference<? extends Enum<?>>>> enumConstantCache = new HashMap<Class<? extends Enum<?>>, Map<String, WeakReference<? extends Enum<?>>>>();
+
+	@GwtIncompatible("java.lang.ref.WeakReference")
+	static <T extends Enum<T>> Map<String, WeakReference<? extends Enum<?>>> getEnumConstants(Class<T> enumClass) {
+		synchronized (enumConstantCache) {
+			Map<String, WeakReference<? extends Enum<?>>> constants = enumConstantCache.get(enumClass);
+			if (constants == null) {
+				constants = populateCache(enumClass);
+			}
+			return constants;
+		}
 	}
 
 	/**
@@ -119,9 +150,6 @@ public final class Enums {
 	}
 
 	@GwtIncompatible("java.lang.ref.WeakReference")
-	private static final Map<Class<? extends Enum<?>>, Map<String, WeakReference<? extends Enum<?>>>> enumConstantCache = new HashMap<Class<? extends Enum<?>>, Map<String, WeakReference<? extends Enum<?>>>>();
-
-	@GwtIncompatible("java.lang.ref.WeakReference")
 	private static <T extends Enum<T>> Map<String, WeakReference<? extends Enum<?>>> populateCache(Class<T> enumClass) {
 		Map<String, WeakReference<? extends Enum<?>>> result = new HashMap<String, WeakReference<? extends Enum<?>>>();
 		for (T enumInstance : EnumSet.allOf(enumClass)) {
@@ -129,17 +157,6 @@ public final class Enums {
 		}
 		enumConstantCache.put(enumClass, result);
 		return result;
-	}
-
-	@GwtIncompatible("java.lang.ref.WeakReference")
-	static <T extends Enum<T>> Map<String, WeakReference<? extends Enum<?>>> getEnumConstants(Class<T> enumClass) {
-		synchronized (enumConstantCache) {
-			Map<String, WeakReference<? extends Enum<?>>> constants = enumConstantCache.get(enumClass);
-			if (constants == null) {
-				constants = populateCache(enumClass);
-			}
-			return constants;
-		}
 	}
 
 	/**
@@ -155,43 +172,26 @@ public final class Enums {
 		return new StringConverter<T>(enumClass);
 	}
 
-	private static final class StringConverter<T extends Enum<T>> extends Converter<String, T> implements Serializable {
+	/**
+	 * Returns a {@link Function} that maps an {@link Enum} name to the associated
+	 * {@code Enum} constant. The {@code Function} will return {@code null} if the
+	 * {@code Enum} constant does not exist.
+	 *
+	 * @param enumClass the {@link Class} of the {@code Enum} declaring the constant
+	 *                  values
+	 * @deprecated Use {@link Enums#stringConverter} instead. Note that the string
+	 *             converter has slightly different behavior: it throws
+	 *             {@link IllegalArgumentException} if the enum constant does not
+	 *             exist rather than returning {@code null}. It also converts
+	 *             {@code null} to {@code null} rather than throwing
+	 *             {@link NullPointerException}. This method is scheduled for
+	 *             removal in Guava 18.0.
+	 */
+	@Deprecated
+	public static <T extends Enum<T>> Function<String, T> valueOfFunction(Class<T> enumClass) {
+		return new ValueOfFunction<T>(enumClass);
+	}
 
-		private final Class<T> enumClass;
-
-		StringConverter(Class<T> enumClass) {
-			this.enumClass = checkNotNull(enumClass);
-		}
-
-		@Override
-		protected T doForward(String value) {
-			return Enum.valueOf(enumClass, value);
-		}
-
-		@Override
-		protected String doBackward(T enumValue) {
-			return enumValue.name();
-		}
-
-		@Override
-		public boolean equals(@Nullable Object object) {
-			if (object instanceof StringConverter) {
-				StringConverter<?> that = (StringConverter<?>) object;
-				return this.enumClass.equals(that.enumClass);
-			}
-			return false;
-		}
-
-		@Override
-		public int hashCode() {
-			return enumClass.hashCode();
-		}
-
-		@Override
-		public String toString() {
-			return "Enums.stringConverter(" + enumClass.getName() + ".class)";
-		}
-
-		private static final long serialVersionUID = 0L;
+	private Enums() {
 	}
 }

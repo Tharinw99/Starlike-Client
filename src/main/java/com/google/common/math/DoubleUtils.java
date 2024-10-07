@@ -33,13 +33,6 @@ import java.math.BigInteger;
  * @author Louis Wasserman
  */
 final class DoubleUtils {
-	private DoubleUtils() {
-	}
-
-	static double nextDown(double d) {
-		return -Math.nextUp(-d);
-	}
-
 	// The mask for the significand, according to the {@link
 	// Double#doubleToRawLongBits(double)} spec.
 	static final long SIGNIFICAND_MASK = 0x000fffffffffffffL;
@@ -61,30 +54,7 @@ final class DoubleUtils {
 	 */
 	static final long IMPLICIT_BIT = SIGNIFICAND_MASK + 1;
 
-	static long getSignificand(double d) {
-		checkArgument(isFinite(d), "not a normal value");
-		int exponent = getExponent(d);
-		long bits = doubleToRawLongBits(d);
-		bits &= SIGNIFICAND_MASK;
-		return (exponent == MIN_EXPONENT - 1) ? bits << 1 : bits | IMPLICIT_BIT;
-	}
-
-	static boolean isFinite(double d) {
-		return getExponent(d) <= MAX_EXPONENT;
-	}
-
-	static boolean isNormal(double d) {
-		return getExponent(d) >= MIN_EXPONENT;
-	}
-
-	/*
-	 * Returns x scaled by a power of 2 such that it is in the range [1, 2). Assumes
-	 * x is positive, normal, and finite.
-	 */
-	static double scaleNormalize(double x) {
-		long significand = doubleToRawLongBits(x) & SIGNIFICAND_MASK;
-		return longBitsToDouble(significand | ONE_BITS);
-	}
+	private static final long ONE_BITS = doubleToRawLongBits(1.0);
 
 	static double bigToDouble(BigInteger x) {
 		// This is an extremely fast implementation of BigInteger.doubleValue(). JDK
@@ -144,5 +114,35 @@ final class DoubleUtils {
 		}
 	}
 
-	private static final long ONE_BITS = doubleToRawLongBits(1.0);
+	static long getSignificand(double d) {
+		checkArgument(isFinite(d), "not a normal value");
+		int exponent = getExponent(d);
+		long bits = doubleToRawLongBits(d);
+		bits &= SIGNIFICAND_MASK;
+		return (exponent == MIN_EXPONENT - 1) ? bits << 1 : bits | IMPLICIT_BIT;
+	}
+
+	static boolean isFinite(double d) {
+		return getExponent(d) <= MAX_EXPONENT;
+	}
+
+	static boolean isNormal(double d) {
+		return getExponent(d) >= MIN_EXPONENT;
+	}
+
+	static double nextDown(double d) {
+		return -Math.nextUp(-d);
+	}
+
+	/*
+	 * Returns x scaled by a power of 2 such that it is in the range [1, 2). Assumes
+	 * x is positive, normal, and finite.
+	 */
+	static double scaleNormalize(double x) {
+		long significand = doubleToRawLongBits(x) & SIGNIFICAND_MASK;
+		return longBitsToDouble(significand | ONE_BITS);
+	}
+
+	private DoubleUtils() {
+	}
 }

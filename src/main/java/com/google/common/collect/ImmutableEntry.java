@@ -27,7 +27,9 @@ import com.google.common.annotations.GwtCompatible;
  */
 @GwtCompatible(serializable = true)
 class ImmutableEntry<K, V> extends AbstractMapEntry<K, V> implements Serializable {
+	private static final long serialVersionUID = 0;
 	final K key;
+
 	final V value;
 
 	ImmutableEntry(@Nullable K key, @Nullable V value) {
@@ -51,6 +53,4 @@ class ImmutableEntry<K, V> extends AbstractMapEntry<K, V> implements Serializabl
 	public final V setValue(V value) {
 		throw new UnsupportedOperationException();
 	}
-
-	private static final long serialVersionUID = 0;
 }

@@ -1,27 +1,31 @@
 package net.minecraft.network.play.client;
 
 import java.io.IOException;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -45,8 +49,35 @@ public class C15PacketClientSettings implements Packet<INetHandlerPlayServer> {
 		this.modelPartFlags = modelPartFlagsIn;
 	}
 
-	/**+
-	 * Reads the raw packet data from the data stream.
+	public EntityPlayer.EnumChatVisibility getChatVisibility() {
+		return this.chatVisibility;
+	}
+
+	public String getLang() {
+		return this.lang;
+	}
+
+	public int getModelPartFlags() {
+		return this.modelPartFlags;
+	}
+
+	public int getViewDistance() {
+		return this.view;
+	}
+
+	public boolean isColorsEnabled() {
+		return this.enableColors;
+	}
+
+	/**
+	 * + Passes this Packet on to the NetHandler for processing.
+	 */
+	public void processPacket(INetHandlerPlayServer inethandlerplayserver) {
+		inethandlerplayserver.processClientSettings(this);
+	}
+
+	/**
+	 * + Reads the raw packet data from the data stream.
 	 */
 	public void readPacketData(PacketBuffer parPacketBuffer) throws IOException {
 		this.lang = parPacketBuffer.readStringFromBuffer(7);
@@ -56,8 +87,8 @@ public class C15PacketClientSettings implements Packet<INetHandlerPlayServer> {
 		this.modelPartFlags = parPacketBuffer.readUnsignedByte();
 	}
 
-	/**+
-	 * Writes the raw packet data to the data stream.
+	/**
+	 * + Writes the raw packet data to the data stream.
 	 */
 	public void writePacketData(PacketBuffer parPacketBuffer) throws IOException {
 		parPacketBuffer.writeString(this.lang);
@@ -65,32 +96,5 @@ public class C15PacketClientSettings implements Packet<INetHandlerPlayServer> {
 		parPacketBuffer.writeByte(this.chatVisibility.getChatVisibility());
 		parPacketBuffer.writeBoolean(this.enableColors);
 		parPacketBuffer.writeByte(this.modelPartFlags);
-	}
-
-	/**+
-	 * Passes this Packet on to the NetHandler for processing.
-	 */
-	public void processPacket(INetHandlerPlayServer inethandlerplayserver) {
-		inethandlerplayserver.processClientSettings(this);
-	}
-
-	public String getLang() {
-		return this.lang;
-	}
-
-	public EntityPlayer.EnumChatVisibility getChatVisibility() {
-		return this.chatVisibility;
-	}
-
-	public boolean isColorsEnabled() {
-		return this.enableColors;
-	}
-
-	public int getModelPartFlags() {
-		return this.modelPartFlags;
-	}
-
-	public int getViewDistance() {
-		return this.view;
 	}
 }

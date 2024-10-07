@@ -18,29 +18,35 @@ import net.minecraft.util.StatCollector;
 import net.minecraft.util.StringUtils;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class ItemEditableBook extends Item {
-	public ItemEditableBook() {
-		this.setMaxStackSize(1);
+	/**
+	 * + Gets the generation of the book (how many times it has been cloned)
+	 */
+	public static int getGeneration(ItemStack book) {
+		return book.getTagCompound().getInteger("generation");
 	}
 
 	public static boolean validBookTagContents(NBTTagCompound nbt) {
@@ -54,29 +60,13 @@ public class ItemEditableBook extends Item {
 		}
 	}
 
-	/**+
-	 * Gets the generation of the book (how many times it has been
-	 * cloned)
-	 */
-	public static int getGeneration(ItemStack book) {
-		return book.getTagCompound().getInteger("generation");
+	public ItemEditableBook() {
+		this.setMaxStackSize(1);
 	}
 
-	public String getItemStackDisplayName(ItemStack itemstack) {
-		if (itemstack.hasTagCompound()) {
-			NBTTagCompound nbttagcompound = itemstack.getTagCompound();
-			String s = nbttagcompound.getString("title");
-			if (!StringUtils.isNullOrEmpty(s)) {
-				return s;
-			}
-		}
-
-		return super.getItemStackDisplayName(itemstack);
-	}
-
-	/**+
-	 * allows items to add custom lines of information to the
-	 * mouseover description
+	/**
+	 * + allows items to add custom lines of information to the mouseover
+	 * description
 	 */
 	public void addInformation(ItemStack itemstack, EntityPlayer var2, List<String> list, boolean var4) {
 		if (itemstack.hasTagCompound()) {
@@ -93,9 +83,25 @@ public class ItemEditableBook extends Item {
 
 	}
 
-	/**+
-	 * Called whenever this item is equipped and the right mouse
-	 * button is pressed. Args: itemStack, world, entityPlayer
+	public String getItemStackDisplayName(ItemStack itemstack) {
+		if (itemstack.hasTagCompound()) {
+			NBTTagCompound nbttagcompound = itemstack.getTagCompound();
+			String s = nbttagcompound.getString("title");
+			if (!StringUtils.isNullOrEmpty(s)) {
+				return s;
+			}
+		}
+
+		return super.getItemStackDisplayName(itemstack);
+	}
+
+	public boolean hasEffect(ItemStack var1) {
+		return true;
+	}
+
+	/**
+	 * + Called whenever this item is equipped and the right mouse button is
+	 * pressed. Args: itemStack, world, entityPlayer
 	 */
 	public ItemStack onItemRightClick(ItemStack itemstack, World world, EntityPlayer entityplayer) {
 		if (!world.isRemote) {
@@ -140,9 +146,5 @@ public class ItemEditableBook extends Item {
 				}
 			}
 		}
-	}
-
-	public boolean hasEffect(ItemStack var1) {
-		return true;
 	}
 }

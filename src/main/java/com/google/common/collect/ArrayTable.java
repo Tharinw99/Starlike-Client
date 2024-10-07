@@ -93,6 +93,221 @@ import com.google.common.base.Objects;
 @GwtCompatible(emulated = true)
 public final class ArrayTable<R, C, V> extends AbstractTable<R, C, V> implements Serializable {
 
+	private abstract static class ArrayMap<K, V> extends Maps.ImprovedAbstractMap<K, V> {
+		private final ImmutableMap<K, Integer> keyIndex;
+
+		private ArrayMap(ImmutableMap<K, Integer> keyIndex) {
+			this.keyIndex = keyIndex;
+		}
+
+		@Override
+		public void clear() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean containsKey(@Nullable Object key) {
+			return keyIndex.containsKey(key);
+		}
+
+		@Override
+		protected Set<Entry<K, V>> createEntrySet() {
+			return new Maps.EntrySet<K, V>() {
+				@Override
+				public Iterator<Entry<K, V>> iterator() {
+					return new AbstractIndexedListIterator<Entry<K, V>>(size()) {
+						@Override
+						protected Entry<K, V> get(final int index) {
+							return new AbstractMapEntry<K, V>() {
+								@Override
+								public K getKey() {
+									return ArrayMap.this.getKey(index);
+								}
+
+								@Override
+								public V getValue() {
+									return ArrayMap.this.getValue(index);
+								}
+
+								@Override
+								public V setValue(V value) {
+									return ArrayMap.this.setValue(index, value);
+								}
+							};
+						}
+					};
+				}
+
+				@Override
+				Map<K, V> map() {
+					return ArrayMap.this;
+				}
+			};
+		}
+
+		@Override
+		public V get(@Nullable Object key) {
+			Integer index = keyIndex.get(key);
+			if (index == null) {
+				return null;
+			} else {
+				return getValue(index);
+			}
+		}
+
+		K getKey(int index) {
+			return keyIndex.keySet().asList().get(index);
+		}
+
+		abstract String getKeyRole();
+
+		@Nullable
+		abstract V getValue(int index);
+
+		@Override
+		public boolean isEmpty() {
+			return keyIndex.isEmpty();
+		}
+
+		// TODO(user): consider an optimized values() implementation
+
+		@Override
+		public Set<K> keySet() {
+			return keyIndex.keySet();
+		}
+
+		@Override
+		public V put(K key, V value) {
+			Integer index = keyIndex.get(key);
+			if (index == null) {
+				throw new IllegalArgumentException(getKeyRole() + " " + key + " not in " + keyIndex.keySet());
+			}
+			return setValue(index, value);
+		}
+
+		@Override
+		public V remove(Object key) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Nullable
+		abstract V setValue(int index, V newValue);
+
+		@Override
+		public int size() {
+			return keyIndex.size();
+		}
+	}
+
+	/*
+	 * TODO(jlevy): Add factory methods taking an Enum class, instead of an
+	 * iterable, to specify the allowed row keys and/or column keys. Note that
+	 * custom serialization logic is needed to support different enum sizes during
+	 * serialization and deserialization.
+	 */
+
+	private class Column extends ArrayMap<R, V> {
+		final int columnIndex;
+
+		Column(int columnIndex) {
+			super(rowKeyToIndex);
+			this.columnIndex = columnIndex;
+		}
+
+		@Override
+		String getKeyRole() {
+			return "Row";
+		}
+
+		@Override
+		V getValue(int index) {
+			return at(index, columnIndex);
+		}
+
+		@Override
+		V setValue(int index, V newValue) {
+			return set(index, columnIndex, newValue);
+		}
+	}
+
+	private class ColumnMap extends ArrayMap<C, Map<R, V>> {
+		private ColumnMap() {
+			super(columnKeyToIndex);
+		}
+
+		@Override
+		String getKeyRole() {
+			return "Column";
+		}
+
+		@Override
+		Map<R, V> getValue(int index) {
+			return new Column(index);
+		}
+
+		@Override
+		public Map<R, V> put(C key, Map<R, V> value) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		Map<R, V> setValue(int index, Map<R, V> newValue) {
+			throw new UnsupportedOperationException();
+		}
+	}
+
+	private class Row extends ArrayMap<C, V> {
+		final int rowIndex;
+
+		Row(int rowIndex) {
+			super(columnKeyToIndex);
+			this.rowIndex = rowIndex;
+		}
+
+		@Override
+		String getKeyRole() {
+			return "Column";
+		}
+
+		@Override
+		V getValue(int index) {
+			return at(rowIndex, index);
+		}
+
+		@Override
+		V setValue(int index, V newValue) {
+			return set(rowIndex, index, newValue);
+		}
+	}
+
+	private class RowMap extends ArrayMap<R, Map<C, V>> {
+		private RowMap() {
+			super(rowKeyToIndex);
+		}
+
+		@Override
+		String getKeyRole() {
+			return "Row";
+		}
+
+		@Override
+		Map<C, V> getValue(int index) {
+			return new Row(index);
+		}
+
+		@Override
+		public Map<C, V> put(R key, Map<C, V> value) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		Map<C, V> setValue(int index, Map<C, V> newValue) {
+			throw new UnsupportedOperationException();
+		}
+	}
+
+	private static final long serialVersionUID = 0;
+
 	/**
 	 * Creates an empty {@code ArrayTable}.
 	 *
@@ -106,13 +321,6 @@ public final class ArrayTable<R, C, V> extends AbstractTable<R, C, V> implements
 			Iterable<? extends C> columnKeys) {
 		return new ArrayTable<R, C, V>(rowKeys, columnKeys);
 	}
-
-	/*
-	 * TODO(jlevy): Add factory methods taking an Enum class, instead of an
-	 * iterable, to specify the allowed row keys and/or column keys. Note that
-	 * custom serialization logic is needed to support different enum sizes during
-	 * serialization and deserialization.
-	 */
 
 	/**
 	 * Creates an {@code ArrayTable} with the mappings in the provided table.
@@ -143,13 +351,44 @@ public final class ArrayTable<R, C, V> extends AbstractTable<R, C, V> implements
 				: new ArrayTable<R, C, V>(table);
 	}
 
+	private static <E> ImmutableMap<E, Integer> index(List<E> list) {
+		ImmutableMap.Builder<E, Integer> columnBuilder = ImmutableMap.builder();
+		for (int i = 0; i < list.size(); i++) {
+			columnBuilder.put(list.get(i), i);
+		}
+		return columnBuilder.build();
+	}
+
 	private final ImmutableList<R> rowList;
+
 	private final ImmutableList<C> columnList;
 
 	// TODO(jlevy): Add getters returning rowKeyToIndex and columnKeyToIndex?
 	private final ImmutableMap<R, Integer> rowKeyToIndex;
+
 	private final ImmutableMap<C, Integer> columnKeyToIndex;
+
 	private final V[][] array;
+
+	private transient ColumnMap columnMap;
+
+	private transient RowMap rowMap;
+
+	private ArrayTable(ArrayTable<R, C, V> table) {
+		rowList = table.rowList;
+		columnList = table.columnList;
+		rowKeyToIndex = table.rowKeyToIndex;
+		columnKeyToIndex = table.columnKeyToIndex;
+		@SuppressWarnings("unchecked")
+		V[][] copy = (V[][]) new Object[rowList.size()][columnList.size()];
+		array = copy;
+		// Necessary because in GWT the arrays are initialized with "undefined" instead
+		// of null.
+		eraseAll();
+		for (int i = 0; i < rowList.size(); i++) {
+			System.arraycopy(table.array[i], 0, copy[i], 0, table.array[i].length);
+		}
+	}
 
 	private ArrayTable(Iterable<? extends R> rowKeys, Iterable<? extends C> columnKeys) {
 		this.rowList = ImmutableList.copyOf(rowKeys);
@@ -173,155 +412,9 @@ public final class ArrayTable<R, C, V> extends AbstractTable<R, C, V> implements
 		eraseAll();
 	}
 
-	private static <E> ImmutableMap<E, Integer> index(List<E> list) {
-		ImmutableMap.Builder<E, Integer> columnBuilder = ImmutableMap.builder();
-		for (int i = 0; i < list.size(); i++) {
-			columnBuilder.put(list.get(i), i);
-		}
-		return columnBuilder.build();
-	}
-
 	private ArrayTable(Table<R, C, V> table) {
 		this(table.rowKeySet(), table.columnKeySet());
 		putAll(table);
-	}
-
-	private ArrayTable(ArrayTable<R, C, V> table) {
-		rowList = table.rowList;
-		columnList = table.columnList;
-		rowKeyToIndex = table.rowKeyToIndex;
-		columnKeyToIndex = table.columnKeyToIndex;
-		@SuppressWarnings("unchecked")
-		V[][] copy = (V[][]) new Object[rowList.size()][columnList.size()];
-		array = copy;
-		// Necessary because in GWT the arrays are initialized with "undefined" instead
-		// of null.
-		eraseAll();
-		for (int i = 0; i < rowList.size(); i++) {
-			System.arraycopy(table.array[i], 0, copy[i], 0, table.array[i].length);
-		}
-	}
-
-	private abstract static class ArrayMap<K, V> extends Maps.ImprovedAbstractMap<K, V> {
-		private final ImmutableMap<K, Integer> keyIndex;
-
-		private ArrayMap(ImmutableMap<K, Integer> keyIndex) {
-			this.keyIndex = keyIndex;
-		}
-
-		@Override
-		public Set<K> keySet() {
-			return keyIndex.keySet();
-		}
-
-		K getKey(int index) {
-			return keyIndex.keySet().asList().get(index);
-		}
-
-		abstract String getKeyRole();
-
-		@Nullable
-		abstract V getValue(int index);
-
-		@Nullable
-		abstract V setValue(int index, V newValue);
-
-		@Override
-		public int size() {
-			return keyIndex.size();
-		}
-
-		@Override
-		public boolean isEmpty() {
-			return keyIndex.isEmpty();
-		}
-
-		@Override
-		protected Set<Entry<K, V>> createEntrySet() {
-			return new Maps.EntrySet<K, V>() {
-				@Override
-				Map<K, V> map() {
-					return ArrayMap.this;
-				}
-
-				@Override
-				public Iterator<Entry<K, V>> iterator() {
-					return new AbstractIndexedListIterator<Entry<K, V>>(size()) {
-						@Override
-						protected Entry<K, V> get(final int index) {
-							return new AbstractMapEntry<K, V>() {
-								@Override
-								public K getKey() {
-									return ArrayMap.this.getKey(index);
-								}
-
-								@Override
-								public V getValue() {
-									return ArrayMap.this.getValue(index);
-								}
-
-								@Override
-								public V setValue(V value) {
-									return ArrayMap.this.setValue(index, value);
-								}
-							};
-						}
-					};
-				}
-			};
-		}
-
-		// TODO(user): consider an optimized values() implementation
-
-		@Override
-		public boolean containsKey(@Nullable Object key) {
-			return keyIndex.containsKey(key);
-		}
-
-		@Override
-		public V get(@Nullable Object key) {
-			Integer index = keyIndex.get(key);
-			if (index == null) {
-				return null;
-			} else {
-				return getValue(index);
-			}
-		}
-
-		@Override
-		public V put(K key, V value) {
-			Integer index = keyIndex.get(key);
-			if (index == null) {
-				throw new IllegalArgumentException(getKeyRole() + " " + key + " not in " + keyIndex.keySet());
-			}
-			return setValue(index, value);
-		}
-
-		@Override
-		public V remove(Object key) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public void clear() {
-			throw new UnsupportedOperationException();
-		}
-	}
-
-	/**
-	 * Returns, as an immutable list, the row keys provided when the table was
-	 * constructed, including those that are mapped to null values only.
-	 */
-	public ImmutableList<R> rowKeyList() {
-		return rowList;
-	}
-
-	/**
-	 * Returns, as an immutable list, the column keys provided when the table was
-	 * constructed, including those that are mapped to null values only.
-	 */
-	public ImmutableList<C> columnKeyList() {
-		return columnList;
 	}
 
 	/**
@@ -346,51 +439,51 @@ public final class ArrayTable<R, C, V> extends AbstractTable<R, C, V> implements
 		return array[rowIndex][columnIndex];
 	}
 
-	/**
-	 * Associates {@code value} with the specified row and column indices. The logic
-	 * {@code
-	 * put(rowKeyList().get(rowIndex), columnKeyList().get(columnIndex), value)} has
-	 * the same behavior, but this method runs more quickly.
-	 *
-	 * @param rowIndex    position of the row key in {@link #rowKeyList()}
-	 * @param columnIndex position of the row key in {@link #columnKeyList()}
-	 * @param value       value to store in the table
-	 * @return the previous value with the specified row and column
-	 * @throws IndexOutOfBoundsException if either index is negative, {@code
-	 *     rowIndex}                  is greater then or equal to the number of
-	 *                                   allowed row keys, or {@code columnIndex} is
-	 *                                   greater then or equal to the number of
-	 *                                   allowed column keys
-	 */
-	public V set(int rowIndex, int columnIndex, @Nullable V value) {
-		// In GWT array access never throws IndexOutOfBoundsException.
-		checkElementIndex(rowIndex, rowList.size());
-		checkElementIndex(columnIndex, columnList.size());
-		V oldValue = array[rowIndex][columnIndex];
-		array[rowIndex][columnIndex] = value;
-		return oldValue;
+	@Override
+	Iterator<Cell<R, C, V>> cellIterator() {
+		return new AbstractIndexedListIterator<Cell<R, C, V>>(size()) {
+			@Override
+			protected Cell<R, C, V> get(final int index) {
+				return new Tables.AbstractCell<R, C, V>() {
+					final int rowIndex = index / columnList.size();
+					final int columnIndex = index % columnList.size();
+
+					@Override
+					public C getColumnKey() {
+						return columnList.get(columnIndex);
+					}
+
+					@Override
+					public R getRowKey() {
+						return rowList.get(rowIndex);
+					}
+
+					@Override
+					public V getValue() {
+						return at(rowIndex, columnIndex);
+					}
+				};
+			}
+		};
 	}
 
 	/**
-	 * Returns a two-dimensional array with the table contents. The row and column
-	 * indices correspond to the positions of the row and column in the iterables
-	 * provided during table construction. If the table lacks a mapping for a given
-	 * row and column, the corresponding array element is null.
+	 * Returns an unmodifiable set of all row key / column key / value triplets.
+	 * Changes to the table will update the returned set.
 	 *
 	 * <p>
-	 * Subsequent table changes will not modify the array, and vice versa.
+	 * The returned set's iterator traverses the mappings with the first row key,
+	 * the mappings with the second row key, and so on.
 	 *
-	 * @param valueClass class of values stored in the returned array
+	 * <p>
+	 * The value in the returned cells may change if the table subsequently changes.
+	 *
+	 * @return set of table cells consisting of row key / column key / value
+	 *         triplets
 	 */
-	@GwtIncompatible("reflection")
-	public V[][] toArray(Class<V> valueClass) {
-		// Can change to use varargs in JDK 1.6 if we want
-		@SuppressWarnings("unchecked") // TODO: safe?
-		V[][] copy = (V[][]) Array.newInstance(valueClass, new int[] { rowList.size(), columnList.size() });
-		for (int i = 0; i < rowList.size(); i++) {
-			System.arraycopy(array[i], 0, copy[i], 0, array[i].length);
-		}
-		return copy;
+	@Override
+	public Set<Cell<R, C, V>> cellSet() {
+		return super.cellSet();
 	}
 
 	/**
@@ -406,13 +499,52 @@ public final class ArrayTable<R, C, V> extends AbstractTable<R, C, V> implements
 	}
 
 	/**
-	 * Associates the value {@code null} with every pair of allowed row and column
-	 * keys.
+	 * Returns a view of all mappings that have the given column key. If the column
+	 * key isn't in {@link #columnKeySet()}, an empty immutable map is returned.
+	 *
+	 * <p>
+	 * Otherwise, for each row key in {@link #rowKeySet()}, the returned map
+	 * associates the row key with the corresponding value in the table. Changes to
+	 * the returned map will update the underlying table, and vice versa.
+	 *
+	 * @param columnKey key of column to search for in the table
+	 * @return the corresponding map from row keys to values
 	 */
-	public void eraseAll() {
-		for (V[] row : array) {
-			Arrays.fill(row, null);
-		}
+	@Override
+	public Map<R, V> column(C columnKey) {
+		checkNotNull(columnKey);
+		Integer columnIndex = columnKeyToIndex.get(columnKey);
+		return (columnIndex == null) ? ImmutableMap.<R, V>of() : new Column(columnIndex);
+	}
+
+	/**
+	 * Returns, as an immutable list, the column keys provided when the table was
+	 * constructed, including those that are mapped to null values only.
+	 */
+	public ImmutableList<C> columnKeyList() {
+		return columnList;
+	}
+
+	/**
+	 * Returns an immutable set of the valid column keys, including those that are
+	 * associated with null values only.
+	 *
+	 * @return immutable set of column keys
+	 */
+	@Override
+	public ImmutableSet<C> columnKeySet() {
+		return columnKeyToIndex.keySet();
+	}
+
+	/*
+	 * TODO(jlevy): Consider creating a merge() method, similar to putAll() but
+	 * copying non-null values only.
+	 */
+
+	@Override
+	public Map<C, Map<R, V>> columnMap() {
+		ColumnMap map = columnMap;
+		return (map == null) ? columnMap = new ColumnMap() : map;
 	}
 
 	/**
@@ -433,6 +565,8 @@ public final class ArrayTable<R, C, V> extends AbstractTable<R, C, V> implements
 		return columnKeyToIndex.containsKey(columnKey);
 	}
 
+	// TODO(jlevy): Add eraseRow and eraseColumn methods?
+
 	/**
 	 * Returns {@code true} if the provided row key is among the row keys provided
 	 * when the table was constructed.
@@ -452,6 +586,39 @@ public final class ArrayTable<R, C, V> extends AbstractTable<R, C, V> implements
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Associates the value {@code null} with the specified keys, assuming both keys
+	 * are valid. If either key is null or isn't among the keys provided during
+	 * construction, this method has no effect.
+	 *
+	 * <p>
+	 * This method is equivalent to {@code put(rowKey, columnKey, null)} when both
+	 * provided keys are valid.
+	 *
+	 * @param rowKey    row key of mapping to be erased
+	 * @param columnKey column key of mapping to be erased
+	 * @return the value previously associated with the keys, or {@code null} if no
+	 *         mapping existed for the keys
+	 */
+	public V erase(@Nullable Object rowKey, @Nullable Object columnKey) {
+		Integer rowIndex = rowKeyToIndex.get(rowKey);
+		Integer columnIndex = columnKeyToIndex.get(columnKey);
+		if (rowIndex == null || columnIndex == null) {
+			return null;
+		}
+		return set(rowIndex, columnIndex, null);
+	}
+
+	/**
+	 * Associates the value {@code null} with every pair of allowed row and column
+	 * keys.
+	 */
+	public void eraseAll() {
+		for (V[] row : array) {
+			Arrays.fill(row, null);
+		}
 	}
 
 	@Override
@@ -487,11 +654,6 @@ public final class ArrayTable<R, C, V> extends AbstractTable<R, C, V> implements
 		return set(rowIndex, columnIndex, value);
 	}
 
-	/*
-	 * TODO(jlevy): Consider creating a merge() method, similar to putAll() but
-	 * copying non-null values only.
-	 */
-
 	/**
 	 * {@inheritDoc}
 	 *
@@ -522,171 +684,6 @@ public final class ArrayTable<R, C, V> extends AbstractTable<R, C, V> implements
 	}
 
 	/**
-	 * Associates the value {@code null} with the specified keys, assuming both keys
-	 * are valid. If either key is null or isn't among the keys provided during
-	 * construction, this method has no effect.
-	 *
-	 * <p>
-	 * This method is equivalent to {@code put(rowKey, columnKey, null)} when both
-	 * provided keys are valid.
-	 *
-	 * @param rowKey    row key of mapping to be erased
-	 * @param columnKey column key of mapping to be erased
-	 * @return the value previously associated with the keys, or {@code null} if no
-	 *         mapping existed for the keys
-	 */
-	public V erase(@Nullable Object rowKey, @Nullable Object columnKey) {
-		Integer rowIndex = rowKeyToIndex.get(rowKey);
-		Integer columnIndex = columnKeyToIndex.get(columnKey);
-		if (rowIndex == null || columnIndex == null) {
-			return null;
-		}
-		return set(rowIndex, columnIndex, null);
-	}
-
-	// TODO(jlevy): Add eraseRow and eraseColumn methods?
-
-	@Override
-	public int size() {
-		return rowList.size() * columnList.size();
-	}
-
-	/**
-	 * Returns an unmodifiable set of all row key / column key / value triplets.
-	 * Changes to the table will update the returned set.
-	 *
-	 * <p>
-	 * The returned set's iterator traverses the mappings with the first row key,
-	 * the mappings with the second row key, and so on.
-	 *
-	 * <p>
-	 * The value in the returned cells may change if the table subsequently changes.
-	 *
-	 * @return set of table cells consisting of row key / column key / value
-	 *         triplets
-	 */
-	@Override
-	public Set<Cell<R, C, V>> cellSet() {
-		return super.cellSet();
-	}
-
-	@Override
-	Iterator<Cell<R, C, V>> cellIterator() {
-		return new AbstractIndexedListIterator<Cell<R, C, V>>(size()) {
-			@Override
-			protected Cell<R, C, V> get(final int index) {
-				return new Tables.AbstractCell<R, C, V>() {
-					final int rowIndex = index / columnList.size();
-					final int columnIndex = index % columnList.size();
-
-					@Override
-					public R getRowKey() {
-						return rowList.get(rowIndex);
-					}
-
-					@Override
-					public C getColumnKey() {
-						return columnList.get(columnIndex);
-					}
-
-					@Override
-					public V getValue() {
-						return at(rowIndex, columnIndex);
-					}
-				};
-			}
-		};
-	}
-
-	/**
-	 * Returns a view of all mappings that have the given column key. If the column
-	 * key isn't in {@link #columnKeySet()}, an empty immutable map is returned.
-	 *
-	 * <p>
-	 * Otherwise, for each row key in {@link #rowKeySet()}, the returned map
-	 * associates the row key with the corresponding value in the table. Changes to
-	 * the returned map will update the underlying table, and vice versa.
-	 *
-	 * @param columnKey key of column to search for in the table
-	 * @return the corresponding map from row keys to values
-	 */
-	@Override
-	public Map<R, V> column(C columnKey) {
-		checkNotNull(columnKey);
-		Integer columnIndex = columnKeyToIndex.get(columnKey);
-		return (columnIndex == null) ? ImmutableMap.<R, V>of() : new Column(columnIndex);
-	}
-
-	private class Column extends ArrayMap<R, V> {
-		final int columnIndex;
-
-		Column(int columnIndex) {
-			super(rowKeyToIndex);
-			this.columnIndex = columnIndex;
-		}
-
-		@Override
-		String getKeyRole() {
-			return "Row";
-		}
-
-		@Override
-		V getValue(int index) {
-			return at(index, columnIndex);
-		}
-
-		@Override
-		V setValue(int index, V newValue) {
-			return set(index, columnIndex, newValue);
-		}
-	}
-
-	/**
-	 * Returns an immutable set of the valid column keys, including those that are
-	 * associated with null values only.
-	 *
-	 * @return immutable set of column keys
-	 */
-	@Override
-	public ImmutableSet<C> columnKeySet() {
-		return columnKeyToIndex.keySet();
-	}
-
-	private transient ColumnMap columnMap;
-
-	@Override
-	public Map<C, Map<R, V>> columnMap() {
-		ColumnMap map = columnMap;
-		return (map == null) ? columnMap = new ColumnMap() : map;
-	}
-
-	private class ColumnMap extends ArrayMap<C, Map<R, V>> {
-		private ColumnMap() {
-			super(columnKeyToIndex);
-		}
-
-		@Override
-		String getKeyRole() {
-			return "Column";
-		}
-
-		@Override
-		Map<R, V> getValue(int index) {
-			return new Column(index);
-		}
-
-		@Override
-		Map<R, V> setValue(int index, Map<R, V> newValue) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public Map<R, V> put(C key, Map<R, V> value) {
-			throw new UnsupportedOperationException();
-		}
-	}
-
-	/**
 	 * Returns a view of all mappings that have the given row key. If the row key
 	 * isn't in {@link #rowKeySet()}, an empty immutable map is returned.
 	 *
@@ -705,28 +702,12 @@ public final class ArrayTable<R, C, V> extends AbstractTable<R, C, V> implements
 		return (rowIndex == null) ? ImmutableMap.<C, V>of() : new Row(rowIndex);
 	}
 
-	private class Row extends ArrayMap<C, V> {
-		final int rowIndex;
-
-		Row(int rowIndex) {
-			super(columnKeyToIndex);
-			this.rowIndex = rowIndex;
-		}
-
-		@Override
-		String getKeyRole() {
-			return "Column";
-		}
-
-		@Override
-		V getValue(int index) {
-			return at(rowIndex, index);
-		}
-
-		@Override
-		V setValue(int index, V newValue) {
-			return set(rowIndex, index, newValue);
-		}
+	/**
+	 * Returns, as an immutable list, the row keys provided when the table was
+	 * constructed, including those that are mapped to null values only.
+	 */
+	public ImmutableList<R> rowKeyList() {
+		return rowList;
 	}
 
 	/**
@@ -740,38 +721,62 @@ public final class ArrayTable<R, C, V> extends AbstractTable<R, C, V> implements
 		return rowKeyToIndex.keySet();
 	}
 
-	private transient RowMap rowMap;
-
 	@Override
 	public Map<R, Map<C, V>> rowMap() {
 		RowMap map = rowMap;
 		return (map == null) ? rowMap = new RowMap() : map;
 	}
 
-	private class RowMap extends ArrayMap<R, Map<C, V>> {
-		private RowMap() {
-			super(rowKeyToIndex);
-		}
+	/**
+	 * Associates {@code value} with the specified row and column indices. The logic
+	 * {@code
+	 * put(rowKeyList().get(rowIndex), columnKeyList().get(columnIndex), value)} has
+	 * the same behavior, but this method runs more quickly.
+	 *
+	 * @param rowIndex    position of the row key in {@link #rowKeyList()}
+	 * @param columnIndex position of the row key in {@link #columnKeyList()}
+	 * @param value       value to store in the table
+	 * @return the previous value with the specified row and column
+	 * @throws IndexOutOfBoundsException if either index is negative, {@code
+	 *     rowIndex}                  is greater then or equal to the number of
+	 *                                   allowed row keys, or {@code columnIndex} is
+	 *                                   greater then or equal to the number of
+	 *                                   allowed column keys
+	 */
+	public V set(int rowIndex, int columnIndex, @Nullable V value) {
+		// In GWT array access never throws IndexOutOfBoundsException.
+		checkElementIndex(rowIndex, rowList.size());
+		checkElementIndex(columnIndex, columnList.size());
+		V oldValue = array[rowIndex][columnIndex];
+		array[rowIndex][columnIndex] = value;
+		return oldValue;
+	}
 
-		@Override
-		String getKeyRole() {
-			return "Row";
-		}
+	@Override
+	public int size() {
+		return rowList.size() * columnList.size();
+	}
 
-		@Override
-		Map<C, V> getValue(int index) {
-			return new Row(index);
+	/**
+	 * Returns a two-dimensional array with the table contents. The row and column
+	 * indices correspond to the positions of the row and column in the iterables
+	 * provided during table construction. If the table lacks a mapping for a given
+	 * row and column, the corresponding array element is null.
+	 *
+	 * <p>
+	 * Subsequent table changes will not modify the array, and vice versa.
+	 *
+	 * @param valueClass class of values stored in the returned array
+	 */
+	@GwtIncompatible("reflection")
+	public V[][] toArray(Class<V> valueClass) {
+		// Can change to use varargs in JDK 1.6 if we want
+		@SuppressWarnings("unchecked") // TODO: safe?
+		V[][] copy = (V[][]) Array.newInstance(valueClass, new int[] { rowList.size(), columnList.size() });
+		for (int i = 0; i < rowList.size(); i++) {
+			System.arraycopy(array[i], 0, copy[i], 0, array[i].length);
 		}
-
-		@Override
-		Map<C, V> setValue(int index, Map<C, V> newValue) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public Map<C, V> put(R key, Map<C, V> value) {
-			throw new UnsupportedOperationException();
-		}
+		return copy;
 	}
 
 	/**
@@ -788,6 +793,4 @@ public final class ArrayTable<R, C, V> extends AbstractTable<R, C, V> implements
 	public Collection<V> values() {
 		return super.values();
 	}
-
-	private static final long serialVersionUID = 0;
 }

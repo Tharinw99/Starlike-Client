@@ -22,31 +22,30 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.storage.MapData;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class ItemMap extends ItemMapBase {
-	protected ItemMap() {
-		this.setHasSubtypes(true);
-	}
-
 	public static MapData loadMapData(int mapId, World worldIn) {
 		String s = "map_" + mapId;
 		MapData mapdata = (MapData) worldIn.loadItemData(MapData.class, s);
@@ -56,6 +55,31 @@ public class ItemMap extends ItemMapBase {
 		}
 
 		return mapdata;
+	}
+
+	protected ItemMap() {
+		this.setHasSubtypes(true);
+	}
+
+	/**
+	 * + allows items to add custom lines of information to the mouseover
+	 * description
+	 */
+	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+		MapData mapdata = this.getMapData(stack, playerIn.worldObj);
+		if (advanced) {
+			if (mapdata == null) {
+				tooltip.add("Unknown map");
+			} else {
+				tooltip.add("Scaling at 1:" + (1 << mapdata.scale));
+				tooltip.add("(Level " + mapdata.scale + "/" + 4 + ")");
+			}
+		}
+
+	}
+
+	public Packet createMapDataPacket(ItemStack stack, World worldIn, EntityPlayer player) {
+		return this.getMapData(stack, worldIn).getMapPacket(stack, worldIn, player);
 	}
 
 	public MapData getMapData(ItemStack stack, World worldIn) {
@@ -74,6 +98,46 @@ public class ItemMap extends ItemMapBase {
 		}
 
 		return mapdata;
+	}
+
+	/**
+	 * + Called when item is crafted/smelted. Used only by maps so far.
+	 */
+	public void onCreated(ItemStack stack, World worldIn, EntityPlayer playerIn) {
+		if (stack.hasTagCompound() && stack.getTagCompound().getBoolean("map_is_scaling")) {
+			MapData mapdata = Items.filled_map.getMapData(stack, worldIn);
+			stack.setItemDamage(worldIn.getUniqueDataId("map"));
+			MapData mapdata1 = new MapData("map_" + stack.getMetadata());
+			mapdata1.scale = (byte) (mapdata.scale + 1);
+			if (mapdata1.scale > 4) {
+				mapdata1.scale = 4;
+			}
+
+			mapdata1.calculateMapCenter((double) mapdata.xCenter, (double) mapdata.zCenter, mapdata1.scale);
+			mapdata1.dimension = mapdata.dimension;
+			mapdata1.markDirty();
+			worldIn.setItemData("map_" + stack.getMetadata(), mapdata1);
+		}
+
+	}
+
+	/**
+	 * + Called each tick as long the item is on a player inventory. Uses by maps to
+	 * check if is on a player hand and update it's contents.
+	 */
+	public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
+		if (!worldIn.isRemote) {
+			MapData mapdata = this.getMapData(stack, worldIn);
+			if (entityIn instanceof EntityPlayer) {
+				EntityPlayer entityplayer = (EntityPlayer) entityIn;
+				mapdata.updateVisiblePlayers(entityplayer, stack);
+			}
+
+			if (isSelected) {
+				this.updateMapData(worldIn, entityIn, mapdata);
+			}
+
+		}
 	}
 
 	public void updateMapData(World worldIn, Entity viewer, MapData data) {
@@ -208,68 +272,5 @@ public class ItemMap extends ItemMapBase {
 			}
 
 		}
-	}
-
-	/**+
-	 * Called each tick as long the item is on a player inventory.
-	 * Uses by maps to check if is on a player hand and update it's
-	 * contents.
-	 */
-	public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
-		if (!worldIn.isRemote) {
-			MapData mapdata = this.getMapData(stack, worldIn);
-			if (entityIn instanceof EntityPlayer) {
-				EntityPlayer entityplayer = (EntityPlayer) entityIn;
-				mapdata.updateVisiblePlayers(entityplayer, stack);
-			}
-
-			if (isSelected) {
-				this.updateMapData(worldIn, entityIn, mapdata);
-			}
-
-		}
-	}
-
-	public Packet createMapDataPacket(ItemStack stack, World worldIn, EntityPlayer player) {
-		return this.getMapData(stack, worldIn).getMapPacket(stack, worldIn, player);
-	}
-
-	/**+
-	 * Called when item is crafted/smelted. Used only by maps so
-	 * far.
-	 */
-	public void onCreated(ItemStack stack, World worldIn, EntityPlayer playerIn) {
-		if (stack.hasTagCompound() && stack.getTagCompound().getBoolean("map_is_scaling")) {
-			MapData mapdata = Items.filled_map.getMapData(stack, worldIn);
-			stack.setItemDamage(worldIn.getUniqueDataId("map"));
-			MapData mapdata1 = new MapData("map_" + stack.getMetadata());
-			mapdata1.scale = (byte) (mapdata.scale + 1);
-			if (mapdata1.scale > 4) {
-				mapdata1.scale = 4;
-			}
-
-			mapdata1.calculateMapCenter((double) mapdata.xCenter, (double) mapdata.zCenter, mapdata1.scale);
-			mapdata1.dimension = mapdata.dimension;
-			mapdata1.markDirty();
-			worldIn.setItemData("map_" + stack.getMetadata(), mapdata1);
-		}
-
-	}
-
-	/**+
-	 * allows items to add custom lines of information to the
-	 * mouseover description
-	 */
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-		MapData mapdata = this.getMapData(stack, playerIn.worldObj);
-		if (advanced) {
-			if (mapdata == null) {
-				tooltip.add("Unknown map");
-			} else {
-				tooltip.add("Scaling at 1:" + (1 << mapdata.scale));
-				tooltip.add("(Level " + mapdata.scale + "/" + 4 + ")");
-			}
-		}
-
 	}
 }

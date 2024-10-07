@@ -19,8 +19,6 @@ import javax.annotation.meta.When;
 @TypeQualifier(applicableTo = Number.class)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Nonnegative {
-	When when() default When.ALWAYS;
-
 	class Checker implements TypeQualifierValidator<Nonnegative> {
 
 		public When forConstantValue(Nonnegative annotation, Object v) {
@@ -44,4 +42,6 @@ public @interface Nonnegative {
 
 		}
 	}
+
+	When when() default When.ALWAYS;
 }

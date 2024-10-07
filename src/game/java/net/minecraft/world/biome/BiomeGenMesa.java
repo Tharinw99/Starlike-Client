@@ -1,6 +1,7 @@
 package net.minecraft.world.biome;
 
 import java.util.Arrays;
+
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import net.minecraft.block.BlockColored;
 import net.minecraft.block.BlockDirt;
@@ -15,22 +16,25 @@ import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.NoiseGeneratorPerlin;
 import net.minecraft.world.gen.feature.WorldGenAbstractTree;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -65,20 +69,107 @@ public class BiomeGenMesa extends BiomeGenBase {
 
 	}
 
-	public WorldGenAbstractTree genBigTreeChance(EaglercraftRandom var1) {
-		return this.worldGeneratorTrees;
-	}
+	protected BiomeGenBase createMutatedBiome(int i) {
+		boolean flag = this.biomeID == BiomeGenBase.mesa.biomeID;
+		BiomeGenMesa biomegenmesa = new BiomeGenMesa(i, flag, this.field_150620_aI);
+		if (!flag) {
+			biomegenmesa.setHeight(height_LowHills);
+			biomegenmesa.setBiomeName(this.biomeName + " M");
+		} else {
+			biomegenmesa.setBiomeName(this.biomeName + " (Bryce)");
+		}
 
-	public int getFoliageColorAtPos(BlockPos var1) {
-		return 10387789;
-	}
-
-	public int getGrassColorAtPos(BlockPos var1) {
-		return 9470285;
+		biomegenmesa.func_150557_a(this.color, true);
+		return biomegenmesa;
 	}
 
 	public void decorate(World world, EaglercraftRandom random, BlockPos blockpos) {
 		super.decorate(world, random, blockpos);
+	}
+
+	private void func_150619_a(long parLong1, boolean scrambleRNG) {
+		this.field_150621_aC = new IBlockState[64];
+		Arrays.fill(this.field_150621_aC, Blocks.hardened_clay.getDefaultState());
+		EaglercraftRandom random = new EaglercraftRandom(parLong1, scrambleRNG);
+		this.field_150625_aG = new NoiseGeneratorPerlin(random, 1);
+
+		for (int l1 = 0; l1 < 64; ++l1) {
+			l1 += random.nextInt(5) + 1;
+			if (l1 < 64) {
+				this.field_150621_aC[l1] = Blocks.stained_hardened_clay.getDefaultState()
+						.withProperty(BlockColored.COLOR, EnumDyeColor.ORANGE);
+			}
+		}
+
+		int i2 = random.nextInt(4) + 2;
+
+		for (int i = 0; i < i2; ++i) {
+			int j = random.nextInt(3) + 1;
+			int k = random.nextInt(64);
+
+			for (int l = 0; k + l < 64 && l < j; ++l) {
+				this.field_150621_aC[k + l] = Blocks.stained_hardened_clay.getDefaultState()
+						.withProperty(BlockColored.COLOR, EnumDyeColor.YELLOW);
+			}
+		}
+
+		int j2 = random.nextInt(4) + 2;
+
+		for (int k2 = 0; k2 < j2; ++k2) {
+			int i3 = random.nextInt(3) + 2;
+			int l3 = random.nextInt(64);
+
+			for (int i1 = 0; l3 + i1 < 64 && i1 < i3; ++i1) {
+				this.field_150621_aC[l3 + i1] = Blocks.stained_hardened_clay.getDefaultState()
+						.withProperty(BlockColored.COLOR, EnumDyeColor.BROWN);
+			}
+		}
+
+		int l2 = random.nextInt(4) + 2;
+
+		for (int j3 = 0; j3 < l2; ++j3) {
+			int i4 = random.nextInt(3) + 1;
+			int k4 = random.nextInt(64);
+
+			for (int j1 = 0; k4 + j1 < 64 && j1 < i4; ++j1) {
+				this.field_150621_aC[k4 + j1] = Blocks.stained_hardened_clay.getDefaultState()
+						.withProperty(BlockColored.COLOR, EnumDyeColor.RED);
+			}
+		}
+
+		int k3 = random.nextInt(3) + 3;
+		int j4 = 0;
+
+		for (int l4 = 0; l4 < k3; ++l4) {
+			byte b0 = 1;
+			j4 += random.nextInt(16) + 4;
+
+			for (int k1 = 0; j4 + k1 < 64 && k1 < b0; ++k1) {
+				this.field_150621_aC[j4 + k1] = Blocks.stained_hardened_clay.getDefaultState()
+						.withProperty(BlockColored.COLOR, EnumDyeColor.WHITE);
+				if (j4 + k1 > 1 && random.nextBoolean()) {
+					this.field_150621_aC[j4 + k1 - 1] = Blocks.stained_hardened_clay.getDefaultState()
+							.withProperty(BlockColored.COLOR, EnumDyeColor.SILVER);
+				}
+
+				if (j4 + k1 < 63 && random.nextBoolean()) {
+					this.field_150621_aC[j4 + k1 + 1] = Blocks.stained_hardened_clay.getDefaultState()
+							.withProperty(BlockColored.COLOR, EnumDyeColor.SILVER);
+				}
+			}
+		}
+
+	}
+
+	private IBlockState func_180629_a(int parInt1, int parInt2, int parInt3) {
+		int i = (int) Math.round(
+				this.field_150625_aG.func_151601_a((double) parInt1 * 1.0D / 512.0D, (double) parInt1 * 1.0D / 512.0D)
+						* 2.0D);
+		return this.field_150621_aC[(parInt2 + i + 64) % 64];
+	}
+
+	public WorldGenAbstractTree genBigTreeChance(EaglercraftRandom var1) {
+		return this.worldGeneratorTrees;
 	}
 
 	public void genTerrainBlocks(World world, EaglercraftRandom random, ChunkPrimer chunkprimer, int i, int j,
@@ -198,98 +289,11 @@ public class BiomeGenMesa extends BiomeGenBase {
 
 	}
 
-	private void func_150619_a(long parLong1, boolean scrambleRNG) {
-		this.field_150621_aC = new IBlockState[64];
-		Arrays.fill(this.field_150621_aC, Blocks.hardened_clay.getDefaultState());
-		EaglercraftRandom random = new EaglercraftRandom(parLong1, scrambleRNG);
-		this.field_150625_aG = new NoiseGeneratorPerlin(random, 1);
-
-		for (int l1 = 0; l1 < 64; ++l1) {
-			l1 += random.nextInt(5) + 1;
-			if (l1 < 64) {
-				this.field_150621_aC[l1] = Blocks.stained_hardened_clay.getDefaultState()
-						.withProperty(BlockColored.COLOR, EnumDyeColor.ORANGE);
-			}
-		}
-
-		int i2 = random.nextInt(4) + 2;
-
-		for (int i = 0; i < i2; ++i) {
-			int j = random.nextInt(3) + 1;
-			int k = random.nextInt(64);
-
-			for (int l = 0; k + l < 64 && l < j; ++l) {
-				this.field_150621_aC[k + l] = Blocks.stained_hardened_clay.getDefaultState()
-						.withProperty(BlockColored.COLOR, EnumDyeColor.YELLOW);
-			}
-		}
-
-		int j2 = random.nextInt(4) + 2;
-
-		for (int k2 = 0; k2 < j2; ++k2) {
-			int i3 = random.nextInt(3) + 2;
-			int l3 = random.nextInt(64);
-
-			for (int i1 = 0; l3 + i1 < 64 && i1 < i3; ++i1) {
-				this.field_150621_aC[l3 + i1] = Blocks.stained_hardened_clay.getDefaultState()
-						.withProperty(BlockColored.COLOR, EnumDyeColor.BROWN);
-			}
-		}
-
-		int l2 = random.nextInt(4) + 2;
-
-		for (int j3 = 0; j3 < l2; ++j3) {
-			int i4 = random.nextInt(3) + 1;
-			int k4 = random.nextInt(64);
-
-			for (int j1 = 0; k4 + j1 < 64 && j1 < i4; ++j1) {
-				this.field_150621_aC[k4 + j1] = Blocks.stained_hardened_clay.getDefaultState()
-						.withProperty(BlockColored.COLOR, EnumDyeColor.RED);
-			}
-		}
-
-		int k3 = random.nextInt(3) + 3;
-		int j4 = 0;
-
-		for (int l4 = 0; l4 < k3; ++l4) {
-			byte b0 = 1;
-			j4 += random.nextInt(16) + 4;
-
-			for (int k1 = 0; j4 + k1 < 64 && k1 < b0; ++k1) {
-				this.field_150621_aC[j4 + k1] = Blocks.stained_hardened_clay.getDefaultState()
-						.withProperty(BlockColored.COLOR, EnumDyeColor.WHITE);
-				if (j4 + k1 > 1 && random.nextBoolean()) {
-					this.field_150621_aC[j4 + k1 - 1] = Blocks.stained_hardened_clay.getDefaultState()
-							.withProperty(BlockColored.COLOR, EnumDyeColor.SILVER);
-				}
-
-				if (j4 + k1 < 63 && random.nextBoolean()) {
-					this.field_150621_aC[j4 + k1 + 1] = Blocks.stained_hardened_clay.getDefaultState()
-							.withProperty(BlockColored.COLOR, EnumDyeColor.SILVER);
-				}
-			}
-		}
-
+	public int getFoliageColorAtPos(BlockPos var1) {
+		return 10387789;
 	}
 
-	private IBlockState func_180629_a(int parInt1, int parInt2, int parInt3) {
-		int i = (int) Math.round(
-				this.field_150625_aG.func_151601_a((double) parInt1 * 1.0D / 512.0D, (double) parInt1 * 1.0D / 512.0D)
-						* 2.0D);
-		return this.field_150621_aC[(parInt2 + i + 64) % 64];
-	}
-
-	protected BiomeGenBase createMutatedBiome(int i) {
-		boolean flag = this.biomeID == BiomeGenBase.mesa.biomeID;
-		BiomeGenMesa biomegenmesa = new BiomeGenMesa(i, flag, this.field_150620_aI);
-		if (!flag) {
-			biomegenmesa.setHeight(height_LowHills);
-			biomegenmesa.setBiomeName(this.biomeName + " M");
-		} else {
-			biomegenmesa.setBiomeName(this.biomeName + " (Bryce)");
-		}
-
-		biomegenmesa.func_150557_a(this.color, true);
-		return biomegenmesa;
+	public int getGrassColorAtPos(BlockPos var1) {
+		return 9470285;
 	}
 }

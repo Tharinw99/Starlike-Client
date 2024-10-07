@@ -1,7 +1,6 @@
 package net.minecraft.tileentity;
 
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -14,27 +13,31 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.IInteractionObject;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class TileEntityEnchantmentTable extends TileEntity implements ITickable, IInteractionObject {
+	private static EaglercraftRandom rand = new EaglercraftRandom();
 	public int tickCount;
 	public float pageFlip;
 	public float pageFlipPrev;
@@ -45,15 +48,38 @@ public class TileEntityEnchantmentTable extends TileEntity implements ITickable,
 	public float bookRotation;
 	public float bookRotationPrev;
 	public float field_145924_q;
-	private static EaglercraftRandom rand = new EaglercraftRandom();
 	private String customName;
 
-	public void writeToNBT(NBTTagCompound nbttagcompound) {
-		super.writeToNBT(nbttagcompound);
-		if (this.hasCustomName()) {
-			nbttagcompound.setString("CustomName", this.customName);
-		}
+	public Container createContainer(InventoryPlayer inventoryplayer, EntityPlayer var2) {
+		return new ContainerEnchantment(inventoryplayer, this.worldObj, this.pos);
+	}
 
+	/**
+	 * + Get the formatted ChatComponent that will be used for the sender's username
+	 * in chat
+	 */
+	public IChatComponent getDisplayName() {
+		return (IChatComponent) (this.hasCustomName() ? new ChatComponentText(this.getName())
+				: new ChatComponentTranslation(this.getName(), new Object[0]));
+	}
+
+	public String getGuiID() {
+		return "minecraft:enchanting_table";
+	}
+
+	/**
+	 * + Gets the name of this command sender (usually username, but possibly
+	 * "Rcon")
+	 */
+	public String getName() {
+		return this.hasCustomName() ? this.customName : "container.enchant";
+	}
+
+	/**
+	 * + Returns true if this thing is named
+	 */
+	public boolean hasCustomName() {
+		return this.customName != null && this.customName.length() > 0;
 	}
 
 	public void readFromNBT(NBTTagCompound nbttagcompound) {
@@ -64,8 +90,12 @@ public class TileEntityEnchantmentTable extends TileEntity implements ITickable,
 
 	}
 
-	/**+
-	 * Like the old updateEntity(), except more generic.
+	public void setCustomName(String customNameIn) {
+		this.customName = customNameIn;
+	}
+
+	/**
+	 * + Like the old updateEntity(), except more generic.
 	 */
 	public void update() {
 		this.bookSpreadPrev = this.bookSpread;
@@ -128,39 +158,11 @@ public class TileEntityEnchantmentTable extends TileEntity implements ITickable,
 		this.pageFlip += this.field_145929_l;
 	}
 
-	/**+
-	 * Gets the name of this command sender (usually username, but
-	 * possibly "Rcon")
-	 */
-	public String getName() {
-		return this.hasCustomName() ? this.customName : "container.enchant";
-	}
+	public void writeToNBT(NBTTagCompound nbttagcompound) {
+		super.writeToNBT(nbttagcompound);
+		if (this.hasCustomName()) {
+			nbttagcompound.setString("CustomName", this.customName);
+		}
 
-	/**+
-	 * Returns true if this thing is named
-	 */
-	public boolean hasCustomName() {
-		return this.customName != null && this.customName.length() > 0;
-	}
-
-	public void setCustomName(String customNameIn) {
-		this.customName = customNameIn;
-	}
-
-	/**+
-	 * Get the formatted ChatComponent that will be used for the
-	 * sender's username in chat
-	 */
-	public IChatComponent getDisplayName() {
-		return (IChatComponent) (this.hasCustomName() ? new ChatComponentText(this.getName())
-				: new ChatComponentTranslation(this.getName(), new Object[0]));
-	}
-
-	public Container createContainer(InventoryPlayer inventoryplayer, EntityPlayer var2) {
-		return new ContainerEnchantment(inventoryplayer, this.worldObj, this.pos);
-	}
-
-	public String getGuiID() {
-		return "minecraft:enchanting_table";
 	}
 }

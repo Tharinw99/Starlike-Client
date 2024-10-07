@@ -2,6 +2,11 @@ package net.minecraft.inventory;
 
 import java.util.Iterator;
 import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+
+import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
+import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 import net.minecraft.block.BlockAnvil;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.Enchantment;
@@ -13,26 +18,26 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
-import org.apache.commons.lang3.StringUtils;
-import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
-import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -47,10 +52,6 @@ public class ContainerRepair extends Container {
 	private int materialCost;
 	private String repairedItemName;
 	private final EntityPlayer thePlayer;
-
-	public ContainerRepair(InventoryPlayer playerInventory, World worldIn, EntityPlayer player) {
-		this(playerInventory, worldIn, BlockPos.ORIGIN, player);
-	}
 
 	public ContainerRepair(InventoryPlayer playerInventory, final World worldIn, final BlockPos blockPosIn,
 			EntityPlayer player) {
@@ -67,14 +68,14 @@ public class ContainerRepair extends Container {
 		this.addSlotToContainer(new Slot(this.inputSlots, 0, 27, 47));
 		this.addSlotToContainer(new Slot(this.inputSlots, 1, 76, 47));
 		this.addSlotToContainer(new Slot(this.outputSlot, 2, 134, 47) {
-			public boolean isItemValid(ItemStack var1) {
-				return false;
-			}
-
 			public boolean canTakeStack(EntityPlayer playerIn) {
 				return (playerIn.capabilities.isCreativeMode
 						|| playerIn.experienceLevel >= ContainerRepair.this.maximumCost)
 						&& ContainerRepair.this.maximumCost > 0 && this.getHasStack();
+			}
+
+			public boolean isItemValid(ItemStack var1) {
+				return false;
 			}
 
 			public void onPickupFromSlot(EntityPlayer entityplayer, ItemStack var2) {
@@ -128,8 +129,39 @@ public class ContainerRepair extends Container {
 
 	}
 
-	/**+
-	 * Callback for when the crafting matrix is changed.
+	public ContainerRepair(InventoryPlayer playerInventory, World worldIn, EntityPlayer player) {
+		this(playerInventory, worldIn, BlockPos.ORIGIN, player);
+	}
+
+	public boolean canInteractWith(EntityPlayer entityplayer) {
+		return this.theWorld.getBlockState(this.selfPosition).getBlock() != Blocks.anvil ? false
+				: entityplayer.getDistanceSq((double) this.selfPosition.getX() + 0.5D,
+						(double) this.selfPosition.getY() + 0.5D, (double) this.selfPosition.getZ() + 0.5D) <= 64.0D;
+	}
+
+	/**
+	 * + Called when the container is closed.
+	 */
+	public void onContainerClosed(EntityPlayer entityplayer) {
+		super.onContainerClosed(entityplayer);
+		if (!this.theWorld.isRemote) {
+			for (int i = 0; i < this.inputSlots.getSizeInventory(); ++i) {
+				ItemStack itemstack = this.inputSlots.removeStackFromSlot(i);
+				if (itemstack != null) {
+					entityplayer.dropPlayerItemWithRandomChoice(itemstack, false);
+				}
+			}
+
+		}
+	}
+
+	public void onCraftGuiOpened(ICrafting icrafting) {
+		super.onCraftGuiOpened(icrafting);
+		icrafting.sendProgressBarUpdate(this, 0, this.maximumCost);
+	}
+
+	/**
+	 * + Callback for when the crafting matrix is changed.
 	 */
 	public void onCraftMatrixChanged(IInventory iinventory) {
 		super.onCraftMatrixChanged(iinventory);
@@ -139,9 +171,72 @@ public class ContainerRepair extends Container {
 
 	}
 
-	/**+
-	 * called when the Anvil Input Slot changes, calculates the new
-	 * result and puts it in the output slot
+	/**
+	 * + Take a stack from the specified inventory slot.
+	 */
+	public ItemStack transferStackInSlot(EntityPlayer entityplayer, int i) {
+		ItemStack itemstack = null;
+		Slot slot = (Slot) this.inventorySlots.get(i);
+		if (slot != null && slot.getHasStack()) {
+			ItemStack itemstack1 = slot.getStack();
+			itemstack = itemstack1.copy();
+			if (i == 2) {
+				if (!this.mergeItemStack(itemstack1, 3, 39, true)) {
+					return null;
+				}
+
+				slot.onSlotChange(itemstack1, itemstack);
+			} else if (i != 0 && i != 1) {
+				if (i >= 3 && i < 39 && !this.mergeItemStack(itemstack1, 0, 2, false)) {
+					return null;
+				}
+			} else if (!this.mergeItemStack(itemstack1, 3, 39, false)) {
+				return null;
+			}
+
+			if (itemstack1.stackSize == 0) {
+				slot.putStack((ItemStack) null);
+			} else {
+				slot.onSlotChanged();
+			}
+
+			if (itemstack1.stackSize == itemstack.stackSize) {
+				return null;
+			}
+
+			slot.onPickupFromSlot(entityplayer, itemstack1);
+		}
+
+		return itemstack;
+	}
+
+	/**
+	 * + used by the Anvil GUI to update the Item Name being typed by the player
+	 */
+	public void updateItemName(String newName) {
+		this.repairedItemName = newName;
+		if (this.getSlot(2).getHasStack()) {
+			ItemStack itemstack = this.getSlot(2).getStack();
+			if (StringUtils.isBlank(newName)) {
+				itemstack.clearCustomName();
+			} else {
+				itemstack.setStackDisplayName(this.repairedItemName);
+			}
+		}
+
+		this.updateRepairOutput();
+	}
+
+	public void updateProgressBar(int i, int j) {
+		if (i == 0) {
+			this.maximumCost = j;
+		}
+
+	}
+
+	/**
+	 * + called when the Anvil Input Slot changes, calculates the new result and
+	 * puts it in the output slot
 	 */
 	public void updateRepairOutput() {
 		boolean flag = false;
@@ -324,96 +419,5 @@ public class ContainerRepair extends Container {
 			this.outputSlot.setInventorySlotContents(0, itemstack1);
 			this.detectAndSendChanges();
 		}
-	}
-
-	public void onCraftGuiOpened(ICrafting icrafting) {
-		super.onCraftGuiOpened(icrafting);
-		icrafting.sendProgressBarUpdate(this, 0, this.maximumCost);
-	}
-
-	public void updateProgressBar(int i, int j) {
-		if (i == 0) {
-			this.maximumCost = j;
-		}
-
-	}
-
-	/**+
-	 * Called when the container is closed.
-	 */
-	public void onContainerClosed(EntityPlayer entityplayer) {
-		super.onContainerClosed(entityplayer);
-		if (!this.theWorld.isRemote) {
-			for (int i = 0; i < this.inputSlots.getSizeInventory(); ++i) {
-				ItemStack itemstack = this.inputSlots.removeStackFromSlot(i);
-				if (itemstack != null) {
-					entityplayer.dropPlayerItemWithRandomChoice(itemstack, false);
-				}
-			}
-
-		}
-	}
-
-	public boolean canInteractWith(EntityPlayer entityplayer) {
-		return this.theWorld.getBlockState(this.selfPosition).getBlock() != Blocks.anvil ? false
-				: entityplayer.getDistanceSq((double) this.selfPosition.getX() + 0.5D,
-						(double) this.selfPosition.getY() + 0.5D, (double) this.selfPosition.getZ() + 0.5D) <= 64.0D;
-	}
-
-	/**+
-	 * Take a stack from the specified inventory slot.
-	 */
-	public ItemStack transferStackInSlot(EntityPlayer entityplayer, int i) {
-		ItemStack itemstack = null;
-		Slot slot = (Slot) this.inventorySlots.get(i);
-		if (slot != null && slot.getHasStack()) {
-			ItemStack itemstack1 = slot.getStack();
-			itemstack = itemstack1.copy();
-			if (i == 2) {
-				if (!this.mergeItemStack(itemstack1, 3, 39, true)) {
-					return null;
-				}
-
-				slot.onSlotChange(itemstack1, itemstack);
-			} else if (i != 0 && i != 1) {
-				if (i >= 3 && i < 39 && !this.mergeItemStack(itemstack1, 0, 2, false)) {
-					return null;
-				}
-			} else if (!this.mergeItemStack(itemstack1, 3, 39, false)) {
-				return null;
-			}
-
-			if (itemstack1.stackSize == 0) {
-				slot.putStack((ItemStack) null);
-			} else {
-				slot.onSlotChanged();
-			}
-
-			if (itemstack1.stackSize == itemstack.stackSize) {
-				return null;
-			}
-
-			slot.onPickupFromSlot(entityplayer, itemstack1);
-		}
-
-		return itemstack;
-	}
-
-	/**+
-	 * used by the Anvil GUI to update the Item Name being typed by
-	 * the player
-	 */
-	public void updateItemName(String newName) {
-		this.repairedItemName = newName;
-		if (this.getSlot(2).getHasStack()) {
-			ItemStack itemstack = this.getSlot(2).getStack();
-			if (StringUtils.isBlank(newName)) {
-				itemstack.clearCustomName();
-			} else {
-				itemstack.setStackDisplayName(this.repairedItemName);
-			}
-		}
-
-		this.updateRepairOutput();
 	}
 }

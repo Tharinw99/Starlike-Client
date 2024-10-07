@@ -42,18 +42,6 @@ public interface BiMap<K, V> extends Map<K, V> {
 	// Modification Operations
 
 	/**
-	 * {@inheritDoc}
-	 *
-	 * @throws IllegalArgumentException if the given value is already bound to a
-	 *                                  different key in this bimap. The bimap will
-	 *                                  remain unmodified in this event. To avoid
-	 *                                  this exception, call {@link #forcePut}
-	 *                                  instead.
-	 */
-	@Override
-	V put(@Nullable K key, @Nullable V value);
-
-	/**
 	 * An alternate form of {@code put} that silently removes any existing entry
 	 * with the value {@code value} before proceeding with the {@link #put}
 	 * operation. If the bimap previously contained the provided key-value mapping,
@@ -74,7 +62,34 @@ public interface BiMap<K, V> extends Map<K, V> {
 	 */
 	V forcePut(@Nullable K key, @Nullable V value);
 
+	/**
+	 * Returns the inverse view of this bimap, which maps each of this bimap's
+	 * values to its associated key. The two bimaps are backed by the same data; any
+	 * changes to one will appear in the other.
+	 *
+	 * <p>
+	 * <b>Note:</b>There is no guaranteed correspondence between the iteration order
+	 * of a bimap and that of its inverse.
+	 *
+	 * @return the inverse view of this bimap
+	 */
+	BiMap<V, K> inverse();
+
 	// Bulk Operations
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @throws IllegalArgumentException if the given value is already bound to a
+	 *                                  different key in this bimap. The bimap will
+	 *                                  remain unmodified in this event. To avoid
+	 *                                  this exception, call {@link #forcePut}
+	 *                                  instead.
+	 */
+	@Override
+	V put(@Nullable K key, @Nullable V value);
+
+	// Views
 
 	/**
 	 * {@inheritDoc}
@@ -91,8 +106,6 @@ public interface BiMap<K, V> extends Map<K, V> {
 	@Override
 	void putAll(Map<? extends K, ? extends V> map);
 
-	// Views
-
 	/**
 	 * {@inheritDoc}
 	 *
@@ -102,17 +115,4 @@ public interface BiMap<K, V> extends Map<K, V> {
 	 */
 	@Override
 	Set<V> values();
-
-	/**
-	 * Returns the inverse view of this bimap, which maps each of this bimap's
-	 * values to its associated key. The two bimaps are backed by the same data; any
-	 * changes to one will appear in the other.
-	 *
-	 * <p>
-	 * <b>Note:</b>There is no guaranteed correspondence between the iteration order
-	 * of a bimap and that of its inverse.
-	 *
-	 * @return the inverse view of this bimap
-	 */
-	BiMap<V, K> inverse();
 }

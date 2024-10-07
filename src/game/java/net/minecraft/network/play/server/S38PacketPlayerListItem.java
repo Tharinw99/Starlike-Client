@@ -1,11 +1,13 @@
 package net.minecraft.network.play.server;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.Lists;
-import net.lax1dude.eaglercraft.v1_8.mojang.authlib.GameProfile;
-import net.lax1dude.eaglercraft.v1_8.mojang.authlib.Property;
 import java.io.IOException;
 import java.util.List;
+
+import com.google.common.base.Objects;
+import com.google.common.collect.Lists;
+
+import net.lax1dude.eaglercraft.v1_8.mojang.authlib.GameProfile;
+import net.lax1dude.eaglercraft.v1_8.mojang.authlib.Property;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
@@ -13,28 +15,74 @@ import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.WorldSettings;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class S38PacketPlayerListItem implements Packet<INetHandlerPlayClient> {
+	public static enum Action {
+		ADD_PLAYER, UPDATE_GAME_MODE, UPDATE_LATENCY, UPDATE_DISPLAY_NAME, REMOVE_PLAYER;
+	}
+
+	public class AddPlayerData {
+		private final int ping;
+		private final WorldSettings.GameType gamemode;
+		private final GameProfile profile;
+		private final IChatComponent displayName;
+
+		public AddPlayerData(GameProfile profile, int pingIn, WorldSettings.GameType gamemodeIn,
+				IChatComponent displayNameIn) {
+			this.profile = profile;
+			this.ping = pingIn;
+			this.gamemode = gamemodeIn;
+			this.displayName = displayNameIn;
+		}
+
+		public IChatComponent getDisplayName() {
+			return this.displayName;
+		}
+
+		public WorldSettings.GameType getGameMode() {
+			return this.gamemode;
+		}
+
+		public int getPing() {
+			return this.ping;
+		}
+
+		public GameProfile getProfile() {
+			return this.profile;
+		}
+
+		public String toString() {
+			return Objects.toStringHelper(this).add("latency", this.ping).add("gameMode", this.gamemode)
+					.add("profile", this.profile).add("displayName", this.displayName == null ? null
+							: IChatComponent.Serializer.componentToJson(this.displayName))
+					.toString();
+		}
+	}
+
 	private S38PacketPlayerListItem.Action action;
+
 	private final List<S38PacketPlayerListItem.AddPlayerData> players = Lists.newArrayList();
 
 	public S38PacketPlayerListItem() {
@@ -63,8 +111,23 @@ public class S38PacketPlayerListItem implements Packet<INetHandlerPlayClient> {
 
 	}
 
-	/**+
-	 * Reads the raw packet data from the data stream.
+	public List<S38PacketPlayerListItem.AddPlayerData> func_179767_a() {
+		return this.players;
+	}
+
+	public S38PacketPlayerListItem.Action func_179768_b() {
+		return this.action;
+	}
+
+	/**
+	 * + Passes this Packet on to the NetHandler for processing.
+	 */
+	public void processPacket(INetHandlerPlayClient inethandlerplayclient) {
+		inethandlerplayclient.handlePlayerListItem(this);
+	}
+
+	/**
+	 * + Reads the raw packet data from the data stream.
 	 */
 	public void readPacketData(PacketBuffer parPacketBuffer) throws IOException {
 		this.action = (S38PacketPlayerListItem.Action) parPacketBuffer
@@ -123,8 +186,12 @@ public class S38PacketPlayerListItem implements Packet<INetHandlerPlayClient> {
 
 	}
 
-	/**+
-	 * Writes the raw packet data to the data stream.
+	public String toString() {
+		return Objects.toStringHelper(this).add("action", this.action).add("entries", this.players).toString();
+	}
+
+	/**
+	 * + Writes the raw packet data to the data stream.
 	 */
 	public void writePacketData(PacketBuffer parPacketBuffer) throws IOException {
 		parPacketBuffer.writeEnumValue(this.action);
@@ -181,66 +248,5 @@ public class S38PacketPlayerListItem implements Packet<INetHandlerPlayClient> {
 			}
 		}
 
-	}
-
-	/**+
-	 * Passes this Packet on to the NetHandler for processing.
-	 */
-	public void processPacket(INetHandlerPlayClient inethandlerplayclient) {
-		inethandlerplayclient.handlePlayerListItem(this);
-	}
-
-	public List<S38PacketPlayerListItem.AddPlayerData> func_179767_a() {
-		return this.players;
-	}
-
-	public S38PacketPlayerListItem.Action func_179768_b() {
-		return this.action;
-	}
-
-	public String toString() {
-		return Objects.toStringHelper(this).add("action", this.action).add("entries", this.players).toString();
-	}
-
-	public static enum Action {
-		ADD_PLAYER, UPDATE_GAME_MODE, UPDATE_LATENCY, UPDATE_DISPLAY_NAME, REMOVE_PLAYER;
-	}
-
-	public class AddPlayerData {
-		private final int ping;
-		private final WorldSettings.GameType gamemode;
-		private final GameProfile profile;
-		private final IChatComponent displayName;
-
-		public AddPlayerData(GameProfile profile, int pingIn, WorldSettings.GameType gamemodeIn,
-				IChatComponent displayNameIn) {
-			this.profile = profile;
-			this.ping = pingIn;
-			this.gamemode = gamemodeIn;
-			this.displayName = displayNameIn;
-		}
-
-		public GameProfile getProfile() {
-			return this.profile;
-		}
-
-		public int getPing() {
-			return this.ping;
-		}
-
-		public WorldSettings.GameType getGameMode() {
-			return this.gamemode;
-		}
-
-		public IChatComponent getDisplayName() {
-			return this.displayName;
-		}
-
-		public String toString() {
-			return Objects.toStringHelper(this).add("latency", this.ping).add("gameMode", this.gamemode)
-					.add("profile", this.profile).add("displayName", this.displayName == null ? null
-							: IChatComponent.Serializer.componentToJson(this.displayName))
-					.toString();
-		}
 	}
 }

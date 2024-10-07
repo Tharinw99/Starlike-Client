@@ -50,7 +50,152 @@ import com.google.common.annotations.GwtCompatible;
  */
 @GwtCompatible(emulated = true)
 public final class Chars {
-	private Chars() {
+	@GwtCompatible
+	private static class CharArrayAsList extends AbstractList<Character> implements RandomAccess, Serializable {
+		private static final long serialVersionUID = 0;
+		final char[] array;
+		final int start;
+
+		final int end;
+
+		CharArrayAsList(char[] array) {
+			this(array, 0, array.length);
+		}
+
+		CharArrayAsList(char[] array, int start, int end) {
+			this.array = array;
+			this.start = start;
+			this.end = end;
+		}
+
+		@Override
+		public boolean contains(Object target) {
+			// Overridden to prevent a ton of boxing
+			return (target instanceof Character) && Chars.indexOf(array, (Character) target, start, end) != -1;
+		}
+
+		@Override
+		public boolean equals(Object object) {
+			if (object == this) {
+				return true;
+			}
+			if (object instanceof CharArrayAsList) {
+				CharArrayAsList that = (CharArrayAsList) object;
+				int size = size();
+				if (that.size() != size) {
+					return false;
+				}
+				for (int i = 0; i < size; i++) {
+					if (array[start + i] != that.array[that.start + i]) {
+						return false;
+					}
+				}
+				return true;
+			}
+			return super.equals(object);
+		}
+
+		@Override
+		public Character get(int index) {
+			checkElementIndex(index, size());
+			return array[start + index];
+		}
+
+		@Override
+		public int hashCode() {
+			int result = 1;
+			for (int i = start; i < end; i++) {
+				result = 31 * result + Chars.hashCode(array[i]);
+			}
+			return result;
+		}
+
+		@Override
+		public int indexOf(Object target) {
+			// Overridden to prevent a ton of boxing
+			if (target instanceof Character) {
+				int i = Chars.indexOf(array, (Character) target, start, end);
+				if (i >= 0) {
+					return i - start;
+				}
+			}
+			return -1;
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return false;
+		}
+
+		@Override
+		public int lastIndexOf(Object target) {
+			// Overridden to prevent a ton of boxing
+			if (target instanceof Character) {
+				int i = Chars.lastIndexOf(array, (Character) target, start, end);
+				if (i >= 0) {
+					return i - start;
+				}
+			}
+			return -1;
+		}
+
+		@Override
+		public Character set(int index, Character element) {
+			checkElementIndex(index, size());
+			char oldValue = array[start + index];
+			// checkNotNull for GWT (do not optimize)
+			array[start + index] = checkNotNull(element);
+			return oldValue;
+		}
+
+		@Override
+		public int size() {
+			return end - start;
+		}
+
+		@Override
+		public List<Character> subList(int fromIndex, int toIndex) {
+			int size = size();
+			checkPositionIndexes(fromIndex, toIndex, size);
+			if (fromIndex == toIndex) {
+				return Collections.emptyList();
+			}
+			return new CharArrayAsList(array, start + fromIndex, start + toIndex);
+		}
+
+		char[] toCharArray() {
+			// Arrays.copyOfRange() is not available under GWT
+			int size = size();
+			char[] result = new char[size];
+			System.arraycopy(array, start, result, 0, size);
+			return result;
+		}
+
+		@Override
+		public String toString() {
+			StringBuilder builder = new StringBuilder(size() * 3);
+			builder.append('[').append(array[start]);
+			for (int i = start + 1; i < end; i++) {
+				builder.append(", ").append(array[i]);
+			}
+			return builder.append(']').toString();
+		}
+	}
+
+	private enum LexicographicalComparator implements Comparator<char[]> {
+		INSTANCE;
+
+		@Override
+		public int compare(char[] left, char[] right) {
+			int minLength = Math.min(left.length, right.length);
+			for (int i = 0; i < minLength; i++) {
+				int result = Chars.compare(left[i], right[i]);
+				if (result != 0) {
+					return result;
+				}
+			}
+			return left.length - right.length;
+		}
 	}
 
 	/**
@@ -59,14 +204,25 @@ public final class Chars {
 	public static final int BYTES = Character.SIZE / Byte.SIZE;
 
 	/**
-	 * Returns a hash code for {@code value}; equal to the result of invoking
-	 * {@code ((Character) value).hashCode()}.
+	 * Returns a fixed-size list backed by the specified array, similar to
+	 * {@link Arrays#asList(Object[])}. The list supports
+	 * {@link List#set(int, Object)}, but any attempt to set a value to {@code null}
+	 * will result in a {@link NullPointerException}.
 	 *
-	 * @param value a primitive {@code char} value
-	 * @return a hash code for the value
+	 * <p>
+	 * The returned list maintains the values, but not the identities, of
+	 * {@code Character} objects written to or read from it. For example, whether
+	 * {@code list.get(0) == list.get(0)} is true for the returned list is
+	 * unspecified.
+	 *
+	 * @param backingArray the array to back the list
+	 * @return a list view of the array
 	 */
-	public static int hashCode(char value) {
-		return value;
+	public static List<Character> asList(char... backingArray) {
+		if (backingArray.length == 0) {
+			return Collections.emptyList();
+		}
+		return new CharArrayAsList(backingArray);
 	}
 
 	/**
@@ -88,24 +244,6 @@ public final class Chars {
 	}
 
 	/**
-	 * Returns the {@code char} nearest in value to {@code value}.
-	 *
-	 * @param value any {@code long} value
-	 * @return the same value cast to {@code char} if it is in the range of the
-	 *         {@code char} type, {@link Character#MAX_VALUE} if it is too large, or
-	 *         {@link Character#MIN_VALUE} if it is too small
-	 */
-	public static char saturatedCast(long value) {
-		if (value > Character.MAX_VALUE) {
-			return Character.MAX_VALUE;
-		}
-		if (value < Character.MIN_VALUE) {
-			return Character.MIN_VALUE;
-		}
-		return (char) value;
-	}
-
-	/**
 	 * Compares the two specified {@code char} values. The sign of the value
 	 * returned is the same as that of {@code ((Character) a).compareTo(b)}.
 	 *
@@ -124,6 +262,29 @@ public final class Chars {
 	}
 
 	/**
+	 * Returns the values from each provided array combined into a single array. For
+	 * example, {@code concat(new char[] {a, b}, new char[] {}, new char[] {c}}
+	 * returns the array {@code {a, b, c}}.
+	 *
+	 * @param arrays zero or more {@code char} arrays
+	 * @return a single array containing all the values from the source arrays, in
+	 *         order
+	 */
+	public static char[] concat(char[]... arrays) {
+		int length = 0;
+		for (char[] array : arrays) {
+			length += array.length;
+		}
+		char[] result = new char[length];
+		int pos = 0;
+		for (char[] array : arrays) {
+			System.arraycopy(array, 0, result, pos, array.length);
+			pos += array.length;
+		}
+		return result;
+	}
+
+	/**
 	 * Returns {@code true} if {@code target} is present as an element anywhere in
 	 * {@code array}.
 	 *
@@ -139,6 +300,46 @@ public final class Chars {
 			}
 		}
 		return false;
+	}
+
+	// Arrays.copyOf() requires Java 6
+	private static char[] copyOf(char[] original, int length) {
+		char[] copy = new char[length];
+		System.arraycopy(original, 0, copy, 0, Math.min(original.length, length));
+		return copy;
+	}
+
+	/**
+	 * Returns an array containing the same values as {@code array}, but guaranteed
+	 * to be of a specified minimum length. If {@code array} already has a length of
+	 * at least {@code minLength}, it is returned directly. Otherwise, a new array
+	 * of size {@code minLength + padding} is returned, containing the values of
+	 * {@code array}, and zeroes in the remaining places.
+	 *
+	 * @param array     the source array
+	 * @param minLength the minimum length the returned array must guarantee
+	 * @param padding   an extra amount to "grow" the array by if growth is
+	 *                  necessary
+	 * @throws IllegalArgumentException if {@code minLength} or {@code padding} is
+	 *                                  negative
+	 * @return an array containing the values of {@code array}, with guaranteed
+	 *         minimum length {@code minLength}
+	 */
+	public static char[] ensureCapacity(char[] array, int minLength, int padding) {
+		checkArgument(minLength >= 0, "Invalid minLength: %s", minLength);
+		checkArgument(padding >= 0, "Invalid padding: %s", padding);
+		return (array.length < minLength) ? copyOf(array, minLength + padding) : array;
+	}
+
+	/**
+	 * Returns a hash code for {@code value}; equal to the result of invoking
+	 * {@code ((Character) value).hashCode()}.
+	 *
+	 * @param value a primitive {@code char} value
+	 * @return a hash code for the value
+	 */
+	public static int hashCode(char value) {
+		return value;
 	}
 
 	/**
@@ -195,119 +396,6 @@ public final class Chars {
 	}
 
 	/**
-	 * Returns the index of the last appearance of the value {@code target} in
-	 * {@code array}.
-	 *
-	 * @param array  an array of {@code char} values, possibly empty
-	 * @param target a primitive {@code char} value
-	 * @return the greatest index {@code i} for which {@code array[i] == target}, or
-	 *         {@code -1} if no such index exists.
-	 */
-	public static int lastIndexOf(char[] array, char target) {
-		return lastIndexOf(array, target, 0, array.length);
-	}
-
-	// TODO(kevinb): consider making this public
-	private static int lastIndexOf(char[] array, char target, int start, int end) {
-		for (int i = end - 1; i >= start; i--) {
-			if (array[i] == target) {
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	/**
-	 * Returns the least value present in {@code array}.
-	 *
-	 * @param array a <i>nonempty</i> array of {@code char} values
-	 * @return the value present in {@code array} that is less than or equal to
-	 *         every other value in the array
-	 * @throws IllegalArgumentException if {@code array} is empty
-	 */
-	public static char min(char... array) {
-		checkArgument(array.length > 0);
-		char min = array[0];
-		for (int i = 1; i < array.length; i++) {
-			if (array[i] < min) {
-				min = array[i];
-			}
-		}
-		return min;
-	}
-
-	/**
-	 * Returns the greatest value present in {@code array}.
-	 *
-	 * @param array a <i>nonempty</i> array of {@code char} values
-	 * @return the value present in {@code array} that is greater than or equal to
-	 *         every other value in the array
-	 * @throws IllegalArgumentException if {@code array} is empty
-	 */
-	public static char max(char... array) {
-		checkArgument(array.length > 0);
-		char max = array[0];
-		for (int i = 1; i < array.length; i++) {
-			if (array[i] > max) {
-				max = array[i];
-			}
-		}
-		return max;
-	}
-
-	/**
-	 * Returns the values from each provided array combined into a single array. For
-	 * example, {@code concat(new char[] {a, b}, new char[] {}, new char[] {c}}
-	 * returns the array {@code {a, b, c}}.
-	 *
-	 * @param arrays zero or more {@code char} arrays
-	 * @return a single array containing all the values from the source arrays, in
-	 *         order
-	 */
-	public static char[] concat(char[]... arrays) {
-		int length = 0;
-		for (char[] array : arrays) {
-			length += array.length;
-		}
-		char[] result = new char[length];
-		int pos = 0;
-		for (char[] array : arrays) {
-			System.arraycopy(array, 0, result, pos, array.length);
-			pos += array.length;
-		}
-		return result;
-	}
-
-	/**
-	 * Returns an array containing the same values as {@code array}, but guaranteed
-	 * to be of a specified minimum length. If {@code array} already has a length of
-	 * at least {@code minLength}, it is returned directly. Otherwise, a new array
-	 * of size {@code minLength + padding} is returned, containing the values of
-	 * {@code array}, and zeroes in the remaining places.
-	 *
-	 * @param array     the source array
-	 * @param minLength the minimum length the returned array must guarantee
-	 * @param padding   an extra amount to "grow" the array by if growth is
-	 *                  necessary
-	 * @throws IllegalArgumentException if {@code minLength} or {@code padding} is
-	 *                                  negative
-	 * @return an array containing the values of {@code array}, with guaranteed
-	 *         minimum length {@code minLength}
-	 */
-	public static char[] ensureCapacity(char[] array, int minLength, int padding) {
-		checkArgument(minLength >= 0, "Invalid minLength: %s", minLength);
-		checkArgument(padding >= 0, "Invalid padding: %s", padding);
-		return (array.length < minLength) ? copyOf(array, minLength + padding) : array;
-	}
-
-	// Arrays.copyOf() requires Java 6
-	private static char[] copyOf(char[] original, int length) {
-		char[] copy = new char[length];
-		System.arraycopy(original, 0, copy, 0, Math.min(original.length, length));
-		return copy;
-	}
-
-	/**
 	 * Returns a string containing the supplied {@code char} values separated by
 	 * {@code separator}. For example, {@code join("-", '1', '2', '3')} returns the
 	 * string {@code "1-2-3"}.
@@ -332,6 +420,29 @@ public final class Chars {
 	}
 
 	/**
+	 * Returns the index of the last appearance of the value {@code target} in
+	 * {@code array}.
+	 *
+	 * @param array  an array of {@code char} values, possibly empty
+	 * @param target a primitive {@code char} value
+	 * @return the greatest index {@code i} for which {@code array[i] == target}, or
+	 *         {@code -1} if no such index exists.
+	 */
+	public static int lastIndexOf(char[] array, char target) {
+		return lastIndexOf(array, target, 0, array.length);
+	}
+
+	// TODO(kevinb): consider making this public
+	private static int lastIndexOf(char[] array, char target, int start, int end) {
+		for (int i = end - 1; i >= start; i--) {
+			if (array[i] == target) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	/**
 	 * Returns a comparator that compares two {@code char} arrays lexicographically.
 	 * That is, it compares, using {@link #compare(char, char)}), the first pair of
 	 * values that follow any common prefix, or when one array is a prefix of the
@@ -351,20 +462,60 @@ public final class Chars {
 		return LexicographicalComparator.INSTANCE;
 	}
 
-	private enum LexicographicalComparator implements Comparator<char[]> {
-		INSTANCE;
-
-		@Override
-		public int compare(char[] left, char[] right) {
-			int minLength = Math.min(left.length, right.length);
-			for (int i = 0; i < minLength; i++) {
-				int result = Chars.compare(left[i], right[i]);
-				if (result != 0) {
-					return result;
-				}
+	/**
+	 * Returns the greatest value present in {@code array}.
+	 *
+	 * @param array a <i>nonempty</i> array of {@code char} values
+	 * @return the value present in {@code array} that is greater than or equal to
+	 *         every other value in the array
+	 * @throws IllegalArgumentException if {@code array} is empty
+	 */
+	public static char max(char... array) {
+		checkArgument(array.length > 0);
+		char max = array[0];
+		for (int i = 1; i < array.length; i++) {
+			if (array[i] > max) {
+				max = array[i];
 			}
-			return left.length - right.length;
 		}
+		return max;
+	}
+
+	/**
+	 * Returns the least value present in {@code array}.
+	 *
+	 * @param array a <i>nonempty</i> array of {@code char} values
+	 * @return the value present in {@code array} that is less than or equal to
+	 *         every other value in the array
+	 * @throws IllegalArgumentException if {@code array} is empty
+	 */
+	public static char min(char... array) {
+		checkArgument(array.length > 0);
+		char min = array[0];
+		for (int i = 1; i < array.length; i++) {
+			if (array[i] < min) {
+				min = array[i];
+			}
+		}
+		return min;
+	}
+
+	/**
+	 * Returns the {@code char} nearest in value to {@code value}.
+	 *
+	 * @param value any {@code long} value
+	 * @return the same value cast to {@code char} if it is in the range of the
+	 *         {@code char} type, {@link Character#MAX_VALUE} if it is too large, or
+	 *         {@link Character#MIN_VALUE} if it is too small
+	 */
+	public static char saturatedCast(long value) {
+		if (value > Character.MAX_VALUE) {
+			return Character.MAX_VALUE;
+		}
+		if (value < Character.MIN_VALUE) {
+			return Character.MIN_VALUE;
+		}
+		return (char) value;
 	}
 
 	/**
@@ -397,157 +548,6 @@ public final class Chars {
 		return array;
 	}
 
-	/**
-	 * Returns a fixed-size list backed by the specified array, similar to
-	 * {@link Arrays#asList(Object[])}. The list supports
-	 * {@link List#set(int, Object)}, but any attempt to set a value to {@code null}
-	 * will result in a {@link NullPointerException}.
-	 *
-	 * <p>
-	 * The returned list maintains the values, but not the identities, of
-	 * {@code Character} objects written to or read from it. For example, whether
-	 * {@code list.get(0) == list.get(0)} is true for the returned list is
-	 * unspecified.
-	 *
-	 * @param backingArray the array to back the list
-	 * @return a list view of the array
-	 */
-	public static List<Character> asList(char... backingArray) {
-		if (backingArray.length == 0) {
-			return Collections.emptyList();
-		}
-		return new CharArrayAsList(backingArray);
-	}
-
-	@GwtCompatible
-	private static class CharArrayAsList extends AbstractList<Character> implements RandomAccess, Serializable {
-		final char[] array;
-		final int start;
-		final int end;
-
-		CharArrayAsList(char[] array) {
-			this(array, 0, array.length);
-		}
-
-		CharArrayAsList(char[] array, int start, int end) {
-			this.array = array;
-			this.start = start;
-			this.end = end;
-		}
-
-		@Override
-		public int size() {
-			return end - start;
-		}
-
-		@Override
-		public boolean isEmpty() {
-			return false;
-		}
-
-		@Override
-		public Character get(int index) {
-			checkElementIndex(index, size());
-			return array[start + index];
-		}
-
-		@Override
-		public boolean contains(Object target) {
-			// Overridden to prevent a ton of boxing
-			return (target instanceof Character) && Chars.indexOf(array, (Character) target, start, end) != -1;
-		}
-
-		@Override
-		public int indexOf(Object target) {
-			// Overridden to prevent a ton of boxing
-			if (target instanceof Character) {
-				int i = Chars.indexOf(array, (Character) target, start, end);
-				if (i >= 0) {
-					return i - start;
-				}
-			}
-			return -1;
-		}
-
-		@Override
-		public int lastIndexOf(Object target) {
-			// Overridden to prevent a ton of boxing
-			if (target instanceof Character) {
-				int i = Chars.lastIndexOf(array, (Character) target, start, end);
-				if (i >= 0) {
-					return i - start;
-				}
-			}
-			return -1;
-		}
-
-		@Override
-		public Character set(int index, Character element) {
-			checkElementIndex(index, size());
-			char oldValue = array[start + index];
-			// checkNotNull for GWT (do not optimize)
-			array[start + index] = checkNotNull(element);
-			return oldValue;
-		}
-
-		@Override
-		public List<Character> subList(int fromIndex, int toIndex) {
-			int size = size();
-			checkPositionIndexes(fromIndex, toIndex, size);
-			if (fromIndex == toIndex) {
-				return Collections.emptyList();
-			}
-			return new CharArrayAsList(array, start + fromIndex, start + toIndex);
-		}
-
-		@Override
-		public boolean equals(Object object) {
-			if (object == this) {
-				return true;
-			}
-			if (object instanceof CharArrayAsList) {
-				CharArrayAsList that = (CharArrayAsList) object;
-				int size = size();
-				if (that.size() != size) {
-					return false;
-				}
-				for (int i = 0; i < size; i++) {
-					if (array[start + i] != that.array[that.start + i]) {
-						return false;
-					}
-				}
-				return true;
-			}
-			return super.equals(object);
-		}
-
-		@Override
-		public int hashCode() {
-			int result = 1;
-			for (int i = start; i < end; i++) {
-				result = 31 * result + Chars.hashCode(array[i]);
-			}
-			return result;
-		}
-
-		@Override
-		public String toString() {
-			StringBuilder builder = new StringBuilder(size() * 3);
-			builder.append('[').append(array[start]);
-			for (int i = start + 1; i < end; i++) {
-				builder.append(", ").append(array[i]);
-			}
-			return builder.append(']').toString();
-		}
-
-		char[] toCharArray() {
-			// Arrays.copyOfRange() is not available under GWT
-			int size = size();
-			char[] result = new char[size];
-			System.arraycopy(array, start, result, 0, size);
-			return result;
-		}
-
-		private static final long serialVersionUID = 0;
+	private Chars() {
 	}
 }

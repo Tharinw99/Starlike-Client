@@ -32,21 +32,6 @@ class TrieParser {
 	private static final Joiner PREFIX_JOINER = Joiner.on("");
 
 	/**
-	 * Parses a serialized trie representation of a map of reversed public suffixes
-	 * into an immutable map of public suffixes.
-	 */
-	static ImmutableMap<String, PublicSuffixType> parseTrie(CharSequence encoded) {
-		ImmutableMap.Builder<String, PublicSuffixType> builder = ImmutableMap.builder();
-		int encodedLen = encoded.length();
-		int idx = 0;
-		while (idx < encodedLen) {
-			idx += doParseTrieToBuilder(Lists.<CharSequence>newLinkedList(), encoded.subSequence(idx, encodedLen),
-					builder);
-		}
-		return builder.build();
-	}
-
-	/**
 	 * Parses a trie node and returns the number of characters consumed.
 	 *
 	 * @param stack   The prefixes that preceed the characters represented by this
@@ -98,6 +83,21 @@ class TrieParser {
 		}
 		stack.remove(0);
 		return idx;
+	}
+
+	/**
+	 * Parses a serialized trie representation of a map of reversed public suffixes
+	 * into an immutable map of public suffixes.
+	 */
+	static ImmutableMap<String, PublicSuffixType> parseTrie(CharSequence encoded) {
+		ImmutableMap.Builder<String, PublicSuffixType> builder = ImmutableMap.builder();
+		int encodedLen = encoded.length();
+		int idx = 0;
+		while (idx < encodedLen) {
+			idx += doParseTrieToBuilder(Lists.<CharSequence>newLinkedList(), encoded.subSequence(idx, encodedLen),
+					builder);
+		}
+		return builder.build();
 	}
 
 	/**

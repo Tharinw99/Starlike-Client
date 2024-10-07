@@ -51,6 +51,38 @@ public abstract class GeneralDigest {
 		byteCount = t.byteCount;
 	}
 
+	public void finish() {
+		long bitLength = (byteCount << 3);
+
+		//
+		// add the pad bytes.
+		//
+		update((byte) 128);
+
+		while (xBufOff != 0) {
+			update((byte) 0);
+		}
+
+		processLength(bitLength);
+
+		processBlock();
+	}
+
+	protected abstract void processBlock();
+
+	protected abstract void processLength(long bitLength);
+
+	protected abstract void processWord(byte[] in, int inOff);
+
+	public void reset() {
+		byteCount = 0;
+
+		xBufOff = 0;
+		for (int i = 0; i < xBuf.length; i++) {
+			xBuf[i] = 0;
+		}
+	}
+
 	public void update(byte in) {
 		xBuf[xBufOff++] = in;
 
@@ -94,36 +126,4 @@ public abstract class GeneralDigest {
 			len--;
 		}
 	}
-
-	public void finish() {
-		long bitLength = (byteCount << 3);
-
-		//
-		// add the pad bytes.
-		//
-		update((byte) 128);
-
-		while (xBufOff != 0) {
-			update((byte) 0);
-		}
-
-		processLength(bitLength);
-
-		processBlock();
-	}
-
-	public void reset() {
-		byteCount = 0;
-
-		xBufOff = 0;
-		for (int i = 0; i < xBuf.length; i++) {
-			xBuf[i] = 0;
-		}
-	}
-
-	protected abstract void processWord(byte[] in, int inOff);
-
-	protected abstract void processLength(long bitLength);
-
-	protected abstract void processBlock();
 }

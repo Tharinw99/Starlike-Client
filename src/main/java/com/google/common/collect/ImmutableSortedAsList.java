@@ -36,16 +36,22 @@ final class ImmutableSortedAsList<E> extends RegularImmutableAsList<E> implement
 	}
 
 	@Override
-	ImmutableSortedSet<E> delegateCollection() {
-		return (ImmutableSortedSet<E>) super.delegateCollection();
-	}
-
-	@Override
 	public Comparator<? super E> comparator() {
 		return delegateCollection().comparator();
 	}
 
+	@Override
+	public boolean contains(Object target) {
+		// Necessary for ISS's with comparators inconsistent with equals.
+		return indexOf(target) >= 0;
+	}
+
 	// Override indexOf() and lastIndexOf() to be O(log N) instead of O(N).
+
+	@Override
+	ImmutableSortedSet<E> delegateCollection() {
+		return (ImmutableSortedSet<E>) super.delegateCollection();
+	}
 
 	@GwtIncompatible("ImmutableSortedSet.indexOf")
 	// TODO(cpovirk): consider manual binary search under GWT to preserve O(log N)
@@ -66,12 +72,6 @@ final class ImmutableSortedAsList<E> extends RegularImmutableAsList<E> implement
 	@Override
 	public int lastIndexOf(@Nullable Object target) {
 		return indexOf(target);
-	}
-
-	@Override
-	public boolean contains(Object target) {
-		// Necessary for ISS's with comparators inconsistent with equals.
-		return indexOf(target) >= 0;
 	}
 
 	@GwtIncompatible("super.subListUnchecked does not exist; inherited subList is valid if slow")

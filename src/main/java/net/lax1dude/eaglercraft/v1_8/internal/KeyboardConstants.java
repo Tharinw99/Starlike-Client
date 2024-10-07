@@ -3,14 +3,15 @@ package net.lax1dude.eaglercraft.v1_8.internal;
 /**
  * Copyright (c) 2022 lax1dude. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -23,7 +24,7 @@ public class KeyboardConstants {
 	private static final int[] keyboardBrowserToEagler = new int[384 * 4];
 	private static final int[] keyboardEaglerToBrowser = new int[256];
 	private static final char[] keyboardChars = new char[256];
-	
+
 	public static final int KEY_NONE = 0x00;
 	public static final int KEY_ESCAPE = 0x01;
 	public static final int KEY_1 = 0x02;
@@ -155,7 +156,7 @@ public class KeyboardConstants {
 	public static final int KEY_APPS = 0xDD; /* AppMenu key */
 	public static final int KEY_POWER = 0xDE;
 	public static final int KEY_SLEEP = 0xDF;
-	
+
 	private static final int GLFW_KEY_SPACE = 32, GLFW_KEY_APOSTROPHE = 39, GLFW_KEY_COMMA = 44, GLFW_KEY_MINUS = 45,
 			GLFW_KEY_PERIOD = 46, GLFW_KEY_SLASH = 47, GLFW_KEY_0 = 48, GLFW_KEY_1 = 49, GLFW_KEY_2 = 50,
 			GLFW_KEY_3 = 51, GLFW_KEY_4 = 52, GLFW_KEY_5 = 53, GLFW_KEY_6 = 54, GLFW_KEY_7 = 55, GLFW_KEY_8 = 56,
@@ -166,7 +167,7 @@ public class KeyboardConstants {
 			GLFW_KEY_U = 85, GLFW_KEY_V = 86, GLFW_KEY_W = 87, GLFW_KEY_X = 88, GLFW_KEY_Y = 89, GLFW_KEY_Z = 90,
 			GLFW_KEY_LEFT_BRACKET = 91, GLFW_KEY_BACKSLASH = 92, GLFW_KEY_RIGHT_BRACKET = 93,
 			GLFW_KEY_GRAVE_ACCENT = 96, GLFW_KEY_WORLD_1 = 161, GLFW_KEY_WORLD_2 = 162;
-	
+
 	private static final int GLFW_KEY_ESCAPE = 256, GLFW_KEY_ENTER = 257, GLFW_KEY_TAB = 258, GLFW_KEY_BACKSPACE = 259,
 			GLFW_KEY_INSERT = 260, GLFW_KEY_DELETE = 261, GLFW_KEY_RIGHT = 262, GLFW_KEY_LEFT = 263,
 			GLFW_KEY_DOWN = 264, GLFW_KEY_UP = 265, GLFW_KEY_PAGE_UP = 266, GLFW_KEY_PAGE_DOWN = 267,
@@ -184,44 +185,10 @@ public class KeyboardConstants {
 			GLFW_KEY_LEFT_CONTROL = 341, GLFW_KEY_LEFT_ALT = 342, GLFW_KEY_LEFT_SUPER = 343, GLFW_KEY_RIGHT_SHIFT = 344,
 			GLFW_KEY_RIGHT_CONTROL = 345, GLFW_KEY_RIGHT_ALT = 346, GLFW_KEY_RIGHT_SUPER = 347, GLFW_KEY_MENU = 348,
 			GLFW_KEY_LAST = GLFW_KEY_MENU;
-	
+
 	private static final int DOM_KEY_LOCATION_STANDARD = 0, DOM_KEY_LOCATION_LEFT = 1, DOM_KEY_LOCATION_RIGHT = 2,
 			DOM_KEY_LOCATION_NUMPAD = 3;
 
-	private static void register(int eaglerId, int glfwId, int browserId, int browserLocation, String name, char character) {
-		if(keyboardEaglerToGLFW[eaglerId] != 0) throw new IllegalArgumentException("Duplicate keyboardEaglerToGLFW entry: " + eaglerId + " -> " + glfwId);
-		keyboardEaglerToGLFW[eaglerId] = glfwId;
-		if(keyboardGLFWToEagler[glfwId] != 0) throw new IllegalArgumentException("Duplicate keyboardGLFWToEagler entry: " + glfwId + " -> " + eaglerId);
-		keyboardGLFWToEagler[glfwId] = eaglerId;
-		if(browserLocation == 0) {
-			if(keyboardEaglerToBrowser[eaglerId] != 0) throw new IllegalArgumentException("Duplicate keyboardEaglerToBrowser entry: " + eaglerId + " -> " + browserId + "(0)");
-			keyboardEaglerToBrowser[eaglerId] = browserId;
-			if(keyboardBrowserToEagler[browserId] != 0) throw new IllegalArgumentException("Duplicate keyboardBrowserToEagler entry: " + browserId + "(0) -> " + eaglerId);
-			keyboardBrowserToEagler[browserId] = eaglerId;
-		}else {
-			browserLocation *= 384;
-			if(keyboardEaglerToBrowser[eaglerId] != 0) throw new IllegalArgumentException("Duplicate keyboardEaglerToBrowser entry: " + eaglerId + " -> " + browserId + "(" + browserLocation + ")");
-			keyboardEaglerToBrowser[eaglerId] = browserId + browserLocation;
-			if(keyboardBrowserToEagler[browserId + browserLocation] != 0) throw new IllegalArgumentException("Duplicate keyboardBrowserToEagler entry: " + browserId + "(" + browserLocation + ") -> " + eaglerId);
-			keyboardBrowserToEagler[browserId + browserLocation] = eaglerId;
-		}
-		if(keyboardNames[eaglerId] != null) throw new IllegalArgumentException("Duplicate keyboardNames entry: " + eaglerId + " -> " + name);
-		keyboardNames[eaglerId] = name;
-		if(keyboardChars[eaglerId] != '\0') throw new IllegalArgumentException("Duplicate keyboardChars entry: " + eaglerId + " -> " + character);
-		keyboardChars[eaglerId] = character;
-	}
-	
-	private static void registerAlt(int eaglerId, int browserId, int browserLocation) {
-		if(browserLocation == 0) {
-			if(keyboardBrowserToEagler[browserId] != 0) throw new IllegalArgumentException("Duplicate (alt) keyboardBrowserToEagler entry: " + browserId + " -> " + eaglerId);
-			keyboardBrowserToEagler[browserId] = eaglerId;
-		}else {
-			browserLocation *= 384;
-			if(keyboardBrowserToEagler[browserId + browserLocation] != 0) throw new IllegalArgumentException("Duplicate (alt) keyboardBrowserToEagler entry: " + browserId + "(" + browserLocation + ") -> " + eaglerId);
-			keyboardBrowserToEagler[browserId + browserLocation] = eaglerId;
-		}
-	}
-	
 	static {
 		register(KEY_SPACE, GLFW_KEY_SPACE, 32, DOM_KEY_LOCATION_STANDARD, "Space", ' ');
 		register(KEY_APOSTROPHE, GLFW_KEY_APOSTROPHE, 222, DOM_KEY_LOCATION_STANDARD, "Quote", '\'');
@@ -329,11 +296,39 @@ public class KeyboardConstants {
 		register(KEY_RMENU, GLFW_KEY_RIGHT_ALT, 18, DOM_KEY_LOCATION_RIGHT, "R. Alt", '\0');
 	}
 
-	public static String getKeyName(int key) {
-		if (key < 0 || key >= 256 || keyboardNames[key] == null) {
-			return "Unknown";
+	public static int getBrowserKeyFromEagler(int key) {
+		if (key < 0 || key >= 256) {
+			return 0;
 		} else {
-			return keyboardNames[key];
+			return keyboardEaglerToBrowser[key] % 384;
+		}
+	}
+
+	public static int getBrowserLocationFromEagler(int key) {
+		if (key < 0 || key >= 384) {
+			return 0;
+		} else {
+			return keyboardEaglerToBrowser[key] / 384;
+		}
+	}
+
+	public static int getEaglerKeyFromBrowser(int key) {
+		return getEaglerKeyFromBrowser(key, 0);
+	}
+
+	public static int getEaglerKeyFromBrowser(int key, int location) {
+		if (key < 0 || key >= 384) {
+			return 0;
+		} else {
+			if (location <= 0 || location >= 4) {
+				return keyboardBrowserToEagler[key];
+			} else {
+				int i = keyboardBrowserToEagler[key + location * 384];
+				if (i == 0) {
+					i = keyboardBrowserToEagler[key];
+				}
+				return i;
+			}
 		}
 	}
 
@@ -352,43 +347,7 @@ public class KeyboardConstants {
 			return keyboardEaglerToGLFW[key];
 		}
 	}
-	
-	public static int getEaglerKeyFromBrowser(int key) {
-		return getEaglerKeyFromBrowser(key, 0);
-	}
-	
-	public static int getEaglerKeyFromBrowser(int key, int location) {
-		if (key < 0 || key >= 384) {
-			return 0;
-		} else {
-			if(location <= 0 || location >= 4) {
-				return keyboardBrowserToEagler[key];
-			}else {
-				int i = keyboardBrowserToEagler[key + location * 384];
-				if(i == 0) {
-					i = keyboardBrowserToEagler[key];
-				}
-				return i;
-			}
-		}
-	}
 
-	public static int getBrowserKeyFromEagler(int key) {
-		if (key < 0 || key >= 256) {
-			return 0;
-		} else {
-			return keyboardEaglerToBrowser[key] % 384;
-		}
-	}
-
-	public static int getBrowserLocationFromEagler(int key) {
-		if (key < 0 || key >= 384) {
-			return 0;
-		} else {
-			return keyboardEaglerToBrowser[key] / 384;
-		}
-	}
-	
 	public static char getKeyCharFromEagler(int key) {
 		if (key < 0 || key >= 256) {
 			return '\0';
@@ -396,5 +355,64 @@ public class KeyboardConstants {
 			return keyboardChars[key];
 		}
 	}
-	
+
+	public static String getKeyName(int key) {
+		if (key < 0 || key >= 256 || keyboardNames[key] == null) {
+			return "Unknown";
+		} else {
+			return keyboardNames[key];
+		}
+	}
+
+	private static void register(int eaglerId, int glfwId, int browserId, int browserLocation, String name,
+			char character) {
+		if (keyboardEaglerToGLFW[eaglerId] != 0)
+			throw new IllegalArgumentException("Duplicate keyboardEaglerToGLFW entry: " + eaglerId + " -> " + glfwId);
+		keyboardEaglerToGLFW[eaglerId] = glfwId;
+		if (keyboardGLFWToEagler[glfwId] != 0)
+			throw new IllegalArgumentException("Duplicate keyboardGLFWToEagler entry: " + glfwId + " -> " + eaglerId);
+		keyboardGLFWToEagler[glfwId] = eaglerId;
+		if (browserLocation == 0) {
+			if (keyboardEaglerToBrowser[eaglerId] != 0)
+				throw new IllegalArgumentException(
+						"Duplicate keyboardEaglerToBrowser entry: " + eaglerId + " -> " + browserId + "(0)");
+			keyboardEaglerToBrowser[eaglerId] = browserId;
+			if (keyboardBrowserToEagler[browserId] != 0)
+				throw new IllegalArgumentException(
+						"Duplicate keyboardBrowserToEagler entry: " + browserId + "(0) -> " + eaglerId);
+			keyboardBrowserToEagler[browserId] = eaglerId;
+		} else {
+			browserLocation *= 384;
+			if (keyboardEaglerToBrowser[eaglerId] != 0)
+				throw new IllegalArgumentException("Duplicate keyboardEaglerToBrowser entry: " + eaglerId + " -> "
+						+ browserId + "(" + browserLocation + ")");
+			keyboardEaglerToBrowser[eaglerId] = browserId + browserLocation;
+			if (keyboardBrowserToEagler[browserId + browserLocation] != 0)
+				throw new IllegalArgumentException("Duplicate keyboardBrowserToEagler entry: " + browserId + "("
+						+ browserLocation + ") -> " + eaglerId);
+			keyboardBrowserToEagler[browserId + browserLocation] = eaglerId;
+		}
+		if (keyboardNames[eaglerId] != null)
+			throw new IllegalArgumentException("Duplicate keyboardNames entry: " + eaglerId + " -> " + name);
+		keyboardNames[eaglerId] = name;
+		if (keyboardChars[eaglerId] != '\0')
+			throw new IllegalArgumentException("Duplicate keyboardChars entry: " + eaglerId + " -> " + character);
+		keyboardChars[eaglerId] = character;
+	}
+
+	private static void registerAlt(int eaglerId, int browserId, int browserLocation) {
+		if (browserLocation == 0) {
+			if (keyboardBrowserToEagler[browserId] != 0)
+				throw new IllegalArgumentException(
+						"Duplicate (alt) keyboardBrowserToEagler entry: " + browserId + " -> " + eaglerId);
+			keyboardBrowserToEagler[browserId] = eaglerId;
+		} else {
+			browserLocation *= 384;
+			if (keyboardBrowserToEagler[browserId + browserLocation] != 0)
+				throw new IllegalArgumentException("Duplicate (alt) keyboardBrowserToEagler entry: " + browserId + "("
+						+ browserLocation + ") -> " + eaglerId);
+			keyboardBrowserToEagler[browserId + browserLocation] = eaglerId;
+		}
+	}
+
 }

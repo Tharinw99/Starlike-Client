@@ -9,22 +9,25 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -62,27 +65,15 @@ public class ChunkCache implements IBlockAccess {
 
 	}
 
-	/**+
-	 * set by !chunk.getAreLevelsEmpty
+	/**
+	 * + set by !chunk.getAreLevelsEmpty
 	 */
 	public boolean extendedLevelsInChunkCache() {
 		return this.hasExtendedLevels;
 	}
 
-	public TileEntity getTileEntity(BlockPos blockpos) {
-		int i = (blockpos.getX() >> 4) - this.chunkX;
-		int j = (blockpos.getZ() >> 4) - this.chunkZ;
-		return this.chunkArray[i][j].getTileEntity(blockpos, Chunk.EnumCreateEntityType.IMMEDIATE);
-	}
-
-	public int getCombinedLight(BlockPos blockpos, int i) {
-		int j = this.getLightForExt(EnumSkyBlock.SKY, blockpos);
-		int k = this.getLightForExt(EnumSkyBlock.BLOCK, blockpos);
-		if (k < i) {
-			k = i;
-		}
-
-		return j << 20 | k << 4;
+	public BiomeGenBase getBiomeGenForCoords(BlockPos blockpos) {
+		return this.worldObj.getBiomeGenForCoords(blockpos);
 	}
 
 	public IBlockState getBlockState(BlockPos blockpos) {
@@ -100,8 +91,24 @@ public class ChunkCache implements IBlockAccess {
 		return Blocks.air.getDefaultState();
 	}
 
-	public BiomeGenBase getBiomeGenForCoords(BlockPos blockpos) {
-		return this.worldObj.getBiomeGenForCoords(blockpos);
+	public int getCombinedLight(BlockPos blockpos, int i) {
+		int j = this.getLightForExt(EnumSkyBlock.SKY, blockpos);
+		int k = this.getLightForExt(EnumSkyBlock.BLOCK, blockpos);
+		if (k < i) {
+			k = i;
+		}
+
+		return j << 20 | k << 4;
+	}
+
+	public int getLightFor(EnumSkyBlock pos, BlockPos parBlockPos) {
+		if (parBlockPos.getY() >= 0 && parBlockPos.getY() < 256) {
+			int i = (parBlockPos.getX() >> 4) - this.chunkX;
+			int j = (parBlockPos.getZ() >> 4) - this.chunkZ;
+			return this.chunkArray[i][j].getLightFor(pos, parBlockPos);
+		} else {
+			return pos.defaultLightValue;
+		}
 	}
 
 	private int getLightForExt(EnumSkyBlock pos, BlockPos parBlockPos) {
@@ -135,32 +142,27 @@ public class ChunkCache implements IBlockAccess {
 		}
 	}
 
-	/**+
-	 * Checks to see if an air block exists at the provided
-	 * location. Note that this only checks to see if the blocks
-	 * material is set to air, meaning it is possible for
-	 * non-vanilla blocks to still pass this check.
-	 */
-	public boolean isAirBlock(BlockPos blockpos) {
-		return this.getBlockState(blockpos).getBlock().getMaterial() == Material.air;
-	}
-
-	public int getLightFor(EnumSkyBlock pos, BlockPos parBlockPos) {
-		if (parBlockPos.getY() >= 0 && parBlockPos.getY() < 256) {
-			int i = (parBlockPos.getX() >> 4) - this.chunkX;
-			int j = (parBlockPos.getZ() >> 4) - this.chunkZ;
-			return this.chunkArray[i][j].getLightFor(pos, parBlockPos);
-		} else {
-			return pos.defaultLightValue;
-		}
-	}
-
 	public int getStrongPower(BlockPos blockpos, EnumFacing enumfacing) {
 		IBlockState iblockstate = this.getBlockState(blockpos);
 		return iblockstate.getBlock().getStrongPower(this, blockpos, iblockstate, enumfacing);
 	}
 
+	public TileEntity getTileEntity(BlockPos blockpos) {
+		int i = (blockpos.getX() >> 4) - this.chunkX;
+		int j = (blockpos.getZ() >> 4) - this.chunkZ;
+		return this.chunkArray[i][j].getTileEntity(blockpos, Chunk.EnumCreateEntityType.IMMEDIATE);
+	}
+
 	public WorldType getWorldType() {
 		return this.worldObj.getWorldType();
+	}
+
+	/**
+	 * + Checks to see if an air block exists at the provided location. Note that
+	 * this only checks to see if the blocks material is set to air, meaning it is
+	 * possible for non-vanilla blocks to still pass this check.
+	 */
+	public boolean isAirBlock(BlockPos blockpos) {
+		return this.getBlockState(blockpos).getBlock().getMaterial() == Material.air;
 	}
 }

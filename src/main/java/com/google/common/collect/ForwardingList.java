@@ -34,9 +34,10 @@ import com.google.common.annotations.GwtCompatible;
  * pattern</a>.
  *
  * <p>
- * This class does not implement {@link net.lax1dude.eaglercraft.v1_8.RandomAccess}. If the delegate
- * supports random access, the {@code ForwardingList} subclass should implement
- * the {@code RandomAccess} interface.
+ * This class does not implement
+ * {@link net.lax1dude.eaglercraft.v1_8.RandomAccess}. If the delegate supports
+ * random access, the {@code ForwardingList} subclass should implement the
+ * {@code RandomAccess} interface.
  *
  * <p>
  * <b>Warning:</b> The methods of {@code ForwardingList} forward
@@ -64,9 +65,6 @@ public abstract class ForwardingList<E> extends ForwardingCollection<E> implemen
 	}
 
 	@Override
-	protected abstract List<E> delegate();
-
-	@Override
 	public void add(int index, E element) {
 		delegate().add(index, element);
 	}
@@ -77,8 +75,21 @@ public abstract class ForwardingList<E> extends ForwardingCollection<E> implemen
 	}
 
 	@Override
+	protected abstract List<E> delegate();
+
+	@Override
+	public boolean equals(@Nullable Object object) {
+		return object == this || delegate().equals(object);
+	}
+
+	@Override
 	public E get(int index) {
 		return delegate().get(index);
+	}
+
+	@Override
+	public int hashCode() {
+		return delegate().hashCode();
 	}
 
 	@Override
@@ -111,21 +122,6 @@ public abstract class ForwardingList<E> extends ForwardingCollection<E> implemen
 		return delegate().set(index, element);
 	}
 
-	@Override
-	public List<E> subList(int fromIndex, int toIndex) {
-		return delegate().subList(fromIndex, toIndex);
-	}
-
-	@Override
-	public boolean equals(@Nullable Object object) {
-		return object == this || delegate().equals(object);
-	}
-
-	@Override
-	public int hashCode() {
-		return delegate().hashCode();
-	}
-
 	/**
 	 * A sensible default implementation of {@link #add(Object)}, in terms of
 	 * {@link #add(int, Object)}. If you override {@link #add(int, Object)}, you may
@@ -151,6 +147,30 @@ public abstract class ForwardingList<E> extends ForwardingCollection<E> implemen
 	}
 
 	/**
+	 * A sensible definition of {@link #equals(Object)} in terms of {@link #size}
+	 * and {@link #iterator}. If you override either of those methods, you may wish
+	 * to override {@link #equals(Object)} to forward to this implementation.
+	 *
+	 * @since 7.0
+	 */
+	@Beta
+	protected boolean standardEquals(@Nullable Object object) {
+		return Lists.equalsImpl(this, object);
+	}
+
+	/**
+	 * A sensible definition of {@link #hashCode} in terms of {@link #iterator}. If
+	 * you override {@link #iterator}, you may wish to override {@link #hashCode} to
+	 * forward to this implementation.
+	 *
+	 * @since 7.0
+	 */
+	@Beta
+	protected int standardHashCode() {
+		return Lists.hashCodeImpl(this);
+	}
+
+	/**
 	 * A sensible default implementation of {@link #indexOf}, in terms of
 	 * {@link #listIterator()}. If you override {@link #listIterator()}, you may
 	 * wish to override {@link #indexOf} to forward to this implementation.
@@ -162,17 +182,6 @@ public abstract class ForwardingList<E> extends ForwardingCollection<E> implemen
 	}
 
 	/**
-	 * A sensible default implementation of {@link #lastIndexOf}, in terms of
-	 * {@link #listIterator(int)}. If you override {@link #listIterator(int)}, you
-	 * may wish to override {@link #lastIndexOf} to forward to this implementation.
-	 *
-	 * @since 7.0
-	 */
-	protected int standardLastIndexOf(@Nullable Object element) {
-		return Lists.lastIndexOfImpl(this, element);
-	}
-
-	/**
 	 * A sensible default implementation of {@link #iterator}, in terms of
 	 * {@link #listIterator()}. If you override {@link #listIterator()}, you may
 	 * wish to override {@link #iterator} to forward to this implementation.
@@ -181,6 +190,17 @@ public abstract class ForwardingList<E> extends ForwardingCollection<E> implemen
 	 */
 	protected Iterator<E> standardIterator() {
 		return listIterator();
+	}
+
+	/**
+	 * A sensible default implementation of {@link #lastIndexOf}, in terms of
+	 * {@link #listIterator(int)}. If you override {@link #listIterator(int)}, you
+	 * may wish to override {@link #lastIndexOf} to forward to this implementation.
+	 *
+	 * @since 7.0
+	 */
+	protected int standardLastIndexOf(@Nullable Object element) {
+		return Lists.lastIndexOfImpl(this, element);
 	}
 
 	/**
@@ -221,27 +241,8 @@ public abstract class ForwardingList<E> extends ForwardingCollection<E> implemen
 		return Lists.subListImpl(this, fromIndex, toIndex);
 	}
 
-	/**
-	 * A sensible definition of {@link #equals(Object)} in terms of {@link #size}
-	 * and {@link #iterator}. If you override either of those methods, you may wish
-	 * to override {@link #equals(Object)} to forward to this implementation.
-	 *
-	 * @since 7.0
-	 */
-	@Beta
-	protected boolean standardEquals(@Nullable Object object) {
-		return Lists.equalsImpl(this, object);
-	}
-
-	/**
-	 * A sensible definition of {@link #hashCode} in terms of {@link #iterator}. If
-	 * you override {@link #iterator}, you may wish to override {@link #hashCode} to
-	 * forward to this implementation.
-	 *
-	 * @since 7.0
-	 */
-	@Beta
-	protected int standardHashCode() {
-		return Lists.hashCodeImpl(this);
+	@Override
+	public List<E> subList(int fromIndex, int toIndex) {
+		return delegate().subList(fromIndex, toIndex);
 	}
 }

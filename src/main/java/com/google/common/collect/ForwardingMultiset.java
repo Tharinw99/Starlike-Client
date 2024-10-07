@@ -54,16 +54,33 @@ import com.google.common.base.Objects;
 @GwtCompatible
 public abstract class ForwardingMultiset<E> extends ForwardingCollection<E> implements Multiset<E> {
 
-	/** Constructor for use by subclasses. */
-	protected ForwardingMultiset() {
+	/**
+	 * A sensible implementation of {@link Multiset#elementSet} in terms of the
+	 * following methods: {@link ForwardingMultiset#clear},
+	 * {@link ForwardingMultiset#contains}, {@link ForwardingMultiset#containsAll},
+	 * {@link ForwardingMultiset#count}, {@link ForwardingMultiset#isEmpty}, the
+	 * {@link Set#size} and {@link Set#iterator} methods of
+	 * {@link ForwardingMultiset#entrySet}, and
+	 * {@link ForwardingMultiset#remove(Object, int)}. In many situations, you may
+	 * wish to override {@link ForwardingMultiset#elementSet} to forward to this
+	 * implementation or a subclass thereof.
+	 *
+	 * @since 10.0
+	 */
+	@Beta
+	protected class StandardElementSet extends Multisets.ElementSet<E> {
+		/** Constructor for use by subclasses. */
+		public StandardElementSet() {
+		}
+
+		@Override
+		Multiset<E> multiset() {
+			return ForwardingMultiset.this;
+		}
 	}
 
-	@Override
-	protected abstract Multiset<E> delegate();
-
-	@Override
-	public int count(Object element) {
-		return delegate().count(element);
+	/** Constructor for use by subclasses. */
+	protected ForwardingMultiset() {
 	}
 
 	@Override
@@ -72,9 +89,12 @@ public abstract class ForwardingMultiset<E> extends ForwardingCollection<E> impl
 	}
 
 	@Override
-	public int remove(Object element, int occurrences) {
-		return delegate().remove(element, occurrences);
+	public int count(Object element) {
+		return delegate().count(element);
 	}
+
+	@Override
+	protected abstract Multiset<E> delegate();
 
 	@Override
 	public Set<E> elementSet() {
@@ -97,6 +117,11 @@ public abstract class ForwardingMultiset<E> extends ForwardingCollection<E> impl
 	}
 
 	@Override
+	public int remove(Object element, int occurrences) {
+		return delegate().remove(element, occurrences);
+	}
+
+	@Override
 	public int setCount(E element, int count) {
 		return delegate().setCount(element, count);
 	}
@@ -104,47 +129,6 @@ public abstract class ForwardingMultiset<E> extends ForwardingCollection<E> impl
 	@Override
 	public boolean setCount(E element, int oldCount, int newCount) {
 		return delegate().setCount(element, oldCount, newCount);
-	}
-
-	/**
-	 * A sensible definition of {@link #contains} in terms of {@link #count}. If you
-	 * override {@link #count}, you may wish to override {@link #contains} to
-	 * forward to this implementation.
-	 * 
-	 * @since 7.0
-	 */
-	@Override
-	protected boolean standardContains(@Nullable Object object) {
-		return count(object) > 0;
-	}
-
-	/**
-	 * A sensible definition of {@link #clear} in terms of the {@code iterator}
-	 * method of {@link #entrySet}. If you override {@link #entrySet}, you may wish
-	 * to override {@link #clear} to forward to this implementation.
-	 *
-	 * @since 7.0
-	 */
-	@Override
-	protected void standardClear() {
-		Iterators.clear(entrySet().iterator());
-	}
-
-	/**
-	 * A sensible, albeit inefficient, definition of {@link #count} in terms of
-	 * {@link #entrySet}. If you override {@link #entrySet}, you may wish to
-	 * override {@link #count} to forward to this implementation.
-	 * 
-	 * @since 7.0
-	 */
-	@Beta
-	protected int standardCount(@Nullable Object object) {
-		for (Entry<?> entry : this.entrySet()) {
-			if (Objects.equal(entry.getElement(), object)) {
-				return entry.getCount();
-			}
-		}
-		return 0;
 	}
 
 	/**
@@ -171,6 +155,81 @@ public abstract class ForwardingMultiset<E> extends ForwardingCollection<E> impl
 	@Override
 	protected boolean standardAddAll(Collection<? extends E> elementsToAdd) {
 		return Multisets.addAllImpl(this, elementsToAdd);
+	}
+
+	/**
+	 * A sensible definition of {@link #clear} in terms of the {@code iterator}
+	 * method of {@link #entrySet}. If you override {@link #entrySet}, you may wish
+	 * to override {@link #clear} to forward to this implementation.
+	 *
+	 * @since 7.0
+	 */
+	@Override
+	protected void standardClear() {
+		Iterators.clear(entrySet().iterator());
+	}
+
+	/**
+	 * A sensible definition of {@link #contains} in terms of {@link #count}. If you
+	 * override {@link #count}, you may wish to override {@link #contains} to
+	 * forward to this implementation.
+	 * 
+	 * @since 7.0
+	 */
+	@Override
+	protected boolean standardContains(@Nullable Object object) {
+		return count(object) > 0;
+	}
+
+	/**
+	 * A sensible, albeit inefficient, definition of {@link #count} in terms of
+	 * {@link #entrySet}. If you override {@link #entrySet}, you may wish to
+	 * override {@link #count} to forward to this implementation.
+	 * 
+	 * @since 7.0
+	 */
+	@Beta
+	protected int standardCount(@Nullable Object object) {
+		for (Entry<?> entry : this.entrySet()) {
+			if (Objects.equal(entry.getElement(), object)) {
+				return entry.getCount();
+			}
+		}
+		return 0;
+	}
+
+	/**
+	 * A sensible, albeit inefficient, definition of {@link #size} in terms of
+	 * {@code entrySet().size()} and {@link #count}. If you override either of these
+	 * methods, you may wish to override {@link #size} to forward to this
+	 * implementation.
+	 *
+	 * @since 7.0
+	 */
+	protected boolean standardEquals(@Nullable Object object) {
+		return Multisets.equalsImpl(this, object);
+	}
+
+	/**
+	 * A sensible definition of {@link #hashCode} as {@code entrySet().hashCode()} .
+	 * If you override {@link #entrySet}, you may wish to override {@link #hashCode}
+	 * to forward to this implementation.
+	 *
+	 * @since 7.0
+	 */
+	protected int standardHashCode() {
+		return entrySet().hashCode();
+	}
+
+	/**
+	 * A sensible definition of {@link #iterator} in terms of {@link #entrySet} and
+	 * {@link #remove(Object)}. If you override either of these methods, you may
+	 * wish to override {@link #iterator} to forward to this implementation.
+	 * 
+	 * @since 7.0
+	 */
+	protected Iterator<E> standardIterator() {
+		return Multisets.iteratorImpl(this);
 	}
 
 	/**
@@ -238,42 +297,6 @@ public abstract class ForwardingMultiset<E> extends ForwardingCollection<E> impl
 	}
 
 	/**
-	 * A sensible implementation of {@link Multiset#elementSet} in terms of the
-	 * following methods: {@link ForwardingMultiset#clear},
-	 * {@link ForwardingMultiset#contains}, {@link ForwardingMultiset#containsAll},
-	 * {@link ForwardingMultiset#count}, {@link ForwardingMultiset#isEmpty}, the
-	 * {@link Set#size} and {@link Set#iterator} methods of
-	 * {@link ForwardingMultiset#entrySet}, and
-	 * {@link ForwardingMultiset#remove(Object, int)}. In many situations, you may
-	 * wish to override {@link ForwardingMultiset#elementSet} to forward to this
-	 * implementation or a subclass thereof.
-	 *
-	 * @since 10.0
-	 */
-	@Beta
-	protected class StandardElementSet extends Multisets.ElementSet<E> {
-		/** Constructor for use by subclasses. */
-		public StandardElementSet() {
-		}
-
-		@Override
-		Multiset<E> multiset() {
-			return ForwardingMultiset.this;
-		}
-	}
-
-	/**
-	 * A sensible definition of {@link #iterator} in terms of {@link #entrySet} and
-	 * {@link #remove(Object)}. If you override either of these methods, you may
-	 * wish to override {@link #iterator} to forward to this implementation.
-	 * 
-	 * @since 7.0
-	 */
-	protected Iterator<E> standardIterator() {
-		return Multisets.iteratorImpl(this);
-	}
-
-	/**
 	 * A sensible, albeit inefficient, definition of {@link #size} in terms of
 	 * {@link #entrySet}. If you override {@link #entrySet}, you may wish to
 	 * override {@link #size} to forward to this implementation.
@@ -282,29 +305,6 @@ public abstract class ForwardingMultiset<E> extends ForwardingCollection<E> impl
 	 */
 	protected int standardSize() {
 		return Multisets.sizeImpl(this);
-	}
-
-	/**
-	 * A sensible, albeit inefficient, definition of {@link #size} in terms of
-	 * {@code entrySet().size()} and {@link #count}. If you override either of these
-	 * methods, you may wish to override {@link #size} to forward to this
-	 * implementation.
-	 *
-	 * @since 7.0
-	 */
-	protected boolean standardEquals(@Nullable Object object) {
-		return Multisets.equalsImpl(this, object);
-	}
-
-	/**
-	 * A sensible definition of {@link #hashCode} as {@code entrySet().hashCode()} .
-	 * If you override {@link #entrySet}, you may wish to override {@link #hashCode}
-	 * to forward to this implementation.
-	 *
-	 * @since 7.0
-	 */
-	protected int standardHashCode() {
-		return entrySet().hashCode();
 	}
 
 	/**

@@ -31,13 +31,11 @@ import com.google.common.primitives.Longs;
  * <pre>
  *    {@code
  *
- *   public int compareTo(Foo that) {
- *     return ComparisonChain.start()
- *         .compare(this.aString, that.aString)
- *         .compare(this.anInt, that.anInt)
- *         .compare(this.anEnum, that.anEnum, Ordering.natural().nullsLast())
- *         .result();
- *   }}
+ * public int compareTo(Foo that) {
+ * 	return ComparisonChain.start().compare(this.aString, that.aString).compare(this.anInt, that.anInt)
+ * 			.compare(this.anEnum, that.anEnum, Ordering.natural().nullsLast()).result();
+ * }
+ * }
  * </pre>
  *
  * <p>
@@ -65,73 +63,6 @@ import com.google.common.primitives.Longs;
  */
 @GwtCompatible
 public abstract class ComparisonChain {
-	private ComparisonChain() {
-	}
-
-	/**
-	 * Begins a new chained comparison statement. See example in the class
-	 * documentation.
-	 */
-	public static ComparisonChain start() {
-		return ACTIVE;
-	}
-
-	private static final ComparisonChain ACTIVE = new ComparisonChain() {
-		@SuppressWarnings("unchecked")
-		@Override
-		public ComparisonChain compare(Comparable left, Comparable right) {
-			return classify(left.compareTo(right));
-		}
-
-		@Override
-		public <T> ComparisonChain compare(@Nullable T left, @Nullable T right, Comparator<T> comparator) {
-			return classify(comparator.compare(left, right));
-		}
-
-		@Override
-		public ComparisonChain compare(int left, int right) {
-			return classify(Ints.compare(left, right));
-		}
-
-		@Override
-		public ComparisonChain compare(long left, long right) {
-			return classify(Longs.compare(left, right));
-		}
-
-		@Override
-		public ComparisonChain compare(float left, float right) {
-			return classify(Float.compare(left, right));
-		}
-
-		@Override
-		public ComparisonChain compare(double left, double right) {
-			return classify(Double.compare(left, right));
-		}
-
-		@Override
-		public ComparisonChain compareTrueFirst(boolean left, boolean right) {
-			return classify(Booleans.compare(right, left)); // reversed
-		}
-
-		@Override
-		public ComparisonChain compareFalseFirst(boolean left, boolean right) {
-			return classify(Booleans.compare(left, right));
-		}
-
-		ComparisonChain classify(int result) {
-			return (result < 0) ? LESS : (result > 0) ? GREATER : ACTIVE;
-		}
-
-		@Override
-		public int result() {
-			return 0;
-		}
-	};
-
-	private static final ComparisonChain LESS = new InactiveComparisonChain(-1);
-
-	private static final ComparisonChain GREATER = new InactiveComparisonChain(1);
-
 	private static final class InactiveComparisonChain extends ComparisonChain {
 		final int result;
 
@@ -145,7 +76,12 @@ public abstract class ComparisonChain {
 		}
 
 		@Override
-		public <T> ComparisonChain compare(@Nullable T left, @Nullable T right, @Nullable Comparator<T> comparator) {
+		public ComparisonChain compare(double left, double right) {
+			return this;
+		}
+
+		@Override
+		public ComparisonChain compare(float left, float right) {
 			return this;
 		}
 
@@ -160,17 +96,7 @@ public abstract class ComparisonChain {
 		}
 
 		@Override
-		public ComparisonChain compare(float left, float right) {
-			return this;
-		}
-
-		@Override
-		public ComparisonChain compare(double left, double right) {
-			return this;
-		}
-
-		@Override
-		public ComparisonChain compareTrueFirst(boolean left, boolean right) {
+		public <T> ComparisonChain compare(@Nullable T left, @Nullable T right, @Nullable Comparator<T> comparator) {
 			return this;
 		}
 
@@ -180,9 +106,81 @@ public abstract class ComparisonChain {
 		}
 
 		@Override
+		public ComparisonChain compareTrueFirst(boolean left, boolean right) {
+			return this;
+		}
+
+		@Override
 		public int result() {
 			return result;
 		}
+	}
+
+	private static final ComparisonChain ACTIVE = new ComparisonChain() {
+		ComparisonChain classify(int result) {
+			return (result < 0) ? LESS : (result > 0) ? GREATER : ACTIVE;
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public ComparisonChain compare(Comparable left, Comparable right) {
+			return classify(left.compareTo(right));
+		}
+
+		@Override
+		public ComparisonChain compare(double left, double right) {
+			return classify(Double.compare(left, right));
+		}
+
+		@Override
+		public ComparisonChain compare(float left, float right) {
+			return classify(Float.compare(left, right));
+		}
+
+		@Override
+		public ComparisonChain compare(int left, int right) {
+			return classify(Ints.compare(left, right));
+		}
+
+		@Override
+		public ComparisonChain compare(long left, long right) {
+			return classify(Longs.compare(left, right));
+		}
+
+		@Override
+		public <T> ComparisonChain compare(@Nullable T left, @Nullable T right, Comparator<T> comparator) {
+			return classify(comparator.compare(left, right));
+		}
+
+		@Override
+		public ComparisonChain compareFalseFirst(boolean left, boolean right) {
+			return classify(Booleans.compare(left, right));
+		}
+
+		@Override
+		public ComparisonChain compareTrueFirst(boolean left, boolean right) {
+			return classify(Booleans.compare(right, left)); // reversed
+		}
+
+		@Override
+		public int result() {
+			return 0;
+		}
+	};
+
+	private static final ComparisonChain LESS = new InactiveComparisonChain(-1);
+
+	private static final ComparisonChain GREATER = new InactiveComparisonChain(1);
+
+	/**
+	 * Begins a new chained comparison statement. See example in the class
+	 * documentation.
+	 */
+	public static ComparisonChain start() {
+		return ACTIVE;
+	}
+
+	private ComparisonChain() {
 	}
 
 	/**
@@ -193,10 +191,18 @@ public abstract class ComparisonChain {
 	public abstract ComparisonChain compare(Comparable<?> left, Comparable<?> right);
 
 	/**
-	 * Compares two objects using a comparator, <i>if</i> the result of this
-	 * comparison chain has not already been determined.
+	 * Compares two {@code double} values as specified by {@link Double#compare},
+	 * <i>if</i> the result of this comparison chain has not already been
+	 * determined.
 	 */
-	public abstract <T> ComparisonChain compare(@Nullable T left, @Nullable T right, Comparator<T> comparator);
+	public abstract ComparisonChain compare(double left, double right);
+
+	/**
+	 * Compares two {@code float} values as specified by {@link Float#compare},
+	 * <i>if</i> the result of this comparison chain has not already been
+	 * determined.
+	 */
+	public abstract ComparisonChain compare(float left, float right);
 
 	/**
 	 * Compares two {@code int} values as specified by {@link Ints#compare},
@@ -213,27 +219,10 @@ public abstract class ComparisonChain {
 	public abstract ComparisonChain compare(long left, long right);
 
 	/**
-	 * Compares two {@code float} values as specified by {@link Float#compare},
-	 * <i>if</i> the result of this comparison chain has not already been
-	 * determined.
+	 * Compares two objects using a comparator, <i>if</i> the result of this
+	 * comparison chain has not already been determined.
 	 */
-	public abstract ComparisonChain compare(float left, float right);
-
-	/**
-	 * Compares two {@code double} values as specified by {@link Double#compare},
-	 * <i>if</i> the result of this comparison chain has not already been
-	 * determined.
-	 */
-	public abstract ComparisonChain compare(double left, double right);
-
-	/**
-	 * Compares two {@code boolean} values, considering {@code true} to be less than
-	 * {@code false}, <i>if</i> the result of this comparison chain has not already
-	 * been determined.
-	 *
-	 * @since 12.0
-	 */
-	public abstract ComparisonChain compareTrueFirst(boolean left, boolean right);
+	public abstract <T> ComparisonChain compare(@Nullable T left, @Nullable T right, Comparator<T> comparator);
 
 	/**
 	 * Compares two {@code boolean} values, considering {@code false} to be less
@@ -243,6 +232,15 @@ public abstract class ComparisonChain {
 	 * @since 12.0 (present as {@code compare} since 2.0)
 	 */
 	public abstract ComparisonChain compareFalseFirst(boolean left, boolean right);
+
+	/**
+	 * Compares two {@code boolean} values, considering {@code true} to be less than
+	 * {@code false}, <i>if</i> the result of this comparison chain has not already
+	 * been determined.
+	 *
+	 * @since 12.0
+	 */
+	public abstract ComparisonChain compareTrueFirst(boolean left, boolean right);
 
 	/**
 	 * Ends this comparison chain and returns its result: a value having the same

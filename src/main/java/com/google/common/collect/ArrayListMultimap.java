@@ -53,7 +53,8 @@ import com.google.common.annotations.VisibleForTesting;
  *
  * <p>
  * The lists returned by {@link #get}, {@link #removeAll}, and
- * {@link #replaceValues} all implement {@link net.lax1dude.eaglercraft.v1_8.RandomAccess}.
+ * {@link #replaceValues} all implement
+ * {@link net.lax1dude.eaglercraft.v1_8.RandomAccess}.
  *
  * <p>
  * This class is not threadsafe when any concurrent operations update the
@@ -74,8 +75,8 @@ public final class ArrayListMultimap<K, V> extends AbstractListMultimap<K, V> {
 	// Default from ArrayList
 	private static final int DEFAULT_VALUES_PER_KEY = 3;
 
-	@VisibleForTesting
-	transient int expectedValuesPerKey;
+	@GwtIncompatible("Not needed in emulated source.")
+	private static final long serialVersionUID = 0;
 
 	/**
 	 * Creates a new, empty {@code ArrayListMultimap} with the default initial
@@ -108,6 +109,9 @@ public final class ArrayListMultimap<K, V> extends AbstractListMultimap<K, V> {
 		return new ArrayListMultimap<K, V>(multimap);
 	}
 
+	@VisibleForTesting
+	transient int expectedValuesPerKey;
+
 	private ArrayListMultimap() {
 		super(new HashMap<K, Collection<V>>());
 		expectedValuesPerKey = DEFAULT_VALUES_PER_KEY;
@@ -135,6 +139,16 @@ public final class ArrayListMultimap<K, V> extends AbstractListMultimap<K, V> {
 		return new ArrayList<V>(expectedValuesPerKey);
 	}
 
+	@GwtIncompatible("java.io.ObjectOutputStream")
+	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+		stream.defaultReadObject();
+		expectedValuesPerKey = stream.readInt();
+		int distinctKeys = Serialization.readCount(stream);
+		Map<K, Collection<V>> map = Maps.newHashMapWithExpectedSize(distinctKeys);
+		setMap(map);
+		Serialization.populateMultimap(this, stream, distinctKeys);
+	}
+
 	/**
 	 * Reduces the memory used by this {@code ArrayListMultimap}, if feasible.
 	 */
@@ -156,17 +170,4 @@ public final class ArrayListMultimap<K, V> extends AbstractListMultimap<K, V> {
 		stream.writeInt(expectedValuesPerKey);
 		Serialization.writeMultimap(this, stream);
 	}
-
-	@GwtIncompatible("java.io.ObjectOutputStream")
-	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
-		stream.defaultReadObject();
-		expectedValuesPerKey = stream.readInt();
-		int distinctKeys = Serialization.readCount(stream);
-		Map<K, Collection<V>> map = Maps.newHashMapWithExpectedSize(distinctKeys);
-		setMap(map);
-		Serialization.populateMultimap(this, stream, distinctKeys);
-	}
-
-	@GwtIncompatible("Not needed in emulated source.")
-	private static final long serialVersionUID = 0;
 }

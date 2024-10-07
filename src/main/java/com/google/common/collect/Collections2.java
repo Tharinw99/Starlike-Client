@@ -54,7 +54,377 @@ import com.google.common.primitives.Ints;
  */
 @GwtCompatible
 public final class Collections2 {
-	private Collections2() {
+	static class FilteredCollection<E> extends AbstractCollection<E> {
+		final Collection<E> unfiltered;
+		final Predicate<? super E> predicate;
+
+		FilteredCollection(Collection<E> unfiltered, Predicate<? super E> predicate) {
+			this.unfiltered = unfiltered;
+			this.predicate = predicate;
+		}
+
+		@Override
+		public boolean add(E element) {
+			checkArgument(predicate.apply(element));
+			return unfiltered.add(element);
+		}
+
+		@Override
+		public boolean addAll(Collection<? extends E> collection) {
+			for (E element : collection) {
+				checkArgument(predicate.apply(element));
+			}
+			return unfiltered.addAll(collection);
+		}
+
+		@Override
+		public void clear() {
+			Iterables.removeIf(unfiltered, predicate);
+		}
+
+		@Override
+		public boolean contains(@Nullable Object element) {
+			if (safeContains(unfiltered, element)) {
+				@SuppressWarnings("unchecked") // element is in unfiltered, so it must be an E
+				E e = (E) element;
+				return predicate.apply(e);
+			}
+			return false;
+		}
+
+		@Override
+		public boolean containsAll(Collection<?> collection) {
+			return containsAllImpl(this, collection);
+		}
+
+		FilteredCollection<E> createCombined(Predicate<? super E> newPredicate) {
+			return new FilteredCollection<E>(unfiltered, Predicates.<E>and(predicate, newPredicate));
+			// .<E> above needed to compile in JDK 5
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return !Iterables.any(unfiltered, predicate);
+		}
+
+		@Override
+		public Iterator<E> iterator() {
+			return Iterators.filter(unfiltered.iterator(), predicate);
+		}
+
+		@Override
+		public boolean remove(Object element) {
+			return contains(element) && unfiltered.remove(element);
+		}
+
+		@Override
+		public boolean removeAll(final Collection<?> collection) {
+			return Iterables.removeIf(unfiltered, and(predicate, (Predicate<E>) in(collection)));
+		}
+
+		@Override
+		public boolean retainAll(final Collection<?> collection) {
+			return Iterables.removeIf(unfiltered, and(predicate, (Predicate<E>) not(in(collection))));
+		}
+
+		@Override
+		public int size() {
+			return Iterators.size(iterator());
+		}
+
+		@Override
+		public Object[] toArray() {
+			// creating an ArrayList so filtering happens once
+			return Lists.newArrayList(iterator()).toArray();
+		}
+
+		@Override
+		public <T> T[] toArray(T[] array) {
+			return Lists.newArrayList(iterator()).toArray(array);
+		}
+	}
+
+	private static final class OrderedPermutationCollection<E> extends AbstractCollection<List<E>> {
+		/**
+		 * The number of permutations with repeated elements is calculated as follows:
+		 * <ul>
+		 * <li>For an empty list, it is 1 (base case).</li>
+		 * <li>When r numbers are added to a list of n-r elements, the number of
+		 * permutations is increased by a factor of (n choose r).</li>
+		 * </ul>
+		 */
+		private static <E> int calculateSize(List<E> sortedInputList, Comparator<? super E> comparator) {
+			long permutations = 1;
+			int n = 1;
+			int r = 1;
+			while (n < sortedInputList.size()) {
+				int comparison = comparator.compare(sortedInputList.get(n - 1), sortedInputList.get(n));
+				if (comparison < 0) {
+					// We move to the next non-repeated element.
+					permutations *= binomial(n, r);
+					r = 0;
+					if (!isPositiveInt(permutations)) {
+						return Integer.MAX_VALUE;
+					}
+				}
+				n++;
+				r++;
+			}
+			permutations *= binomial(n, r);
+			if (!isPositiveInt(permutations)) {
+				return Integer.MAX_VALUE;
+			}
+			return (int) permutations;
+		}
+
+		final ImmutableList<E> inputList;
+		final Comparator<? super E> comparator;
+
+		final int size;
+
+		OrderedPermutationCollection(Iterable<E> input, Comparator<? super E> comparator) {
+			this.inputList = Ordering.from(comparator).immutableSortedCopy(input);
+			this.comparator = comparator;
+			this.size = calculateSize(inputList, comparator);
+		}
+
+		@Override
+		public boolean contains(@Nullable Object obj) {
+			if (obj instanceof List) {
+				List<?> list = (List<?>) obj;
+				return isPermutation(inputList, list);
+			}
+			return false;
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return false;
+		}
+
+		@Override
+		public Iterator<List<E>> iterator() {
+			return new OrderedPermutationIterator<E>(inputList, comparator);
+		}
+
+		@Override
+		public int size() {
+			return size;
+		}
+
+		@Override
+		public String toString() {
+			return "orderedPermutationCollection(" + inputList + ")";
+		}
+	}
+
+	private static final class OrderedPermutationIterator<E> extends AbstractIterator<List<E>> {
+
+		List<E> nextPermutation;
+		final Comparator<? super E> comparator;
+
+		OrderedPermutationIterator(List<E> list, Comparator<? super E> comparator) {
+			this.nextPermutation = Lists.newArrayList(list);
+			this.comparator = comparator;
+		}
+
+		void calculateNextPermutation() {
+			int j = findNextJ();
+			if (j == -1) {
+				nextPermutation = null;
+				return;
+			}
+
+			int l = findNextL(j);
+			Collections.swap(nextPermutation, j, l);
+			int n = nextPermutation.size();
+			Collections.reverse(nextPermutation.subList(j + 1, n));
+		}
+
+		@Override
+		protected List<E> computeNext() {
+			if (nextPermutation == null) {
+				return endOfData();
+			}
+			ImmutableList<E> next = ImmutableList.copyOf(nextPermutation);
+			calculateNextPermutation();
+			return next;
+		}
+
+		int findNextJ() {
+			for (int k = nextPermutation.size() - 2; k >= 0; k--) {
+				if (comparator.compare(nextPermutation.get(k), nextPermutation.get(k + 1)) < 0) {
+					return k;
+				}
+			}
+			return -1;
+		}
+
+		int findNextL(int j) {
+			E ak = nextPermutation.get(j);
+			for (int l = nextPermutation.size() - 1; l > j; l--) {
+				if (comparator.compare(ak, nextPermutation.get(l)) < 0) {
+					return l;
+				}
+			}
+			throw new AssertionError("this statement should be unreachable");
+		}
+	}
+
+	private static final class PermutationCollection<E> extends AbstractCollection<List<E>> {
+		final ImmutableList<E> inputList;
+
+		PermutationCollection(ImmutableList<E> input) {
+			this.inputList = input;
+		}
+
+		@Override
+		public boolean contains(@Nullable Object obj) {
+			if (obj instanceof List) {
+				List<?> list = (List<?>) obj;
+				return isPermutation(inputList, list);
+			}
+			return false;
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return false;
+		}
+
+		@Override
+		public Iterator<List<E>> iterator() {
+			return new PermutationIterator<E>(inputList);
+		}
+
+		@Override
+		public int size() {
+			return IntMath.factorial(inputList.size());
+		}
+
+		@Override
+		public String toString() {
+			return "permutations(" + inputList + ")";
+		}
+	}
+
+	private static class PermutationIterator<E> extends AbstractIterator<List<E>> {
+		final List<E> list;
+		final int[] c;
+		final int[] o;
+		int j;
+
+		PermutationIterator(List<E> list) {
+			this.list = new ArrayList<E>(list);
+			int n = list.size();
+			c = new int[n];
+			o = new int[n];
+			Arrays.fill(c, 0);
+			Arrays.fill(o, 1);
+			j = Integer.MAX_VALUE;
+		}
+
+		void calculateNextPermutation() {
+			j = list.size() - 1;
+			int s = 0;
+
+			// Handle the special case of an empty list. Skip the calculation of the
+			// next permutation.
+			if (j == -1) {
+				return;
+			}
+
+			while (true) {
+				int q = c[j] + o[j];
+				if (q < 0) {
+					switchDirection();
+					continue;
+				}
+				if (q == j + 1) {
+					if (j == 0) {
+						break;
+					}
+					s++;
+					switchDirection();
+					continue;
+				}
+
+				Collections.swap(list, j - c[j] + s, j - q + s);
+				c[j] = q;
+				break;
+			}
+		}
+
+		@Override
+		protected List<E> computeNext() {
+			if (j <= 0) {
+				return endOfData();
+			}
+			ImmutableList<E> next = ImmutableList.copyOf(list);
+			calculateNextPermutation();
+			return next;
+		}
+
+		void switchDirection() {
+			o[j] = -o[j];
+			j--;
+		}
+	}
+
+	static class TransformedCollection<F, T> extends AbstractCollection<T> {
+		final Collection<F> fromCollection;
+		final Function<? super F, ? extends T> function;
+
+		TransformedCollection(Collection<F> fromCollection, Function<? super F, ? extends T> function) {
+			this.fromCollection = checkNotNull(fromCollection);
+			this.function = checkNotNull(function);
+		}
+
+		@Override
+		public void clear() {
+			fromCollection.clear();
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return fromCollection.isEmpty();
+		}
+
+		@Override
+		public Iterator<T> iterator() {
+			return Iterators.transform(fromCollection.iterator(), function);
+		}
+
+		@Override
+		public int size() {
+			return fromCollection.size();
+		}
+	}
+
+	static final Joiner STANDARD_JOINER = Joiner.on(", ").useForNull("null");
+
+	/**
+	 * Used to avoid http://bugs.sun.com/view_bug.do?bug_id=6558557
+	 */
+	static <T> Collection<T> cast(Iterable<T> iterable) {
+		return (Collection<T>) iterable;
+	}
+
+	/**
+	 * Returns {@code true} if the collection {@code self} contains all of the
+	 * elements in the collection {@code c}.
+	 *
+	 * <p>
+	 * This method iterates over the specified collection {@code c}, checking each
+	 * element returned by the iterator in turn to see if it is contained in the
+	 * specified collection {@code self}. If all elements are so contained,
+	 * {@code true} is returned, otherwise {@code false}.
+	 *
+	 * @param self a collection which might contain all elements in {@code c}
+	 * @param c    a collection whose elements might be contained by {@code self}
+	 */
+	static boolean containsAllImpl(Collection<?> self, Collection<?> c) {
+		return Iterables.all(c, Predicates.in(self));
 	}
 
 	/**
@@ -102,213 +472,19 @@ public final class Collections2 {
 	}
 
 	/**
-	 * Delegates to {@link Collection#contains}. Returns {@code false} if the
-	 * {@code contains} method throws a {@code ClassCastException} or
-	 * {@code NullPointerException}.
+	 * Returns {@code true} if the second list is a permutation of the first.
 	 */
-	static boolean safeContains(Collection<?> collection, @Nullable Object object) {
-		checkNotNull(collection);
-		try {
-			return collection.contains(object);
-		} catch (ClassCastException e) {
-			return false;
-		} catch (NullPointerException e) {
+	private static boolean isPermutation(List<?> first, List<?> second) {
+		if (first.size() != second.size()) {
 			return false;
 		}
+		Multiset<?> firstMultiset = HashMultiset.create(first);
+		Multiset<?> secondMultiset = HashMultiset.create(second);
+		return firstMultiset.equals(secondMultiset);
 	}
 
-	/**
-	 * Delegates to {@link Collection#remove}. Returns {@code false} if the
-	 * {@code remove} method throws a {@code ClassCastException} or
-	 * {@code NullPointerException}.
-	 */
-	static boolean safeRemove(Collection<?> collection, @Nullable Object object) {
-		checkNotNull(collection);
-		try {
-			return collection.remove(object);
-		} catch (ClassCastException e) {
-			return false;
-		} catch (NullPointerException e) {
-			return false;
-		}
-	}
-
-	static class FilteredCollection<E> extends AbstractCollection<E> {
-		final Collection<E> unfiltered;
-		final Predicate<? super E> predicate;
-
-		FilteredCollection(Collection<E> unfiltered, Predicate<? super E> predicate) {
-			this.unfiltered = unfiltered;
-			this.predicate = predicate;
-		}
-
-		FilteredCollection<E> createCombined(Predicate<? super E> newPredicate) {
-			return new FilteredCollection<E>(unfiltered, Predicates.<E>and(predicate, newPredicate));
-			// .<E> above needed to compile in JDK 5
-		}
-
-		@Override
-		public boolean add(E element) {
-			checkArgument(predicate.apply(element));
-			return unfiltered.add(element);
-		}
-
-		@Override
-		public boolean addAll(Collection<? extends E> collection) {
-			for (E element : collection) {
-				checkArgument(predicate.apply(element));
-			}
-			return unfiltered.addAll(collection);
-		}
-
-		@Override
-		public void clear() {
-			Iterables.removeIf(unfiltered, predicate);
-		}
-
-		@Override
-		public boolean contains(@Nullable Object element) {
-			if (safeContains(unfiltered, element)) {
-				@SuppressWarnings("unchecked") // element is in unfiltered, so it must be an E
-				E e = (E) element;
-				return predicate.apply(e);
-			}
-			return false;
-		}
-
-		@Override
-		public boolean containsAll(Collection<?> collection) {
-			return containsAllImpl(this, collection);
-		}
-
-		@Override
-		public boolean isEmpty() {
-			return !Iterables.any(unfiltered, predicate);
-		}
-
-		@Override
-		public Iterator<E> iterator() {
-			return Iterators.filter(unfiltered.iterator(), predicate);
-		}
-
-		@Override
-		public boolean remove(Object element) {
-			return contains(element) && unfiltered.remove(element);
-		}
-
-		@Override
-		public boolean removeAll(final Collection<?> collection) {
-			return Iterables.removeIf(unfiltered, and(predicate, (Predicate<E>)in(collection)));
-		}
-
-		@Override
-		public boolean retainAll(final Collection<?> collection) {
-			return Iterables.removeIf(unfiltered, and(predicate, (Predicate<E>)not(in(collection))));
-		}
-
-		@Override
-		public int size() {
-			return Iterators.size(iterator());
-		}
-
-		@Override
-		public Object[] toArray() {
-			// creating an ArrayList so filtering happens once
-			return Lists.newArrayList(iterator()).toArray();
-		}
-
-		@Override
-		public <T> T[] toArray(T[] array) {
-			return Lists.newArrayList(iterator()).toArray(array);
-		}
-	}
-
-	/**
-	 * Returns a collection that applies {@code function} to each element of
-	 * {@code fromCollection}. The returned collection is a live view of {@code
-	 * fromCollection}; changes to one affect the other.
-	 *
-	 * <p>
-	 * The returned collection's {@code add()} and {@code addAll()} methods throw an
-	 * {@link UnsupportedOperationException}. All other collection methods are
-	 * supported, as long as {@code fromCollection} supports them.
-	 *
-	 * <p>
-	 * The returned collection isn't threadsafe or serializable, even if
-	 * {@code fromCollection} is.
-	 *
-	 * <p>
-	 * When a live view is <i>not</i> needed, it may be faster to copy the
-	 * transformed collection and use the copy.
-	 *
-	 * <p>
-	 * If the input {@code Collection} is known to be a {@code List}, consider
-	 * {@link Lists#transform}. If only an {@code Iterable} is available, use
-	 * {@link Iterables#transform}.
-	 */
-	public static <F, T> Collection<T> transform(Collection<F> fromCollection, Function<? super F, T> function) {
-		return new TransformedCollection<F, T>(fromCollection, function);
-	}
-
-	static class TransformedCollection<F, T> extends AbstractCollection<T> {
-		final Collection<F> fromCollection;
-		final Function<? super F, ? extends T> function;
-
-		TransformedCollection(Collection<F> fromCollection, Function<? super F, ? extends T> function) {
-			this.fromCollection = checkNotNull(fromCollection);
-			this.function = checkNotNull(function);
-		}
-
-		@Override
-		public void clear() {
-			fromCollection.clear();
-		}
-
-		@Override
-		public boolean isEmpty() {
-			return fromCollection.isEmpty();
-		}
-
-		@Override
-		public Iterator<T> iterator() {
-			return Iterators.transform(fromCollection.iterator(), function);
-		}
-
-		@Override
-		public int size() {
-			return fromCollection.size();
-		}
-	}
-
-	/**
-	 * Returns {@code true} if the collection {@code self} contains all of the
-	 * elements in the collection {@code c}.
-	 *
-	 * <p>
-	 * This method iterates over the specified collection {@code c}, checking each
-	 * element returned by the iterator in turn to see if it is contained in the
-	 * specified collection {@code self}. If all elements are so contained,
-	 * {@code true} is returned, otherwise {@code false}.
-	 *
-	 * @param self a collection which might contain all elements in {@code c}
-	 * @param c    a collection whose elements might be contained by {@code self}
-	 */
-	static boolean containsAllImpl(Collection<?> self, Collection<?> c) {
-		return Iterables.all(c, Predicates.in(self));
-	}
-
-	/**
-	 * An implementation of {@link Collection#toString()}.
-	 */
-	static String toStringImpl(final Collection<?> collection) {
-		StringBuilder sb = newStringBuilderForCollection(collection.size()).append('[');
-		STANDARD_JOINER.appendTo(sb, Iterables.transform(collection, new Function<Object, Object>() {
-			@Override
-			public Object apply(Object input) {
-				return input == collection ? "(this Collection)" : input;
-			}
-		}));
-		return sb.append(']').toString();
+	private static boolean isPositiveInt(long n) {
+		return n >= 0 && n <= Integer.MAX_VALUE;
 	}
 
 	/**
@@ -318,15 +494,6 @@ public final class Collections2 {
 		checkNonnegative(size, "size");
 		return new StringBuilder((int) Math.min(size * 8L, Ints.MAX_POWER_OF_TWO));
 	}
-
-	/**
-	 * Used to avoid http://bugs.sun.com/view_bug.do?bug_id=6558557
-	 */
-	static <T> Collection<T> cast(Iterable<T> iterable) {
-		return (Collection<T>) iterable;
-	}
-
-	static final Joiner STANDARD_JOINER = Joiner.on(", ").useForNull("null");
 
 	/**
 	 * Returns a {@link Collection} of all the permutations of the specified
@@ -374,25 +541,26 @@ public final class Collections2 {
 	 * <pre>
 	 *    {@code
 	 *
-	 *   for (List<String> perm : orderedPermutations(asList("b", "c", "a"))) {
-	 *     println(perm);
-	 *   }
-	 *   // -> ["a", "b", "c"]
-	 *   // -> ["a", "c", "b"]
-	 *   // -> ["b", "a", "c"]
-	 *   // -> ["b", "c", "a"]
-	 *   // -> ["c", "a", "b"]
-	 *   // -> ["c", "b", "a"]
+	 * for (List<String> perm : orderedPermutations(asList("b", "c", "a"))) {
+	 * 	println(perm);
+	 * }
+	 * // -> ["a", "b", "c"]
+	 * // -> ["a", "c", "b"]
+	 * // -> ["b", "a", "c"]
+	 * // -> ["b", "c", "a"]
+	 * // -> ["c", "a", "b"]
+	 * // -> ["c", "b", "a"]
 	 *
-	 *   for (List<Integer> perm : orderedPermutations(asList(1, 2, 2, 1))) {
-	 *     println(perm);
-	 *   }
-	 *   // -> [1, 1, 2, 2]
-	 *   // -> [1, 2, 1, 2]
-	 *   // -> [1, 2, 2, 1]
-	 *   // -> [2, 1, 1, 2]
-	 *   // -> [2, 1, 2, 1]
-	 *   // -> [2, 2, 1, 1]}
+	 * for (List<Integer> perm : orderedPermutations(asList(1, 2, 2, 1))) {
+	 * 	println(perm);
+	 * }
+	 * // -> [1, 1, 2, 2]
+	 * // -> [1, 2, 1, 2]
+	 * // -> [1, 2, 2, 1]
+	 * // -> [2, 1, 1, 2]
+	 * // -> [2, 1, 2, 1]
+	 * // -> [2, 2, 1, 1]
+	 * }
 	 * </pre>
 	 *
 	 * <p>
@@ -423,132 +591,6 @@ public final class Collections2 {
 		return new OrderedPermutationCollection<E>(elements, comparator);
 	}
 
-	private static final class OrderedPermutationCollection<E> extends AbstractCollection<List<E>> {
-		final ImmutableList<E> inputList;
-		final Comparator<? super E> comparator;
-		final int size;
-
-		OrderedPermutationCollection(Iterable<E> input, Comparator<? super E> comparator) {
-			this.inputList = Ordering.from(comparator).immutableSortedCopy(input);
-			this.comparator = comparator;
-			this.size = calculateSize(inputList, comparator);
-		}
-
-		/**
-		 * The number of permutations with repeated elements is calculated as follows:
-		 * <ul>
-		 * <li>For an empty list, it is 1 (base case).</li>
-		 * <li>When r numbers are added to a list of n-r elements, the number of
-		 * permutations is increased by a factor of (n choose r).</li>
-		 * </ul>
-		 */
-		private static <E> int calculateSize(List<E> sortedInputList, Comparator<? super E> comparator) {
-			long permutations = 1;
-			int n = 1;
-			int r = 1;
-			while (n < sortedInputList.size()) {
-				int comparison = comparator.compare(sortedInputList.get(n - 1), sortedInputList.get(n));
-				if (comparison < 0) {
-					// We move to the next non-repeated element.
-					permutations *= binomial(n, r);
-					r = 0;
-					if (!isPositiveInt(permutations)) {
-						return Integer.MAX_VALUE;
-					}
-				}
-				n++;
-				r++;
-			}
-			permutations *= binomial(n, r);
-			if (!isPositiveInt(permutations)) {
-				return Integer.MAX_VALUE;
-			}
-			return (int) permutations;
-		}
-
-		@Override
-		public int size() {
-			return size;
-		}
-
-		@Override
-		public boolean isEmpty() {
-			return false;
-		}
-
-		@Override
-		public Iterator<List<E>> iterator() {
-			return new OrderedPermutationIterator<E>(inputList, comparator);
-		}
-
-		@Override
-		public boolean contains(@Nullable Object obj) {
-			if (obj instanceof List) {
-				List<?> list = (List<?>) obj;
-				return isPermutation(inputList, list);
-			}
-			return false;
-		}
-
-		@Override
-		public String toString() {
-			return "orderedPermutationCollection(" + inputList + ")";
-		}
-	}
-
-	private static final class OrderedPermutationIterator<E> extends AbstractIterator<List<E>> {
-
-		List<E> nextPermutation;
-		final Comparator<? super E> comparator;
-
-		OrderedPermutationIterator(List<E> list, Comparator<? super E> comparator) {
-			this.nextPermutation = Lists.newArrayList(list);
-			this.comparator = comparator;
-		}
-
-		@Override
-		protected List<E> computeNext() {
-			if (nextPermutation == null) {
-				return endOfData();
-			}
-			ImmutableList<E> next = ImmutableList.copyOf(nextPermutation);
-			calculateNextPermutation();
-			return next;
-		}
-
-		void calculateNextPermutation() {
-			int j = findNextJ();
-			if (j == -1) {
-				nextPermutation = null;
-				return;
-			}
-
-			int l = findNextL(j);
-			Collections.swap(nextPermutation, j, l);
-			int n = nextPermutation.size();
-			Collections.reverse(nextPermutation.subList(j + 1, n));
-		}
-
-		int findNextJ() {
-			for (int k = nextPermutation.size() - 2; k >= 0; k--) {
-				if (comparator.compare(nextPermutation.get(k), nextPermutation.get(k + 1)) < 0) {
-					return k;
-				}
-			}
-			return -1;
-		}
-
-		int findNextL(int j) {
-			E ak = nextPermutation.get(j);
-			for (int l = nextPermutation.size() - 1; l > j; l--) {
-				if (comparator.compare(ak, nextPermutation.get(l)) < 0) {
-					return l;
-				}
-			}
-			throw new AssertionError("this statement should be unreachable");
-		}
-	}
-
 	/**
 	 * Returns a {@link Collection} of all the permutations of the specified
 	 * {@link Collection}.
@@ -577,119 +619,79 @@ public final class Collections2 {
 		return new PermutationCollection<E>(ImmutableList.copyOf(elements));
 	}
 
-	private static final class PermutationCollection<E> extends AbstractCollection<List<E>> {
-		final ImmutableList<E> inputList;
-
-		PermutationCollection(ImmutableList<E> input) {
-			this.inputList = input;
-		}
-
-		@Override
-		public int size() {
-			return IntMath.factorial(inputList.size());
-		}
-
-		@Override
-		public boolean isEmpty() {
+	/**
+	 * Delegates to {@link Collection#contains}. Returns {@code false} if the
+	 * {@code contains} method throws a {@code ClassCastException} or
+	 * {@code NullPointerException}.
+	 */
+	static boolean safeContains(Collection<?> collection, @Nullable Object object) {
+		checkNotNull(collection);
+		try {
+			return collection.contains(object);
+		} catch (ClassCastException e) {
 			return false;
-		}
-
-		@Override
-		public Iterator<List<E>> iterator() {
-			return new PermutationIterator<E>(inputList);
-		}
-
-		@Override
-		public boolean contains(@Nullable Object obj) {
-			if (obj instanceof List) {
-				List<?> list = (List<?>) obj;
-				return isPermutation(inputList, list);
-			}
+		} catch (NullPointerException e) {
 			return false;
-		}
-
-		@Override
-		public String toString() {
-			return "permutations(" + inputList + ")";
-		}
-	}
-
-	private static class PermutationIterator<E> extends AbstractIterator<List<E>> {
-		final List<E> list;
-		final int[] c;
-		final int[] o;
-		int j;
-
-		PermutationIterator(List<E> list) {
-			this.list = new ArrayList<E>(list);
-			int n = list.size();
-			c = new int[n];
-			o = new int[n];
-			Arrays.fill(c, 0);
-			Arrays.fill(o, 1);
-			j = Integer.MAX_VALUE;
-		}
-
-		@Override
-		protected List<E> computeNext() {
-			if (j <= 0) {
-				return endOfData();
-			}
-			ImmutableList<E> next = ImmutableList.copyOf(list);
-			calculateNextPermutation();
-			return next;
-		}
-
-		void calculateNextPermutation() {
-			j = list.size() - 1;
-			int s = 0;
-
-			// Handle the special case of an empty list. Skip the calculation of the
-			// next permutation.
-			if (j == -1) {
-				return;
-			}
-
-			while (true) {
-				int q = c[j] + o[j];
-				if (q < 0) {
-					switchDirection();
-					continue;
-				}
-				if (q == j + 1) {
-					if (j == 0) {
-						break;
-					}
-					s++;
-					switchDirection();
-					continue;
-				}
-
-				Collections.swap(list, j - c[j] + s, j - q + s);
-				c[j] = q;
-				break;
-			}
-		}
-
-		void switchDirection() {
-			o[j] = -o[j];
-			j--;
 		}
 	}
 
 	/**
-	 * Returns {@code true} if the second list is a permutation of the first.
+	 * Delegates to {@link Collection#remove}. Returns {@code false} if the
+	 * {@code remove} method throws a {@code ClassCastException} or
+	 * {@code NullPointerException}.
 	 */
-	private static boolean isPermutation(List<?> first, List<?> second) {
-		if (first.size() != second.size()) {
+	static boolean safeRemove(Collection<?> collection, @Nullable Object object) {
+		checkNotNull(collection);
+		try {
+			return collection.remove(object);
+		} catch (ClassCastException e) {
+			return false;
+		} catch (NullPointerException e) {
 			return false;
 		}
-		Multiset<?> firstMultiset = HashMultiset.create(first);
-		Multiset<?> secondMultiset = HashMultiset.create(second);
-		return firstMultiset.equals(secondMultiset);
 	}
 
-	private static boolean isPositiveInt(long n) {
-		return n >= 0 && n <= Integer.MAX_VALUE;
+	/**
+	 * An implementation of {@link Collection#toString()}.
+	 */
+	static String toStringImpl(final Collection<?> collection) {
+		StringBuilder sb = newStringBuilderForCollection(collection.size()).append('[');
+		STANDARD_JOINER.appendTo(sb, Iterables.transform(collection, new Function<Object, Object>() {
+			@Override
+			public Object apply(Object input) {
+				return input == collection ? "(this Collection)" : input;
+			}
+		}));
+		return sb.append(']').toString();
+	}
+
+	/**
+	 * Returns a collection that applies {@code function} to each element of
+	 * {@code fromCollection}. The returned collection is a live view of {@code
+	 * fromCollection}; changes to one affect the other.
+	 *
+	 * <p>
+	 * The returned collection's {@code add()} and {@code addAll()} methods throw an
+	 * {@link UnsupportedOperationException}. All other collection methods are
+	 * supported, as long as {@code fromCollection} supports them.
+	 *
+	 * <p>
+	 * The returned collection isn't threadsafe or serializable, even if
+	 * {@code fromCollection} is.
+	 *
+	 * <p>
+	 * When a live view is <i>not</i> needed, it may be faster to copy the
+	 * transformed collection and use the copy.
+	 *
+	 * <p>
+	 * If the input {@code Collection} is known to be a {@code List}, consider
+	 * {@link Lists#transform}. If only an {@code Iterable} is available, use
+	 * {@link Iterables#transform}.
+	 */
+	public static <F, T> Collection<T> transform(Collection<F> fromCollection, Function<? super F, T> function) {
+		return new TransformedCollection<F, T>(fromCollection, function);
+	}
+
+	private Collections2() {
 	}
 }

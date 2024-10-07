@@ -1,7 +1,9 @@
 package net.minecraft.world.gen.structure;
 
-import com.google.common.collect.Lists;
 import java.util.List;
+
+import com.google.common.collect.Lists;
+
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -19,130 +21,31 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class StructureMineshaftPieces {
-	private static final List<WeightedRandomChestContent> CHEST_CONTENT_WEIGHT_LIST = Lists.newArrayList(
-			new WeightedRandomChestContent[] { new WeightedRandomChestContent(Items.iron_ingot, 0, 1, 5, 10),
-					new WeightedRandomChestContent(Items.gold_ingot, 0, 1, 3, 5),
-					new WeightedRandomChestContent(Items.redstone, 0, 4, 9, 5),
-					new WeightedRandomChestContent(Items.dye, EnumDyeColor.BLUE.getDyeDamage(), 4, 9, 5),
-					new WeightedRandomChestContent(Items.diamond, 0, 1, 2, 3),
-					new WeightedRandomChestContent(Items.coal, 0, 3, 8, 10),
-					new WeightedRandomChestContent(Items.bread, 0, 1, 3, 15),
-					new WeightedRandomChestContent(Items.iron_pickaxe, 0, 1, 1, 1),
-					new WeightedRandomChestContent(Item.getItemFromBlock(Blocks.rail), 0, 4, 8, 1),
-					new WeightedRandomChestContent(Items.melon_seeds, 0, 2, 4, 10),
-					new WeightedRandomChestContent(Items.pumpkin_seeds, 0, 2, 4, 10),
-					new WeightedRandomChestContent(Items.saddle, 0, 1, 1, 3),
-					new WeightedRandomChestContent(Items.iron_horse_armor, 0, 1, 1, 1) });
-
-	public static void registerStructurePieces() {
-		MapGenStructureIO.registerStructureComponent(StructureMineshaftPieces.Corridor.class, "MSCorridor");
-		MapGenStructureIO.registerStructureComponent(StructureMineshaftPieces.Cross.class, "MSCrossing");
-		MapGenStructureIO.registerStructureComponent(StructureMineshaftPieces.Room.class, "MSRoom");
-		MapGenStructureIO.registerStructureComponent(StructureMineshaftPieces.Stairs.class, "MSStairs");
-	}
-
-	private static StructureComponent func_175892_a(List<StructureComponent> listIn, EaglercraftRandom rand, int x,
-			int y, int z, EnumFacing facing, int type) {
-		int i = rand.nextInt(100);
-		if (i >= 80) {
-			StructureBoundingBox structureboundingbox = StructureMineshaftPieces.Cross.func_175813_a(listIn, rand, x, y,
-					z, facing);
-			if (structureboundingbox != null) {
-				return new StructureMineshaftPieces.Cross(type, rand, structureboundingbox, facing);
-			}
-		} else if (i >= 70) {
-			StructureBoundingBox structureboundingbox1 = StructureMineshaftPieces.Stairs.func_175812_a(listIn, rand, x,
-					y, z, facing);
-			if (structureboundingbox1 != null) {
-				return new StructureMineshaftPieces.Stairs(type, rand, structureboundingbox1, facing);
-			}
-		} else {
-			StructureBoundingBox structureboundingbox2 = StructureMineshaftPieces.Corridor.func_175814_a(listIn, rand,
-					x, y, z, facing);
-			if (structureboundingbox2 != null) {
-				return new StructureMineshaftPieces.Corridor(type, rand, structureboundingbox2, facing);
-			}
-		}
-
-		return null;
-	}
-
-	private static StructureComponent func_175890_b(StructureComponent componentIn, List<StructureComponent> listIn,
-			EaglercraftRandom rand, int x, int y, int z, EnumFacing facing, int type) {
-		if (type > 8) {
-			return null;
-		} else if (Math.abs(x - componentIn.getBoundingBox().minX) <= 80
-				&& Math.abs(z - componentIn.getBoundingBox().minZ) <= 80) {
-			StructureComponent structurecomponent = func_175892_a(listIn, rand, x, y, z, facing, type + 1);
-			if (structurecomponent != null) {
-				listIn.add(structurecomponent);
-				structurecomponent.buildComponent(componentIn, listIn, rand);
-			}
-
-			return structurecomponent;
-		} else {
-			return null;
-		}
-	}
-
 	public static class Corridor extends StructureComponent {
-		private boolean hasRails;
-		private boolean hasSpiders;
-		private boolean spawnerPlaced;
-		private int sectionCount;
-
-		public Corridor() {
-		}
-
-		protected void writeStructureToNBT(NBTTagCompound tagCompound) {
-			tagCompound.setBoolean("hr", this.hasRails);
-			tagCompound.setBoolean("sc", this.hasSpiders);
-			tagCompound.setBoolean("hps", this.spawnerPlaced);
-			tagCompound.setInteger("Num", this.sectionCount);
-		}
-
-		protected void readStructureFromNBT(NBTTagCompound tagCompound) {
-			this.hasRails = tagCompound.getBoolean("hr");
-			this.hasSpiders = tagCompound.getBoolean("sc");
-			this.spawnerPlaced = tagCompound.getBoolean("hps");
-			this.sectionCount = tagCompound.getInteger("Num");
-		}
-
-		public Corridor(int type, EaglercraftRandom rand, StructureBoundingBox structurebb, EnumFacing facing) {
-			super(type);
-			this.coordBaseMode = facing;
-			this.boundingBox = structurebb;
-			this.hasRails = rand.nextInt(3) == 0;
-			this.hasSpiders = !this.hasRails && rand.nextInt(23) == 0;
-			if (this.coordBaseMode != EnumFacing.NORTH && this.coordBaseMode != EnumFacing.SOUTH) {
-				this.sectionCount = structurebb.getXSize() / 5;
-			} else {
-				this.sectionCount = structurebb.getZSize() / 5;
-			}
-
-		}
-
 		public static StructureBoundingBox func_175814_a(List<StructureComponent> rand, EaglercraftRandom x, int y,
 				int z, int facing, EnumFacing parEnumFacing) {
 			StructureBoundingBox structureboundingbox = new StructureBoundingBox(y, z, facing, y, z + 2, facing);
@@ -176,118 +79,27 @@ public class StructureMineshaftPieces {
 			return i > 0 ? structureboundingbox : null;
 		}
 
-		public void buildComponent(StructureComponent componentIn, List<StructureComponent> listIn,
-				EaglercraftRandom rand) {
-			int i = this.getComponentType();
-			int j = rand.nextInt(4);
-			if (this.coordBaseMode != null) {
-				switch (this.coordBaseMode) {
-				case NORTH:
-					if (j <= 1) {
-						StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.minX,
-								this.boundingBox.minY - 1 + rand.nextInt(3), this.boundingBox.minZ - 1,
-								this.coordBaseMode, i);
-					} else if (j == 2) {
-						StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.minX - 1,
-								this.boundingBox.minY - 1 + rand.nextInt(3), this.boundingBox.minZ, EnumFacing.WEST, i);
-					} else {
-						StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.maxX + 1,
-								this.boundingBox.minY - 1 + rand.nextInt(3), this.boundingBox.minZ, EnumFacing.EAST, i);
-					}
-					break;
-				case SOUTH:
-					if (j <= 1) {
-						StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.minX,
-								this.boundingBox.minY - 1 + rand.nextInt(3), this.boundingBox.maxZ + 1,
-								this.coordBaseMode, i);
-					} else if (j == 2) {
-						StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.minX - 1,
-								this.boundingBox.minY - 1 + rand.nextInt(3), this.boundingBox.maxZ - 3, EnumFacing.WEST,
-								i);
-					} else {
-						StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.maxX + 1,
-								this.boundingBox.minY - 1 + rand.nextInt(3), this.boundingBox.maxZ - 3, EnumFacing.EAST,
-								i);
-					}
-					break;
-				case WEST:
-					if (j <= 1) {
-						StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.minX - 1,
-								this.boundingBox.minY - 1 + rand.nextInt(3), this.boundingBox.minZ, this.coordBaseMode,
-								i);
-					} else if (j == 2) {
-						StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.minX,
-								this.boundingBox.minY - 1 + rand.nextInt(3), this.boundingBox.minZ - 1,
-								EnumFacing.NORTH, i);
-					} else {
-						StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.minX,
-								this.boundingBox.minY - 1 + rand.nextInt(3), this.boundingBox.maxZ + 1,
-								EnumFacing.SOUTH, i);
-					}
-					break;
-				case EAST:
-					if (j <= 1) {
-						StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.maxX + 1,
-								this.boundingBox.minY - 1 + rand.nextInt(3), this.boundingBox.minZ, this.coordBaseMode,
-								i);
-					} else if (j == 2) {
-						StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.maxX - 3,
-								this.boundingBox.minY - 1 + rand.nextInt(3), this.boundingBox.minZ - 1,
-								EnumFacing.NORTH, i);
-					} else {
-						StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.maxX - 3,
-								this.boundingBox.minY - 1 + rand.nextInt(3), this.boundingBox.maxZ + 1,
-								EnumFacing.SOUTH, i);
-					}
-				}
-			}
+		private boolean hasRails;
+		private boolean hasSpiders;
+		private boolean spawnerPlaced;
 
-			if (i < 8) {
-				if (this.coordBaseMode != EnumFacing.NORTH && this.coordBaseMode != EnumFacing.SOUTH) {
-					for (int i1 = this.boundingBox.minX + 3; i1 + 3 <= this.boundingBox.maxX; i1 += 5) {
-						int j1 = rand.nextInt(5);
-						if (j1 == 0) {
-							StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, i1, this.boundingBox.minY,
-									this.boundingBox.minZ - 1, EnumFacing.NORTH, i + 1);
-						} else if (j1 == 1) {
-							StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, i1, this.boundingBox.minY,
-									this.boundingBox.maxZ + 1, EnumFacing.SOUTH, i + 1);
-						}
-					}
-				} else {
-					for (int k = this.boundingBox.minZ + 3; k + 3 <= this.boundingBox.maxZ; k += 5) {
-						int l = rand.nextInt(5);
-						if (l == 0) {
-							StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.minX - 1,
-									this.boundingBox.minY, k, EnumFacing.WEST, i + 1);
-						} else if (l == 1) {
-							StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.maxX + 1,
-									this.boundingBox.minY, k, EnumFacing.EAST, i + 1);
-						}
-					}
-				}
-			}
+		private int sectionCount;
 
+		public Corridor() {
 		}
 
-		protected boolean generateChestContents(World worldIn, StructureBoundingBox boundingBoxIn,
-				EaglercraftRandom rand, int x, int y, int z, List<WeightedRandomChestContent> listIn, int max) {
-			BlockPos blockpos = new BlockPos(this.getXWithOffset(x, z), this.getYWithOffset(y),
-					this.getZWithOffset(x, z));
-			if (boundingBoxIn.isVecInside(blockpos)
-					&& worldIn.getBlockState(blockpos).getBlock().getMaterial() == Material.air) {
-				int i = rand.nextBoolean() ? 1 : 0;
-				worldIn.setBlockState(blockpos,
-						Blocks.rail.getStateFromMeta(this.getMetadataWithOffset(Blocks.rail, i)), 2);
-				EntityMinecartChest entityminecartchest = new EntityMinecartChest(worldIn,
-						(double) ((float) blockpos.getX() + 0.5F), (double) ((float) blockpos.getY() + 0.5F),
-						(double) ((float) blockpos.getZ() + 0.5F));
-				WeightedRandomChestContent.generateChestContents(rand, listIn, entityminecartchest, max);
-				worldIn.spawnEntityInWorld(entityminecartchest);
-				return true;
+		public Corridor(int type, EaglercraftRandom rand, StructureBoundingBox structurebb, EnumFacing facing) {
+			super(type);
+			this.coordBaseMode = facing;
+			this.boundingBox = structurebb;
+			this.hasRails = rand.nextInt(3) == 0;
+			this.hasSpiders = !this.hasRails && rand.nextInt(23) == 0;
+			if (this.coordBaseMode != EnumFacing.NORTH && this.coordBaseMode != EnumFacing.SOUTH) {
+				this.sectionCount = structurebb.getXSize() / 5;
 			} else {
-				return false;
+				this.sectionCount = structurebb.getZSize() / 5;
 			}
+
 		}
 
 		public boolean addComponentParts(World worldIn, EaglercraftRandom randomIn,
@@ -405,32 +217,137 @@ public class StructureMineshaftPieces {
 				return true;
 			}
 		}
+
+		public void buildComponent(StructureComponent componentIn, List<StructureComponent> listIn,
+				EaglercraftRandom rand) {
+			int i = this.getComponentType();
+			int j = rand.nextInt(4);
+			if (this.coordBaseMode != null) {
+				switch (this.coordBaseMode) {
+				case NORTH:
+					if (j <= 1) {
+						StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.minX,
+								this.boundingBox.minY - 1 + rand.nextInt(3), this.boundingBox.minZ - 1,
+								this.coordBaseMode, i);
+					} else if (j == 2) {
+						StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.minX - 1,
+								this.boundingBox.minY - 1 + rand.nextInt(3), this.boundingBox.minZ, EnumFacing.WEST, i);
+					} else {
+						StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.maxX + 1,
+								this.boundingBox.minY - 1 + rand.nextInt(3), this.boundingBox.minZ, EnumFacing.EAST, i);
+					}
+					break;
+				case SOUTH:
+					if (j <= 1) {
+						StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.minX,
+								this.boundingBox.minY - 1 + rand.nextInt(3), this.boundingBox.maxZ + 1,
+								this.coordBaseMode, i);
+					} else if (j == 2) {
+						StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.minX - 1,
+								this.boundingBox.minY - 1 + rand.nextInt(3), this.boundingBox.maxZ - 3, EnumFacing.WEST,
+								i);
+					} else {
+						StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.maxX + 1,
+								this.boundingBox.minY - 1 + rand.nextInt(3), this.boundingBox.maxZ - 3, EnumFacing.EAST,
+								i);
+					}
+					break;
+				case WEST:
+					if (j <= 1) {
+						StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.minX - 1,
+								this.boundingBox.minY - 1 + rand.nextInt(3), this.boundingBox.minZ, this.coordBaseMode,
+								i);
+					} else if (j == 2) {
+						StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.minX,
+								this.boundingBox.minY - 1 + rand.nextInt(3), this.boundingBox.minZ - 1,
+								EnumFacing.NORTH, i);
+					} else {
+						StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.minX,
+								this.boundingBox.minY - 1 + rand.nextInt(3), this.boundingBox.maxZ + 1,
+								EnumFacing.SOUTH, i);
+					}
+					break;
+				case EAST:
+					if (j <= 1) {
+						StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.maxX + 1,
+								this.boundingBox.minY - 1 + rand.nextInt(3), this.boundingBox.minZ, this.coordBaseMode,
+								i);
+					} else if (j == 2) {
+						StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.maxX - 3,
+								this.boundingBox.minY - 1 + rand.nextInt(3), this.boundingBox.minZ - 1,
+								EnumFacing.NORTH, i);
+					} else {
+						StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.maxX - 3,
+								this.boundingBox.minY - 1 + rand.nextInt(3), this.boundingBox.maxZ + 1,
+								EnumFacing.SOUTH, i);
+					}
+				}
+			}
+
+			if (i < 8) {
+				if (this.coordBaseMode != EnumFacing.NORTH && this.coordBaseMode != EnumFacing.SOUTH) {
+					for (int i1 = this.boundingBox.minX + 3; i1 + 3 <= this.boundingBox.maxX; i1 += 5) {
+						int j1 = rand.nextInt(5);
+						if (j1 == 0) {
+							StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, i1, this.boundingBox.minY,
+									this.boundingBox.minZ - 1, EnumFacing.NORTH, i + 1);
+						} else if (j1 == 1) {
+							StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, i1, this.boundingBox.minY,
+									this.boundingBox.maxZ + 1, EnumFacing.SOUTH, i + 1);
+						}
+					}
+				} else {
+					for (int k = this.boundingBox.minZ + 3; k + 3 <= this.boundingBox.maxZ; k += 5) {
+						int l = rand.nextInt(5);
+						if (l == 0) {
+							StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.minX - 1,
+									this.boundingBox.minY, k, EnumFacing.WEST, i + 1);
+						} else if (l == 1) {
+							StructureMineshaftPieces.func_175890_b(componentIn, listIn, rand, this.boundingBox.maxX + 1,
+									this.boundingBox.minY, k, EnumFacing.EAST, i + 1);
+						}
+					}
+				}
+			}
+
+		}
+
+		protected boolean generateChestContents(World worldIn, StructureBoundingBox boundingBoxIn,
+				EaglercraftRandom rand, int x, int y, int z, List<WeightedRandomChestContent> listIn, int max) {
+			BlockPos blockpos = new BlockPos(this.getXWithOffset(x, z), this.getYWithOffset(y),
+					this.getZWithOffset(x, z));
+			if (boundingBoxIn.isVecInside(blockpos)
+					&& worldIn.getBlockState(blockpos).getBlock().getMaterial() == Material.air) {
+				int i = rand.nextBoolean() ? 1 : 0;
+				worldIn.setBlockState(blockpos,
+						Blocks.rail.getStateFromMeta(this.getMetadataWithOffset(Blocks.rail, i)), 2);
+				EntityMinecartChest entityminecartchest = new EntityMinecartChest(worldIn,
+						(double) ((float) blockpos.getX() + 0.5F), (double) ((float) blockpos.getY() + 0.5F),
+						(double) ((float) blockpos.getZ() + 0.5F));
+				WeightedRandomChestContent.generateChestContents(rand, listIn, entityminecartchest, max);
+				worldIn.spawnEntityInWorld(entityminecartchest);
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		protected void readStructureFromNBT(NBTTagCompound tagCompound) {
+			this.hasRails = tagCompound.getBoolean("hr");
+			this.hasSpiders = tagCompound.getBoolean("sc");
+			this.spawnerPlaced = tagCompound.getBoolean("hps");
+			this.sectionCount = tagCompound.getInteger("Num");
+		}
+
+		protected void writeStructureToNBT(NBTTagCompound tagCompound) {
+			tagCompound.setBoolean("hr", this.hasRails);
+			tagCompound.setBoolean("sc", this.hasSpiders);
+			tagCompound.setBoolean("hps", this.spawnerPlaced);
+			tagCompound.setInteger("Num", this.sectionCount);
+		}
 	}
 
 	public static class Cross extends StructureComponent {
-		private EnumFacing corridorDirection;
-		private boolean isMultipleFloors;
-
-		public Cross() {
-		}
-
-		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
-			nbttagcompound.setBoolean("tf", this.isMultipleFloors);
-			nbttagcompound.setInteger("D", this.corridorDirection.getHorizontalIndex());
-		}
-
-		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
-			this.isMultipleFloors = nbttagcompound.getBoolean("tf");
-			this.corridorDirection = EnumFacing.getHorizontal(nbttagcompound.getInteger("D"));
-		}
-
-		public Cross(int type, EaglercraftRandom rand, StructureBoundingBox structurebb, EnumFacing facing) {
-			super(type);
-			this.corridorDirection = facing;
-			this.boundingBox = structurebb;
-			this.isMultipleFloors = structurebb.getYSize() > 3;
-		}
-
 		public static StructureBoundingBox func_175813_a(List<StructureComponent> listIn, EaglercraftRandom rand, int x,
 				int y, int z, EnumFacing facing) {
 			StructureBoundingBox structureboundingbox = new StructureBoundingBox(x, y, z, x, y + 2, z);
@@ -464,65 +381,18 @@ public class StructureMineshaftPieces {
 					: structureboundingbox;
 		}
 
-		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
-				EaglercraftRandom random) {
-			int i = this.getComponentType();
-			switch (this.corridorDirection) {
-			case NORTH:
-				StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.minX + 1,
-						this.boundingBox.minY, this.boundingBox.minZ - 1, EnumFacing.NORTH, i);
-				StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.minX - 1,
-						this.boundingBox.minY, this.boundingBox.minZ + 1, EnumFacing.WEST, i);
-				StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.maxX + 1,
-						this.boundingBox.minY, this.boundingBox.minZ + 1, EnumFacing.EAST, i);
-				break;
-			case SOUTH:
-				StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.minX + 1,
-						this.boundingBox.minY, this.boundingBox.maxZ + 1, EnumFacing.SOUTH, i);
-				StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.minX - 1,
-						this.boundingBox.minY, this.boundingBox.minZ + 1, EnumFacing.WEST, i);
-				StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.maxX + 1,
-						this.boundingBox.minY, this.boundingBox.minZ + 1, EnumFacing.EAST, i);
-				break;
-			case WEST:
-				StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.minX + 1,
-						this.boundingBox.minY, this.boundingBox.minZ - 1, EnumFacing.NORTH, i);
-				StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.minX + 1,
-						this.boundingBox.minY, this.boundingBox.maxZ + 1, EnumFacing.SOUTH, i);
-				StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.minX - 1,
-						this.boundingBox.minY, this.boundingBox.minZ + 1, EnumFacing.WEST, i);
-				break;
-			case EAST:
-				StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.minX + 1,
-						this.boundingBox.minY, this.boundingBox.minZ - 1, EnumFacing.NORTH, i);
-				StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.minX + 1,
-						this.boundingBox.minY, this.boundingBox.maxZ + 1, EnumFacing.SOUTH, i);
-				StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.maxX + 1,
-						this.boundingBox.minY, this.boundingBox.minZ + 1, EnumFacing.EAST, i);
-			}
+		private EnumFacing corridorDirection;
 
-			if (this.isMultipleFloors) {
-				if (random.nextBoolean()) {
-					StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.minX + 1,
-							this.boundingBox.minY + 3 + 1, this.boundingBox.minZ - 1, EnumFacing.NORTH, i);
-				}
+		private boolean isMultipleFloors;
 
-				if (random.nextBoolean()) {
-					StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.minX - 1,
-							this.boundingBox.minY + 3 + 1, this.boundingBox.minZ + 1, EnumFacing.WEST, i);
-				}
+		public Cross() {
+		}
 
-				if (random.nextBoolean()) {
-					StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.maxX + 1,
-							this.boundingBox.minY + 3 + 1, this.boundingBox.minZ + 1, EnumFacing.EAST, i);
-				}
-
-				if (random.nextBoolean()) {
-					StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.minX + 1,
-							this.boundingBox.minY + 3 + 1, this.boundingBox.maxZ + 1, EnumFacing.SOUTH, i);
-				}
-			}
-
+		public Cross(int type, EaglercraftRandom rand, StructureBoundingBox structurebb, EnumFacing facing) {
+			super(type);
+			this.corridorDirection = facing;
+			this.boundingBox = structurebb;
+			this.isMultipleFloors = structurebb.getYSize() > 3;
 		}
 
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
@@ -590,6 +460,77 @@ public class StructureMineshaftPieces {
 				return true;
 			}
 		}
+
+		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
+				EaglercraftRandom random) {
+			int i = this.getComponentType();
+			switch (this.corridorDirection) {
+			case NORTH:
+				StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.minX + 1,
+						this.boundingBox.minY, this.boundingBox.minZ - 1, EnumFacing.NORTH, i);
+				StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.minX - 1,
+						this.boundingBox.minY, this.boundingBox.minZ + 1, EnumFacing.WEST, i);
+				StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.maxX + 1,
+						this.boundingBox.minY, this.boundingBox.minZ + 1, EnumFacing.EAST, i);
+				break;
+			case SOUTH:
+				StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.minX + 1,
+						this.boundingBox.minY, this.boundingBox.maxZ + 1, EnumFacing.SOUTH, i);
+				StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.minX - 1,
+						this.boundingBox.minY, this.boundingBox.minZ + 1, EnumFacing.WEST, i);
+				StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.maxX + 1,
+						this.boundingBox.minY, this.boundingBox.minZ + 1, EnumFacing.EAST, i);
+				break;
+			case WEST:
+				StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.minX + 1,
+						this.boundingBox.minY, this.boundingBox.minZ - 1, EnumFacing.NORTH, i);
+				StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.minX + 1,
+						this.boundingBox.minY, this.boundingBox.maxZ + 1, EnumFacing.SOUTH, i);
+				StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.minX - 1,
+						this.boundingBox.minY, this.boundingBox.minZ + 1, EnumFacing.WEST, i);
+				break;
+			case EAST:
+				StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.minX + 1,
+						this.boundingBox.minY, this.boundingBox.minZ - 1, EnumFacing.NORTH, i);
+				StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.minX + 1,
+						this.boundingBox.minY, this.boundingBox.maxZ + 1, EnumFacing.SOUTH, i);
+				StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.maxX + 1,
+						this.boundingBox.minY, this.boundingBox.minZ + 1, EnumFacing.EAST, i);
+			}
+
+			if (this.isMultipleFloors) {
+				if (random.nextBoolean()) {
+					StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.minX + 1,
+							this.boundingBox.minY + 3 + 1, this.boundingBox.minZ - 1, EnumFacing.NORTH, i);
+				}
+
+				if (random.nextBoolean()) {
+					StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.minX - 1,
+							this.boundingBox.minY + 3 + 1, this.boundingBox.minZ + 1, EnumFacing.WEST, i);
+				}
+
+				if (random.nextBoolean()) {
+					StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.maxX + 1,
+							this.boundingBox.minY + 3 + 1, this.boundingBox.minZ + 1, EnumFacing.EAST, i);
+				}
+
+				if (random.nextBoolean()) {
+					StructureMineshaftPieces.func_175890_b(structurecomponent, list, random, this.boundingBox.minX + 1,
+							this.boundingBox.minY + 3 + 1, this.boundingBox.maxZ + 1, EnumFacing.SOUTH, i);
+				}
+			}
+
+		}
+
+		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
+			this.isMultipleFloors = nbttagcompound.getBoolean("tf");
+			this.corridorDirection = EnumFacing.getHorizontal(nbttagcompound.getInteger("D"));
+		}
+
+		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
+			nbttagcompound.setBoolean("tf", this.isMultipleFloors);
+			nbttagcompound.setInteger("D", this.corridorDirection.getHorizontalIndex());
+		}
 	}
 
 	public static class Room extends StructureComponent {
@@ -602,6 +543,33 @@ public class StructureMineshaftPieces {
 			super(type);
 			this.boundingBox = new StructureBoundingBox(x, 50, z, x + 7 + rand.nextInt(6), 54 + rand.nextInt(6),
 					z + 7 + rand.nextInt(6));
+		}
+
+		public boolean addComponentParts(World world, EaglercraftRandom var2,
+				StructureBoundingBox structureboundingbox) {
+			if (this.isLiquidInStructureBoundingBox(world, structureboundingbox)) {
+				return false;
+			} else {
+				this.fillWithBlocks(world, structureboundingbox, this.boundingBox.minX, this.boundingBox.minY,
+						this.boundingBox.minZ, this.boundingBox.maxX, this.boundingBox.minY, this.boundingBox.maxZ,
+						Blocks.dirt.getDefaultState(), Blocks.air.getDefaultState(), true);
+				this.fillWithBlocks(world, structureboundingbox, this.boundingBox.minX, this.boundingBox.minY + 1,
+						this.boundingBox.minZ, this.boundingBox.maxX,
+						Math.min(this.boundingBox.minY + 3, this.boundingBox.maxY), this.boundingBox.maxZ,
+						Blocks.air.getDefaultState(), Blocks.air.getDefaultState(), false);
+
+				for (StructureBoundingBox structureboundingbox1 : this.roomsLinkedToTheRoom) {
+					this.fillWithBlocks(world, structureboundingbox, structureboundingbox1.minX,
+							structureboundingbox1.maxY - 2, structureboundingbox1.minZ, structureboundingbox1.maxX,
+							structureboundingbox1.maxY, structureboundingbox1.maxZ, Blocks.air.getDefaultState(),
+							Blocks.air.getDefaultState(), false);
+				}
+
+				this.randomlyRareFillWithBlocks(world, structureboundingbox, this.boundingBox.minX,
+						this.boundingBox.minY + 4, this.boundingBox.minZ, this.boundingBox.maxX, this.boundingBox.maxY,
+						this.boundingBox.maxZ, Blocks.air.getDefaultState(), false);
+				return true;
+			}
 		}
 
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
@@ -683,38 +651,20 @@ public class StructureMineshaftPieces {
 
 		}
 
-		public boolean addComponentParts(World world, EaglercraftRandom var2,
-				StructureBoundingBox structureboundingbox) {
-			if (this.isLiquidInStructureBoundingBox(world, structureboundingbox)) {
-				return false;
-			} else {
-				this.fillWithBlocks(world, structureboundingbox, this.boundingBox.minX, this.boundingBox.minY,
-						this.boundingBox.minZ, this.boundingBox.maxX, this.boundingBox.minY, this.boundingBox.maxZ,
-						Blocks.dirt.getDefaultState(), Blocks.air.getDefaultState(), true);
-				this.fillWithBlocks(world, structureboundingbox, this.boundingBox.minX, this.boundingBox.minY + 1,
-						this.boundingBox.minZ, this.boundingBox.maxX,
-						Math.min(this.boundingBox.minY + 3, this.boundingBox.maxY), this.boundingBox.maxZ,
-						Blocks.air.getDefaultState(), Blocks.air.getDefaultState(), false);
-
-				for (StructureBoundingBox structureboundingbox1 : this.roomsLinkedToTheRoom) {
-					this.fillWithBlocks(world, structureboundingbox, structureboundingbox1.minX,
-							structureboundingbox1.maxY - 2, structureboundingbox1.minZ, structureboundingbox1.maxX,
-							structureboundingbox1.maxY, structureboundingbox1.maxZ, Blocks.air.getDefaultState(),
-							Blocks.air.getDefaultState(), false);
-				}
-
-				this.randomlyRareFillWithBlocks(world, structureboundingbox, this.boundingBox.minX,
-						this.boundingBox.minY + 4, this.boundingBox.minZ, this.boundingBox.maxX, this.boundingBox.maxY,
-						this.boundingBox.maxZ, Blocks.air.getDefaultState(), false);
-				return true;
-			}
-		}
-
 		public void func_181138_a(int parInt1, int parInt2, int parInt3) {
 			super.func_181138_a(parInt1, parInt2, parInt3);
 
 			for (StructureBoundingBox structureboundingbox : this.roomsLinkedToTheRoom) {
 				structureboundingbox.offset(parInt1, parInt2, parInt3);
+			}
+
+		}
+
+		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
+			NBTTagList nbttaglist = nbttagcompound.getTagList("Entrances", 11);
+
+			for (int i = 0; i < nbttaglist.tagCount(); ++i) {
+				this.roomsLinkedToTheRoom.add(new StructureBoundingBox(nbttaglist.getIntArrayAt(i)));
 			}
 
 		}
@@ -728,33 +678,9 @@ public class StructureMineshaftPieces {
 
 			nbttagcompound.setTag("Entrances", nbttaglist);
 		}
-
-		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
-			NBTTagList nbttaglist = nbttagcompound.getTagList("Entrances", 11);
-
-			for (int i = 0; i < nbttaglist.tagCount(); ++i) {
-				this.roomsLinkedToTheRoom.add(new StructureBoundingBox(nbttaglist.getIntArrayAt(i)));
-			}
-
-		}
 	}
 
 	public static class Stairs extends StructureComponent {
-		public Stairs() {
-		}
-
-		public Stairs(int type, EaglercraftRandom rand, StructureBoundingBox structurebb, EnumFacing facing) {
-			super(type);
-			this.coordBaseMode = facing;
-			this.boundingBox = structurebb;
-		}
-
-		protected void writeStructureToNBT(NBTTagCompound var1) {
-		}
-
-		protected void readStructureFromNBT(NBTTagCompound var1) {
-		}
-
 		public static StructureBoundingBox func_175812_a(List<StructureComponent> listIn, EaglercraftRandom rand, int x,
 				int y, int z, EnumFacing facing) {
 			StructureBoundingBox structureboundingbox = new StructureBoundingBox(x, y - 5, z, x, y + 2, z);
@@ -778,6 +704,34 @@ public class StructureMineshaftPieces {
 
 			return StructureComponent.findIntersecting(listIn, structureboundingbox) != null ? null
 					: structureboundingbox;
+		}
+
+		public Stairs() {
+		}
+
+		public Stairs(int type, EaglercraftRandom rand, StructureBoundingBox structurebb, EnumFacing facing) {
+			super(type);
+			this.coordBaseMode = facing;
+			this.boundingBox = structurebb;
+		}
+
+		public boolean addComponentParts(World world, EaglercraftRandom var2,
+				StructureBoundingBox structureboundingbox) {
+			if (this.isLiquidInStructureBoundingBox(world, structureboundingbox)) {
+				return false;
+			} else {
+				this.fillWithBlocks(world, structureboundingbox, 0, 5, 0, 2, 7, 1, Blocks.air.getDefaultState(),
+						Blocks.air.getDefaultState(), false);
+				this.fillWithBlocks(world, structureboundingbox, 0, 0, 7, 2, 2, 8, Blocks.air.getDefaultState(),
+						Blocks.air.getDefaultState(), false);
+
+				for (int i = 0; i < 5; ++i) {
+					this.fillWithBlocks(world, structureboundingbox, 0, 5 - i - (i < 4 ? 1 : 0), 2 + i, 2, 7 - i, 2 + i,
+							Blocks.air.getDefaultState(), Blocks.air.getDefaultState(), false);
+				}
+
+				return true;
+			}
 		}
 
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
@@ -805,23 +759,76 @@ public class StructureMineshaftPieces {
 
 		}
 
-		public boolean addComponentParts(World world, EaglercraftRandom var2,
-				StructureBoundingBox structureboundingbox) {
-			if (this.isLiquidInStructureBoundingBox(world, structureboundingbox)) {
-				return false;
-			} else {
-				this.fillWithBlocks(world, structureboundingbox, 0, 5, 0, 2, 7, 1, Blocks.air.getDefaultState(),
-						Blocks.air.getDefaultState(), false);
-				this.fillWithBlocks(world, structureboundingbox, 0, 0, 7, 2, 2, 8, Blocks.air.getDefaultState(),
-						Blocks.air.getDefaultState(), false);
+		protected void readStructureFromNBT(NBTTagCompound var1) {
+		}
 
-				for (int i = 0; i < 5; ++i) {
-					this.fillWithBlocks(world, structureboundingbox, 0, 5 - i - (i < 4 ? 1 : 0), 2 + i, 2, 7 - i, 2 + i,
-							Blocks.air.getDefaultState(), Blocks.air.getDefaultState(), false);
-				}
+		protected void writeStructureToNBT(NBTTagCompound var1) {
+		}
+	}
 
-				return true;
+	private static final List<WeightedRandomChestContent> CHEST_CONTENT_WEIGHT_LIST = Lists.newArrayList(
+			new WeightedRandomChestContent[] { new WeightedRandomChestContent(Items.iron_ingot, 0, 1, 5, 10),
+					new WeightedRandomChestContent(Items.gold_ingot, 0, 1, 3, 5),
+					new WeightedRandomChestContent(Items.redstone, 0, 4, 9, 5),
+					new WeightedRandomChestContent(Items.dye, EnumDyeColor.BLUE.getDyeDamage(), 4, 9, 5),
+					new WeightedRandomChestContent(Items.diamond, 0, 1, 2, 3),
+					new WeightedRandomChestContent(Items.coal, 0, 3, 8, 10),
+					new WeightedRandomChestContent(Items.bread, 0, 1, 3, 15),
+					new WeightedRandomChestContent(Items.iron_pickaxe, 0, 1, 1, 1),
+					new WeightedRandomChestContent(Item.getItemFromBlock(Blocks.rail), 0, 4, 8, 1),
+					new WeightedRandomChestContent(Items.melon_seeds, 0, 2, 4, 10),
+					new WeightedRandomChestContent(Items.pumpkin_seeds, 0, 2, 4, 10),
+					new WeightedRandomChestContent(Items.saddle, 0, 1, 1, 3),
+					new WeightedRandomChestContent(Items.iron_horse_armor, 0, 1, 1, 1) });
+
+	private static StructureComponent func_175890_b(StructureComponent componentIn, List<StructureComponent> listIn,
+			EaglercraftRandom rand, int x, int y, int z, EnumFacing facing, int type) {
+		if (type > 8) {
+			return null;
+		} else if (Math.abs(x - componentIn.getBoundingBox().minX) <= 80
+				&& Math.abs(z - componentIn.getBoundingBox().minZ) <= 80) {
+			StructureComponent structurecomponent = func_175892_a(listIn, rand, x, y, z, facing, type + 1);
+			if (structurecomponent != null) {
+				listIn.add(structurecomponent);
+				structurecomponent.buildComponent(componentIn, listIn, rand);
+			}
+
+			return structurecomponent;
+		} else {
+			return null;
+		}
+	}
+
+	private static StructureComponent func_175892_a(List<StructureComponent> listIn, EaglercraftRandom rand, int x,
+			int y, int z, EnumFacing facing, int type) {
+		int i = rand.nextInt(100);
+		if (i >= 80) {
+			StructureBoundingBox structureboundingbox = StructureMineshaftPieces.Cross.func_175813_a(listIn, rand, x, y,
+					z, facing);
+			if (structureboundingbox != null) {
+				return new StructureMineshaftPieces.Cross(type, rand, structureboundingbox, facing);
+			}
+		} else if (i >= 70) {
+			StructureBoundingBox structureboundingbox1 = StructureMineshaftPieces.Stairs.func_175812_a(listIn, rand, x,
+					y, z, facing);
+			if (structureboundingbox1 != null) {
+				return new StructureMineshaftPieces.Stairs(type, rand, structureboundingbox1, facing);
+			}
+		} else {
+			StructureBoundingBox structureboundingbox2 = StructureMineshaftPieces.Corridor.func_175814_a(listIn, rand,
+					x, y, z, facing);
+			if (structureboundingbox2 != null) {
+				return new StructureMineshaftPieces.Corridor(type, rand, structureboundingbox2, facing);
 			}
 		}
+
+		return null;
+	}
+
+	public static void registerStructurePieces() {
+		MapGenStructureIO.registerStructureComponent(StructureMineshaftPieces.Corridor.class, "MSCorridor");
+		MapGenStructureIO.registerStructureComponent(StructureMineshaftPieces.Cross.class, "MSCrossing");
+		MapGenStructureIO.registerStructureComponent(StructureMineshaftPieces.Room.class, "MSRoom");
+		MapGenStructureIO.registerStructureComponent(StructureMineshaftPieces.Stairs.class, "MSStairs");
 	}
 }

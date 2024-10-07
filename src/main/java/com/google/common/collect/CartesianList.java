@@ -34,9 +34,6 @@ import com.google.common.math.IntMath;
 @GwtCompatible
 final class CartesianList<E> extends AbstractList<List<E>> implements RandomAccess {
 
-	private transient final ImmutableList<List<E>> axes;
-	private transient final int[] axesSizeProduct;
-
 	static <E> List<List<E>> create(List<? extends List<? extends E>> lists) {
 		ImmutableList.Builder<List<E>> axesBuilder = new ImmutableList.Builder<List<E>>(lists.size());
 		for (List<? extends E> list : lists) {
@@ -48,6 +45,10 @@ final class CartesianList<E> extends AbstractList<List<E>> implements RandomAcce
 		}
 		return new CartesianList<E>(axesBuilder.build());
 	}
+
+	private transient final ImmutableList<List<E>> axes;
+
+	private transient final int[] axesSizeProduct;
 
 	CartesianList(ImmutableList<List<E>> axes) {
 		this.axes = axes;
@@ -61,39 +62,6 @@ final class CartesianList<E> extends AbstractList<List<E>> implements RandomAcce
 			throw new IllegalArgumentException("Cartesian product too large; must have size at most Integer.MAX_VALUE");
 		}
 		this.axesSizeProduct = axesSizeProduct;
-	}
-
-	private int getAxisIndexForProductIndex(int index, int axis) {
-		return (index / axesSizeProduct[axis + 1]) % axes.get(axis).size();
-	}
-
-	@Override
-	public ImmutableList<E> get(final int index) {
-		checkElementIndex(index, size());
-		return new ImmutableList<E>() {
-
-			@Override
-			public int size() {
-				return axes.size();
-			}
-
-			@Override
-			public E get(int axis) {
-				checkElementIndex(axis, size());
-				int axisIndex = getAxisIndexForProductIndex(index, axis);
-				return axes.get(axis).get(axisIndex);
-			}
-
-			@Override
-			boolean isPartialView() {
-				return true;
-			}
-		};
-	}
-
-	@Override
-	public int size() {
-		return axesSizeProduct[0];
 	}
 
 	@Override
@@ -113,5 +81,38 @@ final class CartesianList<E> extends AbstractList<List<E>> implements RandomAcce
 			}
 		}
 		return true;
+	}
+
+	@Override
+	public ImmutableList<E> get(final int index) {
+		checkElementIndex(index, size());
+		return new ImmutableList<E>() {
+
+			@Override
+			public E get(int axis) {
+				checkElementIndex(axis, size());
+				int axisIndex = getAxisIndexForProductIndex(index, axis);
+				return axes.get(axis).get(axisIndex);
+			}
+
+			@Override
+			boolean isPartialView() {
+				return true;
+			}
+
+			@Override
+			public int size() {
+				return axes.size();
+			}
+		};
+	}
+
+	private int getAxisIndexForProductIndex(int index, int axis) {
+		return (index / axesSizeProduct[axis + 1]) % axes.get(axis).size();
+	}
+
+	@Override
+	public int size() {
+		return axesSizeProduct[0];
 	}
 }

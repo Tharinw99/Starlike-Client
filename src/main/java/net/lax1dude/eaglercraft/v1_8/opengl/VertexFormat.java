@@ -1,37 +1,34 @@
 package net.lax1dude.eaglercraft.v1_8.opengl;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_BYTE;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_FLOAT;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_UNSIGNED_BYTE;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_UNSIGNED_SHORT;
 
 /**
  * Copyright (c) 2022-2023 lax1dude. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public enum VertexFormat {
 
-	BLOCK(true, true, false, true),
-	BLOCK_SHADERS(true, true, true, true),
-	ITEM(true, true, true, false),
-	OLDMODEL_POSITION_TEX_NORMAL(true, false, true, false),
-	PARTICLE_POSITION_TEX_COLOR_LMAP(true, true, true, true),
-	POSITION(false, false, false, false),
-	POSITION_COLOR(false, true, false, false),
-	POSITION_TEX(true, false, false, false),
-	POSITION_NORMAL(false, false, true, false),
-	POSITION_TEX_COLOR(true, true, false, false),
-	POSITION_TEX_NORMAL(true, false, true, false),
-	POSITION_TEX_LMAP_COLOR(true, true, false, true),
-	POSITION_TEX_COLOR_NORMAL(true, true, true, false);
+	BLOCK(true, true, false, true), BLOCK_SHADERS(true, true, true, true), ITEM(true, true, true, false),
+	OLDMODEL_POSITION_TEX_NORMAL(true, false, true, false), PARTICLE_POSITION_TEX_COLOR_LMAP(true, true, true, true),
+	POSITION(false, false, false, false), POSITION_COLOR(false, true, false, false),
+	POSITION_TEX(true, false, false, false), POSITION_NORMAL(false, false, true, false),
+	POSITION_TEX_COLOR(true, true, false, false), POSITION_TEX_NORMAL(true, false, true, false),
+	POSITION_TEX_LMAP_COLOR(true, true, false, true), POSITION_TEX_COLOR_NORMAL(true, true, true, false);
 
 	public static final int COMPONENT_POSITION_SIZE = 3;
 	public static final int COMPONENT_POSITION_FORMAT = GL_FLOAT;
@@ -95,15 +92,15 @@ public enum VertexFormat {
 
 	public final int attribCount;
 	public final int attribStride;
-	
+
 	public final int eaglercraftAttribBits;
 
 	private VertexFormat(boolean texture, boolean color, boolean normal, boolean lightmap) {
-		
+
 		int index = 0;
 		int bytes = 0;
 		int bitfield = 0;
-		
+
 		attribPositionEnabled = true;
 		attribPositionIndex = index++;
 		attribPositionOffset = bytes;
@@ -111,8 +108,8 @@ public enum VertexFormat {
 		attribPositionNormalized = false;
 		attribPositionSize = COMPONENT_POSITION_SIZE;
 		bytes += COMPONENT_POSITION_STRIDE;
-		
-		if(color) {
+
+		if (color) {
 			attribColorEnabled = true;
 			attribColorIndex = index++;
 			attribColorOffset = bytes;
@@ -121,7 +118,7 @@ public enum VertexFormat {
 			attribColorSize = COMPONENT_COLOR_SIZE;
 			bytes += COMPONENT_COLOR_STRIDE;
 			bitfield |= EaglercraftGPU.ATTRIB_COLOR;
-		}else {
+		} else {
 			attribColorEnabled = false;
 			attribColorIndex = -1;
 			attribColorOffset = -1;
@@ -130,7 +127,7 @@ public enum VertexFormat {
 			attribColorSize = -1;
 		}
 
-		if(texture) {
+		if (texture) {
 			attribTextureEnabled = true;
 			attribTextureIndex = index++;
 			attribTextureOffset = bytes;
@@ -139,7 +136,7 @@ public enum VertexFormat {
 			attribTextureSize = COMPONENT_TEX_SIZE;
 			bytes += COMPONENT_TEX_STRIDE;
 			bitfield |= EaglercraftGPU.ATTRIB_TEXTURE;
-		}else {
+		} else {
 			attribTextureEnabled = false;
 			attribTextureIndex = -1;
 			attribTextureOffset = -1;
@@ -147,8 +144,8 @@ public enum VertexFormat {
 			attribTextureNormalized = false;
 			attribTextureSize = -1;
 		}
-		
-		if(normal) {
+
+		if (normal) {
 			attribNormalEnabled = true;
 			attribNormalIndex = index++;
 			attribNormalOffset = bytes;
@@ -157,7 +154,7 @@ public enum VertexFormat {
 			attribNormalSize = COMPONENT_NORMAL_SIZE;
 			bytes += COMPONENT_NORMAL_STRIDE;
 			bitfield |= EaglercraftGPU.ATTRIB_NORMAL;
-		}else {
+		} else {
 			attribNormalEnabled = false;
 			attribNormalIndex = -1;
 			attribNormalOffset = -1;
@@ -165,8 +162,8 @@ public enum VertexFormat {
 			attribNormalNormalized = false;
 			attribNormalSize = -1;
 		}
-		
-		if(lightmap) {
+
+		if (lightmap) {
 			attribLightmapEnabled = true;
 			attribLightmapIndex = index++;
 			attribLightmapOffset = bytes;
@@ -175,7 +172,7 @@ public enum VertexFormat {
 			attribLightmapSize = COMPONENT_LIGHTMAP_SIZE;
 			bytes += COMPONENT_LIGHTMAP_STRIDE;
 			bitfield |= EaglercraftGPU.ATTRIB_LIGHTMAP;
-		}else {
+		} else {
 			attribLightmapEnabled = false;
 			attribLightmapIndex = -1;
 			attribLightmapOffset = -1;
@@ -183,15 +180,15 @@ public enum VertexFormat {
 			attribLightmapNormalized = false;
 			attribLightmapSize = -1;
 		}
-		
+
 		attribCount = index;
-		attribStride = attribPositionStride =  bytes;
+		attribStride = attribPositionStride = bytes;
 		attribColorStride = color ? bytes : -1;
 		attribTextureStride = texture ? bytes : -1;
 		attribNormalStride = normal ? bytes : -1;
 		attribLightmapStride = lightmap ? bytes : -1;
 		eaglercraftAttribBits = bitfield;
-		
+
 	}
-	
+
 }

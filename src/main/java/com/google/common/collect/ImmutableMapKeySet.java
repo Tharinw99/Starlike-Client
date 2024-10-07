@@ -32,20 +32,25 @@ import com.google.common.annotations.GwtIncompatible;
  */
 @GwtCompatible(emulated = true)
 final class ImmutableMapKeySet<K, V> extends ImmutableSet<K> {
+	@GwtIncompatible("serialization")
+	private static class KeySetSerializedForm<K> implements Serializable {
+		private static final long serialVersionUID = 0;
+
+		final ImmutableMap<K, ?> map;
+
+		KeySetSerializedForm(ImmutableMap<K, ?> map) {
+			this.map = map;
+		}
+
+		Object readResolve() {
+			return map.keySet();
+		}
+	}
+
 	private final ImmutableMap<K, V> map;
 
 	ImmutableMapKeySet(ImmutableMap<K, V> map) {
 		this.map = map;
-	}
-
-	@Override
-	public int size() {
-		return map.size();
-	}
-
-	@Override
-	public UnmodifiableIterator<K> iterator() {
-		return asList().iterator();
 	}
 
 	@Override
@@ -59,13 +64,13 @@ final class ImmutableMapKeySet<K, V> extends ImmutableSet<K> {
 		return new ImmutableAsList<K>() {
 
 			@Override
-			public K get(int index) {
-				return entryList.get(index).getKey();
+			ImmutableCollection<K> delegateCollection() {
+				return ImmutableMapKeySet.this;
 			}
 
 			@Override
-			ImmutableCollection<K> delegateCollection() {
-				return ImmutableMapKeySet.this;
+			public K get(int index) {
+				return entryList.get(index).getKey();
 			}
 
 		};
@@ -76,24 +81,19 @@ final class ImmutableMapKeySet<K, V> extends ImmutableSet<K> {
 		return true;
 	}
 
+	@Override
+	public UnmodifiableIterator<K> iterator() {
+		return asList().iterator();
+	}
+
+	@Override
+	public int size() {
+		return map.size();
+	}
+
 	@GwtIncompatible("serialization")
 	@Override
 	Object writeReplace() {
 		return new KeySetSerializedForm<K>(map);
-	}
-
-	@GwtIncompatible("serialization")
-	private static class KeySetSerializedForm<K> implements Serializable {
-		final ImmutableMap<K, ?> map;
-
-		KeySetSerializedForm(ImmutableMap<K, ?> map) {
-			this.map = map;
-		}
-
-		Object readResolve() {
-			return map.keySet();
-		}
-
-		private static final long serialVersionUID = 0;
 	}
 }

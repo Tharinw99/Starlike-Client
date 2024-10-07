@@ -12,22 +12,25 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -48,61 +51,8 @@ public class ItemTool extends Item {
 		this.setCreativeTab(CreativeTabs.tabTools);
 	}
 
-	public float getStrVsBlock(ItemStack var1, Block block) {
-		return this.effectiveBlocks.contains(block) ? this.efficiencyOnProperMaterial : 1.0F;
-	}
-
-	/**+
-	 * Current implementations of this method in child classes do
-	 * not use the entry argument beside ev. They just raise the
-	 * damage on the stack.
-	 */
-	public boolean hitEntity(ItemStack itemstack, EntityLivingBase var2, EntityLivingBase entitylivingbase) {
-		itemstack.damageItem(2, entitylivingbase);
-		return true;
-	}
-
-	/**+
-	 * Called when a Block is destroyed using this Item. Return true
-	 * to trigger the "Use Item" statistic.
-	 */
-	public boolean onBlockDestroyed(ItemStack itemstack, World world, Block block, BlockPos blockpos,
-			EntityLivingBase entitylivingbase) {
-		if ((double) block.getBlockHardness(world, blockpos) != 0.0D) {
-			itemstack.damageItem(1, entitylivingbase);
-		}
-
-		return true;
-	}
-
-	/**+
-	 * Returns True is the item is renderer in full 3D when hold.
-	 */
-	public boolean isFull3D() {
-		return true;
-	}
-
-	public Item.ToolMaterial getToolMaterial() {
-		return this.toolMaterial;
-	}
-
-	/**+
-	 * Return the enchantability factor of the item, most of the
-	 * time is based on material.
-	 */
-	public int getItemEnchantability() {
-		return this.toolMaterial.getEnchantability();
-	}
-
-	/**+
-	 * Return the name for this tool's material.
-	 */
-	public String getToolMaterialName() {
-		return this.toolMaterial.toString();
-	}
-
-	/**+
-	 * Return whether this item is repairable in an anvil.
+	/**
+	 * + Return whether this item is repairable in an anvil.
 	 */
 	public boolean getIsRepairable(ItemStack itemstack, ItemStack itemstack1) {
 		return this.toolMaterial.getRepairItem() == itemstack1.getItem() ? true
@@ -114,5 +64,57 @@ public class ItemTool extends Item {
 		multimap.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(),
 				new AttributeModifier(itemModifierUUID, "Tool modifier", (double) this.damageVsEntity, 0));
 		return multimap;
+	}
+
+	/**
+	 * + Return the enchantability factor of the item, most of the time is based on
+	 * material.
+	 */
+	public int getItemEnchantability() {
+		return this.toolMaterial.getEnchantability();
+	}
+
+	public float getStrVsBlock(ItemStack var1, Block block) {
+		return this.effectiveBlocks.contains(block) ? this.efficiencyOnProperMaterial : 1.0F;
+	}
+
+	public Item.ToolMaterial getToolMaterial() {
+		return this.toolMaterial;
+	}
+
+	/**
+	 * + Return the name for this tool's material.
+	 */
+	public String getToolMaterialName() {
+		return this.toolMaterial.toString();
+	}
+
+	/**
+	 * + Current implementations of this method in child classes do not use the
+	 * entry argument beside ev. They just raise the damage on the stack.
+	 */
+	public boolean hitEntity(ItemStack itemstack, EntityLivingBase var2, EntityLivingBase entitylivingbase) {
+		itemstack.damageItem(2, entitylivingbase);
+		return true;
+	}
+
+	/**
+	 * + Returns True is the item is renderer in full 3D when hold.
+	 */
+	public boolean isFull3D() {
+		return true;
+	}
+
+	/**
+	 * + Called when a Block is destroyed using this Item. Return true to trigger
+	 * the "Use Item" statistic.
+	 */
+	public boolean onBlockDestroyed(ItemStack itemstack, World world, Block block, BlockPos blockpos,
+			EntityLivingBase entitylivingbase) {
+		if ((double) block.getBlockHardness(world, blockpos) != 0.0D) {
+			itemstack.damageItem(1, entitylivingbase);
+		}
+
+		return true;
 	}
 }

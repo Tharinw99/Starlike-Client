@@ -1,7 +1,40 @@
 package net.lax1dude.eaglercraft.v1_8.opengl;
 
-import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL.*;
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglAttachShader;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglBufferData;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglBufferSubData;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglCompileShader;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglCreateProgram;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglCreateShader;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDeleteBuffers;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDeleteProgram;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDeleteShader;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDetachShader;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGenBuffers;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetProgramInfoLog;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetProgrami;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetShaderInfoLog;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetShaderi;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetUniformLocation;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglLinkProgram;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglShaderSource;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniform1i;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniform2f;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniform3f;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniform4f;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniformMatrix4fv;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ARRAY_BUFFER;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_COMPILE_STATUS;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_FLOAT;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_FRAGMENT_SHADER;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_LINK_STATUS;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_STATIC_DRAW;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_STREAM_DRAW;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TRIANGLES;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TRUE;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_UNSIGNED_BYTE;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_UNSIGNED_SHORT;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_VERTEX_SHADER;
 
 import net.lax1dude.eaglercraft.v1_8.EagRuntime;
 import net.lax1dude.eaglercraft.v1_8.internal.IBufferArrayGL;
@@ -18,14 +51,15 @@ import net.lax1dude.eaglercraft.v1_8.vector.Matrix4f;
 /**
  * Copyright (c) 2022-2024 lax1dude. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -65,7 +99,7 @@ public class InstancedParticleRenderer {
 	private static float stateColorB = -999.0f;
 	private static float stateColorA = -999.0f;
 	private static int stateColorSerial = -1;
-	
+
 	private static final Matrix4f tmpMatrix = new Matrix4f();
 	private static int stateModelMatrixSerial = -1;
 	private static int stateProjectionMatrixSerial = -1;
@@ -80,6 +114,77 @@ public class InstancedParticleRenderer {
 	private static float stateTransformParam4 = -999.0f;
 	private static float stateTransformParam5 = -999.0f;
 
+	public static void appendParticle(float posX, float posY, float posZ, int particleTextureX, int particleTextureY,
+			int lightMapX, int lightMapY, int particleSize, int particleTexSize, float r, float g, float b, float a) {
+		int color = ((int) (a * 255.0f) << 24) | ((int) (r * 255.0f) << 16) | ((int) (g * 255.0f) << 8)
+				| (int) (b * 255.0f);
+		appendParticle(posX, posY, posZ, particleTextureX, particleTextureY, lightMapX, lightMapY, particleSize,
+				particleTexSize, color);
+	}
+
+	public static void appendParticle(float posX, float posY, float posZ, int particleTextureX, int particleTextureY,
+			int lightMapX, int lightMapY, int particleSize, int particleTexSize, int rgba) {
+		if (particlesHasOverflowed) {
+			return;
+		}
+		if (particleCount >= PARTICLE_LIMIT) {
+			particlesHasOverflowed = true;
+			logger.error("Particle buffer has overflowed! Exceeded {} particles, no more particles will be rendered.",
+					PARTICLE_LIMIT);
+			return;
+		}
+		++particleCount;
+		ByteBuffer buf = particleBuffer;
+		buf.putFloat(posX);
+		buf.putFloat(posY);
+		buf.putFloat(posZ);
+		buf.putShort((short) particleTextureX);
+		buf.putShort((short) particleTextureY);
+		buf.put((byte) lightMapX);
+		buf.put((byte) lightMapY);
+		buf.put((byte) particleSize);
+		buf.put((byte) particleTexSize);
+		buf.putInt(rgba);
+	}
+
+	public static void begin() {
+		particleBuffer.clear();
+		particleCount = 0;
+		particlesHasOverflowed = false;
+	}
+
+	public static void destroy() {
+		if (particleBuffer != null) {
+			EagRuntime.freeByteBuffer(particleBuffer);
+			particleBuffer = null;
+		}
+		if (shaderProgram != null) {
+			_wglDeleteProgram(shaderProgram);
+			shaderProgram = null;
+		}
+		if (matrixCopyBuffer != null) {
+			EagRuntime.freeFloatBuffer(matrixCopyBuffer);
+			matrixCopyBuffer = null;
+		}
+		u_matrixTransform = null;
+		u_texCoordSize2f_particleSize1f = null;
+		u_transformParam_1_2_5_f = null;
+		u_transformParam_3_4_f = null;
+		u_color4f = null;
+		if (vertexArray != null) {
+			EaglercraftGPU.destroyGLBufferArray(vertexArray);
+			vertexArray = null;
+		}
+		if (vertexBuffer != null) {
+			_wglDeleteBuffers(vertexBuffer);
+			vertexBuffer = null;
+		}
+		if (instancesBuffer != null) {
+			_wglDeleteBuffers(instancesBuffer);
+			instancesBuffer = null;
+		}
+	}
+
 	static void initialize() {
 		String vertexSource = EagRuntime.getRequiredResourceString(vertexShaderPath);
 		String fragmentSource = EagRuntime.getRequiredResourceString(fragmentShaderPath);
@@ -90,12 +195,13 @@ public class InstancedParticleRenderer {
 		_wglShaderSource(vert, GLSLHeader.getVertexHeaderCompat(vertexSource, vertexShaderPrecision));
 		_wglCompileShader(vert);
 
-		if(_wglGetShaderi(vert, GL_COMPILE_STATUS) != GL_TRUE) {
-			logger.error("Failed to compile GL_VERTEX_SHADER \"" + vertexShaderPath + "\" for InstancedParticleRenderer!");
+		if (_wglGetShaderi(vert, GL_COMPILE_STATUS) != GL_TRUE) {
+			logger.error(
+					"Failed to compile GL_VERTEX_SHADER \"" + vertexShaderPath + "\" for InstancedParticleRenderer!");
 			String log = _wglGetShaderInfoLog(vert);
-			if(log != null) {
+			if (log != null) {
 				String[] lines = log.split("(\\r\\n|\\r|\\n)");
-				for(int i = 0; i < lines.length; ++i) {
+				for (int i = 0; i < lines.length; ++i) {
 					logger.error("[VERT] {}", lines[i]);
 				}
 			}
@@ -105,12 +211,13 @@ public class InstancedParticleRenderer {
 		_wglShaderSource(frag, GLSLHeader.getFragmentHeaderCompat(fragmentSource, fragmentShaderPrecision));
 		_wglCompileShader(frag);
 
-		if(_wglGetShaderi(frag, GL_COMPILE_STATUS) != GL_TRUE) {
-			logger.error("Failed to compile GL_FRAGMENT_SHADER \"" + fragmentShaderPath + "\" for InstancedParticleRenderer!");
+		if (_wglGetShaderi(frag, GL_COMPILE_STATUS) != GL_TRUE) {
+			logger.error("Failed to compile GL_FRAGMENT_SHADER \"" + fragmentShaderPath
+					+ "\" for InstancedParticleRenderer!");
 			String log = _wglGetShaderInfoLog(frag);
-			if(log != null) {
+			if (log != null) {
 				String[] lines = log.split("(\\r\\n|\\r|\\n)");
-				for(int i = 0; i < lines.length; ++i) {
+				for (int i = 0; i < lines.length; ++i) {
 					logger.error("[FRAG] {}", lines[i]);
 				}
 			}
@@ -122,7 +229,7 @@ public class InstancedParticleRenderer {
 		_wglAttachShader(shaderProgram, vert);
 		_wglAttachShader(shaderProgram, frag);
 
-		if(EaglercraftGPU.checkOpenGLESVersion() == 200) {
+		if (EaglercraftGPU.checkOpenGLESVersion() == 200) {
 			VSHInputLayoutParser.applyLayout(shaderProgram, VSHInputLayoutParser.getShaderInputs(vertexSource));
 		}
 
@@ -134,12 +241,12 @@ public class InstancedParticleRenderer {
 		_wglDeleteShader(vert);
 		_wglDeleteShader(frag);
 
-		if(_wglGetProgrami(shaderProgram, GL_LINK_STATUS) != GL_TRUE) {
+		if (_wglGetProgrami(shaderProgram, GL_LINK_STATUS) != GL_TRUE) {
 			logger.error("Failed to link shader program for InstancedParticleRenderer!");
 			String log = _wglGetProgramInfoLog(shaderProgram);
-			if(log != null) {
+			if (log != null) {
 				String[] lines = log.split("(\\r\\n|\\r|\\n)");
-				for(int i = 0; i < lines.length; ++i) {
+				for (int i = 0; i < lines.length; ++i) {
 					logger.error("[LINK] {}", lines[i]);
 				}
 			}
@@ -165,10 +272,7 @@ public class InstancedParticleRenderer {
 		instancesBuffer = _wglGenBuffers();
 
 		FloatBuffer verts = EagRuntime.allocateFloatBuffer(12);
-		verts.put(new float[] {
-				-1.0f, -1.0f,  -1.0f,  1.0f,   1.0f, -1.0f,
-				-1.0f,  1.0f,   1.0f,  1.0f,   1.0f, -1.0f
-		});
+		verts.put(new float[] { -1.0f, -1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, -1.0f });
 		verts.flip();
 
 		EaglercraftGPU.bindGLBufferArray(vertexArray);
@@ -207,45 +311,9 @@ public class InstancedParticleRenderer {
 
 	}
 
-	public static void begin() {
-		particleBuffer.clear();
-		particleCount = 0;
-		particlesHasOverflowed = false;
-	}
-
-	public static void appendParticle(float posX, float posY, float posZ, int particleTextureX, int particleTextureY,
-			int lightMapX, int lightMapY, int particleSize, int particleTexSize, float r, float g, float b, float a) {
-		int color = ((int)(a * 255.0f) << 24) | ((int)(r * 255.0f) << 16) | ((int)(g * 255.0f) << 8) | (int)(b * 255.0f);
-		appendParticle(posX, posY, posZ, particleTextureX, particleTextureY, lightMapX, lightMapY, particleSize, particleTexSize, color);
-	}
-
-	public static void appendParticle(float posX, float posY, float posZ, int particleTextureX, int particleTextureY,
-			int lightMapX, int lightMapY, int particleSize, int particleTexSize, int rgba) {
-		if(particlesHasOverflowed) {
-			return;
-		}
-		if(particleCount >= PARTICLE_LIMIT) {
-			particlesHasOverflowed = true;
-			logger.error("Particle buffer has overflowed! Exceeded {} particles, no more particles will be rendered.", PARTICLE_LIMIT);
-			return;
-		}
-		++particleCount;
-		ByteBuffer buf = particleBuffer;
-		buf.putFloat(posX);
-		buf.putFloat(posY);
-		buf.putFloat(posZ);
-		buf.putShort((short)particleTextureX);
-		buf.putShort((short)particleTextureY);
-		buf.put((byte)lightMapX);
-		buf.put((byte)lightMapY);
-		buf.put((byte)particleSize);
-		buf.put((byte)particleTexSize);
-		buf.putInt(rgba);
-	}
-
 	public static void render(float texCoordWidth, float texCoordHeight, float particleCoordSize, float transformParam1,
 			float transformParam2, float transformParam3, float transformParam4, float transformParam5) {
-		if(particleCount == 0) {
+		if (particleCount == 0) {
 			return;
 		}
 		EaglercraftGPU.bindGLShaderProgram(shaderProgram);
@@ -273,14 +341,13 @@ public class InstancedParticleRenderer {
 		}
 
 		int serial = GlStateManager.stateColorSerial;
-		if(stateColorSerial != serial) {
+		if (stateColorSerial != serial) {
 			stateColorSerial = serial;
 			float r = GlStateManager.stateColorR;
 			float g = GlStateManager.stateColorG;
 			float b = GlStateManager.stateColorB;
 			float a = GlStateManager.stateColorA;
-			if(stateColorR != r || stateColorG != g ||
-				stateColorB != b || stateColorA != a) {
+			if (stateColorR != r || stateColorG != g || stateColorB != b || stateColorA != a) {
 				_wglUniform4f(u_color4f, r, g, b, a);
 				stateColorR = r;
 				stateColorG = g;
@@ -293,7 +360,7 @@ public class InstancedParticleRenderer {
 		int serial1 = GlStateManager.modelMatrixStackAccessSerial[ptr1];
 		int ptr2 = GlStateManager.projectionMatrixStackPointer;
 		int serial2 = GlStateManager.projectionMatrixStackAccessSerial[ptr2];
-		if(stateModelMatrixSerial != serial1 || stateProjectionMatrixSerial != serial2) {
+		if (stateModelMatrixSerial != serial1 || stateProjectionMatrixSerial != serial2) {
 			stateModelMatrixSerial = serial1;
 			stateProjectionMatrixSerial = serial2;
 			Matrix4f.mul(GlStateManager.projectionMatrixStack[ptr2], GlStateManager.modelMatrixStack[ptr1], tmpMatrix);
@@ -305,7 +372,7 @@ public class InstancedParticleRenderer {
 
 		EaglercraftGPU.bindGLArrayBuffer(instancesBuffer);
 		EaglercraftGPU.bindGLBufferArray(vertexArray);
-		
+
 		int p = particleBuffer.position();
 		int l = particleBuffer.limit();
 
@@ -319,39 +386,8 @@ public class InstancedParticleRenderer {
 	}
 
 	public static void stupidColorSetHack(IUniformGL color4f) {
-		_wglUniform4f(color4f, GlStateManager.stateColorR, GlStateManager.stateColorG, GlStateManager.stateColorB, GlStateManager.stateColorA);
-	}
-
-	public static void destroy() {
-		if(particleBuffer != null) {
-			EagRuntime.freeByteBuffer(particleBuffer);
-			particleBuffer = null;
-		}
-		if(shaderProgram != null) {
-			_wglDeleteProgram(shaderProgram);
-			shaderProgram = null;
-		}
-		if(matrixCopyBuffer != null) {
-			EagRuntime.freeFloatBuffer(matrixCopyBuffer);
-			matrixCopyBuffer = null;
-		}
-		u_matrixTransform = null;
-		u_texCoordSize2f_particleSize1f = null;
-		u_transformParam_1_2_5_f = null;
-		u_transformParam_3_4_f = null;
-		u_color4f = null;
-		if(vertexArray != null) {
-			EaglercraftGPU.destroyGLBufferArray(vertexArray);
-			vertexArray = null;
-		}
-		if(vertexBuffer != null) {
-			_wglDeleteBuffers(vertexBuffer);
-			vertexBuffer = null;
-		}
-		if(instancesBuffer != null) {
-			_wglDeleteBuffers(instancesBuffer);
-			instancesBuffer = null;
-		}
+		_wglUniform4f(color4f, GlStateManager.stateColorR, GlStateManager.stateColorG, GlStateManager.stateColorB,
+				GlStateManager.stateColorA);
 	}
 
 }

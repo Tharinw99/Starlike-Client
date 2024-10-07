@@ -32,7 +32,9 @@ import com.google.common.base.Objects;
  */
 @GwtCompatible(serializable = true)
 final class ByFunctionOrdering<F, T> extends Ordering<F> implements Serializable {
+	private static final long serialVersionUID = 0;
 	final Function<F, ? extends T> function;
+
 	final Ordering<T> ordering;
 
 	ByFunctionOrdering(Function<F, ? extends T> function, Ordering<T> ordering) {
@@ -66,6 +68,4 @@ final class ByFunctionOrdering<F, T> extends Ordering<F> implements Serializable
 	public String toString() {
 		return ordering + ".onResultOf(" + function + ")";
 	}
-
-	private static final long serialVersionUID = 0;
 }

@@ -1,0 +1,45 @@
+itemGroup.starlike=Starlike
+
+commands.gm.success.self=Set own game mode to %s
+commands.gm.success.other=Set %s's game mode to %s
+commands.gm.usage=/gm%s [player]
+
+tile.deepstone.name=Deepstone
+tile.cobbled_deepstone.name=Cobbled Deepstone
+
+item.steel.name=Steel
+tile.steel_block.name=Steel Block
+tile.steel_grate.name=Steel Grate
+
+tile.platinum_ore.name=Platinum Ore
+tile.platinum_block.name=Platinum Block
+item.platinum_ingot.name=Platinum Ingot
+item.platinum_sword.name=Platinum Sword
+item.platinum_pickaxe.name=Platinum Pickaxe
+item.platinum_shovel.name=Platinum Shovel
+item.platinum_axe.name=Platinum Axe
+item.platinum_hoe.name=Platinum Hoe
+item.platinum_helmet.name=Platinum Helmet
+item.platinum_chestplate.name=Platinum Chestplate
+item.platinum_leggings.name=Platinum Leggings
+item.platinum_boots.name=Platinum Boots
+
+tile.titanium_ore.name=Titanium Ore
+tile.titanium_block.name=Titanium Block
+item.titanium_ingot.name=Titanium Ingot
+
+tile.uranium_ore.name=Uranium Ore
+tile.uranium_block.name=Uranium Block
+item.uranium_crystal.name=Uranium Crystal
+item.uranium_rod.name=Uranium Rod
+
+item.platinum_drill.name=Platinum Drill
+item.titanium_drill.name=Titanium Drill
+
+tile.mosaic.name=Mosaic
+tile.mosaic.oak.name=Oak Mosaic
+tile.mosaic.spruce.name=Spruce Mosaic
+tile.mosaic.birch.name=Birch Mosaic
+tile.mosaic.jungle.name=Jungle Mosaic
+tile.mosaic.acacia.name=Acacia Mosaic
+tile.mosaic.dark_oak.name=Dark Oak Mosaic

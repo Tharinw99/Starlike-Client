@@ -27,34 +27,37 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.ReportedException;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class TileEntityRendererDispatcher {
-	private Map<Class<? extends TileEntity>, TileEntitySpecialRenderer<? extends TileEntity>> mapSpecialRenderers = Maps
-			.newHashMap();
 	public static TileEntityRendererDispatcher instance = new TileEntityRendererDispatcher();
-	private FontRenderer fontRenderer;
 	public static double staticPlayerX;
 	public static double staticPlayerY;
 	public static double staticPlayerZ;
+	private Map<Class<? extends TileEntity>, TileEntitySpecialRenderer<? extends TileEntity>> mapSpecialRenderers = Maps
+			.newHashMap();
+	private FontRenderer fontRenderer;
 	public TextureManager renderEngine;
 	public World worldObj;
 	public Entity entity;
@@ -82,23 +85,6 @@ public class TileEntityRendererDispatcher {
 
 	}
 
-	public <T extends TileEntity> TileEntitySpecialRenderer<T> getSpecialRendererByClass(
-			Class<? extends TileEntity> teClass) {
-		TileEntitySpecialRenderer tileentityspecialrenderer = (TileEntitySpecialRenderer) this.mapSpecialRenderers
-				.get(teClass);
-		if (tileentityspecialrenderer == null && teClass != TileEntity.class) {
-			tileentityspecialrenderer = this
-					.getSpecialRendererByClass((Class<? extends TileEntity>) teClass.getSuperclass());
-			this.mapSpecialRenderers.put(teClass, tileentityspecialrenderer);
-		}
-
-		return tileentityspecialrenderer;
-	}
-
-	public <T extends TileEntity> TileEntitySpecialRenderer<T> getSpecialRenderer(TileEntity tileEntityIn) {
-		return tileEntityIn == null ? null : this.getSpecialRendererByClass(tileEntityIn.getClass());
-	}
-
 	public void cacheActiveRenderInfo(World worldIn, TextureManager textureManagerIn, FontRenderer fontrendererIn,
 			Entity entityIn, float partialTicks) {
 		if (this.worldObj != worldIn) {
@@ -114,6 +100,27 @@ public class TileEntityRendererDispatcher {
 		this.entityX = entityIn.lastTickPosX + (entityIn.posX - entityIn.lastTickPosX) * (double) partialTicks;
 		this.entityY = entityIn.lastTickPosY + (entityIn.posY - entityIn.lastTickPosY) * (double) partialTicks;
 		this.entityZ = entityIn.lastTickPosZ + (entityIn.posZ - entityIn.lastTickPosZ) * (double) partialTicks;
+	}
+
+	public FontRenderer getFontRenderer() {
+		return this.fontRenderer;
+	}
+
+	public <T extends TileEntity> TileEntitySpecialRenderer<T> getSpecialRenderer(TileEntity tileEntityIn) {
+		return tileEntityIn == null ? null : this.getSpecialRendererByClass(tileEntityIn.getClass());
+	}
+
+	public <T extends TileEntity> TileEntitySpecialRenderer<T> getSpecialRendererByClass(
+			Class<? extends TileEntity> teClass) {
+		TileEntitySpecialRenderer tileentityspecialrenderer = (TileEntitySpecialRenderer) this.mapSpecialRenderers
+				.get(teClass);
+		if (tileentityspecialrenderer == null && teClass != TileEntity.class) {
+			tileentityspecialrenderer = this
+					.getSpecialRendererByClass((Class<? extends TileEntity>) teClass.getSuperclass());
+			this.mapSpecialRenderers.put(teClass, tileentityspecialrenderer);
+		}
+
+		return tileentityspecialrenderer;
 	}
 
 	public void renderTileEntity(TileEntity tileentityIn, float partialTicks, int destroyStage) {
@@ -132,15 +139,15 @@ public class TileEntityRendererDispatcher {
 
 	}
 
-	/**+
-	 * Render this TileEntity at a given set of coordinates
+	/**
+	 * + Render this TileEntity at a given set of coordinates
 	 */
 	public void renderTileEntityAt(TileEntity tileEntityIn, double x, double y, double z, float partialTicks) {
 		this.renderTileEntityAt(tileEntityIn, x, y, z, partialTicks, -1);
 	}
 
-	/**+
-	 * Render this TileEntity at a given set of coordinates
+	/**
+	 * + Render this TileEntity at a given set of coordinates
 	 */
 	public void renderTileEntityAt(TileEntity tileEntityIn, double x, double y, double z, float partialTicks,
 			int destroyStage) {
@@ -163,9 +170,5 @@ public class TileEntityRendererDispatcher {
 
 	public void setWorld(World worldIn) {
 		this.worldObj = worldIn;
-	}
-
-	public FontRenderer getFontRenderer() {
-		return this.fontRenderer;
 	}
 }

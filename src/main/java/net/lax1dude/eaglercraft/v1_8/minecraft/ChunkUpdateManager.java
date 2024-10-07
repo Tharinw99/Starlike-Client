@@ -1,6 +1,6 @@
 package net.lax1dude.eaglercraft.v1_8.minecraft;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_COMPILE;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -23,29 +23,58 @@ import net.minecraft.util.EnumWorldBlockLayer;
 
 public class ChunkUpdateManager {
 
+	public static class EmptyBlockLayerException extends IllegalStateException {
+	}
+
 	private static final Logger LOGGER = LogManager.getLogger();
-
 	private final WorldVertexBufferUploader worldVertexUploader;
-	private final RegionRenderCacheBuilder renderCache;
 
+	private final RegionRenderCacheBuilder renderCache;
 	private int chunkUpdatesTotal = 0;
 	private int chunkUpdatesTotalLast = 0;
 	private int chunkUpdatesTotalImmediate = 0;
 	private int chunkUpdatesTotalImmediateLast = 0;
 	private int chunkUpdatesQueued = 0;
 	private int chunkUpdatesQueuedLast = 0;
+
 	private long chunkUpdatesTotalLastUpdate = 0l;
-	
+
 	private final List<ChunkCompileTaskGenerator> queue = new LinkedList<>();
 
 	public ChunkUpdateManager() {
 		worldVertexUploader = new WorldVertexBufferUploader();
 		renderCache = new RegionRenderCacheBuilder();
 	}
-	
-	public static class EmptyBlockLayerException extends IllegalStateException {
+
+	public String getDebugInfo() {
+		long millis = EagRuntime.steadyTimeMillis();
+
+		if (millis - chunkUpdatesTotalLastUpdate > 500l) {
+			chunkUpdatesTotalLastUpdate = millis;
+			chunkUpdatesTotalLast = chunkUpdatesTotal;
+			chunkUpdatesTotalImmediateLast = chunkUpdatesTotalImmediate;
+			chunkUpdatesTotalImmediate = 0;
+			chunkUpdatesTotal = 0;
+			chunkUpdatesQueuedLast = chunkUpdatesQueued;
+			chunkUpdatesQueued -= chunkUpdatesTotalLast;
+			if (chunkUpdatesQueued < 0) {
+				chunkUpdatesQueued = 0;
+			}
+		}
+
+		return "Uq: " + (chunkUpdatesTotalLast + chunkUpdatesTotalImmediateLast) + "/"
+				+ (chunkUpdatesQueuedLast + chunkUpdatesTotalImmediateLast);
 	}
-	
+
+	public boolean isAlreadyQueued(RenderChunk update) {
+		for (int i = 0, l = queue.size(); i < l; ++i) {
+			if (queue.get(i).getRenderChunk() == update) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private void runGenerator(ChunkCompileTaskGenerator generator, Entity entity) {
 		generator.setRegionRenderCacheBuilder(renderCache);
 		float f = (float) entity.posX;
@@ -60,11 +89,13 @@ public class ChunkUpdateManager {
 			try {
 				r.resortTransparency(f, f1, f2, generator);
 				CompiledChunk ch = generator.getCompiledChunk();
-				if(ch.isLayerEmpty(EnumWorldBlockLayer.TRANSLUCENT) && ch.isLayerEmpty(EnumWorldBlockLayer.REALISTIC_WATER)) {
+				if (ch.isLayerEmpty(EnumWorldBlockLayer.TRANSLUCENT)
+						&& ch.isLayerEmpty(EnumWorldBlockLayer.REALISTIC_WATER)) {
 					throw new EmptyBlockLayerException();
 				}
-			}catch(EmptyBlockLayerException ex) {
-				LOGGER.error("RenderChunk {} tried to update it's TRANSLUCENT layer with no proper initialization", r.getPosition());
+			} catch (EmptyBlockLayerException ex) {
+				LOGGER.error("RenderChunk {} tried to update it's TRANSLUCENT layer with no proper initialization",
+						r.getPosition());
 				generator.setStatus(ChunkCompileTaskGenerator.Status.DONE);
 				return; // rip
 			}
@@ -86,13 +117,15 @@ public class ChunkUpdateManager {
 			}
 			generator.getRenderChunk().setCompiledChunk(compiledchunk);
 		} else if (chunkcompiletaskgenerator$type == ChunkCompileTaskGenerator.Type.RESORT_TRANSPARENCY) {
-			if(!compiledchunk.isLayerEmpty(EnumWorldBlockLayer.TRANSLUCENT)) {
-				this.uploadChunk(EnumWorldBlockLayer.TRANSLUCENT, generator.getRegionRenderCacheBuilder()
+			if (!compiledchunk.isLayerEmpty(EnumWorldBlockLayer.TRANSLUCENT)) {
+				this.uploadChunk(
+						EnumWorldBlockLayer.TRANSLUCENT, generator.getRegionRenderCacheBuilder()
 								.getWorldRendererByLayer(EnumWorldBlockLayer.TRANSLUCENT),
 						generator.getRenderChunk(), compiledchunk);
 			}
-			if(!compiledchunk.isLayerEmpty(EnumWorldBlockLayer.REALISTIC_WATER)) {
-				this.uploadChunk(EnumWorldBlockLayer.REALISTIC_WATER, generator.getRegionRenderCacheBuilder()
+			if (!compiledchunk.isLayerEmpty(EnumWorldBlockLayer.REALISTIC_WATER)) {
+				this.uploadChunk(
+						EnumWorldBlockLayer.REALISTIC_WATER, generator.getRegionRenderCacheBuilder()
 								.getWorldRendererByLayer(EnumWorldBlockLayer.REALISTIC_WATER),
 						generator.getRenderChunk(), compiledchunk);
 			}
@@ -100,39 +133,10 @@ public class ChunkUpdateManager {
 			generator.setStatus(ChunkCompileTaskGenerator.Status.DONE);
 		}
 	}
-	
-	public boolean updateChunks(long timeout) {
-		Entity entity = Minecraft.getMinecraft().getRenderViewEntity();
-		if (entity == null) {
-			queue.clear();
-			chunkUpdatesQueued = 0;
-			return false;
-		}else {
-			boolean flag = false;
-			long millis = EagRuntime.steadyTimeMillis();
-			List<ChunkCompileTaskGenerator> droppedUpdates = new LinkedList<>();
-			while(!queue.isEmpty()) {
-				ChunkCompileTaskGenerator generator = queue.remove(0);
-				
-				if(!generator.canExecuteYet()) {
-					if(millis - generator.goddamnFuckingTimeout < 60000l) {
-						droppedUpdates.add(generator);
-					}
-					continue;
-				}
-				
-				runGenerator(generator, entity);
-				flag = true;
-				
-				++chunkUpdatesTotal;
-				
-				if(timeout < EagRuntime.nanoTime()) {
-					break;
-				}
-			}
-			queue.addAll(droppedUpdates);
-			return flag;
-		}
+
+	public void stopChunkUpdates() {
+		queue.clear();
+		chunkUpdatesQueued = 0;
 	}
 
 	public boolean updateChunkLater(RenderChunk chunkRenderer) {
@@ -140,11 +144,11 @@ public class ChunkUpdateManager {
 		boolean flag = queue.size() < 100;
 		if (!flag) {
 			chunkcompiletaskgenerator.finish();
-		}else {
+		} else {
 			chunkcompiletaskgenerator.addFinishRunnable(new Runnable() {
 				@Override
 				public void run() {
-					if(queue.remove(chunkcompiletaskgenerator)) {
+					if (queue.remove(chunkcompiletaskgenerator)) {
 						++chunkUpdatesTotal;
 					}
 				}
@@ -164,13 +168,42 @@ public class ChunkUpdateManager {
 		return true;
 	}
 
-	public void stopChunkUpdates() {
-		queue.clear();
-		chunkUpdatesQueued = 0;
+	public boolean updateChunks(long timeout) {
+		Entity entity = Minecraft.getMinecraft().getRenderViewEntity();
+		if (entity == null) {
+			queue.clear();
+			chunkUpdatesQueued = 0;
+			return false;
+		} else {
+			boolean flag = false;
+			long millis = EagRuntime.steadyTimeMillis();
+			List<ChunkCompileTaskGenerator> droppedUpdates = new LinkedList<>();
+			while (!queue.isEmpty()) {
+				ChunkCompileTaskGenerator generator = queue.remove(0);
+
+				if (!generator.canExecuteYet()) {
+					if (millis - generator.goddamnFuckingTimeout < 60000l) {
+						droppedUpdates.add(generator);
+					}
+					continue;
+				}
+
+				runGenerator(generator, entity);
+				flag = true;
+
+				++chunkUpdatesTotal;
+
+				if (timeout < EagRuntime.nanoTime()) {
+					break;
+				}
+			}
+			queue.addAll(droppedUpdates);
+			return flag;
+		}
 	}
 
 	public boolean updateTransparencyLater(RenderChunk chunkRenderer) {
-		if(isAlreadyQueued(chunkRenderer)) {
+		if (isAlreadyQueued(chunkRenderer)) {
 			return true;
 		}
 		final ChunkCompileTaskGenerator chunkcompiletaskgenerator = chunkRenderer.makeCompileTaskTransparency();
@@ -178,11 +211,11 @@ public class ChunkUpdateManager {
 			return true;
 		}
 		chunkcompiletaskgenerator.goddamnFuckingTimeout = EagRuntime.steadyTimeMillis();
-		if(queue.size() < 100) {
+		if (queue.size() < 100) {
 			chunkcompiletaskgenerator.addFinishRunnable(new Runnable() {
 				@Override
 				public void run() {
-					if(queue.remove(chunkcompiletaskgenerator)) {
+					if (queue.remove(chunkcompiletaskgenerator)) {
 						++chunkUpdatesTotal;
 					}
 				}
@@ -190,7 +223,7 @@ public class ChunkUpdateManager {
 			queue.add(chunkcompiletaskgenerator);
 			++chunkUpdatesQueued;
 			return true;
-		}else {
+		} else {
 			return false;
 		}
 	}
@@ -210,33 +243,4 @@ public class ChunkUpdateManager {
 		EaglercraftGPU.glEndList();
 	}
 
-	public boolean isAlreadyQueued(RenderChunk update) {
-		for(int i = 0, l = queue.size(); i < l; ++i) {
-			if(queue.get(i).getRenderChunk() == update) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public String getDebugInfo() {
-		long millis = EagRuntime.steadyTimeMillis();
-		
-		if(millis - chunkUpdatesTotalLastUpdate > 500l) {
-			chunkUpdatesTotalLastUpdate = millis;
-			chunkUpdatesTotalLast = chunkUpdatesTotal;
-			chunkUpdatesTotalImmediateLast = chunkUpdatesTotalImmediate;
-			chunkUpdatesTotalImmediate = 0;
-			chunkUpdatesTotal = 0;
-			chunkUpdatesQueuedLast = chunkUpdatesQueued;
-			chunkUpdatesQueued -= chunkUpdatesTotalLast;
-			if(chunkUpdatesQueued < 0) {
-				chunkUpdatesQueued = 0;
-			}
-		}
-		
-		return "Uq: " + (chunkUpdatesTotalLast + chunkUpdatesTotalImmediateLast) + "/"
-				+ (chunkUpdatesQueuedLast + chunkUpdatesTotalImmediateLast);
-	}
-	
 }

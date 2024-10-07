@@ -1,7 +1,39 @@
 package net.lax1dude.eaglercraft.v1_8.opengl;
 
-import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL.*;
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglAttachShader;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglBufferData;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglBufferSubData;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglCompileShader;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglCreateProgram;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglCreateShader;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDeleteBuffers;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDeleteProgram;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDeleteShader;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDetachShader;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGenBuffers;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetProgramInfoLog;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetProgrami;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetShaderInfoLog;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetShaderi;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetUniformLocation;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglLinkProgram;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglShaderSource;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniform1i;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniform2f;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniform4f;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniformMatrix4fv;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ARRAY_BUFFER;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_COMPILE_STATUS;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_FLOAT;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_FRAGMENT_SHADER;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_LINK_STATUS;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_SHORT;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_STATIC_DRAW;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_STREAM_DRAW;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TRIANGLES;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TRUE;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_UNSIGNED_BYTE;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_VERTEX_SHADER;
 
 import net.lax1dude.eaglercraft.v1_8.EagRuntime;
 import net.lax1dude.eaglercraft.v1_8.internal.IBufferArrayGL;
@@ -20,14 +52,15 @@ import net.lax1dude.eaglercraft.v1_8.vector.Vector4f;
 /**
  * Copyright (c) 2022-2024 lax1dude. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -68,17 +101,137 @@ public class InstancedFontRenderer {
 	private static float stateColorBiasG = -999.0f;
 	private static float stateColorBiasB = -999.0f;
 	private static float stateColorBiasA = -999.0f;
-	
+
 	private static final Matrix4f tmpMatrix = new Matrix4f();
 	private static final Vector4f tmpVector = new Vector4f();
 	private static int stateModelMatrixSerial = -1;
 	private static int stateProjectionMatrixSerial = -1;
-	
+
 	private static float charWidthValue = -1;
 	private static float charHeightValue = -1;
 	private static float charCoordWidthValue = -1.0f;
 	private static float charCoordHeightValue = -1.0f;
-	
+
+	private static ByteBuffer fontDataBuffer = null;
+
+	private static int charactersDrawn = 0;
+	private static ByteBuffer fontBoldDataBuffer = null;
+	private static int boldCharactersDrawn = 0;
+	private static boolean hasOverflowed = false;
+	private static boolean hasBoldOverflowed = false;
+	private static boolean fogEnabled = false;
+
+	private static int widthCalcLeast = Integer.MAX_VALUE;
+	private static int heightCalcLeast = Integer.MAX_VALUE;
+	private static int widthCalcMost = Integer.MAX_VALUE;
+	private static int heightCalcMost = Integer.MAX_VALUE;
+
+	public static void appendBoldQuad(int x, int y, int cx, int cy, int color, boolean italic) {
+		if (hasBoldOverflowed) {
+			return;
+		}
+		if (boldCharactersDrawn >= CHARACTER_LIMIT) {
+			hasBoldOverflowed = true;
+			logger.error(
+					"Font renderer buffer has overflowed! Exceeded {} bold characters, no more bold characters will be rendered.",
+					CHARACTER_LIMIT);
+			return;
+		}
+		++boldCharactersDrawn;
+		ByteBuffer buf = fontBoldDataBuffer;
+		buf.putShort((short) x);
+		buf.putShort((short) y);
+		buf.put((byte) cx);
+		buf.put((byte) cy);
+		color = ((color >>> 1) & 0x7F000000) | (color & 0xFFFFFF);
+		if (italic) {
+			color |= 0x80000000;
+		}
+		buf.putInt(color);
+		if (fogEnabled) {
+			updateBounds(x, y);
+		}
+	}
+
+	public static void appendQuad(int x, int y, int cx, int cy, int color, boolean italic) {
+		if (hasOverflowed) {
+			return;
+		}
+		if (charactersDrawn >= CHARACTER_LIMIT) {
+			hasOverflowed = true;
+			logger.error(
+					"Font renderer buffer has overflowed! Exceeded {} regular characters, no more regular characters will be rendered.",
+					CHARACTER_LIMIT);
+			return;
+		}
+		++charactersDrawn;
+		ByteBuffer buf = fontDataBuffer;
+		buf.putShort((short) x);
+		buf.putShort((short) y);
+		buf.put((byte) cx);
+		buf.put((byte) cy);
+		color = ((color >>> 1) & 0x7F000000) | (color & 0xFFFFFF);
+		if (italic) {
+			color |= 0x80000000;
+		}
+		buf.putInt(color);
+		if (fogEnabled) {
+			updateBounds(x, y);
+		}
+	}
+
+	public static void begin() {
+		fontDataBuffer.clear();
+		charactersDrawn = 0;
+		fontBoldDataBuffer.clear();
+		boldCharactersDrawn = 0;
+		hasOverflowed = false;
+		hasBoldOverflowed = false;
+		fogEnabled = GlStateManager.stateFog && GlStateManager.stateFogDensity > 0.0f;
+		if (fogEnabled) {
+			widthCalcLeast = Integer.MAX_VALUE;
+			heightCalcLeast = Integer.MAX_VALUE;
+			widthCalcMost = Integer.MAX_VALUE;
+			heightCalcMost = Integer.MAX_VALUE;
+		}
+	}
+
+	public static void destroy() {
+		if (fontDataBuffer != null) {
+			EagRuntime.freeByteBuffer(fontDataBuffer);
+			fontDataBuffer = null;
+		}
+		if (fontBoldDataBuffer != null) {
+			EagRuntime.freeByteBuffer(fontBoldDataBuffer);
+			fontBoldDataBuffer = null;
+		}
+		if (shaderProgram != null) {
+			_wglDeleteProgram(shaderProgram);
+			shaderProgram = null;
+		}
+		if (matrixCopyBuffer != null) {
+			EagRuntime.freeFloatBuffer(matrixCopyBuffer);
+			matrixCopyBuffer = null;
+		}
+		u_matrixTransform = null;
+		u_charSize2f = null;
+		u_charCoordSize2f = null;
+		u_color4f = null;
+		u_colorBias4f = null;
+		if (vertexArray != null) {
+			EaglercraftGPU.destroyGLBufferArray(vertexArray);
+			vertexArray = null;
+		}
+		if (vertexBuffer != null) {
+			_wglDeleteBuffers(vertexBuffer);
+			vertexBuffer = null;
+		}
+		if (instancesBuffer != null) {
+			_wglDeleteBuffers(instancesBuffer);
+			instancesBuffer = null;
+		}
+	}
+
 	static void initialize() {
 		String vertexSource = EagRuntime.getRequiredResourceString(vertexShaderPath);
 		String fragmentSource = EagRuntime.getRequiredResourceString(fragmentShaderPath);
@@ -89,12 +242,12 @@ public class InstancedFontRenderer {
 		_wglShaderSource(vert, GLSLHeader.getVertexHeaderCompat(vertexSource, vertexShaderPrecision));
 		_wglCompileShader(vert);
 
-		if(_wglGetShaderi(vert, GL_COMPILE_STATUS) != GL_TRUE) {
+		if (_wglGetShaderi(vert, GL_COMPILE_STATUS) != GL_TRUE) {
 			logger.error("Failed to compile GL_VERTEX_SHADER \"" + vertexShaderPath + "\" for InstancedFontRenderer!");
 			String log = _wglGetShaderInfoLog(vert);
-			if(log != null) {
+			if (log != null) {
 				String[] lines = log.split("(\\r\\n|\\r|\\n)");
-				for(int i = 0; i < lines.length; ++i) {
+				for (int i = 0; i < lines.length; ++i) {
 					logger.error("[VERT] {}", lines[i]);
 				}
 			}
@@ -104,12 +257,13 @@ public class InstancedFontRenderer {
 		_wglShaderSource(frag, GLSLHeader.getFragmentHeaderCompat(fragmentSource, fragmentShaderPrecision));
 		_wglCompileShader(frag);
 
-		if(_wglGetShaderi(frag, GL_COMPILE_STATUS) != GL_TRUE) {
-			logger.error("Failed to compile GL_FRAGMENT_SHADER \"" + fragmentShaderPath + "\" for InstancedFontRenderer!");
+		if (_wglGetShaderi(frag, GL_COMPILE_STATUS) != GL_TRUE) {
+			logger.error(
+					"Failed to compile GL_FRAGMENT_SHADER \"" + fragmentShaderPath + "\" for InstancedFontRenderer!");
 			String log = _wglGetShaderInfoLog(frag);
-			if(log != null) {
+			if (log != null) {
 				String[] lines = log.split("(\\r\\n|\\r|\\n)");
-				for(int i = 0; i < lines.length; ++i) {
+				for (int i = 0; i < lines.length; ++i) {
 					logger.error("[FRAG] {}", lines[i]);
 				}
 			}
@@ -121,7 +275,7 @@ public class InstancedFontRenderer {
 		_wglAttachShader(shaderProgram, vert);
 		_wglAttachShader(shaderProgram, frag);
 
-		if(EaglercraftGPU.checkOpenGLESVersion() == 200) {
+		if (EaglercraftGPU.checkOpenGLESVersion() == 200) {
 			VSHInputLayoutParser.applyLayout(shaderProgram, VSHInputLayoutParser.getShaderInputs(vertexSource));
 		}
 
@@ -133,12 +287,12 @@ public class InstancedFontRenderer {
 		_wglDeleteShader(vert);
 		_wglDeleteShader(frag);
 
-		if(_wglGetProgrami(shaderProgram, GL_LINK_STATUS) != GL_TRUE) {
+		if (_wglGetProgrami(shaderProgram, GL_LINK_STATUS) != GL_TRUE) {
 			logger.error("Failed to link shader program for InstancedFontRenderer!");
 			String log = _wglGetProgramInfoLog(shaderProgram);
-			if(log != null) {
+			if (log != null) {
 				String[] lines = log.split("(\\r\\n|\\r|\\n)");
-				for(int i = 0; i < lines.length; ++i) {
+				for (int i = 0; i < lines.length; ++i) {
 					logger.error("[LINK] {}", lines[i]);
 				}
 			}
@@ -167,25 +321,24 @@ public class InstancedFontRenderer {
 		float paddingA = 0.005f;
 		float paddingB = 1.0f - paddingA;
 		verts.put(new float[] {
-				
+
 				// (0 - 6 - 12) regular:
-				
-				paddingA, paddingA, 0.25f,  paddingA, paddingB, 0.25f,  paddingB, paddingA, 0.25f,
-				paddingB, paddingA, 0.25f,  paddingA, paddingB, 0.25f,  paddingB, paddingB, 0.25f,
-				paddingA, paddingA, 0.0f,  paddingA, paddingB, 0.0f,  paddingB, paddingA, 0.0f,
-				paddingB, paddingA, 0.0f,  paddingA, paddingB, 0.0f,  paddingB, paddingB, 0.0f,
+
+				paddingA, paddingA, 0.25f, paddingA, paddingB, 0.25f, paddingB, paddingA, 0.25f, paddingB, paddingA,
+				0.25f, paddingA, paddingB, 0.25f, paddingB, paddingB, 0.25f, paddingA, paddingA, 0.0f, paddingA,
+				paddingB, 0.0f, paddingB, paddingA, 0.0f, paddingB, paddingA, 0.0f, paddingA, paddingB, 0.0f, paddingB,
+				paddingB, 0.0f,
 
 				// (12 - 24 - 36) bold shadow:
 
-				paddingA, paddingA, 0.25f,  paddingA, paddingB, 0.25f,  paddingB, paddingA, 0.25f,
-				paddingB, paddingA, 0.25f,  paddingA, paddingB, 0.25f,  paddingB, paddingB, 0.25f,
-				paddingA, paddingA, 0.75f,  paddingA, paddingB, 0.75f,  paddingB, paddingA, 0.75f,
-				paddingB, paddingA, 0.75f,  paddingA, paddingB, 0.75f,  paddingB, paddingB, 0.75f,
+				paddingA, paddingA, 0.25f, paddingA, paddingB, 0.25f, paddingB, paddingA, 0.25f, paddingB, paddingA,
+				0.25f, paddingA, paddingB, 0.25f, paddingB, paddingB, 0.25f, paddingA, paddingA, 0.75f, paddingA,
+				paddingB, 0.75f, paddingB, paddingA, 0.75f, paddingB, paddingA, 0.75f, paddingA, paddingB, 0.75f,
+				paddingB, paddingB, 0.75f,
 
-				paddingA, paddingA, 0.0f,  paddingA, paddingB, 0.0f,  paddingB, paddingA, 0.0f,
-				paddingB, paddingA, 0.0f,  paddingA, paddingB, 0.0f,  paddingB, paddingB, 0.0f,
-				paddingA, paddingA, 0.5f,  paddingA, paddingB, 0.5f,  paddingB, paddingA, 0.5f,
-				paddingB, paddingA, 0.5f,  paddingA, paddingB, 0.5f,  paddingB, paddingB, 0.5f
+				paddingA, paddingA, 0.0f, paddingA, paddingB, 0.0f, paddingB, paddingA, 0.0f, paddingB, paddingA, 0.0f,
+				paddingA, paddingB, 0.0f, paddingB, paddingB, 0.0f, paddingA, paddingA, 0.5f, paddingA, paddingB, 0.5f,
+				paddingB, paddingA, 0.5f, paddingB, paddingA, 0.5f, paddingA, paddingB, 0.5f, paddingB, paddingB, 0.5f
 
 		});
 		verts.flip();
@@ -215,61 +368,33 @@ public class InstancedFontRenderer {
 		EaglercraftGPU.enableVertexAttribArray(3);
 		EaglercraftGPU.vertexAttribPointer(3, 4, GL_UNSIGNED_BYTE, true, 10, 6);
 		EaglercraftGPU.vertexAttribDivisor(3, 1);
-		
+
 	}
 
-	private static ByteBuffer fontDataBuffer = null;
-	private static int charactersDrawn = 0;
-	private static ByteBuffer fontBoldDataBuffer = null;
-	private static int boldCharactersDrawn = 0;
-	private static boolean hasOverflowed = false;
-	private static boolean hasBoldOverflowed = false;
-
-	private static boolean fogEnabled = false;
-	private static int widthCalcLeast = Integer.MAX_VALUE;
-	private static int heightCalcLeast = Integer.MAX_VALUE;
-	private static int widthCalcMost = Integer.MAX_VALUE;
-	private static int heightCalcMost = Integer.MAX_VALUE;
-
-	public static void begin() {
-		fontDataBuffer.clear();
-		charactersDrawn = 0;
-		fontBoldDataBuffer.clear();
-		boldCharactersDrawn = 0;
-		hasOverflowed = false;
-		hasBoldOverflowed = false;
-		fogEnabled = GlStateManager.stateFog && GlStateManager.stateFogDensity > 0.0f;
-		if(fogEnabled) {
-			widthCalcLeast = Integer.MAX_VALUE;
-			heightCalcLeast = Integer.MAX_VALUE;
-			widthCalcMost = Integer.MAX_VALUE;
-			heightCalcMost = Integer.MAX_VALUE;
-		}
-	}
-
-	public static void render(float charWidth, float charHeight, float charCoordWidth, float charCoordHeight, boolean shadow) {
-		if(charactersDrawn == 0 && boldCharactersDrawn == 0) {
+	public static void render(float charWidth, float charHeight, float charCoordWidth, float charCoordHeight,
+			boolean shadow) {
+		if (charactersDrawn == 0 && boldCharactersDrawn == 0) {
 			return;
 		}
 		EaglercraftGPU.bindGLShaderProgram(shaderProgram);
-		
-		if(charWidth != charWidthValue || charHeight != charHeightValue) {
+
+		if (charWidth != charWidthValue || charHeight != charHeightValue) {
 			charWidthValue = charWidth;
 			charHeightValue = charHeight;
-			_wglUniform2f(u_charSize2f, (float)charWidth, (float)charHeight);
+			_wglUniform2f(u_charSize2f, (float) charWidth, (float) charHeight);
 		}
-		
-		if(charCoordWidth != charCoordWidthValue || charCoordHeight != charCoordHeightValue) {
+
+		if (charCoordWidth != charCoordWidthValue || charCoordHeight != charCoordHeightValue) {
 			charCoordWidthValue = charCoordWidth;
 			charCoordHeightValue = charCoordHeight;
 			_wglUniform2f(u_charCoordSize2f, charCoordWidth, charCoordHeight);
 		}
-		
+
 		int ptr1 = GlStateManager.modelMatrixStackPointer;
 		int serial1 = GlStateManager.modelMatrixStackAccessSerial[ptr1];
 		int ptr2 = GlStateManager.projectionMatrixStackPointer;
 		int serial2 = GlStateManager.projectionMatrixStackAccessSerial[ptr2];
-		if(stateModelMatrixSerial != serial1 || stateProjectionMatrixSerial != serial2) {
+		if (stateModelMatrixSerial != serial1 || stateProjectionMatrixSerial != serial2) {
 			stateModelMatrixSerial = serial1;
 			stateProjectionMatrixSerial = serial2;
 			Matrix4f.mul(GlStateManager.projectionMatrixStack[ptr2], GlStateManager.modelMatrixStack[ptr1], tmpMatrix);
@@ -278,17 +403,16 @@ public class InstancedFontRenderer {
 			matrixCopyBuffer.flip();
 			_wglUniformMatrix4fv(u_matrixTransform, false, matrixCopyBuffer);
 		}
-		
-		if(!fogEnabled || DeferredStateManager.isInDeferredPass()) {
+
+		if (!fogEnabled || DeferredStateManager.isInDeferredPass()) {
 			int serial = GlStateManager.stateColorSerial;
-			if(stateColorSerial != serial) {
+			if (stateColorSerial != serial) {
 				stateColorSerial = serial;
 				float r = GlStateManager.stateColorR;
 				float g = GlStateManager.stateColorG;
 				float b = GlStateManager.stateColorB;
 				float a = GlStateManager.stateColorA;
-				if(stateColorR != r || stateColorG != g ||
-					stateColorB != b || stateColorA != a) {
+				if (stateColorR != r || stateColorG != g || stateColorB != b || stateColorA != a) {
 					_wglUniform4f(u_color4f, r, g, b, a);
 					stateColorR = r;
 					stateColorG = g;
@@ -296,19 +420,19 @@ public class InstancedFontRenderer {
 					stateColorA = a;
 				}
 			}
-			if(stateColorBiasR != 0.0f || stateColorBiasG != 0.0f ||
-					stateColorBiasB != 0.0f || stateColorBiasA != 0.0f) {
+			if (stateColorBiasR != 0.0f || stateColorBiasG != 0.0f || stateColorBiasB != 0.0f
+					|| stateColorBiasA != 0.0f) {
 				_wglUniform4f(u_colorBias4f, 0.0f, 0.0f, 0.0f, 0.0f);
 				stateColorBiasR = 0.0f;
 				stateColorBiasG = 0.0f;
 				stateColorBiasB = 0.0f;
 				stateColorBiasA = 0.0f;
 			}
-		}else {
+		} else {
 			stateColorSerial = -1;
 			Vector4f vec4 = tmpVector;
-			vec4.x = (float)(widthCalcLeast + (widthCalcMost - widthCalcLeast + 1.0f) * 0.5f) * charWidth;
-			vec4.y = (float)(heightCalcLeast + (heightCalcMost - heightCalcLeast + 1.0f) * 0.5f)* charHeight;
+			vec4.x = (float) (widthCalcLeast + (widthCalcMost - widthCalcLeast + 1.0f) * 0.5f) * charWidth;
+			vec4.y = (float) (heightCalcLeast + (heightCalcMost - heightCalcLeast + 1.0f) * 0.5f) * charHeight;
 			vec4.z = 0.0f;
 			vec4.w = 1.0f;
 
@@ -324,14 +448,17 @@ public class InstancedFontRenderer {
 			vec4.z *= vec4.z;
 
 			float fogFactor = (float) Math.sqrt(vec4.x + vec4.y + vec4.z);
-			if(GlStateManager.stateFogEXP) {
+			if (GlStateManager.stateFogEXP) {
 				fogFactor = 1.0f - (float) Math.pow(2.718, -(GlStateManager.stateFogDensity * fogFactor));
-			}else {
-				fogFactor = (fogFactor - GlStateManager.stateFogStart) / (GlStateManager.stateFogEnd - GlStateManager.stateFogStart);
+			} else {
+				fogFactor = (fogFactor - GlStateManager.stateFogStart)
+						/ (GlStateManager.stateFogEnd - GlStateManager.stateFogStart);
 			}
 
-			if(fogFactor > 1.0f) fogFactor = 1.0f;
-			if(fogFactor < 0.0f) fogFactor = 0.0f;
+			if (fogFactor > 1.0f)
+				fogFactor = 1.0f;
+			if (fogFactor < 0.0f)
+				fogFactor = 0.0f;
 
 			float r = GlStateManager.stateColorR;
 			float g = GlStateManager.stateColorG;
@@ -343,8 +470,7 @@ public class InstancedFontRenderer {
 			g *= fogFactor2;
 			b *= fogFactor2;
 
-			if(stateColorR != r || stateColorG != g ||
-				stateColorB != b || stateColorA != a) {
+			if (stateColorR != r || stateColorG != g || stateColorB != b || stateColorA != a) {
 				_wglUniform4f(u_color4f, r, g, b, a);
 				stateColorR = r;
 				stateColorG = g;
@@ -358,8 +484,8 @@ public class InstancedFontRenderer {
 			float biasB = GlStateManager.stateFogColorB * fogFactor;
 			float biasA = 0.0f;
 
-			if(stateColorBiasR != biasR || stateColorBiasG != biasG ||
-				stateColorBiasB != biasB || stateColorBiasA != biasA) {
+			if (stateColorBiasR != biasR || stateColorBiasG != biasG || stateColorBiasB != biasB
+					|| stateColorBiasA != biasA) {
 				_wglUniform4f(u_colorBias4f, biasR, biasG, biasB, biasA);
 				stateColorBiasR = biasR;
 				stateColorBiasG = biasG;
@@ -371,7 +497,7 @@ public class InstancedFontRenderer {
 		EaglercraftGPU.bindGLArrayBuffer(instancesBuffer);
 		EaglercraftGPU.bindGLBufferArray(vertexArray);
 
-		if(charactersDrawn > 0) {
+		if (charactersDrawn > 0) {
 			int p = fontDataBuffer.position();
 			int l = fontDataBuffer.limit();
 
@@ -384,7 +510,7 @@ public class InstancedFontRenderer {
 			EaglercraftGPU.doDrawArraysInstanced(GL_TRIANGLES, shadow ? 0 : 6, shadow ? 12 : 6, charactersDrawn);
 		}
 
-		if(boldCharactersDrawn > 0) {
+		if (boldCharactersDrawn > 0) {
 			int p = fontBoldDataBuffer.position();
 			int l = fontBoldDataBuffer.limit();
 
@@ -398,97 +524,15 @@ public class InstancedFontRenderer {
 		}
 	}
 
-	public static void appendQuad(int x, int y, int cx, int cy, int color, boolean italic) {
-		if(hasOverflowed) {
-			return;
-		}
-		if(charactersDrawn >= CHARACTER_LIMIT) {
-			hasOverflowed = true;
-			logger.error("Font renderer buffer has overflowed! Exceeded {} regular characters, no more regular characters will be rendered.", CHARACTER_LIMIT);
-			return;
-		}
-		++charactersDrawn;
-		ByteBuffer buf = fontDataBuffer;
-		buf.putShort((short)x);
-		buf.putShort((short)y);
-		buf.put((byte)cx);
-		buf.put((byte)cy);
-		color = ((color >>> 1) & 0x7F000000) | (color & 0xFFFFFF);
-		if(italic) {
-			color |= 0x80000000;
-		}
-		buf.putInt(color);
-		if(fogEnabled) {
-			updateBounds(x, y);
-		}
-	}
-
-	public static void appendBoldQuad(int x, int y, int cx, int cy, int color, boolean italic) {
-		if(hasBoldOverflowed) {
-			return;
-		}
-		if(boldCharactersDrawn >= CHARACTER_LIMIT) {
-			hasBoldOverflowed = true;
-			logger.error("Font renderer buffer has overflowed! Exceeded {} bold characters, no more bold characters will be rendered.", CHARACTER_LIMIT);
-			return;
-		}
-		++boldCharactersDrawn;
-		ByteBuffer buf = fontBoldDataBuffer;
-		buf.putShort((short)x);
-		buf.putShort((short)y);
-		buf.put((byte)cx);
-		buf.put((byte)cy);
-		color = ((color >>> 1) & 0x7F000000) | (color & 0xFFFFFF);
-		if(italic) {
-			color |= 0x80000000;
-		}
-		buf.putInt(color);
-		if(fogEnabled) {
-			updateBounds(x, y);
-		}
-	}
-
 	private static final void updateBounds(int x, int y) {
-		if(x < widthCalcLeast || widthCalcLeast == Integer.MAX_VALUE) widthCalcLeast = x;
-		if(x > widthCalcMost || widthCalcMost == Integer.MAX_VALUE) widthCalcMost = x;
-		if(y < heightCalcLeast || heightCalcLeast == Integer.MAX_VALUE) heightCalcLeast = y;
-		if(y > heightCalcMost || heightCalcMost == Integer.MAX_VALUE) heightCalcMost = y;
-	}
-
-	public static void destroy() {
-		if(fontDataBuffer != null) {
-			EagRuntime.freeByteBuffer(fontDataBuffer);
-			fontDataBuffer = null;
-		}
-		if(fontBoldDataBuffer != null) {
-			EagRuntime.freeByteBuffer(fontBoldDataBuffer);
-			fontBoldDataBuffer = null;
-		}
-		if(shaderProgram != null) {
-			_wglDeleteProgram(shaderProgram);
-			shaderProgram = null;
-		}
-		if(matrixCopyBuffer != null) {
-			EagRuntime.freeFloatBuffer(matrixCopyBuffer);
-			matrixCopyBuffer = null;
-		}
-		u_matrixTransform = null;
-		u_charSize2f = null;
-		u_charCoordSize2f = null;
-		u_color4f = null;
-		u_colorBias4f = null;
-		if(vertexArray != null) {
-			EaglercraftGPU.destroyGLBufferArray(vertexArray);
-			vertexArray = null;
-		}
-		if(vertexBuffer != null) {
-			_wglDeleteBuffers(vertexBuffer);
-			vertexBuffer = null;
-		}
-		if(instancesBuffer != null) {
-			_wglDeleteBuffers(instancesBuffer);
-			instancesBuffer = null;
-		}
+		if (x < widthCalcLeast || widthCalcLeast == Integer.MAX_VALUE)
+			widthCalcLeast = x;
+		if (x > widthCalcMost || widthCalcMost == Integer.MAX_VALUE)
+			widthCalcMost = x;
+		if (y < heightCalcLeast || heightCalcLeast == Integer.MAX_VALUE)
+			heightCalcLeast = y;
+		if (y > heightCalcMost || heightCalcMost == Integer.MAX_VALUE)
+			heightCalcMost = y;
 	}
 
 }

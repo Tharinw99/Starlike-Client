@@ -1,8 +1,8 @@
 package net.minecraft.block;
 
 import java.util.List;
-import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 
+import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -26,22 +26,25 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -54,9 +57,9 @@ public class BlockCauldron extends Block {
 		this.setDefaultState(this.blockState.getBaseState().withProperty(LEVEL, Integer.valueOf(0)));
 	}
 
-	/**+
-	 * Add all collision boxes of this Block to the list that
-	 * intersect with the given mask.
+	/**
+	 * + Add all collision boxes of this Block to the list that intersect with the
+	 * given mask.
 	 */
 	public void addCollisionBoxesToList(World world, BlockPos blockpos, IBlockState iblockstate,
 			AxisAlignedBB axisalignedbb, List<AxisAlignedBB> list, Entity entity) {
@@ -74,36 +77,66 @@ public class BlockCauldron extends Block {
 		this.setBlockBoundsForItemRender();
 	}
 
-	/**+
-	 * Sets the block's bounds for rendering it as an item
-	 */
-	public void setBlockBoundsForItemRender() {
-		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
+	protected BlockState createBlockState() {
+		return new BlockState(this, new IProperty[] { LEVEL });
 	}
 
-	/**+
-	 * Used to determine ambient occlusion and culling when
-	 * rebuilding chunks for render
+	/**
+	 * + Called similar to random ticks, but only when it is raining.
 	 */
-	public boolean isOpaqueCube() {
-		return false;
+	public void fillWithRain(World world, BlockPos blockpos) {
+		if (world.rand.nextInt(20) == 1) {
+			IBlockState iblockstate = world.getBlockState(blockpos);
+			if (((Integer) iblockstate.getValue(LEVEL)).intValue() < 3) {
+				world.setBlockState(blockpos, iblockstate.cycleProperty(LEVEL), 2);
+			}
+
+		}
+	}
+
+	public int getComparatorInputOverride(World world, BlockPos blockpos) {
+		return ((Integer) world.getBlockState(blockpos).getValue(LEVEL)).intValue();
+	}
+
+	public Item getItem(World var1, BlockPos var2) {
+		return Items.cauldron;
+	}
+
+	/**
+	 * + Get the Item that this Block should drop when harvested.
+	 */
+	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
+		return Items.cauldron;
+	}
+
+	/**
+	 * + Convert the BlockState into the correct metadata value
+	 */
+	public int getMetaFromState(IBlockState iblockstate) {
+		return ((Integer) iblockstate.getValue(LEVEL)).intValue();
+	}
+
+	/**
+	 * + Convert the given metadata into a BlockState for this Block
+	 */
+	public IBlockState getStateFromMeta(int i) {
+		return this.getDefaultState().withProperty(LEVEL, Integer.valueOf(i));
+	}
+
+	public boolean hasComparatorInputOverride() {
+		return true;
 	}
 
 	public boolean isFullCube() {
 		return false;
 	}
 
-	/**+
-	 * Called When an Entity Collided with the Block
+	/**
+	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
+	 * render
 	 */
-	public void onEntityCollidedWithBlock(World world, BlockPos blockpos, IBlockState iblockstate, Entity entity) {
-		int i = ((Integer) iblockstate.getValue(LEVEL)).intValue();
-		float f = (float) blockpos.getY() + (6.0F + (float) (3 * i)) / 16.0F;
-		if (!world.isRemote && entity.isBurning() && i > 0 && entity.getEntityBoundingBox().minY <= (double) f) {
-			entity.extinguish();
-			this.setWaterLevel(world, blockpos, iblockstate, i - 1);
-		}
-
+	public boolean isOpaqueCube() {
+		return false;
 	}
 
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState iblockstate, EntityPlayer entityplayer,
@@ -198,58 +231,28 @@ public class BlockCauldron extends Block {
 		}
 	}
 
+	/**
+	 * + Called When an Entity Collided with the Block
+	 */
+	public void onEntityCollidedWithBlock(World world, BlockPos blockpos, IBlockState iblockstate, Entity entity) {
+		int i = ((Integer) iblockstate.getValue(LEVEL)).intValue();
+		float f = (float) blockpos.getY() + (6.0F + (float) (3 * i)) / 16.0F;
+		if (!world.isRemote && entity.isBurning() && i > 0 && entity.getEntityBoundingBox().minY <= (double) f) {
+			entity.extinguish();
+			this.setWaterLevel(world, blockpos, iblockstate, i - 1);
+		}
+
+	}
+
+	/**
+	 * + Sets the block's bounds for rendering it as an item
+	 */
+	public void setBlockBoundsForItemRender() {
+		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
+	}
+
 	public void setWaterLevel(World worldIn, BlockPos pos, IBlockState state, int level) {
 		worldIn.setBlockState(pos, state.withProperty(LEVEL, Integer.valueOf(MathHelper.clamp_int(level, 0, 3))), 2);
 		worldIn.updateComparatorOutputLevel(pos, this);
-	}
-
-	/**+
-	 * Called similar to random ticks, but only when it is raining.
-	 */
-	public void fillWithRain(World world, BlockPos blockpos) {
-		if (world.rand.nextInt(20) == 1) {
-			IBlockState iblockstate = world.getBlockState(blockpos);
-			if (((Integer) iblockstate.getValue(LEVEL)).intValue() < 3) {
-				world.setBlockState(blockpos, iblockstate.cycleProperty(LEVEL), 2);
-			}
-
-		}
-	}
-
-	/**+
-	 * Get the Item that this Block should drop when harvested.
-	 */
-	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
-		return Items.cauldron;
-	}
-
-	public Item getItem(World var1, BlockPos var2) {
-		return Items.cauldron;
-	}
-
-	public boolean hasComparatorInputOverride() {
-		return true;
-	}
-
-	public int getComparatorInputOverride(World world, BlockPos blockpos) {
-		return ((Integer) world.getBlockState(blockpos).getValue(LEVEL)).intValue();
-	}
-
-	/**+
-	 * Convert the given metadata into a BlockState for this Block
-	 */
-	public IBlockState getStateFromMeta(int i) {
-		return this.getDefaultState().withProperty(LEVEL, Integer.valueOf(i));
-	}
-
-	/**+
-	 * Convert the BlockState into the correct metadata value
-	 */
-	public int getMetaFromState(IBlockState iblockstate) {
-		return ((Integer) iblockstate.getValue(LEVEL)).intValue();
-	}
-
-	protected BlockState createBlockState() {
-		return new BlockState(this, new IProperty[] { LEVEL });
 	}
 }

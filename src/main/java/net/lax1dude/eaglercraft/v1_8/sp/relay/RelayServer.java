@@ -9,24 +9,25 @@ import net.minecraft.client.Minecraft;
 /**
  * Copyright (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class RelayServer {
-	
+
 	public final String address;
 	public final String comment;
 	private boolean primary;
-	
+
 	private RelayQuery query = null;
 	private int queriedVersion = -1;
 	private String queriedComment;
@@ -36,58 +37,62 @@ public class RelayServer {
 	private long workingPing = 0l;
 	public long lastPing = 0l;
 
+	public RelayServer(RelayEntry etr) {
+		this(etr.address, etr.comment, etr.primary);
+	}
+
 	public RelayServer(String address, String comment, boolean primary) {
 		this.address = address;
 		this.comment = comment;
 		this.primary = primary;
 	}
-	
-	public RelayServer(RelayEntry etr) {
-		this(etr.address, etr.comment, etr.primary);
-	}
-	
-	public boolean isPrimary() {
-		return primary;
-	}
-	
-	public void setPrimary(boolean primaryee) {
-		primary = primaryee;
+
+	public void close() {
+		if (query != null && query.isQueryOpen()) {
+			query.close();
+			query = null;
+			queriedVersion = -1;
+			queriedComment = null;
+			queriedVendor = null;
+			queriedCompatible = VersionMismatch.UNKNOWN;
+			ping = 0l;
+		}
 	}
 
 	public long getPing() {
 		return ping;
 	}
 
-	public long getWorkingPing() {
-		return workingPing;
-	}
-	
-	public int getPingVersion() {
-		return queriedVersion;
-	}
-	
 	public String getPingComment() {
 		return queriedComment == null ? "" : queriedComment;
 	}
-	
-	public String getPingVendor() {
-		return queriedVendor == null ? "" : queriedVendor;
-	}
-	
+
 	public VersionMismatch getPingCompatible() {
 		return queriedCompatible;
 	}
-	
-	public void pingBlocking() {
-		ping();
-		while(getPing() < 0l) {
-			EagUtils.sleep(250l);
-			update();
-		}
+
+	public String getPingVendor() {
+		return queriedVendor == null ? "" : queriedVendor;
 	}
-	
+
+	public int getPingVersion() {
+		return queriedVersion;
+	}
+
+	public long getWorkingPing() {
+		return workingPing;
+	}
+
+	public boolean isPrimary() {
+		return primary;
+	}
+
+	public RelayServerSocket openSocket() {
+		return PlatformWebRTC.openRelayConnection(address, Minecraft.getMinecraft().gameSettings.relayTimeout * 1000);
+	}
+
 	public void ping() {
-		if(PlatformWebRTC.supported()) {
+		if (PlatformWebRTC.supported()) {
 			close();
 			query = PlatformWebRTC.openRelayQuery(address);
 			queriedVersion = -1;
@@ -95,7 +100,7 @@ public class RelayServer {
 			queriedVendor = null;
 			queriedCompatible = VersionMismatch.UNKNOWN;
 			ping = -1l;
-		}else {
+		} else {
 			query = null;
 			queriedVersion = 1;
 			queriedComment = "LAN NOT SUPPORTED";
@@ -104,18 +109,30 @@ public class RelayServer {
 			ping = -1l;
 		}
 	}
-	
+
+	public void pingBlocking() {
+		ping();
+		while (getPing() < 0l) {
+			EagUtils.sleep(250l);
+			update();
+		}
+	}
+
+	public void setPrimary(boolean primaryee) {
+		primary = primaryee;
+	}
+
 	public void update() {
-		if(query != null) {
+		if (query != null) {
 			query.update();
-			if(!query.isQueryOpen()) {
-				if(query.isQueryFailed()) {
+			if (!query.isQueryOpen()) {
+				if (query.isQueryFailed()) {
 					queriedVersion = -1;
 					queriedComment = null;
 					queriedVendor = null;
 					queriedCompatible = VersionMismatch.UNKNOWN;
 					ping = 0l;
-				}else {
+				} else {
 					queriedVersion = query.getVersion();
 					queriedComment = query.getComment();
 					queriedVendor = query.getBrand();
@@ -128,21 +145,5 @@ public class RelayServer {
 			}
 		}
 	}
-	
-	public void close() {
-		if(query != null && query.isQueryOpen()) {
-			query.close();
-			query = null;
-			queriedVersion = -1;
-			queriedComment = null;
-			queriedVendor = null;
-			queriedCompatible = VersionMismatch.UNKNOWN;
-			ping = 0l;
-		}
-	}
-	
-	public RelayServerSocket openSocket() {
-		return PlatformWebRTC.openRelayConnection(address, Minecraft.getMinecraft().gameSettings.relayTimeout * 1000);
-	}
-	
+
 }

@@ -1,14 +1,15 @@
 package net.minecraft.client.gui;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_MODELVIEW;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_PROJECTION;
 
 import java.util.ArrayList;
-import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
-import net.lax1dude.eaglercraft.v1_8.Mouse;
-import net.lax1dude.eaglercraft.v1_8.internal.EnumCursorType;
 
 import com.google.common.collect.Lists;
 
+import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
+import net.lax1dude.eaglercraft.v1_8.Mouse;
+import net.lax1dude.eaglercraft.v1_8.internal.EnumCursorType;
 import net.lax1dude.eaglercraft.v1_8.opengl.GlStateManager;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.model.ModelBook;
@@ -26,47 +27,48 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IWorldNameable;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class GuiEnchantment extends GuiContainer {
-	/**+
-	 * The ResourceLocation containing the Enchantment GUI texture
-	 * location
+	/**
+	 * + The ResourceLocation containing the Enchantment GUI texture location
 	 */
 	private static final ResourceLocation ENCHANTMENT_TABLE_GUI_TEXTURE = new ResourceLocation(
 			"textures/gui/container/enchanting_table.png");
-	/**+
-	 * The ResourceLocation containing the texture for the Book
-	 * rendered above the enchantment table
+	/**
+	 * + The ResourceLocation containing the texture for the Book rendered above the
+	 * enchantment table
 	 */
 	private static final ResourceLocation ENCHANTMENT_TABLE_BOOK_TEXTURE = new ResourceLocation(
 			"textures/entity/enchanting_table_book.png");
-	/**+
-	 * The ModelBook instance used for rendering the book on the
-	 * Enchantment table
+	/**
+	 * + The ModelBook instance used for rendering the book on the Enchantment table
 	 */
 	private static final ModelBook MODEL_BOOK = new ModelBook();
 	private final InventoryPlayer playerInventory;
-	/**+
-	 * A Random instance for use with the enchantment gui
+	/**
+	 * + A Random instance for use with the enchantment gui
 	 */
 	private EaglercraftRandom random = new EaglercraftRandom();
 	private ContainerEnchantment container;
@@ -87,45 +89,8 @@ public class GuiEnchantment extends GuiContainer {
 		this.field_175380_I = parIWorldNameable;
 	}
 
-	/**+
-	 * Draw the foreground layer for the GuiContainer (everything in
-	 * front of the items). Args : mouseX, mouseY
-	 */
-	protected void drawGuiContainerForegroundLayer(int var1, int var2) {
-		this.fontRendererObj.drawString(this.field_175380_I.getDisplayName().getUnformattedText(), 12, 5, 4210752);
-		this.fontRendererObj.drawString(this.playerInventory.getDisplayName().getUnformattedText(), 8,
-				this.ySize - 96 + 2, 4210752);
-	}
-
-	/**+
-	 * Called from the main game loop to update the screen.
-	 */
-	public void updateScreen() {
-		super.updateScreen();
-		this.func_147068_g();
-	}
-
-	/**+
-	 * Called when the mouse is clicked. Args : mouseX, mouseY,
-	 * clickedButton
-	 */
-	protected void mouseClicked(int parInt1, int parInt2, int parInt3) {
-		super.mouseClicked(parInt1, parInt2, parInt3);
-		int i = (this.width - this.xSize) / 2;
-		int j = (this.height - this.ySize) / 2;
-
-		for (int k = 0; k < 3; ++k) {
-			int l = parInt1 - (i + 60);
-			int i1 = parInt2 - (j + 14 + 19 * k);
-			if (l >= 0 && i1 >= 0 && l < 108 && i1 < 19 && this.container.enchantItem(this.mc.thePlayer, k)) {
-				this.mc.playerController.sendEnchantPacket(this.container.windowId, k);
-			}
-		}
-
-	}
-
-	/**+
-	 * Args : renderPartialTicks, mouseX, mouseY
+	/**
+	 * + Args : renderPartialTicks, mouseX, mouseY
 	 */
 	protected void drawGuiContainerBackgroundLayer(float f, int i, int j) {
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
@@ -238,9 +203,19 @@ public class GuiEnchantment extends GuiContainer {
 
 	}
 
-	/**+
-	 * Draws the screen and all the components in it. Args : mouseX,
-	 * mouseY, renderPartialTicks
+	/**
+	 * + Draw the foreground layer for the GuiContainer (everything in front of the
+	 * items). Args : mouseX, mouseY
+	 */
+	protected void drawGuiContainerForegroundLayer(int var1, int var2) {
+		this.fontRendererObj.drawString(this.field_175380_I.getDisplayName().getUnformattedText(), 12, 5, 4210752);
+		this.fontRendererObj.drawString(this.playerInventory.getDisplayName().getUnformattedText(), 8,
+				this.ySize - 96 + 2, 4210752);
+	}
+
+	/**
+	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
+	 * renderPartialTicks
 	 */
 	public void drawScreen(int i, int j, float f) {
 		super.drawScreen(i, j, f);
@@ -336,5 +311,31 @@ public class GuiEnchantment extends GuiContainer {
 		f1 = MathHelper.clamp_float(f1, -f, f);
 		this.field_147081_y += (f1 - this.field_147081_y) * 0.9F;
 		this.field_147071_v += this.field_147081_y;
+	}
+
+	/**
+	 * + Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
+	 */
+	protected void mouseClicked(int parInt1, int parInt2, int parInt3) {
+		super.mouseClicked(parInt1, parInt2, parInt3);
+		int i = (this.width - this.xSize) / 2;
+		int j = (this.height - this.ySize) / 2;
+
+		for (int k = 0; k < 3; ++k) {
+			int l = parInt1 - (i + 60);
+			int i1 = parInt2 - (j + 14 + 19 * k);
+			if (l >= 0 && i1 >= 0 && l < 108 && i1 < 19 && this.container.enchantItem(this.mc.thePlayer, k)) {
+				this.mc.playerController.sendEnchantPacket(this.container.windowId, k);
+			}
+		}
+
+	}
+
+	/**
+	 * + Called from the main game loop to update the screen.
+	 */
+	public void updateScreen() {
+		super.updateScreen();
+		this.func_147068_g();
 	}
 }

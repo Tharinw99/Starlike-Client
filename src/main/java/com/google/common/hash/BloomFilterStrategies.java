@@ -45,25 +45,6 @@ enum BloomFilterStrategies implements BloomFilter.Strategy {
 	 */
 	MURMUR128_MITZ_32() {
 		@Override
-		public <T> boolean put(T object, Funnel<? super T> funnel, int numHashFunctions, BitArray bits) {
-			long bitSize = bits.bitSize();
-			long hash64 = Hashing.murmur3_128().hashObject(object, funnel).asLong();
-			int hash1 = (int) hash64;
-			int hash2 = (int) (hash64 >>> 32);
-
-			boolean bitsChanged = false;
-			for (int i = 1; i <= numHashFunctions; i++) {
-				int combinedHash = hash1 + (i * hash2);
-				// Flip all the bits if it's negative (guaranteed positive number)
-				if (combinedHash < 0) {
-					combinedHash = ~combinedHash;
-				}
-				bitsChanged |= bits.set(combinedHash % bitSize);
-			}
-			return bitsChanged;
-		}
-
-		@Override
 		public <T> boolean mightContain(T object, Funnel<? super T> funnel, int numHashFunctions, BitArray bits) {
 			long bitSize = bits.bitSize();
 			long hash64 = Hashing.murmur3_128().hashObject(object, funnel).asLong();
@@ -82,6 +63,25 @@ enum BloomFilterStrategies implements BloomFilter.Strategy {
 			}
 			return true;
 		}
+
+		@Override
+		public <T> boolean put(T object, Funnel<? super T> funnel, int numHashFunctions, BitArray bits) {
+			long bitSize = bits.bitSize();
+			long hash64 = Hashing.murmur3_128().hashObject(object, funnel).asLong();
+			int hash1 = (int) hash64;
+			int hash2 = (int) (hash64 >>> 32);
+
+			boolean bitsChanged = false;
+			for (int i = 1; i <= numHashFunctions; i++) {
+				int combinedHash = hash1 + (i * hash2);
+				// Flip all the bits if it's negative (guaranteed positive number)
+				if (combinedHash < 0) {
+					combinedHash = ~combinedHash;
+				}
+				bitsChanged |= bits.set(combinedHash % bitSize);
+			}
+			return bitsChanged;
+		}
 	},
 	/**
 	 * This strategy uses all 128 bits of {@link Hashing#murmur3_128} when hashing.
@@ -91,21 +91,8 @@ enum BloomFilterStrategies implements BloomFilter.Strategy {
 	 * Long.MAX_VALUE instead of flipping the bits.
 	 */
 	MURMUR128_MITZ_64() {
-		@Override
-		public <T> boolean put(T object, Funnel<? super T> funnel, int numHashFunctions, BitArray bits) {
-			long bitSize = bits.bitSize();
-			byte[] bytes = Hashing.murmur3_128().hashObject(object, funnel).getBytesInternal();
-			long hash1 = lowerEight(bytes);
-			long hash2 = upperEight(bytes);
-
-			boolean bitsChanged = false;
-			long combinedHash = hash1;
-			for (int i = 0; i < numHashFunctions; i++) {
-				// Make the combined hash positive and indexable
-				bitsChanged |= bits.set((combinedHash & Long.MAX_VALUE) % bitSize);
-				combinedHash += hash2;
-			}
-			return bitsChanged;
+		private /* static */ long lowerEight(byte[] bytes) {
+			return Longs.fromBytes(bytes[7], bytes[6], bytes[5], bytes[4], bytes[3], bytes[2], bytes[1], bytes[0]);
 		}
 
 		@Override
@@ -126,8 +113,21 @@ enum BloomFilterStrategies implements BloomFilter.Strategy {
 			return true;
 		}
 
-		private /* static */ long lowerEight(byte[] bytes) {
-			return Longs.fromBytes(bytes[7], bytes[6], bytes[5], bytes[4], bytes[3], bytes[2], bytes[1], bytes[0]);
+		@Override
+		public <T> boolean put(T object, Funnel<? super T> funnel, int numHashFunctions, BitArray bits) {
+			long bitSize = bits.bitSize();
+			byte[] bytes = Hashing.murmur3_128().hashObject(object, funnel).getBytesInternal();
+			long hash1 = lowerEight(bytes);
+			long hash2 = upperEight(bytes);
+
+			boolean bitsChanged = false;
+			long combinedHash = hash1;
+			for (int i = 0; i < numHashFunctions; i++) {
+				// Make the combined hash positive and indexable
+				bitsChanged |= bits.set((combinedHash & Long.MAX_VALUE) % bitSize);
+				combinedHash += hash2;
+			}
+			return bitsChanged;
 		}
 
 		private /* static */ long upperEight(byte[] bytes) {
@@ -157,12 +157,25 @@ enum BloomFilterStrategies implements BloomFilter.Strategy {
 			this.bitCount = bitCount;
 		}
 
-		/** Returns true if the bit changed value. */
-		boolean set(long index) {
-			if (!get(index)) {
-				data[(int) (index >>> 6)] |= (1L << index);
-				bitCount++;
-				return true;
+		/** Number of set bits (1s) */
+		long bitCount() {
+			return bitCount;
+		}
+
+		/** Number of bits */
+		long bitSize() {
+			return (long) data.length * Long.SIZE;
+		}
+
+		BitArray copy() {
+			return new BitArray(data.clone());
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (o instanceof BitArray) {
+				BitArray bitArray = (BitArray) o;
+				return Arrays.equals(data, bitArray.data);
 			}
 			return false;
 		}
@@ -171,18 +184,9 @@ enum BloomFilterStrategies implements BloomFilter.Strategy {
 			return (data[(int) (index >>> 6)] & (1L << index)) != 0;
 		}
 
-		/** Number of bits */
-		long bitSize() {
-			return (long) data.length * Long.SIZE;
-		}
-
-		/** Number of set bits (1s) */
-		long bitCount() {
-			return bitCount;
-		}
-
-		BitArray copy() {
-			return new BitArray(data.clone());
+		@Override
+		public int hashCode() {
+			return Arrays.hashCode(data);
 		}
 
 		/** Combines the two BitArrays using bitwise OR. */
@@ -196,18 +200,14 @@ enum BloomFilterStrategies implements BloomFilter.Strategy {
 			}
 		}
 
-		@Override
-		public boolean equals(Object o) {
-			if (o instanceof BitArray) {
-				BitArray bitArray = (BitArray) o;
-				return Arrays.equals(data, bitArray.data);
+		/** Returns true if the bit changed value. */
+		boolean set(long index) {
+			if (!get(index)) {
+				data[(int) (index >>> 6)] |= (1L << index);
+				bitCount++;
+				return true;
 			}
 			return false;
-		}
-
-		@Override
-		public int hashCode() {
-			return Arrays.hashCode(data);
 		}
 	}
 }

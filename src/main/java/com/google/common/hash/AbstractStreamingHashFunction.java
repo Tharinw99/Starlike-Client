@@ -34,47 +34,6 @@ import com.google.common.base.Preconditions;
  * @author Kevin Bourrillion
  */
 abstract class AbstractStreamingHashFunction implements HashFunction {
-	@Override
-	public <T> HashCode hashObject(T instance, Funnel<? super T> funnel) {
-		return newHasher().putObject(instance, funnel).hash();
-	}
-
-	@Override
-	public HashCode hashUnencodedChars(CharSequence input) {
-		return newHasher().putUnencodedChars(input).hash();
-	}
-
-	@Override
-	public HashCode hashString(CharSequence input, Charset charset) {
-		return newHasher().putString(input, charset).hash();
-	}
-
-	@Override
-	public HashCode hashInt(int input) {
-		return newHasher().putInt(input).hash();
-	}
-
-	@Override
-	public HashCode hashLong(long input) {
-		return newHasher().putLong(input).hash();
-	}
-
-	@Override
-	public HashCode hashBytes(byte[] input) {
-		return newHasher().putBytes(input).hash();
-	}
-
-	@Override
-	public HashCode hashBytes(byte[] input, int off, int len) {
-		return newHasher().putBytes(input, off, len).hash();
-	}
-
-	@Override
-	public Hasher newHasher(int expectedInputSize) {
-		Preconditions.checkArgument(expectedInputSize >= 0);
-		return newHasher();
-	}
-
 	/**
 	 * A convenience base class for implementors of {@code Hasher}; handles
 	 * accumulating data until an entire "chunk" (of implementation-dependent
@@ -128,6 +87,37 @@ abstract class AbstractStreamingHashFunction implements HashFunction {
 			this.chunkSize = chunkSize;
 		}
 
+		@Override
+		public final HashCode hash() {
+			munch();
+			buffer.flip();
+			if (buffer.remaining() > 0) {
+				processRemaining(buffer);
+			}
+			return makeHash();
+		}
+
+		abstract HashCode makeHash();
+
+		private void munch() {
+			buffer.flip();
+			while (buffer.remaining() >= chunkSize) {
+				// we could limit the buffer to ensure process() does not read more than
+				// chunkSize number of bytes, but we trust the implementations
+				process(buffer);
+			}
+			buffer.compact(); // preserve any remaining data that do not make a full chunk
+		}
+
+		// Process pent-up data in chunks
+		private void munchIfFull() {
+			if (buffer.remaining() < 8) {
+				// buffer is full; not enough room for a primitive. We have at least one full
+				// chunk.
+				munch();
+			}
+		}
+
 		/**
 		 * Processes the available bytes of the buffer (at most {@code chunk} bytes).
 		 */
@@ -150,6 +140,13 @@ abstract class AbstractStreamingHashFunction implements HashFunction {
 			bb.limit(chunkSize);
 			bb.flip();
 			process(bb);
+		}
+
+		@Override
+		public final Hasher putByte(byte b) {
+			buffer.put(b);
+			munchIfFull();
+			return this;
 		}
 
 		@Override
@@ -188,28 +185,6 @@ abstract class AbstractStreamingHashFunction implements HashFunction {
 		}
 
 		@Override
-		public final Hasher putUnencodedChars(CharSequence charSequence) {
-			for (int i = 0; i < charSequence.length(); i++) {
-				putChar(charSequence.charAt(i));
-			}
-			return this;
-		}
-
-		@Override
-		public final Hasher putByte(byte b) {
-			buffer.put(b);
-			munchIfFull();
-			return this;
-		}
-
-		@Override
-		public final Hasher putShort(short s) {
-			buffer.putShort(s);
-			munchIfFull();
-			return this;
-		}
-
-		@Override
 		public final Hasher putChar(char c) {
 			buffer.putChar(c);
 			munchIfFull();
@@ -237,34 +212,59 @@ abstract class AbstractStreamingHashFunction implements HashFunction {
 		}
 
 		@Override
-		public final HashCode hash() {
-			munch();
-			buffer.flip();
-			if (buffer.remaining() > 0) {
-				processRemaining(buffer);
-			}
-			return makeHash();
+		public final Hasher putShort(short s) {
+			buffer.putShort(s);
+			munchIfFull();
+			return this;
 		}
 
-		abstract HashCode makeHash();
-
-		// Process pent-up data in chunks
-		private void munchIfFull() {
-			if (buffer.remaining() < 8) {
-				// buffer is full; not enough room for a primitive. We have at least one full
-				// chunk.
-				munch();
+		@Override
+		public final Hasher putUnencodedChars(CharSequence charSequence) {
+			for (int i = 0; i < charSequence.length(); i++) {
+				putChar(charSequence.charAt(i));
 			}
+			return this;
 		}
+	}
 
-		private void munch() {
-			buffer.flip();
-			while (buffer.remaining() >= chunkSize) {
-				// we could limit the buffer to ensure process() does not read more than
-				// chunkSize number of bytes, but we trust the implementations
-				process(buffer);
-			}
-			buffer.compact(); // preserve any remaining data that do not make a full chunk
-		}
+	@Override
+	public HashCode hashBytes(byte[] input) {
+		return newHasher().putBytes(input).hash();
+	}
+
+	@Override
+	public HashCode hashBytes(byte[] input, int off, int len) {
+		return newHasher().putBytes(input, off, len).hash();
+	}
+
+	@Override
+	public HashCode hashInt(int input) {
+		return newHasher().putInt(input).hash();
+	}
+
+	@Override
+	public HashCode hashLong(long input) {
+		return newHasher().putLong(input).hash();
+	}
+
+	@Override
+	public <T> HashCode hashObject(T instance, Funnel<? super T> funnel) {
+		return newHasher().putObject(instance, funnel).hash();
+	}
+
+	@Override
+	public HashCode hashString(CharSequence input, Charset charset) {
+		return newHasher().putString(input, charset).hash();
+	}
+
+	@Override
+	public HashCode hashUnencodedChars(CharSequence input) {
+		return newHasher().putUnencodedChars(input).hash();
+	}
+
+	@Override
+	public Hasher newHasher(int expectedInputSize) {
+		Preconditions.checkArgument(expectedInputSize >= 0);
+		return newHasher();
 	}
 }

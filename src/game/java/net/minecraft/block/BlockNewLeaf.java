@@ -18,33 +18,31 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class BlockNewLeaf extends BlockLeaves {
 	public static PropertyEnum<BlockPlanks.EnumType> VARIANT;
-
-	public BlockNewLeaf() {
-		this.setDefaultState(this.blockState.getBaseState().withProperty(VARIANT, BlockPlanks.EnumType.ACACIA)
-				.withProperty(CHECK_DECAY, Boolean.valueOf(true)).withProperty(DECAYABLE, Boolean.valueOf(true)));
-	}
 
 	public static void bootstrapStates() {
 		VARIANT = PropertyEnum.create("variant", BlockPlanks.EnumType.class, new Predicate<BlockPlanks.EnumType>() {
@@ -54,34 +52,13 @@ public class BlockNewLeaf extends BlockLeaves {
 		});
 	}
 
-	protected void dropApple(World world, BlockPos blockpos, IBlockState iblockstate, int i) {
-		if (iblockstate.getValue(VARIANT) == BlockPlanks.EnumType.DARK_OAK && world.rand.nextInt(i) == 0) {
-			spawnAsEntity(world, blockpos, new ItemStack(Items.apple, 1, 0));
-		}
+	public BlockNewLeaf() {
+		this.setDefaultState(this.blockState.getBaseState().withProperty(VARIANT, BlockPlanks.EnumType.ACACIA)
+				.withProperty(CHECK_DECAY, Boolean.valueOf(true)).withProperty(DECAYABLE, Boolean.valueOf(true)));
 	}
 
-	/**+
-	 * Gets the metadata of the item this Block can drop. This
-	 * method is called when the block gets destroyed. It returns
-	 * the metadata of the dropped item based on the old metadata of
-	 * the block.
-	 */
-	public int damageDropped(IBlockState iblockstate) {
-		return ((BlockPlanks.EnumType) iblockstate.getValue(VARIANT)).getMetadata();
-	}
-
-	public int getDamageValue(World world, BlockPos blockpos) {
-		IBlockState iblockstate = world.getBlockState(blockpos);
-		return iblockstate.getBlock().getMetaFromState(iblockstate) & 3;
-	}
-
-	/**+
-	 * returns a list of blocks with the same ID, but different meta
-	 * (eg: wood returns 4 blocks)
-	 */
-	public void getSubBlocks(Item item, CreativeTabs var2, List<ItemStack> list) {
-		list.add(new ItemStack(item, 1, 0));
-		list.add(new ItemStack(item, 1, 1));
+	protected BlockState createBlockState() {
+		return new BlockState(this, new IProperty[] { VARIANT, CHECK_DECAY, DECAYABLE });
 	}
 
 	protected ItemStack createStackedBlock(IBlockState iblockstate) {
@@ -89,17 +66,28 @@ public class BlockNewLeaf extends BlockLeaves {
 				((BlockPlanks.EnumType) iblockstate.getValue(VARIANT)).getMetadata() - 4);
 	}
 
-	/**+
-	 * Convert the given metadata into a BlockState for this Block
+	/**
+	 * + Gets the metadata of the item this Block can drop. This method is called
+	 * when the block gets destroyed. It returns the metadata of the dropped item
+	 * based on the old metadata of the block.
 	 */
-	public IBlockState getStateFromMeta(int i) {
-		return this.getDefaultState().withProperty(VARIANT, this.getWoodType(i))
-				.withProperty(DECAYABLE, Boolean.valueOf((i & 4) == 0))
-				.withProperty(CHECK_DECAY, Boolean.valueOf((i & 8) > 0));
+	public int damageDropped(IBlockState iblockstate) {
+		return ((BlockPlanks.EnumType) iblockstate.getValue(VARIANT)).getMetadata();
 	}
 
-	/**+
-	 * Convert the BlockState into the correct metadata value
+	protected void dropApple(World world, BlockPos blockpos, IBlockState iblockstate, int i) {
+		if (iblockstate.getValue(VARIANT) == BlockPlanks.EnumType.DARK_OAK && world.rand.nextInt(i) == 0) {
+			spawnAsEntity(world, blockpos, new ItemStack(Items.apple, 1, 0));
+		}
+	}
+
+	public int getDamageValue(World world, BlockPos blockpos) {
+		IBlockState iblockstate = world.getBlockState(blockpos);
+		return iblockstate.getBlock().getMetaFromState(iblockstate) & 3;
+	}
+
+	/**
+	 * + Convert the BlockState into the correct metadata value
 	 */
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
@@ -115,12 +103,26 @@ public class BlockNewLeaf extends BlockLeaves {
 		return i;
 	}
 
-	public BlockPlanks.EnumType getWoodType(int i) {
-		return BlockPlanks.EnumType.byMetadata((i & 3) + 4);
+	/**
+	 * + Convert the given metadata into a BlockState for this Block
+	 */
+	public IBlockState getStateFromMeta(int i) {
+		return this.getDefaultState().withProperty(VARIANT, this.getWoodType(i))
+				.withProperty(DECAYABLE, Boolean.valueOf((i & 4) == 0))
+				.withProperty(CHECK_DECAY, Boolean.valueOf((i & 8) > 0));
 	}
 
-	protected BlockState createBlockState() {
-		return new BlockState(this, new IProperty[] { VARIANT, CHECK_DECAY, DECAYABLE });
+	/**
+	 * + returns a list of blocks with the same ID, but different meta (eg: wood
+	 * returns 4 blocks)
+	 */
+	public void getSubBlocks(Item item, CreativeTabs var2, List<ItemStack> list) {
+		list.add(new ItemStack(item, 1, 0));
+		list.add(new ItemStack(item, 1, 1));
+	}
+
+	public BlockPlanks.EnumType getWoodType(int i) {
+		return BlockPlanks.EnumType.byMetadata((i & 3) + 4);
 	}
 
 	public void harvestBlock(World world, EntityPlayer entityplayer, BlockPos blockpos, IBlockState iblockstate,

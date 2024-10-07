@@ -47,17 +47,58 @@ import com.google.common.annotations.GwtCompatible;
 @Beta
 public abstract class DiscreteDomain<C extends Comparable> {
 
-	/**
-	 * Returns the discrete domain for values of type {@code Integer}.
-	 * 
-	 * @since 14.0 (since 10.0 as {@code DiscreteDomains.integers()})
-	 */
-	public static DiscreteDomain<Integer> integers() {
-		return IntegerDomain.INSTANCE;
+	private static final class BigIntegerDomain extends DiscreteDomain<BigInteger> implements Serializable {
+		private static final BigIntegerDomain INSTANCE = new BigIntegerDomain();
+
+		private static final BigInteger MIN_LONG = BigInteger.valueOf(Long.MIN_VALUE);
+		private static final BigInteger MAX_LONG = BigInteger.valueOf(Long.MAX_VALUE);
+
+		private static final long serialVersionUID = 0;
+
+		@Override
+		public long distance(BigInteger start, BigInteger end) {
+			return end.subtract(start).max(MIN_LONG).min(MAX_LONG).longValue();
+		}
+
+		@Override
+		public BigInteger next(BigInteger value) {
+			return value.add(BigInteger.ONE);
+		}
+
+		@Override
+		public BigInteger previous(BigInteger value) {
+			return value.subtract(BigInteger.ONE);
+		}
+
+		private Object readResolve() {
+			return INSTANCE;
+		}
+
+		@Override
+		public String toString() {
+			return "DiscreteDomain.bigIntegers()";
+		}
 	}
 
 	private static final class IntegerDomain extends DiscreteDomain<Integer> implements Serializable {
 		private static final IntegerDomain INSTANCE = new IntegerDomain();
+
+		private static final long serialVersionUID = 0;
+
+		@Override
+		public long distance(Integer start, Integer end) {
+			return (long) end - start;
+		}
+
+		@Override
+		public Integer maxValue() {
+			return Integer.MAX_VALUE;
+		}
+
+		@Override
+		public Integer minValue() {
+			return Integer.MIN_VALUE;
+		}
 
 		@Override
 		public Integer next(Integer value) {
@@ -71,21 +112,6 @@ public abstract class DiscreteDomain<C extends Comparable> {
 			return (i == Integer.MIN_VALUE) ? null : i - 1;
 		}
 
-		@Override
-		public long distance(Integer start, Integer end) {
-			return (long) end - start;
-		}
-
-		@Override
-		public Integer minValue() {
-			return Integer.MIN_VALUE;
-		}
-
-		@Override
-		public Integer maxValue() {
-			return Integer.MAX_VALUE;
-		}
-
 		private Object readResolve() {
 			return INSTANCE;
 		}
@@ -94,33 +120,12 @@ public abstract class DiscreteDomain<C extends Comparable> {
 		public String toString() {
 			return "DiscreteDomain.integers()";
 		}
-
-		private static final long serialVersionUID = 0;
-	}
-
-	/**
-	 * Returns the discrete domain for values of type {@code Long}.
-	 * 
-	 * @since 14.0 (since 10.0 as {@code DiscreteDomains.longs()})
-	 */
-	public static DiscreteDomain<Long> longs() {
-		return LongDomain.INSTANCE;
 	}
 
 	private static final class LongDomain extends DiscreteDomain<Long> implements Serializable {
 		private static final LongDomain INSTANCE = new LongDomain();
 
-		@Override
-		public Long next(Long value) {
-			long l = value;
-			return (l == Long.MAX_VALUE) ? null : l + 1;
-		}
-
-		@Override
-		public Long previous(Long value) {
-			long l = value;
-			return (l == Long.MIN_VALUE) ? null : l - 1;
-		}
+		private static final long serialVersionUID = 0;
 
 		@Override
 		public long distance(Long start, Long end) {
@@ -135,13 +140,25 @@ public abstract class DiscreteDomain<C extends Comparable> {
 		}
 
 		@Override
+		public Long maxValue() {
+			return Long.MAX_VALUE;
+		}
+
+		@Override
 		public Long minValue() {
 			return Long.MIN_VALUE;
 		}
 
 		@Override
-		public Long maxValue() {
-			return Long.MAX_VALUE;
+		public Long next(Long value) {
+			long l = value;
+			return (l == Long.MAX_VALUE) ? null : l + 1;
+		}
+
+		@Override
+		public Long previous(Long value) {
+			long l = value;
+			return (l == Long.MIN_VALUE) ? null : l - 1;
 		}
 
 		private Object readResolve() {
@@ -152,8 +169,6 @@ public abstract class DiscreteDomain<C extends Comparable> {
 		public String toString() {
 			return "DiscreteDomain.longs()";
 		}
-
-		private static final long serialVersionUID = 0;
 	}
 
 	/**
@@ -165,41 +180,74 @@ public abstract class DiscreteDomain<C extends Comparable> {
 		return BigIntegerDomain.INSTANCE;
 	}
 
-	private static final class BigIntegerDomain extends DiscreteDomain<BigInteger> implements Serializable {
-		private static final BigIntegerDomain INSTANCE = new BigIntegerDomain();
+	/**
+	 * Returns the discrete domain for values of type {@code Integer}.
+	 * 
+	 * @since 14.0 (since 10.0 as {@code DiscreteDomains.integers()})
+	 */
+	public static DiscreteDomain<Integer> integers() {
+		return IntegerDomain.INSTANCE;
+	}
 
-		private static final BigInteger MIN_LONG = BigInteger.valueOf(Long.MIN_VALUE);
-		private static final BigInteger MAX_LONG = BigInteger.valueOf(Long.MAX_VALUE);
-
-		@Override
-		public BigInteger next(BigInteger value) {
-			return value.add(BigInteger.ONE);
-		}
-
-		@Override
-		public BigInteger previous(BigInteger value) {
-			return value.subtract(BigInteger.ONE);
-		}
-
-		@Override
-		public long distance(BigInteger start, BigInteger end) {
-			return end.subtract(start).max(MIN_LONG).min(MAX_LONG).longValue();
-		}
-
-		private Object readResolve() {
-			return INSTANCE;
-		}
-
-		@Override
-		public String toString() {
-			return "DiscreteDomain.bigIntegers()";
-		}
-
-		private static final long serialVersionUID = 0;
+	/**
+	 * Returns the discrete domain for values of type {@code Long}.
+	 * 
+	 * @since 14.0 (since 10.0 as {@code DiscreteDomains.longs()})
+	 */
+	public static DiscreteDomain<Long> longs() {
+		return LongDomain.INSTANCE;
 	}
 
 	/** Constructor for use by subclasses. */
 	protected DiscreteDomain() {
+	}
+
+	/**
+	 * Returns a signed value indicating how many nested invocations of
+	 * {@link #next} (if positive) or {@link #previous} (if negative) are needed to
+	 * reach {@code end} starting from {@code start}. For example, if {@code end =
+	 * next(next(next(start)))}, then {@code distance(start, end) == 3} and {@code
+	 * distance(end, start) == -3}. As well, {@code distance(a, a)} is always zero.
+	 *
+	 * <p>
+	 * Note that this function is necessarily well-defined for any discrete type.
+	 *
+	 * @return the distance as described above, or {@link Long#MIN_VALUE} or
+	 *         {@link Long#MAX_VALUE} if the distance is too small or too large,
+	 *         respectively.
+	 */
+	public abstract long distance(C start, C end);
+
+	/**
+	 * Returns the maximum value of type {@code C}, if it has one. The maximum value
+	 * is the unique value for which {@link Comparable#compareTo(Object)} never
+	 * returns a negative value for any input of type {@code C}.
+	 *
+	 * <p>
+	 * The default implementation throws {@code NoSuchElementException}.
+	 *
+	 * @return the maximum value of type {@code C}; never null
+	 * @throws NoSuchElementException if the type has no (practical) maximum value;
+	 *                                for example, {@link java.math.BigInteger}
+	 */
+	public C maxValue() {
+		throw new NoSuchElementException();
+	}
+
+	/**
+	 * Returns the minimum value of type {@code C}, if it has one. The minimum value
+	 * is the unique value for which {@link Comparable#compareTo(Object)} never
+	 * returns a positive value for any input of type {@code C}.
+	 *
+	 * <p>
+	 * The default implementation throws {@code NoSuchElementException}.
+	 *
+	 * @return the minimum value of type {@code C}; never null
+	 * @throws NoSuchElementException if the type has no (practical) minimum value;
+	 *                                for example, {@link java.math.BigInteger}
+	 */
+	public C minValue() {
+		throw new NoSuchElementException();
 	}
 
 	/**
@@ -223,53 +271,5 @@ public abstract class DiscreteDomain<C extends Comparable> {
 	 *         {@code value} is {@code minValue()}
 	 */
 	public abstract C previous(C value);
-
-	/**
-	 * Returns a signed value indicating how many nested invocations of
-	 * {@link #next} (if positive) or {@link #previous} (if negative) are needed to
-	 * reach {@code end} starting from {@code start}. For example, if {@code end =
-	 * next(next(next(start)))}, then {@code distance(start, end) == 3} and {@code
-	 * distance(end, start) == -3}. As well, {@code distance(a, a)} is always zero.
-	 *
-	 * <p>
-	 * Note that this function is necessarily well-defined for any discrete type.
-	 *
-	 * @return the distance as described above, or {@link Long#MIN_VALUE} or
-	 *         {@link Long#MAX_VALUE} if the distance is too small or too large,
-	 *         respectively.
-	 */
-	public abstract long distance(C start, C end);
-
-	/**
-	 * Returns the minimum value of type {@code C}, if it has one. The minimum value
-	 * is the unique value for which {@link Comparable#compareTo(Object)} never
-	 * returns a positive value for any input of type {@code C}.
-	 *
-	 * <p>
-	 * The default implementation throws {@code NoSuchElementException}.
-	 *
-	 * @return the minimum value of type {@code C}; never null
-	 * @throws NoSuchElementException if the type has no (practical) minimum value;
-	 *                                for example, {@link java.math.BigInteger}
-	 */
-	public C minValue() {
-		throw new NoSuchElementException();
-	}
-
-	/**
-	 * Returns the maximum value of type {@code C}, if it has one. The maximum value
-	 * is the unique value for which {@link Comparable#compareTo(Object)} never
-	 * returns a negative value for any input of type {@code C}.
-	 *
-	 * <p>
-	 * The default implementation throws {@code NoSuchElementException}.
-	 *
-	 * @return the maximum value of type {@code C}; never null
-	 * @throws NoSuchElementException if the type has no (practical) maximum value;
-	 *                                for example, {@link java.math.BigInteger}
-	 */
-	public C maxValue() {
-		throw new NoSuchElementException();
-	}
 
 }

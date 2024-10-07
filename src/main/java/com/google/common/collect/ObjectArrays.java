@@ -36,45 +36,31 @@ import com.google.common.annotations.GwtIncompatible;
 public final class ObjectArrays {
 	static final Object[] EMPTY_ARRAY = new Object[0];
 
-	private ObjectArrays() {
+	/** GWT safe version of Arrays.copyOf. */
+	static <T> T[] arraysCopyOf(T[] original, int newLength) {
+		T[] copy = newArray(original, newLength);
+		System.arraycopy(original, 0, copy, 0, Math.min(original.length, newLength));
+		return copy;
 	}
 
-	/**
-	 * Returns a new array of the given length with the specified component type.
-	 *
-	 * @param type   the component type
-	 * @param length the length of the new array
-	 */
-	@GwtIncompatible("Array.newInstance(Class, int)")
-	@SuppressWarnings("unchecked")
-	public static <T> T[] newArray(Class<T> type, int length) {
-		return (T[]) Array.newInstance(type, length);
+	// We do this instead of Preconditions.checkNotNull to save boxing and array
+	// creation cost.
+	static Object checkElementNotNull(Object element, int index) {
+		if (element == null) {
+			throw new NullPointerException("at index " + index);
+		}
+		return element;
 	}
 
-	/**
-	 * Returns a new array of the given length with the same type as a reference
-	 * array.
-	 *
-	 * @param reference any array of the desired type
-	 * @param length    the length of the new array
-	 */
-	public static <T> T[] newArray(T[] reference, int length) {
-		return Platform.newArray(reference, length);
+	static Object[] checkElementsNotNull(Object... array) {
+		return checkElementsNotNull(array, array.length);
 	}
 
-	/**
-	 * Returns a new array that contains the concatenated contents of two arrays.
-	 *
-	 * @param first  the first array of elements to concatenate
-	 * @param second the second array of elements to concatenate
-	 * @param type   the component type of the returned array
-	 */
-	@GwtIncompatible("Array.newInstance(Class, int)")
-	public static <T> T[] concat(T[] first, T[] second, Class<T> type) {
-		T[] result = newArray(type, first.length + second.length);
-		System.arraycopy(first, 0, result, 0, first.length);
-		System.arraycopy(second, 0, result, first.length, second.length);
-		return result;
+	static Object[] checkElementsNotNull(Object[] array, int length) {
+		for (int i = 0; i < length; i++) {
+			checkElementNotNull(array[i], i);
+		}
+		return array;
 	}
 
 	/**
@@ -108,11 +94,93 @@ public final class ObjectArrays {
 		return result;
 	}
 
-	/** GWT safe version of Arrays.copyOf. */
-	static <T> T[] arraysCopyOf(T[] original, int newLength) {
-		T[] copy = newArray(original, newLength);
-		System.arraycopy(original, 0, copy, 0, Math.min(original.length, newLength));
-		return copy;
+	/**
+	 * Returns a new array that contains the concatenated contents of two arrays.
+	 *
+	 * @param first  the first array of elements to concatenate
+	 * @param second the second array of elements to concatenate
+	 * @param type   the component type of the returned array
+	 */
+	@GwtIncompatible("Array.newInstance(Class, int)")
+	public static <T> T[] concat(T[] first, T[] second, Class<T> type) {
+		T[] result = newArray(type, first.length + second.length);
+		System.arraycopy(first, 0, result, 0, first.length);
+		System.arraycopy(second, 0, result, first.length, second.length);
+		return result;
+	}
+
+	/**
+	 * Returns a copy of the specified subrange of the specified array that is
+	 * literally an Object[], and not e.g. a {@code String[]}.
+	 */
+	static Object[] copyAsObjectArray(Object[] elements, int offset, int length) {
+		checkPositionIndexes(offset, offset + length, elements.length);
+		if (length == 0) {
+			return EMPTY_ARRAY;
+		}
+		Object[] result = new Object[length];
+		System.arraycopy(elements, offset, result, 0, length);
+		return result;
+	}
+
+	private static Object[] fillArray(Iterable<?> elements, Object[] array) {
+		int i = 0;
+		for (Object element : elements) {
+			array[i++] = element;
+		}
+		return array;
+	}
+
+	/**
+	 * Returns a new array of the given length with the specified component type.
+	 *
+	 * @param type   the component type
+	 * @param length the length of the new array
+	 */
+	@GwtIncompatible("Array.newInstance(Class, int)")
+	@SuppressWarnings("unchecked")
+	public static <T> T[] newArray(Class<T> type, int length) {
+		return (T[]) Array.newInstance(type, length);
+	}
+
+	/**
+	 * Returns a new array of the given length with the same type as a reference
+	 * array.
+	 *
+	 * @param reference any array of the desired type
+	 * @param length    the length of the new array
+	 */
+	public static <T> T[] newArray(T[] reference, int length) {
+		return Platform.newArray(reference, length);
+	}
+
+	/**
+	 * Swaps {@code array[i]} with {@code array[j]}.
+	 */
+	static void swap(Object[] array, int i, int j) {
+		Object temp = array[i];
+		array[i] = array[j];
+		array[j] = temp;
+	}
+
+	/**
+	 * Returns an array containing all of the elements in the specified collection.
+	 * This method returns the elements in the order they are returned by the
+	 * collection's iterator. The returned array is "safe" in that no references to
+	 * it are maintained by the collection. The caller is thus free to modify the
+	 * returned array.
+	 *
+	 * <p>
+	 * This method assumes that the collection size doesn't change while the method
+	 * is running.
+	 *
+	 * <p>
+	 * TODO(kevinb): support concurrently modified collections?
+	 *
+	 * @param c the collection for which to return an array of elements
+	 */
+	static Object[] toArrayImpl(Collection<?> c) {
+		return fillArray(c, new Object[c.size()]);
 	}
 
 	/**
@@ -179,74 +247,6 @@ public final class ObjectArrays {
 		return dst;
 	}
 
-	/**
-	 * Returns an array containing all of the elements in the specified collection.
-	 * This method returns the elements in the order they are returned by the
-	 * collection's iterator. The returned array is "safe" in that no references to
-	 * it are maintained by the collection. The caller is thus free to modify the
-	 * returned array.
-	 *
-	 * <p>
-	 * This method assumes that the collection size doesn't change while the method
-	 * is running.
-	 *
-	 * <p>
-	 * TODO(kevinb): support concurrently modified collections?
-	 *
-	 * @param c the collection for which to return an array of elements
-	 */
-	static Object[] toArrayImpl(Collection<?> c) {
-		return fillArray(c, new Object[c.size()]);
-	}
-
-	/**
-	 * Returns a copy of the specified subrange of the specified array that is
-	 * literally an Object[], and not e.g. a {@code String[]}.
-	 */
-	static Object[] copyAsObjectArray(Object[] elements, int offset, int length) {
-		checkPositionIndexes(offset, offset + length, elements.length);
-		if (length == 0) {
-			return EMPTY_ARRAY;
-		}
-		Object[] result = new Object[length];
-		System.arraycopy(elements, offset, result, 0, length);
-		return result;
-	}
-
-	private static Object[] fillArray(Iterable<?> elements, Object[] array) {
-		int i = 0;
-		for (Object element : elements) {
-			array[i++] = element;
-		}
-		return array;
-	}
-
-	/**
-	 * Swaps {@code array[i]} with {@code array[j]}.
-	 */
-	static void swap(Object[] array, int i, int j) {
-		Object temp = array[i];
-		array[i] = array[j];
-		array[j] = temp;
-	}
-
-	static Object[] checkElementsNotNull(Object... array) {
-		return checkElementsNotNull(array, array.length);
-	}
-
-	static Object[] checkElementsNotNull(Object[] array, int length) {
-		for (int i = 0; i < length; i++) {
-			checkElementNotNull(array[i], i);
-		}
-		return array;
-	}
-
-	// We do this instead of Preconditions.checkNotNull to save boxing and array
-	// creation cost.
-	static Object checkElementNotNull(Object element, int index) {
-		if (element == null) {
-			throw new NullPointerException("at index " + index);
-		}
-		return element;
+	private ObjectArrays() {
 	}
 }

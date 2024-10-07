@@ -34,32 +34,62 @@ import javax.annotation.Nullable;
  */
 abstract class AbstractNavigableMap<K, V> extends AbstractMap<K, V> implements NavigableMap<K, V> {
 
+	private final class DescendingMap extends Maps.DescendingMap<K, V> {
+		@Override
+		Iterator<Entry<K, V>> entryIterator() {
+			return descendingEntryIterator();
+		}
+
+		@Override
+		NavigableMap<K, V> forward() {
+			return AbstractNavigableMap.this;
+		}
+	}
+
 	@Override
 	@Nullable
-	public abstract V get(@Nullable Object key);
+	public Entry<K, V> ceilingEntry(K key) {
+		return tailMap(key, true).firstEntry();
+	}
+
+	@Override
+	public K ceilingKey(K key) {
+		return Maps.keyOrNull(ceilingEntry(key));
+	}
+
+	abstract Iterator<Entry<K, V>> descendingEntryIterator();
+
+	@Override
+	public NavigableSet<K> descendingKeySet() {
+		return descendingMap().navigableKeySet();
+	}
+
+	@Override
+	public NavigableMap<K, V> descendingMap() {
+		return new DescendingMap();
+	}
+
+	abstract Iterator<Entry<K, V>> entryIterator();
+
+	@Override
+	public Set<Entry<K, V>> entrySet() {
+		return new Maps.EntrySet<K, V>() {
+			@Override
+			public Iterator<Entry<K, V>> iterator() {
+				return entryIterator();
+			}
+
+			@Override
+			Map<K, V> map() {
+				return AbstractNavigableMap.this;
+			}
+		};
+	}
 
 	@Override
 	@Nullable
 	public Entry<K, V> firstEntry() {
 		return Iterators.getNext(entryIterator(), null);
-	}
-
-	@Override
-	@Nullable
-	public Entry<K, V> lastEntry() {
-		return Iterators.getNext(descendingEntryIterator(), null);
-	}
-
-	@Override
-	@Nullable
-	public Entry<K, V> pollFirstEntry() {
-		return Iterators.pollNext(entryIterator());
-	}
-
-	@Override
-	@Nullable
-	public Entry<K, V> pollLastEntry() {
-		return Iterators.pollNext(descendingEntryIterator());
 	}
 
 	@Override
@@ -70,6 +100,48 @@ abstract class AbstractNavigableMap<K, V> extends AbstractMap<K, V> implements N
 		} else {
 			return entry.getKey();
 		}
+	}
+
+	@Override
+	@Nullable
+	public Entry<K, V> floorEntry(K key) {
+		return headMap(key, true).lastEntry();
+	}
+
+	@Override
+	public K floorKey(K key) {
+		return Maps.keyOrNull(floorEntry(key));
+	}
+
+	@Override
+	@Nullable
+	public abstract V get(@Nullable Object key);
+
+	@Override
+	public SortedMap<K, V> headMap(K toKey) {
+		return headMap(toKey, false);
+	}
+
+	@Override
+	@Nullable
+	public Entry<K, V> higherEntry(K key) {
+		return tailMap(key, false).firstEntry();
+	}
+
+	@Override
+	public K higherKey(K key) {
+		return Maps.keyOrNull(higherEntry(key));
+	}
+
+	@Override
+	public Set<K> keySet() {
+		return navigableKeySet();
+	}
+
+	@Override
+	@Nullable
+	public Entry<K, V> lastEntry() {
+		return Iterators.getNext(descendingEntryIterator(), null);
 	}
 
 	@Override
@@ -89,60 +161,8 @@ abstract class AbstractNavigableMap<K, V> extends AbstractMap<K, V> implements N
 	}
 
 	@Override
-	@Nullable
-	public Entry<K, V> floorEntry(K key) {
-		return headMap(key, true).lastEntry();
-	}
-
-	@Override
-	@Nullable
-	public Entry<K, V> ceilingEntry(K key) {
-		return tailMap(key, true).firstEntry();
-	}
-
-	@Override
-	@Nullable
-	public Entry<K, V> higherEntry(K key) {
-		return tailMap(key, false).firstEntry();
-	}
-
-	@Override
 	public K lowerKey(K key) {
 		return Maps.keyOrNull(lowerEntry(key));
-	}
-
-	@Override
-	public K floorKey(K key) {
-		return Maps.keyOrNull(floorEntry(key));
-	}
-
-	@Override
-	public K ceilingKey(K key) {
-		return Maps.keyOrNull(ceilingEntry(key));
-	}
-
-	@Override
-	public K higherKey(K key) {
-		return Maps.keyOrNull(higherEntry(key));
-	}
-
-	abstract Iterator<Entry<K, V>> entryIterator();
-
-	abstract Iterator<Entry<K, V>> descendingEntryIterator();
-
-	@Override
-	public SortedMap<K, V> subMap(K fromKey, K toKey) {
-		return subMap(fromKey, true, toKey, false);
-	}
-
-	@Override
-	public SortedMap<K, V> headMap(K toKey) {
-		return headMap(toKey, false);
-	}
-
-	@Override
-	public SortedMap<K, V> tailMap(K fromKey) {
-		return tailMap(fromKey, true);
 	}
 
 	@Override
@@ -151,48 +171,28 @@ abstract class AbstractNavigableMap<K, V> extends AbstractMap<K, V> implements N
 	}
 
 	@Override
-	public Set<K> keySet() {
-		return navigableKeySet();
+	@Nullable
+	public Entry<K, V> pollFirstEntry() {
+		return Iterators.pollNext(entryIterator());
+	}
+
+	@Override
+	@Nullable
+	public Entry<K, V> pollLastEntry() {
+		return Iterators.pollNext(descendingEntryIterator());
 	}
 
 	@Override
 	public abstract int size();
 
 	@Override
-	public Set<Entry<K, V>> entrySet() {
-		return new Maps.EntrySet<K, V>() {
-			@Override
-			Map<K, V> map() {
-				return AbstractNavigableMap.this;
-			}
-
-			@Override
-			public Iterator<Entry<K, V>> iterator() {
-				return entryIterator();
-			}
-		};
+	public SortedMap<K, V> subMap(K fromKey, K toKey) {
+		return subMap(fromKey, true, toKey, false);
 	}
 
 	@Override
-	public NavigableSet<K> descendingKeySet() {
-		return descendingMap().navigableKeySet();
-	}
-
-	@Override
-	public NavigableMap<K, V> descendingMap() {
-		return new DescendingMap();
-	}
-
-	private final class DescendingMap extends Maps.DescendingMap<K, V> {
-		@Override
-		NavigableMap<K, V> forward() {
-			return AbstractNavigableMap.this;
-		}
-
-		@Override
-		Iterator<Entry<K, V>> entryIterator() {
-			return descendingEntryIterator();
-		}
+	public SortedMap<K, V> tailMap(K fromKey) {
+		return tailMap(fromKey, true);
 	}
 
 }

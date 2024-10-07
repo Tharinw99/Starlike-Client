@@ -41,6 +41,8 @@ abstract class AbstractSortedMultiset<E> extends AbstractMultiset<E> implements 
 	@GwtTransient
 	final Comparator<? super E> comparator;
 
+	private transient SortedMultiset<E> descendingMultiset;
+
 	// needed for serialization
 	@SuppressWarnings("unchecked")
 	AbstractSortedMultiset() {
@@ -52,8 +54,27 @@ abstract class AbstractSortedMultiset<E> extends AbstractMultiset<E> implements 
 	}
 
 	@Override
-	public NavigableSet<E> elementSet() {
-		return (NavigableSet<E>) super.elementSet();
+	public Comparator<? super E> comparator() {
+		return comparator;
+	}
+
+	SortedMultiset<E> createDescendingMultiset() {
+		return new DescendingMultiset<E>() {
+			@Override
+			Iterator<Entry<E>> entryIterator() {
+				return descendingEntryIterator();
+			}
+
+			@Override
+			SortedMultiset<E> forwardMultiset() {
+				return AbstractSortedMultiset.this;
+			}
+
+			@Override
+			public Iterator<E> iterator() {
+				return descendingIterator();
+			}
+		};
 	}
 
 	@Override
@@ -61,9 +82,21 @@ abstract class AbstractSortedMultiset<E> extends AbstractMultiset<E> implements 
 		return new SortedMultisets.NavigableElementSet<E>(this);
 	}
 
+	abstract Iterator<Entry<E>> descendingEntryIterator();
+
+	Iterator<E> descendingIterator() {
+		return Multisets.iteratorImpl(descendingMultiset());
+	}
+
 	@Override
-	public Comparator<? super E> comparator() {
-		return comparator;
+	public SortedMultiset<E> descendingMultiset() {
+		SortedMultiset<E> result = descendingMultiset;
+		return (result == null) ? descendingMultiset = createDescendingMultiset() : result;
+	}
+
+	@Override
+	public NavigableSet<E> elementSet() {
+		return (NavigableSet<E>) super.elementSet();
 	}
 
 	@Override
@@ -110,38 +143,5 @@ abstract class AbstractSortedMultiset<E> extends AbstractMultiset<E> implements 
 		checkNotNull(fromBoundType);
 		checkNotNull(toBoundType);
 		return tailMultiset(fromElement, fromBoundType).headMultiset(toElement, toBoundType);
-	}
-
-	abstract Iterator<Entry<E>> descendingEntryIterator();
-
-	Iterator<E> descendingIterator() {
-		return Multisets.iteratorImpl(descendingMultiset());
-	}
-
-	private transient SortedMultiset<E> descendingMultiset;
-
-	@Override
-	public SortedMultiset<E> descendingMultiset() {
-		SortedMultiset<E> result = descendingMultiset;
-		return (result == null) ? descendingMultiset = createDescendingMultiset() : result;
-	}
-
-	SortedMultiset<E> createDescendingMultiset() {
-		return new DescendingMultiset<E>() {
-			@Override
-			SortedMultiset<E> forwardMultiset() {
-				return AbstractSortedMultiset.this;
-			}
-
-			@Override
-			Iterator<Entry<E>> entryIterator() {
-				return descendingEntryIterator();
-			}
-
-			@Override
-			public Iterator<E> iterator() {
-				return descendingIterator();
-			}
-		};
 	}
 }

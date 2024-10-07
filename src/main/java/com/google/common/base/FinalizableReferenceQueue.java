@@ -137,97 +137,83 @@ public class FinalizableReferenceQueue implements Closeable {
 	 * directly in the application class loader.
 	 */
 
-	private static final Logger logger = Logger.getLogger(FinalizableReferenceQueue.class.getName());
-
-	private static final String FINALIZER_CLASS_NAME = "com.google.common.base.internal.Finalizer";
-
-	/** Reference to Finalizer.startFinalizer(). */
-	private static final Method startFinalizer;
-	static {
-		Class<?> finalizer = loadFinalizer(new SystemLoader(), new DecoupledLoader(), new DirectLoader());
-		startFinalizer = getStartFinalizer(finalizer);
-	}
-
 	/**
-	 * The actual reference queue that our background thread will poll.
+	 * Try to load Finalizer in its own class loader. If Finalizer's thread had a
+	 * direct reference to our class loader (which could be that of a dynamically
+	 * loaded web application or OSGi bundle), it would prevent our class loader
+	 * from getting garbage collected.
 	 */
-	final ReferenceQueue<Object> queue;
+	static class DecoupledLoader implements FinalizerLoader {
+		private static final String LOADING_ERROR = "Could not load Finalizer in its own class loader."
+				+ "Loading Finalizer in the current class loader instead. As a result, you will not be able"
+				+ "to garbage collect this class loader. To support reclaiming this class loader, either"
+				+ "resolve the underlying issue, or move Google Collections to your system class path.";
 
-	final PhantomReference<Object> frqRef;
+		/**
+		 * Gets URL for base of path containing Finalizer.class.
+		 */
+		URL getBaseUrl() throws IOException {
+			// Find URL pointing to Finalizer.class file.
+			String finalizerPath = FINALIZER_CLASS_NAME.replace('.', '/') + ".class";
+			URL finalizerUrl = getClass().getClassLoader().getResource(finalizerPath);
+			if (finalizerUrl == null) {
+				throw new FileNotFoundException(finalizerPath);
+			}
 
-	/**
-	 * Whether or not the background thread started successfully.
-	 */
-	final boolean threadStarted;
-
-	/**
-	 * Constructs a new queue.
-	 */
-	public FinalizableReferenceQueue() {
-		// We could start the finalizer lazily, but I'd rather it blow up early.
-		queue = new ReferenceQueue<Object>();
-		frqRef = new PhantomReference<Object>(this, queue);
-		boolean threadStarted = false;
-		try {
-			startFinalizer.invoke(null, FinalizableReference.class, queue, frqRef);
-			threadStarted = true;
-		} catch (IllegalAccessException impossible) {
-			throw new AssertionError(impossible); // startFinalizer() is public
-		} catch (Throwable t) {
-			logger.log(Level.INFO, "Failed to start reference finalizer thread."
-					+ " Reference cleanup will only occur when new references are created.", t);
+			// Find URL pointing to base of class path.
+			String urlString = finalizerUrl.toString();
+			if (!urlString.endsWith(finalizerPath)) {
+				throw new IOException("Unsupported path style: " + urlString);
+			}
+			urlString = urlString.substring(0, urlString.length() - finalizerPath.length());
+			return new URL(finalizerUrl, urlString);
 		}
 
-		this.threadStarted = threadStarted;
-	}
-
-	@Override
-	public void close() {
-		frqRef.enqueue();
-		cleanUp();
-	}
-
-	/**
-	 * Repeatedly dequeues references from the queue and invokes
-	 * {@link FinalizableReference#finalizeReferent()} on them until the queue is
-	 * empty. This method is a no-op if the background thread was created
-	 * successfully.
-	 */
-	void cleanUp() {
-		if (threadStarted) {
-			return;
-		}
-
-		Reference<?> reference;
-		while ((reference = queue.poll()) != null) {
-			/*
-			 * This is for the benefit of phantom references. Weak and soft references will
-			 * have already been cleared by this point.
-			 */
-			reference.clear();
+		@Override
+		public Class<?> loadFinalizer() {
 			try {
-				((FinalizableReference) reference).finalizeReferent();
-			} catch (Throwable t) {
-				logger.log(Level.SEVERE, "Error cleaning up after reference.", t);
+				/*
+				 * We use URLClassLoader because it's the only concrete class loader
+				 * implementation in the JDK. If we used our own ClassLoader subclass, Finalizer
+				 * would indirectly reference this class loader:
+				 *
+				 * Finalizer.class -> CustomClassLoader -> CustomClassLoader.class -> This class
+				 * loader
+				 *
+				 * System class loader will (and must) be the parent.
+				 */
+				ClassLoader finalizerLoader = newLoader(getBaseUrl());
+				return finalizerLoader.loadClass(FINALIZER_CLASS_NAME);
+			} catch (Exception e) {
+				logger.log(Level.WARNING, LOADING_ERROR, e);
+				return null;
 			}
+		}
+
+		/** Creates a class loader with the given base URL as its classpath. */
+		URLClassLoader newLoader(URL base) {
+			// We use the bootstrap class loader as the parent because Finalizer by design
+			// uses
+			// only standard Java classes. That also means that
+			// FinalizableReferenceQueueTest
+			// doesn't pick up the wrong version of the Finalizer class.
+			return new URLClassLoader(new URL[] { base }, null);
 		}
 	}
 
 	/**
-	 * Iterates through the given loaders until it finds one that can load
-	 * Finalizer.
-	 *
-	 * @return Finalizer.class
+	 * Loads Finalizer directly using the current class loader. We won't be able to
+	 * garbage collect this class loader, but at least the world doesn't end.
 	 */
-	private static Class<?> loadFinalizer(FinalizerLoader... loaders) {
-		for (FinalizerLoader loader : loaders) {
-			Class<?> finalizer = loader.loadFinalizer();
-			if (finalizer != null) {
-				return finalizer;
+	static class DirectLoader implements FinalizerLoader {
+		@Override
+		public Class<?> loadFinalizer() {
+			try {
+				return Class.forName(FINALIZER_CLASS_NAME);
+			} catch (ClassNotFoundException e) {
+				throw new AssertionError(e);
 			}
 		}
-
-		throw new AssertionError();
 	}
 
 	/**
@@ -279,83 +265,16 @@ public class FinalizableReferenceQueue implements Closeable {
 		}
 	}
 
-	/**
-	 * Try to load Finalizer in its own class loader. If Finalizer's thread had a
-	 * direct reference to our class loader (which could be that of a dynamically
-	 * loaded web application or OSGi bundle), it would prevent our class loader
-	 * from getting garbage collected.
-	 */
-	static class DecoupledLoader implements FinalizerLoader {
-		private static final String LOADING_ERROR = "Could not load Finalizer in its own class loader."
-				+ "Loading Finalizer in the current class loader instead. As a result, you will not be able"
-				+ "to garbage collect this class loader. To support reclaiming this class loader, either"
-				+ "resolve the underlying issue, or move Google Collections to your system class path.";
+	private static final Logger logger = Logger.getLogger(FinalizableReferenceQueue.class.getName());
 
-		@Override
-		public Class<?> loadFinalizer() {
-			try {
-				/*
-				 * We use URLClassLoader because it's the only concrete class loader
-				 * implementation in the JDK. If we used our own ClassLoader subclass, Finalizer
-				 * would indirectly reference this class loader:
-				 *
-				 * Finalizer.class -> CustomClassLoader -> CustomClassLoader.class -> This class
-				 * loader
-				 *
-				 * System class loader will (and must) be the parent.
-				 */
-				ClassLoader finalizerLoader = newLoader(getBaseUrl());
-				return finalizerLoader.loadClass(FINALIZER_CLASS_NAME);
-			} catch (Exception e) {
-				logger.log(Level.WARNING, LOADING_ERROR, e);
-				return null;
-			}
-		}
+	private static final String FINALIZER_CLASS_NAME = "com.google.common.base.internal.Finalizer";
 
-		/**
-		 * Gets URL for base of path containing Finalizer.class.
-		 */
-		URL getBaseUrl() throws IOException {
-			// Find URL pointing to Finalizer.class file.
-			String finalizerPath = FINALIZER_CLASS_NAME.replace('.', '/') + ".class";
-			URL finalizerUrl = getClass().getClassLoader().getResource(finalizerPath);
-			if (finalizerUrl == null) {
-				throw new FileNotFoundException(finalizerPath);
-			}
+	/** Reference to Finalizer.startFinalizer(). */
+	private static final Method startFinalizer;
 
-			// Find URL pointing to base of class path.
-			String urlString = finalizerUrl.toString();
-			if (!urlString.endsWith(finalizerPath)) {
-				throw new IOException("Unsupported path style: " + urlString);
-			}
-			urlString = urlString.substring(0, urlString.length() - finalizerPath.length());
-			return new URL(finalizerUrl, urlString);
-		}
-
-		/** Creates a class loader with the given base URL as its classpath. */
-		URLClassLoader newLoader(URL base) {
-			// We use the bootstrap class loader as the parent because Finalizer by design
-			// uses
-			// only standard Java classes. That also means that
-			// FinalizableReferenceQueueTest
-			// doesn't pick up the wrong version of the Finalizer class.
-			return new URLClassLoader(new URL[] { base }, null);
-		}
-	}
-
-	/**
-	 * Loads Finalizer directly using the current class loader. We won't be able to
-	 * garbage collect this class loader, but at least the world doesn't end.
-	 */
-	static class DirectLoader implements FinalizerLoader {
-		@Override
-		public Class<?> loadFinalizer() {
-			try {
-				return Class.forName(FINALIZER_CLASS_NAME);
-			} catch (ClassNotFoundException e) {
-				throw new AssertionError(e);
-			}
-		}
+	static {
+		Class<?> finalizer = loadFinalizer(new SystemLoader(), new DecoupledLoader(), new DirectLoader());
+		startFinalizer = getStartFinalizer(finalizer);
 	}
 
 	/**
@@ -367,5 +286,87 @@ public class FinalizableReferenceQueue implements Closeable {
 		} catch (NoSuchMethodException e) {
 			throw new AssertionError(e);
 		}
+	}
+
+	/**
+	 * Iterates through the given loaders until it finds one that can load
+	 * Finalizer.
+	 *
+	 * @return Finalizer.class
+	 */
+	private static Class<?> loadFinalizer(FinalizerLoader... loaders) {
+		for (FinalizerLoader loader : loaders) {
+			Class<?> finalizer = loader.loadFinalizer();
+			if (finalizer != null) {
+				return finalizer;
+			}
+		}
+
+		throw new AssertionError();
+	}
+
+	/**
+	 * The actual reference queue that our background thread will poll.
+	 */
+	final ReferenceQueue<Object> queue;
+
+	final PhantomReference<Object> frqRef;
+
+	/**
+	 * Whether or not the background thread started successfully.
+	 */
+	final boolean threadStarted;
+
+	/**
+	 * Constructs a new queue.
+	 */
+	public FinalizableReferenceQueue() {
+		// We could start the finalizer lazily, but I'd rather it blow up early.
+		queue = new ReferenceQueue<Object>();
+		frqRef = new PhantomReference<Object>(this, queue);
+		boolean threadStarted = false;
+		try {
+			startFinalizer.invoke(null, FinalizableReference.class, queue, frqRef);
+			threadStarted = true;
+		} catch (IllegalAccessException impossible) {
+			throw new AssertionError(impossible); // startFinalizer() is public
+		} catch (Throwable t) {
+			logger.log(Level.INFO, "Failed to start reference finalizer thread."
+					+ " Reference cleanup will only occur when new references are created.", t);
+		}
+
+		this.threadStarted = threadStarted;
+	}
+
+	/**
+	 * Repeatedly dequeues references from the queue and invokes
+	 * {@link FinalizableReference#finalizeReferent()} on them until the queue is
+	 * empty. This method is a no-op if the background thread was created
+	 * successfully.
+	 */
+	void cleanUp() {
+		if (threadStarted) {
+			return;
+		}
+
+		Reference<?> reference;
+		while ((reference = queue.poll()) != null) {
+			/*
+			 * This is for the benefit of phantom references. Weak and soft references will
+			 * have already been cleared by this point.
+			 */
+			reference.clear();
+			try {
+				((FinalizableReference) reference).finalizeReferent();
+			} catch (Throwable t) {
+				logger.log(Level.SEVERE, "Error cleaning up after reference.", t);
+			}
+		}
+	}
+
+	@Override
+	public void close() {
+		frqRef.enqueue();
+		cleanUp();
 	}
 }

@@ -9,51 +9,74 @@ import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.border.WorldBorder;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class CommandWorldBorder extends CommandBase {
 
-	/**+
-	 * Gets the name of the command
+	/**
+	 * + Return a list of options when the user types TAB
+	 */
+	public List<String> addTabCompletionOptions(ICommandSender var1, String[] astring, BlockPos blockpos) {
+		return astring.length == 1
+				? getListOfStringsMatchingLastWord(astring,
+						new String[] { "set", "center", "damage", "warning", "add", "get" })
+				: (astring.length == 2 && astring[0].equals("damage")
+						? getListOfStringsMatchingLastWord(astring, new String[] { "buffer", "amount" })
+						: (astring.length >= 2 && astring.length <= 3 && astring[0].equals("center")
+								? func_181043_b(astring, 1, blockpos)
+								: (astring.length == 2 && astring[0].equals("warning")
+										? getListOfStringsMatchingLastWord(astring, new String[] { "time", "distance" })
+										: null)));
+	}
+
+	/**
+	 * + Gets the name of the command
 	 */
 	public String getCommandName() {
 		return "worldborder";
 	}
 
-	/**+
-	 * Return the required permission level for this command.
-	 */
-	public int getRequiredPermissionLevel() {
-		return 2;
-	}
-
-	/**+
-	 * Gets the usage string for the command.
+	/**
+	 * + Gets the usage string for the command.
 	 */
 	public String getCommandUsage(ICommandSender var1) {
 		return "commands.worldborder.usage";
 	}
 
-	/**+
-	 * Callback when the command is invoked
+	/**
+	 * + Return the required permission level for this command.
+	 */
+	public int getRequiredPermissionLevel() {
+		return 2;
+	}
+
+	protected WorldBorder getWorldBorder() {
+		return MinecraftServer.getServer().worldServers[0].getWorldBorder();
+	}
+
+	/**
+	 * + Callback when the command is invoked
 	 */
 	public void processCommand(ICommandSender parICommandSender, String[] parArrayOfString) throws CommandException {
 		if (parArrayOfString.length < 1) {
@@ -194,25 +217,5 @@ public class CommandWorldBorder extends CommandBase {
 			}
 
 		}
-	}
-
-	protected WorldBorder getWorldBorder() {
-		return MinecraftServer.getServer().worldServers[0].getWorldBorder();
-	}
-
-	/**+
-	 * Return a list of options when the user types TAB
-	 */
-	public List<String> addTabCompletionOptions(ICommandSender var1, String[] astring, BlockPos blockpos) {
-		return astring.length == 1
-				? getListOfStringsMatchingLastWord(astring,
-						new String[] { "set", "center", "damage", "warning", "add", "get" })
-				: (astring.length == 2 && astring[0].equals("damage")
-						? getListOfStringsMatchingLastWord(astring, new String[] { "buffer", "amount" })
-						: (astring.length >= 2 && astring.length <= 3 && astring[0].equals("center")
-								? func_181043_b(astring, 1, blockpos)
-								: (astring.length == 2 && astring[0].equals("warning")
-										? getListOfStringsMatchingLastWord(astring, new String[] { "time", "distance" })
-										: null)));
 	}
 }

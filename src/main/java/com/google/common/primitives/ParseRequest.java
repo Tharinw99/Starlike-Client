@@ -21,14 +21,6 @@ import com.google.common.annotations.GwtCompatible;
  */
 @GwtCompatible
 final class ParseRequest {
-	final String rawValue;
-	final int radix;
-
-	private ParseRequest(String rawValue, int radix) {
-		this.rawValue = rawValue;
-		this.radix = radix;
-	}
-
 	static ParseRequest fromString(String stringValue) {
 		if (stringValue.length() == 0) {
 			throw new NumberFormatException("empty string");
@@ -53,5 +45,14 @@ final class ParseRequest {
 		}
 
 		return new ParseRequest(rawValue, radix);
+	}
+
+	final String rawValue;
+
+	final int radix;
+
+	private ParseRequest(String rawValue, int radix) {
+		this.rawValue = rawValue;
+		this.radix = radix;
 	}
 }

@@ -2,22 +2,25 @@ package net.minecraft.world.gen;
 
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -27,12 +30,23 @@ public class NoiseGeneratorSimplex {
 			{ 1, 0, 1 }, { -1, 0, 1 }, { 1, 0, -1 }, { -1, 0, -1 }, { 0, 1, 1 }, { 0, -1, 1 }, { 0, 1, -1 },
 			{ 0, -1, -1 } };
 	public static final double field_151614_a = Math.sqrt(3.0D);
-	private int[] field_151608_f;
-	public double field_151612_b;
-	public double field_151613_c;
-	public double field_151610_d;
 	private static final double field_151609_g = 0.5D * (field_151614_a - 1.0D);
 	private static final double field_151615_h = (3.0D - field_151614_a) / 6.0D;
+
+	private static double func_151604_a(int[] parArrayOfInt, double parDouble1, double parDouble2) {
+		return (double) parArrayOfInt[0] * parDouble1 + (double) parArrayOfInt[1] * parDouble2;
+	}
+
+	private static int func_151607_a(double parDouble1) {
+		return parDouble1 > 0.0D ? (int) parDouble1 : (int) parDouble1 - 1;
+	}
+
+	private int[] field_151608_f;
+	public double field_151612_b;
+
+	public double field_151613_c;
+
+	public double field_151610_d;
 
 	public NoiseGeneratorSimplex() {
 		this(new EaglercraftRandom());
@@ -56,14 +70,6 @@ public class NoiseGeneratorSimplex {
 			this.field_151608_f[l + 256] = this.field_151608_f[l];
 		}
 
-	}
-
-	private static int func_151607_a(double parDouble1) {
-		return parDouble1 > 0.0D ? (int) parDouble1 : (int) parDouble1 - 1;
-	}
-
-	private static double func_151604_a(int[] parArrayOfInt, double parDouble1, double parDouble2) {
-		return (double) parArrayOfInt[0] * parDouble1 + (double) parArrayOfInt[1] * parDouble2;
 	}
 
 	public double func_151605_a(double parDouble1, double parDouble2) {

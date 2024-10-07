@@ -10,22 +10,25 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -42,13 +45,42 @@ public class EntityEnderEye extends Entity {
 		this.setSize(0.25F, 0.25F);
 	}
 
+	public EntityEnderEye(World worldIn, double x, double y, double z) {
+		super(worldIn);
+		this.despawnTimer = 0;
+		this.setSize(0.25F, 0.25F);
+		this.setPosition(x, y, z);
+	}
+
+	/**
+	 * + If returns false, the item will not inflict any damage against entities.
+	 */
+	public boolean canAttackWithItem() {
+		return false;
+	}
+
 	protected void entityInit() {
 	}
 
-	/**+
-	 * Checks if the entity is in range to render by using the past
-	 * in distance and comparing it to its average edge length * 64
-	 * * renderDistanceWeight Args: distance
+	/**
+	 * + Gets how bright this entity is.
+	 */
+	public float getBrightness(float var1) {
+		return 1.0F;
+	}
+
+	public int getBrightnessForRender(float var1) {
+		return 15728880;
+	}
+
+	protected float getEaglerDynamicLightsValueSimple(float partialTicks) {
+		return 0.5f;
+	}
+
+	/**
+	 * + Checks if the entity is in range to render by using the past in distance
+	 * and comparing it to its average edge length * 64 * renderDistanceWeight Args:
+	 * distance
 	 */
 	public boolean isInRangeToRenderDist(double d0) {
 		double d1 = this.getEntityBoundingBox().getAverageEdgeLength() * 4.0D;
@@ -58,13 +90,6 @@ public class EntityEnderEye extends Entity {
 
 		d1 = d1 * 64.0D;
 		return d0 < d1 * d1;
-	}
-
-	public EntityEnderEye(World worldIn, double x, double y, double z) {
-		super(worldIn);
-		this.despawnTimer = 0;
-		this.setSize(0.25F, 0.25F);
-		this.setPosition(x, y, z);
 	}
 
 	public void moveTowards(BlockPos parBlockPos) {
@@ -88,25 +113,8 @@ public class EntityEnderEye extends Entity {
 		this.shatterOrDrop = this.rand.nextInt(5) > 0;
 	}
 
-	/**+
-	 * Sets the velocity to the args. Args: x, y, z
-	 */
-	public void setVelocity(double d0, double d1, double d2) {
-		this.motionX = d0;
-		this.motionY = d1;
-		this.motionZ = d2;
-		if (this.prevRotationPitch == 0.0F && this.prevRotationYaw == 0.0F) {
-			float f = MathHelper.sqrt_double(d0 * d0 + d2 * d2);
-			this.prevRotationYaw = this.rotationYaw = (float) (MathHelper.func_181159_b(d0, d2) * 180.0D
-					/ 3.1415927410125732D);
-			this.prevRotationPitch = this.rotationPitch = (float) (MathHelper.func_181159_b(d1, (double) f) * 180.0D
-					/ 3.1415927410125732D);
-		}
-
-	}
-
-	/**+
-	 * Called to update the entity's position/logic.
+	/**
+	 * + Called to update the entity's position/logic.
 	 */
 	public void onUpdate() {
 		this.lastTickPosX = this.posX;
@@ -191,29 +199,10 @@ public class EntityEnderEye extends Entity {
 
 	}
 
-	/**+
-	 * (abstract) Protected helper method to write subclass entity
-	 * data to NBT.
-	 */
-	public void writeEntityToNBT(NBTTagCompound var1) {
-	}
-
-	/**+
-	 * (abstract) Protected helper method to read subclass entity
-	 * data from NBT.
+	/**
+	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
 	public void readEntityFromNBT(NBTTagCompound var1) {
-	}
-
-	/**+
-	 * Gets how bright this entity is.
-	 */
-	public float getBrightness(float var1) {
-		return 1.0F;
-	}
-
-	protected float getEaglerDynamicLightsValueSimple(float partialTicks) {
-		return 0.5f;
 	}
 
 	protected void renderDynamicLightsEaglerAt(double entityX, double entityY, double entityZ, double renderX,
@@ -227,15 +216,26 @@ public class EntityEnderEye extends Entity {
 		}
 	}
 
-	public int getBrightnessForRender(float var1) {
-		return 15728880;
+	/**
+	 * + Sets the velocity to the args. Args: x, y, z
+	 */
+	public void setVelocity(double d0, double d1, double d2) {
+		this.motionX = d0;
+		this.motionY = d1;
+		this.motionZ = d2;
+		if (this.prevRotationPitch == 0.0F && this.prevRotationYaw == 0.0F) {
+			float f = MathHelper.sqrt_double(d0 * d0 + d2 * d2);
+			this.prevRotationYaw = this.rotationYaw = (float) (MathHelper.func_181159_b(d0, d2) * 180.0D
+					/ 3.1415927410125732D);
+			this.prevRotationPitch = this.rotationPitch = (float) (MathHelper.func_181159_b(d1, (double) f) * 180.0D
+					/ 3.1415927410125732D);
+		}
+
 	}
 
-	/**+
-	 * If returns false, the item will not inflict any damage
-	 * against entities.
+	/**
+	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
-	public boolean canAttackWithItem() {
-		return false;
+	public void writeEntityToNBT(NBTTagCompound var1) {
 	}
 }

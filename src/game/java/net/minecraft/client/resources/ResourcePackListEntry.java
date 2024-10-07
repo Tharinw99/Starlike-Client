@@ -16,22 +16,25 @@ import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ResourceLocation;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -128,7 +131,23 @@ public abstract class ResourcePackListEntry implements GuiListExtended.IGuiListE
 
 	}
 
-	protected abstract int func_183019_a();
+	protected boolean func_148307_h() {
+		List list = this.resourcePacksGUI.getListContaining(this);
+		int i = list.indexOf(this);
+		return i >= 0 && i < list.size() - 1 && ((ResourcePackListEntry) list.get(i + 1)).func_148310_d();
+	}
+
+	protected boolean func_148308_f() {
+		return this.resourcePacksGUI.hasResourcePackEntry(this);
+	}
+
+	protected boolean func_148309_e() {
+		return !this.resourcePacksGUI.hasResourcePackEntry(this);
+	}
+
+	protected boolean func_148310_d() {
+		return true;
+	}
 
 	protected abstract String func_148311_a();
 
@@ -136,64 +155,18 @@ public abstract class ResourcePackListEntry implements GuiListExtended.IGuiListE
 
 	protected abstract void func_148313_c();
 
-	protected abstract String getEaglerFolderName();
-
-	protected boolean func_148310_d() {
-		return true;
-	}
-
-	protected boolean func_148309_e() {
-		return !this.resourcePacksGUI.hasResourcePackEntry(this);
-	}
-
-	protected boolean func_148308_f() {
-		return this.resourcePacksGUI.hasResourcePackEntry(this);
-	}
-
 	protected boolean func_148314_g() {
 		List list = this.resourcePacksGUI.getListContaining(this);
 		int i = list.indexOf(this);
 		return i > 0 && ((ResourcePackListEntry) list.get(i - 1)).func_148310_d();
 	}
 
-	protected boolean func_148307_h() {
-		List list = this.resourcePacksGUI.getListContaining(this);
-		int i = list.indexOf(this);
-		return i >= 0 && i < list.size() - 1 && ((ResourcePackListEntry) list.get(i + 1)).func_148310_d();
-	}
+	protected abstract int func_183019_a();
 
-	private void proceedWithBs(int l, boolean deleteInstead) {
-		if (!deleteInstead && l != 1) {
-			String s1 = I18n.format("resourcePack.incompatible.confirm.title", new Object[0]);
-			String s = I18n.format("resourcePack.incompatible.confirm." + (l > 1 ? "new" : "old"), new Object[0]);
-			this.mc.displayGuiScreen(new GuiYesNo(new GuiYesNoCallback() {
-				public void confirmClicked(boolean flag, int var2) {
-					List list2 = ResourcePackListEntry.this.resourcePacksGUI
-							.getListContaining(ResourcePackListEntry.this);
-					ResourcePackListEntry.this.mc.displayGuiScreen(ResourcePackListEntry.this.resourcePacksGUI);
-					if (flag) {
-						list2.remove(ResourcePackListEntry.this);
-						ResourcePackListEntry.this.resourcePacksGUI.getSelectedResourcePacks().add(0,
-								ResourcePackListEntry.this);
-					}
+	protected abstract String getEaglerFolderName();
 
-				}
-			}, s1, s, 0).withOpaqueBackground());
-		} else {
-			this.mc.displayGuiScreen(this.resourcePacksGUI);
-			this.resourcePacksGUI.getListContaining(this).remove(this);
-			if (deleteInstead) {
-				this.mc.loadingScreen.eaglerShow(I18n.format("resourcePack.load.deleting"), this.func_148312_b());
-				EaglerFolderResourcePack.deleteResourcePack(EaglerFolderResourcePack.RESOURCE_PACKS,
-						this.getEaglerFolderName());
-			} else {
-				this.resourcePacksGUI.getSelectedResourcePacks().add(0, this);
-			}
-		}
-	}
-
-	/**+
-	 * Returns true if the mouse has been pressed on this control.
+	/**
+	 * + Returns true if the mouse has been pressed on this control.
 	 */
 	public boolean mousePressed(int var1, int var2, int var3, int var4, int i, int j) {
 		if (this.func_148310_d() && i <= 32) {
@@ -246,13 +219,43 @@ public abstract class ResourcePackListEntry implements GuiListExtended.IGuiListE
 		return false;
 	}
 
-	public void setSelected(int var1, int var2, int var3) {
-	}
-
-	/**+
-	 * Fired when the mouse button is released. Arguments: index, x,
-	 * y, mouseEvent, relativeX, relativeY
+	/**
+	 * + Fired when the mouse button is released. Arguments: index, x, y,
+	 * mouseEvent, relativeX, relativeY
 	 */
 	public void mouseReleased(int var1, int var2, int var3, int var4, int var5, int var6) {
+	}
+
+	private void proceedWithBs(int l, boolean deleteInstead) {
+		if (!deleteInstead && l != 1) {
+			String s1 = I18n.format("resourcePack.incompatible.confirm.title", new Object[0]);
+			String s = I18n.format("resourcePack.incompatible.confirm." + (l > 1 ? "new" : "old"), new Object[0]);
+			this.mc.displayGuiScreen(new GuiYesNo(new GuiYesNoCallback() {
+				public void confirmClicked(boolean flag, int var2) {
+					List list2 = ResourcePackListEntry.this.resourcePacksGUI
+							.getListContaining(ResourcePackListEntry.this);
+					ResourcePackListEntry.this.mc.displayGuiScreen(ResourcePackListEntry.this.resourcePacksGUI);
+					if (flag) {
+						list2.remove(ResourcePackListEntry.this);
+						ResourcePackListEntry.this.resourcePacksGUI.getSelectedResourcePacks().add(0,
+								ResourcePackListEntry.this);
+					}
+
+				}
+			}, s1, s, 0).withOpaqueBackground());
+		} else {
+			this.mc.displayGuiScreen(this.resourcePacksGUI);
+			this.resourcePacksGUI.getListContaining(this).remove(this);
+			if (deleteInstead) {
+				this.mc.loadingScreen.eaglerShow(I18n.format("resourcePack.load.deleting"), this.func_148312_b());
+				EaglerFolderResourcePack.deleteResourcePack(EaglerFolderResourcePack.RESOURCE_PACKS,
+						this.getEaglerFolderName());
+			} else {
+				this.resourcePacksGUI.getSelectedResourcePacks().add(0, this);
+			}
+		}
+	}
+
+	public void setSelected(int var1, int var2, int var3) {
 	}
 }

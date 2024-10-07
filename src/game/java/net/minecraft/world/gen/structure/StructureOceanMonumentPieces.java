@@ -1,9 +1,10 @@
 package net.minecraft.world.gen.structure;
 
-import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import net.lax1dude.eaglercraft.v1_8.ArrayUtils;
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
@@ -18,41 +19,30 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class StructureOceanMonumentPieces {
-	public static void registerOceanMonumentPieces() {
-		MapGenStructureIO.registerStructureComponent(StructureOceanMonumentPieces.MonumentBuilding.class, "OMB");
-		MapGenStructureIO.registerStructureComponent(StructureOceanMonumentPieces.MonumentCoreRoom.class, "OMCR");
-		MapGenStructureIO.registerStructureComponent(StructureOceanMonumentPieces.DoubleXRoom.class, "OMDXR");
-		MapGenStructureIO.registerStructureComponent(StructureOceanMonumentPieces.DoubleXYRoom.class, "OMDXYR");
-		MapGenStructureIO.registerStructureComponent(StructureOceanMonumentPieces.DoubleYRoom.class, "OMDYR");
-		MapGenStructureIO.registerStructureComponent(StructureOceanMonumentPieces.DoubleYZRoom.class, "OMDYZR");
-		MapGenStructureIO.registerStructureComponent(StructureOceanMonumentPieces.DoubleZRoom.class, "OMDZR");
-		MapGenStructureIO.registerStructureComponent(StructureOceanMonumentPieces.EntryRoom.class, "OMEntry");
-		MapGenStructureIO.registerStructureComponent(StructureOceanMonumentPieces.Penthouse.class, "OMPenthouse");
-		MapGenStructureIO.registerStructureComponent(StructureOceanMonumentPieces.SimpleRoom.class, "OMSimple");
-		MapGenStructureIO.registerStructureComponent(StructureOceanMonumentPieces.SimpleTopRoom.class, "OMSimpleT");
-	}
-
 	public static class DoubleXRoom extends StructureOceanMonumentPieces.Piece {
 		public DoubleXRoom() {
 		}
@@ -613,10 +603,6 @@ public class StructureOceanMonumentPieces {
 		private FitSimpleRoomHelper() {
 		}
 
-		public boolean func_175969_a(StructureOceanMonumentPieces.RoomDefinition var1) {
-			return true;
-		}
-
 		public StructureOceanMonumentPieces.Piece func_175968_a(EnumFacing enumfacing,
 				StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition,
 				EaglercraftRandom random) {
@@ -624,10 +610,22 @@ public class StructureOceanMonumentPieces {
 			return new StructureOceanMonumentPieces.SimpleRoom(enumfacing, structureoceanmonumentpieces$roomdefinition,
 					random);
 		}
+
+		public boolean func_175969_a(StructureOceanMonumentPieces.RoomDefinition var1) {
+			return true;
+		}
 	}
 
 	static class FitSimpleRoomTopHelper implements StructureOceanMonumentPieces.MonumentRoomFitHelper {
 		private FitSimpleRoomTopHelper() {
+		}
+
+		public StructureOceanMonumentPieces.Piece func_175968_a(EnumFacing enumfacing,
+				StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition,
+				EaglercraftRandom random) {
+			structureoceanmonumentpieces$roomdefinition.field_175963_d = true;
+			return new StructureOceanMonumentPieces.SimpleTopRoom(enumfacing,
+					structureoceanmonumentpieces$roomdefinition, random);
 		}
 
 		public boolean func_175969_a(
@@ -637,14 +635,6 @@ public class StructureOceanMonumentPieces {
 					&& !structureoceanmonumentpieces$roomdefinition.field_175966_c[EnumFacing.NORTH.getIndex()]
 					&& !structureoceanmonumentpieces$roomdefinition.field_175966_c[EnumFacing.SOUTH.getIndex()]
 					&& !structureoceanmonumentpieces$roomdefinition.field_175966_c[EnumFacing.UP.getIndex()];
-		}
-
-		public StructureOceanMonumentPieces.Piece func_175968_a(EnumFacing enumfacing,
-				StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition,
-				EaglercraftRandom random) {
-			structureoceanmonumentpieces$roomdefinition.field_175963_d = true;
-			return new StructureOceanMonumentPieces.SimpleTopRoom(enumfacing,
-					structureoceanmonumentpieces$roomdefinition, random);
 		}
 	}
 
@@ -733,6 +723,133 @@ public class StructureOceanMonumentPieces {
 					.add(new StructureOceanMonumentPieces.WingRoom(this.coordBaseMode, structureboundingbox2, i++));
 			this.field_175843_q
 					.add(new StructureOceanMonumentPieces.Penthouse(this.coordBaseMode, structureboundingbox));
+		}
+
+		public boolean addComponentParts(World world, EaglercraftRandom random,
+				StructureBoundingBox structureboundingbox) {
+			int i = Math.max(world.func_181545_F(), 64) - this.boundingBox.minY;
+			this.func_181655_a(world, structureboundingbox, 0, 0, 0, 58, i, 58, false);
+			this.func_175840_a(false, 0, world, random, structureboundingbox);
+			this.func_175840_a(true, 33, world, random, structureboundingbox);
+			this.func_175839_b(world, random, structureboundingbox);
+			this.func_175837_c(world, random, structureboundingbox);
+			this.func_175841_d(world, random, structureboundingbox);
+			this.func_175835_e(world, random, structureboundingbox);
+			this.func_175842_f(world, random, structureboundingbox);
+			this.func_175838_g(world, random, structureboundingbox);
+
+			for (int j = 0; j < 7; ++j) {
+				int k = 0;
+
+				while (k < 7) {
+					if (k == 0 && j == 3) {
+						k = 6;
+					}
+
+					int l = j * 9;
+					int i1 = k * 9;
+
+					for (int j1 = 0; j1 < 4; ++j1) {
+						for (int k1 = 0; k1 < 4; ++k1) {
+							this.setBlockState(world, field_175826_b, l + j1, 0, i1 + k1, structureboundingbox);
+							this.replaceAirAndLiquidDownwards(world, field_175826_b, l + j1, -1, i1 + k1,
+									structureboundingbox);
+						}
+					}
+
+					if (j != 0 && j != 6) {
+						k += 6;
+					} else {
+						++k;
+					}
+				}
+			}
+
+			for (int l1 = 0; l1 < 5; ++l1) {
+				this.func_181655_a(world, structureboundingbox, -1 - l1, 0 + l1 * 2, -1 - l1, -1 - l1, 23, 58 + l1,
+						false);
+				this.func_181655_a(world, structureboundingbox, 58 + l1, 0 + l1 * 2, -1 - l1, 58 + l1, 23, 58 + l1,
+						false);
+				this.func_181655_a(world, structureboundingbox, 0 - l1, 0 + l1 * 2, -1 - l1, 57 + l1, 23, -1 - l1,
+						false);
+				this.func_181655_a(world, structureboundingbox, 0 - l1, 0 + l1 * 2, 58 + l1, 57 + l1, 23, 58 + l1,
+						false);
+			}
+
+			for (StructureOceanMonumentPieces.Piece structureoceanmonumentpieces$piece : this.field_175843_q) {
+				if (structureoceanmonumentpieces$piece.getBoundingBox().intersectsWith(structureboundingbox)) {
+					structureoceanmonumentpieces$piece.addComponentParts(world, random, structureboundingbox);
+				}
+			}
+
+			return true;
+		}
+
+		private void func_175835_e(World worldIn, EaglercraftRandom parRandom,
+				StructureBoundingBox parStructureBoundingBox) {
+			if (this.func_175818_a(parStructureBoundingBox, 0, 21, 6, 58)) {
+				this.fillWithBlocks(worldIn, parStructureBoundingBox, 0, 0, 21, 6, 0, 57, field_175828_a,
+						field_175828_a, false);
+				this.func_181655_a(worldIn, parStructureBoundingBox, 0, 1, 21, 6, 7, 57, false);
+				this.fillWithBlocks(worldIn, parStructureBoundingBox, 4, 4, 21, 6, 4, 53, field_175828_a,
+						field_175828_a, false);
+
+				for (int i = 0; i < 4; ++i) {
+					this.fillWithBlocks(worldIn, parStructureBoundingBox, i, i + 1, 21, i, i + 1, 57 - i,
+							field_175826_b, field_175826_b, false);
+				}
+
+				for (int j = 23; j < 53; j += 3) {
+					this.setBlockState(worldIn, field_175824_d, 5, 5, j, parStructureBoundingBox);
+				}
+
+				this.setBlockState(worldIn, field_175824_d, 5, 5, 52, parStructureBoundingBox);
+
+				for (int k = 0; k < 4; ++k) {
+					this.fillWithBlocks(worldIn, parStructureBoundingBox, k, k + 1, 21, k, k + 1, 57 - k,
+							field_175826_b, field_175826_b, false);
+				}
+
+				this.fillWithBlocks(worldIn, parStructureBoundingBox, 4, 1, 52, 6, 3, 52, field_175828_a,
+						field_175828_a, false);
+				this.fillWithBlocks(worldIn, parStructureBoundingBox, 5, 1, 51, 5, 3, 53, field_175828_a,
+						field_175828_a, false);
+			}
+
+			if (this.func_175818_a(parStructureBoundingBox, 51, 21, 58, 58)) {
+				this.fillWithBlocks(worldIn, parStructureBoundingBox, 51, 0, 21, 57, 0, 57, field_175828_a,
+						field_175828_a, false);
+				this.func_181655_a(worldIn, parStructureBoundingBox, 51, 1, 21, 57, 7, 57, false);
+				this.fillWithBlocks(worldIn, parStructureBoundingBox, 51, 4, 21, 53, 4, 53, field_175828_a,
+						field_175828_a, false);
+
+				for (int l = 0; l < 4; ++l) {
+					this.fillWithBlocks(worldIn, parStructureBoundingBox, 57 - l, l + 1, 21, 57 - l, l + 1, 57 - l,
+							field_175826_b, field_175826_b, false);
+				}
+
+				for (int i1 = 23; i1 < 53; i1 += 3) {
+					this.setBlockState(worldIn, field_175824_d, 52, 5, i1, parStructureBoundingBox);
+				}
+
+				this.setBlockState(worldIn, field_175824_d, 52, 5, 52, parStructureBoundingBox);
+				this.fillWithBlocks(worldIn, parStructureBoundingBox, 51, 1, 52, 53, 3, 52, field_175828_a,
+						field_175828_a, false);
+				this.fillWithBlocks(worldIn, parStructureBoundingBox, 52, 1, 51, 52, 3, 53, field_175828_a,
+						field_175828_a, false);
+			}
+
+			if (this.func_175818_a(parStructureBoundingBox, 0, 51, 57, 57)) {
+				this.fillWithBlocks(worldIn, parStructureBoundingBox, 7, 0, 51, 50, 0, 57, field_175828_a,
+						field_175828_a, false);
+				this.func_181655_a(worldIn, parStructureBoundingBox, 7, 1, 51, 50, 10, 57, false);
+
+				for (int j1 = 0; j1 < 4; ++j1) {
+					this.fillWithBlocks(worldIn, parStructureBoundingBox, j1 + 1, j1 + 1, 57 - j1, 56 - j1, j1 + 1,
+							57 - j1, field_175826_b, field_175826_b, false);
+				}
+			}
+
 		}
 
 		private List<StructureOceanMonumentPieces.RoomDefinition> func_175836_a(EaglercraftRandom parRandom) {
@@ -867,152 +984,6 @@ public class StructureOceanMonumentPieces {
 			return arraylist;
 		}
 
-		public boolean addComponentParts(World world, EaglercraftRandom random,
-				StructureBoundingBox structureboundingbox) {
-			int i = Math.max(world.func_181545_F(), 64) - this.boundingBox.minY;
-			this.func_181655_a(world, structureboundingbox, 0, 0, 0, 58, i, 58, false);
-			this.func_175840_a(false, 0, world, random, structureboundingbox);
-			this.func_175840_a(true, 33, world, random, structureboundingbox);
-			this.func_175839_b(world, random, structureboundingbox);
-			this.func_175837_c(world, random, structureboundingbox);
-			this.func_175841_d(world, random, structureboundingbox);
-			this.func_175835_e(world, random, structureboundingbox);
-			this.func_175842_f(world, random, structureboundingbox);
-			this.func_175838_g(world, random, structureboundingbox);
-
-			for (int j = 0; j < 7; ++j) {
-				int k = 0;
-
-				while (k < 7) {
-					if (k == 0 && j == 3) {
-						k = 6;
-					}
-
-					int l = j * 9;
-					int i1 = k * 9;
-
-					for (int j1 = 0; j1 < 4; ++j1) {
-						for (int k1 = 0; k1 < 4; ++k1) {
-							this.setBlockState(world, field_175826_b, l + j1, 0, i1 + k1, structureboundingbox);
-							this.replaceAirAndLiquidDownwards(world, field_175826_b, l + j1, -1, i1 + k1,
-									structureboundingbox);
-						}
-					}
-
-					if (j != 0 && j != 6) {
-						k += 6;
-					} else {
-						++k;
-					}
-				}
-			}
-
-			for (int l1 = 0; l1 < 5; ++l1) {
-				this.func_181655_a(world, structureboundingbox, -1 - l1, 0 + l1 * 2, -1 - l1, -1 - l1, 23, 58 + l1,
-						false);
-				this.func_181655_a(world, structureboundingbox, 58 + l1, 0 + l1 * 2, -1 - l1, 58 + l1, 23, 58 + l1,
-						false);
-				this.func_181655_a(world, structureboundingbox, 0 - l1, 0 + l1 * 2, -1 - l1, 57 + l1, 23, -1 - l1,
-						false);
-				this.func_181655_a(world, structureboundingbox, 0 - l1, 0 + l1 * 2, 58 + l1, 57 + l1, 23, 58 + l1,
-						false);
-			}
-
-			for (StructureOceanMonumentPieces.Piece structureoceanmonumentpieces$piece : this.field_175843_q) {
-				if (structureoceanmonumentpieces$piece.getBoundingBox().intersectsWith(structureboundingbox)) {
-					structureoceanmonumentpieces$piece.addComponentParts(world, random, structureboundingbox);
-				}
-			}
-
-			return true;
-		}
-
-		private void func_175840_a(boolean worldIn, int parInt1, World parWorld, EaglercraftRandom parRandom,
-				StructureBoundingBox parStructureBoundingBox) {
-			boolean flag = true;
-			if (this.func_175818_a(parStructureBoundingBox, parInt1, 0, parInt1 + 23, 20)) {
-				this.fillWithBlocks(parWorld, parStructureBoundingBox, parInt1 + 0, 0, 0, parInt1 + 24, 0, 20,
-						field_175828_a, field_175828_a, false);
-				this.func_181655_a(parWorld, parStructureBoundingBox, parInt1 + 0, 1, 0, parInt1 + 24, 10, 20, false);
-
-				for (int i = 0; i < 4; ++i) {
-					this.fillWithBlocks(parWorld, parStructureBoundingBox, parInt1 + i, i + 1, i, parInt1 + i, i + 1,
-							20, field_175826_b, field_175826_b, false);
-					this.fillWithBlocks(parWorld, parStructureBoundingBox, parInt1 + i + 7, i + 5, i + 7,
-							parInt1 + i + 7, i + 5, 20, field_175826_b, field_175826_b, false);
-					this.fillWithBlocks(parWorld, parStructureBoundingBox, parInt1 + 17 - i, i + 5, i + 7,
-							parInt1 + 17 - i, i + 5, 20, field_175826_b, field_175826_b, false);
-					this.fillWithBlocks(parWorld, parStructureBoundingBox, parInt1 + 24 - i, i + 1, i, parInt1 + 24 - i,
-							i + 1, 20, field_175826_b, field_175826_b, false);
-					this.fillWithBlocks(parWorld, parStructureBoundingBox, parInt1 + i + 1, i + 1, i, parInt1 + 23 - i,
-							i + 1, i, field_175826_b, field_175826_b, false);
-					this.fillWithBlocks(parWorld, parStructureBoundingBox, parInt1 + i + 8, i + 5, i + 7,
-							parInt1 + 16 - i, i + 5, i + 7, field_175826_b, field_175826_b, false);
-				}
-
-				this.fillWithBlocks(parWorld, parStructureBoundingBox, parInt1 + 4, 4, 4, parInt1 + 6, 4, 20,
-						field_175828_a, field_175828_a, false);
-				this.fillWithBlocks(parWorld, parStructureBoundingBox, parInt1 + 7, 4, 4, parInt1 + 17, 4, 6,
-						field_175828_a, field_175828_a, false);
-				this.fillWithBlocks(parWorld, parStructureBoundingBox, parInt1 + 18, 4, 4, parInt1 + 20, 4, 20,
-						field_175828_a, field_175828_a, false);
-				this.fillWithBlocks(parWorld, parStructureBoundingBox, parInt1 + 11, 8, 11, parInt1 + 13, 8, 20,
-						field_175828_a, field_175828_a, false);
-				this.setBlockState(parWorld, field_175824_d, parInt1 + 12, 9, 12, parStructureBoundingBox);
-				this.setBlockState(parWorld, field_175824_d, parInt1 + 12, 9, 15, parStructureBoundingBox);
-				this.setBlockState(parWorld, field_175824_d, parInt1 + 12, 9, 18, parStructureBoundingBox);
-				int i1 = worldIn ? parInt1 + 19 : parInt1 + 5;
-				int j = worldIn ? parInt1 + 5 : parInt1 + 19;
-
-				for (int k = 20; k >= 5; k -= 3) {
-					this.setBlockState(parWorld, field_175824_d, i1, 5, k, parStructureBoundingBox);
-				}
-
-				for (int j1 = 19; j1 >= 7; j1 -= 3) {
-					this.setBlockState(parWorld, field_175824_d, j, 5, j1, parStructureBoundingBox);
-				}
-
-				for (int k1 = 0; k1 < 4; ++k1) {
-					int l = worldIn ? parInt1 + (24 - (17 - k1 * 3)) : parInt1 + 17 - k1 * 3;
-					this.setBlockState(parWorld, field_175824_d, l, 5, 5, parStructureBoundingBox);
-				}
-
-				this.setBlockState(parWorld, field_175824_d, j, 5, 5, parStructureBoundingBox);
-				this.fillWithBlocks(parWorld, parStructureBoundingBox, parInt1 + 11, 1, 12, parInt1 + 13, 7, 12,
-						field_175828_a, field_175828_a, false);
-				this.fillWithBlocks(parWorld, parStructureBoundingBox, parInt1 + 12, 1, 11, parInt1 + 12, 7, 13,
-						field_175828_a, field_175828_a, false);
-			}
-
-		}
-
-		private void func_175839_b(World worldIn, EaglercraftRandom parRandom,
-				StructureBoundingBox parStructureBoundingBox) {
-			if (this.func_175818_a(parStructureBoundingBox, 22, 5, 35, 17)) {
-				this.func_181655_a(worldIn, parStructureBoundingBox, 25, 0, 0, 32, 8, 20, false);
-
-				for (int i = 0; i < 4; ++i) {
-					this.fillWithBlocks(worldIn, parStructureBoundingBox, 24, 2, 5 + i * 4, 24, 4, 5 + i * 4,
-							field_175826_b, field_175826_b, false);
-					this.fillWithBlocks(worldIn, parStructureBoundingBox, 22, 4, 5 + i * 4, 23, 4, 5 + i * 4,
-							field_175826_b, field_175826_b, false);
-					this.setBlockState(worldIn, field_175826_b, 25, 5, 5 + i * 4, parStructureBoundingBox);
-					this.setBlockState(worldIn, field_175826_b, 26, 6, 5 + i * 4, parStructureBoundingBox);
-					this.setBlockState(worldIn, field_175825_e, 26, 5, 5 + i * 4, parStructureBoundingBox);
-					this.fillWithBlocks(worldIn, parStructureBoundingBox, 33, 2, 5 + i * 4, 33, 4, 5 + i * 4,
-							field_175826_b, field_175826_b, false);
-					this.fillWithBlocks(worldIn, parStructureBoundingBox, 34, 4, 5 + i * 4, 35, 4, 5 + i * 4,
-							field_175826_b, field_175826_b, false);
-					this.setBlockState(worldIn, field_175826_b, 32, 5, 5 + i * 4, parStructureBoundingBox);
-					this.setBlockState(worldIn, field_175826_b, 31, 6, 5 + i * 4, parStructureBoundingBox);
-					this.setBlockState(worldIn, field_175825_e, 31, 5, 5 + i * 4, parStructureBoundingBox);
-					this.fillWithBlocks(worldIn, parStructureBoundingBox, 27, 6, 5 + i * 4, 30, 6, 5 + i * 4,
-							field_175828_a, field_175828_a, false);
-				}
-			}
-
-		}
-
 		private void func_175837_c(World worldIn, EaglercraftRandom parRandom,
 				StructureBoundingBox parStructureBoundingBox) {
 			if (this.func_175818_a(parStructureBoundingBox, 15, 20, 42, 21)) {
@@ -1087,6 +1058,151 @@ public class StructureOceanMonumentPieces {
 
 		}
 
+		private void func_175838_g(World worldIn, EaglercraftRandom parRandom,
+				StructureBoundingBox parStructureBoundingBox) {
+			if (this.func_175818_a(parStructureBoundingBox, 14, 21, 20, 43)) {
+				this.fillWithBlocks(worldIn, parStructureBoundingBox, 14, 0, 21, 20, 0, 43, field_175828_a,
+						field_175828_a, false);
+				this.func_181655_a(worldIn, parStructureBoundingBox, 14, 1, 22, 20, 14, 43, false);
+				this.fillWithBlocks(worldIn, parStructureBoundingBox, 18, 12, 22, 20, 12, 39, field_175828_a,
+						field_175828_a, false);
+				this.fillWithBlocks(worldIn, parStructureBoundingBox, 18, 12, 21, 20, 12, 21, field_175826_b,
+						field_175826_b, false);
+
+				for (int i = 0; i < 4; ++i) {
+					this.fillWithBlocks(worldIn, parStructureBoundingBox, i + 14, i + 9, 21, i + 14, i + 9, 43 - i,
+							field_175826_b, field_175826_b, false);
+				}
+
+				for (int j = 23; j <= 39; j += 3) {
+					this.setBlockState(worldIn, field_175824_d, 19, 13, j, parStructureBoundingBox);
+				}
+			}
+
+			if (this.func_175818_a(parStructureBoundingBox, 37, 21, 43, 43)) {
+				this.fillWithBlocks(worldIn, parStructureBoundingBox, 37, 0, 21, 43, 0, 43, field_175828_a,
+						field_175828_a, false);
+				this.func_181655_a(worldIn, parStructureBoundingBox, 37, 1, 22, 43, 14, 43, false);
+				this.fillWithBlocks(worldIn, parStructureBoundingBox, 37, 12, 22, 39, 12, 39, field_175828_a,
+						field_175828_a, false);
+				this.fillWithBlocks(worldIn, parStructureBoundingBox, 37, 12, 21, 39, 12, 21, field_175826_b,
+						field_175826_b, false);
+
+				for (int k = 0; k < 4; ++k) {
+					this.fillWithBlocks(worldIn, parStructureBoundingBox, 43 - k, k + 9, 21, 43 - k, k + 9, 43 - k,
+							field_175826_b, field_175826_b, false);
+				}
+
+				for (int l = 23; l <= 39; l += 3) {
+					this.setBlockState(worldIn, field_175824_d, 38, 13, l, parStructureBoundingBox);
+				}
+			}
+
+			if (this.func_175818_a(parStructureBoundingBox, 15, 37, 42, 43)) {
+				this.fillWithBlocks(worldIn, parStructureBoundingBox, 21, 0, 37, 36, 0, 43, field_175828_a,
+						field_175828_a, false);
+				this.func_181655_a(worldIn, parStructureBoundingBox, 21, 1, 37, 36, 14, 43, false);
+				this.fillWithBlocks(worldIn, parStructureBoundingBox, 21, 12, 37, 36, 12, 39, field_175828_a,
+						field_175828_a, false);
+
+				for (int i1 = 0; i1 < 4; ++i1) {
+					this.fillWithBlocks(worldIn, parStructureBoundingBox, 15 + i1, i1 + 9, 43 - i1, 42 - i1, i1 + 9,
+							43 - i1, field_175826_b, field_175826_b, false);
+				}
+
+				for (int j1 = 21; j1 <= 36; j1 += 3) {
+					this.setBlockState(worldIn, field_175824_d, j1, 13, 38, parStructureBoundingBox);
+				}
+			}
+
+		}
+
+		private void func_175839_b(World worldIn, EaglercraftRandom parRandom,
+				StructureBoundingBox parStructureBoundingBox) {
+			if (this.func_175818_a(parStructureBoundingBox, 22, 5, 35, 17)) {
+				this.func_181655_a(worldIn, parStructureBoundingBox, 25, 0, 0, 32, 8, 20, false);
+
+				for (int i = 0; i < 4; ++i) {
+					this.fillWithBlocks(worldIn, parStructureBoundingBox, 24, 2, 5 + i * 4, 24, 4, 5 + i * 4,
+							field_175826_b, field_175826_b, false);
+					this.fillWithBlocks(worldIn, parStructureBoundingBox, 22, 4, 5 + i * 4, 23, 4, 5 + i * 4,
+							field_175826_b, field_175826_b, false);
+					this.setBlockState(worldIn, field_175826_b, 25, 5, 5 + i * 4, parStructureBoundingBox);
+					this.setBlockState(worldIn, field_175826_b, 26, 6, 5 + i * 4, parStructureBoundingBox);
+					this.setBlockState(worldIn, field_175825_e, 26, 5, 5 + i * 4, parStructureBoundingBox);
+					this.fillWithBlocks(worldIn, parStructureBoundingBox, 33, 2, 5 + i * 4, 33, 4, 5 + i * 4,
+							field_175826_b, field_175826_b, false);
+					this.fillWithBlocks(worldIn, parStructureBoundingBox, 34, 4, 5 + i * 4, 35, 4, 5 + i * 4,
+							field_175826_b, field_175826_b, false);
+					this.setBlockState(worldIn, field_175826_b, 32, 5, 5 + i * 4, parStructureBoundingBox);
+					this.setBlockState(worldIn, field_175826_b, 31, 6, 5 + i * 4, parStructureBoundingBox);
+					this.setBlockState(worldIn, field_175825_e, 31, 5, 5 + i * 4, parStructureBoundingBox);
+					this.fillWithBlocks(worldIn, parStructureBoundingBox, 27, 6, 5 + i * 4, 30, 6, 5 + i * 4,
+							field_175828_a, field_175828_a, false);
+				}
+			}
+
+		}
+
+		private void func_175840_a(boolean worldIn, int parInt1, World parWorld, EaglercraftRandom parRandom,
+				StructureBoundingBox parStructureBoundingBox) {
+			boolean flag = true;
+			if (this.func_175818_a(parStructureBoundingBox, parInt1, 0, parInt1 + 23, 20)) {
+				this.fillWithBlocks(parWorld, parStructureBoundingBox, parInt1 + 0, 0, 0, parInt1 + 24, 0, 20,
+						field_175828_a, field_175828_a, false);
+				this.func_181655_a(parWorld, parStructureBoundingBox, parInt1 + 0, 1, 0, parInt1 + 24, 10, 20, false);
+
+				for (int i = 0; i < 4; ++i) {
+					this.fillWithBlocks(parWorld, parStructureBoundingBox, parInt1 + i, i + 1, i, parInt1 + i, i + 1,
+							20, field_175826_b, field_175826_b, false);
+					this.fillWithBlocks(parWorld, parStructureBoundingBox, parInt1 + i + 7, i + 5, i + 7,
+							parInt1 + i + 7, i + 5, 20, field_175826_b, field_175826_b, false);
+					this.fillWithBlocks(parWorld, parStructureBoundingBox, parInt1 + 17 - i, i + 5, i + 7,
+							parInt1 + 17 - i, i + 5, 20, field_175826_b, field_175826_b, false);
+					this.fillWithBlocks(parWorld, parStructureBoundingBox, parInt1 + 24 - i, i + 1, i, parInt1 + 24 - i,
+							i + 1, 20, field_175826_b, field_175826_b, false);
+					this.fillWithBlocks(parWorld, parStructureBoundingBox, parInt1 + i + 1, i + 1, i, parInt1 + 23 - i,
+							i + 1, i, field_175826_b, field_175826_b, false);
+					this.fillWithBlocks(parWorld, parStructureBoundingBox, parInt1 + i + 8, i + 5, i + 7,
+							parInt1 + 16 - i, i + 5, i + 7, field_175826_b, field_175826_b, false);
+				}
+
+				this.fillWithBlocks(parWorld, parStructureBoundingBox, parInt1 + 4, 4, 4, parInt1 + 6, 4, 20,
+						field_175828_a, field_175828_a, false);
+				this.fillWithBlocks(parWorld, parStructureBoundingBox, parInt1 + 7, 4, 4, parInt1 + 17, 4, 6,
+						field_175828_a, field_175828_a, false);
+				this.fillWithBlocks(parWorld, parStructureBoundingBox, parInt1 + 18, 4, 4, parInt1 + 20, 4, 20,
+						field_175828_a, field_175828_a, false);
+				this.fillWithBlocks(parWorld, parStructureBoundingBox, parInt1 + 11, 8, 11, parInt1 + 13, 8, 20,
+						field_175828_a, field_175828_a, false);
+				this.setBlockState(parWorld, field_175824_d, parInt1 + 12, 9, 12, parStructureBoundingBox);
+				this.setBlockState(parWorld, field_175824_d, parInt1 + 12, 9, 15, parStructureBoundingBox);
+				this.setBlockState(parWorld, field_175824_d, parInt1 + 12, 9, 18, parStructureBoundingBox);
+				int i1 = worldIn ? parInt1 + 19 : parInt1 + 5;
+				int j = worldIn ? parInt1 + 5 : parInt1 + 19;
+
+				for (int k = 20; k >= 5; k -= 3) {
+					this.setBlockState(parWorld, field_175824_d, i1, 5, k, parStructureBoundingBox);
+				}
+
+				for (int j1 = 19; j1 >= 7; j1 -= 3) {
+					this.setBlockState(parWorld, field_175824_d, j, 5, j1, parStructureBoundingBox);
+				}
+
+				for (int k1 = 0; k1 < 4; ++k1) {
+					int l = worldIn ? parInt1 + (24 - (17 - k1 * 3)) : parInt1 + 17 - k1 * 3;
+					this.setBlockState(parWorld, field_175824_d, l, 5, 5, parStructureBoundingBox);
+				}
+
+				this.setBlockState(parWorld, field_175824_d, j, 5, 5, parStructureBoundingBox);
+				this.fillWithBlocks(parWorld, parStructureBoundingBox, parInt1 + 11, 1, 12, parInt1 + 13, 7, 12,
+						field_175828_a, field_175828_a, false);
+				this.fillWithBlocks(parWorld, parStructureBoundingBox, parInt1 + 12, 1, 11, parInt1 + 12, 7, 13,
+						field_175828_a, field_175828_a, false);
+			}
+
+		}
+
 		private void func_175841_d(World worldIn, EaglercraftRandom parRandom,
 				StructureBoundingBox parStructureBoundingBox) {
 			if (this.func_175818_a(parStructureBoundingBox, 21, 21, 36, 36)) {
@@ -1135,73 +1251,6 @@ public class StructureOceanMonumentPieces {
 						field_175828_a, false);
 				this.fillWithBlocks(worldIn, parStructureBoundingBox, 30, 21, 28, 30, 21, 29, field_175828_a,
 						field_175828_a, false);
-			}
-
-		}
-
-		private void func_175835_e(World worldIn, EaglercraftRandom parRandom,
-				StructureBoundingBox parStructureBoundingBox) {
-			if (this.func_175818_a(parStructureBoundingBox, 0, 21, 6, 58)) {
-				this.fillWithBlocks(worldIn, parStructureBoundingBox, 0, 0, 21, 6, 0, 57, field_175828_a,
-						field_175828_a, false);
-				this.func_181655_a(worldIn, parStructureBoundingBox, 0, 1, 21, 6, 7, 57, false);
-				this.fillWithBlocks(worldIn, parStructureBoundingBox, 4, 4, 21, 6, 4, 53, field_175828_a,
-						field_175828_a, false);
-
-				for (int i = 0; i < 4; ++i) {
-					this.fillWithBlocks(worldIn, parStructureBoundingBox, i, i + 1, 21, i, i + 1, 57 - i,
-							field_175826_b, field_175826_b, false);
-				}
-
-				for (int j = 23; j < 53; j += 3) {
-					this.setBlockState(worldIn, field_175824_d, 5, 5, j, parStructureBoundingBox);
-				}
-
-				this.setBlockState(worldIn, field_175824_d, 5, 5, 52, parStructureBoundingBox);
-
-				for (int k = 0; k < 4; ++k) {
-					this.fillWithBlocks(worldIn, parStructureBoundingBox, k, k + 1, 21, k, k + 1, 57 - k,
-							field_175826_b, field_175826_b, false);
-				}
-
-				this.fillWithBlocks(worldIn, parStructureBoundingBox, 4, 1, 52, 6, 3, 52, field_175828_a,
-						field_175828_a, false);
-				this.fillWithBlocks(worldIn, parStructureBoundingBox, 5, 1, 51, 5, 3, 53, field_175828_a,
-						field_175828_a, false);
-			}
-
-			if (this.func_175818_a(parStructureBoundingBox, 51, 21, 58, 58)) {
-				this.fillWithBlocks(worldIn, parStructureBoundingBox, 51, 0, 21, 57, 0, 57, field_175828_a,
-						field_175828_a, false);
-				this.func_181655_a(worldIn, parStructureBoundingBox, 51, 1, 21, 57, 7, 57, false);
-				this.fillWithBlocks(worldIn, parStructureBoundingBox, 51, 4, 21, 53, 4, 53, field_175828_a,
-						field_175828_a, false);
-
-				for (int l = 0; l < 4; ++l) {
-					this.fillWithBlocks(worldIn, parStructureBoundingBox, 57 - l, l + 1, 21, 57 - l, l + 1, 57 - l,
-							field_175826_b, field_175826_b, false);
-				}
-
-				for (int i1 = 23; i1 < 53; i1 += 3) {
-					this.setBlockState(worldIn, field_175824_d, 52, 5, i1, parStructureBoundingBox);
-				}
-
-				this.setBlockState(worldIn, field_175824_d, 52, 5, 52, parStructureBoundingBox);
-				this.fillWithBlocks(worldIn, parStructureBoundingBox, 51, 1, 52, 53, 3, 52, field_175828_a,
-						field_175828_a, false);
-				this.fillWithBlocks(worldIn, parStructureBoundingBox, 52, 1, 51, 52, 3, 53, field_175828_a,
-						field_175828_a, false);
-			}
-
-			if (this.func_175818_a(parStructureBoundingBox, 0, 51, 57, 57)) {
-				this.fillWithBlocks(worldIn, parStructureBoundingBox, 7, 0, 51, 50, 0, 57, field_175828_a,
-						field_175828_a, false);
-				this.func_181655_a(worldIn, parStructureBoundingBox, 7, 1, 51, 50, 10, 57, false);
-
-				for (int j1 = 0; j1 < 4; ++j1) {
-					this.fillWithBlocks(worldIn, parStructureBoundingBox, j1 + 1, j1 + 1, 57 - j1, 56 - j1, j1 + 1,
-							57 - j1, field_175826_b, field_175826_b, false);
-				}
 			}
 
 		}
@@ -1273,65 +1322,6 @@ public class StructureOceanMonumentPieces {
 						field_175826_b, false);
 				this.fillWithBlocks(worldIn, parStructureBoundingBox, 14, 8, 44, 43, 8, 53, field_175828_a,
 						field_175828_a, false);
-			}
-
-		}
-
-		private void func_175838_g(World worldIn, EaglercraftRandom parRandom,
-				StructureBoundingBox parStructureBoundingBox) {
-			if (this.func_175818_a(parStructureBoundingBox, 14, 21, 20, 43)) {
-				this.fillWithBlocks(worldIn, parStructureBoundingBox, 14, 0, 21, 20, 0, 43, field_175828_a,
-						field_175828_a, false);
-				this.func_181655_a(worldIn, parStructureBoundingBox, 14, 1, 22, 20, 14, 43, false);
-				this.fillWithBlocks(worldIn, parStructureBoundingBox, 18, 12, 22, 20, 12, 39, field_175828_a,
-						field_175828_a, false);
-				this.fillWithBlocks(worldIn, parStructureBoundingBox, 18, 12, 21, 20, 12, 21, field_175826_b,
-						field_175826_b, false);
-
-				for (int i = 0; i < 4; ++i) {
-					this.fillWithBlocks(worldIn, parStructureBoundingBox, i + 14, i + 9, 21, i + 14, i + 9, 43 - i,
-							field_175826_b, field_175826_b, false);
-				}
-
-				for (int j = 23; j <= 39; j += 3) {
-					this.setBlockState(worldIn, field_175824_d, 19, 13, j, parStructureBoundingBox);
-				}
-			}
-
-			if (this.func_175818_a(parStructureBoundingBox, 37, 21, 43, 43)) {
-				this.fillWithBlocks(worldIn, parStructureBoundingBox, 37, 0, 21, 43, 0, 43, field_175828_a,
-						field_175828_a, false);
-				this.func_181655_a(worldIn, parStructureBoundingBox, 37, 1, 22, 43, 14, 43, false);
-				this.fillWithBlocks(worldIn, parStructureBoundingBox, 37, 12, 22, 39, 12, 39, field_175828_a,
-						field_175828_a, false);
-				this.fillWithBlocks(worldIn, parStructureBoundingBox, 37, 12, 21, 39, 12, 21, field_175826_b,
-						field_175826_b, false);
-
-				for (int k = 0; k < 4; ++k) {
-					this.fillWithBlocks(worldIn, parStructureBoundingBox, 43 - k, k + 9, 21, 43 - k, k + 9, 43 - k,
-							field_175826_b, field_175826_b, false);
-				}
-
-				for (int l = 23; l <= 39; l += 3) {
-					this.setBlockState(worldIn, field_175824_d, 38, 13, l, parStructureBoundingBox);
-				}
-			}
-
-			if (this.func_175818_a(parStructureBoundingBox, 15, 37, 42, 43)) {
-				this.fillWithBlocks(worldIn, parStructureBoundingBox, 21, 0, 37, 36, 0, 43, field_175828_a,
-						field_175828_a, false);
-				this.func_181655_a(worldIn, parStructureBoundingBox, 21, 1, 37, 36, 14, 43, false);
-				this.fillWithBlocks(worldIn, parStructureBoundingBox, 21, 12, 37, 36, 12, 39, field_175828_a,
-						field_175828_a, false);
-
-				for (int i1 = 0; i1 < 4; ++i1) {
-					this.fillWithBlocks(worldIn, parStructureBoundingBox, 15 + i1, i1 + 9, 43 - i1, 42 - i1, i1 + 9,
-							43 - i1, field_175826_b, field_175826_b, false);
-				}
-
-				for (int j1 = 21; j1 <= 36; j1 += 3) {
-					this.setBlockState(worldIn, field_175824_d, j1, 13, 38, parStructureBoundingBox);
-				}
 			}
 
 		}
@@ -1424,10 +1414,10 @@ public class StructureOceanMonumentPieces {
 	}
 
 	interface MonumentRoomFitHelper {
-		boolean func_175969_a(StructureOceanMonumentPieces.RoomDefinition var1);
-
 		StructureOceanMonumentPieces.Piece func_175968_a(EnumFacing var1,
 				StructureOceanMonumentPieces.RoomDefinition var2, EaglercraftRandom var3);
+
+		boolean func_175969_a(StructureOceanMonumentPieces.RoomDefinition var1);
 	}
 
 	public static class Penthouse extends StructureOceanMonumentPieces.Piece {
@@ -1507,24 +1497,25 @@ public class StructureOceanMonumentPieces {
 		protected static final int field_175831_h = func_175820_a(2, 2, 0);
 		protected static final int field_175832_i = func_175820_a(0, 1, 0);
 		protected static final int field_175829_j = func_175820_a(4, 1, 0);
-		protected StructureOceanMonumentPieces.RoomDefinition field_175830_k;
 
 		protected static final int func_175820_a(int parInt1, int parInt2, int parInt3) {
 			return parInt2 * 25 + parInt3 * 5 + parInt1;
 		}
 
+		protected StructureOceanMonumentPieces.RoomDefinition field_175830_k;
+
 		public Piece() {
 			super(0);
-		}
-
-		public Piece(int parInt1) {
-			super(parInt1);
 		}
 
 		public Piece(EnumFacing parEnumFacing, StructureBoundingBox parStructureBoundingBox) {
 			super(1);
 			this.coordBaseMode = parEnumFacing;
 			this.boundingBox = parStructureBoundingBox;
+		}
+
+		public Piece(int parInt1) {
+			super(parInt1);
 		}
 
 		protected Piece(int parInt1, EnumFacing parEnumFacing,
@@ -1558,25 +1549,42 @@ public class StructureOceanMonumentPieces {
 
 		}
 
-		protected void writeStructureToNBT(NBTTagCompound var1) {
+		protected boolean func_175817_a(World worldIn, StructureBoundingBox parStructureBoundingBox, int parInt1,
+				int parInt2, int parInt3) {
+			int i = this.getXWithOffset(parInt1, parInt3);
+			int j = this.getYWithOffset(parInt2);
+			int k = this.getZWithOffset(parInt1, parInt3);
+			if (parStructureBoundingBox.isVecInside(new BlockPos(i, j, k))) {
+				EntityGuardian entityguardian = new EntityGuardian(worldIn);
+				entityguardian.setElder(true);
+				entityguardian.heal(entityguardian.getMaxHealth());
+				entityguardian.setLocationAndAngles((double) i + 0.5D, (double) j, (double) k + 0.5D, 0.0F, 0.0F);
+				entityguardian.onInitialSpawn(worldIn.getDifficultyForLocation(new BlockPos(entityguardian)),
+						(IEntityLivingData) null);
+				worldIn.spawnEntityInWorld(entityguardian);
+				return true;
+			} else {
+				return false;
+			}
 		}
 
-		protected void readStructureFromNBT(NBTTagCompound var1) {
+		protected boolean func_175818_a(StructureBoundingBox parStructureBoundingBox, int parInt1, int parInt2,
+				int parInt3, int parInt4) {
+			int i = this.getXWithOffset(parInt1, parInt2);
+			int j = this.getZWithOffset(parInt1, parInt2);
+			int k = this.getXWithOffset(parInt3, parInt4);
+			int l = this.getZWithOffset(parInt3, parInt4);
+			return parStructureBoundingBox.intersectsWith(Math.min(i, k), Math.min(j, l), Math.max(i, k),
+					Math.max(j, l));
 		}
 
-		protected void func_181655_a(World parWorld, StructureBoundingBox parStructureBoundingBox, int parInt1,
-				int parInt2, int parInt3, int parInt4, int parInt5, int parInt6, boolean parFlag) {
+		protected void func_175819_a(World worldIn, StructureBoundingBox parStructureBoundingBox, int parInt1,
+				int parInt2, int parInt3, int parInt4, int parInt5, int parInt6, IBlockState parIBlockState) {
 			for (int i = parInt2; i <= parInt5; ++i) {
 				for (int j = parInt1; j <= parInt4; ++j) {
 					for (int k = parInt3; k <= parInt6; ++k) {
-						if (!parFlag || this.getBlockStateFromPos(parWorld, j, i, k, parStructureBoundingBox).getBlock()
-								.getMaterial() != Material.air) {
-							if (this.getYWithOffset(i) >= parWorld.func_181545_F()) {
-								this.setBlockState(parWorld, Blocks.air.getDefaultState(), j, i, k,
-										parStructureBoundingBox);
-							} else {
-								this.setBlockState(parWorld, field_175822_f, j, i, k, parStructureBoundingBox);
-							}
+						if (this.getBlockStateFromPos(worldIn, j, i, k, parStructureBoundingBox) == field_175822_f) {
+							this.setBlockState(worldIn, parIBlockState, j, i, k, parStructureBoundingBox);
 						}
 					}
 				}
@@ -1610,13 +1618,19 @@ public class StructureOceanMonumentPieces {
 
 		}
 
-		protected void func_175819_a(World worldIn, StructureBoundingBox parStructureBoundingBox, int parInt1,
-				int parInt2, int parInt3, int parInt4, int parInt5, int parInt6, IBlockState parIBlockState) {
+		protected void func_181655_a(World parWorld, StructureBoundingBox parStructureBoundingBox, int parInt1,
+				int parInt2, int parInt3, int parInt4, int parInt5, int parInt6, boolean parFlag) {
 			for (int i = parInt2; i <= parInt5; ++i) {
 				for (int j = parInt1; j <= parInt4; ++j) {
 					for (int k = parInt3; k <= parInt6; ++k) {
-						if (this.getBlockStateFromPos(worldIn, j, i, k, parStructureBoundingBox) == field_175822_f) {
-							this.setBlockState(worldIn, parIBlockState, j, i, k, parStructureBoundingBox);
+						if (!parFlag || this.getBlockStateFromPos(parWorld, j, i, k, parStructureBoundingBox).getBlock()
+								.getMaterial() != Material.air) {
+							if (this.getYWithOffset(i) >= parWorld.func_181545_F()) {
+								this.setBlockState(parWorld, Blocks.air.getDefaultState(), j, i, k,
+										parStructureBoundingBox);
+							} else {
+								this.setBlockState(parWorld, field_175822_f, j, i, k, parStructureBoundingBox);
+							}
 						}
 					}
 				}
@@ -1624,33 +1638,10 @@ public class StructureOceanMonumentPieces {
 
 		}
 
-		protected boolean func_175818_a(StructureBoundingBox parStructureBoundingBox, int parInt1, int parInt2,
-				int parInt3, int parInt4) {
-			int i = this.getXWithOffset(parInt1, parInt2);
-			int j = this.getZWithOffset(parInt1, parInt2);
-			int k = this.getXWithOffset(parInt3, parInt4);
-			int l = this.getZWithOffset(parInt3, parInt4);
-			return parStructureBoundingBox.intersectsWith(Math.min(i, k), Math.min(j, l), Math.max(i, k),
-					Math.max(j, l));
+		protected void readStructureFromNBT(NBTTagCompound var1) {
 		}
 
-		protected boolean func_175817_a(World worldIn, StructureBoundingBox parStructureBoundingBox, int parInt1,
-				int parInt2, int parInt3) {
-			int i = this.getXWithOffset(parInt1, parInt3);
-			int j = this.getYWithOffset(parInt2);
-			int k = this.getZWithOffset(parInt1, parInt3);
-			if (parStructureBoundingBox.isVecInside(new BlockPos(i, j, k))) {
-				EntityGuardian entityguardian = new EntityGuardian(worldIn);
-				entityguardian.setElder(true);
-				entityguardian.heal(entityguardian.getMaxHealth());
-				entityguardian.setLocationAndAngles((double) i + 0.5D, (double) j, (double) k + 0.5D, 0.0F, 0.0F);
-				entityguardian.onInitialSpawn(worldIn.getDifficultyForLocation(new BlockPos(entityguardian)),
-						(IEntityLivingData) null);
-				worldIn.spawnEntityInWorld(entityguardian);
-				return true;
-			} else {
-				return false;
-			}
+		protected void writeStructureToNBT(NBTTagCompound var1) {
 		}
 	}
 
@@ -1697,10 +1688,6 @@ public class StructureOceanMonumentPieces {
 			}
 		}
 
-		public boolean func_175961_b() {
-			return this.field_175967_a >= 75;
-		}
-
 		public int func_175960_c() {
 			int i = 0;
 
@@ -1711,6 +1698,10 @@ public class StructureOceanMonumentPieces {
 			}
 
 			return i;
+		}
+
+		public boolean func_175961_b() {
+			return this.field_175967_a >= 75;
 		}
 	}
 
@@ -2149,21 +2140,34 @@ public class StructureOceanMonumentPieces {
 		private XDoubleRoomFitHelper() {
 		}
 
-		public boolean func_175969_a(StructureOceanMonumentPieces.RoomDefinition parRoomDefinition) {
-			return parRoomDefinition.field_175966_c[EnumFacing.EAST.getIndex()]
-					&& !parRoomDefinition.field_175965_b[EnumFacing.EAST.getIndex()].field_175963_d;
-		}
-
 		public StructureOceanMonumentPieces.Piece func_175968_a(EnumFacing parEnumFacing,
 				StructureOceanMonumentPieces.RoomDefinition parRoomDefinition, EaglercraftRandom parRandom) {
 			parRoomDefinition.field_175963_d = true;
 			parRoomDefinition.field_175965_b[EnumFacing.EAST.getIndex()].field_175963_d = true;
 			return new StructureOceanMonumentPieces.DoubleXRoom(parEnumFacing, parRoomDefinition, parRandom);
 		}
+
+		public boolean func_175969_a(StructureOceanMonumentPieces.RoomDefinition parRoomDefinition) {
+			return parRoomDefinition.field_175966_c[EnumFacing.EAST.getIndex()]
+					&& !parRoomDefinition.field_175965_b[EnumFacing.EAST.getIndex()].field_175963_d;
+		}
 	}
 
 	static class XYDoubleRoomFitHelper implements StructureOceanMonumentPieces.MonumentRoomFitHelper {
 		private XYDoubleRoomFitHelper() {
+		}
+
+		public StructureOceanMonumentPieces.Piece func_175968_a(EnumFacing enumfacing,
+				StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition,
+				EaglercraftRandom random) {
+			structureoceanmonumentpieces$roomdefinition.field_175963_d = true;
+			structureoceanmonumentpieces$roomdefinition.field_175965_b[EnumFacing.EAST
+					.getIndex()].field_175963_d = true;
+			structureoceanmonumentpieces$roomdefinition.field_175965_b[EnumFacing.UP.getIndex()].field_175963_d = true;
+			structureoceanmonumentpieces$roomdefinition.field_175965_b[EnumFacing.EAST
+					.getIndex()].field_175965_b[EnumFacing.UP.getIndex()].field_175963_d = true;
+			return new StructureOceanMonumentPieces.DoubleXYRoom(enumfacing,
+					structureoceanmonumentpieces$roomdefinition, random);
 		}
 
 		public boolean func_175969_a(
@@ -2183,30 +2187,10 @@ public class StructureOceanMonumentPieces {
 				return false;
 			}
 		}
-
-		public StructureOceanMonumentPieces.Piece func_175968_a(EnumFacing enumfacing,
-				StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition,
-				EaglercraftRandom random) {
-			structureoceanmonumentpieces$roomdefinition.field_175963_d = true;
-			structureoceanmonumentpieces$roomdefinition.field_175965_b[EnumFacing.EAST
-					.getIndex()].field_175963_d = true;
-			structureoceanmonumentpieces$roomdefinition.field_175965_b[EnumFacing.UP.getIndex()].field_175963_d = true;
-			structureoceanmonumentpieces$roomdefinition.field_175965_b[EnumFacing.EAST
-					.getIndex()].field_175965_b[EnumFacing.UP.getIndex()].field_175963_d = true;
-			return new StructureOceanMonumentPieces.DoubleXYRoom(enumfacing,
-					structureoceanmonumentpieces$roomdefinition, random);
-		}
 	}
 
 	static class YDoubleRoomFitHelper implements StructureOceanMonumentPieces.MonumentRoomFitHelper {
 		private YDoubleRoomFitHelper() {
-		}
-
-		public boolean func_175969_a(
-				StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition) {
-			return structureoceanmonumentpieces$roomdefinition.field_175966_c[EnumFacing.UP.getIndex()]
-					&& !structureoceanmonumentpieces$roomdefinition.field_175965_b[EnumFacing.UP
-							.getIndex()].field_175963_d;
 		}
 
 		public StructureOceanMonumentPieces.Piece func_175968_a(EnumFacing enumfacing,
@@ -2217,10 +2201,30 @@ public class StructureOceanMonumentPieces {
 			return new StructureOceanMonumentPieces.DoubleYRoom(enumfacing, structureoceanmonumentpieces$roomdefinition,
 					random);
 		}
+
+		public boolean func_175969_a(
+				StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition) {
+			return structureoceanmonumentpieces$roomdefinition.field_175966_c[EnumFacing.UP.getIndex()]
+					&& !structureoceanmonumentpieces$roomdefinition.field_175965_b[EnumFacing.UP
+							.getIndex()].field_175963_d;
+		}
 	}
 
 	static class YZDoubleRoomFitHelper implements StructureOceanMonumentPieces.MonumentRoomFitHelper {
 		private YZDoubleRoomFitHelper() {
+		}
+
+		public StructureOceanMonumentPieces.Piece func_175968_a(EnumFacing enumfacing,
+				StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition,
+				EaglercraftRandom random) {
+			structureoceanmonumentpieces$roomdefinition.field_175963_d = true;
+			structureoceanmonumentpieces$roomdefinition.field_175965_b[EnumFacing.NORTH
+					.getIndex()].field_175963_d = true;
+			structureoceanmonumentpieces$roomdefinition.field_175965_b[EnumFacing.UP.getIndex()].field_175963_d = true;
+			structureoceanmonumentpieces$roomdefinition.field_175965_b[EnumFacing.NORTH
+					.getIndex()].field_175965_b[EnumFacing.UP.getIndex()].field_175963_d = true;
+			return new StructureOceanMonumentPieces.DoubleYZRoom(enumfacing,
+					structureoceanmonumentpieces$roomdefinition, random);
 		}
 
 		public boolean func_175969_a(
@@ -2240,30 +2244,10 @@ public class StructureOceanMonumentPieces {
 				return false;
 			}
 		}
-
-		public StructureOceanMonumentPieces.Piece func_175968_a(EnumFacing enumfacing,
-				StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition,
-				EaglercraftRandom random) {
-			structureoceanmonumentpieces$roomdefinition.field_175963_d = true;
-			structureoceanmonumentpieces$roomdefinition.field_175965_b[EnumFacing.NORTH
-					.getIndex()].field_175963_d = true;
-			structureoceanmonumentpieces$roomdefinition.field_175965_b[EnumFacing.UP.getIndex()].field_175963_d = true;
-			structureoceanmonumentpieces$roomdefinition.field_175965_b[EnumFacing.NORTH
-					.getIndex()].field_175965_b[EnumFacing.UP.getIndex()].field_175963_d = true;
-			return new StructureOceanMonumentPieces.DoubleYZRoom(enumfacing,
-					structureoceanmonumentpieces$roomdefinition, random);
-		}
 	}
 
 	static class ZDoubleRoomFitHelper implements StructureOceanMonumentPieces.MonumentRoomFitHelper {
 		private ZDoubleRoomFitHelper() {
-		}
-
-		public boolean func_175969_a(
-				StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition) {
-			return structureoceanmonumentpieces$roomdefinition.field_175966_c[EnumFacing.NORTH.getIndex()]
-					&& !structureoceanmonumentpieces$roomdefinition.field_175965_b[EnumFacing.NORTH
-							.getIndex()].field_175963_d;
 		}
 
 		public StructureOceanMonumentPieces.Piece func_175968_a(EnumFacing enumfacing,
@@ -2283,5 +2267,26 @@ public class StructureOceanMonumentPieces {
 			return new StructureOceanMonumentPieces.DoubleZRoom(enumfacing,
 					structureoceanmonumentpieces$roomdefinition1, random);
 		}
+
+		public boolean func_175969_a(
+				StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition) {
+			return structureoceanmonumentpieces$roomdefinition.field_175966_c[EnumFacing.NORTH.getIndex()]
+					&& !structureoceanmonumentpieces$roomdefinition.field_175965_b[EnumFacing.NORTH
+							.getIndex()].field_175963_d;
+		}
+	}
+
+	public static void registerOceanMonumentPieces() {
+		MapGenStructureIO.registerStructureComponent(StructureOceanMonumentPieces.MonumentBuilding.class, "OMB");
+		MapGenStructureIO.registerStructureComponent(StructureOceanMonumentPieces.MonumentCoreRoom.class, "OMCR");
+		MapGenStructureIO.registerStructureComponent(StructureOceanMonumentPieces.DoubleXRoom.class, "OMDXR");
+		MapGenStructureIO.registerStructureComponent(StructureOceanMonumentPieces.DoubleXYRoom.class, "OMDXYR");
+		MapGenStructureIO.registerStructureComponent(StructureOceanMonumentPieces.DoubleYRoom.class, "OMDYR");
+		MapGenStructureIO.registerStructureComponent(StructureOceanMonumentPieces.DoubleYZRoom.class, "OMDYZR");
+		MapGenStructureIO.registerStructureComponent(StructureOceanMonumentPieces.DoubleZRoom.class, "OMDZR");
+		MapGenStructureIO.registerStructureComponent(StructureOceanMonumentPieces.EntryRoom.class, "OMEntry");
+		MapGenStructureIO.registerStructureComponent(StructureOceanMonumentPieces.Penthouse.class, "OMPenthouse");
+		MapGenStructureIO.registerStructureComponent(StructureOceanMonumentPieces.SimpleRoom.class, "OMSimple");
+		MapGenStructureIO.registerStructureComponent(StructureOceanMonumentPieces.SimpleTopRoom.class, "OMSimpleT");
 	}
 }

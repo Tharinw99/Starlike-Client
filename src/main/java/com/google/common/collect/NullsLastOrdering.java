@@ -25,6 +25,8 @@ import com.google.common.annotations.GwtCompatible;
 /** An ordering that treats {@code null} as greater than all other values. */
 @GwtCompatible(serializable = true)
 final class NullsLastOrdering<T> extends Ordering<T> implements Serializable {
+	private static final long serialVersionUID = 0;
+
 	final Ordering<? super T> ordering;
 
 	NullsLastOrdering(Ordering<? super T> ordering) {
@@ -46,23 +48,6 @@ final class NullsLastOrdering<T> extends Ordering<T> implements Serializable {
 	}
 
 	@Override
-	public <S extends T> Ordering<S> reverse() {
-		// ordering.reverse() might be optimized, so let it do its thing
-		return ordering.reverse().nullsFirst();
-	}
-
-	@Override
-	public <S extends T> Ordering<S> nullsFirst() {
-		return ordering.nullsFirst();
-	}
-
-	@SuppressWarnings("unchecked") // still need the right way to explain this
-	@Override
-	public <S extends T> Ordering<S> nullsLast() {
-		return (Ordering<S>) this;
-	}
-
-	@Override
 	public boolean equals(@Nullable Object object) {
 		if (object == this) {
 			return true;
@@ -80,9 +65,24 @@ final class NullsLastOrdering<T> extends Ordering<T> implements Serializable {
 	}
 
 	@Override
+	public <S extends T> Ordering<S> nullsFirst() {
+		return ordering.nullsFirst();
+	}
+
+	@SuppressWarnings("unchecked") // still need the right way to explain this
+	@Override
+	public <S extends T> Ordering<S> nullsLast() {
+		return (Ordering<S>) this;
+	}
+
+	@Override
+	public <S extends T> Ordering<S> reverse() {
+		// ordering.reverse() might be optimized, so let it do its thing
+		return ordering.reverse().nullsFirst();
+	}
+
+	@Override
 	public String toString() {
 		return ordering + ".nullsLast()";
 	}
-
-	private static final long serialVersionUID = 0;
 }

@@ -32,19 +32,20 @@ import com.google.common.annotations.GwtCompatible;
 final class AllEqualOrdering extends Ordering<Object> implements Serializable {
 	static final AllEqualOrdering INSTANCE = new AllEqualOrdering();
 
+	private static final long serialVersionUID = 0;
+
 	@Override
 	public int compare(@Nullable Object left, @Nullable Object right) {
 		return 0;
 	}
 
 	@Override
-	public <E> List<E> sortedCopy(Iterable<E> iterable) {
-		return Lists.newArrayList(iterable);
-	}
-
-	@Override
 	public <E> ImmutableList<E> immutableSortedCopy(Iterable<E> iterable) {
 		return ImmutableList.copyOf(iterable);
+	}
+
+	private Object readResolve() {
+		return INSTANCE;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -53,14 +54,13 @@ final class AllEqualOrdering extends Ordering<Object> implements Serializable {
 		return (Ordering<S>) this;
 	}
 
-	private Object readResolve() {
-		return INSTANCE;
+	@Override
+	public <E> List<E> sortedCopy(Iterable<E> iterable) {
+		return Lists.newArrayList(iterable);
 	}
 
 	@Override
 	public String toString() {
 		return "Ordering.allEqual()";
 	}
-
-	private static final long serialVersionUID = 0;
 }

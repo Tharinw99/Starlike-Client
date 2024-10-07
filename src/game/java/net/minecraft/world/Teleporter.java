@@ -1,8 +1,10 @@
 package net.minecraft.world;
 
-import com.google.common.collect.Lists;
 import java.util.Iterator;
 import java.util.List;
+
+import com.google.common.collect.Lists;
+
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.state.IBlockState;
@@ -14,182 +16,55 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.LongHashMap;
 import net.minecraft.util.MathHelper;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class Teleporter {
+	public class PortalPosition extends BlockPos {
+		public long lastUpdateTime;
+
+		public PortalPosition(BlockPos pos, long lastUpdate) {
+			super(pos.getX(), pos.getY(), pos.getZ());
+			this.lastUpdateTime = lastUpdate;
+		}
+	}
+
 	private final WorldServer worldServerInstance;
 	private final EaglercraftRandom random;
-	/**+
-	 * Stores successful portal placement locations for rapid
-	 * lookup.
+	/**
+	 * + Stores successful portal placement locations for rapid lookup.
 	 */
 	private final LongHashMap<Teleporter.PortalPosition> destinationCoordinateCache = new LongHashMap();
-	/**+
-	 * A list of valid keys for the destinationCoordainteCache.
-	 * These are based on the X & Z of the players initial location.
+
+	/**
+	 * + A list of valid keys for the destinationCoordainteCache. These are based on
+	 * the X & Z of the players initial location.
 	 */
 	private final List<Long> destinationCoordinateKeys = Lists.newArrayList();
 
 	public Teleporter(WorldServer worldIn) {
 		this.worldServerInstance = worldIn;
 		this.random = new EaglercraftRandom(worldIn.getSeed(), !worldIn.getWorldInfo().isOldEaglercraftRandom());
-	}
-
-	public void placeInPortal(Entity entityIn, float rotationYaw) {
-		if (this.worldServerInstance.provider.getDimensionId() != 1) {
-			if (!this.placeInExistingPortal(entityIn, rotationYaw)) {
-				this.makePortal(entityIn);
-				this.placeInExistingPortal(entityIn, rotationYaw);
-			}
-		} else {
-			int i = MathHelper.floor_double(entityIn.posX);
-			int j = MathHelper.floor_double(entityIn.posY) - 1;
-			int k = MathHelper.floor_double(entityIn.posZ);
-			byte b0 = 1;
-			byte b1 = 0;
-
-			for (int l = -2; l <= 2; ++l) {
-				for (int i1 = -2; i1 <= 2; ++i1) {
-					for (int j1 = -1; j1 < 3; ++j1) {
-						int k1 = i + i1 * b0 + l * b1;
-						int l1 = j + j1;
-						int i2 = k + i1 * b1 - l * b0;
-						boolean flag = j1 < 0;
-						this.worldServerInstance.setBlockState(new BlockPos(k1, l1, i2),
-								flag ? Blocks.obsidian.getDefaultState() : Blocks.air.getDefaultState());
-					}
-				}
-			}
-
-			entityIn.setLocationAndAngles((double) i, (double) j, (double) k, entityIn.rotationYaw, 0.0F);
-			entityIn.motionX = entityIn.motionY = entityIn.motionZ = 0.0D;
-		}
-	}
-
-	public boolean placeInExistingPortal(Entity entityIn, float rotationYaw) {
-		boolean flag = true;
-		double d0 = -1.0D;
-		int i = MathHelper.floor_double(entityIn.posX);
-		int j = MathHelper.floor_double(entityIn.posZ);
-		boolean flag1 = true;
-		Object object = BlockPos.ORIGIN;
-		long k = ChunkCoordIntPair.chunkXZ2Int(i, j);
-		if (this.destinationCoordinateCache.containsItem(k)) {
-			Teleporter.PortalPosition teleporter$portalposition = (Teleporter.PortalPosition) this.destinationCoordinateCache
-					.getValueByKey(k);
-			d0 = 0.0D;
-			object = teleporter$portalposition;
-			teleporter$portalposition.lastUpdateTime = this.worldServerInstance.getTotalWorldTime();
-			flag1 = false;
-		} else {
-			BlockPos blockpos2 = new BlockPos(entityIn);
-
-			for (int l = -128; l <= 128; ++l) {
-				BlockPos blockpos1;
-				for (int i1 = -128; i1 <= 128; ++i1) {
-					for (BlockPos blockpos = blockpos2.add(l,
-							this.worldServerInstance.getActualHeight() - 1 - blockpos2.getY(), i1); blockpos
-									.getY() >= 0; blockpos = blockpos1) {
-						blockpos1 = blockpos.down();
-						if (this.worldServerInstance.getBlockState(blockpos).getBlock() == Blocks.portal) {
-							while (this.worldServerInstance.getBlockState(blockpos1 = blockpos.down())
-									.getBlock() == Blocks.portal) {
-								blockpos = blockpos1;
-							}
-
-							double d1 = blockpos.distanceSq(blockpos2);
-							if (d0 < 0.0D || d1 < d0) {
-								d0 = d1;
-								object = blockpos;
-							}
-						}
-					}
-				}
-			}
-		}
-
-		if (d0 >= 0.0D) {
-			if (flag1) {
-				this.destinationCoordinateCache.add(k,
-						new Teleporter.PortalPosition((BlockPos) object, this.worldServerInstance.getTotalWorldTime()));
-				this.destinationCoordinateKeys.add(Long.valueOf(k));
-			}
-
-			double d5 = (double) ((BlockPos) object).getX() + 0.5D;
-			double d6 = (double) ((BlockPos) object).getY() + 0.5D;
-			double d7 = (double) ((BlockPos) object).getZ() + 0.5D;
-			BlockPattern.PatternHelper blockpattern$patternhelper = Blocks.portal
-					.func_181089_f(this.worldServerInstance, (BlockPos) object);
-			boolean flag2 = blockpattern$patternhelper.getFinger().rotateY()
-					.getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE;
-			double d2 = blockpattern$patternhelper.getFinger().getAxis() == EnumFacing.Axis.X
-					? (double) blockpattern$patternhelper.func_181117_a().getZ()
-					: (double) blockpattern$patternhelper.func_181117_a().getX();
-			d6 = (double) (blockpattern$patternhelper.func_181117_a().getY() + 1)
-					- entityIn.func_181014_aG().yCoord * (double) blockpattern$patternhelper.func_181119_e();
-			if (flag2) {
-				++d2;
-			}
-
-			if (blockpattern$patternhelper.getFinger().getAxis() == EnumFacing.Axis.X) {
-				d7 = d2 + (1.0D - entityIn.func_181014_aG().xCoord)
-						* (double) blockpattern$patternhelper.func_181118_d()
-						* (double) blockpattern$patternhelper.getFinger().rotateY().getAxisDirection().getOffset();
-			} else {
-				d5 = d2 + (1.0D - entityIn.func_181014_aG().xCoord)
-						* (double) blockpattern$patternhelper.func_181118_d()
-						* (double) blockpattern$patternhelper.getFinger().rotateY().getAxisDirection().getOffset();
-			}
-
-			float f = 0.0F;
-			float f1 = 0.0F;
-			float f2 = 0.0F;
-			float f3 = 0.0F;
-			if (blockpattern$patternhelper.getFinger().getOpposite() == entityIn.func_181012_aH()) {
-				f = 1.0F;
-				f1 = 1.0F;
-			} else if (blockpattern$patternhelper.getFinger().getOpposite() == entityIn.func_181012_aH()
-					.getOpposite()) {
-				f = -1.0F;
-				f1 = -1.0F;
-			} else if (blockpattern$patternhelper.getFinger().getOpposite() == entityIn.func_181012_aH().rotateY()) {
-				f2 = 1.0F;
-				f3 = -1.0F;
-			} else {
-				f2 = -1.0F;
-				f3 = 1.0F;
-			}
-
-			double d3 = entityIn.motionX;
-			double d4 = entityIn.motionZ;
-			entityIn.motionX = d3 * (double) f + d4 * (double) f3;
-			entityIn.motionZ = d3 * (double) f2 + d4 * (double) f1;
-			entityIn.rotationYaw = rotationYaw
-					- (float) (entityIn.func_181012_aH().getOpposite().getHorizontalIndex() * 90)
-					+ (float) (blockpattern$patternhelper.getFinger().getHorizontalIndex() * 90);
-			entityIn.setLocationAndAngles(d5, d6, d7, entityIn.rotationYaw, entityIn.rotationPitch);
-			return true;
-		} else {
-			return false;
-		}
 	}
 
 	public boolean makePortal(Entity parEntity) {
@@ -367,10 +242,148 @@ public class Teleporter {
 		return true;
 	}
 
-	/**+
-	 * called periodically to remove out-of-date portal locations
-	 * from the cache list. Argument par1 is a
-	 * WorldServer.getTotalWorldTime() value.
+	public boolean placeInExistingPortal(Entity entityIn, float rotationYaw) {
+		boolean flag = true;
+		double d0 = -1.0D;
+		int i = MathHelper.floor_double(entityIn.posX);
+		int j = MathHelper.floor_double(entityIn.posZ);
+		boolean flag1 = true;
+		Object object = BlockPos.ORIGIN;
+		long k = ChunkCoordIntPair.chunkXZ2Int(i, j);
+		if (this.destinationCoordinateCache.containsItem(k)) {
+			Teleporter.PortalPosition teleporter$portalposition = (Teleporter.PortalPosition) this.destinationCoordinateCache
+					.getValueByKey(k);
+			d0 = 0.0D;
+			object = teleporter$portalposition;
+			teleporter$portalposition.lastUpdateTime = this.worldServerInstance.getTotalWorldTime();
+			flag1 = false;
+		} else {
+			BlockPos blockpos2 = new BlockPos(entityIn);
+
+			for (int l = -128; l <= 128; ++l) {
+				BlockPos blockpos1;
+				for (int i1 = -128; i1 <= 128; ++i1) {
+					for (BlockPos blockpos = blockpos2.add(l,
+							this.worldServerInstance.getActualHeight() - 1 - blockpos2.getY(), i1); blockpos
+									.getY() >= 0; blockpos = blockpos1) {
+						blockpos1 = blockpos.down();
+						if (this.worldServerInstance.getBlockState(blockpos).getBlock() == Blocks.portal) {
+							while (this.worldServerInstance.getBlockState(blockpos1 = blockpos.down())
+									.getBlock() == Blocks.portal) {
+								blockpos = blockpos1;
+							}
+
+							double d1 = blockpos.distanceSq(blockpos2);
+							if (d0 < 0.0D || d1 < d0) {
+								d0 = d1;
+								object = blockpos;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if (d0 >= 0.0D) {
+			if (flag1) {
+				this.destinationCoordinateCache.add(k,
+						new Teleporter.PortalPosition((BlockPos) object, this.worldServerInstance.getTotalWorldTime()));
+				this.destinationCoordinateKeys.add(Long.valueOf(k));
+			}
+
+			double d5 = (double) ((BlockPos) object).getX() + 0.5D;
+			double d6 = (double) ((BlockPos) object).getY() + 0.5D;
+			double d7 = (double) ((BlockPos) object).getZ() + 0.5D;
+			BlockPattern.PatternHelper blockpattern$patternhelper = Blocks.portal
+					.func_181089_f(this.worldServerInstance, (BlockPos) object);
+			boolean flag2 = blockpattern$patternhelper.getFinger().rotateY()
+					.getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE;
+			double d2 = blockpattern$patternhelper.getFinger().getAxis() == EnumFacing.Axis.X
+					? (double) blockpattern$patternhelper.func_181117_a().getZ()
+					: (double) blockpattern$patternhelper.func_181117_a().getX();
+			d6 = (double) (blockpattern$patternhelper.func_181117_a().getY() + 1)
+					- entityIn.func_181014_aG().yCoord * (double) blockpattern$patternhelper.func_181119_e();
+			if (flag2) {
+				++d2;
+			}
+
+			if (blockpattern$patternhelper.getFinger().getAxis() == EnumFacing.Axis.X) {
+				d7 = d2 + (1.0D - entityIn.func_181014_aG().xCoord)
+						* (double) blockpattern$patternhelper.func_181118_d()
+						* (double) blockpattern$patternhelper.getFinger().rotateY().getAxisDirection().getOffset();
+			} else {
+				d5 = d2 + (1.0D - entityIn.func_181014_aG().xCoord)
+						* (double) blockpattern$patternhelper.func_181118_d()
+						* (double) blockpattern$patternhelper.getFinger().rotateY().getAxisDirection().getOffset();
+			}
+
+			float f = 0.0F;
+			float f1 = 0.0F;
+			float f2 = 0.0F;
+			float f3 = 0.0F;
+			if (blockpattern$patternhelper.getFinger().getOpposite() == entityIn.func_181012_aH()) {
+				f = 1.0F;
+				f1 = 1.0F;
+			} else if (blockpattern$patternhelper.getFinger().getOpposite() == entityIn.func_181012_aH()
+					.getOpposite()) {
+				f = -1.0F;
+				f1 = -1.0F;
+			} else if (blockpattern$patternhelper.getFinger().getOpposite() == entityIn.func_181012_aH().rotateY()) {
+				f2 = 1.0F;
+				f3 = -1.0F;
+			} else {
+				f2 = -1.0F;
+				f3 = 1.0F;
+			}
+
+			double d3 = entityIn.motionX;
+			double d4 = entityIn.motionZ;
+			entityIn.motionX = d3 * (double) f + d4 * (double) f3;
+			entityIn.motionZ = d3 * (double) f2 + d4 * (double) f1;
+			entityIn.rotationYaw = rotationYaw
+					- (float) (entityIn.func_181012_aH().getOpposite().getHorizontalIndex() * 90)
+					+ (float) (blockpattern$patternhelper.getFinger().getHorizontalIndex() * 90);
+			entityIn.setLocationAndAngles(d5, d6, d7, entityIn.rotationYaw, entityIn.rotationPitch);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public void placeInPortal(Entity entityIn, float rotationYaw) {
+		if (this.worldServerInstance.provider.getDimensionId() != 1) {
+			if (!this.placeInExistingPortal(entityIn, rotationYaw)) {
+				this.makePortal(entityIn);
+				this.placeInExistingPortal(entityIn, rotationYaw);
+			}
+		} else {
+			int i = MathHelper.floor_double(entityIn.posX);
+			int j = MathHelper.floor_double(entityIn.posY) - 1;
+			int k = MathHelper.floor_double(entityIn.posZ);
+			byte b0 = 1;
+			byte b1 = 0;
+
+			for (int l = -2; l <= 2; ++l) {
+				for (int i1 = -2; i1 <= 2; ++i1) {
+					for (int j1 = -1; j1 < 3; ++j1) {
+						int k1 = i + i1 * b0 + l * b1;
+						int l1 = j + j1;
+						int i2 = k + i1 * b1 - l * b0;
+						boolean flag = j1 < 0;
+						this.worldServerInstance.setBlockState(new BlockPos(k1, l1, i2),
+								flag ? Blocks.obsidian.getDefaultState() : Blocks.air.getDefaultState());
+					}
+				}
+			}
+
+			entityIn.setLocationAndAngles((double) i, (double) j, (double) k, entityIn.rotationYaw, 0.0F);
+			entityIn.motionX = entityIn.motionY = entityIn.motionZ = 0.0D;
+		}
+	}
+
+	/**
+	 * + called periodically to remove out-of-date portal locations from the cache
+	 * list. Argument par1 is a WorldServer.getTotalWorldTime() value.
 	 */
 	public void removeStalePortalLocations(long worldTime) {
 		if (worldTime % 100L == 0L) {
@@ -388,14 +401,5 @@ public class Teleporter {
 			}
 		}
 
-	}
-
-	public class PortalPosition extends BlockPos {
-		public long lastUpdateTime;
-
-		public PortalPosition(BlockPos pos, long lastUpdate) {
-			super(pos.getX(), pos.getY(), pos.getZ());
-			this.lastUpdateTime = lastUpdate;
-		}
 	}
 }

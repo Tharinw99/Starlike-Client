@@ -1,6 +1,7 @@
 package net.minecraft.client.gui;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ONE_MINUS_SRC_ALPHA;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_SRC_ALPHA;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.lax1dude.eaglercraft.v1_8.internal.EnumTouchEvent;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Splitter;
@@ -24,6 +24,7 @@ import net.lax1dude.eaglercraft.v1_8.Mouse;
 import net.lax1dude.eaglercraft.v1_8.PauseMenuCustomizeState;
 import net.lax1dude.eaglercraft.v1_8.PointerInputAbstraction;
 import net.lax1dude.eaglercraft.v1_8.Touch;
+import net.lax1dude.eaglercraft.v1_8.internal.EnumTouchEvent;
 import net.lax1dude.eaglercraft.v1_8.internal.KeyboardConstants;
 import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
 import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
@@ -54,22 +55,25 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ResourceLocation;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -78,114 +82,59 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback {
 	private static final Logger LOGGER = LogManager.getLogger();
 	private static final Set<String> PROTOCOLS = Sets.newHashSet(new String[] { "http", "https" });
 	private static final Splitter NEWLINE_SPLITTER = Splitter.on('\n');
-	protected Minecraft mc;
-	protected RenderItem itemRender;
-	public int width;
-	public int height;
-	/**+
-	 * A list of all the buttons in this container.
-	 */
-	protected List<GuiButton> buttonList = Lists.newArrayList();
-	/**+
-	 * A list of all the labels in this container.
-	 */
-	protected List<GuiLabel> labelList = Lists.newArrayList();
-	public boolean allowUserInput;
-	protected FontRenderer fontRendererObj;
-	protected GuiButton selectedButton;
-	private int eventButton;
-	private long lastMouseEvent;
-	private int touchValue;
-	private String clickedLinkURI;
-	protected long showingCloseKey = 0;
 
-	protected int touchModeCursorPosX = -1;
-	protected int touchModeCursorPosY = -1;
-	private long lastTouchEvent;
-
-	/**+
-	 * Draws the screen and all the components in it. Args : mouseX,
-	 * mouseY, renderPartialTicks
-	 */
-	public void drawScreen(int i, int j, float var3) {
-		for (int k = 0, l = this.buttonList.size(); k < l; ++k) {
-			((GuiButton) this.buttonList.get(k)).drawButton(this.mc, i, j);
-		}
-
-		for (int l = 0, m = this.labelList.size(); l < m; ++l) {
-			((GuiLabel) this.labelList.get(l)).drawLabel(this.mc, i, j);
-		}
-
-		long millis = EagRuntime.steadyTimeMillis();
-		long closeKeyTimeout = millis - showingCloseKey;
-		if (closeKeyTimeout < 3000l) {
-			int alpha1 = 0xC0000000;
-			int alpha2 = 0xFF000000;
-			if (closeKeyTimeout > 2500l) {
-				float f = (float) (3000l - closeKeyTimeout) * 0.002f;
-				if (f < 0.03f)
-					f = 0.03f;
-				alpha1 = (int) (f * 192.0f) << 24;
-				alpha2 = (int) (f * 255.0f) << 24;
-			}
-			String str;
-			int k = getCloseKey();
-			if (k == KeyboardConstants.KEY_GRAVE) {
-				str = I18n.format("gui.exitKeyRetarded");
-			} else {
-				str = I18n.format("gui.exitKey", Keyboard.getKeyName(k));
-			}
-			int w = fontRendererObj.getStringWidth(str);
-			int x = (width - w - 4) / 2;
-			int y = 10;
-			drawRect(x, y, x + w + 4, y + 12, alpha1);
-			if (closeKeyTimeout > 2500l)
-				GlStateManager.enableBlend();
-			fontRendererObj.drawStringWithShadow(str, x + 2, y + 2, 0xFFAAAA | alpha2);
-			if (closeKeyTimeout > 2500l)
-				GlStateManager.disableBlend();
-		}
-
+	public static int applyEaglerScale(float scaleFac, int coord, int screenDim) {
+		return (int) ((coord - (1.0f - scaleFac) * screenDim * 0.5f) / scaleFac);
 	}
 
-	protected int getCloseKey() {
-		if (this instanceof GuiContainer) {
-			return this.mc.gameSettings.keyBindInventory.getKeyCode();
-		} else {
-			return this.mc.gameSettings.keyBindClose.getKeyCode();
-		}
-	}
-
-	/**+
-	 * Fired when a key is typed (except F11 which toggles full
-	 * screen). This is the equivalent of
-	 * KeyListener.keyTyped(KeyEvent e). Args : character (character
-	 * on the key), keyCode (lwjgl Keyboard key code)
-	 */
-	protected void keyTyped(char parChar1, int parInt1) {
-		if (!canCloseGui())
-			return;
-		if (((this.mc.theWorld == null || this.mc.thePlayer.getHealth() <= 0.0F) && parInt1 == 1)
-				|| parInt1 == this.mc.gameSettings.keyBindClose.getKeyCode()
-				|| (parInt1 == 1 && (this.mc.gameSettings.keyBindClose.getKeyCode() == 0 || this.mc.areKeysLocked()))) {
-			this.mc.displayGuiScreen((GuiScreen) null);
-			if (this.mc.currentScreen == null) {
-				this.mc.setIngameFocus();
-			}
-		} else if (parInt1 == 1) {
-			showingCloseKey = EagRuntime.steadyTimeMillis();
-		}
-	}
-
-	/**+
-	 * Returns a string stored in the system clipboard.
+	/**
+	 * + Returns a string stored in the system clipboard.
 	 */
 	public static String getClipboardString() {
 		return EagRuntime.getClipboard();
 	}
 
-	/**+
-	 * Stores the given string in the system clipboard
+	/**
+	 * + Returns true if either alt key is down
+	 */
+	public static boolean isAltKeyDown() {
+		return Keyboard.isKeyDown(56) || Keyboard.isKeyDown(184);
+	}
+
+	/**
+	 * + Returns true if either windows ctrl key is down or if either mac meta key
+	 * is down
+	 */
+	public static boolean isCtrlKeyDown() {
+		return Minecraft.isRunningOnMac ? Keyboard.isKeyDown(219) || Keyboard.isKeyDown(220)
+				: Keyboard.isKeyDown(29) || Keyboard.isKeyDown(157);
+	}
+
+	public static boolean isKeyComboCtrlA(int parInt1) {
+		return parInt1 == 30 && isCtrlKeyDown() && !isShiftKeyDown() && !isAltKeyDown();
+	}
+
+	public static boolean isKeyComboCtrlC(int parInt1) {
+		return parInt1 == 46 && isCtrlKeyDown() && !isShiftKeyDown() && !isAltKeyDown();
+	}
+
+	public static boolean isKeyComboCtrlV(int parInt1) {
+		return parInt1 == 47 && isCtrlKeyDown() && !isShiftKeyDown() && !isAltKeyDown();
+	}
+
+	public static boolean isKeyComboCtrlX(int parInt1) {
+		return parInt1 == 45 && isCtrlKeyDown() && !isShiftKeyDown() && !isAltKeyDown();
+	}
+
+	/**
+	 * + Returns true if either shift key is down
+	 */
+	public static boolean isShiftKeyDown() {
+		return Keyboard.isKeyDown(42) || Keyboard.isKeyDown(54);
+	}
+
+	/**
+	 * + Stores the given string in the system clipboard
 	 */
 	public static void setClipboardString(String copyText) {
 		if (!StringUtils.isEmpty(copyText)) {
@@ -193,36 +142,121 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback {
 		}
 	}
 
-	protected void renderToolTip(ItemStack itemstack, int i, int j) {
-		renderToolTip0(itemstack, i, j, false);
+	protected Minecraft mc;
+	protected RenderItem itemRender;
+	public int width;
+	public int height;
+
+	/**
+	 * + A list of all the buttons in this container.
+	 */
+	protected List<GuiButton> buttonList = Lists.newArrayList();
+	/**
+	 * + A list of all the labels in this container.
+	 */
+	protected List<GuiLabel> labelList = Lists.newArrayList();
+	public boolean allowUserInput;
+
+	protected FontRenderer fontRendererObj;
+
+	protected GuiButton selectedButton;
+
+	private int eventButton;
+
+	private long lastMouseEvent;
+
+	private int touchValue;
+
+	private String clickedLinkURI;
+
+	protected long showingCloseKey = 0;
+
+	protected int touchModeCursorPosX = -1;
+
+	protected int touchModeCursorPosY = -1;
+
+	private long lastTouchEvent;
+
+	public final Map<Integer, int[]> touchStarts = new HashMap<>();
+
+	/**
+	 * + Called by the controls from the buttonList when activated. (Mouse pressed
+	 * for buttons)
+	 */
+	protected void actionPerformed(GuiButton parGuiButton) {
 	}
 
-	protected void renderToolTip0(ItemStack itemstack, int i, int j, boolean eagler) {
-		List list = itemstack.getTooltipProfanityFilter(this.mc.thePlayer, this.mc.gameSettings.advancedItemTooltips);
+	public boolean blockPTTKey() {
+		return false;
+	}
 
-		for (int k = 0, l = list.size(); k < l; ++k) {
-			if (k == 0) {
-				list.set(k, itemstack.getRarity().rarityColor + (String) list.get(k));
-			} else {
-				list.set(k, EnumChatFormatting.GRAY + (String) list.get(k));
+	public boolean canCloseGui() {
+		return true;
+	}
+
+	public void confirmClicked(boolean flag, int i) {
+		if (i == 31102009) {
+			if (flag) {
+				this.openWebLink(this.clickedLinkURI);
 			}
+
+			this.clickedLinkURI = null;
+			this.mc.displayGuiScreen(this);
 		}
 
-		this.drawHoveringText0(list, i, j, eagler);
 	}
 
-	/**+
-	 * Draws the text when mouse is over creative inventory tab.
-	 * Params: current creative tab to be checked, current mouse x
-	 * position, current mouse y position.
+	/**
+	 * + Returns true if this GUI should pause the game when it is displayed in
+	 * single-player
+	 */
+	public boolean doesGuiPauseGame() {
+		return true;
+	}
+
+	/**
+	 * + Draws the background (i is always 0 as of 1.2.2)
+	 */
+	public void drawBackground(int tint) {
+		GlStateManager.disableLighting();
+		GlStateManager.disableFog();
+		Tessellator tessellator = Tessellator.getInstance();
+		WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+		this.mc.getTextureManager().bindTexture(optionsBackground);
+		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+		float f = 32.0F;
+		worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+		worldrenderer.pos(0.0D, (double) this.height, 0.0D)
+				.tex(0.0D, (double) ((float) this.height / 32.0F + (float) tint)).color(64, 64, 64, 255).endVertex();
+		worldrenderer.pos((double) this.width, (double) this.height, 0.0D)
+				.tex((double) ((float) this.width / 32.0F), (double) ((float) this.height / 32.0F + (float) tint))
+				.color(64, 64, 64, 255).endVertex();
+		worldrenderer.pos((double) this.width, 0.0D, 0.0D).tex((double) ((float) this.width / 32.0F), (double) tint)
+				.color(64, 64, 64, 255).endVertex();
+		worldrenderer.pos(0.0D, 0.0D, 0.0D).tex(0.0D, (double) tint).color(64, 64, 64, 255).endVertex();
+		tessellator.draw();
+	}
+
+	/**
+	 * + Draws the text when mouse is over creative inventory tab. Params: current
+	 * creative tab to be checked, current mouse x position, current mouse y
+	 * position.
 	 */
 	protected void drawCreativeTabHoveringText(String s, int i, int j) {
 		this.drawHoveringText(Arrays.asList(new String[] { s }), i, j);
 	}
 
-	/**+
-	 * Draws a List of strings as a tooltip. Every entry is drawn on
-	 * a seperate line.
+	/**
+	 * + Draws either a gradient over the background screen (when it exists) or a
+	 * flat gradient over background.png
+	 */
+	public void drawDefaultBackground() {
+		this.drawWorldBackground(0);
+	}
+
+	/**
+	 * + Draws a List of strings as a tooltip. Every entry is drawn on a seperate
+	 * line.
 	 */
 	protected void drawHoveringText(List<String> list, int i, int j) {
 		drawHoveringText0(list, i, j, false);
@@ -301,8 +335,189 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback {
 		}
 	}
 
-	/**+
-	 * Draws the hover event specified by the given chat component
+	/**
+	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
+	 * renderPartialTicks
+	 */
+	public void drawScreen(int i, int j, float var3) {
+		for (int k = 0, l = this.buttonList.size(); k < l; ++k) {
+			((GuiButton) this.buttonList.get(k)).drawButton(this.mc, i, j);
+		}
+
+		for (int l = 0, m = this.labelList.size(); l < m; ++l) {
+			((GuiLabel) this.labelList.get(l)).drawLabel(this.mc, i, j);
+		}
+
+		long millis = EagRuntime.steadyTimeMillis();
+		long closeKeyTimeout = millis - showingCloseKey;
+		if (closeKeyTimeout < 3000l) {
+			int alpha1 = 0xC0000000;
+			int alpha2 = 0xFF000000;
+			if (closeKeyTimeout > 2500l) {
+				float f = (float) (3000l - closeKeyTimeout) * 0.002f;
+				if (f < 0.03f)
+					f = 0.03f;
+				alpha1 = (int) (f * 192.0f) << 24;
+				alpha2 = (int) (f * 255.0f) << 24;
+			}
+			String str;
+			int k = getCloseKey();
+			if (k == KeyboardConstants.KEY_GRAVE) {
+				str = I18n.format("gui.exitKeyRetarded");
+			} else {
+				str = I18n.format("gui.exitKey", Keyboard.getKeyName(k));
+			}
+			int w = fontRendererObj.getStringWidth(str);
+			int x = (width - w - 4) / 2;
+			int y = 10;
+			drawRect(x, y, x + w + 4, y + 12, alpha1);
+			if (closeKeyTimeout > 2500l)
+				GlStateManager.enableBlend();
+			fontRendererObj.drawStringWithShadow(str, x + 2, y + 2, 0xFFAAAA | alpha2);
+			if (closeKeyTimeout > 2500l)
+				GlStateManager.disableBlend();
+		}
+
+	}
+
+	public void drawWorldBackground(int i) {
+		if (this.mc.theWorld != null) {
+			boolean ingame = isPartOfPauseMenu();
+			ResourceLocation loc = (ingame && PauseMenuCustomizeState.icon_background_pause != null)
+					? PauseMenuCustomizeState.icon_background_pause
+					: PauseMenuCustomizeState.icon_background_all;
+			float aspect = (ingame && PauseMenuCustomizeState.icon_background_pause != null)
+					? 1.0f / PauseMenuCustomizeState.icon_background_pause_aspect
+					: 1.0f / PauseMenuCustomizeState.icon_background_all_aspect;
+			if (loc != null) {
+				GlStateManager.disableLighting();
+				GlStateManager.disableFog();
+				GlStateManager.enableBlend();
+				GlStateManager.disableAlpha();
+				GlStateManager.enableTexture2D();
+				GlStateManager.tryBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+				Tessellator tessellator = Tessellator.getInstance();
+				WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+				this.mc.getTextureManager().bindTexture(loc);
+				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+				float f = 64.0F;
+				worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+				worldrenderer.pos(0.0D, (double) this.height, 0.0D).tex(0.0D, (double) ((float) this.height / f))
+						.color(64, 64, 64, 192).endVertex();
+				worldrenderer.pos((double) this.width, (double) this.height, 0.0D)
+						.tex((double) ((float) this.width / f * aspect), (double) ((float) this.height / f))
+						.color(64, 64, 64, 192).endVertex();
+				worldrenderer.pos((double) this.width, 0.0D, 0.0D)
+						.tex((double) ((float) this.width / f * aspect), (double) 0).color(64, 64, 64, 192).endVertex();
+				worldrenderer.pos(0.0D, 0.0D, 0.0D).tex(0.0D, (double) 0).color(64, 64, 64, 192).endVertex();
+				tessellator.draw();
+				GlStateManager.enableAlpha();
+			} else {
+				this.drawGradientRect(0, 0, this.width, this.height, -1072689136, -804253680);
+			}
+			if (!(this instanceof GuiScreenServerInfo)) {
+				loc = (ingame && PauseMenuCustomizeState.icon_watermark_pause != null)
+						? PauseMenuCustomizeState.icon_watermark_pause
+						: PauseMenuCustomizeState.icon_watermark_all;
+				aspect = (ingame && PauseMenuCustomizeState.icon_watermark_pause != null)
+						? PauseMenuCustomizeState.icon_watermark_pause_aspect
+						: PauseMenuCustomizeState.icon_watermark_all_aspect;
+				if (loc != null) {
+					GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+					mc.getTextureManager().bindTexture(loc);
+					GlStateManager.pushMatrix();
+					GlStateManager.translate(8, height - 72, 0.0f);
+					float f2 = 64.0f / 256.0f;
+					GlStateManager.scale(f2 * aspect, f2, f2);
+					this.drawTexturedModalRect(0, 0, 0, 0, 256, 256);
+					GlStateManager.popMatrix();
+				}
+			}
+		} else {
+			this.drawBackground(i);
+		}
+
+	}
+
+	public void fireInputEvent(EnumInputEvent event, String param) {
+
+	}
+
+	protected int getCloseKey() {
+		if (this instanceof GuiContainer) {
+			return this.mc.gameSettings.keyBindInventory.getKeyCode();
+		} else {
+			return this.mc.gameSettings.keyBindClose.getKeyCode();
+		}
+	}
+
+	public float getEaglerScale() {
+		return PointerInputAbstraction.isTouchMode() ? getTouchModeScale() : 1.0f;
+	}
+
+	protected float getTouchModeScale() {
+		return 1.0f;
+	}
+
+	/**
+	 * + Executes the click event specified by the given chat component
+	 */
+	public boolean handleComponentClick(IChatComponent parIChatComponent) {
+		if (parIChatComponent == null) {
+			return false;
+		} else {
+			ClickEvent clickevent = parIChatComponent.getChatStyle().getChatClickEvent();
+			if (isShiftKeyDown()) {
+				if (parIChatComponent.getChatStyle().getInsertion() != null) {
+					this.setText(parIChatComponent.getChatStyle().getInsertion(), false);
+				}
+			} else if (clickevent != null) {
+				if (clickevent.getAction() == ClickEvent.Action.OPEN_URL) {
+					if (!this.mc.gameSettings.chatLinks) {
+						return false;
+					}
+					String uri = clickevent.getValue();
+
+					if (this.mc.gameSettings.chatLinksPrompt) {
+						this.clickedLinkURI = uri;
+						this.mc.displayGuiScreen(new GuiConfirmOpenLink(this, clickevent.getValue(), 31102009, false));
+					} else {
+						this.openWebLink(uri);
+					}
+				} else if (clickevent.getAction() == ClickEvent.Action.OPEN_FILE) {
+					// rip
+				} else if (clickevent.getAction() == ClickEvent.Action.SUGGEST_COMMAND) {
+					this.setText(clickevent.getValue(), true);
+				} else if (clickevent.getAction() == ClickEvent.Action.RUN_COMMAND) {
+					this.sendChatMessage(clickevent.getValue(), false);
+				} else if (clickevent.getAction() == ClickEvent.Action.TWITCH_USER_INFO) {
+					/*
+					 * ChatUserInfo chatuserinfo =
+					 * this.mc.getTwitchStream().func_152926_a(clickevent.getValue()); if
+					 * (chatuserinfo != null) { this.mc.displayGuiScreen(new
+					 * GuiTwitchUserMode(this.mc.getTwitchStream(), chatuserinfo)); } else { }
+					 */
+					LOGGER.error("Tried to handle twitch user but couldn\'t find them!");
+				} else if (clickevent.getAction() == ClickEvent.Action.EAGLER_PLUGIN_DOWNLOAD) {
+					if (EaglerXBungeeVersion.pluginFileEPK.equals(clickevent.getValue())) {
+						EaglerXBungeeVersion.startPluginDownload();
+					} else {
+						LOGGER.error("Invalid plugin download from EPK was blocked: {}",
+								EaglerXBungeeVersion.pluginFileEPK);
+					}
+				} else {
+					LOGGER.error("Don\'t know how to handle " + clickevent);
+				}
+
+				return true;
+			}
+
+			return false;
+		}
+	}
+
+	/**
+	 * + Draws the hover event specified by the given chat component
 	 */
 	public void handleComponentHover(IChatComponent parIChatComponent, int parInt1, int parInt2) {
 		if (parIChatComponent != null && parIChatComponent.getChatStyle().getChatHoverEvent() != null) {
@@ -378,177 +593,8 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback {
 		}
 	}
 
-	/**+
-	 * Sets the text of the chat
-	 */
-	protected void setText(String var1, boolean var2) {
-	}
-
-	/**+
-	 * Executes the click event specified by the given chat
-	 * component
-	 */
-	public boolean handleComponentClick(IChatComponent parIChatComponent) {
-		if (parIChatComponent == null) {
-			return false;
-		} else {
-			ClickEvent clickevent = parIChatComponent.getChatStyle().getChatClickEvent();
-			if (isShiftKeyDown()) {
-				if (parIChatComponent.getChatStyle().getInsertion() != null) {
-					this.setText(parIChatComponent.getChatStyle().getInsertion(), false);
-				}
-			} else if (clickevent != null) {
-				if (clickevent.getAction() == ClickEvent.Action.OPEN_URL) {
-					if (!this.mc.gameSettings.chatLinks) {
-						return false;
-					}
-					String uri = clickevent.getValue();
-
-					if (this.mc.gameSettings.chatLinksPrompt) {
-						this.clickedLinkURI = uri;
-						this.mc.displayGuiScreen(new GuiConfirmOpenLink(this, clickevent.getValue(), 31102009, false));
-					} else {
-						this.openWebLink(uri);
-					}
-				} else if (clickevent.getAction() == ClickEvent.Action.OPEN_FILE) {
-					// rip
-				} else if (clickevent.getAction() == ClickEvent.Action.SUGGEST_COMMAND) {
-					this.setText(clickevent.getValue(), true);
-				} else if (clickevent.getAction() == ClickEvent.Action.RUN_COMMAND) {
-					this.sendChatMessage(clickevent.getValue(), false);
-				} else if (clickevent.getAction() == ClickEvent.Action.TWITCH_USER_INFO) {
-					/*
-					 * ChatUserInfo chatuserinfo =
-					 * this.mc.getTwitchStream().func_152926_a(clickevent.getValue()); if
-					 * (chatuserinfo != null) { this.mc.displayGuiScreen(new
-					 * GuiTwitchUserMode(this.mc.getTwitchStream(), chatuserinfo)); } else { }
-					 */
-					LOGGER.error("Tried to handle twitch user but couldn\'t find them!");
-				} else if (clickevent.getAction() == ClickEvent.Action.EAGLER_PLUGIN_DOWNLOAD) {
-					if (EaglerXBungeeVersion.pluginFileEPK.equals(clickevent.getValue())) {
-						EaglerXBungeeVersion.startPluginDownload();
-					} else {
-						LOGGER.error("Invalid plugin download from EPK was blocked: {}",
-								EaglerXBungeeVersion.pluginFileEPK);
-					}
-				} else {
-					LOGGER.error("Don\'t know how to handle " + clickevent);
-				}
-
-				return true;
-			}
-
-			return false;
-		}
-	}
-
-	public void sendChatMessage(String msg) {
-		this.sendChatMessage(msg, true);
-	}
-
-	public void sendChatMessage(String msg, boolean addToChat) {
-		if (addToChat) {
-			this.mc.ingameGUI.getChatGUI().addToSentMessages(msg);
-		}
-
-		this.mc.thePlayer.sendChatMessage(msg);
-	}
-
-	protected void touchStarted(int parInt1, int parInt2, int parInt3) {
-		if (shouldTouchGenerateMouseEvents()) {
-			this.mouseClicked(parInt1, parInt2, 12345);
-		}
-	}
-
-	protected void touchTapped(int parInt1, int parInt2, int parInt3) {
-		if (shouldTouchGenerateMouseEvents()) {
-			this.mouseClicked(parInt1, parInt2, 0);
-			this.mouseReleased(parInt1, parInt2, 0);
-		}
-	}
-
-	protected void touchMoved(int parInt1, int parInt2, int parInt3) {
-	}
-
-	protected void touchEndMove(int parInt1, int parInt2, int parInt3) {
-		if (shouldTouchGenerateMouseEvents()) {
-			this.mouseReleased(parInt1, parInt2, 12345);
-		}
-	}
-
-	/**+
-	 * Called when the mouse is clicked. Args : mouseX, mouseY,
-	 * clickedButton
-	 */
-	protected void mouseClicked(int parInt1, int parInt2, int parInt3) {
-		boolean touchMode = PointerInputAbstraction.isTouchMode();
-		if (parInt3 == 0 || parInt3 == 12345) {
-			for (int i = 0; i < this.buttonList.size(); ++i) {
-				GuiButton guibutton = (GuiButton) this.buttonList.get(i);
-				if (touchMode && (parInt3 == 12345) != guibutton.isSliderTouchEvents())
-					continue;
-				if (guibutton.mousePressed(this.mc, parInt1, parInt2)) {
-					this.selectedButton = guibutton;
-					guibutton.playPressSound(this.mc.getSoundHandler());
-					this.actionPerformed(guibutton);
-				}
-			}
-		}
-
-	}
-
-	/**+
-	 * Called when a mouse button is released. Args : mouseX,
-	 * mouseY, releaseButton
-	 */
-	protected void mouseReleased(int i, int j, int k) {
-		if (this.selectedButton != null && (k == 0 || k == 12345)
-				&& (!PointerInputAbstraction.isTouchMode() || (k == 12345) == selectedButton.isSliderTouchEvents())) {
-			this.selectedButton.mouseReleased(i, j);
-			this.selectedButton = null;
-		}
-
-	}
-
-	/**+
-	 * Called when a mouse button is pressed and the mouse is moved
-	 * around. Parameters are : mouseX, mouseY, lastButtonClicked &
-	 * timeSinceMouseClick.
-	 */
-	protected void mouseClickMove(int var1, int var2, int var3, long var4) {
-	}
-
-	/**+
-	 * Called by the controls from the buttonList when activated.
-	 * (Mouse pressed for buttons)
-	 */
-	protected void actionPerformed(GuiButton parGuiButton) {
-	}
-
-	/**+
-	 * Causes the screen to lay out its subcomponents again. This is
-	 * the equivalent of the Java call Container.validate()
-	 */
-	public void setWorldAndResolution(Minecraft mc, int width, int height) {
-		this.mc = mc;
-		this.itemRender = mc.getRenderItem();
-		this.fontRendererObj = mc.fontRendererObj;
-		this.width = width;
-		this.height = height;
-		this.buttonList.clear();
-		this.initGui();
-	}
-
-	/**+
-	 * Adds the buttons (and other controls) to the screen in
-	 * question. Called when the GUI is displayed and when the
-	 * window resizes, the buttonList is cleared beforehand.
-	 */
-	public void initGui() {
-	}
-
-	/**+
-	 * Delegates mouse and keyboard input.
+	/**
+	 * + Delegates mouse and keyboard input.
 	 */
 	public void handleInput() throws IOException {
 		boolean noTouch = true;
@@ -574,7 +620,48 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback {
 
 	}
 
-	public final Map<Integer, int[]> touchStarts = new HashMap<>();
+	/**
+	 * + Handles keyboard input.
+	 */
+	public void handleKeyboardInput() throws IOException {
+		if (Keyboard.getEventKeyState()) {
+			this.keyTyped(Keyboard.getEventCharacter(), Keyboard.getEventKey());
+		}
+
+		this.mc.dispatchKeypresses();
+	}
+
+	/**
+	 * + Handles mouse input.
+	 */
+	public void handleMouseInput() throws IOException {
+		float f = getEaglerScale();
+		int i = applyEaglerScale(f, Mouse.getEventX() * this.width / this.mc.displayWidth, this.width);
+		int j = applyEaglerScale(f, this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1,
+				this.height);
+		int k = Mouse.getEventButton();
+		if (Mouse.getEventButtonState()) {
+			PointerInputAbstraction.enterMouseModeHook();
+			if (this.mc.gameSettings.touchscreen && this.touchValue++ > 0) {
+				return;
+			}
+
+			this.eventButton = k;
+			this.lastMouseEvent = Minecraft.getSystemTime();
+			this.mouseClicked(i, j, this.eventButton);
+		} else if (k != -1) {
+			if (this.mc.gameSettings.touchscreen && --this.touchValue > 0) {
+				return;
+			}
+
+			this.eventButton = -1;
+			this.mouseReleased(i, j, k);
+		} else if (this.eventButton != -1 && this.lastMouseEvent > 0L) {
+			long l = Minecraft.getSystemTime() - this.lastMouseEvent;
+			this.mouseClickMove(i, j, this.eventButton, l);
+		}
+
+	}
 
 	/**
 	 * Handles touch input.
@@ -653,270 +740,193 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback {
 		}
 	}
 
-	public boolean isTouchPointDragging(int uid) {
-		int[] ret = touchStarts.get(uid);
-		return ret != null && ret[2] == 1;
-	}
-
-	/**+
-	 * Handles mouse input.
+	/**
+	 * + Adds the buttons (and other controls) to the screen in question. Called
+	 * when the GUI is displayed and when the window resizes, the buttonList is
+	 * cleared beforehand.
 	 */
-	public void handleMouseInput() throws IOException {
-		float f = getEaglerScale();
-		int i = applyEaglerScale(f, Mouse.getEventX() * this.width / this.mc.displayWidth, this.width);
-		int j = applyEaglerScale(f, this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1,
-				this.height);
-		int k = Mouse.getEventButton();
-		if (Mouse.getEventButtonState()) {
-			PointerInputAbstraction.enterMouseModeHook();
-			if (this.mc.gameSettings.touchscreen && this.touchValue++ > 0) {
-				return;
-			}
-
-			this.eventButton = k;
-			this.lastMouseEvent = Minecraft.getSystemTime();
-			this.mouseClicked(i, j, this.eventButton);
-		} else if (k != -1) {
-			if (this.mc.gameSettings.touchscreen && --this.touchValue > 0) {
-				return;
-			}
-
-			this.eventButton = -1;
-			this.mouseReleased(i, j, k);
-		} else if (this.eventButton != -1 && this.lastMouseEvent > 0L) {
-			long l = Minecraft.getSystemTime() - this.lastMouseEvent;
-			this.mouseClickMove(i, j, this.eventButton, l);
-		}
-
-	}
-
-	/**+
-	 * Handles keyboard input.
-	 */
-	public void handleKeyboardInput() throws IOException {
-		if (Keyboard.getEventKeyState()) {
-			this.keyTyped(Keyboard.getEventCharacter(), Keyboard.getEventKey());
-		}
-
-		this.mc.dispatchKeypresses();
-	}
-
-	/**+
-	 * Called from the main game loop to update the screen.
-	 */
-	public void updateScreen() {
-	}
-
-	/**+
-	 * Called when the screen is unloaded. Used to disable keyboard
-	 * repeat events
-	 */
-	public void onGuiClosed() {
-	}
-
-	/**+
-	 * Draws either a gradient over the background screen (when it
-	 * exists) or a flat gradient over background.png
-	 */
-	public void drawDefaultBackground() {
-		this.drawWorldBackground(0);
+	public void initGui() {
 	}
 
 	protected boolean isPartOfPauseMenu() {
 		return false;
 	}
 
-	public void drawWorldBackground(int i) {
-		if (this.mc.theWorld != null) {
-			boolean ingame = isPartOfPauseMenu();
-			ResourceLocation loc = (ingame && PauseMenuCustomizeState.icon_background_pause != null)
-					? PauseMenuCustomizeState.icon_background_pause
-					: PauseMenuCustomizeState.icon_background_all;
-			float aspect = (ingame && PauseMenuCustomizeState.icon_background_pause != null)
-					? 1.0f / PauseMenuCustomizeState.icon_background_pause_aspect
-					: 1.0f / PauseMenuCustomizeState.icon_background_all_aspect;
-			if (loc != null) {
-				GlStateManager.disableLighting();
-				GlStateManager.disableFog();
-				GlStateManager.enableBlend();
-				GlStateManager.disableAlpha();
-				GlStateManager.enableTexture2D();
-				GlStateManager.tryBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-				Tessellator tessellator = Tessellator.getInstance();
-				WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-				this.mc.getTextureManager().bindTexture(loc);
-				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-				float f = 64.0F;
-				worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-				worldrenderer.pos(0.0D, (double) this.height, 0.0D).tex(0.0D, (double) ((float) this.height / f))
-						.color(64, 64, 64, 192).endVertex();
-				worldrenderer.pos((double) this.width, (double) this.height, 0.0D)
-						.tex((double) ((float) this.width / f * aspect), (double) ((float) this.height / f))
-						.color(64, 64, 64, 192).endVertex();
-				worldrenderer.pos((double) this.width, 0.0D, 0.0D)
-						.tex((double) ((float) this.width / f * aspect), (double) 0).color(64, 64, 64, 192).endVertex();
-				worldrenderer.pos(0.0D, 0.0D, 0.0D).tex(0.0D, (double) 0).color(64, 64, 64, 192).endVertex();
-				tessellator.draw();
-				GlStateManager.enableAlpha();
-			} else {
-				this.drawGradientRect(0, 0, this.width, this.height, -1072689136, -804253680);
+	protected boolean isTouchDraggingStateLocked(int uid) {
+		return false;
+	}
+
+	public boolean isTouchPointDragging(int uid) {
+		int[] ret = touchStarts.get(uid);
+		return ret != null && ret[2] == 1;
+	}
+
+	/**
+	 * + Fired when a key is typed (except F11 which toggles full screen). This is
+	 * the equivalent of KeyListener.keyTyped(KeyEvent e). Args : character
+	 * (character on the key), keyCode (lwjgl Keyboard key code)
+	 */
+	protected void keyTyped(char parChar1, int parInt1) {
+		if (!canCloseGui())
+			return;
+		if (((this.mc.theWorld == null || this.mc.thePlayer.getHealth() <= 0.0F) && parInt1 == 1)
+				|| parInt1 == this.mc.gameSettings.keyBindClose.getKeyCode()
+				|| (parInt1 == 1 && (this.mc.gameSettings.keyBindClose.getKeyCode() == 0 || this.mc.areKeysLocked()))) {
+			this.mc.displayGuiScreen((GuiScreen) null);
+			if (this.mc.currentScreen == null) {
+				this.mc.setIngameFocus();
 			}
-			if (!(this instanceof GuiScreenServerInfo)) {
-				loc = (ingame && PauseMenuCustomizeState.icon_watermark_pause != null)
-						? PauseMenuCustomizeState.icon_watermark_pause
-						: PauseMenuCustomizeState.icon_watermark_all;
-				aspect = (ingame && PauseMenuCustomizeState.icon_watermark_pause != null)
-						? PauseMenuCustomizeState.icon_watermark_pause_aspect
-						: PauseMenuCustomizeState.icon_watermark_all_aspect;
-				if (loc != null) {
-					GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
-					mc.getTextureManager().bindTexture(loc);
-					GlStateManager.pushMatrix();
-					GlStateManager.translate(8, height - 72, 0.0f);
-					float f2 = 64.0f / 256.0f;
-					GlStateManager.scale(f2 * aspect, f2, f2);
-					this.drawTexturedModalRect(0, 0, 0, 0, 256, 256);
-					GlStateManager.popMatrix();
+		} else if (parInt1 == 1) {
+			showingCloseKey = EagRuntime.steadyTimeMillis();
+		}
+	}
+
+	/**
+	 * + Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
+	 */
+	protected void mouseClicked(int parInt1, int parInt2, int parInt3) {
+		boolean touchMode = PointerInputAbstraction.isTouchMode();
+		if (parInt3 == 0 || parInt3 == 12345) {
+			for (int i = 0; i < this.buttonList.size(); ++i) {
+				GuiButton guibutton = (GuiButton) this.buttonList.get(i);
+				if (touchMode && (parInt3 == 12345) != guibutton.isSliderTouchEvents())
+					continue;
+				if (guibutton.mousePressed(this.mc, parInt1, parInt2)) {
+					this.selectedButton = guibutton;
+					guibutton.playPressSound(this.mc.getSoundHandler());
+					this.actionPerformed(guibutton);
 				}
 			}
-		} else {
-			this.drawBackground(i);
 		}
 
 	}
 
-	/**+
-	 * Draws the background (i is always 0 as of 1.2.2)
+	/**
+	 * + Called when a mouse button is pressed and the mouse is moved around.
+	 * Parameters are : mouseX, mouseY, lastButtonClicked & timeSinceMouseClick.
 	 */
-	public void drawBackground(int tint) {
-		GlStateManager.disableLighting();
-		GlStateManager.disableFog();
-		Tessellator tessellator = Tessellator.getInstance();
-		WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-		this.mc.getTextureManager().bindTexture(optionsBackground);
-		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-		float f = 32.0F;
-		worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-		worldrenderer.pos(0.0D, (double) this.height, 0.0D)
-				.tex(0.0D, (double) ((float) this.height / 32.0F + (float) tint)).color(64, 64, 64, 255).endVertex();
-		worldrenderer.pos((double) this.width, (double) this.height, 0.0D)
-				.tex((double) ((float) this.width / 32.0F), (double) ((float) this.height / 32.0F + (float) tint))
-				.color(64, 64, 64, 255).endVertex();
-		worldrenderer.pos((double) this.width, 0.0D, 0.0D).tex((double) ((float) this.width / 32.0F), (double) tint)
-				.color(64, 64, 64, 255).endVertex();
-		worldrenderer.pos(0.0D, 0.0D, 0.0D).tex(0.0D, (double) tint).color(64, 64, 64, 255).endVertex();
-		tessellator.draw();
+	protected void mouseClickMove(int var1, int var2, int var3, long var4) {
 	}
 
-	/**+
-	 * Returns true if this GUI should pause the game when it is
-	 * displayed in single-player
+	/**
+	 * + Called when a mouse button is released. Args : mouseX, mouseY,
+	 * releaseButton
 	 */
-	public boolean doesGuiPauseGame() {
-		return true;
-	}
-
-	public void confirmClicked(boolean flag, int i) {
-		if (i == 31102009) {
-			if (flag) {
-				this.openWebLink(this.clickedLinkURI);
-			}
-
-			this.clickedLinkURI = null;
-			this.mc.displayGuiScreen(this);
+	protected void mouseReleased(int i, int j, int k) {
+		if (this.selectedButton != null && (k == 0 || k == 12345)
+				&& (!PointerInputAbstraction.isTouchMode() || (k == 12345) == selectedButton.isSliderTouchEvents())) {
+			this.selectedButton.mouseReleased(i, j);
+			this.selectedButton = null;
 		}
 
+	}
+
+	/**
+	 * + Called when the screen is unloaded. Used to disable keyboard repeat events
+	 */
+	public void onGuiClosed() {
+	}
+
+	/**
+	 * + Called when the GUI is resized in order to update the world and the
+	 * resolution
+	 */
+	public void onResize(Minecraft mcIn, int parInt1, int parInt2) {
+		this.setWorldAndResolution(mcIn, parInt1, parInt2);
 	}
 
 	private void openWebLink(String parURI) {
 		EagRuntime.openLink(parURI);
 	}
 
-	/**+
-	 * Returns true if either windows ctrl key is down or if either
-	 * mac meta key is down
+	protected void renderToolTip(ItemStack itemstack, int i, int j) {
+		renderToolTip0(itemstack, i, j, false);
+	}
+
+	protected void renderToolTip0(ItemStack itemstack, int i, int j, boolean eagler) {
+		List list = itemstack.getTooltipProfanityFilter(this.mc.thePlayer, this.mc.gameSettings.advancedItemTooltips);
+
+		for (int k = 0, l = list.size(); k < l; ++k) {
+			if (k == 0) {
+				list.set(k, itemstack.getRarity().rarityColor + (String) list.get(k));
+			} else {
+				list.set(k, EnumChatFormatting.GRAY + (String) list.get(k));
+			}
+		}
+
+		this.drawHoveringText0(list, i, j, eagler);
+	}
+
+	public void sendChatMessage(String msg) {
+		this.sendChatMessage(msg, true);
+	}
+
+	public void sendChatMessage(String msg, boolean addToChat) {
+		if (addToChat) {
+			this.mc.ingameGUI.getChatGUI().addToSentMessages(msg);
+		}
+
+		this.mc.thePlayer.sendChatMessage(msg);
+	}
+
+	/**
+	 * + Sets the text of the chat
 	 */
-	public static boolean isCtrlKeyDown() {
-		return Minecraft.isRunningOnMac ? Keyboard.isKeyDown(219) || Keyboard.isKeyDown(220)
-				: Keyboard.isKeyDown(29) || Keyboard.isKeyDown(157);
+	protected void setText(String var1, boolean var2) {
 	}
 
-	/**+
-	 * Returns true if either shift key is down
+	/**
+	 * + Causes the screen to lay out its subcomponents again. This is the
+	 * equivalent of the Java call Container.validate()
 	 */
-	public static boolean isShiftKeyDown() {
-		return Keyboard.isKeyDown(42) || Keyboard.isKeyDown(54);
-	}
-
-	/**+
-	 * Returns true if either alt key is down
-	 */
-	public static boolean isAltKeyDown() {
-		return Keyboard.isKeyDown(56) || Keyboard.isKeyDown(184);
-	}
-
-	public static boolean isKeyComboCtrlX(int parInt1) {
-		return parInt1 == 45 && isCtrlKeyDown() && !isShiftKeyDown() && !isAltKeyDown();
-	}
-
-	public static boolean isKeyComboCtrlV(int parInt1) {
-		return parInt1 == 47 && isCtrlKeyDown() && !isShiftKeyDown() && !isAltKeyDown();
-	}
-
-	public static boolean isKeyComboCtrlC(int parInt1) {
-		return parInt1 == 46 && isCtrlKeyDown() && !isShiftKeyDown() && !isAltKeyDown();
-	}
-
-	public static boolean isKeyComboCtrlA(int parInt1) {
-		return parInt1 == 30 && isCtrlKeyDown() && !isShiftKeyDown() && !isAltKeyDown();
-	}
-
-	/**+
-	 * Called when the GUI is resized in order to update the world
-	 * and the resolution
-	 */
-	public void onResize(Minecraft mcIn, int parInt1, int parInt2) {
-		this.setWorldAndResolution(mcIn, parInt1, parInt2);
+	public void setWorldAndResolution(Minecraft mc, int width, int height) {
+		this.mc = mc;
+		this.itemRender = mc.getRenderItem();
+		this.fontRendererObj = mc.fontRendererObj;
+		this.width = width;
+		this.height = height;
+		this.buttonList.clear();
+		this.initGui();
 	}
 
 	public boolean shouldHangupIntegratedServer() {
 		return true;
 	}
 
-	public boolean blockPTTKey() {
-		return false;
-	}
-
-	public void fireInputEvent(EnumInputEvent event, String param) {
-
+	protected boolean shouldTouchGenerateMouseEvents() {
+		return true;
 	}
 
 	public boolean showCopyPasteButtons() {
 		return false;
 	}
 
-	public static int applyEaglerScale(float scaleFac, int coord, int screenDim) {
-		return (int) ((coord - (1.0f - scaleFac) * screenDim * 0.5f) / scaleFac);
+	protected void touchEndMove(int parInt1, int parInt2, int parInt3) {
+		if (shouldTouchGenerateMouseEvents()) {
+			this.mouseReleased(parInt1, parInt2, 12345);
+		}
 	}
 
-	public float getEaglerScale() {
-		return PointerInputAbstraction.isTouchMode() ? getTouchModeScale() : 1.0f;
+	protected void touchMoved(int parInt1, int parInt2, int parInt3) {
 	}
 
-	protected float getTouchModeScale() {
-		return 1.0f;
+	protected void touchStarted(int parInt1, int parInt2, int parInt3) {
+		if (shouldTouchGenerateMouseEvents()) {
+			this.mouseClicked(parInt1, parInt2, 12345);
+		}
 	}
 
-	public boolean canCloseGui() {
-		return true;
+	protected void touchTapped(int parInt1, int parInt2, int parInt3) {
+		if (shouldTouchGenerateMouseEvents()) {
+			this.mouseClicked(parInt1, parInt2, 0);
+			this.mouseReleased(parInt1, parInt2, 0);
+		}
 	}
 
-	protected boolean isTouchDraggingStateLocked(int uid) {
-		return false;
-	}
-
-	protected boolean shouldTouchGenerateMouseEvents() {
-		return true;
+	/**
+	 * + Called from the main game loop to update the screen.
+	 */
+	public void updateScreen() {
 	}
 
 }

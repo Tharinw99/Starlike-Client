@@ -1,6 +1,7 @@
 package net.minecraft.world.gen;
 
 import com.google.common.base.Objects;
+
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import net.minecraft.block.BlockSand;
 import net.minecraft.block.material.Material;
@@ -11,22 +12,25 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkPrimer;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -37,10 +41,28 @@ public class MapGenCaves extends MapGenBase {
 		super(scramble);
 	}
 
-	protected void func_180703_a(long parLong1, int parInt1, int parInt2, ChunkPrimer parChunkPrimer, double parDouble1,
-			double parDouble2, double parDouble3) {
-		this.func_180702_a(parLong1, parInt1, parInt2, parChunkPrimer, parDouble1, parDouble2, parDouble3,
-				1.0F + this.rand.nextFloat() * 6.0F, 0.0F, 0.0F, -1, -1, 0.5D);
+	protected boolean func_175793_a(IBlockState parIBlockState, IBlockState parIBlockState2) {
+		return parIBlockState.getBlock() == Blocks.stone ? true
+				: (parIBlockState.getBlock() == Blocks.dirt ? true
+						: (parIBlockState.getBlock() == Blocks.deepstone ? true
+								: (parIBlockState.getBlock() == Blocks.grass ? true
+										: (parIBlockState.getBlock() == Blocks.hardened_clay ? true
+												: (parIBlockState.getBlock() == Blocks.stained_hardened_clay ? true
+														: (parIBlockState.getBlock() == Blocks.sandstone ? true
+																: (parIBlockState.getBlock() == Blocks.red_sandstone
+																		? true
+																		: (parIBlockState.getBlock() == Blocks.mycelium
+																				? true
+																				: (parIBlockState
+																						.getBlock() == Blocks.snow_layer
+																								? true
+																								: (parIBlockState
+																										.getBlock() == Blocks.sand
+																										|| parIBlockState
+																												.getBlock() == Blocks.gravel)
+																										&& parIBlockState2
+																												.getBlock()
+																												.getMaterial() != Material.water)))))))));
 	}
 
 	protected void func_180702_a(long parLong1, int parInt1, int parInt2, ChunkPrimer parChunkPrimer, double parDouble1,
@@ -65,11 +87,35 @@ public class MapGenCaves extends MapGenBase {
 		int j = random.nextInt(parInt4 / 2) + parInt4 / 4;
 
 		for (boolean flag = random.nextInt(6) == 0; parInt3 < parInt4; ++parInt3) {
-			double d2 = 1.5D
-					+ (double) (MathHelper.sin((float) parInt3 * 3.1415927F / (float) parInt4) * parFloat1 * 1.0F);
-			double d3 = d2 * parDouble4;
-			float f2 = MathHelper.cos(parFloat3);
-			float f3 = MathHelper.sin(parFloat3);
+			EaglercraftRandom eaglerRand = new EaglercraftRandom();
+			int rangeSelector = eaglerRand.nextInt(100);
+			double baseSize;
+			if (rangeSelector == 0) {
+				baseSize = 1.1D + (1.5D - 1.1D) * eaglerRand.nextDouble();
+			} else if (rangeSelector == 1) {
+				baseSize = 1.1D + (1.3D - 1.1D) * eaglerRand.nextDouble();
+			} else if (rangeSelector == 2) {
+				baseSize = 1.4D + (2.1D - 1.4D) * eaglerRand.nextDouble();
+
+			} else if (rangeSelector == 3) {
+				baseSize = 1.15D + (1.3D - 1.15D) * eaglerRand.nextDouble();
+			} else {
+				baseSize = 0.3D + (1.3D - 0.3D) * eaglerRand.nextDouble();
+
+			}
+
+			double d2 = baseSize
+					+ MathHelper.sin(parInt3 * 3.1415927F / parInt4) * (parFloat1 + eaglerRand.nextFloat() * 2.0F);
+			double d3 = d2 * (parDouble4 * 2.0);
+
+			float f2 = MathHelper.cos(parFloat3 * 0.3F);
+
+			float f3 = MathHelper.sin(parFloat3 * 0.3F);
+
+			if (parDouble2 > 50.0D) {
+				d2 = d2 * 1.5D;
+			}
+
 			parDouble1 += (double) (MathHelper.cos(parFloat2) * f2);
 			parDouble2 += (double) f3;
 			parDouble3 += (double) (MathHelper.sin(parFloat2) * f2);
@@ -200,7 +246,7 @@ public class MapGenCaves extends MapGenBase {
 														parChunkPrimer.setBlockState(j3, j2 - 1, i2,
 																this.worldObj.getBiomeGenForCoords(
 																		blockpos$mutableblockpos).topBlock.getBlock()
-																				.getDefaultState());
+																		.getDefaultState());
 													}
 												}
 											}
@@ -220,29 +266,15 @@ public class MapGenCaves extends MapGenBase {
 
 	}
 
-	protected boolean func_175793_a(IBlockState parIBlockState, IBlockState parIBlockState2) {
-		return parIBlockState.getBlock() == Blocks.stone ? true
-				: (parIBlockState.getBlock() == Blocks.dirt ? true
-						: (parIBlockState.getBlock() == Blocks.grass ? true
-								: (parIBlockState.getBlock() == Blocks.hardened_clay ? true
-										: (parIBlockState.getBlock() == Blocks.stained_hardened_clay ? true
-												: (parIBlockState.getBlock() == Blocks.sandstone ? true
-														: (parIBlockState.getBlock() == Blocks.red_sandstone ? true
-																: (parIBlockState.getBlock() == Blocks.mycelium ? true
-																		: (parIBlockState
-																				.getBlock() == Blocks.snow_layer
-																						? true
-																						: (parIBlockState
-																								.getBlock() == Blocks.sand
-																								|| parIBlockState
-																										.getBlock() == Blocks.gravel)
-																								&& parIBlockState2
-																										.getBlock()
-																										.getMaterial() != Material.water))))))));
+	protected void func_180703_a(long parLong1, int parInt1, int parInt2, ChunkPrimer parChunkPrimer, double parDouble1,
+			double parDouble2, double parDouble3) {
+
+		this.func_180702_a(parLong1, parInt1, parInt2, parChunkPrimer, parDouble1, parDouble2, parDouble3,
+				2.0F + this.rand.nextFloat() * 6.0F, 0.0F, 0.0F, -1, -1, 0.5D);
 	}
 
-	/**+
-	 * Recursively called by generate()
+	/**
+	 * + Recursively called by generate()
 	 */
 	protected void recursiveGenerate(World var1, int i, int j, int k, int l, ChunkPrimer chunkprimer) {
 		int i1 = this.rand.nextInt(this.rand.nextInt(this.rand.nextInt(15) + 1) + 1);

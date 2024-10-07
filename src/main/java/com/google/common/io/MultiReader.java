@@ -50,6 +50,17 @@ class MultiReader extends Reader {
 	}
 
 	@Override
+	public void close() throws IOException {
+		if (current != null) {
+			try {
+				current.close();
+			} finally {
+				current = null;
+			}
+		}
+	}
+
+	@Override
 	public int read(@Nullable char cbuf[], int off, int len) throws IOException {
 		if (current == null) {
 			return -1;
@@ -60,6 +71,11 @@ class MultiReader extends Reader {
 			return read(cbuf, off, len);
 		}
 		return result;
+	}
+
+	@Override
+	public boolean ready() throws IOException {
+		return (current != null) && current.ready();
 	}
 
 	@Override
@@ -75,21 +91,5 @@ class MultiReader extends Reader {
 			}
 		}
 		return 0;
-	}
-
-	@Override
-	public boolean ready() throws IOException {
-		return (current != null) && current.ready();
-	}
-
-	@Override
-	public void close() throws IOException {
-		if (current != null) {
-			try {
-				current.close();
-			} finally {
-				current = null;
-			}
-		}
 	}
 }

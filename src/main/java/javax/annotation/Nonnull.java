@@ -20,8 +20,6 @@ import javax.annotation.meta.When;
 @TypeQualifier
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Nonnull {
-	When when() default When.ALWAYS;
-
 	class Checker implements TypeQualifierValidator<Nonnull> {
 
 		public When forConstantValue(Nonnull qualifierArgument, Object value) {
@@ -30,4 +28,6 @@ public @interface Nonnull {
 			return When.ALWAYS;
 		}
 	}
+
+	When when() default When.ALWAYS;
 }

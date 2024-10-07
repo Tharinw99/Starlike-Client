@@ -1,6 +1,13 @@
 package net.minecraft.client.gui;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_LINEAR;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_MODELVIEW;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ONE_MINUS_SRC_ALPHA;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_PROJECTION;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_SRC_ALPHA;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE_2D;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE_MAG_FILTER;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE_MIN_FILTER;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,16 +18,15 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
+import com.google.common.base.Charsets;
+import com.google.common.collect.Lists;
+
 import net.lax1dude.eaglercraft.v1_8.EagRuntime;
 import net.lax1dude.eaglercraft.v1_8.EagUtils;
 import net.lax1dude.eaglercraft.v1_8.EaglerInputStream;
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import net.lax1dude.eaglercraft.v1_8.EaglercraftVersion;
 import net.lax1dude.eaglercraft.v1_8.Mouse;
-
-import com.google.common.base.Charsets;
-import com.google.common.collect.Lists;
-
 import net.lax1dude.eaglercraft.v1_8.crypto.SHA1Digest;
 import net.lax1dude.eaglercraft.v1_8.internal.EnumCursorType;
 import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
@@ -47,22 +53,25 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.storage.ISaveFormat;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -70,30 +79,22 @@ import net.minecraft.world.storage.ISaveFormat;
 public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
 	private static final Logger logger = LogManager.getLogger();
 	private static final EaglercraftRandom RANDOM = new EaglercraftRandom();
-	private float updateCounter;
-	private boolean isDefault;
 	private static final int lendef = 5987;
 	private static final byte[] sha1def = new byte[] { -107, 77, 108, 49, 11, -100, -8, -119, -1, -100, -85, -55, 18,
 			-69, -107, 113, -93, -101, -79, 32 };
-	private String splashText;
-	private GuiButton buttonResetDemo;
-	private int panoramaTimer;
-	/**+
-	 * Texture allocated for the current viewport of the main menu's
-	 * panorama background.
+	/**
+	 * + Texture allocated for the current viewport of the main menu's panorama
+	 * background.
 	 */
 	private static DynamicTexture viewportTexture = null;
-	private boolean field_175375_v = true;
-	private String openGLWarning1;
-	private String openGLWarning2;
 	private static final ResourceLocation splashTexts = new ResourceLocation("texts/splashes.txt");
 	private static final ResourceLocation minecraftTitleTextures = new ResourceLocation(
 			"textures/gui/title/minecraft.png");
 	private static final ResourceLocation minecraftTitleBlurFlag = new ResourceLocation(
 			"textures/gui/title/background/enable_blur.txt");
 	private static final ResourceLocation eaglerGuiTextures = new ResourceLocation("eagler:gui/eagler_gui.png");
-	/**+
-	 * An array of all the paths to the panorama pictures.
+	/**
+	 * + An array of all the paths to the panorama pictures.
 	 */
 	private static final ResourceLocation[] titlePanoramaPaths = new ResourceLocation[] {
 			new ResourceLocation("starlike:textures/gui/title/background/panorama_0.png"),
@@ -102,19 +103,35 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
 			new ResourceLocation("starlike:textures/gui/title/background/panorama_3.png"),
 			new ResourceLocation("starlike:textures/gui/title/background/panorama_4.png"),
 			new ResourceLocation("starlike:textures/gui/title/background/panorama_5.png") };
+	private static ResourceLocation backgroundTexture = null;
+	private static GuiMainMenu instance = null;
+
+	public static void doResourceReloadHack() {
+		if (instance != null) {
+			instance.shouldReload = true;
+		}
+	}
+
+	private float updateCounter;
+	private boolean isDefault;
+	private String splashText;
+	private GuiButton buttonResetDemo;
+	private int panoramaTimer;
+	private boolean field_175375_v = true;
+	private String openGLWarning1;
+	private String openGLWarning2;
 	private int field_92024_r;
 	private int field_92023_s;
 	private int field_92022_t;
 	private int field_92021_u;
 	private int field_92020_v;
 	private int field_92019_w;
-	private static ResourceLocation backgroundTexture = null;
 	private GuiUpdateCheckerOverlay updateCheckerOverlay;
 	private GuiButton downloadOfflineButton;
-	private boolean enableBlur = true;
-	private boolean shouldReload = false;
 
-	private static GuiMainMenu instance = null;
+	private boolean enableBlur = true;
+
+	private boolean shouldReload = false;
 
 	public GuiMainMenu() {
 		instance = this;
@@ -162,186 +179,9 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
 		reloadResourceFlags();
 	}
 
-	private void reloadResourceFlags() {
-		if (Minecraft.getMinecraft().isDemo()) {
-			this.isDefault = false;
-		} else {
-			if (!EagRuntime.getConfiguration().isEnableMinceraft()) {
-				this.isDefault = false;
-			} else {
-				try {
-					byte[] bytes = EaglerInputStream.inputStreamToBytesQuiet(Minecraft.getMinecraft()
-							.getResourceManager().getResource(minecraftTitleTextures).getInputStream());
-					if (bytes != null && bytes.length == lendef) {
-						SHA1Digest sha1 = new SHA1Digest();
-						byte[] sha1out = new byte[20];
-						sha1.update(bytes, 0, bytes.length);
-						sha1.doFinal(sha1out, 0);
-						this.isDefault = Arrays.equals(sha1out, sha1def);
-					} else {
-						this.isDefault = false;
-					}
-				} catch (IOException e) {
-					this.isDefault = false;
-				}
-			}
-		}
-
-		this.enableBlur = true;
-
-		try {
-			byte[] bytes = EaglerInputStream.inputStreamToBytesQuiet(
-					Minecraft.getMinecraft().getResourceManager().getResource(minecraftTitleBlurFlag).getInputStream());
-			if (bytes != null) {
-				String[] blurCfg = EagUtils.linesArray(new String(bytes, StandardCharsets.UTF_8));
-				for (int i = 0; i < blurCfg.length; ++i) {
-					String s = blurCfg[i];
-					if (s.startsWith("enable_blur=")) {
-						s = s.substring(12).trim();
-						this.enableBlur = s.equals("1") || s.equals("true");
-						break;
-					}
-				}
-			}
-		} catch (IOException e) {
-			;
-		}
-	}
-
-	public static void doResourceReloadHack() {
-		if (instance != null) {
-			instance.shouldReload = true;
-		}
-	}
-
-	/**+
-	 * Called from the main game loop to update the screen.
-	 */
-	public void updateScreen() {
-		++this.panoramaTimer;
-		if (downloadOfflineButton != null) {
-			downloadOfflineButton.enabled = !UpdateService.shouldDisableDownloadButton();
-		}
-		if (shouldReload) {
-			reloadResourceFlags();
-			shouldReload = false;
-		}
-	}
-
-	/**+
-	 * Returns true if this GUI should pause the game when it is
-	 * displayed in single-player
-	 */
-	public boolean doesGuiPauseGame() {
-		return false;
-	}
-
-	/**+
-	 * Fired when a key is typed (except F11 which toggles full
-	 * screen). This is the equivalent of
-	 * KeyListener.keyTyped(KeyEvent e). Args : character (character
-	 * on the key), keyCode (lwjgl Keyboard key code)
-	 */
-	protected void keyTyped(char parChar1, int parInt1) {
-	}
-
-	/**+
-	 * Adds the buttons (and other controls) to the screen in
-	 * question. Called when the GUI is displayed and when the
-	 * window resizes, the buttonList is cleared beforehand.
-	 */
-	public void initGui() {
-		if (viewportTexture == null) {
-			viewportTexture = new DynamicTexture(256, 256);
-			backgroundTexture = this.mc.getTextureManager().getDynamicTextureLocation("background", viewportTexture);
-		}
-		this.updateCheckerOverlay.setResolution(mc, width, height);
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(new Date());
-		if (calendar.get(2) + 1 == 12 && calendar.get(5) == 24) {
-			this.splashText = "Merry X-mas!";
-		} else if (calendar.get(2) + 1 == 1 && calendar.get(5) == 1) {
-			this.splashText = "Happy new year!";
-		} else if (calendar.get(2) + 1 == 10 && calendar.get(5) == 31) {
-			this.splashText = "OOoooOOOoooo! Spooky!";
-		}
-
-		int i = this.height / 4 + 48;
-
-		boolean isFork = !EaglercraftVersion.projectOriginAuthor.equalsIgnoreCase(EaglercraftVersion.projectForkVendor);
-
-		if (isFork && EaglercraftVersion.mainMenuStringF != null && EaglercraftVersion.mainMenuStringF.length() > 0) {
-			i += 11;
-		}
-
-		if (this.mc.isDemo()) {
-			this.addDemoButtons(i, 24);
-		} else {
-			this.addSingleplayerMultiplayerButtons(i, 24);
-		}
-
-		this.buttonList.add(new GuiButton(0, this.width / 2 - 100, i + 72 + 12, 98, 20,
-				I18n.format("menu.options", new Object[0])));
-		this.buttonList.add(new GuiButton(4, this.width / 2 + 2, i + 72 + 12, 98, 20,
-				I18n.format("menu.editProfile", new Object[0])));
-
-		this.buttonList.add(new GuiButtonLanguage(5, this.width / 2 - 124, i + 72 + 12));
-
-		if (isFork) {
-			this.openGLWarning1 = EaglercraftVersion.mainMenuStringE;
-			this.openGLWarning2 = EaglercraftVersion.mainMenuStringF;
-			boolean line2 = this.openGLWarning2 != null && this.openGLWarning2.length() > 0;
-			this.field_92023_s = this.fontRendererObj.getStringWidth(this.openGLWarning1);
-			this.field_92024_r = this.fontRendererObj.getStringWidth(this.openGLWarning2);
-			int j = Math.max(this.field_92023_s, this.field_92024_r);
-			this.field_92022_t = (this.width - j) / 2;
-			this.field_92021_u = ((GuiButton) this.buttonList.get(0)).yPosition - (line2 ? 32 : 21);
-			this.field_92020_v = this.field_92022_t + j;
-			this.field_92019_w = this.field_92021_u + (line2 ? 24 : 11);
-		}
-
-		this.mc.func_181537_a(false);
-	}
-
-	/**+
-	 * Adds Singleplayer and Multiplayer buttons on Main Menu for
-	 * players who have bought the game.
-	 */
-	private void addSingleplayerMultiplayerButtons(int parInt1, int parInt2) {
-		this.buttonList
-				.add(new GuiButton(1, this.width / 2 - 100, parInt1, I18n.format("menu.singleplayer", new Object[0])));
-		this.buttonList.add(new GuiButton(2, this.width / 2 - 100, parInt1 + parInt2 * 1,
-				I18n.format("menu.multiplayer", new Object[0])));
-		if (EaglercraftVersion.mainMenuEnableGithubButton) {
-			this.buttonList.add(
-					new GuiButton(14, this.width / 2 - 100, parInt1 + parInt2 * 2, I18n.format("menu.forkOnGitlab")));
-		} else {
-			if (EagRuntime.getConfiguration().isEnableDownloadOfflineButton()
-					&& (EagRuntime.getConfiguration().getDownloadOfflineButtonLink() != null
-							|| (!EagRuntime.isOfflineDownloadURL() && UpdateService.supported()
-									&& UpdateService.getClientSignatureData() != null))) {
-				this.buttonList.add(downloadOfflineButton = new GuiButton(15, this.width / 2 - 100,
-						parInt1 + parInt2 * 2, I18n.format("update.downloadOffline")));
-				downloadOfflineButton.enabled = !UpdateService.shouldDisableDownloadButton();
-			}
-		}
-	}
-
-	/**+
-	 * Adds Demo buttons on Main Menu for players who are playing
-	 * Demo.
-	 */
-	private void addDemoButtons(int parInt1, int parInt2) {
-		this.buttonList
-				.add(new GuiButton(11, this.width / 2 - 100, parInt1, I18n.format("menu.playdemo", new Object[0])));
-		this.buttonList.add(this.buttonResetDemo = new GuiButton(12, this.width / 2 - 100, parInt1 + parInt2 * 1,
-				I18n.format("menu.resetdemo", new Object[0])));
-		this.buttonResetDemo.enabled = this.mc.gameSettings.hasCreatedDemoWorld;
-	}
-
-	/**+
-	 * Called by the controls from the buttonList when activated.
-	 * (Mouse pressed for buttons)
+	/**
+	 * + Called by the controls from the buttonList when activated. (Mouse pressed
+	 * for buttons)
 	 */
 	protected void actionPerformed(GuiButton parGuiButton) {
 		if (parGuiButton.id == 0) {
@@ -389,6 +229,41 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
 		}
 	}
 
+	/**
+	 * + Adds Demo buttons on Main Menu for players who are playing Demo.
+	 */
+	private void addDemoButtons(int parInt1, int parInt2) {
+		this.buttonList
+				.add(new GuiButton(11, this.width / 2 - 100, parInt1, I18n.format("menu.playdemo", new Object[0])));
+		this.buttonList.add(this.buttonResetDemo = new GuiButton(12, this.width / 2 - 100, parInt1 + parInt2 * 1,
+				I18n.format("menu.resetdemo", new Object[0])));
+		this.buttonResetDemo.enabled = this.mc.gameSettings.hasCreatedDemoWorld;
+	}
+
+	/**
+	 * + Adds Singleplayer and Multiplayer buttons on Main Menu for players who have
+	 * bought the game.
+	 */
+	private void addSingleplayerMultiplayerButtons(int parInt1, int parInt2) {
+		this.buttonList
+				.add(new GuiButton(1, this.width / 2 - 100, parInt1, I18n.format("menu.singleplayer", new Object[0])));
+		this.buttonList.add(new GuiButton(2, this.width / 2 - 100, parInt1 + parInt2 * 1,
+				I18n.format("menu.multiplayer", new Object[0])));
+		if (EaglercraftVersion.mainMenuEnableGithubButton) {
+			this.buttonList.add(
+					new GuiButton(14, this.width / 2 - 100, parInt1 + parInt2 * 2, I18n.format("menu.forkOnGitlab")));
+		} else {
+			if (EagRuntime.getConfiguration().isEnableDownloadOfflineButton()
+					&& (EagRuntime.getConfiguration().getDownloadOfflineButtonLink() != null
+							|| (!EagRuntime.isOfflineDownloadURL() && UpdateService.supported()
+									&& UpdateService.getClientSignatureData() != null))) {
+				this.buttonList.add(downloadOfflineButton = new GuiButton(15, this.width / 2 - 100,
+						parInt1 + parInt2 * 2, I18n.format("update.downloadOffline")));
+				downloadOfflineButton.enabled = !UpdateService.shouldDisableDownloadButton();
+			}
+		}
+	}
+
 	public void confirmClicked(boolean flag, int i) {
 		if (flag && i == 12) {
 			this.mc.gameSettings.hasCreatedDemoWorld = false;
@@ -402,8 +277,16 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
 		}
 	}
 
-	/**+
-	 * Draws the main menu panorama
+	/**
+	 * + Returns true if this GUI should pause the game when it is displayed in
+	 * single-player
+	 */
+	public boolean doesGuiPauseGame() {
+		return false;
+	}
+
+	/**
+	 * + Draws the main menu panorama
 	 */
 	private void drawPanorama(int parInt1, int parInt2, float parFloat1) {
 		Tessellator tessellator = Tessellator.getInstance();
@@ -490,79 +373,9 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
 		GlStateManager.enableDepth();
 	}
 
-	/**+
-	 * Rotate and blurs the skybox view in the main menu
-	 */
-	private void rotateAndBlurSkybox(float parFloat1) {
-		this.mc.getTextureManager().bindTexture(backgroundTexture);
-		EaglercraftGPU.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		EaglercraftGPU.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		EaglercraftGPU.glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, 256, 256);
-		GlStateManager.enableBlend();
-		GlStateManager.tryBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-		GlStateManager.colorMask(true, true, true, false);
-		Tessellator tessellator = Tessellator.getInstance();
-		WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-		worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-		GlStateManager.disableAlpha();
-		byte b0 = 3;
-
-		for (int i = 0; i < b0; ++i) {
-			float f = 1.0F / (float) (i + 1);
-			int j = this.width;
-			int k = this.height;
-			float f1 = (float) (i - b0 / 2) / 256.0F;
-			worldrenderer.pos((double) j, (double) k, (double) this.zLevel).tex((double) (0.0F + f1), 1.0D)
-					.color(1.0F, 1.0F, 1.0F, f).endVertex();
-			worldrenderer.pos((double) j, 0.0D, (double) this.zLevel).tex((double) (1.0F + f1), 1.0D)
-					.color(1.0F, 1.0F, 1.0F, f).endVertex();
-			worldrenderer.pos(0.0D, 0.0D, (double) this.zLevel).tex((double) (1.0F + f1), 0.0D)
-					.color(1.0F, 1.0F, 1.0F, f).endVertex();
-			worldrenderer.pos(0.0D, (double) k, (double) this.zLevel).tex((double) (0.0F + f1), 0.0D)
-					.color(1.0F, 1.0F, 1.0F, f).endVertex();
-		}
-
-		tessellator.draw();
-		GlStateManager.enableAlpha();
-		GlStateManager.colorMask(true, true, true, true);
-	}
-
-	/**+
-	 * Renders the skybox in the main menu
-	 */
-	private void renderSkybox(int parInt1, int parInt2, float parFloat1) {
-		GlStateManager.viewport(0, 0, 256, 256);
-		this.drawPanorama(parInt1, parInt2, parFloat1);
-		this.rotateAndBlurSkybox(parFloat1);
-		this.rotateAndBlurSkybox(parFloat1);
-		this.rotateAndBlurSkybox(parFloat1);
-		this.rotateAndBlurSkybox(parFloat1);
-		this.rotateAndBlurSkybox(parFloat1);
-		this.rotateAndBlurSkybox(parFloat1);
-		this.rotateAndBlurSkybox(parFloat1);
-		GlStateManager.viewport(0, 0, this.mc.displayWidth, this.mc.displayHeight);
-		float f = this.width > this.height ? 120.0F / (float) this.width : 120.0F / (float) this.height;
-		float f1 = (float) this.height * f / 256.0F;
-		float f2 = (float) this.width * f / 256.0F;
-		int i = this.width;
-		int j = this.height;
-		Tessellator tessellator = Tessellator.getInstance();
-		WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-		worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-		worldrenderer.pos(0.0D, (double) j, (double) this.zLevel).tex((double) (0.5F - f1), (double) (0.5F + f2))
-				.color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-		worldrenderer.pos((double) i, (double) j, (double) this.zLevel).tex((double) (0.5F - f1), (double) (0.5F - f2))
-				.color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-		worldrenderer.pos((double) i, 0.0D, (double) this.zLevel).tex((double) (0.5F + f1), (double) (0.5F - f2))
-				.color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-		worldrenderer.pos(0.0D, 0.0D, (double) this.zLevel).tex((double) (0.5F + f1), (double) (0.5F + f2))
-				.color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-		tessellator.draw();
-	}
-
-	/**+
-	 * Draws the screen and all the components in it. Args : mouseX,
-	 * mouseY, renderPartialTicks
+	/**
+	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
+	 * renderPartialTicks
 	 */
 	public void drawScreen(int i, int j, float f) {
 		GlStateManager.disableAlpha();
@@ -710,9 +523,74 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
 		super.drawScreen(i, j, f);
 	}
 
-	/**+
-	 * Called when the mouse is clicked. Args : mouseX, mouseY,
-	 * clickedButton
+	/**
+	 * + Adds the buttons (and other controls) to the screen in question. Called
+	 * when the GUI is displayed and when the window resizes, the buttonList is
+	 * cleared beforehand.
+	 */
+	public void initGui() {
+		if (viewportTexture == null) {
+			viewportTexture = new DynamicTexture(256, 256);
+			backgroundTexture = this.mc.getTextureManager().getDynamicTextureLocation("background", viewportTexture);
+		}
+		this.updateCheckerOverlay.setResolution(mc, width, height);
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date());
+		if (calendar.get(2) + 1 == 12 && calendar.get(5) == 24) {
+			this.splashText = "Merry X-mas!";
+		} else if (calendar.get(2) + 1 == 1 && calendar.get(5) == 1) {
+			this.splashText = "Happy new year!";
+		} else if (calendar.get(2) + 1 == 10 && calendar.get(5) == 31) {
+			this.splashText = "OOoooOOOoooo! Spooky!";
+		}
+
+		int i = this.height / 4 + 48;
+
+		boolean isFork = !EaglercraftVersion.projectOriginAuthor.equalsIgnoreCase(EaglercraftVersion.projectForkVendor);
+
+		if (isFork && EaglercraftVersion.mainMenuStringF != null && EaglercraftVersion.mainMenuStringF.length() > 0) {
+			i += 11;
+		}
+
+		if (this.mc.isDemo()) {
+			this.addDemoButtons(i, 24);
+		} else {
+			this.addSingleplayerMultiplayerButtons(i, 24);
+		}
+
+		this.buttonList.add(new GuiButton(0, this.width / 2 - 100, i + 72 + 12, 98, 20,
+				I18n.format("menu.options", new Object[0])));
+		this.buttonList.add(new GuiButton(4, this.width / 2 + 2, i + 72 + 12, 98, 20,
+				I18n.format("menu.editProfile", new Object[0])));
+
+		this.buttonList.add(new GuiButtonLanguage(5, this.width / 2 - 124, i + 72 + 12));
+
+		if (isFork) {
+			this.openGLWarning1 = EaglercraftVersion.mainMenuStringE;
+			this.openGLWarning2 = EaglercraftVersion.mainMenuStringF;
+			boolean line2 = this.openGLWarning2 != null && this.openGLWarning2.length() > 0;
+			this.field_92023_s = this.fontRendererObj.getStringWidth(this.openGLWarning1);
+			this.field_92024_r = this.fontRendererObj.getStringWidth(this.openGLWarning2);
+			int j = Math.max(this.field_92023_s, this.field_92024_r);
+			this.field_92022_t = (this.width - j) / 2;
+			this.field_92021_u = ((GuiButton) this.buttonList.get(0)).yPosition - (line2 ? 32 : 21);
+			this.field_92020_v = this.field_92022_t + j;
+			this.field_92019_w = this.field_92021_u + (line2 ? 24 : 11);
+		}
+
+		this.mc.func_181537_a(false);
+	}
+
+	/**
+	 * + Fired when a key is typed (except F11 which toggles full screen). This is
+	 * the equivalent of KeyListener.keyTyped(KeyEvent e). Args : character
+	 * (character on the key), keyCode (lwjgl Keyboard key code)
+	 */
+	protected void keyTyped(char parChar1, int parInt1) {
+	}
+
+	/**
+	 * + Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
 	 */
 	protected void mouseClicked(int par1, int par2, int par3) {
 		if (par3 == 0) {
@@ -730,5 +608,135 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
 		}
 		this.updateCheckerOverlay.mouseClicked(par1, par2, par3);
 		super.mouseClicked(par1, par2, par3);
+	}
+
+	private void reloadResourceFlags() {
+		if (Minecraft.getMinecraft().isDemo()) {
+			this.isDefault = false;
+		} else {
+			if (!EagRuntime.getConfiguration().isEnableMinceraft()) {
+				this.isDefault = false;
+			} else {
+				try {
+					byte[] bytes = EaglerInputStream.inputStreamToBytesQuiet(Minecraft.getMinecraft()
+							.getResourceManager().getResource(minecraftTitleTextures).getInputStream());
+					if (bytes != null && bytes.length == lendef) {
+						SHA1Digest sha1 = new SHA1Digest();
+						byte[] sha1out = new byte[20];
+						sha1.update(bytes, 0, bytes.length);
+						sha1.doFinal(sha1out, 0);
+						this.isDefault = Arrays.equals(sha1out, sha1def);
+					} else {
+						this.isDefault = false;
+					}
+				} catch (IOException e) {
+					this.isDefault = false;
+				}
+			}
+		}
+
+		this.enableBlur = true;
+
+		try {
+			byte[] bytes = EaglerInputStream.inputStreamToBytesQuiet(
+					Minecraft.getMinecraft().getResourceManager().getResource(minecraftTitleBlurFlag).getInputStream());
+			if (bytes != null) {
+				String[] blurCfg = EagUtils.linesArray(new String(bytes, StandardCharsets.UTF_8));
+				for (int i = 0; i < blurCfg.length; ++i) {
+					String s = blurCfg[i];
+					if (s.startsWith("enable_blur=")) {
+						s = s.substring(12).trim();
+						this.enableBlur = s.equals("1") || s.equals("true");
+						break;
+					}
+				}
+			}
+		} catch (IOException e) {
+			;
+		}
+	}
+
+	/**
+	 * + Renders the skybox in the main menu
+	 */
+	private void renderSkybox(int parInt1, int parInt2, float parFloat1) {
+		GlStateManager.viewport(0, 0, 256, 256);
+		this.drawPanorama(parInt1, parInt2, parFloat1);
+		this.rotateAndBlurSkybox(parFloat1);
+		this.rotateAndBlurSkybox(parFloat1);
+		this.rotateAndBlurSkybox(parFloat1);
+		this.rotateAndBlurSkybox(parFloat1);
+		this.rotateAndBlurSkybox(parFloat1);
+		this.rotateAndBlurSkybox(parFloat1);
+		this.rotateAndBlurSkybox(parFloat1);
+		GlStateManager.viewport(0, 0, this.mc.displayWidth, this.mc.displayHeight);
+		float f = this.width > this.height ? 120.0F / (float) this.width : 120.0F / (float) this.height;
+		float f1 = (float) this.height * f / 256.0F;
+		float f2 = (float) this.width * f / 256.0F;
+		int i = this.width;
+		int j = this.height;
+		Tessellator tessellator = Tessellator.getInstance();
+		WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+		worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+		worldrenderer.pos(0.0D, (double) j, (double) this.zLevel).tex((double) (0.5F - f1), (double) (0.5F + f2))
+				.color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
+		worldrenderer.pos((double) i, (double) j, (double) this.zLevel).tex((double) (0.5F - f1), (double) (0.5F - f2))
+				.color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
+		worldrenderer.pos((double) i, 0.0D, (double) this.zLevel).tex((double) (0.5F + f1), (double) (0.5F - f2))
+				.color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
+		worldrenderer.pos(0.0D, 0.0D, (double) this.zLevel).tex((double) (0.5F + f1), (double) (0.5F + f2))
+				.color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
+		tessellator.draw();
+	}
+
+	/**
+	 * + Rotate and blurs the skybox view in the main menu
+	 */
+	private void rotateAndBlurSkybox(float parFloat1) {
+		this.mc.getTextureManager().bindTexture(backgroundTexture);
+		EaglercraftGPU.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		EaglercraftGPU.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		EaglercraftGPU.glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, 256, 256);
+		GlStateManager.enableBlend();
+		GlStateManager.tryBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+		GlStateManager.colorMask(true, true, true, false);
+		Tessellator tessellator = Tessellator.getInstance();
+		WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+		worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+		GlStateManager.disableAlpha();
+		byte b0 = 3;
+
+		for (int i = 0; i < b0; ++i) {
+			float f = 1.0F / (float) (i + 1);
+			int j = this.width;
+			int k = this.height;
+			float f1 = (float) (i - b0 / 2) / 256.0F;
+			worldrenderer.pos((double) j, (double) k, (double) this.zLevel).tex((double) (0.0F + f1), 1.0D)
+					.color(1.0F, 1.0F, 1.0F, f).endVertex();
+			worldrenderer.pos((double) j, 0.0D, (double) this.zLevel).tex((double) (1.0F + f1), 1.0D)
+					.color(1.0F, 1.0F, 1.0F, f).endVertex();
+			worldrenderer.pos(0.0D, 0.0D, (double) this.zLevel).tex((double) (1.0F + f1), 0.0D)
+					.color(1.0F, 1.0F, 1.0F, f).endVertex();
+			worldrenderer.pos(0.0D, (double) k, (double) this.zLevel).tex((double) (0.0F + f1), 0.0D)
+					.color(1.0F, 1.0F, 1.0F, f).endVertex();
+		}
+
+		tessellator.draw();
+		GlStateManager.enableAlpha();
+		GlStateManager.colorMask(true, true, true, true);
+	}
+
+	/**
+	 * + Called from the main game loop to update the screen.
+	 */
+	public void updateScreen() {
+		++this.panoramaTimer;
+		if (downloadOfflineButton != null) {
+			downloadOfflineButton.enabled = !UpdateService.shouldDisableDownloadButton();
+		}
+		if (shouldReload) {
+			reloadResourceFlags();
+			shouldReload = false;
+		}
 	}
 }

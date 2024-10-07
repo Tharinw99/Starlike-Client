@@ -1,7 +1,6 @@
 package net.minecraft.block;
 
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
-
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyDirection;
@@ -21,22 +20,25 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -45,28 +47,20 @@ public class BlockPistonMoving extends BlockContainer {
 	public static final PropertyDirection FACING = BlockPistonExtension.FACING;
 	public static PropertyEnum<BlockPistonExtension.EnumPistonType> TYPE;
 
-	public BlockPistonMoving() {
-		super(Material.piston);
-		this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH).withProperty(TYPE,
-				BlockPistonExtension.EnumPistonType.DEFAULT));
-		this.setHardness(-1.0F);
-	}
-
 	public static void bootstrapStates() {
 		TYPE = BlockPistonExtension.TYPE;
-	}
-
-	/**+
-	 * Returns a new instance of a block's tile entity class. Called
-	 * on placing the block.
-	 */
-	public TileEntity createNewTileEntity(World var1, int var2) {
-		return null;
 	}
 
 	public static TileEntity newTileEntity(IBlockState state, EnumFacing facing, boolean extending,
 			boolean renderHead) {
 		return new TileEntityPiston(state, facing, extending, renderHead);
+	}
+
+	public BlockPistonMoving() {
+		super(Material.piston);
+		this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH).withProperty(TYPE,
+				BlockPistonExtension.EnumPistonType.DEFAULT));
+		this.setHardness(-1.0F);
 	}
 
 	public void breakBlock(World world, BlockPos blockpos, IBlockState iblockstate) {
@@ -83,57 +77,35 @@ public class BlockPistonMoving extends BlockContainer {
 		return false;
 	}
 
-	/**+
-	 * Check whether this Block can be placed on the given side
+	/**
+	 * + Check whether this Block can be placed on the given side
 	 */
 	public boolean canPlaceBlockOnSide(World var1, BlockPos var2, EnumFacing var3) {
 		return false;
 	}
 
-	/**+
-	 * Called when a player destroys this Block
+	/**
+	 * + Ray traces through the blocks collision from start vector to end vector
+	 * returning a ray trace hit.
 	 */
-	public void onBlockDestroyedByPlayer(World world, BlockPos blockpos, IBlockState iblockstate) {
-		BlockPos blockpos1 = blockpos.offset(((EnumFacing) iblockstate.getValue(FACING)).getOpposite());
-		IBlockState iblockstate1 = world.getBlockState(blockpos1);
-		if (iblockstate1.getBlock() instanceof BlockPistonBase
-				&& ((Boolean) iblockstate1.getValue(BlockPistonBase.EXTENDED)).booleanValue()) {
-			world.setBlockToAir(blockpos1);
-		}
-
-	}
-
-	/**+
-	 * Used to determine ambient occlusion and culling when
-	 * rebuilding chunks for render
-	 */
-	public boolean isOpaqueCube() {
-		return false;
-	}
-
-	public boolean isFullCube() {
-		return false;
-	}
-
-	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState var3, EntityPlayer var4,
-			EnumFacing var5, float var6, float var7, float var8) {
-		if (!world.isRemote && world.getTileEntity(blockpos) == null) {
-			world.setBlockToAir(blockpos);
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	/**+
-	 * Get the Item that this Block should drop when harvested.
-	 */
-	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
+	public MovingObjectPosition collisionRayTrace(World var1, BlockPos var2, Vec3 var3, Vec3 var4) {
 		return null;
 	}
 
-	/**+
-	 * Spawns this Block's drops into the World as EntityItems.
+	protected BlockState createBlockState() {
+		return new BlockState(this, new IProperty[] { FACING, TYPE });
+	}
+
+	/**
+	 * + Returns a new instance of a block's tile entity class. Called on placing
+	 * the block.
+	 */
+	public TileEntity createNewTileEntity(World var1, int var2) {
+		return null;
+	}
+
+	/**
+	 * + Spawns this Block's drops into the World as EntityItems.
 	 */
 	public void dropBlockAsItemWithChance(World world, BlockPos blockpos, IBlockState var3, float var4, int var5) {
 		if (!world.isRemote) {
@@ -143,68 +115,6 @@ public class BlockPistonMoving extends BlockContainer {
 				iblockstate.getBlock().dropBlockAsItem(world, blockpos, iblockstate, 0);
 			}
 		}
-	}
-
-	/**+
-	 * Ray traces through the blocks collision from start vector to
-	 * end vector returning a ray trace hit.
-	 */
-	public MovingObjectPosition collisionRayTrace(World var1, BlockPos var2, Vec3 var3, Vec3 var4) {
-		return null;
-	}
-
-	/**+
-	 * Called when a neighboring block changes.
-	 */
-	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState var3, Block var4) {
-		if (!world.isRemote) {
-			world.getTileEntity(blockpos);
-		}
-	}
-
-	public AxisAlignedBB getCollisionBoundingBox(World world, BlockPos blockpos, IBlockState var3) {
-		TileEntityPiston tileentitypiston = this.getTileEntity(world, blockpos);
-		if (tileentitypiston == null) {
-			return null;
-		} else {
-			float f = tileentitypiston.getProgress(0.0F);
-			if (tileentitypiston.isExtending()) {
-				f = 1.0F - f;
-			}
-
-			return this.getBoundingBox(world, blockpos, tileentitypiston.getPistonState(), f,
-					tileentitypiston.getFacing());
-		}
-	}
-
-	public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
-		TileEntityPiston tileentitypiston = this.getTileEntity(iblockaccess, blockpos);
-		if (tileentitypiston != null) {
-			IBlockState iblockstate = tileentitypiston.getPistonState();
-			Block block = iblockstate.getBlock();
-			if (block == this || block.getMaterial() == Material.air) {
-				return;
-			}
-
-			float f = tileentitypiston.getProgress(0.0F);
-			if (tileentitypiston.isExtending()) {
-				f = 1.0F - f;
-			}
-
-			block.setBlockBoundsBasedOnState(iblockaccess, blockpos);
-			if (block == Blocks.piston || block == Blocks.sticky_piston) {
-				f = 0.0F;
-			}
-
-			EnumFacing enumfacing = tileentitypiston.getFacing();
-			this.minX = block.getBlockBoundsMinX() - (double) ((float) enumfacing.getFrontOffsetX() * f);
-			this.minY = block.getBlockBoundsMinY() - (double) ((float) enumfacing.getFrontOffsetY() * f);
-			this.minZ = block.getBlockBoundsMinZ() - (double) ((float) enumfacing.getFrontOffsetZ() * f);
-			this.maxX = block.getBlockBoundsMaxX() - (double) ((float) enumfacing.getFrontOffsetX() * f);
-			this.maxY = block.getBlockBoundsMaxY() - (double) ((float) enumfacing.getFrontOffsetY() * f);
-			this.maxZ = block.getBlockBoundsMaxZ() - (double) ((float) enumfacing.getFrontOffsetZ() * f);
-		}
-
 	}
 
 	public AxisAlignedBB getBoundingBox(World worldIn, BlockPos pos, IBlockState extendingBlock, float progress,
@@ -246,25 +156,34 @@ public class BlockPistonMoving extends BlockContainer {
 		}
 	}
 
-	private TileEntityPiston getTileEntity(IBlockAccess worldIn, BlockPos pos) {
-		TileEntity tileentity = worldIn.getTileEntity(pos);
-		return tileentity instanceof TileEntityPiston ? (TileEntityPiston) tileentity : null;
+	public AxisAlignedBB getCollisionBoundingBox(World world, BlockPos blockpos, IBlockState var3) {
+		TileEntityPiston tileentitypiston = this.getTileEntity(world, blockpos);
+		if (tileentitypiston == null) {
+			return null;
+		} else {
+			float f = tileentitypiston.getProgress(0.0F);
+			if (tileentitypiston.isExtending()) {
+				f = 1.0F - f;
+			}
+
+			return this.getBoundingBox(world, blockpos, tileentitypiston.getPistonState(), f,
+					tileentitypiston.getFacing());
+		}
 	}
 
 	public Item getItem(World var1, BlockPos var2) {
 		return null;
 	}
 
-	/**+
-	 * Convert the given metadata into a BlockState for this Block
+	/**
+	 * + Get the Item that this Block should drop when harvested.
 	 */
-	public IBlockState getStateFromMeta(int i) {
-		return this.getDefaultState().withProperty(FACING, BlockPistonExtension.getFacing(i)).withProperty(TYPE,
-				(i & 8) > 0 ? BlockPistonExtension.EnumPistonType.STICKY : BlockPistonExtension.EnumPistonType.DEFAULT);
+	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
+		return null;
 	}
 
-	/**+
-	 * Convert the BlockState into the correct metadata value
+	/**
+	 * + Convert the BlockState into the correct metadata value
 	 */
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
@@ -276,7 +195,90 @@ public class BlockPistonMoving extends BlockContainer {
 		return i;
 	}
 
-	protected BlockState createBlockState() {
-		return new BlockState(this, new IProperty[] { FACING, TYPE });
+	/**
+	 * + Convert the given metadata into a BlockState for this Block
+	 */
+	public IBlockState getStateFromMeta(int i) {
+		return this.getDefaultState().withProperty(FACING, BlockPistonExtension.getFacing(i)).withProperty(TYPE,
+				(i & 8) > 0 ? BlockPistonExtension.EnumPistonType.STICKY : BlockPistonExtension.EnumPistonType.DEFAULT);
+	}
+
+	private TileEntityPiston getTileEntity(IBlockAccess worldIn, BlockPos pos) {
+		TileEntity tileentity = worldIn.getTileEntity(pos);
+		return tileentity instanceof TileEntityPiston ? (TileEntityPiston) tileentity : null;
+	}
+
+	public boolean isFullCube() {
+		return false;
+	}
+
+	/**
+	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
+	 * render
+	 */
+	public boolean isOpaqueCube() {
+		return false;
+	}
+
+	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState var3, EntityPlayer var4,
+			EnumFacing var5, float var6, float var7, float var8) {
+		if (!world.isRemote && world.getTileEntity(blockpos) == null) {
+			world.setBlockToAir(blockpos);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * + Called when a player destroys this Block
+	 */
+	public void onBlockDestroyedByPlayer(World world, BlockPos blockpos, IBlockState iblockstate) {
+		BlockPos blockpos1 = blockpos.offset(((EnumFacing) iblockstate.getValue(FACING)).getOpposite());
+		IBlockState iblockstate1 = world.getBlockState(blockpos1);
+		if (iblockstate1.getBlock() instanceof BlockPistonBase
+				&& ((Boolean) iblockstate1.getValue(BlockPistonBase.EXTENDED)).booleanValue()) {
+			world.setBlockToAir(blockpos1);
+		}
+
+	}
+
+	/**
+	 * + Called when a neighboring block changes.
+	 */
+	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState var3, Block var4) {
+		if (!world.isRemote) {
+			world.getTileEntity(blockpos);
+		}
+	}
+
+	public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
+		TileEntityPiston tileentitypiston = this.getTileEntity(iblockaccess, blockpos);
+		if (tileentitypiston != null) {
+			IBlockState iblockstate = tileentitypiston.getPistonState();
+			Block block = iblockstate.getBlock();
+			if (block == this || block.getMaterial() == Material.air) {
+				return;
+			}
+
+			float f = tileentitypiston.getProgress(0.0F);
+			if (tileentitypiston.isExtending()) {
+				f = 1.0F - f;
+			}
+
+			block.setBlockBoundsBasedOnState(iblockaccess, blockpos);
+			if (block == Blocks.piston || block == Blocks.sticky_piston) {
+				f = 0.0F;
+			}
+
+			EnumFacing enumfacing = tileentitypiston.getFacing();
+			this.minX = block.getBlockBoundsMinX() - (double) ((float) enumfacing.getFrontOffsetX() * f);
+			this.minY = block.getBlockBoundsMinY() - (double) ((float) enumfacing.getFrontOffsetY() * f);
+			this.minZ = block.getBlockBoundsMinZ() - (double) ((float) enumfacing.getFrontOffsetZ() * f);
+			this.maxX = block.getBlockBoundsMaxX() - (double) ((float) enumfacing.getFrontOffsetX() * f);
+			this.maxY = block.getBlockBoundsMaxY() - (double) ((float) enumfacing.getFrontOffsetY() * f);
+			this.maxZ = block.getBlockBoundsMaxZ() - (double) ((float) enumfacing.getFrontOffsetZ() * f);
+		}
+
 	}
 }

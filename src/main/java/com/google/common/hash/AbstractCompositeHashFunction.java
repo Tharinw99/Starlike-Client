@@ -29,6 +29,8 @@ import java.nio.charset.Charset;
  * @author Dimitris Andreou
  */
 abstract class AbstractCompositeHashFunction extends AbstractStreamingHashFunction {
+	private static final long serialVersionUID = 0L;
+
 	final HashFunction[] functions;
 
 	AbstractCompositeHashFunction(HashFunction... functions) {
@@ -56,6 +58,19 @@ abstract class AbstractCompositeHashFunction extends AbstractStreamingHashFuncti
 		}
 		return new Hasher() {
 			@Override
+			public HashCode hash() {
+				return makeHash(hashers);
+			}
+
+			@Override
+			public Hasher putBoolean(boolean b) {
+				for (Hasher hasher : hashers) {
+					hasher.putBoolean(b);
+				}
+				return this;
+			}
+
+			@Override
 			public Hasher putByte(byte b) {
 				for (Hasher hasher : hashers) {
 					hasher.putByte(b);
@@ -80,9 +95,25 @@ abstract class AbstractCompositeHashFunction extends AbstractStreamingHashFuncti
 			}
 
 			@Override
-			public Hasher putShort(short s) {
+			public Hasher putChar(char c) {
 				for (Hasher hasher : hashers) {
-					hasher.putShort(s);
+					hasher.putChar(c);
+				}
+				return this;
+			}
+
+			@Override
+			public Hasher putDouble(double d) {
+				for (Hasher hasher : hashers) {
+					hasher.putDouble(d);
+				}
+				return this;
+			}
+
+			@Override
+			public Hasher putFloat(float f) {
+				for (Hasher hasher : hashers) {
+					hasher.putFloat(f);
 				}
 				return this;
 			}
@@ -104,41 +135,17 @@ abstract class AbstractCompositeHashFunction extends AbstractStreamingHashFuncti
 			}
 
 			@Override
-			public Hasher putFloat(float f) {
+			public <T> Hasher putObject(T instance, Funnel<? super T> funnel) {
 				for (Hasher hasher : hashers) {
-					hasher.putFloat(f);
+					hasher.putObject(instance, funnel);
 				}
 				return this;
 			}
 
 			@Override
-			public Hasher putDouble(double d) {
+			public Hasher putShort(short s) {
 				for (Hasher hasher : hashers) {
-					hasher.putDouble(d);
-				}
-				return this;
-			}
-
-			@Override
-			public Hasher putBoolean(boolean b) {
-				for (Hasher hasher : hashers) {
-					hasher.putBoolean(b);
-				}
-				return this;
-			}
-
-			@Override
-			public Hasher putChar(char c) {
-				for (Hasher hasher : hashers) {
-					hasher.putChar(c);
-				}
-				return this;
-			}
-
-			@Override
-			public Hasher putUnencodedChars(CharSequence chars) {
-				for (Hasher hasher : hashers) {
-					hasher.putUnencodedChars(chars);
+					hasher.putShort(s);
 				}
 				return this;
 			}
@@ -152,19 +159,12 @@ abstract class AbstractCompositeHashFunction extends AbstractStreamingHashFuncti
 			}
 
 			@Override
-			public <T> Hasher putObject(T instance, Funnel<? super T> funnel) {
+			public Hasher putUnencodedChars(CharSequence chars) {
 				for (Hasher hasher : hashers) {
-					hasher.putObject(instance, funnel);
+					hasher.putUnencodedChars(chars);
 				}
 				return this;
 			}
-
-			@Override
-			public HashCode hash() {
-				return makeHash(hashers);
-			}
 		};
 	}
-
-	private static final long serialVersionUID = 0L;
 }

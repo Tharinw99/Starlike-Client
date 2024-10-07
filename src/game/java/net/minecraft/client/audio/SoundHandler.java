@@ -25,69 +25,30 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.ResourceLocation;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class SoundHandler implements IResourceManagerReloadListener, ITickable {
-	private static final Logger logger = LogManager.getLogger();
-	private static final Logger tipLogger = LogManager.getLogger("EaglercraftX");
-	public static final SoundPoolEntry missing_sound = new SoundPoolEntry(new ResourceLocation("meta:missing_sound"),
-			0.0D, 0.0D, false);
-	private final SoundRegistry sndRegistry = new SoundRegistry();
-	private final EaglercraftSoundManager sndManager;
-	private final IResourceManager mcResourceManager;
-
-	public SoundHandler(IResourceManager manager, GameSettings gameSettingsIn) {
-		this.mcResourceManager = manager;
-		this.sndManager = new EaglercraftSoundManager(gameSettingsIn, this);
-	}
-
-	public void onResourceManagerReload(IResourceManager iresourcemanager) {
-		this.sndManager.reloadSoundSystem();
-		this.sndRegistry.clearMap();
-
-		for (String s : iresourcemanager.getResourceDomains()) {
-			try {
-				for (IResource iresource : iresourcemanager.getAllResources(new ResourceLocation(s, "sounds.json"))) {
-					try {
-						Map map = this.getSoundMap(iresource.getInputStream());
-
-						for (Entry entry : (Set<Entry>) map.entrySet()) {
-							this.loadSoundResource(new ResourceLocation(s, (String) entry.getKey()),
-									(SoundList) entry.getValue());
-						}
-					} catch (RuntimeException runtimeexception) {
-						logger.warn("Invalid sounds.json", runtimeexception);
-					}
-				}
-			} catch (IOException var11) {
-				;
-			}
-		}
-
-		if (this.sndRegistry.getObject(new ResourceLocation("minecraft:sounds/music/game/calm1.ogg")) == null) {
-			tipLogger.info(
-					"Download this resource pack if you want music: https://bafybeiayojww5jfyzvlmtuk7l5ufkt7nlfto7mhwmzf2vs4bvsjd5ouiuq.ipfs.nftstorage.link/?filename=Music_For_Eaglercraft.zip");
-		}
-	}
-
 	public static class SoundMap {
 
 		protected final Map<String, SoundList> soundMap;
@@ -96,6 +57,49 @@ public class SoundHandler implements IResourceManagerReloadListener, ITickable {
 			this.soundMap = soundMap;
 		}
 
+	}
+
+	private static final Logger logger = LogManager.getLogger();
+	private static final Logger tipLogger = LogManager.getLogger("EaglercraftX");
+	public static final SoundPoolEntry missing_sound = new SoundPoolEntry(new ResourceLocation("meta:missing_sound"),
+			0.0D, 0.0D, false);
+	private final SoundRegistry sndRegistry = new SoundRegistry();
+	private final EaglercraftSoundManager sndManager;
+
+	private final IResourceManager mcResourceManager;
+
+	public SoundHandler(IResourceManager manager, GameSettings gameSettingsIn) {
+		this.mcResourceManager = manager;
+		this.sndManager = new EaglercraftSoundManager(gameSettingsIn, this);
+	}
+
+	/**
+	 * + Returns a random sound from one or more categories
+	 */
+	public SoundEventAccessorComposite getRandomSoundFromCategories(SoundCategory... categories) {
+		ArrayList arraylist = Lists.newArrayList();
+
+		for (ResourceLocation resourcelocation : this.sndRegistry.getKeys()) {
+			SoundEventAccessorComposite soundeventaccessorcomposite = (SoundEventAccessorComposite) this.sndRegistry
+					.getObject(resourcelocation);
+			SoundCategory cat = soundeventaccessorcomposite.getSoundCategory();
+			for (int i = 0; i < categories.length; ++i) {
+				if (cat == categories[i]) {
+					arraylist.add(soundeventaccessorcomposite);
+					break;
+				}
+			}
+		}
+
+		if (arraylist.isEmpty()) {
+			return null;
+		} else {
+			return (SoundEventAccessorComposite) arraylist.get(ThreadLocalRandom.current().nextInt(arraylist.size()));
+		}
+	}
+
+	public SoundEventAccessorComposite getSound(ResourceLocation location) {
+		return (SoundEventAccessorComposite) this.sndRegistry.getObject(location);
 	}
 
 	protected Map<String, SoundList> getSoundMap(InputStream stream) {
@@ -110,6 +114,10 @@ public class SoundHandler implements IResourceManagerReloadListener, ITickable {
 		}
 
 		return map;
+	}
+
+	public boolean isSoundPlaying(ISound sound) {
+		return this.sndManager.isSoundPlaying(sound);
 	}
 
 	private void loadSoundResource(ResourceLocation location, SoundList sounds) {
@@ -163,17 +171,17 @@ public class SoundHandler implements IResourceManagerReloadListener, ITickable {
 					final ResourceLocation field_148726_a = new ResourceLocation(s1,
 							soundlist$soundentry.getSoundEntryName());
 
-					public int getWeight() {
-						SoundEventAccessorComposite soundeventaccessorcomposite1 = (SoundEventAccessorComposite) SoundHandler.this.sndRegistry
-								.getObject(this.field_148726_a);
-						return soundeventaccessorcomposite1 == null ? 0 : soundeventaccessorcomposite1.getWeight();
-					}
-
 					public SoundPoolEntry cloneEntry() {
 						SoundEventAccessorComposite soundeventaccessorcomposite1 = (SoundEventAccessorComposite) SoundHandler.this.sndRegistry
 								.getObject(this.field_148726_a);
 						return soundeventaccessorcomposite1 == null ? SoundHandler.missing_sound
 								: soundeventaccessorcomposite1.cloneEntry();
+					}
+
+					public int getWeight() {
+						SoundEventAccessorComposite soundeventaccessorcomposite1 = (SoundEventAccessorComposite) SoundHandler.this.sndRegistry
+								.getObject(this.field_148726_a);
+						return soundeventaccessorcomposite1 == null ? 0 : soundeventaccessorcomposite1.getWeight();
 					}
 				};
 				break;
@@ -186,49 +194,59 @@ public class SoundHandler implements IResourceManagerReloadListener, ITickable {
 
 	}
 
-	public SoundEventAccessorComposite getSound(ResourceLocation location) {
-		return (SoundEventAccessorComposite) this.sndRegistry.getObject(location);
-	}
+	public void onResourceManagerReload(IResourceManager iresourcemanager) {
+		this.sndManager.reloadSoundSystem();
+		this.sndRegistry.clearMap();
 
-	/**+
-	 * Play a sound
-	 */
-	public void playSound(ISound sound) {
-		this.sndManager.playSound(sound);
-	}
+		for (String s : iresourcemanager.getResourceDomains()) {
+			try {
+				for (IResource iresource : iresourcemanager.getAllResources(new ResourceLocation(s, "sounds.json"))) {
+					try {
+						Map map = this.getSoundMap(iresource.getInputStream());
 
-	/**+
-	 * Plays the sound in n ticks
-	 */
-	public void playDelayedSound(ISound sound, int delay) {
-		this.sndManager.playDelayedSound(sound, delay);
-	}
+						for (Entry entry : (Set<Entry>) map.entrySet()) {
+							this.loadSoundResource(new ResourceLocation(s, (String) entry.getKey()),
+									(SoundList) entry.getValue());
+						}
+					} catch (RuntimeException runtimeexception) {
+						logger.warn("Invalid sounds.json", runtimeexception);
+					}
+				}
+			} catch (IOException var11) {
+				;
+			}
+		}
 
-	public void setListener(EntityPlayer player, float parFloat1) {
-		this.sndManager.setListener(player, parFloat1);
+		if (this.sndRegistry.getObject(new ResourceLocation("minecraft:sounds/music/game/calm1.ogg")) == null) {
+			tipLogger.info(
+					"Download this resource pack if you want music: https://bafybeiayojww5jfyzvlmtuk7l5ufkt7nlfto7mhwmzf2vs4bvsjd5ouiuq.ipfs.nftstorage.link/?filename=Music_For_Eaglercraft.zip");
+		}
 	}
 
 	public void pauseSounds() {
 		this.sndManager.pauseAllSounds();
 	}
 
-	public void stopSounds() {
-		this.sndManager.stopAllSounds();
-	}
-
-	public void unloadSounds() {
-		this.sndManager.unloadSoundSystem();
-	}
-
-	/**+
-	 * Like the old updateEntity(), except more generic.
+	/**
+	 * + Plays the sound in n ticks
 	 */
-	public void update() {
-		this.sndManager.updateAllSounds();
+	public void playDelayedSound(ISound sound, int delay) {
+		this.sndManager.playDelayedSound(sound, delay);
+	}
+
+	/**
+	 * + Play a sound
+	 */
+	public void playSound(ISound sound) {
+		this.sndManager.playSound(sound);
 	}
 
 	public void resumeSounds() {
 		this.sndManager.resumeAllSounds();
+	}
+
+	public void setListener(EntityPlayer player, float parFloat1) {
+		this.sndManager.setListener(player, parFloat1);
 	}
 
 	public void setSoundLevel(SoundCategory category, float volume) {
@@ -243,32 +261,18 @@ public class SoundHandler implements IResourceManagerReloadListener, ITickable {
 		this.sndManager.stopSound(parISound);
 	}
 
-	/**+
-	 * Returns a random sound from one or more categories
-	 */
-	public SoundEventAccessorComposite getRandomSoundFromCategories(SoundCategory... categories) {
-		ArrayList arraylist = Lists.newArrayList();
-
-		for (ResourceLocation resourcelocation : this.sndRegistry.getKeys()) {
-			SoundEventAccessorComposite soundeventaccessorcomposite = (SoundEventAccessorComposite) this.sndRegistry
-					.getObject(resourcelocation);
-			SoundCategory cat = soundeventaccessorcomposite.getSoundCategory();
-			for (int i = 0; i < categories.length; ++i) {
-				if (cat == categories[i]) {
-					arraylist.add(soundeventaccessorcomposite);
-					break;
-				}
-			}
-		}
-
-		if (arraylist.isEmpty()) {
-			return null;
-		} else {
-			return (SoundEventAccessorComposite) arraylist.get(ThreadLocalRandom.current().nextInt(arraylist.size()));
-		}
+	public void stopSounds() {
+		this.sndManager.stopAllSounds();
 	}
 
-	public boolean isSoundPlaying(ISound sound) {
-		return this.sndManager.isSoundPlaying(sound);
+	public void unloadSounds() {
+		this.sndManager.unloadSoundSystem();
+	}
+
+	/**
+	 * + Like the old updateEntity(), except more generic.
+	 */
+	public void update() {
+		this.sndManager.updateAllSounds();
 	}
 }

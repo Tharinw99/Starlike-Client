@@ -20,11 +20,13 @@ import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 
 /**
  * <p>
- * Utility library that supplements the standard {@link EaglercraftRandom} class.
+ * Utility library that supplements the standard {@link EaglercraftRandom}
+ * class.
  * </p>
  *
  * <p>
- * Caveat: Instances of {@link EaglercraftRandom} are not cryptographically secure.
+ * Caveat: Instances of {@link EaglercraftRandom} are not cryptographically
+ * secure.
  * </p>
  *
  * <p>
@@ -44,21 +46,6 @@ public class RandomUtils {
 	 * method so as to not return the same value in the same millisecond.
 	 */
 	private static final EaglercraftRandom RANDOM = new EaglercraftRandom();
-
-	/**
-	 * <p>
-	 * {@code RandomUtils} instances should NOT be constructed in standard
-	 * programming. Instead, the class should be used as
-	 * {@code RandomUtils.nextBytes(5);}.
-	 * </p>
-	 *
-	 * <p>
-	 * This constructor is public to permit tools that require a JavaBean instance
-	 * to operate.
-	 * </p>
-	 */
-	public RandomUtils() {
-	}
 
 	/**
 	 * <p>
@@ -91,6 +78,91 @@ public class RandomUtils {
 
 	/**
 	 * <p>
+	 * Returns a random double within 0 - Double.MAX_VALUE
+	 * </p>
+	 *
+	 * @return the random double
+	 * @see #nextDouble(double, double)
+	 * @since 3.5
+	 */
+	public static double nextDouble() {
+		return nextDouble(0, Double.MAX_VALUE);
+	}
+
+	/**
+	 * <p>
+	 * Returns a random double within the specified range.
+	 * </p>
+	 *
+	 * @param startInclusive the smallest value that can be returned, must be
+	 *                       non-negative
+	 * @param endExclusive   the upper bound (not included)
+	 * @throws IllegalArgumentException if {@code startInclusive > endExclusive} or
+	 *                                  if {@code startInclusive} is negative
+	 * @return the random double
+	 */
+	public static double nextDouble(final double startInclusive, final double endExclusive) {
+		Validate.isTrue(endExclusive >= startInclusive, "Start value must be smaller or equal to end value.");
+		Validate.isTrue(startInclusive >= 0, "Both range values must be non-negative.");
+
+		if (startInclusive == endExclusive) {
+			return startInclusive;
+		}
+
+		return startInclusive + ((endExclusive - startInclusive) * RANDOM.nextDouble());
+	}
+
+	/**
+	 * <p>
+	 * Returns a random float within 0 - Float.MAX_VALUE
+	 * </p>
+	 *
+	 * @return the random float
+	 * @see #nextFloat(float, float)
+	 * @since 3.5
+	 */
+	public static float nextFloat() {
+		return nextFloat(0, Float.MAX_VALUE);
+	}
+
+	/**
+	 * <p>
+	 * Returns a random float within the specified range.
+	 * </p>
+	 *
+	 * @param startInclusive the smallest value that can be returned, must be
+	 *                       non-negative
+	 * @param endExclusive   the upper bound (not included)
+	 * @throws IllegalArgumentException if {@code startInclusive > endExclusive} or
+	 *                                  if {@code startInclusive} is negative
+	 * @return the random float
+	 */
+	public static float nextFloat(final float startInclusive, final float endExclusive) {
+		Validate.isTrue(endExclusive >= startInclusive, "Start value must be smaller or equal to end value.");
+		Validate.isTrue(startInclusive >= 0, "Both range values must be non-negative.");
+
+		if (startInclusive == endExclusive) {
+			return startInclusive;
+		}
+
+		return startInclusive + ((endExclusive - startInclusive) * RANDOM.nextFloat());
+	}
+
+	/**
+	 * <p>
+	 * Returns a random int within 0 - Integer.MAX_VALUE
+	 * </p>
+	 *
+	 * @return the random integer
+	 * @see #nextInt(int, int)
+	 * @since 3.5
+	 */
+	public static int nextInt() {
+		return nextInt(0, Integer.MAX_VALUE);
+	}
+
+	/**
+	 * <p>
 	 * Returns a random integer within the specified range.
 	 * </p>
 	 *
@@ -110,42 +182,6 @@ public class RandomUtils {
 		}
 
 		return startInclusive + RANDOM.nextInt(endExclusive - startInclusive);
-	}
-
-	/**
-	 * <p>
-	 * Returns a random int within 0 - Integer.MAX_VALUE
-	 * </p>
-	 *
-	 * @return the random integer
-	 * @see #nextInt(int, int)
-	 * @since 3.5
-	 */
-	public static int nextInt() {
-		return nextInt(0, Integer.MAX_VALUE);
-	}
-
-	/**
-	 * <p>
-	 * Returns a random long within the specified range.
-	 * </p>
-	 *
-	 * @param startInclusive the smallest value that can be returned, must be
-	 *                       non-negative
-	 * @param endExclusive   the upper bound (not included)
-	 * @throws IllegalArgumentException if {@code startInclusive > endExclusive} or
-	 *                                  if {@code startInclusive} is negative
-	 * @return the random long
-	 */
-	public static long nextLong(final long startInclusive, final long endExclusive) {
-		Validate.isTrue(endExclusive >= startInclusive, "Start value must be smaller or equal to end value.");
-		Validate.isTrue(startInclusive >= 0, "Both range values must be non-negative.");
-
-		if (startInclusive == endExclusive) {
-			return startInclusive;
-		}
-
-		return startInclusive + nextLong(endExclusive - startInclusive);
 	}
 
 	/**
@@ -183,7 +219,7 @@ public class RandomUtils {
 
 	/**
 	 * <p>
-	 * Returns a random double within the specified range.
+	 * Returns a random long within the specified range.
 	 * </p>
 	 *
 	 * @param startInclusive the smallest value that can be returned, must be
@@ -191,9 +227,9 @@ public class RandomUtils {
 	 * @param endExclusive   the upper bound (not included)
 	 * @throws IllegalArgumentException if {@code startInclusive > endExclusive} or
 	 *                                  if {@code startInclusive} is negative
-	 * @return the random double
+	 * @return the random long
 	 */
-	public static double nextDouble(final double startInclusive, final double endExclusive) {
+	public static long nextLong(final long startInclusive, final long endExclusive) {
 		Validate.isTrue(endExclusive >= startInclusive, "Start value must be smaller or equal to end value.");
 		Validate.isTrue(startInclusive >= 0, "Both range values must be non-negative.");
 
@@ -201,55 +237,21 @@ public class RandomUtils {
 			return startInclusive;
 		}
 
-		return startInclusive + ((endExclusive - startInclusive) * RANDOM.nextDouble());
+		return startInclusive + nextLong(endExclusive - startInclusive);
 	}
 
 	/**
 	 * <p>
-	 * Returns a random double within 0 - Double.MAX_VALUE
+	 * {@code RandomUtils} instances should NOT be constructed in standard
+	 * programming. Instead, the class should be used as
+	 * {@code RandomUtils.nextBytes(5);}.
 	 * </p>
 	 *
-	 * @return the random double
-	 * @see #nextDouble(double, double)
-	 * @since 3.5
-	 */
-	public static double nextDouble() {
-		return nextDouble(0, Double.MAX_VALUE);
-	}
-
-	/**
 	 * <p>
-	 * Returns a random float within the specified range.
+	 * This constructor is public to permit tools that require a JavaBean instance
+	 * to operate.
 	 * </p>
-	 *
-	 * @param startInclusive the smallest value that can be returned, must be
-	 *                       non-negative
-	 * @param endExclusive   the upper bound (not included)
-	 * @throws IllegalArgumentException if {@code startInclusive > endExclusive} or
-	 *                                  if {@code startInclusive} is negative
-	 * @return the random float
 	 */
-	public static float nextFloat(final float startInclusive, final float endExclusive) {
-		Validate.isTrue(endExclusive >= startInclusive, "Start value must be smaller or equal to end value.");
-		Validate.isTrue(startInclusive >= 0, "Both range values must be non-negative.");
-
-		if (startInclusive == endExclusive) {
-			return startInclusive;
-		}
-
-		return startInclusive + ((endExclusive - startInclusive) * RANDOM.nextFloat());
-	}
-
-	/**
-	 * <p>
-	 * Returns a random float within 0 - Float.MAX_VALUE
-	 * </p>
-	 *
-	 * @return the random float
-	 * @see #nextFloat(float, float)
-	 * @since 3.5
-	 */
-	public static float nextFloat() {
-		return nextFloat(0, Float.MAX_VALUE);
+	public RandomUtils() {
 	}
 }

@@ -34,46 +34,30 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class PlayerControllerMP {
-	private final Minecraft mc;
-	private final NetHandlerPlayClient netClientHandler;
-	private BlockPos currentBlock = new BlockPos(-1, -1, -1);
-	private ItemStack currentItemHittingBlock;
-	private float curBlockDamageMP;
-	private float stepSoundTickCounter;
-	private int blockHitDelay;
-	private boolean isHittingBlock;
-	/**+
-	 * Current game type for the player
-	 */
-	private WorldSettings.GameType currentGameType = WorldSettings.GameType.SURVIVAL;
-	private int currentPlayerItem;
-
-	public PlayerControllerMP(Minecraft mcIn, NetHandlerPlayClient parNetHandlerPlayClient) {
-		this.mc = mcIn;
-		this.netClientHandler = parNetHandlerPlayClient;
-	}
-
 	public static void clickBlockCreative(Minecraft mcIn, PlayerControllerMP parPlayerControllerMP,
 			BlockPos parBlockPos, EnumFacing parEnumFacing) {
 		if (!mcIn.theWorld.extinguishFire(mcIn.thePlayer, parBlockPos, parEnumFacing)) {
@@ -82,96 +66,40 @@ public class PlayerControllerMP {
 
 	}
 
-	/**+
-	 * Sets player capabilities depending on current gametype.
-	 * params: player
+	private final Minecraft mc;
+	private final NetHandlerPlayClient netClientHandler;
+	private BlockPos currentBlock = new BlockPos(-1, -1, -1);
+	private ItemStack currentItemHittingBlock;
+	private float curBlockDamageMP;
+	private float stepSoundTickCounter;
+	private int blockHitDelay;
+	private boolean isHittingBlock;
+	/**
+	 * + Current game type for the player
 	 */
-	public void setPlayerCapabilities(EntityPlayer parEntityPlayer) {
-		this.currentGameType.configurePlayerCapabilities(parEntityPlayer.capabilities);
+	private WorldSettings.GameType currentGameType = WorldSettings.GameType.SURVIVAL;
+
+	private int currentPlayerItem;
+
+	public PlayerControllerMP(Minecraft mcIn, NetHandlerPlayClient parNetHandlerPlayClient) {
+		this.mc = mcIn;
+		this.netClientHandler = parNetHandlerPlayClient;
 	}
 
-	/**+
-	 * None
+	/**
+	 * + Attacks an entity
 	 */
-	public boolean isSpectator() {
-		return this.currentGameType == WorldSettings.GameType.SPECTATOR;
-	}
-
-	/**+
-	 * Sets the game type for the player.
-	 */
-	public void setGameType(WorldSettings.GameType parGameType) {
-		this.currentGameType = parGameType;
-		this.currentGameType.configurePlayerCapabilities(this.mc.thePlayer.capabilities);
-	}
-
-	/**+
-	 * Flips the player around.
-	 */
-	public void flipPlayer(EntityPlayer playerIn) {
-		playerIn.rotationYaw = -180.0F;
-	}
-
-	public boolean shouldDrawHUD() {
-		return this.currentGameType.isSurvivalOrAdventure();
-	}
-
-	/**+
-	 * Called when a player completes the destruction of a block
-	 */
-	public boolean onPlayerDestroyBlock(BlockPos pos, EnumFacing side) {
-		if (this.currentGameType.isAdventure()) {
-			if (this.currentGameType == WorldSettings.GameType.SPECTATOR) {
-				return false;
-			}
-
-			if (!this.mc.thePlayer.isAllowEdit()) {
-				Block block = this.mc.theWorld.getBlockState(pos).getBlock();
-				ItemStack itemstack = this.mc.thePlayer.getCurrentEquippedItem();
-				if (itemstack == null) {
-					return false;
-				}
-
-				if (!itemstack.canDestroy(block)) {
-					return false;
-				}
-			}
+	public void attackEntity(EntityPlayer playerIn, Entity targetEntity) {
+		this.syncCurrentPlayItem();
+		this.netClientHandler.addToSendQueue(new C02PacketUseEntity(targetEntity, C02PacketUseEntity.Action.ATTACK));
+		if (this.currentGameType != WorldSettings.GameType.SPECTATOR) {
+			playerIn.attackTargetEntityWithCurrentItem(targetEntity);
 		}
 
-		if (this.currentGameType.isCreative() && this.mc.thePlayer.getHeldItem() != null
-				&& this.mc.thePlayer.getHeldItem().getItem() instanceof ItemSword) {
-			return false;
-		} else {
-			WorldClient worldclient = this.mc.theWorld;
-			IBlockState iblockstate = worldclient.getBlockState(pos);
-			Block block1 = iblockstate.getBlock();
-			if (block1.getMaterial() == Material.air) {
-				return false;
-			} else {
-				worldclient.playAuxSFX(2001, pos, Block.getStateId(iblockstate));
-				boolean flag = worldclient.setBlockToAir(pos);
-				if (flag) {
-					block1.onBlockDestroyedByPlayer(worldclient, pos, iblockstate);
-				}
-
-				this.currentBlock = new BlockPos(this.currentBlock.getX(), -1, this.currentBlock.getZ());
-				if (!this.currentGameType.isCreative()) {
-					ItemStack itemstack1 = this.mc.thePlayer.getCurrentEquippedItem();
-					if (itemstack1 != null) {
-						itemstack1.onBlockDestroyed(worldclient, block1, pos, this.mc.thePlayer);
-						if (itemstack1.stackSize == 0) {
-							this.mc.thePlayer.destroyCurrentEquippedItem();
-						}
-					}
-				}
-
-				return flag;
-			}
-		}
 	}
 
-	/**+
-	 * Called when the player is hitting a block with an item.
+	/**
+	 * + Called when the player is hitting a block with an item.
 	 */
 	public boolean clickBlock(BlockPos loc, EnumFacing face) {
 		if (this.currentGameType.isAdventure()) {
@@ -232,18 +160,107 @@ public class PlayerControllerMP {
 		}
 	}
 
-	/**+
-	 * Resets current block damage and field_78778_j
+	/**
+	 * + true for hitting entities far away.
 	 */
-	public void resetBlockRemoving() {
-		if (this.isHittingBlock) {
-			this.netClientHandler.addToSendQueue(new C07PacketPlayerDigging(
-					C07PacketPlayerDigging.Action.ABORT_DESTROY_BLOCK, this.currentBlock, EnumFacing.DOWN));
-			this.isHittingBlock = false;
-			this.curBlockDamageMP = 0.0F;
-			this.mc.theWorld.sendBlockBreakProgress(this.mc.thePlayer.getEntityId(), this.currentBlock, -1);
+	public boolean extendedReach() {
+		return this.currentGameType.isCreative();
+	}
+
+	/**
+	 * + Flips the player around.
+	 */
+	public void flipPlayer(EntityPlayer playerIn) {
+		playerIn.rotationYaw = -180.0F;
+	}
+
+	public EntityPlayerSP func_178892_a(World worldIn, StatFileWriter statWriter) {
+		return new EntityPlayerSP(this.mc, worldIn, this.netClientHandler, statWriter);
+	}
+
+	public boolean func_178894_a(EntityPlayer parEntityPlayer, Entity parEntity,
+			MovingObjectPosition parMovingObjectPosition) {
+		this.syncCurrentPlayItem();
+		Vec3 vec3 = new Vec3(parMovingObjectPosition.hitVec.xCoord - parEntity.posX,
+				parMovingObjectPosition.hitVec.yCoord - parEntity.posY,
+				parMovingObjectPosition.hitVec.zCoord - parEntity.posZ);
+		this.netClientHandler.addToSendQueue(new C02PacketUseEntity(parEntity, vec3));
+		return this.currentGameType != WorldSettings.GameType.SPECTATOR && parEntity.interactAt(parEntityPlayer, vec3);
+	}
+
+	public boolean func_181040_m() {
+		return this.isHittingBlock;
+	}
+
+	public boolean gameIsSurvivalOrAdventure() {
+		return this.currentGameType.isSurvivalOrAdventure();
+	}
+
+	/**
+	 * + player reach distance = 4F
+	 */
+	public float getBlockReachDistance() {
+		return this.currentGameType.isCreative() ? 5.0F : 4.5F;
+	}
+
+	public WorldSettings.GameType getCurrentGameType() {
+		return this.currentGameType;
+	}
+
+	/**
+	 * + Send packet to server - player is interacting with another entity (left
+	 * click)
+	 */
+	public boolean interactWithEntitySendPacket(EntityPlayer playerIn, Entity targetEntity) {
+		this.syncCurrentPlayItem();
+		this.netClientHandler.addToSendQueue(new C02PacketUseEntity(targetEntity, C02PacketUseEntity.Action.INTERACT));
+		return this.currentGameType != WorldSettings.GameType.SPECTATOR && playerIn.interactWith(targetEntity);
+	}
+
+	private boolean isHittingPosition(BlockPos pos) {
+		ItemStack itemstack = this.mc.thePlayer.getHeldItem();
+		boolean flag = this.currentItemHittingBlock == null && itemstack == null;
+		if (this.currentItemHittingBlock != null && itemstack != null) {
+			flag = itemstack.getItem() == this.currentItemHittingBlock.getItem()
+					&& ItemStack.areItemStackTagsEqual(itemstack, this.currentItemHittingBlock)
+					&& (itemstack.isItemStackDamageable()
+							|| itemstack.getMetadata() == this.currentItemHittingBlock.getMetadata());
 		}
 
+		return pos.equals(this.currentBlock) && flag;
+	}
+
+	/**
+	 * + returns true if player is in creative mode
+	 */
+	public boolean isInCreativeMode() {
+		return this.currentGameType.isCreative();
+	}
+
+	/**
+	 * + Checks if the player is not creative, used for checking if it should break
+	 * a block instantly
+	 */
+	public boolean isNotCreative() {
+		return !this.currentGameType.isCreative();
+	}
+
+	/**
+	 * + Checks if the player is riding a horse, used to chose the GUI to open
+	 */
+	public boolean isRidingHorse() {
+		return this.mc.thePlayer.isRiding() && this.mc.thePlayer.ridingEntity instanceof EntityHorse;
+	}
+
+	/**
+	 * + None
+	 */
+	public boolean isSpectator() {
+		return this.currentGameType == WorldSettings.GameType.SPECTATOR;
+	}
+
+	public boolean isSpectatorMode() {
+		return this.currentGameType == WorldSettings.GameType.SPECTATOR;
 	}
 
 	public boolean onPlayerDamageBlock(BlockPos posBlock, EnumFacing directionFacing) {
@@ -293,59 +310,58 @@ public class PlayerControllerMP {
 		}
 	}
 
-	/**+
-	 * player reach distance = 4F
+	/**
+	 * + Called when a player completes the destruction of a block
 	 */
-	public float getBlockReachDistance() {
-		return this.currentGameType.isCreative() ? 5.0F : 4.5F;
-	}
-
-	public void updateController() {
-		this.syncCurrentPlayItem();
-		if (this.netClientHandler.getNetworkManager().isChannelOpen()) {
-			try {
-				this.netClientHandler.getNetworkManager().processReceivedPackets();
-			} catch (IOException ex) {
-				EaglercraftNetworkManager.logger
-						.fatal("Unhandled IOException was thrown " + "while processing multiplayer packets!");
-				EaglercraftNetworkManager.logger.fatal(ex);
-				EaglercraftNetworkManager.logger.fatal("Disconnecting...");
-				this.netClientHandler.getNetworkManager()
-						.closeChannel(new ChatComponentText("Exception thrown: " + ex.toString()));
+	public boolean onPlayerDestroyBlock(BlockPos pos, EnumFacing side) {
+		if (this.currentGameType.isAdventure()) {
+			if (this.currentGameType == WorldSettings.GameType.SPECTATOR) {
+				return false;
 			}
-			this.netClientHandler.getSkinCache().flush();
-			this.netClientHandler.getCapeCache().flush();
-			this.netClientHandler.getNotifManager().runTick();
-			ClientUUIDLoadingCache.update();
+
+			if (!this.mc.thePlayer.isAllowEdit()) {
+				Block block = this.mc.theWorld.getBlockState(pos).getBlock();
+				ItemStack itemstack = this.mc.thePlayer.getCurrentEquippedItem();
+				if (itemstack == null) {
+					return false;
+				}
+
+				if (!itemstack.canDestroy(block)) {
+					return false;
+				}
+			}
+		}
+
+		if (this.currentGameType.isCreative() && this.mc.thePlayer.getHeldItem() != null
+				&& this.mc.thePlayer.getHeldItem().getItem() instanceof ItemSword) {
+			return false;
 		} else {
-			this.netClientHandler.getNetworkManager().checkDisconnected();
+			WorldClient worldclient = this.mc.theWorld;
+			IBlockState iblockstate = worldclient.getBlockState(pos);
+			Block block1 = iblockstate.getBlock();
+			if (block1.getMaterial() == Material.air) {
+				return false;
+			} else {
+				worldclient.playAuxSFX(2001, pos, Block.getStateId(iblockstate));
+				boolean flag = worldclient.setBlockToAir(pos);
+				if (flag) {
+					block1.onBlockDestroyedByPlayer(worldclient, pos, iblockstate);
+				}
+
+				this.currentBlock = new BlockPos(this.currentBlock.getX(), -1, this.currentBlock.getZ());
+				if (!this.currentGameType.isCreative()) {
+					ItemStack itemstack1 = this.mc.thePlayer.getCurrentEquippedItem();
+					if (itemstack1 != null) {
+						itemstack1.onBlockDestroyed(worldclient, block1, pos, this.mc.thePlayer);
+						if (itemstack1.stackSize == 0) {
+							this.mc.thePlayer.destroyCurrentEquippedItem();
+						}
+					}
+				}
+
+				return flag;
+			}
 		}
-
-	}
-
-	private boolean isHittingPosition(BlockPos pos) {
-		ItemStack itemstack = this.mc.thePlayer.getHeldItem();
-		boolean flag = this.currentItemHittingBlock == null && itemstack == null;
-		if (this.currentItemHittingBlock != null && itemstack != null) {
-			flag = itemstack.getItem() == this.currentItemHittingBlock.getItem()
-					&& ItemStack.areItemStackTagsEqual(itemstack, this.currentItemHittingBlock)
-					&& (itemstack.isItemStackDamageable()
-							|| itemstack.getMetadata() == this.currentItemHittingBlock.getMetadata());
-		}
-
-		return pos.equals(this.currentBlock) && flag;
-	}
-
-	/**+
-	 * Syncs the current player item with the server
-	 */
-	private void syncCurrentPlayItem() {
-		int i = this.mc.thePlayer.inventory.currentItem;
-		if (i != this.currentPlayerItem) {
-			this.currentPlayerItem = i;
-			this.netClientHandler.addToSendQueue(new C09PacketHeldItemChange(this.currentPlayerItem));
-		}
-
 	}
 
 	public boolean onPlayerRightClick(EntityPlayerSP player, WorldClient worldIn, ItemStack heldStack, BlockPos hitPos,
@@ -394,8 +410,58 @@ public class PlayerControllerMP {
 		}
 	}
 
-	/**+
-	 * Notifies the server of things like consuming food, etc...
+	public void onStoppedUsingItem(EntityPlayer playerIn) {
+		this.syncCurrentPlayItem();
+		this.netClientHandler.addToSendQueue(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM,
+				BlockPos.ORIGIN, EnumFacing.DOWN));
+		playerIn.stopUsingItem();
+	}
+
+	/**
+	 * + Resets current block damage and field_78778_j
+	 */
+	public void resetBlockRemoving() {
+		if (this.isHittingBlock) {
+			this.netClientHandler.addToSendQueue(new C07PacketPlayerDigging(
+					C07PacketPlayerDigging.Action.ABORT_DESTROY_BLOCK, this.currentBlock, EnumFacing.DOWN));
+			this.isHittingBlock = false;
+			this.curBlockDamageMP = 0.0F;
+			this.mc.theWorld.sendBlockBreakProgress(this.mc.thePlayer.getEntityId(), this.currentBlock, -1);
+		}
+
+	}
+
+	/**
+	 * + GuiEnchantment uses this during multiplayer to tell PlayerControllerMP to
+	 * send a packet indicating the enchantment action the player has taken.
+	 */
+	public void sendEnchantPacket(int parInt1, int parInt2) {
+		this.netClientHandler.addToSendQueue(new C11PacketEnchantItem(parInt1, parInt2));
+	}
+
+	/**
+	 * + Sends a Packet107 to the server to drop the item on the ground
+	 */
+	public void sendPacketDropItem(ItemStack itemStackIn) {
+		if (this.currentGameType.isCreative() && itemStackIn != null) {
+			this.netClientHandler.addToSendQueue(new C10PacketCreativeInventoryAction(-1, itemStackIn));
+		}
+
+	}
+
+	/**
+	 * + Used in PlayerControllerMP to update the server with an ItemStack in a
+	 * slot.
+	 */
+	public void sendSlotPacket(ItemStack itemStackIn, int slotId) {
+		if (this.currentGameType.isCreative()) {
+			this.netClientHandler.addToSendQueue(new C10PacketCreativeInventoryAction(slotId, itemStackIn));
+		}
+
+	}
+
+	/**
+	 * + Notifies the server of things like consuming food, etc...
 	 */
 	public boolean sendUseItem(EntityPlayer playerIn, World worldIn, ItemStack itemStackIn) {
 		if (this.currentGameType == WorldSettings.GameType.SPECTATOR) {
@@ -419,44 +485,62 @@ public class PlayerControllerMP {
 		}
 	}
 
-	public EntityPlayerSP func_178892_a(World worldIn, StatFileWriter statWriter) {
-		return new EntityPlayerSP(this.mc, worldIn, this.netClientHandler, statWriter);
+	/**
+	 * + Sets the game type for the player.
+	 */
+	public void setGameType(WorldSettings.GameType parGameType) {
+		this.currentGameType = parGameType;
+		this.currentGameType.configurePlayerCapabilities(this.mc.thePlayer.capabilities);
 	}
 
-	/**+
-	 * Attacks an entity
+	/**
+	 * + Sets player capabilities depending on current gametype. params: player
 	 */
-	public void attackEntity(EntityPlayer playerIn, Entity targetEntity) {
-		this.syncCurrentPlayItem();
-		this.netClientHandler.addToSendQueue(new C02PacketUseEntity(targetEntity, C02PacketUseEntity.Action.ATTACK));
-		if (this.currentGameType != WorldSettings.GameType.SPECTATOR) {
-			playerIn.attackTargetEntityWithCurrentItem(targetEntity);
+	public void setPlayerCapabilities(EntityPlayer parEntityPlayer) {
+		this.currentGameType.configurePlayerCapabilities(parEntityPlayer.capabilities);
+	}
+
+	public boolean shouldDrawHUD() {
+		return this.currentGameType.isSurvivalOrAdventure();
+	}
+
+	/**
+	 * + Syncs the current player item with the server
+	 */
+	private void syncCurrentPlayItem() {
+		int i = this.mc.thePlayer.inventory.currentItem;
+		if (i != this.currentPlayerItem) {
+			this.currentPlayerItem = i;
+			this.netClientHandler.addToSendQueue(new C09PacketHeldItemChange(this.currentPlayerItem));
 		}
 
 	}
 
-	/**+
-	 * Send packet to server - player is interacting with another
-	 * entity (left click)
-	 */
-	public boolean interactWithEntitySendPacket(EntityPlayer playerIn, Entity targetEntity) {
+	public void updateController() {
 		this.syncCurrentPlayItem();
-		this.netClientHandler.addToSendQueue(new C02PacketUseEntity(targetEntity, C02PacketUseEntity.Action.INTERACT));
-		return this.currentGameType != WorldSettings.GameType.SPECTATOR && playerIn.interactWith(targetEntity);
+		if (this.netClientHandler.getNetworkManager().isChannelOpen()) {
+			try {
+				this.netClientHandler.getNetworkManager().processReceivedPackets();
+			} catch (IOException ex) {
+				EaglercraftNetworkManager.logger
+						.fatal("Unhandled IOException was thrown " + "while processing multiplayer packets!");
+				EaglercraftNetworkManager.logger.fatal(ex);
+				EaglercraftNetworkManager.logger.fatal("Disconnecting...");
+				this.netClientHandler.getNetworkManager()
+						.closeChannel(new ChatComponentText("Exception thrown: " + ex.toString()));
+			}
+			this.netClientHandler.getSkinCache().flush();
+			this.netClientHandler.getCapeCache().flush();
+			this.netClientHandler.getNotifManager().runTick();
+			ClientUUIDLoadingCache.update();
+		} else {
+			this.netClientHandler.getNetworkManager().checkDisconnected();
+		}
+
 	}
 
-	public boolean func_178894_a(EntityPlayer parEntityPlayer, Entity parEntity,
-			MovingObjectPosition parMovingObjectPosition) {
-		this.syncCurrentPlayItem();
-		Vec3 vec3 = new Vec3(parMovingObjectPosition.hitVec.xCoord - parEntity.posX,
-				parMovingObjectPosition.hitVec.yCoord - parEntity.posY,
-				parMovingObjectPosition.hitVec.zCoord - parEntity.posZ);
-		this.netClientHandler.addToSendQueue(new C02PacketUseEntity(parEntity, vec3));
-		return this.currentGameType != WorldSettings.GameType.SPECTATOR && parEntity.interactAt(parEntityPlayer, vec3);
-	}
-
-	/**+
-	 * Handles slot clicks sends a packet to the server.
+	/**
+	 * + Handles slot clicks sends a packet to the server.
 	 */
 	public ItemStack windowClick(int windowId, int slotId, int mouseButtonClicked, int mode, EntityPlayer playerIn) {
 		short short1 = playerIn.openContainer.getNextTransactionID(playerIn.inventory);
@@ -464,89 +548,5 @@ public class PlayerControllerMP {
 		this.netClientHandler.addToSendQueue(
 				new C0EPacketClickWindow(windowId, slotId, mouseButtonClicked, mode, itemstack, short1));
 		return itemstack;
-	}
-
-	/**+
-	 * GuiEnchantment uses this during multiplayer to tell
-	 * PlayerControllerMP to send a packet indicating the
-	 * enchantment action the player has taken.
-	 */
-	public void sendEnchantPacket(int parInt1, int parInt2) {
-		this.netClientHandler.addToSendQueue(new C11PacketEnchantItem(parInt1, parInt2));
-	}
-
-	/**+
-	 * Used in PlayerControllerMP to update the server with an
-	 * ItemStack in a slot.
-	 */
-	public void sendSlotPacket(ItemStack itemStackIn, int slotId) {
-		if (this.currentGameType.isCreative()) {
-			this.netClientHandler.addToSendQueue(new C10PacketCreativeInventoryAction(slotId, itemStackIn));
-		}
-
-	}
-
-	/**+
-	 * Sends a Packet107 to the server to drop the item on the
-	 * ground
-	 */
-	public void sendPacketDropItem(ItemStack itemStackIn) {
-		if (this.currentGameType.isCreative() && itemStackIn != null) {
-			this.netClientHandler.addToSendQueue(new C10PacketCreativeInventoryAction(-1, itemStackIn));
-		}
-
-	}
-
-	public void onStoppedUsingItem(EntityPlayer playerIn) {
-		this.syncCurrentPlayItem();
-		this.netClientHandler.addToSendQueue(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM,
-				BlockPos.ORIGIN, EnumFacing.DOWN));
-		playerIn.stopUsingItem();
-	}
-
-	public boolean gameIsSurvivalOrAdventure() {
-		return this.currentGameType.isSurvivalOrAdventure();
-	}
-
-	/**+
-	 * Checks if the player is not creative, used for checking if it
-	 * should break a block instantly
-	 */
-	public boolean isNotCreative() {
-		return !this.currentGameType.isCreative();
-	}
-
-	/**+
-	 * returns true if player is in creative mode
-	 */
-	public boolean isInCreativeMode() {
-		return this.currentGameType.isCreative();
-	}
-
-	/**+
-	 * true for hitting entities far away.
-	 */
-	public boolean extendedReach() {
-		return this.currentGameType.isCreative();
-	}
-
-	/**+
-	 * Checks if the player is riding a horse, used to chose the GUI
-	 * to open
-	 */
-	public boolean isRidingHorse() {
-		return this.mc.thePlayer.isRiding() && this.mc.thePlayer.ridingEntity instanceof EntityHorse;
-	}
-
-	public boolean isSpectatorMode() {
-		return this.currentGameType == WorldSettings.GameType.SPECTATOR;
-	}
-
-	public WorldSettings.GameType getCurrentGameType() {
-		return this.currentGameType;
-	}
-
-	public boolean func_181040_m() {
-		return this.isHittingBlock;
 	}
 }

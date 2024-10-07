@@ -10,7 +10,35 @@ import net.lax1dude.eaglercraft.v1_8.cookie.ServerCookieDataStore;
 import net.lax1dude.eaglercraft.v1_8.profile.EaglerProfile;
 import net.lax1dude.eaglercraft.v1_8.profile.SkinModel;
 import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.GameMessageHandler;
-import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.*;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketCustomizePauseMenuV4EAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketEnableFNAWSkinsEAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketForceClientCapeCustomV4EAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketForceClientCapePresetV4EAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketForceClientSkinCustomV4EAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketForceClientSkinPresetV4EAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketInvalidatePlayerCacheV4EAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketNotifBadgeHideV4EAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketNotifBadgeShowV4EAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketNotifIconsRegisterV4EAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketNotifIconsReleaseV4EAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketOtherCapeCustomEAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketOtherCapePresetEAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketOtherPlayerClientUUIDV4EAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketOtherSkinCustomV4EAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketOtherSkinPresetEAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketRedirectClientV4EAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketServerInfoDataChunkV4EAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketSetServerCookieV4EAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketUnforceClientV4EAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketUpdateCertEAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketVoiceSignalAllowedEAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketVoiceSignalConnectAnnounceV4EAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketVoiceSignalConnectV4EAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketVoiceSignalDescEAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketVoiceSignalDisconnectPeerEAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketVoiceSignalGlobalEAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketVoiceSignalICEEAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketWebViewMessageV4EAG;
 import net.lax1dude.eaglercraft.v1_8.socket.protocol.util.SkinPacketVersionCache;
 import net.lax1dude.eaglercraft.v1_8.update.UpdateService;
 import net.lax1dude.eaglercraft.v1_8.voice.VoiceClientController;
@@ -22,14 +50,15 @@ import net.minecraft.client.network.NetHandlerPlayClient;
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -42,11 +71,61 @@ public class ClientV4MessageHandler implements GameMessageHandler {
 		this.netHandler = netHandler;
 	}
 
+	public void handleServer(SPacketCustomizePauseMenuV4EAG packet) {
+		PauseMenuCustomizeState.loadPacket(packet);
+	}
+
 	public void handleServer(SPacketEnableFNAWSkinsEAG packet) {
 		netHandler.currentFNAWSkinAllowedState = packet.enableSkins;
 		netHandler.currentFNAWSkinForcedState = packet.force;
 		Minecraft.getMinecraft().getRenderManager().setEnableFNAWSkins(netHandler.currentFNAWSkinForcedState
 				|| (netHandler.currentFNAWSkinAllowedState && Minecraft.getMinecraft().gameSettings.enableFNAWSkins));
+	}
+
+	public void handleServer(SPacketForceClientCapeCustomV4EAG packet) {
+		EaglerProfile.handleForceCapeCustom(packet.customCape);
+	}
+
+	public void handleServer(SPacketForceClientCapePresetV4EAG packet) {
+		EaglerProfile.handleForceCapePreset(packet.presetCape);
+	}
+
+	public void handleServer(SPacketForceClientSkinCustomV4EAG packet) {
+		EaglerProfile.handleForceSkinCustom(packet.modelID, SkinPacketVersionCache.convertToV3Raw(packet.customSkin));
+	}
+
+	public void handleServer(SPacketForceClientSkinPresetV4EAG packet) {
+		EaglerProfile.handleForceSkinPreset(packet.presetSkin);
+	}
+
+	public void handleServer(SPacketInvalidatePlayerCacheV4EAG packet) {
+		if (packet.players != null && packet.players.size() > 0) {
+			for (SPacketInvalidatePlayerCacheV4EAG.InvalidateRequest req : packet.players) {
+				EaglercraftUUID uuid = new EaglercraftUUID(req.uuidMost, req.uuidLeast);
+				if (req.invalidateSkin) {
+					this.netHandler.getSkinCache().handleInvalidate(uuid);
+				}
+				if (req.invalidateCape) {
+					this.netHandler.getCapeCache().handleInvalidate(uuid);
+				}
+			}
+		}
+	}
+
+	public void handleServer(SPacketNotifBadgeHideV4EAG packet) {
+		netHandler.getNotifManager().processPacketHideBadge(packet);
+	}
+
+	public void handleServer(SPacketNotifBadgeShowV4EAG packet) {
+		netHandler.getNotifManager().processPacketShowBadge(packet);
+	}
+
+	public void handleServer(SPacketNotifIconsRegisterV4EAG packet) {
+		netHandler.getNotifManager().processPacketAddIcons(packet);
+	}
+
+	public void handleServer(SPacketNotifIconsReleaseV4EAG packet) {
+		netHandler.getNotifManager().processPacketRemIcons(packet);
 	}
 
 	public void handleServer(SPacketOtherCapeCustomEAG packet) {
@@ -59,25 +138,62 @@ public class ClientV4MessageHandler implements GameMessageHandler {
 				packet.presetCape);
 	}
 
+	public void handleServer(SPacketOtherPlayerClientUUIDV4EAG packet) {
+		ClientUUIDLoadingCache.handleResponse(packet.requestId,
+				new EaglercraftUUID(packet.clientUUIDMost, packet.clientUUIDLeast));
+	}
+
 	public void handleServer(SPacketOtherSkinCustomV4EAG packet) {
 		EaglercraftUUID responseUUID = new EaglercraftUUID(packet.uuidMost, packet.uuidLeast);
 		SkinModel modelId;
-		if(packet.modelID == (byte)0xFF) {
+		if (packet.modelID == (byte) 0xFF) {
 			modelId = this.netHandler.getSkinCache().getRequestedSkinType(responseUUID);
-		}else {
+		} else {
 			modelId = SkinModel.getModelFromId(packet.modelID & 0x7F);
-			if((packet.modelID & 0x80) != 0 && modelId.sanitize) {
+			if ((packet.modelID & 0x80) != 0 && modelId.sanitize) {
 				modelId = SkinModel.STEVE;
 			}
 		}
-		if(modelId.highPoly != null) {
+		if (modelId.highPoly != null) {
 			modelId = SkinModel.STEVE;
 		}
-		this.netHandler.getSkinCache().cacheSkinCustom(responseUUID, SkinPacketVersionCache.convertToV3Raw(packet.customSkin), modelId);
+		this.netHandler.getSkinCache().cacheSkinCustom(responseUUID,
+				SkinPacketVersionCache.convertToV3Raw(packet.customSkin), modelId);
 	}
 
 	public void handleServer(SPacketOtherSkinPresetEAG packet) {
-		this.netHandler.getSkinCache().cacheSkinPreset(new EaglercraftUUID(packet.uuidMost, packet.uuidLeast), packet.presetSkin);
+		this.netHandler.getSkinCache().cacheSkinPreset(new EaglercraftUUID(packet.uuidMost, packet.uuidLeast),
+				packet.presetSkin);
+	}
+
+	public void handleServer(SPacketRedirectClientV4EAG packet) {
+		Minecraft.getMinecraft().handleReconnectPacket(packet.redirectURI);
+	}
+
+	public void handleServer(SPacketServerInfoDataChunkV4EAG packet) {
+		ServerInfoCache.handleChunk(packet);
+	}
+
+	public void handleServer(SPacketSetServerCookieV4EAG packet) {
+		if (!netHandler.isClientInEaglerSingleplayerOrLAN()
+				&& Minecraft.getMinecraft().getCurrentServerData().enableCookies) {
+			ServerCookieDataStore.saveCookie(netHandler.getNetworkManager().getAddress(), packet.expires, packet.data,
+					packet.revokeQuerySupported, packet.saveCookieToDisk);
+		}
+	}
+
+	public void handleServer(SPacketUnforceClientV4EAG packet) {
+		if (packet.resetSkin) {
+			EaglerProfile.isServerSkinOverride = false;
+		}
+		if (packet.resetCape) {
+			EaglerProfile.isServerCapeOverride = false;
+		}
+		if (packet.resetFNAW) {
+			netHandler.currentFNAWSkinForcedState = false;
+			Minecraft.getMinecraft().getRenderManager().setEnableFNAWSkins(
+					netHandler.currentFNAWSkinAllowedState && Minecraft.getMinecraft().gameSettings.enableFNAWSkins);
+		}
 	}
 
 	public void handleServer(SPacketUpdateCertEAG packet) {
@@ -92,15 +208,17 @@ public class ClientV4MessageHandler implements GameMessageHandler {
 		}
 	}
 
-	public void handleServer(SPacketVoiceSignalConnectV4EAG packet) {
+	public void handleServer(SPacketVoiceSignalConnectAnnounceV4EAG packet) {
 		if (VoiceClientController.isClientSupported()) {
-			VoiceClientController.handleVoiceSignalPacketTypeConnect(new EaglercraftUUID(packet.uuidMost, packet.uuidLeast), packet.offer);
+			VoiceClientController
+					.handleVoiceSignalPacketTypeConnectAnnounce(new EaglercraftUUID(packet.uuidMost, packet.uuidLeast));
 		}
 	}
 
-	public void handleServer(SPacketVoiceSignalConnectAnnounceV4EAG packet) {
+	public void handleServer(SPacketVoiceSignalConnectV4EAG packet) {
 		if (VoiceClientController.isClientSupported()) {
-			VoiceClientController.handleVoiceSignalPacketTypeConnectAnnounce(new EaglercraftUUID(packet.uuidMost, packet.uuidLeast));
+			VoiceClientController.handleVoiceSignalPacketTypeConnect(
+					new EaglercraftUUID(packet.uuidMost, packet.uuidLeast), packet.offer);
 		}
 	}
 
@@ -114,7 +232,8 @@ public class ClientV4MessageHandler implements GameMessageHandler {
 
 	public void handleServer(SPacketVoiceSignalDisconnectPeerEAG packet) {
 		if (VoiceClientController.isClientSupported()) {
-			VoiceClientController.handleVoiceSignalPacketTypeDisconnect(new EaglercraftUUID(packet.uuidMost, packet.uuidLeast));
+			VoiceClientController
+					.handleVoiceSignalPacketTypeDisconnect(new EaglercraftUUID(packet.uuidMost, packet.uuidLeast));
 		}
 	}
 
@@ -132,91 +251,8 @@ public class ClientV4MessageHandler implements GameMessageHandler {
 		}
 	}
 
-	public void handleServer(SPacketForceClientSkinPresetV4EAG packet) {
-		EaglerProfile.handleForceSkinPreset(packet.presetSkin);
-	}
-
-	public void handleServer(SPacketForceClientSkinCustomV4EAG packet) {
-		EaglerProfile.handleForceSkinCustom(packet.modelID, SkinPacketVersionCache.convertToV3Raw(packet.customSkin));
-	}
-
-	public void handleServer(SPacketSetServerCookieV4EAG packet) {
-		if(!netHandler.isClientInEaglerSingleplayerOrLAN() && Minecraft.getMinecraft().getCurrentServerData().enableCookies) {
-			ServerCookieDataStore.saveCookie(netHandler.getNetworkManager().getAddress(), packet.expires, packet.data,
-					packet.revokeQuerySupported, packet.saveCookieToDisk);
-		}
-	}
-
-	public void handleServer(SPacketRedirectClientV4EAG packet) {
-		Minecraft.getMinecraft().handleReconnectPacket(packet.redirectURI);
-	}
-
-	public void handleServer(SPacketOtherPlayerClientUUIDV4EAG packet) {
-		ClientUUIDLoadingCache.handleResponse(packet.requestId, new EaglercraftUUID(packet.clientUUIDMost, packet.clientUUIDLeast));
-	}
-
-	public void handleServer(SPacketForceClientCapePresetV4EAG packet) {
-		EaglerProfile.handleForceCapePreset(packet.presetCape);
-	}
-
-	public void handleServer(SPacketForceClientCapeCustomV4EAG packet) {
-		EaglerProfile.handleForceCapeCustom(packet.customCape);
-	}
-
-	public void handleServer(SPacketInvalidatePlayerCacheV4EAG packet) {
-		if(packet.players != null && packet.players.size() > 0) {
-			for(SPacketInvalidatePlayerCacheV4EAG.InvalidateRequest req : packet.players) {
-				EaglercraftUUID uuid = new EaglercraftUUID(req.uuidMost, req.uuidLeast);
-				if(req.invalidateSkin) {
-					this.netHandler.getSkinCache().handleInvalidate(uuid);
-				}
-				if(req.invalidateCape) {
-					this.netHandler.getCapeCache().handleInvalidate(uuid);
-				}
-			}
-		}
-	}
-
-	public void handleServer(SPacketUnforceClientV4EAG packet) {
-		if(packet.resetSkin) {
-			EaglerProfile.isServerSkinOverride = false;
-		}
-		if(packet.resetCape) {
-			EaglerProfile.isServerCapeOverride = false;
-		}
-		if(packet.resetFNAW) {
-			netHandler.currentFNAWSkinForcedState = false;
-			Minecraft.getMinecraft().getRenderManager().setEnableFNAWSkins(
-					netHandler.currentFNAWSkinAllowedState && Minecraft.getMinecraft().gameSettings.enableFNAWSkins);
-		}
-	}
-
-	public void handleServer(SPacketCustomizePauseMenuV4EAG packet) {
-		PauseMenuCustomizeState.loadPacket(packet);
-	}
-
-	public void handleServer(SPacketServerInfoDataChunkV4EAG packet) {
-		ServerInfoCache.handleChunk(packet);
-	}
-
 	public void handleServer(SPacketWebViewMessageV4EAG packet) {
 		WebViewOverlayController.handleMessagePacket(packet);
-	}
-
-	public void handleServer(SPacketNotifIconsRegisterV4EAG packet) {
-		netHandler.getNotifManager().processPacketAddIcons(packet);
-	}
-
-	public void handleServer(SPacketNotifIconsReleaseV4EAG packet) {
-		netHandler.getNotifManager().processPacketRemIcons(packet);
-	}
-
-	public void handleServer(SPacketNotifBadgeShowV4EAG packet) {
-		netHandler.getNotifManager().processPacketShowBadge(packet);
-	}
-
-	public void handleServer(SPacketNotifBadgeHideV4EAG packet) {
-		netHandler.getNotifManager().processPacketHideBadge(packet);
 	}
 
 }

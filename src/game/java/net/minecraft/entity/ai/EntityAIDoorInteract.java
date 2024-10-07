@@ -9,22 +9,25 @@ import net.minecraft.pathfinding.PathNavigateGround;
 import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.util.BlockPos;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -44,8 +47,20 @@ public abstract class EntityAIDoorInteract extends EntityAIBase {
 		}
 	}
 
-	/**+
-	 * Returns whether the EntityAIBase should begin execution.
+	/**
+	 * + Returns whether an in-progress EntityAIBase should continue executing
+	 */
+	public boolean continueExecuting() {
+		return !this.hasStoppedDoorInteraction;
+	}
+
+	private BlockDoor getBlockDoor(BlockPos pos) {
+		Block block = this.theEntity.worldObj.getBlockState(pos).getBlock();
+		return block instanceof BlockDoor && block.getMaterial() == Material.wood ? (BlockDoor) block : null;
+	}
+
+	/**
+	 * + Returns whether the EntityAIBase should begin execution.
 	 */
 	public boolean shouldExecute() {
 		if (!this.theEntity.isCollidedHorizontally) {
@@ -76,16 +91,8 @@ public abstract class EntityAIDoorInteract extends EntityAIBase {
 		}
 	}
 
-	/**+
-	 * Returns whether an in-progress EntityAIBase should continue
-	 * executing
-	 */
-	public boolean continueExecuting() {
-		return !this.hasStoppedDoorInteraction;
-	}
-
-	/**+
-	 * Execute a one shot task or start executing a continuous task
+	/**
+	 * + Execute a one shot task or start executing a continuous task
 	 */
 	public void startExecuting() {
 		this.hasStoppedDoorInteraction = false;
@@ -93,8 +100,8 @@ public abstract class EntityAIDoorInteract extends EntityAIBase {
 		this.entityPositionZ = (float) ((double) ((float) this.doorPosition.getZ() + 0.5F) - this.theEntity.posZ);
 	}
 
-	/**+
-	 * Updates the task
+	/**
+	 * + Updates the task
 	 */
 	public void updateTask() {
 		float f = (float) ((double) ((float) this.doorPosition.getX() + 0.5F) - this.theEntity.posX);
@@ -104,10 +111,5 @@ public abstract class EntityAIDoorInteract extends EntityAIBase {
 			this.hasStoppedDoorInteraction = true;
 		}
 
-	}
-
-	private BlockDoor getBlockDoor(BlockPos pos) {
-		Block block = this.theEntity.worldObj.getBlockState(pos).getBlock();
-		return block instanceof BlockDoor && block.getMaterial() == Material.wood ? (BlockDoor) block : null;
 	}
 }

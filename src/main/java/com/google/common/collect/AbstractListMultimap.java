@@ -36,6 +36,8 @@ import com.google.common.annotations.GwtCompatible;
  */
 @GwtCompatible
 abstract class AbstractListMultimap<K, V> extends AbstractMapBasedMultimap<K, V> implements ListMultimap<K, V> {
+	private static final long serialVersionUID = 6588350623831699109L;
+
 	/**
 	 * Creates a new multimap that uses the provided map.
 	 *
@@ -46,6 +48,20 @@ abstract class AbstractListMultimap<K, V> extends AbstractMapBasedMultimap<K, V>
 		super(map);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * Though the method signature doesn't say so explicitly, the returned map has
+	 * {@link List} values.
+	 */
+	@Override
+	public Map<K, Collection<V>> asMap() {
+		return super.asMap();
+	}
+
+	// Following Javadoc copied from ListMultimap.
+
 	@Override
 	abstract List<V> createCollection();
 
@@ -54,7 +70,18 @@ abstract class AbstractListMultimap<K, V> extends AbstractMapBasedMultimap<K, V>
 		return ImmutableList.of();
 	}
 
-	// Following Javadoc copied from ListMultimap.
+	/**
+	 * Compares the specified object to this multimap for equality.
+	 *
+	 * <p>
+	 * Two {@code ListMultimap} instances are equal if, for each key, they contain
+	 * the same values in the same order. If the value orderings disagree, the
+	 * multimaps will not be considered equal.
+	 */
+	@Override
+	public boolean equals(@Nullable Object object) {
+		return super.equals(object);
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -67,6 +94,18 @@ abstract class AbstractListMultimap<K, V> extends AbstractMapBasedMultimap<K, V>
 	@Override
 	public List<V> get(@Nullable K key) {
 		return (List<V>) super.get(key);
+	}
+
+	/**
+	 * Stores a key-value pair in the multimap.
+	 *
+	 * @param key   key to store in the multimap
+	 * @param value value to store in the multimap
+	 * @return {@code true} always
+	 */
+	@Override
+	public boolean put(@Nullable K key, @Nullable V value) {
+		return super.put(key, value);
 	}
 
 	/**
@@ -94,43 +133,4 @@ abstract class AbstractListMultimap<K, V> extends AbstractMapBasedMultimap<K, V>
 	public List<V> replaceValues(@Nullable K key, Iterable<? extends V> values) {
 		return (List<V>) super.replaceValues(key, values);
 	}
-
-	/**
-	 * Stores a key-value pair in the multimap.
-	 *
-	 * @param key   key to store in the multimap
-	 * @param value value to store in the multimap
-	 * @return {@code true} always
-	 */
-	@Override
-	public boolean put(@Nullable K key, @Nullable V value) {
-		return super.put(key, value);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>
-	 * Though the method signature doesn't say so explicitly, the returned map has
-	 * {@link List} values.
-	 */
-	@Override
-	public Map<K, Collection<V>> asMap() {
-		return super.asMap();
-	}
-
-	/**
-	 * Compares the specified object to this multimap for equality.
-	 *
-	 * <p>
-	 * Two {@code ListMultimap} instances are equal if, for each key, they contain
-	 * the same values in the same order. If the value orderings disagree, the
-	 * multimaps will not be considered equal.
-	 */
-	@Override
-	public boolean equals(@Nullable Object object) {
-		return super.equals(object);
-	}
-
-	private static final long serialVersionUID = 6588350623831699109L;
 }

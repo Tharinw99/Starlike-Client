@@ -27,6 +27,8 @@ import com.google.common.annotations.GwtCompatible;
 class EmptyImmutableSetMultimap extends ImmutableSetMultimap<Object, Object> {
 	static final EmptyImmutableSetMultimap INSTANCE = new EmptyImmutableSetMultimap();
 
+	private static final long serialVersionUID = 0;
+
 	private EmptyImmutableSetMultimap() {
 		super(ImmutableMap.<Object, ImmutableSet<Object>>of(), 0, null);
 	}
@@ -34,6 +36,4 @@ class EmptyImmutableSetMultimap extends ImmutableSetMultimap<Object, Object> {
 	private Object readResolve() {
 		return INSTANCE; // preserve singleton property
 	}
-
-	private static final long serialVersionUID = 0;
 }

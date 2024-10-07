@@ -1,9 +1,10 @@
 package net.minecraft.client.gui;
 
-import com.google.common.base.Predicate;
-import com.google.common.primitives.Floats;
 import java.io.IOException;
 import java.util.Random;
+
+import com.google.common.base.Predicate;
+import com.google.common.primitives.Floats;
 
 import net.lax1dude.eaglercraft.v1_8.HString;
 import net.lax1dude.eaglercraft.v1_8.minecraft.EnumInputEvent;
@@ -16,22 +17,25 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.gen.ChunkProviderSettings;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -63,8 +67,8 @@ public class GuiCustomizeWorldScreen extends GuiScreen
 	};
 	private ChunkProviderSettings.Factory field_175334_E = new ChunkProviderSettings.Factory();
 	private ChunkProviderSettings.Factory field_175336_F;
-	/**+
-	 * A Random instance for this world customization
+	/**
+	 * + A Random instance for this world customization
 	 */
 	private Random random = new Random();
 
@@ -73,66 +77,257 @@ public class GuiCustomizeWorldScreen extends GuiScreen
 		this.func_175324_a(parString1);
 	}
 
-	/**+
-	 * Adds the buttons (and other controls) to the screen in
-	 * question. Called when the GUI is displayed and when the
-	 * window resizes, the buttonList is cleared beforehand.
+	/**
+	 * + Called by the controls from the buttonList when activated. (Mouse pressed
+	 * for buttons)
 	 */
-	public void initGui() {
-		int i = 0;
-		int j = 0;
-		if (this.field_175349_r != null) {
-			i = this.field_175349_r.func_178059_e();
-			j = this.field_175349_r.getAmountScrolled();
-		}
+	protected void actionPerformed(GuiButton parGuiButton) {
+		if (parGuiButton.enabled) {
+			switch (parGuiButton.id) {
+			case 300:
+				this.field_175343_i.chunkProviderSettingsJson = this.field_175336_F.toString();
+				this.mc.displayGuiScreen(this.field_175343_i);
+				break;
+			case 301:
+				for (int i = 0; i < this.field_175349_r.getSize(); ++i) {
+					GuiPageButtonList.GuiEntry guipagebuttonlist$guientry = this.field_175349_r.getListEntry(i);
+					Gui gui = guipagebuttonlist$guientry.func_178022_a();
+					if (gui instanceof GuiButton) {
+						GuiButton guibutton = (GuiButton) gui;
+						if (guibutton instanceof GuiSlider) {
+							float f = ((GuiSlider) guibutton).func_175217_d() * (0.75F + this.random.nextFloat() * 0.5F)
+									+ (this.random.nextFloat() * 0.1F - 0.05F);
+							((GuiSlider) guibutton).func_175219_a(MathHelper.clamp_float(f, 0.0F, 1.0F));
+						} else if (guibutton instanceof GuiListButton) {
+							((GuiListButton) guibutton).func_175212_b(this.random.nextBoolean());
+						}
+					}
 
-		this.field_175341_a = I18n.format("options.customizeTitle", new Object[0]);
-		this.buttonList.clear();
-		this.buttonList.add(this.field_175345_v = new GuiButton(302, 20, 5, 80, 20,
-				I18n.format("createWorld.customize.custom.prev", new Object[0])));
-		this.buttonList.add(this.field_175344_w = new GuiButton(303, this.width - 100, 5, 80, 20,
-				I18n.format("createWorld.customize.custom.next", new Object[0])));
-		this.buttonList.add(this.field_175346_u = new GuiButton(304, this.width / 2 - 187, this.height - 27, 90, 20,
-				I18n.format("createWorld.customize.custom.defaults", new Object[0])));
-		this.buttonList.add(this.field_175347_t = new GuiButton(301, this.width / 2 - 92, this.height - 27, 90, 20,
-				I18n.format("createWorld.customize.custom.randomize", new Object[0])));
-		this.buttonList.add(this.field_175350_z = new GuiButton(305, this.width / 2 + 3, this.height - 27, 90, 20,
-				I18n.format("createWorld.customize.custom.presets", new Object[0])));
-		this.buttonList.add(this.field_175348_s = new GuiButton(300, this.width / 2 + 98, this.height - 27, 90, 20,
-				I18n.format("gui.done", new Object[0])));
-		this.field_175346_u.enabled = this.field_175338_A;
-		this.field_175352_x = new GuiButton(306, this.width / 2 - 55, 160, 50, 20,
-				I18n.format("gui.yes", new Object[0]));
-		this.field_175352_x.visible = false;
-		this.buttonList.add(this.field_175352_x);
-		this.field_175351_y = new GuiButton(307, this.width / 2 + 5, 160, 50, 20, I18n.format("gui.no", new Object[0]));
-		this.field_175351_y.visible = false;
-		this.buttonList.add(this.field_175351_y);
+					Gui gui1 = guipagebuttonlist$guientry.func_178021_b();
+					if (gui1 instanceof GuiButton) {
+						GuiButton guibutton1 = (GuiButton) gui1;
+						if (guibutton1 instanceof GuiSlider) {
+							float f1 = ((GuiSlider) guibutton1).func_175217_d()
+									* (0.75F + this.random.nextFloat() * 0.5F)
+									+ (this.random.nextFloat() * 0.1F - 0.05F);
+							((GuiSlider) guibutton1).func_175219_a(MathHelper.clamp_float(f1, 0.0F, 1.0F));
+						} else if (guibutton1 instanceof GuiListButton) {
+							((GuiListButton) guibutton1).func_175212_b(this.random.nextBoolean());
+						}
+					}
+				}
+
+				return;
+			case 302:
+				this.field_175349_r.func_178071_h();
+				this.func_175328_i();
+				break;
+			case 303:
+				this.field_175349_r.func_178064_i();
+				this.func_175328_i();
+				break;
+			case 304:
+				if (this.field_175338_A) {
+					this.func_175322_b(304);
+				}
+				break;
+			case 305:
+				this.mc.displayGuiScreen(new GuiScreenCustomizePresets(this));
+				break;
+			case 306:
+				this.func_175331_h();
+				break;
+			case 307:
+				this.field_175339_B = 0;
+				this.func_175331_h();
+			}
+
+		}
+	}
+
+	/**
+	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
+	 * renderPartialTicks
+	 */
+	public void drawScreen(int i, int j, float f) {
+		this.drawDefaultBackground();
+		this.field_175349_r.drawScreen(i, j, f);
+		this.drawCenteredString(this.fontRendererObj, this.field_175341_a, this.width / 2, 2, 16777215);
+		this.drawCenteredString(this.fontRendererObj, this.field_175333_f, this.width / 2, 12, 16777215);
+		this.drawCenteredString(this.fontRendererObj, this.field_175335_g, this.width / 2, 22, 16777215);
+		super.drawScreen(i, j, f);
 		if (this.field_175339_B != 0) {
-			this.field_175352_x.visible = true;
-			this.field_175351_y.visible = true;
-		}
-
-		this.func_175325_f();
-		if (i != 0) {
-			this.field_175349_r.func_181156_c(i);
-			this.field_175349_r.scrollBy(j);
-			this.func_175328_i();
+			drawRect(0, 0, this.width, this.height, Integer.MIN_VALUE);
+			this.drawHorizontalLine(this.width / 2 - 91, this.width / 2 + 90, 99, -2039584);
+			this.drawHorizontalLine(this.width / 2 - 91, this.width / 2 + 90, 185, -6250336);
+			this.drawVerticalLine(this.width / 2 - 91, 99, 185, -2039584);
+			this.drawVerticalLine(this.width / 2 + 90, 99, 185, -6250336);
+			float f1 = 85.0F;
+			float f2 = 180.0F;
+			GlStateManager.disableLighting();
+			GlStateManager.disableFog();
+			Tessellator tessellator = Tessellator.getInstance();
+			WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+			this.mc.getTextureManager().bindTexture(optionsBackground);
+			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+			float f3 = 32.0F;
+			worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+			worldrenderer.pos((double) (this.width / 2 - 90), 185.0D, 0.0D).tex(0.0D, 2.65625D).color(64, 64, 64, 64)
+					.endVertex();
+			worldrenderer.pos((double) (this.width / 2 + 90), 185.0D, 0.0D).tex(5.625D, 2.65625D).color(64, 64, 64, 64)
+					.endVertex();
+			worldrenderer.pos((double) (this.width / 2 + 90), 100.0D, 0.0D).tex(5.625D, 0.0D).color(64, 64, 64, 64)
+					.endVertex();
+			worldrenderer.pos((double) (this.width / 2 - 90), 100.0D, 0.0D).tex(0.0D, 0.0D).color(64, 64, 64, 64)
+					.endVertex();
+			tessellator.draw();
+			this.drawCenteredString(this.fontRendererObj,
+					I18n.format("createWorld.customize.custom.confirmTitle", new Object[0]), this.width / 2, 105,
+					16777215);
+			this.drawCenteredString(this.fontRendererObj,
+					I18n.format("createWorld.customize.custom.confirm1", new Object[0]), this.width / 2, 125, 16777215);
+			this.drawCenteredString(this.fontRendererObj,
+					I18n.format("createWorld.customize.custom.confirm2", new Object[0]), this.width / 2, 135, 16777215);
+			this.field_175352_x.drawButton(this.mc, i, j);
+			this.field_175351_y.drawButton(this.mc, i, j);
 		}
 
 	}
 
-	/**+
-	 * Handles mouse input.
-	 */
-	public void handleMouseInput() throws IOException {
-		super.handleMouseInput();
-		this.field_175349_r.handleMouseInput();
+	@Override
+	public void fireInputEvent(EnumInputEvent event, String param) {
+		field_175349_r.fireInputEvent(event, param);
 	}
 
-	public void handleTouchInput() throws IOException {
-		super.handleTouchInput();
-		this.field_175349_r.handleTouchInput();
+	public void func_175319_a(int i, String s) {
+		float f = 0.0F;
+
+		try {
+			f = Float.parseFloat(s);
+		} catch (NumberFormatException var5) {
+			;
+		}
+
+		float f1 = 0.0F;
+		switch (i) {
+		case 132:
+			f1 = this.field_175336_F.mainNoiseScaleX = MathHelper.clamp_float(f, 1.0F, 5000.0F);
+			break;
+		case 133:
+			f1 = this.field_175336_F.mainNoiseScaleY = MathHelper.clamp_float(f, 1.0F, 5000.0F);
+			break;
+		case 134:
+			f1 = this.field_175336_F.mainNoiseScaleZ = MathHelper.clamp_float(f, 1.0F, 5000.0F);
+			break;
+		case 135:
+			f1 = this.field_175336_F.depthNoiseScaleX = MathHelper.clamp_float(f, 1.0F, 2000.0F);
+			break;
+		case 136:
+			f1 = this.field_175336_F.depthNoiseScaleZ = MathHelper.clamp_float(f, 1.0F, 2000.0F);
+			break;
+		case 137:
+			f1 = this.field_175336_F.depthNoiseScaleExponent = MathHelper.clamp_float(f, 0.01F, 20.0F);
+			break;
+		case 138:
+			f1 = this.field_175336_F.baseSize = MathHelper.clamp_float(f, 1.0F, 25.0F);
+			break;
+		case 139:
+			f1 = this.field_175336_F.coordinateScale = MathHelper.clamp_float(f, 1.0F, 6000.0F);
+			break;
+		case 140:
+			f1 = this.field_175336_F.heightScale = MathHelper.clamp_float(f, 1.0F, 6000.0F);
+			break;
+		case 141:
+			f1 = this.field_175336_F.stretchY = MathHelper.clamp_float(f, 0.01F, 50.0F);
+			break;
+		case 142:
+			f1 = this.field_175336_F.upperLimitScale = MathHelper.clamp_float(f, 1.0F, 5000.0F);
+			break;
+		case 143:
+			f1 = this.field_175336_F.lowerLimitScale = MathHelper.clamp_float(f, 1.0F, 5000.0F);
+			break;
+		case 144:
+			f1 = this.field_175336_F.biomeDepthWeight = MathHelper.clamp_float(f, 1.0F, 20.0F);
+			break;
+		case 145:
+			f1 = this.field_175336_F.biomeDepthOffset = MathHelper.clamp_float(f, 0.0F, 20.0F);
+			break;
+		case 146:
+			f1 = this.field_175336_F.biomeScaleWeight = MathHelper.clamp_float(f, 1.0F, 20.0F);
+			break;
+		case 147:
+			f1 = this.field_175336_F.biomeScaleOffset = MathHelper.clamp_float(f, 0.0F, 20.0F);
+		}
+
+		if (f1 != f && f != 0.0F) {
+			((GuiTextField) this.field_175349_r.func_178061_c(i)).setText(this.func_175330_b(i, f1));
+		}
+
+		((GuiSlider) this.field_175349_r.func_178061_c(i - 132 + 100)).func_175218_a(f1, false);
+		if (!this.field_175336_F.equals(this.field_175334_E)) {
+			this.func_181031_a(true);
+		}
+
+	}
+
+	public void func_175321_a(int i, boolean flag) {
+		switch (i) {
+		case 148:
+			this.field_175336_F.useCaves = flag;
+			break;
+		case 149:
+			this.field_175336_F.useDungeons = flag;
+			break;
+		case 150:
+			this.field_175336_F.useStrongholds = flag;
+			break;
+		case 151:
+			this.field_175336_F.useVillages = flag;
+			break;
+		case 152:
+			this.field_175336_F.useMineShafts = flag;
+			break;
+		case 153:
+			this.field_175336_F.useTemples = flag;
+			break;
+		case 154:
+			this.field_175336_F.useRavines = flag;
+			break;
+		case 155:
+			this.field_175336_F.useWaterLakes = flag;
+			break;
+		case 156:
+			this.field_175336_F.useLavaLakes = flag;
+			break;
+		case 161:
+			this.field_175336_F.useLavaOceans = flag;
+			break;
+		case 210:
+			this.field_175336_F.useMonuments = flag;
+		}
+
+		if (!this.field_175336_F.equals(this.field_175334_E)) {
+			this.func_181031_a(true);
+		}
+
+	}
+
+	private void func_175322_b(int parInt1) {
+		this.field_175339_B = parInt1;
+		this.func_175329_a(true);
+	}
+
+	public String func_175323_a() {
+		return this.field_175336_F.toString().replace("\n", "");
+	}
+
+	public void func_175324_a(String parString1) {
+		if (parString1 != null && parString1.length() != 0) {
+			this.field_175336_F = ChunkProviderSettings.Factory.jsonToFactory(parString1);
+		} else {
+			this.field_175336_F = new ChunkProviderSettings.Factory();
+		}
+
 	}
 
 	private void func_175325_f() {
@@ -484,97 +679,60 @@ public class GuiCustomizeWorldScreen extends GuiScreen
 		this.func_175328_i();
 	}
 
-	public String func_175323_a() {
-		return this.field_175336_F.toString().replace("\n", "");
+	private void func_175326_g() {
+		this.field_175336_F.func_177863_a();
+		this.func_175325_f();
+		this.func_181031_a(false);
 	}
 
-	public void func_175324_a(String parString1) {
-		if (parString1 != null && parString1.length() != 0) {
-			this.field_175336_F = ChunkProviderSettings.Factory.jsonToFactory(parString1);
-		} else {
-			this.field_175336_F = new ChunkProviderSettings.Factory();
-		}
+	private void func_175327_a(float parFloat1) {
+		Gui gui = this.field_175349_r.func_178056_g();
+		if (gui instanceof GuiTextField) {
+			float f = parFloat1;
+			if (GuiScreen.isShiftKeyDown()) {
+				f = parFloat1 * 0.1F;
+				if (GuiScreen.isCtrlKeyDown()) {
+					f *= 0.1F;
+				}
+			} else if (GuiScreen.isCtrlKeyDown()) {
+				f = parFloat1 * 10.0F;
+				if (GuiScreen.isAltKeyDown()) {
+					f *= 10.0F;
+				}
+			}
 
+			GuiTextField guitextfield = (GuiTextField) gui;
+			Float f1 = Floats.tryParse(guitextfield.getText());
+			if (f1 != null) {
+				f1 = Float.valueOf(f1.floatValue() + f);
+				int i = guitextfield.getId();
+				String s = this.func_175330_b(guitextfield.getId(), f1.floatValue());
+				guitextfield.setText(s);
+				this.func_175319_a(i, s);
+			}
+		}
 	}
 
-	public void func_175319_a(int i, String s) {
-		float f = 0.0F;
-
-		try {
-			f = Float.parseFloat(s);
-		} catch (NumberFormatException var5) {
-			;
-		}
-
-		float f1 = 0.0F;
-		switch (i) {
-		case 132:
-			f1 = this.field_175336_F.mainNoiseScaleX = MathHelper.clamp_float(f, 1.0F, 5000.0F);
-			break;
-		case 133:
-			f1 = this.field_175336_F.mainNoiseScaleY = MathHelper.clamp_float(f, 1.0F, 5000.0F);
-			break;
-		case 134:
-			f1 = this.field_175336_F.mainNoiseScaleZ = MathHelper.clamp_float(f, 1.0F, 5000.0F);
-			break;
-		case 135:
-			f1 = this.field_175336_F.depthNoiseScaleX = MathHelper.clamp_float(f, 1.0F, 2000.0F);
-			break;
-		case 136:
-			f1 = this.field_175336_F.depthNoiseScaleZ = MathHelper.clamp_float(f, 1.0F, 2000.0F);
-			break;
-		case 137:
-			f1 = this.field_175336_F.depthNoiseScaleExponent = MathHelper.clamp_float(f, 0.01F, 20.0F);
-			break;
-		case 138:
-			f1 = this.field_175336_F.baseSize = MathHelper.clamp_float(f, 1.0F, 25.0F);
-			break;
-		case 139:
-			f1 = this.field_175336_F.coordinateScale = MathHelper.clamp_float(f, 1.0F, 6000.0F);
-			break;
-		case 140:
-			f1 = this.field_175336_F.heightScale = MathHelper.clamp_float(f, 1.0F, 6000.0F);
-			break;
-		case 141:
-			f1 = this.field_175336_F.stretchY = MathHelper.clamp_float(f, 0.01F, 50.0F);
-			break;
-		case 142:
-			f1 = this.field_175336_F.upperLimitScale = MathHelper.clamp_float(f, 1.0F, 5000.0F);
-			break;
-		case 143:
-			f1 = this.field_175336_F.lowerLimitScale = MathHelper.clamp_float(f, 1.0F, 5000.0F);
-			break;
-		case 144:
-			f1 = this.field_175336_F.biomeDepthWeight = MathHelper.clamp_float(f, 1.0F, 20.0F);
-			break;
-		case 145:
-			f1 = this.field_175336_F.biomeDepthOffset = MathHelper.clamp_float(f, 0.0F, 20.0F);
-			break;
-		case 146:
-			f1 = this.field_175336_F.biomeScaleWeight = MathHelper.clamp_float(f, 1.0F, 20.0F);
-			break;
-		case 147:
-			f1 = this.field_175336_F.biomeScaleOffset = MathHelper.clamp_float(f, 0.0F, 20.0F);
-		}
-
-		if (f1 != f && f != 0.0F) {
-			((GuiTextField) this.field_175349_r.func_178061_c(i)).setText(this.func_175330_b(i, f1));
-		}
-
-		((GuiSlider) this.field_175349_r.func_178061_c(i - 132 + 100)).func_175218_a(f1, false);
-		if (!this.field_175336_F.equals(this.field_175334_E)) {
-			this.func_181031_a(true);
-		}
-
+	private void func_175328_i() {
+		this.field_175345_v.enabled = this.field_175349_r.func_178059_e() != 0;
+		this.field_175344_w.enabled = this.field_175349_r.func_178059_e() != this.field_175349_r.func_178057_f() - 1;
+		this.field_175333_f = I18n.format("book.pageIndicator",
+				new Object[] { Integer.valueOf(this.field_175349_r.func_178059_e() + 1),
+						Integer.valueOf(this.field_175349_r.func_178057_f()) });
+		this.field_175335_g = this.field_175342_h[this.field_175349_r.func_178059_e()];
+		this.field_175347_t.enabled = this.field_175349_r.func_178059_e() != this.field_175349_r.func_178057_f() - 1;
 	}
 
-	private void func_181031_a(boolean parFlag) {
-		this.field_175338_A = parFlag;
-		this.field_175346_u.enabled = parFlag;
-	}
-
-	public String getText(int i, String s, float f) {
-		return s + ": " + this.func_175330_b(i, f);
+	private void func_175329_a(boolean parFlag) {
+		this.field_175352_x.visible = parFlag;
+		this.field_175351_y.visible = parFlag;
+		this.field_175347_t.enabled = !parFlag;
+		this.field_175348_s.enabled = !parFlag;
+		this.field_175345_v.enabled = !parFlag;
+		this.field_175344_w.enabled = !parFlag;
+		this.field_175346_u.enabled = this.field_175338_A && !parFlag;
+		this.field_175350_z.enabled = !parFlag;
+		this.field_175349_r.func_181155_a(!parFlag);
 	}
 
 	private String func_175330_b(int parInt1, float parFloat1) {
@@ -658,46 +816,134 @@ public class GuiCustomizeWorldScreen extends GuiScreen
 		}
 	}
 
-	public void func_175321_a(int i, boolean flag) {
-		switch (i) {
-		case 148:
-			this.field_175336_F.useCaves = flag;
+	private void func_175331_h() {
+		switch (this.field_175339_B) {
+		case 300:
+			this.actionPerformed((GuiListButton) this.field_175349_r.func_178061_c(300));
 			break;
-		case 149:
-			this.field_175336_F.useDungeons = flag;
-			break;
-		case 150:
-			this.field_175336_F.useStrongholds = flag;
-			break;
-		case 151:
-			this.field_175336_F.useVillages = flag;
-			break;
-		case 152:
-			this.field_175336_F.useMineShafts = flag;
-			break;
-		case 153:
-			this.field_175336_F.useTemples = flag;
-			break;
-		case 154:
-			this.field_175336_F.useRavines = flag;
-			break;
-		case 155:
-			this.field_175336_F.useWaterLakes = flag;
-			break;
-		case 156:
-			this.field_175336_F.useLavaLakes = flag;
-			break;
-		case 161:
-			this.field_175336_F.useLavaOceans = flag;
-			break;
-		case 210:
-			this.field_175336_F.useMonuments = flag;
+		case 304:
+			this.func_175326_g();
 		}
 
-		if (!this.field_175336_F.equals(this.field_175334_E)) {
-			this.func_181031_a(true);
+		this.field_175339_B = 0;
+		this.field_175340_C = true;
+		this.func_175329_a(false);
+	}
+
+	private void func_181031_a(boolean parFlag) {
+		this.field_175338_A = parFlag;
+		this.field_175346_u.enabled = parFlag;
+	}
+
+	public String getText(int i, String s, float f) {
+		return s + ": " + this.func_175330_b(i, f);
+	}
+
+	/**
+	 * + Handles mouse input.
+	 */
+	public void handleMouseInput() throws IOException {
+		super.handleMouseInput();
+		this.field_175349_r.handleMouseInput();
+	}
+
+	public void handleTouchInput() throws IOException {
+		super.handleTouchInput();
+		this.field_175349_r.handleTouchInput();
+	}
+
+	/**
+	 * + Adds the buttons (and other controls) to the screen in question. Called
+	 * when the GUI is displayed and when the window resizes, the buttonList is
+	 * cleared beforehand.
+	 */
+	public void initGui() {
+		int i = 0;
+		int j = 0;
+		if (this.field_175349_r != null) {
+			i = this.field_175349_r.func_178059_e();
+			j = this.field_175349_r.getAmountScrolled();
 		}
 
+		this.field_175341_a = I18n.format("options.customizeTitle", new Object[0]);
+		this.buttonList.clear();
+		this.buttonList.add(this.field_175345_v = new GuiButton(302, 20, 5, 80, 20,
+				I18n.format("createWorld.customize.custom.prev", new Object[0])));
+		this.buttonList.add(this.field_175344_w = new GuiButton(303, this.width - 100, 5, 80, 20,
+				I18n.format("createWorld.customize.custom.next", new Object[0])));
+		this.buttonList.add(this.field_175346_u = new GuiButton(304, this.width / 2 - 187, this.height - 27, 90, 20,
+				I18n.format("createWorld.customize.custom.defaults", new Object[0])));
+		this.buttonList.add(this.field_175347_t = new GuiButton(301, this.width / 2 - 92, this.height - 27, 90, 20,
+				I18n.format("createWorld.customize.custom.randomize", new Object[0])));
+		this.buttonList.add(this.field_175350_z = new GuiButton(305, this.width / 2 + 3, this.height - 27, 90, 20,
+				I18n.format("createWorld.customize.custom.presets", new Object[0])));
+		this.buttonList.add(this.field_175348_s = new GuiButton(300, this.width / 2 + 98, this.height - 27, 90, 20,
+				I18n.format("gui.done", new Object[0])));
+		this.field_175346_u.enabled = this.field_175338_A;
+		this.field_175352_x = new GuiButton(306, this.width / 2 - 55, 160, 50, 20,
+				I18n.format("gui.yes", new Object[0]));
+		this.field_175352_x.visible = false;
+		this.buttonList.add(this.field_175352_x);
+		this.field_175351_y = new GuiButton(307, this.width / 2 + 5, 160, 50, 20, I18n.format("gui.no", new Object[0]));
+		this.field_175351_y.visible = false;
+		this.buttonList.add(this.field_175351_y);
+		if (this.field_175339_B != 0) {
+			this.field_175352_x.visible = true;
+			this.field_175351_y.visible = true;
+		}
+
+		this.func_175325_f();
+		if (i != 0) {
+			this.field_175349_r.func_181156_c(i);
+			this.field_175349_r.scrollBy(j);
+			this.func_175328_i();
+		}
+
+	}
+
+	/**
+	 * + Fired when a key is typed (except F11 which toggles full screen). This is
+	 * the equivalent of KeyListener.keyTyped(KeyEvent e). Args : character
+	 * (character on the key), keyCode (lwjgl Keyboard key code)
+	 */
+	protected void keyTyped(char parChar1, int parInt1) {
+		super.keyTyped(parChar1, parInt1);
+		if (this.field_175339_B == 0) {
+			switch (parInt1) {
+			case 200:
+				this.func_175327_a(1.0F);
+				break;
+			case 208:
+				this.func_175327_a(-1.0F);
+				break;
+			default:
+				this.field_175349_r.func_178062_a(parChar1, parInt1);
+			}
+
+		}
+	}
+
+	/**
+	 * + Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
+	 */
+	protected void mouseClicked(int parInt1, int parInt2, int parInt3) {
+		super.mouseClicked(parInt1, parInt2, parInt3);
+		if (this.field_175339_B == 0 && !this.field_175340_C) {
+			this.field_175349_r.mouseClicked(parInt1, parInt2, parInt3);
+		}
+	}
+
+	/**
+	 * + Called when a mouse button is released. Args : mouseX, mouseY,
+	 * releaseButton
+	 */
+	protected void mouseReleased(int i, int j, int k) {
+		super.mouseReleased(i, j, k);
+		if (this.field_175340_C) {
+			this.field_175340_C = false;
+		} else if (this.field_175339_B == 0) {
+			this.field_175349_r.mouseReleased(i, j, k);
+		}
 	}
 
 	public void onTick(int i, float f) {
@@ -961,253 +1207,9 @@ public class GuiCustomizeWorldScreen extends GuiScreen
 
 	}
 
-	/**+
-	 * Called by the controls from the buttonList when activated.
-	 * (Mouse pressed for buttons)
-	 */
-	protected void actionPerformed(GuiButton parGuiButton) {
-		if (parGuiButton.enabled) {
-			switch (parGuiButton.id) {
-			case 300:
-				this.field_175343_i.chunkProviderSettingsJson = this.field_175336_F.toString();
-				this.mc.displayGuiScreen(this.field_175343_i);
-				break;
-			case 301:
-				for (int i = 0; i < this.field_175349_r.getSize(); ++i) {
-					GuiPageButtonList.GuiEntry guipagebuttonlist$guientry = this.field_175349_r.getListEntry(i);
-					Gui gui = guipagebuttonlist$guientry.func_178022_a();
-					if (gui instanceof GuiButton) {
-						GuiButton guibutton = (GuiButton) gui;
-						if (guibutton instanceof GuiSlider) {
-							float f = ((GuiSlider) guibutton).func_175217_d() * (0.75F + this.random.nextFloat() * 0.5F)
-									+ (this.random.nextFloat() * 0.1F - 0.05F);
-							((GuiSlider) guibutton).func_175219_a(MathHelper.clamp_float(f, 0.0F, 1.0F));
-						} else if (guibutton instanceof GuiListButton) {
-							((GuiListButton) guibutton).func_175212_b(this.random.nextBoolean());
-						}
-					}
-
-					Gui gui1 = guipagebuttonlist$guientry.func_178021_b();
-					if (gui1 instanceof GuiButton) {
-						GuiButton guibutton1 = (GuiButton) gui1;
-						if (guibutton1 instanceof GuiSlider) {
-							float f1 = ((GuiSlider) guibutton1).func_175217_d()
-									* (0.75F + this.random.nextFloat() * 0.5F)
-									+ (this.random.nextFloat() * 0.1F - 0.05F);
-							((GuiSlider) guibutton1).func_175219_a(MathHelper.clamp_float(f1, 0.0F, 1.0F));
-						} else if (guibutton1 instanceof GuiListButton) {
-							((GuiListButton) guibutton1).func_175212_b(this.random.nextBoolean());
-						}
-					}
-				}
-
-				return;
-			case 302:
-				this.field_175349_r.func_178071_h();
-				this.func_175328_i();
-				break;
-			case 303:
-				this.field_175349_r.func_178064_i();
-				this.func_175328_i();
-				break;
-			case 304:
-				if (this.field_175338_A) {
-					this.func_175322_b(304);
-				}
-				break;
-			case 305:
-				this.mc.displayGuiScreen(new GuiScreenCustomizePresets(this));
-				break;
-			case 306:
-				this.func_175331_h();
-				break;
-			case 307:
-				this.field_175339_B = 0;
-				this.func_175331_h();
-			}
-
-		}
-	}
-
-	private void func_175326_g() {
-		this.field_175336_F.func_177863_a();
-		this.func_175325_f();
-		this.func_181031_a(false);
-	}
-
-	private void func_175322_b(int parInt1) {
-		this.field_175339_B = parInt1;
-		this.func_175329_a(true);
-	}
-
-	private void func_175331_h() {
-		switch (this.field_175339_B) {
-		case 300:
-			this.actionPerformed((GuiListButton) this.field_175349_r.func_178061_c(300));
-			break;
-		case 304:
-			this.func_175326_g();
-		}
-
-		this.field_175339_B = 0;
-		this.field_175340_C = true;
-		this.func_175329_a(false);
-	}
-
-	private void func_175329_a(boolean parFlag) {
-		this.field_175352_x.visible = parFlag;
-		this.field_175351_y.visible = parFlag;
-		this.field_175347_t.enabled = !parFlag;
-		this.field_175348_s.enabled = !parFlag;
-		this.field_175345_v.enabled = !parFlag;
-		this.field_175344_w.enabled = !parFlag;
-		this.field_175346_u.enabled = this.field_175338_A && !parFlag;
-		this.field_175350_z.enabled = !parFlag;
-		this.field_175349_r.func_181155_a(!parFlag);
-	}
-
-	private void func_175328_i() {
-		this.field_175345_v.enabled = this.field_175349_r.func_178059_e() != 0;
-		this.field_175344_w.enabled = this.field_175349_r.func_178059_e() != this.field_175349_r.func_178057_f() - 1;
-		this.field_175333_f = I18n.format("book.pageIndicator",
-				new Object[] { Integer.valueOf(this.field_175349_r.func_178059_e() + 1),
-						Integer.valueOf(this.field_175349_r.func_178057_f()) });
-		this.field_175335_g = this.field_175342_h[this.field_175349_r.func_178059_e()];
-		this.field_175347_t.enabled = this.field_175349_r.func_178059_e() != this.field_175349_r.func_178057_f() - 1;
-	}
-
-	/**+
-	 * Fired when a key is typed (except F11 which toggles full
-	 * screen). This is the equivalent of
-	 * KeyListener.keyTyped(KeyEvent e). Args : character (character
-	 * on the key), keyCode (lwjgl Keyboard key code)
-	 */
-	protected void keyTyped(char parChar1, int parInt1) {
-		super.keyTyped(parChar1, parInt1);
-		if (this.field_175339_B == 0) {
-			switch (parInt1) {
-			case 200:
-				this.func_175327_a(1.0F);
-				break;
-			case 208:
-				this.func_175327_a(-1.0F);
-				break;
-			default:
-				this.field_175349_r.func_178062_a(parChar1, parInt1);
-			}
-
-		}
-	}
-
-	private void func_175327_a(float parFloat1) {
-		Gui gui = this.field_175349_r.func_178056_g();
-		if (gui instanceof GuiTextField) {
-			float f = parFloat1;
-			if (GuiScreen.isShiftKeyDown()) {
-				f = parFloat1 * 0.1F;
-				if (GuiScreen.isCtrlKeyDown()) {
-					f *= 0.1F;
-				}
-			} else if (GuiScreen.isCtrlKeyDown()) {
-				f = parFloat1 * 10.0F;
-				if (GuiScreen.isAltKeyDown()) {
-					f *= 10.0F;
-				}
-			}
-
-			GuiTextField guitextfield = (GuiTextField) gui;
-			Float f1 = Floats.tryParse(guitextfield.getText());
-			if (f1 != null) {
-				f1 = Float.valueOf(f1.floatValue() + f);
-				int i = guitextfield.getId();
-				String s = this.func_175330_b(guitextfield.getId(), f1.floatValue());
-				guitextfield.setText(s);
-				this.func_175319_a(i, s);
-			}
-		}
-	}
-
-	/**+
-	 * Called when the mouse is clicked. Args : mouseX, mouseY,
-	 * clickedButton
-	 */
-	protected void mouseClicked(int parInt1, int parInt2, int parInt3) {
-		super.mouseClicked(parInt1, parInt2, parInt3);
-		if (this.field_175339_B == 0 && !this.field_175340_C) {
-			this.field_175349_r.mouseClicked(parInt1, parInt2, parInt3);
-		}
-	}
-
-	/**+
-	 * Called when a mouse button is released. Args : mouseX,
-	 * mouseY, releaseButton
-	 */
-	protected void mouseReleased(int i, int j, int k) {
-		super.mouseReleased(i, j, k);
-		if (this.field_175340_C) {
-			this.field_175340_C = false;
-		} else if (this.field_175339_B == 0) {
-			this.field_175349_r.mouseReleased(i, j, k);
-		}
-	}
-
-	/**+
-	 * Draws the screen and all the components in it. Args : mouseX,
-	 * mouseY, renderPartialTicks
-	 */
-	public void drawScreen(int i, int j, float f) {
-		this.drawDefaultBackground();
-		this.field_175349_r.drawScreen(i, j, f);
-		this.drawCenteredString(this.fontRendererObj, this.field_175341_a, this.width / 2, 2, 16777215);
-		this.drawCenteredString(this.fontRendererObj, this.field_175333_f, this.width / 2, 12, 16777215);
-		this.drawCenteredString(this.fontRendererObj, this.field_175335_g, this.width / 2, 22, 16777215);
-		super.drawScreen(i, j, f);
-		if (this.field_175339_B != 0) {
-			drawRect(0, 0, this.width, this.height, Integer.MIN_VALUE);
-			this.drawHorizontalLine(this.width / 2 - 91, this.width / 2 + 90, 99, -2039584);
-			this.drawHorizontalLine(this.width / 2 - 91, this.width / 2 + 90, 185, -6250336);
-			this.drawVerticalLine(this.width / 2 - 91, 99, 185, -2039584);
-			this.drawVerticalLine(this.width / 2 + 90, 99, 185, -6250336);
-			float f1 = 85.0F;
-			float f2 = 180.0F;
-			GlStateManager.disableLighting();
-			GlStateManager.disableFog();
-			Tessellator tessellator = Tessellator.getInstance();
-			WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-			this.mc.getTextureManager().bindTexture(optionsBackground);
-			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-			float f3 = 32.0F;
-			worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-			worldrenderer.pos((double) (this.width / 2 - 90), 185.0D, 0.0D).tex(0.0D, 2.65625D).color(64, 64, 64, 64)
-					.endVertex();
-			worldrenderer.pos((double) (this.width / 2 + 90), 185.0D, 0.0D).tex(5.625D, 2.65625D).color(64, 64, 64, 64)
-					.endVertex();
-			worldrenderer.pos((double) (this.width / 2 + 90), 100.0D, 0.0D).tex(5.625D, 0.0D).color(64, 64, 64, 64)
-					.endVertex();
-			worldrenderer.pos((double) (this.width / 2 - 90), 100.0D, 0.0D).tex(0.0D, 0.0D).color(64, 64, 64, 64)
-					.endVertex();
-			tessellator.draw();
-			this.drawCenteredString(this.fontRendererObj,
-					I18n.format("createWorld.customize.custom.confirmTitle", new Object[0]), this.width / 2, 105,
-					16777215);
-			this.drawCenteredString(this.fontRendererObj,
-					I18n.format("createWorld.customize.custom.confirm1", new Object[0]), this.width / 2, 125, 16777215);
-			this.drawCenteredString(this.fontRendererObj,
-					I18n.format("createWorld.customize.custom.confirm2", new Object[0]), this.width / 2, 135, 16777215);
-			this.field_175352_x.drawButton(this.mc, i, j);
-			this.field_175351_y.drawButton(this.mc, i, j);
-		}
-
-	}
-
 	@Override
 	public boolean showCopyPasteButtons() {
 		return field_175349_r.isTextFieldFocused();
-	}
-
-	@Override
-	public void fireInputEvent(EnumInputEvent event, String param) {
-		field_175349_r.fireInputEvent(event, param);
 	}
 
 }

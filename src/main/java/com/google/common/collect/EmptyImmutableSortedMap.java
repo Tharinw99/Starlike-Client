@@ -43,8 +43,44 @@ final class EmptyImmutableSortedMap<K, V> extends ImmutableSortedMap<K, V> {
 	}
 
 	@Override
+	public ImmutableSetMultimap<K, V> asMultimap() {
+		return ImmutableSetMultimap.of();
+	}
+
+	@Override
+	ImmutableSortedMap<K, V> createDescendingMap() {
+		return new EmptyImmutableSortedMap<K, V>(Ordering.from(comparator()).reverse(), this);
+	}
+
+	@Override
+	ImmutableSet<Entry<K, V>> createEntrySet() {
+		throw new AssertionError("should never be called");
+	}
+
+	@Override
+	public ImmutableSet<Entry<K, V>> entrySet() {
+		return ImmutableSet.of();
+	}
+
+	@Override
 	public V get(@Nullable Object key) {
 		return null;
+	}
+
+	@Override
+	public ImmutableSortedMap<K, V> headMap(K toKey, boolean inclusive) {
+		checkNotNull(toKey);
+		return this;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return true;
+	}
+
+	@Override
+	boolean isPartialView() {
+		return false;
 	}
 
 	@Override
@@ -58,13 +94,9 @@ final class EmptyImmutableSortedMap<K, V> extends ImmutableSortedMap<K, V> {
 	}
 
 	@Override
-	public boolean isEmpty() {
-		return true;
-	}
-
-	@Override
-	public ImmutableCollection<V> values() {
-		return ImmutableList.of();
+	public ImmutableSortedMap<K, V> tailMap(K fromKey, boolean inclusive) {
+		checkNotNull(fromKey);
+		return this;
 	}
 
 	@Override
@@ -73,39 +105,7 @@ final class EmptyImmutableSortedMap<K, V> extends ImmutableSortedMap<K, V> {
 	}
 
 	@Override
-	boolean isPartialView() {
-		return false;
-	}
-
-	@Override
-	public ImmutableSet<Entry<K, V>> entrySet() {
-		return ImmutableSet.of();
-	}
-
-	@Override
-	ImmutableSet<Entry<K, V>> createEntrySet() {
-		throw new AssertionError("should never be called");
-	}
-
-	@Override
-	public ImmutableSetMultimap<K, V> asMultimap() {
-		return ImmutableSetMultimap.of();
-	}
-
-	@Override
-	public ImmutableSortedMap<K, V> headMap(K toKey, boolean inclusive) {
-		checkNotNull(toKey);
-		return this;
-	}
-
-	@Override
-	public ImmutableSortedMap<K, V> tailMap(K fromKey, boolean inclusive) {
-		checkNotNull(fromKey);
-		return this;
-	}
-
-	@Override
-	ImmutableSortedMap<K, V> createDescendingMap() {
-		return new EmptyImmutableSortedMap<K, V>(Ordering.from(comparator()).reverse(), this);
+	public ImmutableCollection<V> values() {
+		return ImmutableList.of();
 	}
 }

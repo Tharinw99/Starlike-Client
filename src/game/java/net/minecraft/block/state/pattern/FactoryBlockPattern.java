@@ -15,31 +15,40 @@ import com.google.common.collect.Maps;
 
 import net.minecraft.block.state.BlockWorldState;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class FactoryBlockPattern {
 	private static final Joiner COMMA_JOIN = Joiner.on(",");
+
+	public static FactoryBlockPattern start() {
+		return new FactoryBlockPattern();
+	}
+
 	private final List<String[]> depth = Lists.newArrayList();
 	private final Map<Character, Predicate<BlockWorldState>> symbolMap = Maps.newHashMap();
 	private int aisleHeight;
+
 	private int rowWidth;
 
 	private FactoryBlockPattern() {
@@ -82,17 +91,23 @@ public class FactoryBlockPattern {
 		}
 	}
 
-	public static FactoryBlockPattern start() {
-		return new FactoryBlockPattern();
-	}
-
-	public FactoryBlockPattern where(char symbol, Predicate<BlockWorldState> blockMatcher) {
-		this.symbolMap.put(Character.valueOf(symbol), blockMatcher);
-		return this;
-	}
-
 	public BlockPattern build() {
 		return new BlockPattern(this.makePredicateArray());
+	}
+
+	private void checkMissingPredicates() {
+		ArrayList arraylist = Lists.newArrayList();
+
+		for (Entry entry : this.symbolMap.entrySet()) {
+			if (entry.getValue() == null) {
+				arraylist.add(entry.getKey());
+			}
+		}
+
+		if (!arraylist.isEmpty()) {
+			throw new IllegalStateException(
+					"Predicates for character(s) " + COMMA_JOIN.join(arraylist) + " are missing");
+		}
 	}
 
 	private Predicate<BlockWorldState>[][][] makePredicateArray() {
@@ -111,18 +126,8 @@ public class FactoryBlockPattern {
 		return apredicate;
 	}
 
-	private void checkMissingPredicates() {
-		ArrayList arraylist = Lists.newArrayList();
-
-		for (Entry entry : this.symbolMap.entrySet()) {
-			if (entry.getValue() == null) {
-				arraylist.add(entry.getKey());
-			}
-		}
-
-		if (!arraylist.isEmpty()) {
-			throw new IllegalStateException(
-					"Predicates for character(s) " + COMMA_JOIN.join(arraylist) + " are missing");
-		}
+	public FactoryBlockPattern where(char symbol, Predicate<BlockWorldState> blockMatcher) {
+		this.symbolMap.put(Character.valueOf(symbol), blockMatcher);
+		return this;
 	}
 }

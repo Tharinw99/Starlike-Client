@@ -38,6 +38,9 @@ import com.google.common.annotations.GwtIncompatible;
  */
 @GwtCompatible(emulated = true)
 public final class EnumMultiset<E extends Enum<E>> extends AbstractMapBasedMultiset<E> {
+	@GwtIncompatible("Not needed in emulated source")
+	private static final long serialVersionUID = 0;
+
 	/** Creates an empty {@code EnumMultiset}. */
 	public static <E extends Enum<E>> EnumMultiset<E> create(Class<E> type) {
 		return new EnumMultiset<E>(type);
@@ -82,13 +85,6 @@ public final class EnumMultiset<E extends Enum<E>> extends AbstractMapBasedMulti
 		this.type = type;
 	}
 
-	@GwtIncompatible("java.io.ObjectOutputStream")
-	private void writeObject(ObjectOutputStream stream) throws IOException {
-		stream.defaultWriteObject();
-		stream.writeObject(type);
-		Serialization.writeMultiset(this, stream);
-	}
-
 	/**
 	 * @serialData the {@code Class<E>} for the enum type, the number of distinct
 	 *             elements, the first element, its count, the second element, its
@@ -104,6 +100,10 @@ public final class EnumMultiset<E extends Enum<E>> extends AbstractMapBasedMulti
 		Serialization.populateMultiset(this, stream);
 	}
 
-	@GwtIncompatible("Not needed in emulated source")
-	private static final long serialVersionUID = 0;
+	@GwtIncompatible("java.io.ObjectOutputStream")
+	private void writeObject(ObjectOutputStream stream) throws IOException {
+		stream.defaultWriteObject();
+		stream.writeObject(type);
+		Serialization.writeMultiset(this, stream);
+	}
 }

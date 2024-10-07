@@ -1,6 +1,7 @@
 package net.minecraft.block;
 
 import java.util.List;
+
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.DeferredStateManager;
 import net.minecraft.block.material.Material;
@@ -19,22 +20,25 @@ import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -55,53 +59,9 @@ public class BlockPane extends Block {
 		this.setCreativeTab(CreativeTabs.tabDecorations);
 	}
 
-	/**+
-	 * Get the actual Block state of this Block at the given
-	 * position. This applies properties not visible in the
-	 * metadata, such as fence connections.
-	 */
-	public IBlockState getActualState(IBlockState iblockstate, IBlockAccess iblockaccess, BlockPos blockpos) {
-		return iblockstate
-				.withProperty(NORTH,
-						Boolean.valueOf(
-								this.canPaneConnectToBlock(iblockaccess.getBlockState(blockpos.north()).getBlock())))
-				.withProperty(SOUTH,
-						Boolean.valueOf(
-								this.canPaneConnectToBlock(iblockaccess.getBlockState(blockpos.south()).getBlock())))
-				.withProperty(WEST,
-						Boolean.valueOf(
-								this.canPaneConnectToBlock(iblockaccess.getBlockState(blockpos.west()).getBlock())))
-				.withProperty(EAST, Boolean
-						.valueOf(this.canPaneConnectToBlock(iblockaccess.getBlockState(blockpos.east()).getBlock())));
-	}
-
-	/**+
-	 * Get the Item that this Block should drop when harvested.
-	 */
-	public Item getItemDropped(IBlockState iblockstate, EaglercraftRandom random, int i) {
-		return !this.canDrop ? null : super.getItemDropped(iblockstate, random, i);
-	}
-
-	/**+
-	 * Used to determine ambient occlusion and culling when
-	 * rebuilding chunks for render
-	 */
-	public boolean isOpaqueCube() {
-		return false;
-	}
-
-	public boolean isFullCube() {
-		return false;
-	}
-
-	public boolean shouldSideBeRendered(IBlockAccess iblockaccess, BlockPos blockpos, EnumFacing enumfacing) {
-		return iblockaccess.getBlockState(blockpos).getBlock() == this ? false
-				: super.shouldSideBeRendered(iblockaccess, blockpos, enumfacing);
-	}
-
-	/**+
-	 * Add all collision boxes of this Block to the list that
-	 * intersect with the given mask.
+	/**
+	 * + Add all collision boxes of this Block to the list that intersect with the
+	 * given mask.
 	 */
 	public void addCollisionBoxesToList(World world, BlockPos blockpos, IBlockState iblockstate,
 			AxisAlignedBB axisalignedbb, List<AxisAlignedBB> list, Entity entity) {
@@ -137,11 +97,70 @@ public class BlockPane extends Block {
 
 	}
 
-	/**+
-	 * Sets the block's bounds for rendering it as an item
+	public final boolean canPaneConnectToBlock(Block blockIn) {
+		return blockIn.isFullBlock() || blockIn == this || blockIn == Blocks.glass || blockIn == Blocks.stained_glass
+				|| blockIn == Blocks.stained_glass_pane || blockIn instanceof BlockPane;
+	}
+
+	protected boolean canSilkHarvest() {
+		return true;
+	}
+
+	protected BlockState createBlockState() {
+		return new BlockState(this, new IProperty[] { NORTH, EAST, WEST, SOUTH });
+	}
+
+	public boolean eaglerShadersShouldRenderGlassHighlights() {
+		return this == Blocks.glass_pane && DeferredStateManager.isRenderingGlassHighlights();
+	}
+
+	/**
+	 * + Get the actual Block state of this Block at the given position. This
+	 * applies properties not visible in the metadata, such as fence connections.
 	 */
-	public void setBlockBoundsForItemRender() {
-		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
+	public IBlockState getActualState(IBlockState iblockstate, IBlockAccess iblockaccess, BlockPos blockpos) {
+		return iblockstate
+				.withProperty(NORTH,
+						Boolean.valueOf(
+								this.canPaneConnectToBlock(iblockaccess.getBlockState(blockpos.north()).getBlock())))
+				.withProperty(SOUTH,
+						Boolean.valueOf(
+								this.canPaneConnectToBlock(iblockaccess.getBlockState(blockpos.south()).getBlock())))
+				.withProperty(WEST,
+						Boolean.valueOf(
+								this.canPaneConnectToBlock(iblockaccess.getBlockState(blockpos.west()).getBlock())))
+				.withProperty(EAST, Boolean
+						.valueOf(this.canPaneConnectToBlock(iblockaccess.getBlockState(blockpos.east()).getBlock())));
+	}
+
+	public EnumWorldBlockLayer getBlockLayer() {
+		return EnumWorldBlockLayer.CUTOUT_MIPPED;
+	}
+
+	/**
+	 * + Get the Item that this Block should drop when harvested.
+	 */
+	public Item getItemDropped(IBlockState iblockstate, EaglercraftRandom random, int i) {
+		return !this.canDrop ? null : super.getItemDropped(iblockstate, random, i);
+	}
+
+	/**
+	 * + Convert the BlockState into the correct metadata value
+	 */
+	public int getMetaFromState(IBlockState var1) {
+		return 0;
+	}
+
+	public boolean isFullCube() {
+		return false;
+	}
+
+	/**
+	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
+	 * render
+	 */
+	public boolean isOpaqueCube() {
+		return false;
 	}
 
 	public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
@@ -178,31 +197,15 @@ public class BlockPane extends Block {
 		this.setBlockBounds(f, 0.0F, f2, f1, 1.0F, f3);
 	}
 
-	public final boolean canPaneConnectToBlock(Block blockIn) {
-		return blockIn.isFullBlock() || blockIn == this || blockIn == Blocks.glass || blockIn == Blocks.stained_glass
-				|| blockIn == Blocks.stained_glass_pane || blockIn instanceof BlockPane;
-	}
-
-	protected boolean canSilkHarvest() {
-		return true;
-	}
-
-	public EnumWorldBlockLayer getBlockLayer() {
-		return EnumWorldBlockLayer.CUTOUT_MIPPED;
-	}
-
-	public boolean eaglerShadersShouldRenderGlassHighlights() {
-		return this == Blocks.glass_pane && DeferredStateManager.isRenderingGlassHighlights();
-	}
-
-	/**+
-	 * Convert the BlockState into the correct metadata value
+	/**
+	 * + Sets the block's bounds for rendering it as an item
 	 */
-	public int getMetaFromState(IBlockState var1) {
-		return 0;
+	public void setBlockBoundsForItemRender() {
+		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
 	}
 
-	protected BlockState createBlockState() {
-		return new BlockState(this, new IProperty[] { NORTH, EAST, WEST, SOUTH });
+	public boolean shouldSideBeRendered(IBlockAccess iblockaccess, BlockPos blockpos, EnumFacing enumfacing) {
+		return iblockaccess.getBlockState(blockpos).getBlock() == this ? false
+				: super.shouldSideBeRendered(iblockaccess, blockpos, enumfacing);
 	}
 }

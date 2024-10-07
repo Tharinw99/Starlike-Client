@@ -1,6 +1,7 @@
 package net.minecraft.client.renderer.tileentity;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_MODELVIEW;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE;
 
 import net.lax1dude.eaglercraft.v1_8.mojang.authlib.GameProfile;
 import net.lax1dude.eaglercraft.v1_8.opengl.GlStateManager;
@@ -14,22 +15,25 @@ import net.minecraft.tileentity.TileEntitySkull;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -45,19 +49,6 @@ public class TileEntitySkullRenderer extends TileEntitySpecialRenderer<TileEntit
 	public static TileEntitySkullRenderer instance;
 	private final ModelSkeletonHead skeletonHead = new ModelSkeletonHead(0, 0, 64, 32);
 	private final ModelSkeletonHead humanoidHead = new ModelHumanoidHead();
-
-	public void renderTileEntityAt(TileEntitySkull tileentityskull, double d0, double d1, double d2, float var8,
-			int i) {
-		EnumFacing enumfacing = EnumFacing.getFront(tileentityskull.getBlockMetadata() & 7);
-		this.renderSkull((float) d0, (float) d1, (float) d2, enumfacing,
-				(float) (tileentityskull.getSkullRotation() * 360) / 16.0F, tileentityskull.getSkullType(),
-				tileentityskull.getPlayerProfile(), i);
-	}
-
-	public void setRendererDispatcher(TileEntityRendererDispatcher tileentityrendererdispatcher) {
-		super.setRendererDispatcher(tileentityrendererdispatcher);
-		instance = this;
-	}
 
 	public void renderSkull(float parFloat1, float parFloat2, float parFloat3, EnumFacing parEnumFacing,
 			float parFloat4, int parInt1, GameProfile parGameProfile, int parInt2) {
@@ -134,5 +125,18 @@ public class TileEntitySkullRenderer extends TileEntitySpecialRenderer<TileEntit
 			GlStateManager.matrixMode(GL_MODELVIEW);
 		}
 
+	}
+
+	public void renderTileEntityAt(TileEntitySkull tileentityskull, double d0, double d1, double d2, float var8,
+			int i) {
+		EnumFacing enumfacing = EnumFacing.getFront(tileentityskull.getBlockMetadata() & 7);
+		this.renderSkull((float) d0, (float) d1, (float) d2, enumfacing,
+				(float) (tileentityskull.getSkullRotation() * 360) / 16.0F, tileentityskull.getSkullType(),
+				tileentityskull.getPlayerProfile(), i);
+	}
+
+	public void setRendererDispatcher(TileEntityRendererDispatcher tileentityrendererdispatcher) {
+		super.setRendererDispatcher(tileentityrendererdispatcher);
+		instance = this;
 	}
 }

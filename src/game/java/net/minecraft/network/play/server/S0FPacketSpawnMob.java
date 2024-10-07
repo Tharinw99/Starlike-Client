@@ -11,22 +11,25 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.util.MathHelper;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -92,49 +95,6 @@ public class S0FPacketSpawnMob implements Packet<INetHandlerPlayClient> {
 		this.field_149043_l = entityIn.getDataWatcher();
 	}
 
-	/**+
-	 * Reads the raw packet data from the data stream.
-	 */
-	public void readPacketData(PacketBuffer parPacketBuffer) throws IOException {
-		this.entityId = parPacketBuffer.readVarIntFromBuffer();
-		this.type = parPacketBuffer.readByte() & 255;
-		this.x = parPacketBuffer.readInt();
-		this.y = parPacketBuffer.readInt();
-		this.z = parPacketBuffer.readInt();
-		this.yaw = parPacketBuffer.readByte();
-		this.pitch = parPacketBuffer.readByte();
-		this.headPitch = parPacketBuffer.readByte();
-		this.velocityX = parPacketBuffer.readShort();
-		this.velocityY = parPacketBuffer.readShort();
-		this.velocityZ = parPacketBuffer.readShort();
-		this.watcher = DataWatcher.readWatchedListFromPacketBuffer(parPacketBuffer);
-	}
-
-	/**+
-	 * Writes the raw packet data to the data stream.
-	 */
-	public void writePacketData(PacketBuffer parPacketBuffer) throws IOException {
-		parPacketBuffer.writeVarIntToBuffer(this.entityId);
-		parPacketBuffer.writeByte(this.type & 255);
-		parPacketBuffer.writeInt(this.x);
-		parPacketBuffer.writeInt(this.y);
-		parPacketBuffer.writeInt(this.z);
-		parPacketBuffer.writeByte(this.yaw);
-		parPacketBuffer.writeByte(this.pitch);
-		parPacketBuffer.writeByte(this.headPitch);
-		parPacketBuffer.writeShort(this.velocityX);
-		parPacketBuffer.writeShort(this.velocityY);
-		parPacketBuffer.writeShort(this.velocityZ);
-		this.field_149043_l.writeTo(parPacketBuffer);
-	}
-
-	/**+
-	 * Passes this Packet on to the NetHandler for processing.
-	 */
-	public void processPacket(INetHandlerPlayClient inethandlerplayclient) {
-		inethandlerplayclient.handleSpawnMob(this);
-	}
-
 	public List<DataWatcher.WatchableObject> func_149027_c() {
 		if (this.watcher == null) {
 			this.watcher = this.field_149043_l.getAllWatched();
@@ -151,16 +111,12 @@ public class S0FPacketSpawnMob implements Packet<INetHandlerPlayClient> {
 		return this.type;
 	}
 
-	public int getX() {
-		return this.x;
+	public byte getHeadPitch() {
+		return this.headPitch;
 	}
 
-	public int getY() {
-		return this.y;
-	}
-
-	public int getZ() {
-		return this.z;
+	public byte getPitch() {
+		return this.pitch;
 	}
 
 	public int getVelocityX() {
@@ -175,15 +131,62 @@ public class S0FPacketSpawnMob implements Packet<INetHandlerPlayClient> {
 		return this.velocityZ;
 	}
 
+	public int getX() {
+		return this.x;
+	}
+
+	public int getY() {
+		return this.y;
+	}
+
 	public byte getYaw() {
 		return this.yaw;
 	}
 
-	public byte getPitch() {
-		return this.pitch;
+	public int getZ() {
+		return this.z;
 	}
 
-	public byte getHeadPitch() {
-		return this.headPitch;
+	/**
+	 * + Passes this Packet on to the NetHandler for processing.
+	 */
+	public void processPacket(INetHandlerPlayClient inethandlerplayclient) {
+		inethandlerplayclient.handleSpawnMob(this);
+	}
+
+	/**
+	 * + Reads the raw packet data from the data stream.
+	 */
+	public void readPacketData(PacketBuffer parPacketBuffer) throws IOException {
+		this.entityId = parPacketBuffer.readVarIntFromBuffer();
+		this.type = parPacketBuffer.readByte() & 255;
+		this.x = parPacketBuffer.readInt();
+		this.y = parPacketBuffer.readInt();
+		this.z = parPacketBuffer.readInt();
+		this.yaw = parPacketBuffer.readByte();
+		this.pitch = parPacketBuffer.readByte();
+		this.headPitch = parPacketBuffer.readByte();
+		this.velocityX = parPacketBuffer.readShort();
+		this.velocityY = parPacketBuffer.readShort();
+		this.velocityZ = parPacketBuffer.readShort();
+		this.watcher = DataWatcher.readWatchedListFromPacketBuffer(parPacketBuffer);
+	}
+
+	/**
+	 * + Writes the raw packet data to the data stream.
+	 */
+	public void writePacketData(PacketBuffer parPacketBuffer) throws IOException {
+		parPacketBuffer.writeVarIntToBuffer(this.entityId);
+		parPacketBuffer.writeByte(this.type & 255);
+		parPacketBuffer.writeInt(this.x);
+		parPacketBuffer.writeInt(this.y);
+		parPacketBuffer.writeInt(this.z);
+		parPacketBuffer.writeByte(this.yaw);
+		parPacketBuffer.writeByte(this.pitch);
+		parPacketBuffer.writeByte(this.headPitch);
+		parPacketBuffer.writeShort(this.velocityX);
+		parPacketBuffer.writeShort(this.velocityY);
+		parPacketBuffer.writeShort(this.velocityZ);
+		this.field_149043_l.writeTo(parPacketBuffer);
 	}
 }

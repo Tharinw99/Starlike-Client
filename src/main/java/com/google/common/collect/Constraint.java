@@ -26,12 +26,13 @@ import com.google.common.annotations.GwtCompatible;
  * <pre>
  *    {@code
  *
- *   public Object checkElement(Object element) {
- *     if (element == null) {
- *       throw new NullPointerException();
- *     }
- *     return element;
- *   }}
+ * public Object checkElement(Object element) {
+ * 	if (element == null) {
+ * 		throw new NullPointerException();
+ * 	}
+ * 	return element;
+ * }
+ * }
  * </pre>
  *
  * <p>

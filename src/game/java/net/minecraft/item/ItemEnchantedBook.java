@@ -1,8 +1,8 @@
 package net.minecraft.item;
 
 import java.util.List;
-import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 
+import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -12,73 +12,32 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.WeightedRandomChestContent;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class ItemEnchantedBook extends Item {
-	public boolean hasEffect(ItemStack var1) {
-		return true;
-	}
-
-	/**+
-	 * Checks isDamagable and if it cannot be stacked
-	 */
-	public boolean isItemTool(ItemStack var1) {
-		return false;
-	}
-
-	/**+
-	 * Return an item rarity from EnumRarity
-	 */
-	public EnumRarity getRarity(ItemStack itemstack) {
-		return this.getEnchantments(itemstack).tagCount() > 0 ? EnumRarity.UNCOMMON : super.getRarity(itemstack);
-	}
-
-	public NBTTagList getEnchantments(ItemStack stack) {
-		NBTTagCompound nbttagcompound = stack.getTagCompound();
-		return nbttagcompound != null && nbttagcompound.hasKey("StoredEnchantments", 9)
-				? (NBTTagList) nbttagcompound.getTag("StoredEnchantments")
-				: new NBTTagList();
-	}
-
-	/**+
-	 * allows items to add custom lines of information to the
-	 * mouseover description
-	 */
-	public void addInformation(ItemStack itemstack, EntityPlayer entityplayer, List<String> list, boolean flag) {
-		super.addInformation(itemstack, entityplayer, list, flag);
-		NBTTagList nbttaglist = this.getEnchantments(itemstack);
-		if (nbttaglist != null) {
-			for (int i = 0; i < nbttaglist.tagCount(); ++i) {
-				short short1 = nbttaglist.getCompoundTagAt(i).getShort("id");
-				short short2 = nbttaglist.getCompoundTagAt(i).getShort("lvl");
-				if (Enchantment.getEnchantmentById(short1) != null) {
-					list.add(Enchantment.getEnchantmentById(short1).getTranslatedName(short2));
-				}
-			}
-		}
-
-	}
-
-	/**+
-	 * Adds an stored enchantment to an enchanted book ItemStack
+	/**
+	 * + Adds an stored enchantment to an enchanted book ItemStack
 	 */
 	public void addEnchantment(ItemStack stack, EnchantmentData enchantment) {
 		NBTTagList nbttaglist = this.getEnchantments(stack);
@@ -110,13 +69,23 @@ public class ItemEnchantedBook extends Item {
 		stack.getTagCompound().setTag("StoredEnchantments", nbttaglist);
 	}
 
-	/**+
-	 * Returns the ItemStack of an enchanted version of this item.
+	/**
+	 * + allows items to add custom lines of information to the mouseover
+	 * description
 	 */
-	public ItemStack getEnchantedItemStack(EnchantmentData data) {
-		ItemStack itemstack = new ItemStack(this);
-		this.addEnchantment(itemstack, data);
-		return itemstack;
+	public void addInformation(ItemStack itemstack, EntityPlayer entityplayer, List<String> list, boolean flag) {
+		super.addInformation(itemstack, entityplayer, list, flag);
+		NBTTagList nbttaglist = this.getEnchantments(itemstack);
+		if (nbttaglist != null) {
+			for (int i = 0; i < nbttaglist.tagCount(); ++i) {
+				short short1 = nbttaglist.getCompoundTagAt(i).getShort("id");
+				short short2 = nbttaglist.getCompoundTagAt(i).getShort("lvl");
+				if (Enchantment.getEnchantmentById(short1) != null) {
+					list.add(Enchantment.getEnchantmentById(short1).getTranslatedName(short2));
+				}
+			}
+		}
+
 	}
 
 	public void getAll(Enchantment enchantment, List<ItemStack> list) {
@@ -124,6 +93,22 @@ public class ItemEnchantedBook extends Item {
 			list.add(this.getEnchantedItemStack(new EnchantmentData(enchantment, i)));
 		}
 
+	}
+
+	/**
+	 * + Returns the ItemStack of an enchanted version of this item.
+	 */
+	public ItemStack getEnchantedItemStack(EnchantmentData data) {
+		ItemStack itemstack = new ItemStack(this);
+		this.addEnchantment(itemstack, data);
+		return itemstack;
+	}
+
+	public NBTTagList getEnchantments(ItemStack stack) {
+		NBTTagCompound nbttagcompound = stack.getTagCompound();
+		return nbttagcompound != null && nbttagcompound.hasKey("StoredEnchantments", 9)
+				? (NBTTagList) nbttagcompound.getTag("StoredEnchantments")
+				: new NBTTagList();
 	}
 
 	public WeightedRandomChestContent getRandom(EaglercraftRandom rand) {
@@ -134,5 +119,23 @@ public class ItemEnchantedBook extends Item {
 		ItemStack itemstack = new ItemStack(Items.book, 1, 0);
 		EnchantmentHelper.addRandomEnchantment(rand, itemstack, 30);
 		return new WeightedRandomChestContent(itemstack, minChance, maxChance, weight);
+	}
+
+	/**
+	 * + Return an item rarity from EnumRarity
+	 */
+	public EnumRarity getRarity(ItemStack itemstack) {
+		return this.getEnchantments(itemstack).tagCount() > 0 ? EnumRarity.UNCOMMON : super.getRarity(itemstack);
+	}
+
+	public boolean hasEffect(ItemStack var1) {
+		return true;
+	}
+
+	/**
+	 * + Checks isDamagable and if it cannot be stacked
+	 */
+	public boolean isItemTool(ItemStack var1) {
+		return false;
 	}
 }

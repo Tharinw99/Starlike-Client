@@ -2,22 +2,25 @@ package net.minecraft.entity;
 
 import net.minecraft.util.MathHelper;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -31,8 +34,25 @@ public class EntityBodyHelper {
 		this.theLiving = parEntityLivingBase;
 	}
 
-	/**+
-	 * Update the Head and Body rendenring angles
+	/**
+	 * + Return the new angle2 such that the difference between angle1 and angle2 is
+	 * lower than angleMax. Args : angle1, angle2, angleMax
+	 */
+	private float computeAngleWithBound(float parFloat1, float parFloat2, float parFloat3) {
+		float f = MathHelper.wrapAngleTo180_float(parFloat1 - parFloat2);
+		if (f < -parFloat3) {
+			f = -parFloat3;
+		}
+
+		if (f >= parFloat3) {
+			f = parFloat3;
+		}
+
+		return parFloat1 - f;
+	}
+
+	/**
+	 * + Update the Head and Body rendenring angles
 	 */
 	public void updateRenderAngles() {
 		double d0 = this.theLiving.posX - this.theLiving.prevPosX;
@@ -59,23 +79,5 @@ public class EntityBodyHelper {
 			this.theLiving.renderYawOffset = this.computeAngleWithBound(this.theLiving.rotationYawHead,
 					this.theLiving.renderYawOffset, f);
 		}
-	}
-
-	/**+
-	 * Return the new angle2 such that the difference between angle1
-	 * and angle2 is lower than angleMax. Args : angle1, angle2,
-	 * angleMax
-	 */
-	private float computeAngleWithBound(float parFloat1, float parFloat2, float parFloat3) {
-		float f = MathHelper.wrapAngleTo180_float(parFloat1 - parFloat2);
-		if (f < -parFloat3) {
-			f = -parFloat3;
-		}
-
-		if (f >= parFloat3) {
-			f = parFloat3;
-		}
-
-		return parFloat1 - f;
 	}
 }

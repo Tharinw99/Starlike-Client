@@ -1,7 +1,14 @@
 package net.minecraft.client.renderer.entity.layers;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_EQUAL;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_LEQUAL;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_MODELVIEW;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ONE;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_SRC_COLOR;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ZERO;
 
+import java.io.IOException;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
@@ -12,6 +19,7 @@ import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.DeferredStateManager;
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.EaglerDeferredPipeline;
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.ShadersRenderPassFuture;
 import net.lax1dude.eaglercraft.v1_8.vector.Matrix4f;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
@@ -20,22 +28,25 @@ import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -43,6 +54,7 @@ import net.minecraft.util.ResourceLocation;
 public abstract class LayerArmorBase<T extends ModelBase> implements LayerRenderer<EntityLivingBase> {
 	protected static final ResourceLocation ENCHANTED_ITEM_GLINT_RES = new ResourceLocation(
 			"textures/misc/enchanted_item_glint.png");
+	private static final Map<String, ResourceLocation> ARMOR_TEXTURE_RES_MAP = Maps.newHashMap();
 	protected T field_177189_c;
 	protected T field_177186_d;
 	private final RendererLivingEntity<?> renderer;
@@ -51,7 +63,6 @@ public abstract class LayerArmorBase<T extends ModelBase> implements LayerRender
 	private float colorG = 1.0F;
 	private float colorB = 1.0F;
 	private boolean field_177193_i;
-	private static final Map<String, ResourceLocation> ARMOR_TEXTURE_RES_MAP = Maps.newHashMap();
 
 	public LayerArmorBase(RendererLivingEntity<?> rendererIn) {
 		this.renderer = rendererIn;
@@ -70,8 +81,92 @@ public abstract class LayerArmorBase<T extends ModelBase> implements LayerRender
 				1);
 	}
 
-	public boolean shouldCombineTextures() {
-		return false;
+	public T func_177175_a(int parInt1) {
+		return (T) (this.isSlotForLeggings(parInt1) ? this.field_177189_c : this.field_177186_d);
+	}
+
+	protected abstract void func_177179_a(T var1, int var2);
+
+	private void func_177183_a(EntityLivingBase entitylivingbaseIn, T modelbaseIn, float parFloat1, float parFloat2,
+			float parFloat3, float parFloat4, float parFloat5, float parFloat6, float parFloat7) {
+		float f = (float) entitylivingbaseIn.ticksExisted + parFloat3;
+		this.renderer.bindTexture(ENCHANTED_ITEM_GLINT_RES);
+		GlStateManager.enableBlend();
+		GlStateManager.depthFunc(GL_EQUAL);
+		GlStateManager.depthMask(false);
+		float f1 = 0.5F;
+		boolean d = !DeferredStateManager.isInDeferredPass();
+		if (d) {
+			GlStateManager.color(f1, f1, f1, 1.0F);
+		}
+
+		for (int i = 0; i < 2; ++i) {
+			GlStateManager.disableLighting();
+			float f2 = 0.76F;
+			if (d) {
+				GlStateManager.blendFunc(GL_SRC_COLOR, GL_ONE);
+				GlStateManager.color(0.5F * f2, 0.25F * f2, 0.8F * f2, 1.0F);
+			}
+			GlStateManager.matrixMode(GL_TEXTURE);
+			GlStateManager.loadIdentity();
+			float f3 = 0.33333334F;
+			GlStateManager.scale(f3, f3, f3);
+			GlStateManager.rotate(30.0F - (float) i * 60.0F, 0.0F, 0.0F, 1.0F);
+			GlStateManager.translate(0.0F, f * (0.001F + (float) i * 0.003F) * 20.0F, 0.0F);
+			GlStateManager.matrixMode(GL_MODELVIEW);
+			modelbaseIn.render(entitylivingbaseIn, parFloat1, parFloat2, parFloat4, parFloat5, parFloat6, parFloat7);
+		}
+
+		GlStateManager.matrixMode(GL_TEXTURE);
+		GlStateManager.loadIdentity();
+		GlStateManager.matrixMode(GL_MODELVIEW);
+		GlStateManager.enableLighting();
+		GlStateManager.depthMask(true);
+		GlStateManager.depthFunc(GL_LEQUAL);
+		GlStateManager.disableBlend();
+	}
+
+	private ResourceLocation getArmorResource(ItemArmor parItemArmor, boolean parFlag) {
+		return this.getArmorResource(parItemArmor, parFlag, (String) null);
+	}
+
+	private ResourceLocation getArmorResource(ItemArmor parItemArmor, boolean parFlag, String parString1) {
+		String s1 = HString.format("textures/models/armor/%s_layer_%d%s.png",
+				new Object[] { parItemArmor.getArmorMaterial().getName(), Integer.valueOf(parFlag ? 2 : 1),
+						parString1 == null ? "" : HString.format("_%s", new Object[] { parString1 }) });
+		String s2 = HString.format("starlike:textures/models/armor/%s_layer_%d%s.png",
+				new Object[] { parItemArmor.getArmorMaterial().getName(), Integer.valueOf(parFlag ? 2 : 1),
+						parString1 == null ? "" : HString.format("_%s", new Object[] { parString1 }) });
+		ResourceLocation resourcelocation1 = (ResourceLocation) ARMOR_TEXTURE_RES_MAP.get(s1);
+		ResourceLocation resourcelocation2 = (ResourceLocation) ARMOR_TEXTURE_RES_MAP.get(s2);
+		if (resourcelocation1 != null) {
+			return resourcelocation1;
+		} else if (resourcelocation2 != null) {
+			return resourcelocation2;
+		} else {
+			resourcelocation1 = new ResourceLocation(s1);
+			resourcelocation2 = new ResourceLocation(s2);
+			if (resourceExists(resourcelocation1)) {
+				ARMOR_TEXTURE_RES_MAP.put(s1, resourcelocation1);
+				return resourcelocation1;
+			} else if (resourceExists(resourcelocation2)) {
+				ARMOR_TEXTURE_RES_MAP.put(s2, resourcelocation2);
+				return resourcelocation2;
+			} else {
+				ARMOR_TEXTURE_RES_MAP.put(s1, resourcelocation1);
+				return resourcelocation1;
+			}
+		}
+	}
+
+	public ItemStack getCurrentArmor(EntityLivingBase entitylivingbaseIn, int armorSlot) {
+		return entitylivingbaseIn.getCurrentArmor(armorSlot - 1);
+	}
+
+	protected abstract void initArmor();
+
+	private boolean isSlotForLeggings(int armorSlot) {
+		return armorSlot == 2;
 	}
 
 	private void renderLayer(EntityLivingBase entitylivingbaseIn, float armorSlot, float parFloat2, float parFloat3,
@@ -100,6 +195,10 @@ public abstract class LayerArmorBase<T extends ModelBase> implements LayerRender
 				DeferredStateManager.setRoughnessConstant(0.078f);
 				DeferredStateManager.setMetalnessConstant(0.588f);
 				break;
+			case PLATINUM:
+				DeferredStateManager.setRoughnessConstant(0.129f);
+				DeferredStateManager.setMetalnessConstant(0.913f);
+				break;
 			default:
 				break;
 			}
@@ -116,6 +215,7 @@ public abstract class LayerArmorBase<T extends ModelBase> implements LayerRender
 			case IRON:
 			case GOLD:
 			case DIAMOND:
+			case PLATINUM:
 				GlStateManager.color(this.colorR, this.colorG, this.colorB, this.alpha);
 				modelbase.render(entitylivingbaseIn, armorSlot, parFloat2, parFloat4, parFloat5, parFloat6, parFloat7);
 				DeferredStateManager.setDefaultMaterialConstants();
@@ -167,75 +267,16 @@ public abstract class LayerArmorBase<T extends ModelBase> implements LayerRender
 		}
 	}
 
-	public ItemStack getCurrentArmor(EntityLivingBase entitylivingbaseIn, int armorSlot) {
-		return entitylivingbaseIn.getCurrentArmor(armorSlot - 1);
-	}
-
-	public T func_177175_a(int parInt1) {
-		return (T) (this.isSlotForLeggings(parInt1) ? this.field_177189_c : this.field_177186_d);
-	}
-
-	private boolean isSlotForLeggings(int armorSlot) {
-		return armorSlot == 2;
-	}
-
-	private void func_177183_a(EntityLivingBase entitylivingbaseIn, T modelbaseIn, float parFloat1, float parFloat2,
-			float parFloat3, float parFloat4, float parFloat5, float parFloat6, float parFloat7) {
-		float f = (float) entitylivingbaseIn.ticksExisted + parFloat3;
-		this.renderer.bindTexture(ENCHANTED_ITEM_GLINT_RES);
-		GlStateManager.enableBlend();
-		GlStateManager.depthFunc(GL_EQUAL);
-		GlStateManager.depthMask(false);
-		float f1 = 0.5F;
-		boolean d = !DeferredStateManager.isInDeferredPass();
-		if (d) {
-			GlStateManager.color(f1, f1, f1, 1.0F);
+	private boolean resourceExists(ResourceLocation resourcelocation) {
+		try {
+			Minecraft.getMinecraft().getResourceManager().getResource(resourcelocation);
+			return true;
+		} catch (IOException e) {
+			return false;
 		}
-
-		for (int i = 0; i < 2; ++i) {
-			GlStateManager.disableLighting();
-			float f2 = 0.76F;
-			if (d) {
-				GlStateManager.blendFunc(GL_SRC_COLOR, GL_ONE);
-				GlStateManager.color(0.5F * f2, 0.25F * f2, 0.8F * f2, 1.0F);
-			}
-			GlStateManager.matrixMode(GL_TEXTURE);
-			GlStateManager.loadIdentity();
-			float f3 = 0.33333334F;
-			GlStateManager.scale(f3, f3, f3);
-			GlStateManager.rotate(30.0F - (float) i * 60.0F, 0.0F, 0.0F, 1.0F);
-			GlStateManager.translate(0.0F, f * (0.001F + (float) i * 0.003F) * 20.0F, 0.0F);
-			GlStateManager.matrixMode(GL_MODELVIEW);
-			modelbaseIn.render(entitylivingbaseIn, parFloat1, parFloat2, parFloat4, parFloat5, parFloat6, parFloat7);
-		}
-
-		GlStateManager.matrixMode(GL_TEXTURE);
-		GlStateManager.loadIdentity();
-		GlStateManager.matrixMode(GL_MODELVIEW);
-		GlStateManager.enableLighting();
-		GlStateManager.depthMask(true);
-		GlStateManager.depthFunc(GL_LEQUAL);
-		GlStateManager.disableBlend();
 	}
 
-	private ResourceLocation getArmorResource(ItemArmor parItemArmor, boolean parFlag) {
-		return this.getArmorResource(parItemArmor, parFlag, (String) null);
+	public boolean shouldCombineTextures() {
+		return false;
 	}
-
-	private ResourceLocation getArmorResource(ItemArmor parItemArmor, boolean parFlag, String parString1) {
-		String s = HString.format("textures/models/armor/%s_layer_%d%s.png",
-				new Object[] { parItemArmor.getArmorMaterial().getName(), Integer.valueOf(parFlag ? 2 : 1),
-						parString1 == null ? "" : HString.format("_%s", new Object[] { parString1 }) });
-		ResourceLocation resourcelocation = (ResourceLocation) ARMOR_TEXTURE_RES_MAP.get(s);
-		if (resourcelocation == null) {
-			resourcelocation = new ResourceLocation(s);
-			ARMOR_TEXTURE_RES_MAP.put(s, resourcelocation);
-		}
-
-		return resourcelocation;
-	}
-
-	protected abstract void initArmor();
-
-	protected abstract void func_177179_a(T var1, int var2);
 }

@@ -31,41 +31,8 @@ import com.google.common.base.CharMatcher.FastMatcher;
 @GwtIncompatible("no precomputation is done in GWT")
 final class SmallCharMatcher extends FastMatcher {
 	static final int MAX_SIZE = 1023;
-	private final char[] table;
-	private final boolean containsZero;
-	private final long filter;
-
-	private SmallCharMatcher(char[] table, long filter, boolean containsZero, String description) {
-		super(description);
-		this.table = table;
-		this.filter = filter;
-		this.containsZero = containsZero;
-	}
-
 	private static final int C1 = 0xcc9e2d51;
 	private static final int C2 = 0x1b873593;
-
-	/*
-	 * This method was rewritten in Java from an intermediate step of the Murmur
-	 * hash function in
-	 * http://code.google.com/p/smhasher/source/browse/trunk/MurmurHash3.cpp, which
-	 * contained the following header:
-	 *
-	 * MurmurHash3 was written by Austin Appleby, and is placed in the public
-	 * domain. The author hereby disclaims copyright to this source code.
-	 */
-	static int smear(int hashCode) {
-		return C2 * Integer.rotateLeft(hashCode * C1, 15);
-	}
-
-	private boolean checkFilter(int c) {
-		return 1 == (1 & (filter >> c));
-	}
-
-	// This is all essentially copied from ImmutableSet, but we have to duplicate
-	// because
-	// of dependencies.
-
 	// Represents how tightly we can pack things, as a maximum.
 	private static final double DESIRED_LOAD_FACTOR = 0.5;
 
@@ -112,6 +79,40 @@ final class SmallCharMatcher extends FastMatcher {
 			}
 		}
 		return new SmallCharMatcher(table, filter, containsZero, description);
+	}
+
+	/*
+	 * This method was rewritten in Java from an intermediate step of the Murmur
+	 * hash function in
+	 * http://code.google.com/p/smhasher/source/browse/trunk/MurmurHash3.cpp, which
+	 * contained the following header:
+	 *
+	 * MurmurHash3 was written by Austin Appleby, and is placed in the public
+	 * domain. The author hereby disclaims copyright to this source code.
+	 */
+	static int smear(int hashCode) {
+		return C2 * Integer.rotateLeft(hashCode * C1, 15);
+	}
+
+	private final char[] table;
+
+	private final boolean containsZero;
+
+	// This is all essentially copied from ImmutableSet, but we have to duplicate
+	// because
+	// of dependencies.
+
+	private final long filter;
+
+	private SmallCharMatcher(char[] table, long filter, boolean containsZero, String description) {
+		super(description);
+		this.table = table;
+		this.filter = filter;
+		this.containsZero = containsZero;
+	}
+
+	private boolean checkFilter(int c) {
+		return 1 == (1 & (filter >> c));
 	}
 
 	@Override

@@ -33,6 +33,9 @@ import com.google.common.annotations.Beta;
 @Beta
 public interface LineProcessor<T> {
 
+	/** Return the result of processing all the lines. */
+	T getResult();
+
 	/**
 	 * This method will be called once for each line.
 	 *
@@ -40,7 +43,4 @@ public interface LineProcessor<T> {
 	 * @return true to continue processing, false to stop
 	 */
 	boolean processLine(String line) throws IOException;
-
-	/** Return the result of processing all the lines. */
-	T getResult();
 }

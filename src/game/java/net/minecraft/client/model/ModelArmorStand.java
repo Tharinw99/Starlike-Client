@@ -4,22 +4,25 @@ import net.lax1dude.eaglercraft.v1_8.opengl.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityArmorStand;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -71,12 +74,47 @@ public class ModelArmorStand extends ModelArmorStandArmor {
 		this.standBase.setRotationPoint(0.0F, 12.0F, 0.0F);
 	}
 
-	/**+
-	 * Sets the model's various rotation angles. For bipeds, par1
-	 * and par2 are used for animating the movement of arms and
-	 * legs, where par1 represents the time(so that arms and legs
-	 * swing back and forth) and par2 represents how "far" arms and
-	 * legs can swing at most.
+	public void postRenderArm(float scale) {
+		boolean flag = this.bipedRightArm.showModel;
+		this.bipedRightArm.showModel = true;
+		super.postRenderArm(scale);
+		this.bipedRightArm.showModel = flag;
+	}
+
+	/**
+	 * + Sets the models various rotation angles then renders the model.
+	 */
+	public void render(Entity entityIn, float scale, float parFloat2, float parFloat3, float parFloat4, float parFloat5,
+			float parFloat6) {
+		super.render(entityIn, scale, parFloat2, parFloat3, parFloat4, parFloat5, parFloat6);
+		GlStateManager.pushMatrix();
+		if (this.isChild) {
+			float f = 2.0F;
+			GlStateManager.scale(1.0F / f, 1.0F / f, 1.0F / f);
+			GlStateManager.translate(0.0F, 24.0F * parFloat6, 0.0F);
+			this.standRightSide.render(parFloat6);
+			this.standLeftSide.render(parFloat6);
+			this.standWaist.render(parFloat6);
+			this.standBase.render(parFloat6);
+		} else {
+			if (entityIn.isSneaking()) {
+				GlStateManager.translate(0.0F, 0.2F, 0.0F);
+			}
+
+			this.standRightSide.render(parFloat6);
+			this.standLeftSide.render(parFloat6);
+			this.standWaist.render(parFloat6);
+			this.standBase.render(parFloat6);
+		}
+
+		GlStateManager.popMatrix();
+	}
+
+	/**
+	 * + Sets the model's various rotation angles. For bipeds, par1 and par2 are
+	 * used for animating the movement of arms and legs, where par1 represents the
+	 * time(so that arms and legs swing back and forth) and par2 represents how
+	 * "far" arms and legs can swing at most.
 	 */
 	public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5, Entity entity) {
 		super.setRotationAngles(f, f1, f2, f3, f4, f5, entity);
@@ -106,42 +144,5 @@ public class ModelArmorStand extends ModelArmorStandArmor {
 			this.standBase.rotateAngleY = 0.017453292F * -entity.rotationYaw;
 			this.standBase.rotateAngleZ = 0.0F;
 		}
-	}
-
-	/**+
-	 * Sets the models various rotation angles then renders the
-	 * model.
-	 */
-	public void render(Entity entityIn, float scale, float parFloat2, float parFloat3, float parFloat4, float parFloat5,
-			float parFloat6) {
-		super.render(entityIn, scale, parFloat2, parFloat3, parFloat4, parFloat5, parFloat6);
-		GlStateManager.pushMatrix();
-		if (this.isChild) {
-			float f = 2.0F;
-			GlStateManager.scale(1.0F / f, 1.0F / f, 1.0F / f);
-			GlStateManager.translate(0.0F, 24.0F * parFloat6, 0.0F);
-			this.standRightSide.render(parFloat6);
-			this.standLeftSide.render(parFloat6);
-			this.standWaist.render(parFloat6);
-			this.standBase.render(parFloat6);
-		} else {
-			if (entityIn.isSneaking()) {
-				GlStateManager.translate(0.0F, 0.2F, 0.0F);
-			}
-
-			this.standRightSide.render(parFloat6);
-			this.standLeftSide.render(parFloat6);
-			this.standWaist.render(parFloat6);
-			this.standBase.render(parFloat6);
-		}
-
-		GlStateManager.popMatrix();
-	}
-
-	public void postRenderArm(float scale) {
-		boolean flag = this.bipedRightArm.showModel;
-		this.bipedRightArm.showModel = true;
-		super.postRenderArm(scale);
-		this.bipedRightArm.showModel = flag;
 	}
 }

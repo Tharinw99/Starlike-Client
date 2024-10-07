@@ -7,22 +7,25 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -34,19 +37,6 @@ public class EntityFireworkRocket extends Entity {
 	public EntityFireworkRocket(World worldIn) {
 		super(worldIn);
 		this.setSize(0.25F, 0.25F);
-	}
-
-	protected void entityInit() {
-		this.dataWatcher.addObjectByDataType(8, 5);
-	}
-
-	/**+
-	 * Checks if the entity is in range to render by using the past
-	 * in distance and comparing it to its average edge length * 64
-	 * * renderDistanceWeight Args: distance
-	 */
-	public boolean isInRangeToRenderDist(double d0) {
-		return d0 < 4096.0D;
 	}
 
 	public EntityFireworkRocket(World worldIn, double x, double y, double z, ItemStack givenItem) {
@@ -70,25 +60,58 @@ public class EntityFireworkRocket extends Entity {
 		this.lifetime = 10 * i + this.rand.nextInt(6) + this.rand.nextInt(7);
 	}
 
-	/**+
-	 * Sets the velocity to the args. Args: x, y, z
+	/**
+	 * + If returns false, the item will not inflict any damage against entities.
 	 */
-	public void setVelocity(double d0, double d1, double d2) {
-		this.motionX = d0;
-		this.motionY = d1;
-		this.motionZ = d2;
-		if (this.prevRotationPitch == 0.0F && this.prevRotationYaw == 0.0F) {
-			float f = MathHelper.sqrt_double(d0 * d0 + d2 * d2);
-			this.prevRotationYaw = this.rotationYaw = (float) (MathHelper.func_181159_b(d0, d2) * 180.0D
-					/ 3.1415927410125732D);
-			this.prevRotationPitch = this.rotationPitch = (float) (MathHelper.func_181159_b(d1, (double) f) * 180.0D
-					/ 3.1415927410125732D);
-		}
-
+	public boolean canAttackWithItem() {
+		return false;
 	}
 
-	/**+
-	 * Called to update the entity's position/logic.
+	protected void entityInit() {
+		this.dataWatcher.addObjectByDataType(8, 5);
+	}
+
+	/**
+	 * + Gets how bright this entity is.
+	 */
+	public float getBrightness(float f) {
+		return super.getBrightness(f);
+	}
+
+	public int getBrightnessForRender(float f) {
+		return super.getBrightnessForRender(f);
+	}
+
+	protected float getEaglerDynamicLightsValueSimple(float partialTicks) {
+		return 1.0f;
+	}
+
+	public void handleStatusUpdate(byte b0) {
+		if (b0 == 17 && this.worldObj.isRemote) {
+			ItemStack itemstack = this.dataWatcher.getWatchableObjectItemStack(8);
+			NBTTagCompound nbttagcompound = null;
+			if (itemstack != null && itemstack.hasTagCompound()) {
+				nbttagcompound = itemstack.getTagCompound().getCompoundTag("Fireworks");
+			}
+
+			this.worldObj.makeFireworks(this.posX, this.posY, this.posZ, this.motionX, this.motionY, this.motionZ,
+					nbttagcompound);
+		}
+
+		super.handleStatusUpdate(b0);
+	}
+
+	/**
+	 * + Checks if the entity is in range to render by using the past in distance
+	 * and comparing it to its average edge length * 64 * renderDistanceWeight Args:
+	 * distance
+	 */
+	public boolean isInRangeToRenderDist(double d0) {
+		return d0 < 4096.0D;
+	}
+
+	/**
+	 * + Called to update the entity's position/logic.
 	 */
 	public void onUpdate() {
 		this.lastTickPosX = this.posX;
@@ -141,40 +164,8 @@ public class EntityFireworkRocket extends Entity {
 
 	}
 
-	public void handleStatusUpdate(byte b0) {
-		if (b0 == 17 && this.worldObj.isRemote) {
-			ItemStack itemstack = this.dataWatcher.getWatchableObjectItemStack(8);
-			NBTTagCompound nbttagcompound = null;
-			if (itemstack != null && itemstack.hasTagCompound()) {
-				nbttagcompound = itemstack.getTagCompound().getCompoundTag("Fireworks");
-			}
-
-			this.worldObj.makeFireworks(this.posX, this.posY, this.posZ, this.motionX, this.motionY, this.motionZ,
-					nbttagcompound);
-		}
-
-		super.handleStatusUpdate(b0);
-	}
-
-	/**+
-	 * (abstract) Protected helper method to write subclass entity
-	 * data to NBT.
-	 */
-	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
-		nbttagcompound.setInteger("Life", this.fireworkAge);
-		nbttagcompound.setInteger("LifeTime", this.lifetime);
-		ItemStack itemstack = this.dataWatcher.getWatchableObjectItemStack(8);
-		if (itemstack != null) {
-			NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-			itemstack.writeToNBT(nbttagcompound1);
-			nbttagcompound.setTag("FireworksItem", nbttagcompound1);
-		}
-
-	}
-
-	/**+
-	 * (abstract) Protected helper method to read subclass entity
-	 * data from NBT.
+	/**
+	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		this.fireworkAge = nbttagcompound.getInteger("Life");
@@ -189,26 +180,35 @@ public class EntityFireworkRocket extends Entity {
 
 	}
 
-	/**+
-	 * Gets how bright this entity is.
+	/**
+	 * + Sets the velocity to the args. Args: x, y, z
 	 */
-	public float getBrightness(float f) {
-		return super.getBrightness(f);
+	public void setVelocity(double d0, double d1, double d2) {
+		this.motionX = d0;
+		this.motionY = d1;
+		this.motionZ = d2;
+		if (this.prevRotationPitch == 0.0F && this.prevRotationYaw == 0.0F) {
+			float f = MathHelper.sqrt_double(d0 * d0 + d2 * d2);
+			this.prevRotationYaw = this.rotationYaw = (float) (MathHelper.func_181159_b(d0, d2) * 180.0D
+					/ 3.1415927410125732D);
+			this.prevRotationPitch = this.rotationPitch = (float) (MathHelper.func_181159_b(d1, (double) f) * 180.0D
+					/ 3.1415927410125732D);
+		}
+
 	}
 
-	protected float getEaglerDynamicLightsValueSimple(float partialTicks) {
-		return 1.0f;
-	}
-
-	public int getBrightnessForRender(float f) {
-		return super.getBrightnessForRender(f);
-	}
-
-	/**+
-	 * If returns false, the item will not inflict any damage
-	 * against entities.
+	/**
+	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
-	public boolean canAttackWithItem() {
-		return false;
+	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
+		nbttagcompound.setInteger("Life", this.fireworkAge);
+		nbttagcompound.setInteger("LifeTime", this.lifetime);
+		ItemStack itemstack = this.dataWatcher.getWatchableObjectItemStack(8);
+		if (itemstack != null) {
+			NBTTagCompound nbttagcompound1 = new NBTTagCompound();
+			itemstack.writeToNBT(nbttagcompound1);
+			nbttagcompound.setTag("FireworksItem", nbttagcompound1);
+		}
+
 	}
 }

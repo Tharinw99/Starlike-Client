@@ -55,18 +55,37 @@ import com.google.common.annotations.GwtCompatible;
 @Beta
 @GwtCompatible
 public final class UnsignedLongs {
-	private UnsignedLongs() {
+	enum LexicographicalComparator implements Comparator<long[]> {
+		INSTANCE;
+
+		@Override
+		public int compare(long[] left, long[] right) {
+			int minLength = Math.min(left.length, right.length);
+			for (int i = 0; i < minLength; i++) {
+				if (left[i] != right[i]) {
+					return UnsignedLongs.compare(left[i], right[i]);
+				}
+			}
+			return left.length - right.length;
+		}
 	}
 
 	public static final long MAX_VALUE = -1L; // Equivalent to 2^64 - 1
 
-	/**
-	 * A (self-inverse) bijection which converts the ordering on unsigned longs to
-	 * the ordering on longs, that is, {@code a <= b} as unsigned longs if and only
-	 * if {@code flip(a) <= flip(b)} as signed longs.
-	 */
-	private static long flip(long a) {
-		return a ^ Long.MIN_VALUE;
+	// calculated as 0xffffffffffffffff / radix
+	private static final long[] maxValueDivs = new long[Character.MAX_RADIX + 1];
+
+	private static final int[] maxValueMods = new int[Character.MAX_RADIX + 1];
+
+	private static final int[] maxSafeDigits = new int[Character.MAX_RADIX + 1];
+
+	static {
+		BigInteger overflow = new BigInteger("10000000000000000", 16);
+		for (int i = Character.MIN_RADIX; i <= Character.MAX_RADIX; i++) {
+			maxValueDivs[i] = divide(MAX_VALUE, i);
+			maxValueMods[i] = (int) remainder(MAX_VALUE, i);
+			maxSafeDigits[i] = overflow.toString(i).length() - 1;
+		}
 	}
 
 	/**
@@ -84,45 +103,74 @@ public final class UnsignedLongs {
 	}
 
 	/**
-	 * Returns the least value present in {@code array}, treating values as
-	 * unsigned.
+	 * Returns the unsigned {@code long} value represented by the given string.
 	 *
-	 * @param array a <i>nonempty</i> array of unsigned {@code long} values
-	 * @return the value present in {@code array} that is less than or equal to
-	 *         every other value in the array according to {@link #compare}
-	 * @throws IllegalArgumentException if {@code array} is empty
+	 * Accepts a decimal, hexadecimal, or octal number given by specifying the
+	 * following prefix:
+	 *
+	 * <ul>
+	 * <li>{@code 0x}<i>HexDigits</i>
+	 * <li>{@code 0X}<i>HexDigits</i>
+	 * <li>{@code #}<i>HexDigits</i>
+	 * <li>{@code 0}<i>OctalDigits</i>
+	 * </ul>
+	 *
+	 * @throws NumberFormatException if the string does not contain a valid unsigned
+	 *                               {@code long} value
+	 * @since 13.0
 	 */
-	public static long min(long... array) {
-		checkArgument(array.length > 0);
-		long min = flip(array[0]);
-		for (int i = 1; i < array.length; i++) {
-			long next = flip(array[i]);
-			if (next < min) {
-				min = next;
-			}
+	public static long decode(String stringValue) {
+		ParseRequest request = ParseRequest.fromString(stringValue);
+
+		try {
+			return parseUnsignedLong(request.rawValue, request.radix);
+		} catch (NumberFormatException e) {
+			NumberFormatException decodeException = new NumberFormatException("Error parsing value: " + stringValue);
+			decodeException.initCause(e);
+			throw decodeException;
 		}
-		return flip(min);
 	}
 
 	/**
-	 * Returns the greatest value present in {@code array}, treating values as
-	 * unsigned.
+	 * Returns dividend / divisor, where the dividend and divisor are treated as
+	 * unsigned 64-bit quantities.
 	 *
-	 * @param array a <i>nonempty</i> array of unsigned {@code long} values
-	 * @return the value present in {@code array} that is greater than or equal to
-	 *         every other value in the array according to {@link #compare}
-	 * @throws IllegalArgumentException if {@code array} is empty
+	 * @param dividend the dividend (numerator)
+	 * @param divisor  the divisor (denominator)
+	 * @throws ArithmeticException if divisor is 0
 	 */
-	public static long max(long... array) {
-		checkArgument(array.length > 0);
-		long max = flip(array[0]);
-		for (int i = 1; i < array.length; i++) {
-			long next = flip(array[i]);
-			if (next > max) {
-				max = next;
+	public static long divide(long dividend, long divisor) {
+		if (divisor < 0) { // i.e., divisor >= 2^63:
+			if (compare(dividend, divisor) < 0) {
+				return 0; // dividend < divisor
+			} else {
+				return 1; // dividend >= divisor
 			}
 		}
-		return flip(max);
+
+		// Optimization - use signed division if dividend < 2^63
+		if (dividend >= 0) {
+			return dividend / divisor;
+		}
+
+		/*
+		 * Otherwise, approximate the quotient, check, and correct if necessary. Our
+		 * approximation is guaranteed to be either exact or one less than the correct
+		 * value. This follows from fact that floor(floor(x)/i) == floor(x/i) for any
+		 * real x and integer i != 0. The proof is not quite trivial.
+		 */
+		long quotient = ((dividend >>> 1) / divisor) << 1;
+		long rem = dividend - quotient * divisor;
+		return quotient + (compare(rem, divisor) >= 0 ? 1 : 0);
+	}
+
+	/**
+	 * A (self-inverse) bijection which converts the ordering on unsigned longs to
+	 * the ordering on longs, that is, {@code a <= b} as unsigned longs if and only
+	 * if {@code flip(a) <= flip(b)} as signed longs.
+	 */
+	private static long flip(long a) {
+		return a ^ Long.MIN_VALUE;
 	}
 
 	/**
@@ -169,86 +217,69 @@ public final class UnsignedLongs {
 		return LexicographicalComparator.INSTANCE;
 	}
 
-	enum LexicographicalComparator implements Comparator<long[]> {
-		INSTANCE;
-
-		@Override
-		public int compare(long[] left, long[] right) {
-			int minLength = Math.min(left.length, right.length);
-			for (int i = 0; i < minLength; i++) {
-				if (left[i] != right[i]) {
-					return UnsignedLongs.compare(left[i], right[i]);
-				}
+	/**
+	 * Returns the greatest value present in {@code array}, treating values as
+	 * unsigned.
+	 *
+	 * @param array a <i>nonempty</i> array of unsigned {@code long} values
+	 * @return the value present in {@code array} that is greater than or equal to
+	 *         every other value in the array according to {@link #compare}
+	 * @throws IllegalArgumentException if {@code array} is empty
+	 */
+	public static long max(long... array) {
+		checkArgument(array.length > 0);
+		long max = flip(array[0]);
+		for (int i = 1; i < array.length; i++) {
+			long next = flip(array[i]);
+			if (next > max) {
+				max = next;
 			}
-			return left.length - right.length;
 		}
+		return flip(max);
 	}
 
 	/**
-	 * Returns dividend / divisor, where the dividend and divisor are treated as
-	 * unsigned 64-bit quantities.
+	 * Returns the least value present in {@code array}, treating values as
+	 * unsigned.
 	 *
-	 * @param dividend the dividend (numerator)
-	 * @param divisor  the divisor (denominator)
-	 * @throws ArithmeticException if divisor is 0
+	 * @param array a <i>nonempty</i> array of unsigned {@code long} values
+	 * @return the value present in {@code array} that is less than or equal to
+	 *         every other value in the array according to {@link #compare}
+	 * @throws IllegalArgumentException if {@code array} is empty
 	 */
-	public static long divide(long dividend, long divisor) {
-		if (divisor < 0) { // i.e., divisor >= 2^63:
-			if (compare(dividend, divisor) < 0) {
-				return 0; // dividend < divisor
-			} else {
-				return 1; // dividend >= divisor
+	public static long min(long... array) {
+		checkArgument(array.length > 0);
+		long min = flip(array[0]);
+		for (int i = 1; i < array.length; i++) {
+			long next = flip(array[i]);
+			if (next < min) {
+				min = next;
 			}
 		}
-
-		// Optimization - use signed division if dividend < 2^63
-		if (dividend >= 0) {
-			return dividend / divisor;
-		}
-
-		/*
-		 * Otherwise, approximate the quotient, check, and correct if necessary. Our
-		 * approximation is guaranteed to be either exact or one less than the correct
-		 * value. This follows from fact that floor(floor(x)/i) == floor(x/i) for any
-		 * real x and integer i != 0. The proof is not quite trivial.
-		 */
-		long quotient = ((dividend >>> 1) / divisor) << 1;
-		long rem = dividend - quotient * divisor;
-		return quotient + (compare(rem, divisor) >= 0 ? 1 : 0);
+		return flip(min);
 	}
 
 	/**
-	 * Returns dividend % divisor, where the dividend and divisor are treated as
-	 * unsigned 64-bit quantities.
-	 *
-	 * @param dividend the dividend (numerator)
-	 * @param divisor  the divisor (denominator)
-	 * @throws ArithmeticException if divisor is 0
-	 * @since 11.0
+	 * Returns true if (current * radix) + digit is a number too large to be
+	 * represented by an unsigned long. This is useful for detecting overflow while
+	 * parsing a string representation of a number. Does not verify whether supplied
+	 * radix is valid, passing an invalid radix will give undefined results or an
+	 * ArrayIndexOutOfBoundsException.
 	 */
-	public static long remainder(long dividend, long divisor) {
-		if (divisor < 0) { // i.e., divisor >= 2^63:
-			if (compare(dividend, divisor) < 0) {
-				return dividend; // dividend < divisor
-			} else {
-				return dividend - divisor; // dividend >= divisor
+	private static boolean overflowInParse(long current, int digit, int radix) {
+		if (current >= 0) {
+			if (current < maxValueDivs[radix]) {
+				return false;
 			}
+			if (current > maxValueDivs[radix]) {
+				return true;
+			}
+			// current == maxValueDivs[radix]
+			return (digit > maxValueMods[radix]);
 		}
 
-		// Optimization - use signed modulus if dividend < 2^63
-		if (dividend >= 0) {
-			return dividend % divisor;
-		}
-
-		/*
-		 * Otherwise, approximate the quotient, check, and correct if necessary. Our
-		 * approximation is guaranteed to be either exact or one less than the correct
-		 * value. This follows from fact that floor(floor(x)/i) == floor(x/i) for any
-		 * real x and integer i != 0. The proof is not quite trivial.
-		 */
-		long quotient = ((dividend >>> 1) / divisor) << 1;
-		long rem = dividend - quotient * divisor;
-		return rem - (compare(rem, divisor) >= 0 ? divisor : 0);
+		// current < 0: high bit is set
+		return true;
 	}
 
 	/**
@@ -262,35 +293,6 @@ public final class UnsignedLongs {
 	 */
 	public static long parseUnsignedLong(String s) {
 		return parseUnsignedLong(s, 10);
-	}
-
-	/**
-	 * Returns the unsigned {@code long} value represented by the given string.
-	 *
-	 * Accepts a decimal, hexadecimal, or octal number given by specifying the
-	 * following prefix:
-	 *
-	 * <ul>
-	 * <li>{@code 0x}<i>HexDigits</i>
-	 * <li>{@code 0X}<i>HexDigits</i>
-	 * <li>{@code #}<i>HexDigits</i>
-	 * <li>{@code 0}<i>OctalDigits</i>
-	 * </ul>
-	 *
-	 * @throws NumberFormatException if the string does not contain a valid unsigned
-	 *                               {@code long} value
-	 * @since 13.0
-	 */
-	public static long decode(String stringValue) {
-		ParseRequest request = ParseRequest.fromString(stringValue);
-
-		try {
-			return parseUnsignedLong(request.rawValue, request.radix);
-		} catch (NumberFormatException e) {
-			NumberFormatException decodeException = new NumberFormatException("Error parsing value: " + stringValue);
-			decodeException.initCause(e);
-			throw decodeException;
-		}
 	}
 
 	/**
@@ -334,26 +336,37 @@ public final class UnsignedLongs {
 	}
 
 	/**
-	 * Returns true if (current * radix) + digit is a number too large to be
-	 * represented by an unsigned long. This is useful for detecting overflow while
-	 * parsing a string representation of a number. Does not verify whether supplied
-	 * radix is valid, passing an invalid radix will give undefined results or an
-	 * ArrayIndexOutOfBoundsException.
+	 * Returns dividend % divisor, where the dividend and divisor are treated as
+	 * unsigned 64-bit quantities.
+	 *
+	 * @param dividend the dividend (numerator)
+	 * @param divisor  the divisor (denominator)
+	 * @throws ArithmeticException if divisor is 0
+	 * @since 11.0
 	 */
-	private static boolean overflowInParse(long current, int digit, int radix) {
-		if (current >= 0) {
-			if (current < maxValueDivs[radix]) {
-				return false;
+	public static long remainder(long dividend, long divisor) {
+		if (divisor < 0) { // i.e., divisor >= 2^63:
+			if (compare(dividend, divisor) < 0) {
+				return dividend; // dividend < divisor
+			} else {
+				return dividend - divisor; // dividend >= divisor
 			}
-			if (current > maxValueDivs[radix]) {
-				return true;
-			}
-			// current == maxValueDivs[radix]
-			return (digit > maxValueMods[radix]);
 		}
 
-		// current < 0: high bit is set
-		return true;
+		// Optimization - use signed modulus if dividend < 2^63
+		if (dividend >= 0) {
+			return dividend % divisor;
+		}
+
+		/*
+		 * Otherwise, approximate the quotient, check, and correct if necessary. Our
+		 * approximation is guaranteed to be either exact or one less than the correct
+		 * value. This follows from fact that floor(floor(x)/i) == floor(x/i) for any
+		 * real x and integer i != 0. The proof is not quite trivial.
+		 */
+		long quotient = ((dividend >>> 1) / divisor) << 1;
+		long rem = dividend - quotient * divisor;
+		return rem - (compare(rem, divisor) >= 0 ? divisor : 0);
 	}
 
 	/**
@@ -400,16 +413,6 @@ public final class UnsignedLongs {
 		}
 	}
 
-	// calculated as 0xffffffffffffffff / radix
-	private static final long[] maxValueDivs = new long[Character.MAX_RADIX + 1];
-	private static final int[] maxValueMods = new int[Character.MAX_RADIX + 1];
-	private static final int[] maxSafeDigits = new int[Character.MAX_RADIX + 1];
-	static {
-		BigInteger overflow = new BigInteger("10000000000000000", 16);
-		for (int i = Character.MIN_RADIX; i <= Character.MAX_RADIX; i++) {
-			maxValueDivs[i] = divide(MAX_VALUE, i);
-			maxValueMods[i] = (int) remainder(MAX_VALUE, i);
-			maxSafeDigits[i] = overflow.toString(i).length() - 1;
-		}
+	private UnsignedLongs() {
 	}
 }

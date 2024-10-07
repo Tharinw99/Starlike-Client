@@ -10,34 +10,127 @@ import net.minecraft.util.IChatComponent;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class CommandResultStats {
 
-	/**+
-	 * The number of result command result types that are possible.
+	public static enum Type {
+		SUCCESS_COUNT(0, "SuccessCount"), AFFECTED_BLOCKS(1, "AffectedBlocks"),
+		AFFECTED_ENTITIES(2, "AffectedEntities"), AFFECTED_ITEMS(3, "AffectedItems"), QUERY_RESULT(4, "QueryResult");
+
+		public static final Type[] _VALUES = values();
+
+		public static CommandResultStats.Type getTypeByName(String name) {
+			CommandResultStats.Type[] types = _VALUES;
+			for (int i = 0; i < types.length; ++i) {
+				CommandResultStats.Type commandresultstats$type = types[i];
+				if (commandresultstats$type.getTypeName().equals(name)) {
+					return commandresultstats$type;
+				}
+			}
+
+			return null;
+		}
+
+		public static String[] getTypeNames() {
+			String[] astring = new String[_VALUES.length];
+			int i = 0;
+
+			CommandResultStats.Type[] types = _VALUES;
+			for (int j = 0; j < types.length; ++j) {
+				astring[i++] = types[j].getTypeName();
+			}
+
+			return astring;
+		}
+
+		final int typeID;
+
+		final String typeName;
+
+		private Type(int id, String name) {
+			this.typeID = id;
+			this.typeName = name;
+		}
+
+		public int getTypeID() {
+			return this.typeID;
+		}
+
+		public String getTypeName() {
+			return this.typeName;
+		}
+	}
+
+	/**
+	 * + The number of result command result types that are possible.
 	 */
 	private static final int NUM_RESULT_TYPES = CommandResultStats.Type._VALUES.length;
 	private static final String[] STRING_RESULT_TYPES = new String[NUM_RESULT_TYPES];
+
+	public static void func_179667_a(CommandResultStats stats, CommandResultStats.Type resultType, String parString1,
+			String parString2) {
+		if (parString1 != null && parString1.length() != 0 && parString2 != null && parString2.length() != 0) {
+			if (stats.field_179675_c == STRING_RESULT_TYPES || stats.field_179673_d == STRING_RESULT_TYPES) {
+				stats.field_179675_c = new String[NUM_RESULT_TYPES];
+				stats.field_179673_d = new String[NUM_RESULT_TYPES];
+			}
+
+			stats.field_179675_c[resultType.getTypeID()] = parString1;
+			stats.field_179673_d[resultType.getTypeID()] = parString2;
+		} else {
+			func_179669_a(stats, resultType);
+		}
+	}
+
+	private static void func_179669_a(CommandResultStats resultStatsIn, CommandResultStats.Type resultTypeIn) {
+		if (resultStatsIn.field_179675_c != STRING_RESULT_TYPES
+				&& resultStatsIn.field_179673_d != STRING_RESULT_TYPES) {
+			resultStatsIn.field_179675_c[resultTypeIn.getTypeID()] = null;
+			resultStatsIn.field_179673_d[resultTypeIn.getTypeID()] = null;
+			boolean flag = true;
+
+			CommandResultStats.Type[] types = CommandResultStats.Type.values();
+			for (int i = 0; i < types.length; ++i) {
+				CommandResultStats.Type commandresultstats$type = types[i];
+				if (resultStatsIn.field_179675_c[commandresultstats$type.getTypeID()] != null
+						&& resultStatsIn.field_179673_d[commandresultstats$type.getTypeID()] != null) {
+					flag = false;
+					break;
+				}
+			}
+
+			if (flag) {
+				resultStatsIn.field_179675_c = STRING_RESULT_TYPES;
+				resultStatsIn.field_179673_d = STRING_RESULT_TYPES;
+			}
+
+		}
+	}
+
 	private String[] field_179675_c;
+
 	private String[] field_179673_d;
 
 	public CommandResultStats() {
@@ -45,18 +138,21 @@ public class CommandResultStats {
 		this.field_179673_d = STRING_RESULT_TYPES;
 	}
 
+	public void func_179671_a(CommandResultStats resultStatsIn) {
+		CommandResultStats.Type[] types = CommandResultStats.Type.values();
+		for (int i = 0; i < types.length; ++i) {
+			CommandResultStats.Type commandresultstats$type = types[i];
+			func_179667_a(this, commandresultstats$type,
+					resultStatsIn.field_179675_c[commandresultstats$type.getTypeID()],
+					resultStatsIn.field_179673_d[commandresultstats$type.getTypeID()]);
+		}
+
+	}
+
 	public void func_179672_a(final ICommandSender sender, CommandResultStats.Type resultTypeIn, int parInt1) {
 		String s = this.field_179675_c[resultTypeIn.getTypeID()];
 		if (s != null) {
 			ICommandSender icommandsender = new ICommandSender() {
-				public String getName() {
-					return sender.getName();
-				}
-
-				public IChatComponent getDisplayName() {
-					return sender.getDisplayName();
-				}
-
 				public void addChatMessage(IChatComponent ichatcomponent) {
 					sender.addChatMessage(ichatcomponent);
 				}
@@ -65,20 +161,28 @@ public class CommandResultStats {
 					return true;
 				}
 
-				public BlockPos getPosition() {
-					return sender.getPosition();
+				public Entity getCommandSenderEntity() {
+					return sender.getCommandSenderEntity();
 				}
 
-				public Vec3 getPositionVector() {
-					return sender.getPositionVector();
+				public IChatComponent getDisplayName() {
+					return sender.getDisplayName();
 				}
 
 				public World getEntityWorld() {
 					return sender.getEntityWorld();
 				}
 
-				public Entity getCommandSenderEntity() {
-					return sender.getCommandSenderEntity();
+				public String getName() {
+					return sender.getName();
+				}
+
+				public BlockPos getPosition() {
+					return sender.getPosition();
+				}
+
+				public Vec3 getPositionVector() {
+					return sender.getPositionVector();
 				}
 
 				public boolean sendCommandFeedback() {
@@ -148,103 +252,5 @@ public class CommandResultStats {
 			tagcompound.setTag("CommandStats", nbttagcompound);
 		}
 
-	}
-
-	public static void func_179667_a(CommandResultStats stats, CommandResultStats.Type resultType, String parString1,
-			String parString2) {
-		if (parString1 != null && parString1.length() != 0 && parString2 != null && parString2.length() != 0) {
-			if (stats.field_179675_c == STRING_RESULT_TYPES || stats.field_179673_d == STRING_RESULT_TYPES) {
-				stats.field_179675_c = new String[NUM_RESULT_TYPES];
-				stats.field_179673_d = new String[NUM_RESULT_TYPES];
-			}
-
-			stats.field_179675_c[resultType.getTypeID()] = parString1;
-			stats.field_179673_d[resultType.getTypeID()] = parString2;
-		} else {
-			func_179669_a(stats, resultType);
-		}
-	}
-
-	private static void func_179669_a(CommandResultStats resultStatsIn, CommandResultStats.Type resultTypeIn) {
-		if (resultStatsIn.field_179675_c != STRING_RESULT_TYPES
-				&& resultStatsIn.field_179673_d != STRING_RESULT_TYPES) {
-			resultStatsIn.field_179675_c[resultTypeIn.getTypeID()] = null;
-			resultStatsIn.field_179673_d[resultTypeIn.getTypeID()] = null;
-			boolean flag = true;
-
-			CommandResultStats.Type[] types = CommandResultStats.Type.values();
-			for (int i = 0; i < types.length; ++i) {
-				CommandResultStats.Type commandresultstats$type = types[i];
-				if (resultStatsIn.field_179675_c[commandresultstats$type.getTypeID()] != null
-						&& resultStatsIn.field_179673_d[commandresultstats$type.getTypeID()] != null) {
-					flag = false;
-					break;
-				}
-			}
-
-			if (flag) {
-				resultStatsIn.field_179675_c = STRING_RESULT_TYPES;
-				resultStatsIn.field_179673_d = STRING_RESULT_TYPES;
-			}
-
-		}
-	}
-
-	public void func_179671_a(CommandResultStats resultStatsIn) {
-		CommandResultStats.Type[] types = CommandResultStats.Type.values();
-		for (int i = 0; i < types.length; ++i) {
-			CommandResultStats.Type commandresultstats$type = types[i];
-			func_179667_a(this, commandresultstats$type,
-					resultStatsIn.field_179675_c[commandresultstats$type.getTypeID()],
-					resultStatsIn.field_179673_d[commandresultstats$type.getTypeID()]);
-		}
-
-	}
-
-	public static enum Type {
-		SUCCESS_COUNT(0, "SuccessCount"), AFFECTED_BLOCKS(1, "AffectedBlocks"),
-		AFFECTED_ENTITIES(2, "AffectedEntities"), AFFECTED_ITEMS(3, "AffectedItems"), QUERY_RESULT(4, "QueryResult");
-
-		public static final Type[] _VALUES = values();
-
-		final int typeID;
-		final String typeName;
-
-		private Type(int id, String name) {
-			this.typeID = id;
-			this.typeName = name;
-		}
-
-		public int getTypeID() {
-			return this.typeID;
-		}
-
-		public String getTypeName() {
-			return this.typeName;
-		}
-
-		public static String[] getTypeNames() {
-			String[] astring = new String[_VALUES.length];
-			int i = 0;
-
-			CommandResultStats.Type[] types = _VALUES;
-			for (int j = 0; j < types.length; ++j) {
-				astring[i++] = types[j].getTypeName();
-			}
-
-			return astring;
-		}
-
-		public static CommandResultStats.Type getTypeByName(String name) {
-			CommandResultStats.Type[] types = _VALUES;
-			for (int i = 0; i < types.length; ++i) {
-				CommandResultStats.Type commandresultstats$type = types[i];
-				if (commandresultstats$type.getTypeName().equals(name)) {
-					return commandresultstats$type;
-				}
-			}
-
-			return null;
-		}
 	}
 }

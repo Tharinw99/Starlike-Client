@@ -83,9 +83,9 @@ import com.google.common.base.Supplier;
 @GwtCompatible(serializable = true)
 @Beta
 public class TreeBasedTable<R, C, V> extends StandardRowSortedTable<R, C, V> {
-	private final Comparator<? super C> columnComparator;
-
 	private static class Factory<C, V> implements Supplier<TreeMap<C, V>>, Serializable {
+		private static final long serialVersionUID = 0;
+
 		final Comparator<? super C> comparator;
 
 		Factory(Comparator<? super C> comparator) {
@@ -96,9 +96,138 @@ public class TreeBasedTable<R, C, V> extends StandardRowSortedTable<R, C, V> {
 		public TreeMap<C, V> get() {
 			return new TreeMap<C, V>(comparator);
 		}
-
-		private static final long serialVersionUID = 0;
 	}
+
+	private class TreeRow extends Row implements SortedMap<C, V> {
+		@Nullable
+		final C lowerBound;
+		@Nullable
+		final C upperBound;
+
+		transient SortedMap<C, V> wholeRow;
+
+		TreeRow(R rowKey) {
+			this(rowKey, null, null);
+		}
+
+		TreeRow(R rowKey, @Nullable C lowerBound, @Nullable C upperBound) {
+			super(rowKey);
+			this.lowerBound = lowerBound;
+			this.upperBound = upperBound;
+			checkArgument(lowerBound == null || upperBound == null || compare(lowerBound, upperBound) <= 0);
+		}
+
+		@Override
+		SortedMap<C, V> backingRowMap() {
+			return (SortedMap<C, V>) super.backingRowMap();
+		}
+
+		@Override
+		public Comparator<? super C> comparator() {
+			return columnComparator();
+		}
+
+		int compare(Object a, Object b) {
+			// pretend we can compare anything
+			@SuppressWarnings({ "rawtypes", "unchecked" })
+			Comparator<Object> cmp = (Comparator) comparator();
+			return cmp.compare(a, b);
+		}
+
+		@Override
+		SortedMap<C, V> computeBackingRowMap() {
+			SortedMap<C, V> map = wholeRow();
+			if (map != null) {
+				if (lowerBound != null) {
+					map = map.tailMap(lowerBound);
+				}
+				if (upperBound != null) {
+					map = map.headMap(upperBound);
+				}
+				return map;
+			}
+			return null;
+		}
+
+		@Override
+		public boolean containsKey(Object key) {
+			return rangeContains(key) && super.containsKey(key);
+		}
+
+		@Override
+		public C firstKey() {
+			SortedMap<C, V> backing = backingRowMap();
+			if (backing == null) {
+				throw new NoSuchElementException();
+			}
+			return backingRowMap().firstKey();
+		}
+
+		@Override
+		public SortedMap<C, V> headMap(C toKey) {
+			checkArgument(rangeContains(checkNotNull(toKey)));
+			return new TreeRow(rowKey, lowerBound, toKey);
+		}
+
+		@Override
+		public SortedSet<C> keySet() {
+			return new Maps.SortedKeySet<C, V>(this);
+		}
+
+		@Override
+		public C lastKey() {
+			SortedMap<C, V> backing = backingRowMap();
+			if (backing == null) {
+				throw new NoSuchElementException();
+			}
+			return backingRowMap().lastKey();
+		}
+
+		@Override
+		void maintainEmptyInvariant() {
+			if (wholeRow() != null && wholeRow.isEmpty()) {
+				backingMap.remove(rowKey);
+				wholeRow = null;
+				backingRowMap = null;
+			}
+		}
+
+		@Override
+		public V put(C key, V value) {
+			checkArgument(rangeContains(checkNotNull(key)));
+			return super.put(key, value);
+		}
+
+		boolean rangeContains(@Nullable Object o) {
+			return o != null && (lowerBound == null || compare(lowerBound, o) <= 0)
+					&& (upperBound == null || compare(upperBound, o) > 0);
+		}
+
+		@Override
+		public SortedMap<C, V> subMap(C fromKey, C toKey) {
+			checkArgument(rangeContains(checkNotNull(fromKey)) && rangeContains(checkNotNull(toKey)));
+			return new TreeRow(rowKey, fromKey, toKey);
+		}
+
+		@Override
+		public SortedMap<C, V> tailMap(C fromKey) {
+			checkArgument(rangeContains(checkNotNull(fromKey)));
+			return new TreeRow(rowKey, fromKey, upperBound);
+		}
+
+		/*
+		 * If the row was previously empty, we check if there's a new row here every
+		 * time we're queried.
+		 */
+		SortedMap<C, V> wholeRow() {
+			if (wholeRow == null || (wholeRow.isEmpty() && backingMap.containsKey(rowKey))) {
+				wholeRow = (SortedMap<C, V>) backingMap.get(rowKey);
+			}
+			return wholeRow;
+		}
+	}
+
+	private static final long serialVersionUID = 0;
 
 	/**
 	 * Creates an empty {@code TreeBasedTable} that uses the natural orderings of
@@ -138,20 +267,16 @@ public class TreeBasedTable<R, C, V> extends StandardRowSortedTable<R, C, V> {
 		return result;
 	}
 
+	// TODO(jlevy): Move to StandardRowSortedTable?
+
+	private final Comparator<? super C> columnComparator;
+
 	TreeBasedTable(Comparator<? super R> rowComparator, Comparator<? super C> columnComparator) {
 		super(new TreeMap<R, Map<C, V>>(rowComparator), new Factory<C, V>(columnComparator));
 		this.columnComparator = columnComparator;
 	}
 
-	// TODO(jlevy): Move to StandardRowSortedTable?
-
-	/**
-	 * Returns the comparator that orders the rows. With natural ordering,
-	 * {@link Ordering#natural()} is returned.
-	 */
-	public Comparator<? super R> rowComparator() {
-		return rowKeySet().comparator();
-	}
+	// TODO(user): make column return a SortedMap
 
 	/**
 	 * Returns the comparator that orders the columns. With natural ordering,
@@ -159,166 +284,6 @@ public class TreeBasedTable<R, C, V> extends StandardRowSortedTable<R, C, V> {
 	 */
 	public Comparator<? super C> columnComparator() {
 		return columnComparator;
-	}
-
-	// TODO(user): make column return a SortedMap
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>
-	 * Because a {@code TreeBasedTable} has unique sorted values for a given row,
-	 * this method returns a {@link SortedMap}, instead of the {@link Map} specified
-	 * in the {@link Table} interface.
-	 * 
-	 * @since 10.0
-	 *        (<a href="http://code.google.com/p/guava-libraries/wiki/Compatibility"
-	 *        >mostly source-compatible</a> since 7.0)
-	 */
-	@Override
-	public SortedMap<C, V> row(R rowKey) {
-		return new TreeRow(rowKey);
-	}
-
-	private class TreeRow extends Row implements SortedMap<C, V> {
-		@Nullable
-		final C lowerBound;
-		@Nullable
-		final C upperBound;
-
-		TreeRow(R rowKey) {
-			this(rowKey, null, null);
-		}
-
-		TreeRow(R rowKey, @Nullable C lowerBound, @Nullable C upperBound) {
-			super(rowKey);
-			this.lowerBound = lowerBound;
-			this.upperBound = upperBound;
-			checkArgument(lowerBound == null || upperBound == null || compare(lowerBound, upperBound) <= 0);
-		}
-
-		@Override
-		public SortedSet<C> keySet() {
-			return new Maps.SortedKeySet<C, V>(this);
-		}
-
-		@Override
-		public Comparator<? super C> comparator() {
-			return columnComparator();
-		}
-
-		int compare(Object a, Object b) {
-			// pretend we can compare anything
-			@SuppressWarnings({ "rawtypes", "unchecked" })
-			Comparator<Object> cmp = (Comparator) comparator();
-			return cmp.compare(a, b);
-		}
-
-		boolean rangeContains(@Nullable Object o) {
-			return o != null && (lowerBound == null || compare(lowerBound, o) <= 0)
-					&& (upperBound == null || compare(upperBound, o) > 0);
-		}
-
-		@Override
-		public SortedMap<C, V> subMap(C fromKey, C toKey) {
-			checkArgument(rangeContains(checkNotNull(fromKey)) && rangeContains(checkNotNull(toKey)));
-			return new TreeRow(rowKey, fromKey, toKey);
-		}
-
-		@Override
-		public SortedMap<C, V> headMap(C toKey) {
-			checkArgument(rangeContains(checkNotNull(toKey)));
-			return new TreeRow(rowKey, lowerBound, toKey);
-		}
-
-		@Override
-		public SortedMap<C, V> tailMap(C fromKey) {
-			checkArgument(rangeContains(checkNotNull(fromKey)));
-			return new TreeRow(rowKey, fromKey, upperBound);
-		}
-
-		@Override
-		public C firstKey() {
-			SortedMap<C, V> backing = backingRowMap();
-			if (backing == null) {
-				throw new NoSuchElementException();
-			}
-			return backingRowMap().firstKey();
-		}
-
-		@Override
-		public C lastKey() {
-			SortedMap<C, V> backing = backingRowMap();
-			if (backing == null) {
-				throw new NoSuchElementException();
-			}
-			return backingRowMap().lastKey();
-		}
-
-		transient SortedMap<C, V> wholeRow;
-
-		/*
-		 * If the row was previously empty, we check if there's a new row here every
-		 * time we're queried.
-		 */
-		SortedMap<C, V> wholeRow() {
-			if (wholeRow == null || (wholeRow.isEmpty() && backingMap.containsKey(rowKey))) {
-				wholeRow = (SortedMap<C, V>) backingMap.get(rowKey);
-			}
-			return wholeRow;
-		}
-
-		@Override
-		SortedMap<C, V> backingRowMap() {
-			return (SortedMap<C, V>) super.backingRowMap();
-		}
-
-		@Override
-		SortedMap<C, V> computeBackingRowMap() {
-			SortedMap<C, V> map = wholeRow();
-			if (map != null) {
-				if (lowerBound != null) {
-					map = map.tailMap(lowerBound);
-				}
-				if (upperBound != null) {
-					map = map.headMap(upperBound);
-				}
-				return map;
-			}
-			return null;
-		}
-
-		@Override
-		void maintainEmptyInvariant() {
-			if (wholeRow() != null && wholeRow.isEmpty()) {
-				backingMap.remove(rowKey);
-				wholeRow = null;
-				backingRowMap = null;
-			}
-		}
-
-		@Override
-		public boolean containsKey(Object key) {
-			return rangeContains(key) && super.containsKey(key);
-		}
-
-		@Override
-		public V put(C key, V value) {
-			checkArgument(rangeContains(checkNotNull(key)));
-			return super.put(key, value);
-		}
-	}
-
-	// rowKeySet() and rowMap() are defined here so they appear in the Javadoc.
-
-	@Override
-	public SortedSet<R> rowKeySet() {
-		return super.rowKeySet();
-	}
-
-	@Override
-	public SortedMap<R, Map<C, V>> rowMap() {
-		return super.rowMap();
 	}
 
 	/**
@@ -358,5 +323,40 @@ public class TreeBasedTable<R, C, V> extends StandardRowSortedTable<R, C, V> {
 		};
 	}
 
-	private static final long serialVersionUID = 0;
+	// rowKeySet() and rowMap() are defined here so they appear in the Javadoc.
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * Because a {@code TreeBasedTable} has unique sorted values for a given row,
+	 * this method returns a {@link SortedMap}, instead of the {@link Map} specified
+	 * in the {@link Table} interface.
+	 * 
+	 * @since 10.0
+	 *        (<a href="http://code.google.com/p/guava-libraries/wiki/Compatibility"
+	 *        >mostly source-compatible</a> since 7.0)
+	 */
+	@Override
+	public SortedMap<C, V> row(R rowKey) {
+		return new TreeRow(rowKey);
+	}
+
+	/**
+	 * Returns the comparator that orders the rows. With natural ordering,
+	 * {@link Ordering#natural()} is returned.
+	 */
+	public Comparator<? super R> rowComparator() {
+		return rowKeySet().comparator();
+	}
+
+	@Override
+	public SortedSet<R> rowKeySet() {
+		return super.rowKeySet();
+	}
+
+	@Override
+	public SortedMap<R, Map<C, V>> rowMap() {
+		return super.rowMap();
+	}
 }

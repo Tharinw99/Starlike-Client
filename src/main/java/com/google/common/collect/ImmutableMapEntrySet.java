@@ -32,14 +32,22 @@ import com.google.common.annotations.GwtIncompatible;
  */
 @GwtCompatible(emulated = true)
 abstract class ImmutableMapEntrySet<K, V> extends ImmutableSet<Entry<K, V>> {
-	ImmutableMapEntrySet() {
+	@GwtIncompatible("serialization")
+	private static class EntrySetSerializedForm<K, V> implements Serializable {
+		private static final long serialVersionUID = 0;
+
+		final ImmutableMap<K, V> map;
+
+		EntrySetSerializedForm(ImmutableMap<K, V> map) {
+			this.map = map;
+		}
+
+		Object readResolve() {
+			return map.entrySet();
+		}
 	}
 
-	abstract ImmutableMap<K, V> map();
-
-	@Override
-	public int size() {
-		return map().size();
+	ImmutableMapEntrySet() {
 	}
 
 	@Override
@@ -57,24 +65,16 @@ abstract class ImmutableMapEntrySet<K, V> extends ImmutableSet<Entry<K, V>> {
 		return map().isPartialView();
 	}
 
+	abstract ImmutableMap<K, V> map();
+
+	@Override
+	public int size() {
+		return map().size();
+	}
+
 	@GwtIncompatible("serialization")
 	@Override
 	Object writeReplace() {
 		return new EntrySetSerializedForm<K, V>(map());
-	}
-
-	@GwtIncompatible("serialization")
-	private static class EntrySetSerializedForm<K, V> implements Serializable {
-		final ImmutableMap<K, V> map;
-
-		EntrySetSerializedForm(ImmutableMap<K, V> map) {
-			this.map = map;
-		}
-
-		Object readResolve() {
-			return map.entrySet();
-		}
-
-		private static final long serialVersionUID = 0;
 	}
 }

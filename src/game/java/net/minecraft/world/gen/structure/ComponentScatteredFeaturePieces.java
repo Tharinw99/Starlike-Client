@@ -1,7 +1,9 @@
 package net.minecraft.world.gen.structure;
 
-import com.google.common.collect.Lists;
 import java.util.List;
+
+import com.google.common.collect.Lists;
+
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import net.minecraft.block.BlockFlowerPot;
 import net.minecraft.block.BlockLever;
@@ -22,35 +24,31 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class ComponentScatteredFeaturePieces {
-	public static void registerScatteredFeaturePieces() {
-		MapGenStructureIO.registerStructureComponent(ComponentScatteredFeaturePieces.DesertPyramid.class, "TeDP");
-		MapGenStructureIO.registerStructureComponent(ComponentScatteredFeaturePieces.JunglePyramid.class, "TeJP");
-		MapGenStructureIO.registerStructureComponent(ComponentScatteredFeaturePieces.SwampHut.class, "TeSH");
-	}
-
 	public static class DesertPyramid extends ComponentScatteredFeaturePieces.Feature {
-		private boolean[] field_74940_h = new boolean[4];
 		private static final List<WeightedRandomChestContent> itemsToGenerateInTemple = Lists.newArrayList(
 				new WeightedRandomChestContent[] { new WeightedRandomChestContent(Items.diamond, 0, 1, 3, 3),
 						new WeightedRandomChestContent(Items.iron_ingot, 0, 1, 5, 10),
@@ -62,28 +60,13 @@ public class ComponentScatteredFeaturePieces {
 						new WeightedRandomChestContent(Items.iron_horse_armor, 0, 1, 1, 1),
 						new WeightedRandomChestContent(Items.golden_horse_armor, 0, 1, 1, 1),
 						new WeightedRandomChestContent(Items.diamond_horse_armor, 0, 1, 1, 1) });
+		private boolean[] field_74940_h = new boolean[4];
 
 		public DesertPyramid() {
 		}
 
 		public DesertPyramid(EaglercraftRandom parRandom, int parInt1, int parInt2) {
 			super(parRandom, parInt1, 64, parInt2, 21, 15, 21);
-		}
-
-		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
-			super.writeStructureToNBT(nbttagcompound);
-			nbttagcompound.setBoolean("hasPlacedChest0", this.field_74940_h[0]);
-			nbttagcompound.setBoolean("hasPlacedChest1", this.field_74940_h[1]);
-			nbttagcompound.setBoolean("hasPlacedChest2", this.field_74940_h[2]);
-			nbttagcompound.setBoolean("hasPlacedChest3", this.field_74940_h[3]);
-		}
-
-		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
-			super.readStructureFromNBT(nbttagcompound);
-			this.field_74940_h[0] = nbttagcompound.getBoolean("hasPlacedChest0");
-			this.field_74940_h[1] = nbttagcompound.getBoolean("hasPlacedChest1");
-			this.field_74940_h[2] = nbttagcompound.getBoolean("hasPlacedChest2");
-			this.field_74940_h[3] = nbttagcompound.getBoolean("hasPlacedChest3");
 		}
 
 		public boolean addComponentParts(World world, EaglercraftRandom random,
@@ -456,6 +439,22 @@ public class ComponentScatteredFeaturePieces {
 
 			return true;
 		}
+
+		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
+			super.readStructureFromNBT(nbttagcompound);
+			this.field_74940_h[0] = nbttagcompound.getBoolean("hasPlacedChest0");
+			this.field_74940_h[1] = nbttagcompound.getBoolean("hasPlacedChest1");
+			this.field_74940_h[2] = nbttagcompound.getBoolean("hasPlacedChest2");
+			this.field_74940_h[3] = nbttagcompound.getBoolean("hasPlacedChest3");
+		}
+
+		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
+			super.writeStructureToNBT(nbttagcompound);
+			nbttagcompound.setBoolean("hasPlacedChest0", this.field_74940_h[0]);
+			nbttagcompound.setBoolean("hasPlacedChest1", this.field_74940_h[1]);
+			nbttagcompound.setBoolean("hasPlacedChest2", this.field_74940_h[2]);
+			nbttagcompound.setBoolean("hasPlacedChest3", this.field_74940_h[3]);
+		}
 	}
 
 	abstract static class Feature extends StructureComponent {
@@ -487,20 +486,6 @@ public class ComponentScatteredFeaturePieces {
 
 		}
 
-		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
-			nbttagcompound.setInteger("Width", this.scatteredFeatureSizeX);
-			nbttagcompound.setInteger("Height", this.scatteredFeatureSizeY);
-			nbttagcompound.setInteger("Depth", this.scatteredFeatureSizeZ);
-			nbttagcompound.setInteger("HPos", this.field_74936_d);
-		}
-
-		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
-			this.scatteredFeatureSizeX = nbttagcompound.getInteger("Width");
-			this.scatteredFeatureSizeY = nbttagcompound.getInteger("Height");
-			this.scatteredFeatureSizeZ = nbttagcompound.getInteger("Depth");
-			this.field_74936_d = nbttagcompound.getInteger("HPos");
-		}
-
 		protected boolean func_74935_a(World worldIn, StructureBoundingBox parStructureBoundingBox, int parInt1) {
 			if (this.field_74936_d >= 0) {
 				return true;
@@ -529,13 +514,37 @@ public class ComponentScatteredFeaturePieces {
 				}
 			}
 		}
+
+		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
+			this.scatteredFeatureSizeX = nbttagcompound.getInteger("Width");
+			this.scatteredFeatureSizeY = nbttagcompound.getInteger("Height");
+			this.scatteredFeatureSizeZ = nbttagcompound.getInteger("Depth");
+			this.field_74936_d = nbttagcompound.getInteger("HPos");
+		}
+
+		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
+			nbttagcompound.setInteger("Width", this.scatteredFeatureSizeX);
+			nbttagcompound.setInteger("Height", this.scatteredFeatureSizeY);
+			nbttagcompound.setInteger("Depth", this.scatteredFeatureSizeZ);
+			nbttagcompound.setInteger("HPos", this.field_74936_d);
+		}
 	}
 
 	public static class JunglePyramid extends ComponentScatteredFeaturePieces.Feature {
-		private boolean field_74947_h;
-		private boolean field_74948_i;
-		private boolean field_74945_j;
-		private boolean field_74946_k;
+		static class Stones extends StructureComponent.BlockSelector {
+			private Stones() {
+			}
+
+			public void selectBlocks(EaglercraftRandom rand, int x, int y, int z, boolean parFlag) {
+				if (rand.nextFloat() < 0.4F) {
+					this.blockstate = Blocks.cobblestone.getDefaultState();
+				} else {
+					this.blockstate = Blocks.mossy_cobblestone.getDefaultState();
+				}
+
+			}
+		}
+
 		private static final List<WeightedRandomChestContent> field_175816_i = Lists.newArrayList(
 				new WeightedRandomChestContent[] { new WeightedRandomChestContent(Items.diamond, 0, 1, 3, 3),
 						new WeightedRandomChestContent(Items.iron_ingot, 0, 1, 5, 10),
@@ -550,28 +559,17 @@ public class ComponentScatteredFeaturePieces {
 		private static final List<WeightedRandomChestContent> field_175815_j = Lists.newArrayList(
 				new WeightedRandomChestContent[] { new WeightedRandomChestContent(Items.arrow, 0, 2, 7, 30) });
 		private static ComponentScatteredFeaturePieces.JunglePyramid.Stones junglePyramidsRandomScatteredStones = new ComponentScatteredFeaturePieces.JunglePyramid.Stones();
+		private boolean field_74947_h;
+		private boolean field_74948_i;
+		private boolean field_74945_j;
+
+		private boolean field_74946_k;
 
 		public JunglePyramid() {
 		}
 
 		public JunglePyramid(EaglercraftRandom parRandom, int parInt1, int parInt2) {
 			super(parRandom, parInt1, 64, parInt2, 12, 10, 15);
-		}
-
-		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
-			super.writeStructureToNBT(nbttagcompound);
-			nbttagcompound.setBoolean("placedMainChest", this.field_74947_h);
-			nbttagcompound.setBoolean("placedHiddenChest", this.field_74948_i);
-			nbttagcompound.setBoolean("placedTrap1", this.field_74945_j);
-			nbttagcompound.setBoolean("placedTrap2", this.field_74946_k);
-		}
-
-		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
-			super.readStructureFromNBT(nbttagcompound);
-			this.field_74947_h = nbttagcompound.getBoolean("placedMainChest");
-			this.field_74948_i = nbttagcompound.getBoolean("placedHiddenChest");
-			this.field_74945_j = nbttagcompound.getBoolean("placedTrap1");
-			this.field_74946_k = nbttagcompound.getBoolean("placedTrap2");
 		}
 
 		public boolean addComponentParts(World world, EaglercraftRandom random,
@@ -853,18 +851,20 @@ public class ComponentScatteredFeaturePieces {
 			}
 		}
 
-		static class Stones extends StructureComponent.BlockSelector {
-			private Stones() {
-			}
+		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
+			super.readStructureFromNBT(nbttagcompound);
+			this.field_74947_h = nbttagcompound.getBoolean("placedMainChest");
+			this.field_74948_i = nbttagcompound.getBoolean("placedHiddenChest");
+			this.field_74945_j = nbttagcompound.getBoolean("placedTrap1");
+			this.field_74946_k = nbttagcompound.getBoolean("placedTrap2");
+		}
 
-			public void selectBlocks(EaglercraftRandom rand, int x, int y, int z, boolean parFlag) {
-				if (rand.nextFloat() < 0.4F) {
-					this.blockstate = Blocks.cobblestone.getDefaultState();
-				} else {
-					this.blockstate = Blocks.mossy_cobblestone.getDefaultState();
-				}
-
-			}
+		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
+			super.writeStructureToNBT(nbttagcompound);
+			nbttagcompound.setBoolean("placedMainChest", this.field_74947_h);
+			nbttagcompound.setBoolean("placedHiddenChest", this.field_74948_i);
+			nbttagcompound.setBoolean("placedTrap1", this.field_74945_j);
+			nbttagcompound.setBoolean("placedTrap2", this.field_74946_k);
 		}
 	}
 
@@ -876,16 +876,6 @@ public class ComponentScatteredFeaturePieces {
 
 		public SwampHut(EaglercraftRandom parRandom, int parInt1, int parInt2) {
 			super(parRandom, parInt1, 64, parInt2, 7, 7, 9);
-		}
-
-		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
-			super.writeStructureToNBT(nbttagcompound);
-			nbttagcompound.setBoolean("Witch", this.hasWitch);
-		}
-
-		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
-			super.readStructureFromNBT(nbttagcompound);
-			this.hasWitch = nbttagcompound.getBoolean("Witch");
 		}
 
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
@@ -971,5 +961,21 @@ public class ComponentScatteredFeaturePieces {
 				return true;
 			}
 		}
+
+		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
+			super.readStructureFromNBT(nbttagcompound);
+			this.hasWitch = nbttagcompound.getBoolean("Witch");
+		}
+
+		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
+			super.writeStructureToNBT(nbttagcompound);
+			nbttagcompound.setBoolean("Witch", this.hasWitch);
+		}
+	}
+
+	public static void registerScatteredFeaturePieces() {
+		MapGenStructureIO.registerStructureComponent(ComponentScatteredFeaturePieces.DesertPyramid.class, "TeDP");
+		MapGenStructureIO.registerStructureComponent(ComponentScatteredFeaturePieces.JunglePyramid.class, "TeJP");
+		MapGenStructureIO.registerStructureComponent(ComponentScatteredFeaturePieces.SwampHut.class, "TeSH");
 	}
 }

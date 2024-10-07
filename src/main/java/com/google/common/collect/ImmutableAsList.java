@@ -33,7 +33,23 @@ import com.google.common.annotations.GwtIncompatible;
 @GwtCompatible(serializable = true, emulated = true)
 @SuppressWarnings("serial")
 abstract class ImmutableAsList<E> extends ImmutableList<E> {
-	abstract ImmutableCollection<E> delegateCollection();
+	/**
+	 * Serialized form that leads to the same performance as the original list.
+	 */
+	@GwtIncompatible("serialization")
+	static class SerializedForm implements Serializable {
+		private static final long serialVersionUID = 0;
+
+		final ImmutableCollection<?> collection;
+
+		SerializedForm(ImmutableCollection<?> collection) {
+			this.collection = collection;
+		}
+
+		Object readResolve() {
+			return collection.asList();
+		}
+	}
 
 	@Override
 	public boolean contains(Object target) {
@@ -42,10 +58,7 @@ abstract class ImmutableAsList<E> extends ImmutableList<E> {
 		return delegateCollection().contains(target);
 	}
 
-	@Override
-	public int size() {
-		return delegateCollection().size();
-	}
+	abstract ImmutableCollection<E> delegateCollection();
 
 	@Override
 	public boolean isEmpty() {
@@ -57,27 +70,14 @@ abstract class ImmutableAsList<E> extends ImmutableList<E> {
 		return delegateCollection().isPartialView();
 	}
 
-	/**
-	 * Serialized form that leads to the same performance as the original list.
-	 */
-	@GwtIncompatible("serialization")
-	static class SerializedForm implements Serializable {
-		final ImmutableCollection<?> collection;
-
-		SerializedForm(ImmutableCollection<?> collection) {
-			this.collection = collection;
-		}
-
-		Object readResolve() {
-			return collection.asList();
-		}
-
-		private static final long serialVersionUID = 0;
-	}
-
 	@GwtIncompatible("serialization")
 	private void readObject(ObjectInputStream stream) throws InvalidObjectException {
 		throw new InvalidObjectException("Use SerializedForm");
+	}
+
+	@Override
+	public int size() {
+		return delegateCollection().size();
 	}
 
 	@GwtIncompatible("serialization")

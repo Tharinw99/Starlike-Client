@@ -11,22 +11,25 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -46,6 +49,15 @@ public class EntityFirework {
 		protected OverlayFX(World parWorld, double parDouble1, double parDouble2, double parDouble3) {
 			super(parWorld, parDouble1, parDouble2, parDouble3);
 			this.particleMaxAge = 4;
+		}
+
+		public boolean renderAccelerated(IAcceleratedParticleEngine accelerator, Entity var2, float f, float f1,
+				float f2, float f3, float f4, float f5) {
+			accelerator.drawParticle(this, 64, 32, getBrightnessForRender(f), 64,
+					7.1F * MathHelper.sin(((float) this.particleAge + f - 1.0F) * 0.25F * 3.1415927F) * 0.0625f * 0.25f,
+					this.particleRed, this.particleGreen, this.particleBlue,
+					0.6F - ((float) this.particleAge + f - 1.0F) * 0.25F * 0.5F);
+			return true;
 		}
 
 		public void renderParticle(WorldRenderer worldrenderer, Entity var2, float f, float f1, float f2, float f3,
@@ -87,15 +99,6 @@ public class EntityFirework {
 					.color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k)
 					.endVertex();
 		}
-
-		public boolean renderAccelerated(IAcceleratedParticleEngine accelerator, Entity var2, float f, float f1,
-				float f2, float f3, float f4, float f5) {
-			accelerator.drawParticle(this, 64, 32, getBrightnessForRender(f), 64,
-					7.1F * MathHelper.sin(((float) this.particleAge + f - 1.0F) * 0.25F * 3.1415927F) * 0.0625f * 0.25f,
-					this.particleRed, this.particleGreen, this.particleBlue,
-					0.6F - ((float) this.particleAge + f - 1.0F) * 0.25F * 0.5F);
-			return true;
-		}
 	}
 
 	public static class SparkFX extends EntityFX {
@@ -120,44 +123,20 @@ public class EntityFirework {
 			this.noClip = false;
 		}
 
-		public void setTrail(boolean trailIn) {
-			this.trail = trailIn;
-		}
-
-		public void setTwinkle(boolean twinkleIn) {
-			this.twinkle = twinkleIn;
-		}
-
-		public void setColour(int colour) {
-			float f = (float) ((colour & 16711680) >> 16) / 255.0F;
-			float f1 = (float) ((colour & '\uff00') >> 8) / 255.0F;
-			float f2 = (float) ((colour & 255) >> 0) / 255.0F;
-			float f3 = 1.0F;
-			this.setRBGColorF(f * f3, f1 * f3, f2 * f3);
-		}
-
-		public void setFadeColour(int faceColour) {
-			this.fadeColourRed = (float) ((faceColour & 16711680) >> 16) / 255.0F;
-			this.fadeColourGreen = (float) ((faceColour & '\uff00') >> 8) / 255.0F;
-			this.fadeColourBlue = (float) ((faceColour & 255) >> 0) / 255.0F;
-			this.hasFadeColour = true;
-		}
-
-		public AxisAlignedBB getCollisionBoundingBox() {
-			return null;
-		}
-
 		public boolean canBePushed() {
 			return false;
 		}
 
-		public void renderParticle(WorldRenderer worldrenderer, Entity entity, float f, float f1, float f2, float f3,
-				float f4, float f5) {
-			if (!this.twinkle || this.particleAge < this.particleMaxAge / 3
-					|| (this.particleAge + this.particleMaxAge) / 3 % 2 == 0) {
-				super.renderParticle(worldrenderer, entity, f, f1, f2, f3, f4, f5);
-			}
+		public float getBrightness(float var1) {
+			return 1.0F;
+		}
 
+		public int getBrightnessForRender(float var1) {
+			return 15728880;
+		}
+
+		public AxisAlignedBB getCollisionBoundingBox() {
+			return null;
 		}
 
 		public void onUpdate() {
@@ -209,12 +188,36 @@ public class EntityFirework {
 
 		}
 
-		public int getBrightnessForRender(float var1) {
-			return 15728880;
+		public void renderParticle(WorldRenderer worldrenderer, Entity entity, float f, float f1, float f2, float f3,
+				float f4, float f5) {
+			if (!this.twinkle || this.particleAge < this.particleMaxAge / 3
+					|| (this.particleAge + this.particleMaxAge) / 3 % 2 == 0) {
+				super.renderParticle(worldrenderer, entity, f, f1, f2, f3, f4, f5);
+			}
+
 		}
 
-		public float getBrightness(float var1) {
-			return 1.0F;
+		public void setColour(int colour) {
+			float f = (float) ((colour & 16711680) >> 16) / 255.0F;
+			float f1 = (float) ((colour & '\uff00') >> 8) / 255.0F;
+			float f2 = (float) ((colour & 255) >> 0) / 255.0F;
+			float f3 = 1.0F;
+			this.setRBGColorF(f * f3, f1 * f3, f2 * f3);
+		}
+
+		public void setFadeColour(int faceColour) {
+			this.fadeColourRed = (float) ((faceColour & 16711680) >> 16) / 255.0F;
+			this.fadeColourGreen = (float) ((faceColour & '\uff00') >> 8) / 255.0F;
+			this.fadeColourBlue = (float) ((faceColour & 255) >> 0) / 255.0F;
+			this.hasFadeColour = true;
+		}
+
+		public void setTrail(boolean trailIn) {
+			this.trail = trailIn;
+		}
+
+		public void setTwinkle(boolean twinkleIn) {
+			this.twinkle = twinkleIn;
 		}
 	}
 
@@ -253,8 +256,107 @@ public class EntityFirework {
 
 		}
 
-		public void renderParticle(WorldRenderer var1, Entity var2, float var3, float var4, float var5, float var6,
-				float var7, float var8) {
+		private void createBall(double speed, int size, int[] colours, int[] fadeColours, boolean trail,
+				boolean twinkleIn) {
+			double d0 = this.posX;
+			double d1 = this.posY;
+			double d2 = this.posZ;
+
+			for (int i = -size; i <= size; ++i) {
+				for (int j = -size; j <= size; ++j) {
+					for (int k = -size; k <= size; ++k) {
+						double d3 = (double) j + (this.rand.nextDouble() - this.rand.nextDouble()) * 0.5D;
+						double d4 = (double) i + (this.rand.nextDouble() - this.rand.nextDouble()) * 0.5D;
+						double d5 = (double) k + (this.rand.nextDouble() - this.rand.nextDouble()) * 0.5D;
+						double d6 = (double) MathHelper.sqrt_double(d3 * d3 + d4 * d4 + d5 * d5) / speed
+								+ this.rand.nextGaussian() * 0.05D;
+						this.createParticle(d0, d1, d2, d3 / d6, d4 / d6, d5 / d6, colours, fadeColours, trail,
+								twinkleIn);
+						if (i != -size && i != size && j != -size && j != size) {
+							k += size * 2 - 1;
+						}
+					}
+				}
+			}
+
+		}
+
+		private void createBurst(int[] colours, int[] fadeColours, boolean trail, boolean twinkleIn) {
+			double d0 = this.rand.nextGaussian() * 0.05D;
+			double d1 = this.rand.nextGaussian() * 0.05D;
+
+			for (int i = 0; i < 70; ++i) {
+				double d2 = this.motionX * 0.5D + this.rand.nextGaussian() * 0.15D + d0;
+				double d3 = this.motionZ * 0.5D + this.rand.nextGaussian() * 0.15D + d1;
+				double d4 = this.motionY * 0.5D + this.rand.nextDouble() * 0.5D;
+				this.createParticle(this.posX, this.posY, this.posZ, d2, d4, d3, colours, fadeColours, trail,
+						twinkleIn);
+			}
+
+		}
+
+		private void createParticle(double parDouble1, double parDouble2, double parDouble3, double parDouble4,
+				double parDouble5, double parDouble6, int[] parArrayOfInt, int[] parArrayOfInt2, boolean parFlag,
+				boolean parFlag2) {
+			EntityFirework.SparkFX entityfirework$sparkfx = new EntityFirework.SparkFX(this.worldObj, parDouble1,
+					parDouble2, parDouble3, parDouble4, parDouble5, parDouble6, this.theEffectRenderer);
+			entityfirework$sparkfx.setAlphaF(0.99F);
+			entityfirework$sparkfx.setTrail(parFlag);
+			entityfirework$sparkfx.setTwinkle(parFlag2);
+			int i = this.rand.nextInt(parArrayOfInt.length);
+			entityfirework$sparkfx.setColour(parArrayOfInt[i]);
+			if (parArrayOfInt2 != null && parArrayOfInt2.length > 0) {
+				entityfirework$sparkfx.setFadeColour(parArrayOfInt2[this.rand.nextInt(parArrayOfInt2.length)]);
+			}
+
+			this.theEffectRenderer.addEffect(entityfirework$sparkfx);
+		}
+
+		private void createShaped(double speed, double[][] shape, int[] colours, int[] fadeColours, boolean trail,
+				boolean twinkleIn, boolean parFlag3) {
+			double d0 = shape[0][0];
+			double d1 = shape[0][1];
+			this.createParticle(this.posX, this.posY, this.posZ, d0 * speed, d1 * speed, 0.0D, colours, fadeColours,
+					trail, twinkleIn);
+			float f = this.rand.nextFloat() * 3.1415927F;
+			double d2 = parFlag3 ? 0.034D : 0.34D;
+
+			for (int i = 0; i < 3; ++i) {
+				double d3 = (double) f + (double) ((float) i * 3.1415927F) * d2;
+				double d4 = d0;
+				double d5 = d1;
+
+				for (int j = 1; j < shape.length; ++j) {
+					double d6 = shape[j][0];
+					double d7 = shape[j][1];
+
+					for (double d8 = 0.25D; d8 <= 1.0D; d8 += 0.25D) {
+						double d9 = (d4 + (d6 - d4) * d8) * speed;
+						double d10 = (d5 + (d7 - d5) * d8) * speed;
+						double d11 = d9 * Math.sin(d3);
+						d9 = d9 * Math.cos(d3);
+
+						for (double d12 = -1.0D; d12 <= 1.0D; d12 += 2.0D) {
+							this.createParticle(this.posX, this.posY, this.posZ, d9 * d12, d10, d11 * d12, colours,
+									fadeColours, trail, twinkleIn);
+						}
+					}
+
+					d4 = d6;
+					d5 = d7;
+				}
+			}
+
+		}
+
+		private boolean func_92037_i() {
+			Minecraft minecraft = Minecraft.getMinecraft();
+			return minecraft == null || minecraft.getRenderViewEntity() == null
+					|| minecraft.getRenderViewEntity().getDistanceSq(this.posX, this.posY, this.posZ) >= 256.0D;
+		}
+
+		public int getFXLayer() {
+			return 0;
 		}
 
 		public void onUpdate() {
@@ -336,107 +438,8 @@ public class EntityFirework {
 
 		}
 
-		private boolean func_92037_i() {
-			Minecraft minecraft = Minecraft.getMinecraft();
-			return minecraft == null || minecraft.getRenderViewEntity() == null
-					|| minecraft.getRenderViewEntity().getDistanceSq(this.posX, this.posY, this.posZ) >= 256.0D;
-		}
-
-		private void createParticle(double parDouble1, double parDouble2, double parDouble3, double parDouble4,
-				double parDouble5, double parDouble6, int[] parArrayOfInt, int[] parArrayOfInt2, boolean parFlag,
-				boolean parFlag2) {
-			EntityFirework.SparkFX entityfirework$sparkfx = new EntityFirework.SparkFX(this.worldObj, parDouble1,
-					parDouble2, parDouble3, parDouble4, parDouble5, parDouble6, this.theEffectRenderer);
-			entityfirework$sparkfx.setAlphaF(0.99F);
-			entityfirework$sparkfx.setTrail(parFlag);
-			entityfirework$sparkfx.setTwinkle(parFlag2);
-			int i = this.rand.nextInt(parArrayOfInt.length);
-			entityfirework$sparkfx.setColour(parArrayOfInt[i]);
-			if (parArrayOfInt2 != null && parArrayOfInt2.length > 0) {
-				entityfirework$sparkfx.setFadeColour(parArrayOfInt2[this.rand.nextInt(parArrayOfInt2.length)]);
-			}
-
-			this.theEffectRenderer.addEffect(entityfirework$sparkfx);
-		}
-
-		private void createBall(double speed, int size, int[] colours, int[] fadeColours, boolean trail,
-				boolean twinkleIn) {
-			double d0 = this.posX;
-			double d1 = this.posY;
-			double d2 = this.posZ;
-
-			for (int i = -size; i <= size; ++i) {
-				for (int j = -size; j <= size; ++j) {
-					for (int k = -size; k <= size; ++k) {
-						double d3 = (double) j + (this.rand.nextDouble() - this.rand.nextDouble()) * 0.5D;
-						double d4 = (double) i + (this.rand.nextDouble() - this.rand.nextDouble()) * 0.5D;
-						double d5 = (double) k + (this.rand.nextDouble() - this.rand.nextDouble()) * 0.5D;
-						double d6 = (double) MathHelper.sqrt_double(d3 * d3 + d4 * d4 + d5 * d5) / speed
-								+ this.rand.nextGaussian() * 0.05D;
-						this.createParticle(d0, d1, d2, d3 / d6, d4 / d6, d5 / d6, colours, fadeColours, trail,
-								twinkleIn);
-						if (i != -size && i != size && j != -size && j != size) {
-							k += size * 2 - 1;
-						}
-					}
-				}
-			}
-
-		}
-
-		private void createShaped(double speed, double[][] shape, int[] colours, int[] fadeColours, boolean trail,
-				boolean twinkleIn, boolean parFlag3) {
-			double d0 = shape[0][0];
-			double d1 = shape[0][1];
-			this.createParticle(this.posX, this.posY, this.posZ, d0 * speed, d1 * speed, 0.0D, colours, fadeColours,
-					trail, twinkleIn);
-			float f = this.rand.nextFloat() * 3.1415927F;
-			double d2 = parFlag3 ? 0.034D : 0.34D;
-
-			for (int i = 0; i < 3; ++i) {
-				double d3 = (double) f + (double) ((float) i * 3.1415927F) * d2;
-				double d4 = d0;
-				double d5 = d1;
-
-				for (int j = 1; j < shape.length; ++j) {
-					double d6 = shape[j][0];
-					double d7 = shape[j][1];
-
-					for (double d8 = 0.25D; d8 <= 1.0D; d8 += 0.25D) {
-						double d9 = (d4 + (d6 - d4) * d8) * speed;
-						double d10 = (d5 + (d7 - d5) * d8) * speed;
-						double d11 = d9 * Math.sin(d3);
-						d9 = d9 * Math.cos(d3);
-
-						for (double d12 = -1.0D; d12 <= 1.0D; d12 += 2.0D) {
-							this.createParticle(this.posX, this.posY, this.posZ, d9 * d12, d10, d11 * d12, colours,
-									fadeColours, trail, twinkleIn);
-						}
-					}
-
-					d4 = d6;
-					d5 = d7;
-				}
-			}
-
-		}
-
-		private void createBurst(int[] colours, int[] fadeColours, boolean trail, boolean twinkleIn) {
-			double d0 = this.rand.nextGaussian() * 0.05D;
-			double d1 = this.rand.nextGaussian() * 0.05D;
-
-			for (int i = 0; i < 70; ++i) {
-				double d2 = this.motionX * 0.5D + this.rand.nextGaussian() * 0.15D + d0;
-				double d3 = this.motionZ * 0.5D + this.rand.nextGaussian() * 0.15D + d1;
-				double d4 = this.motionY * 0.5D + this.rand.nextDouble() * 0.5D;
-				this.createParticle(this.posX, this.posY, this.posZ, d2, d4, d3, colours, fadeColours, trail,
-						twinkleIn);
-			}
-
-		}
-
-		public int getFXLayer() {
-			return 0;
+		public void renderParticle(WorldRenderer var1, Entity var2, float var3, float var4, float var5, float var6,
+				float var7, float var8) {
 		}
 	}
 }

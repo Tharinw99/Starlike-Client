@@ -1,8 +1,8 @@
 package net.minecraft.block;
 
 import java.util.List;
-import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 
+import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
@@ -27,22 +27,25 @@ import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -58,45 +61,9 @@ public class BlockBrewingStand extends BlockContainer {
 				.withProperty(HAS_BOTTLE[2], Boolean.valueOf(false)));
 	}
 
-	/**+
-	 * Gets the localized name of this block. Used for the
-	 * statistics page.
-	 */
-	public String getLocalizedName() {
-		return StatCollector.translateToLocal("item.brewingStand.name");
-	}
-
-	/**+
-	 * Used to determine ambient occlusion and culling when
-	 * rebuilding chunks for render
-	 */
-	public boolean isOpaqueCube() {
-		return false;
-	}
-
-	/**+
-	 * The type of render function called. 3 for standard block
-	 * models, 2 for TESR's, 1 for liquids, -1 is no render
-	 */
-	public int getRenderType() {
-		return 3;
-	}
-
-	/**+
-	 * Returns a new instance of a block's tile entity class. Called
-	 * on placing the block.
-	 */
-	public TileEntity createNewTileEntity(World var1, int var2) {
-		return new TileEntityBrewingStand();
-	}
-
-	public boolean isFullCube() {
-		return false;
-	}
-
-	/**+
-	 * Add all collision boxes of this Block to the list that
-	 * intersect with the given mask.
+	/**
+	 * + Add all collision boxes of this Block to the list that intersect with the
+	 * given mask.
 	 */
 	public void addCollisionBoxesToList(World world, BlockPos blockpos, IBlockState iblockstate,
 			AxisAlignedBB axisalignedbb, List<AxisAlignedBB> list, Entity entity) {
@@ -106,11 +73,103 @@ public class BlockBrewingStand extends BlockContainer {
 		super.addCollisionBoxesToList(world, blockpos, iblockstate, axisalignedbb, list, entity);
 	}
 
-	/**+
-	 * Sets the block's bounds for rendering it as an item
+	public void breakBlock(World world, BlockPos blockpos, IBlockState iblockstate) {
+		TileEntity tileentity = world.getTileEntity(blockpos);
+		if (tileentity instanceof TileEntityBrewingStand) {
+			InventoryHelper.dropInventoryItems(world, blockpos, (TileEntityBrewingStand) tileentity);
+		}
+
+		super.breakBlock(world, blockpos, iblockstate);
+	}
+
+	protected BlockState createBlockState() {
+		return new BlockState(this, new IProperty[] { HAS_BOTTLE[0], HAS_BOTTLE[1], HAS_BOTTLE[2] });
+	}
+
+	/**
+	 * + Returns a new instance of a block's tile entity class. Called on placing
+	 * the block.
 	 */
-	public void setBlockBoundsForItemRender() {
-		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.125F, 1.0F);
+	public TileEntity createNewTileEntity(World var1, int var2) {
+		return new TileEntityBrewingStand();
+	}
+
+	public EnumWorldBlockLayer getBlockLayer() {
+		return EnumWorldBlockLayer.CUTOUT;
+	}
+
+	public int getComparatorInputOverride(World world, BlockPos blockpos) {
+		return Container.calcRedstone(world.getTileEntity(blockpos));
+	}
+
+	public Item getItem(World var1, BlockPos var2) {
+		return Items.brewing_stand;
+	}
+
+	/**
+	 * + Get the Item that this Block should drop when harvested.
+	 */
+	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
+		return Items.brewing_stand;
+	}
+
+	/**
+	 * + Gets the localized name of this block. Used for the statistics page.
+	 */
+	public String getLocalizedName() {
+		return StatCollector.translateToLocal("item.brewingStand.name");
+	}
+
+	/**
+	 * + Convert the BlockState into the correct metadata value
+	 */
+	public int getMetaFromState(IBlockState iblockstate) {
+		int i = 0;
+
+		for (int j = 0; j < 3; ++j) {
+			if (((Boolean) iblockstate.getValue(HAS_BOTTLE[j])).booleanValue()) {
+				i |= 1 << j;
+			}
+		}
+
+		return i;
+	}
+
+	/**
+	 * + The type of render function called. 3 for standard block models, 2 for
+	 * TESR's, 1 for liquids, -1 is no render
+	 */
+	public int getRenderType() {
+		return 3;
+	}
+
+	/**
+	 * + Convert the given metadata into a BlockState for this Block
+	 */
+	public IBlockState getStateFromMeta(int i) {
+		IBlockState iblockstate = this.getDefaultState();
+
+		for (int j = 0; j < 3; ++j) {
+			iblockstate = iblockstate.withProperty(HAS_BOTTLE[j], Boolean.valueOf((i & 1 << j) > 0));
+		}
+
+		return iblockstate;
+	}
+
+	public boolean hasComparatorInputOverride() {
+		return true;
+	}
+
+	public boolean isFullCube() {
+		return false;
+	}
+
+	/**
+	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
+	 * render
+	 */
+	public boolean isOpaqueCube() {
+		return false;
 	}
 
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState var3, EntityPlayer entityplayer,
@@ -125,9 +184,9 @@ public class BlockBrewingStand extends BlockContainer {
 		return true;
 	}
 
-	/**+
-	 * Called by ItemBlocks after a block is set in the world, to
-	 * allow post-place logic
+	/**
+	 * + Called by ItemBlocks after a block is set in the world, to allow post-place
+	 * logic
 	 */
 	public void onBlockPlacedBy(World world, BlockPos blockpos, IBlockState var3, EntityLivingBase var4,
 			ItemStack itemstack) {
@@ -147,67 +206,10 @@ public class BlockBrewingStand extends BlockContainer {
 		world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, d0, d1, d2, 0.0D, 0.0D, 0.0D, new int[0]);
 	}
 
-	public void breakBlock(World world, BlockPos blockpos, IBlockState iblockstate) {
-		TileEntity tileentity = world.getTileEntity(blockpos);
-		if (tileentity instanceof TileEntityBrewingStand) {
-			InventoryHelper.dropInventoryItems(world, blockpos, (TileEntityBrewingStand) tileentity);
-		}
-
-		super.breakBlock(world, blockpos, iblockstate);
-	}
-
-	/**+
-	 * Get the Item that this Block should drop when harvested.
+	/**
+	 * + Sets the block's bounds for rendering it as an item
 	 */
-	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
-		return Items.brewing_stand;
-	}
-
-	public Item getItem(World var1, BlockPos var2) {
-		return Items.brewing_stand;
-	}
-
-	public boolean hasComparatorInputOverride() {
-		return true;
-	}
-
-	public int getComparatorInputOverride(World world, BlockPos blockpos) {
-		return Container.calcRedstone(world.getTileEntity(blockpos));
-	}
-
-	public EnumWorldBlockLayer getBlockLayer() {
-		return EnumWorldBlockLayer.CUTOUT;
-	}
-
-	/**+
-	 * Convert the given metadata into a BlockState for this Block
-	 */
-	public IBlockState getStateFromMeta(int i) {
-		IBlockState iblockstate = this.getDefaultState();
-
-		for (int j = 0; j < 3; ++j) {
-			iblockstate = iblockstate.withProperty(HAS_BOTTLE[j], Boolean.valueOf((i & 1 << j) > 0));
-		}
-
-		return iblockstate;
-	}
-
-	/**+
-	 * Convert the BlockState into the correct metadata value
-	 */
-	public int getMetaFromState(IBlockState iblockstate) {
-		int i = 0;
-
-		for (int j = 0; j < 3; ++j) {
-			if (((Boolean) iblockstate.getValue(HAS_BOTTLE[j])).booleanValue()) {
-				i |= 1 << j;
-			}
-		}
-
-		return i;
-	}
-
-	protected BlockState createBlockState() {
-		return new BlockState(this, new IProperty[] { HAS_BOTTLE[0], HAS_BOTTLE[1], HAS_BOTTLE[2] });
+	public void setBlockBoundsForItemRender() {
+		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.125F, 1.0F);
 	}
 }

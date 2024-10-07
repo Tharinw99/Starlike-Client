@@ -29,21 +29,6 @@ package org.apache.commons.lang3;
 public class ClassPathUtils {
 
 	/**
-	 * <p>
-	 * {@code ClassPathUtils} instances should NOT be constructed in standard
-	 * programming. Instead, the class should be used as
-	 * {@code ClassPathUtils.toFullyQualifiedName(MyClass.class, "MyClass.properties");}.
-	 * </p>
-	 *
-	 * <p>
-	 * This constructor is public to permit tools that require a JavaBean instance
-	 * to operate.
-	 * </p>
-	 */
-	public ClassPathUtils() {
-	}
-
-	/**
 	 * Returns the fully qualified name for the resource with name
 	 * {@code resourceName} relative to the given context.
 	 *
@@ -153,6 +138,21 @@ public class ClassPathUtils {
 		Validate.notNull(context, "context");
 		Validate.notNull(resourceName, "resourceName");
 		return context.getName().replace('.', '/') + "/" + resourceName;
+	}
+
+	/**
+	 * <p>
+	 * {@code ClassPathUtils} instances should NOT be constructed in standard
+	 * programming. Instead, the class should be used as
+	 * {@code ClassPathUtils.toFullyQualifiedName(MyClass.class, "MyClass.properties");}.
+	 * </p>
+	 *
+	 * <p>
+	 * This constructor is public to permit tools that require a JavaBean instance
+	 * to operate.
+	 * </p>
+	 */
+	public ClassPathUtils() {
 	}
 
 }

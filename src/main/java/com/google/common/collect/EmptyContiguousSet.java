@@ -30,8 +30,48 @@ import com.google.common.annotations.GwtIncompatible;
 @GwtCompatible(emulated = true)
 @SuppressWarnings("unchecked") // allow ungenerified Comparable types
 final class EmptyContiguousSet<C extends Comparable> extends ContiguousSet<C> {
+	@GwtIncompatible("serialization")
+	private static final class SerializedForm<C extends Comparable> implements Serializable {
+		private static final long serialVersionUID = 0;
+
+		private final DiscreteDomain<C> domain;
+
+		private SerializedForm(DiscreteDomain<C> domain) {
+			this.domain = domain;
+		}
+
+		private Object readResolve() {
+			return new EmptyContiguousSet<C>(domain);
+		}
+	}
+
 	EmptyContiguousSet(DiscreteDomain<C> domain) {
 		super(domain);
+	}
+
+	@Override
+	public ImmutableList<C> asList() {
+		return ImmutableList.of();
+	}
+
+	@GwtIncompatible("NavigableSet")
+	ImmutableSortedSet<C> createDescendingSet() {
+		return new EmptyImmutableSortedSet<C>(Ordering.natural().reverse());
+	}
+
+	@GwtIncompatible("NavigableSet")
+	@Override
+	public UnmodifiableIterator<C> descendingIterator() {
+		return Iterators.emptyIterator();
+	}
+
+	@Override
+	public boolean equals(@Nullable Object object) {
+		if (object instanceof Set) {
+			Set<?> that = (Set<?>) object;
+			return that.isEmpty();
+		}
+		return false;
 	}
 
 	@Override
@@ -40,18 +80,44 @@ final class EmptyContiguousSet<C extends Comparable> extends ContiguousSet<C> {
 	}
 
 	@Override
-	public C last() {
-		throw new NoSuchElementException();
+	public int hashCode() {
+		return 0;
 	}
 
 	@Override
-	public int size() {
-		return 0;
+	ContiguousSet<C> headSetImpl(C toElement, boolean inclusive) {
+		return this;
+	}
+
+	@GwtIncompatible("not used by GWT emulation")
+	@Override
+	int indexOf(Object target) {
+		return -1;
 	}
 
 	@Override
 	public ContiguousSet<C> intersection(ContiguousSet<C> other) {
 		return this;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return true;
+	}
+
+	@Override
+	boolean isPartialView() {
+		return false;
+	}
+
+	@Override
+	public UnmodifiableIterator<C> iterator() {
+		return Iterators.emptyIterator();
+	}
+
+	@Override
+	public C last() {
+		throw new NoSuchElementException();
 	}
 
 	@Override
@@ -65,8 +131,8 @@ final class EmptyContiguousSet<C extends Comparable> extends ContiguousSet<C> {
 	}
 
 	@Override
-	ContiguousSet<C> headSetImpl(C toElement, boolean inclusive) {
-		return this;
+	public int size() {
+		return 0;
 	}
 
 	@Override
@@ -79,80 +145,14 @@ final class EmptyContiguousSet<C extends Comparable> extends ContiguousSet<C> {
 		return this;
 	}
 
-	@GwtIncompatible("not used by GWT emulation")
-	@Override
-	int indexOf(Object target) {
-		return -1;
-	}
-
-	@Override
-	public UnmodifiableIterator<C> iterator() {
-		return Iterators.emptyIterator();
-	}
-
-	@GwtIncompatible("NavigableSet")
-	@Override
-	public UnmodifiableIterator<C> descendingIterator() {
-		return Iterators.emptyIterator();
-	}
-
-	@Override
-	boolean isPartialView() {
-		return false;
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return true;
-	}
-
-	@Override
-	public ImmutableList<C> asList() {
-		return ImmutableList.of();
-	}
-
 	@Override
 	public String toString() {
 		return "[]";
-	}
-
-	@Override
-	public boolean equals(@Nullable Object object) {
-		if (object instanceof Set) {
-			Set<?> that = (Set<?>) object;
-			return that.isEmpty();
-		}
-		return false;
-	}
-
-	@Override
-	public int hashCode() {
-		return 0;
-	}
-
-	@GwtIncompatible("serialization")
-	private static final class SerializedForm<C extends Comparable> implements Serializable {
-		private final DiscreteDomain<C> domain;
-
-		private SerializedForm(DiscreteDomain<C> domain) {
-			this.domain = domain;
-		}
-
-		private Object readResolve() {
-			return new EmptyContiguousSet<C>(domain);
-		}
-
-		private static final long serialVersionUID = 0;
 	}
 
 	@GwtIncompatible("serialization")
 	@Override
 	Object writeReplace() {
 		return new SerializedForm<C>(domain);
-	}
-
-	@GwtIncompatible("NavigableSet")
-	ImmutableSortedSet<C> createDescendingSet() {
-		return new EmptyImmutableSortedSet<C>(Ordering.natural().reverse());
 	}
 }

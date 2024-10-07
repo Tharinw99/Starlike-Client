@@ -18,22 +18,25 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -60,23 +63,44 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
 		this.cachedChestType = chestType;
 	}
 
-	/**+
-	 * Returns the number of slots in the inventory.
+	/**
+	 * + Performs the check for adjacent chests to determine if this chest is double
+	 * or not.
 	 */
-	public int getSizeInventory() {
-		return 27;
+	public void checkForAdjacentChests() {
+		if (!this.adjacentChestChecked) {
+			this.adjacentChestChecked = true;
+			this.adjacentChestXNeg = this.getAdjacentChest(EnumFacing.WEST);
+			this.adjacentChestXPos = this.getAdjacentChest(EnumFacing.EAST);
+			this.adjacentChestZNeg = this.getAdjacentChest(EnumFacing.NORTH);
+			this.adjacentChestZPos = this.getAdjacentChest(EnumFacing.SOUTH);
+		}
 	}
 
-	/**+
-	 * Returns the stack in the given slot.
-	 */
-	public ItemStack getStackInSlot(int i) {
-		return this.chestContents[i];
+	public void clear() {
+		for (int i = 0; i < this.chestContents.length; ++i) {
+			this.chestContents[i] = null;
+		}
+
 	}
 
-	/**+
-	 * Removes up to a specified number of items from an inventory
-	 * slot and returns them in a new stack.
+	public void closeInventory(EntityPlayer entityplayer) {
+		if (!entityplayer.isSpectator() && this.getBlockType() instanceof BlockChest) {
+			--this.numPlayersUsing;
+			this.worldObj.addBlockEvent(this.pos, this.getBlockType(), 1, this.numPlayersUsing);
+			this.worldObj.notifyNeighborsOfStateChange(this.pos, this.getBlockType());
+			this.worldObj.notifyNeighborsOfStateChange(this.pos.down(), this.getBlockType());
+		}
+
+	}
+
+	public Container createContainer(InventoryPlayer inventoryplayer, EntityPlayer entityplayer) {
+		return new ContainerChest(inventoryplayer, this, entityplayer);
+	}
+
+	/**
+	 * + Removes up to a specified number of items from an inventory slot and
+	 * returns them in a new stack.
 	 */
 	public ItemStack decrStackSize(int i, int j) {
 		if (this.chestContents[i] != null) {
@@ -97,112 +121,6 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
 		} else {
 			return null;
 		}
-	}
-
-	/**+
-	 * Removes a stack from the given slot and returns it.
-	 */
-	public ItemStack removeStackFromSlot(int i) {
-		if (this.chestContents[i] != null) {
-			ItemStack itemstack = this.chestContents[i];
-			this.chestContents[i] = null;
-			return itemstack;
-		} else {
-			return null;
-		}
-	}
-
-	/**+
-	 * Sets the given item stack to the specified slot in the
-	 * inventory (can be crafting or armor sections).
-	 */
-	public void setInventorySlotContents(int i, ItemStack itemstack) {
-		this.chestContents[i] = itemstack;
-		if (itemstack != null && itemstack.stackSize > this.getInventoryStackLimit()) {
-			itemstack.stackSize = this.getInventoryStackLimit();
-		}
-
-		this.markDirty();
-	}
-
-	/**+
-	 * Gets the name of this command sender (usually username, but
-	 * possibly "Rcon")
-	 */
-	public String getName() {
-		return this.hasCustomName() ? this.customName : "container.chest";
-	}
-
-	/**+
-	 * Returns true if this thing is named
-	 */
-	public boolean hasCustomName() {
-		return this.customName != null && this.customName.length() > 0;
-	}
-
-	public void setCustomName(String name) {
-		this.customName = name;
-	}
-
-	public void readFromNBT(NBTTagCompound nbttagcompound) {
-		super.readFromNBT(nbttagcompound);
-		NBTTagList nbttaglist = nbttagcompound.getTagList("Items", 10);
-		this.chestContents = new ItemStack[this.getSizeInventory()];
-		if (nbttagcompound.hasKey("CustomName", 8)) {
-			this.customName = nbttagcompound.getString("CustomName");
-		}
-
-		for (int i = 0; i < nbttaglist.tagCount(); ++i) {
-			NBTTagCompound nbttagcompound1 = nbttaglist.getCompoundTagAt(i);
-			int j = nbttagcompound1.getByte("Slot") & 255;
-			if (j >= 0 && j < this.chestContents.length) {
-				this.chestContents[j] = ItemStack.loadItemStackFromNBT(nbttagcompound1);
-			}
-		}
-
-	}
-
-	public void writeToNBT(NBTTagCompound nbttagcompound) {
-		super.writeToNBT(nbttagcompound);
-		NBTTagList nbttaglist = new NBTTagList();
-
-		for (int i = 0; i < this.chestContents.length; ++i) {
-			if (this.chestContents[i] != null) {
-				NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-				nbttagcompound1.setByte("Slot", (byte) i);
-				this.chestContents[i].writeToNBT(nbttagcompound1);
-				nbttaglist.appendTag(nbttagcompound1);
-			}
-		}
-
-		nbttagcompound.setTag("Items", nbttaglist);
-		if (this.hasCustomName()) {
-			nbttagcompound.setString("CustomName", this.customName);
-		}
-
-	}
-
-	/**+
-	 * Returns the maximum stack size for a inventory slot. Seems to
-	 * always be 64, possibly will be extended.
-	 */
-	public int getInventoryStackLimit() {
-		return 64;
-	}
-
-	/**+
-	 * Do not make give this method the name canInteractWith because
-	 * it clashes with Container
-	 */
-	public boolean isUseableByPlayer(EntityPlayer entityplayer) {
-		return this.worldObj.getTileEntity(this.pos) != this ? false
-				: entityplayer.getDistanceSq((double) this.pos.getX() + 0.5D, (double) this.pos.getY() + 0.5D,
-						(double) this.pos.getZ() + 0.5D) <= 64.0D;
-	}
-
-	public void updateContainingBlockInfo() {
-		super.updateContainingBlockInfo();
-		this.adjacentChestChecked = false;
 	}
 
 	private void func_174910_a(TileEntityChest chestTe, EnumFacing side) {
@@ -234,20 +152,6 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
 
 	}
 
-	/**+
-	 * Performs the check for adjacent chests to determine if this
-	 * chest is double or not.
-	 */
-	public void checkForAdjacentChests() {
-		if (!this.adjacentChestChecked) {
-			this.adjacentChestChecked = true;
-			this.adjacentChestXNeg = this.getAdjacentChest(EnumFacing.WEST);
-			this.adjacentChestXPos = this.getAdjacentChest(EnumFacing.EAST);
-			this.adjacentChestZNeg = this.getAdjacentChest(EnumFacing.NORTH);
-			this.adjacentChestZPos = this.getAdjacentChest(EnumFacing.SOUTH);
-		}
-	}
-
 	protected TileEntityChest getAdjacentChest(EnumFacing side) {
 		BlockPos blockpos = this.pos.offset(side);
 		if (this.isChestAt(blockpos)) {
@@ -262,6 +166,76 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
 		return null;
 	}
 
+	public int getChestType() {
+		if (this.cachedChestType == -1) {
+			if (this.worldObj == null || !(this.getBlockType() instanceof BlockChest)) {
+				return 0;
+			}
+
+			this.cachedChestType = ((BlockChest) this.getBlockType()).chestType;
+		}
+
+		return this.cachedChestType;
+	}
+
+	public int getField(int var1) {
+		return 0;
+	}
+
+	public int getFieldCount() {
+		return 0;
+	}
+
+	public String getGuiID() {
+		return "minecraft:chest";
+	}
+
+	/**
+	 * + Returns the maximum stack size for a inventory slot. Seems to always be 64,
+	 * possibly will be extended.
+	 */
+	public int getInventoryStackLimit() {
+		return 64;
+	}
+
+	/**
+	 * + Gets the name of this command sender (usually username, but possibly
+	 * "Rcon")
+	 */
+	public String getName() {
+		return this.hasCustomName() ? this.customName : "container.chest";
+	}
+
+	/**
+	 * + Returns the number of slots in the inventory.
+	 */
+	public int getSizeInventory() {
+		return 27;
+	}
+
+	/**
+	 * + Returns the stack in the given slot.
+	 */
+	public ItemStack getStackInSlot(int i) {
+		return this.chestContents[i];
+	}
+
+	/**
+	 * + Returns true if this thing is named
+	 */
+	public boolean hasCustomName() {
+		return this.customName != null && this.customName.length() > 0;
+	}
+
+	/**
+	 * + invalidates a tile entity
+	 */
+	public void invalidate() {
+		super.invalidate();
+		this.updateContainingBlockInfo();
+		this.checkForAdjacentChests();
+	}
+
 	private boolean isChestAt(BlockPos posIn) {
 		if (this.worldObj == null) {
 			return false;
@@ -271,8 +245,100 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
 		}
 	}
 
-	/**+
-	 * Like the old updateEntity(), except more generic.
+	/**
+	 * + Returns true if automation is allowed to insert the given stack (ignoring
+	 * stack size) into the given slot.
+	 */
+	public boolean isItemValidForSlot(int var1, ItemStack var2) {
+		return true;
+	}
+
+	/**
+	 * + Do not make give this method the name canInteractWith because it clashes
+	 * with Container
+	 */
+	public boolean isUseableByPlayer(EntityPlayer entityplayer) {
+		return this.worldObj.getTileEntity(this.pos) != this ? false
+				: entityplayer.getDistanceSq((double) this.pos.getX() + 0.5D, (double) this.pos.getY() + 0.5D,
+						(double) this.pos.getZ() + 0.5D) <= 64.0D;
+	}
+
+	public void openInventory(EntityPlayer entityplayer) {
+		if (!entityplayer.isSpectator()) {
+			if (this.numPlayersUsing < 0) {
+				this.numPlayersUsing = 0;
+			}
+
+			++this.numPlayersUsing;
+			this.worldObj.addBlockEvent(this.pos, this.getBlockType(), 1, this.numPlayersUsing);
+			this.worldObj.notifyNeighborsOfStateChange(this.pos, this.getBlockType());
+			this.worldObj.notifyNeighborsOfStateChange(this.pos.down(), this.getBlockType());
+		}
+
+	}
+
+	public void readFromNBT(NBTTagCompound nbttagcompound) {
+		super.readFromNBT(nbttagcompound);
+		NBTTagList nbttaglist = nbttagcompound.getTagList("Items", 10);
+		this.chestContents = new ItemStack[this.getSizeInventory()];
+		if (nbttagcompound.hasKey("CustomName", 8)) {
+			this.customName = nbttagcompound.getString("CustomName");
+		}
+
+		for (int i = 0; i < nbttaglist.tagCount(); ++i) {
+			NBTTagCompound nbttagcompound1 = nbttaglist.getCompoundTagAt(i);
+			int j = nbttagcompound1.getByte("Slot") & 255;
+			if (j >= 0 && j < this.chestContents.length) {
+				this.chestContents[j] = ItemStack.loadItemStackFromNBT(nbttagcompound1);
+			}
+		}
+
+	}
+
+	public boolean receiveClientEvent(int i, int j) {
+		if (i == 1) {
+			this.numPlayersUsing = j;
+			return true;
+		} else {
+			return super.receiveClientEvent(i, j);
+		}
+	}
+
+	/**
+	 * + Removes a stack from the given slot and returns it.
+	 */
+	public ItemStack removeStackFromSlot(int i) {
+		if (this.chestContents[i] != null) {
+			ItemStack itemstack = this.chestContents[i];
+			this.chestContents[i] = null;
+			return itemstack;
+		} else {
+			return null;
+		}
+	}
+
+	public void setCustomName(String name) {
+		this.customName = name;
+	}
+
+	public void setField(int var1, int var2) {
+	}
+
+	/**
+	 * + Sets the given item stack to the specified slot in the inventory (can be
+	 * crafting or armor sections).
+	 */
+	public void setInventorySlotContents(int i, ItemStack itemstack) {
+		this.chestContents[i] = itemstack;
+		if (itemstack != null && itemstack.stackSize > this.getInventoryStackLimit()) {
+			itemstack.stackSize = this.getInventoryStackLimit();
+		}
+
+		this.markDirty();
+	}
+
+	/**
+	 * + Like the old updateEntity(), except more generic.
 	 */
 	public void update() {
 		this.checkForAdjacentChests();
@@ -353,90 +419,27 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
 
 	}
 
-	public boolean receiveClientEvent(int i, int j) {
-		if (i == 1) {
-			this.numPlayersUsing = j;
-			return true;
-		} else {
-			return super.receiveClientEvent(i, j);
-		}
+	public void updateContainingBlockInfo() {
+		super.updateContainingBlockInfo();
+		this.adjacentChestChecked = false;
 	}
 
-	public void openInventory(EntityPlayer entityplayer) {
-		if (!entityplayer.isSpectator()) {
-			if (this.numPlayersUsing < 0) {
-				this.numPlayersUsing = 0;
-			}
+	public void writeToNBT(NBTTagCompound nbttagcompound) {
+		super.writeToNBT(nbttagcompound);
+		NBTTagList nbttaglist = new NBTTagList();
 
-			++this.numPlayersUsing;
-			this.worldObj.addBlockEvent(this.pos, this.getBlockType(), 1, this.numPlayersUsing);
-			this.worldObj.notifyNeighborsOfStateChange(this.pos, this.getBlockType());
-			this.worldObj.notifyNeighborsOfStateChange(this.pos.down(), this.getBlockType());
-		}
-
-	}
-
-	public void closeInventory(EntityPlayer entityplayer) {
-		if (!entityplayer.isSpectator() && this.getBlockType() instanceof BlockChest) {
-			--this.numPlayersUsing;
-			this.worldObj.addBlockEvent(this.pos, this.getBlockType(), 1, this.numPlayersUsing);
-			this.worldObj.notifyNeighborsOfStateChange(this.pos, this.getBlockType());
-			this.worldObj.notifyNeighborsOfStateChange(this.pos.down(), this.getBlockType());
-		}
-
-	}
-
-	/**+
-	 * Returns true if automation is allowed to insert the given
-	 * stack (ignoring stack size) into the given slot.
-	 */
-	public boolean isItemValidForSlot(int var1, ItemStack var2) {
-		return true;
-	}
-
-	/**+
-	 * invalidates a tile entity
-	 */
-	public void invalidate() {
-		super.invalidate();
-		this.updateContainingBlockInfo();
-		this.checkForAdjacentChests();
-	}
-
-	public int getChestType() {
-		if (this.cachedChestType == -1) {
-			if (this.worldObj == null || !(this.getBlockType() instanceof BlockChest)) {
-				return 0;
-			}
-
-			this.cachedChestType = ((BlockChest) this.getBlockType()).chestType;
-		}
-
-		return this.cachedChestType;
-	}
-
-	public String getGuiID() {
-		return "minecraft:chest";
-	}
-
-	public Container createContainer(InventoryPlayer inventoryplayer, EntityPlayer entityplayer) {
-		return new ContainerChest(inventoryplayer, this, entityplayer);
-	}
-
-	public int getField(int var1) {
-		return 0;
-	}
-
-	public void setField(int var1, int var2) {
-	}
-
-	public int getFieldCount() {
-		return 0;
-	}
-
-	public void clear() {
 		for (int i = 0; i < this.chestContents.length; ++i) {
-			this.chestContents[i] = null;
+			if (this.chestContents[i] != null) {
+				NBTTagCompound nbttagcompound1 = new NBTTagCompound();
+				nbttagcompound1.setByte("Slot", (byte) i);
+				this.chestContents[i].writeToNBT(nbttagcompound1);
+				nbttaglist.appendTag(nbttagcompound1);
+			}
+		}
+
+		nbttagcompound.setTag("Items", nbttaglist);
+		if (this.hasCustomName()) {
+			nbttagcompound.setString("CustomName", this.customName);
 		}
 
 	}

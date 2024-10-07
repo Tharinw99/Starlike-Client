@@ -23,38 +23,41 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public abstract class GuiContainer extends GuiScreen {
-	/**+
-	 * The location of the inventory background texture
+	/**
+	 * + The location of the inventory background texture
 	 */
 	protected static final ResourceLocation inventoryBackground = new ResourceLocation(
 			"textures/gui/container/inventory.png");
-	/**+
-	 * The X size of the inventory window in pixels.
+	/**
+	 * + The X size of the inventory window in pixels.
 	 */
 	protected int xSize = 176;
-	/**+
-	 * The Y size of the inventory window in pixels.
+	/**
+	 * + The Y size of the inventory window in pixels.
 	 */
 	protected int ySize = 166;
 	public Container inventorySlots;
@@ -83,30 +86,69 @@ public abstract class GuiContainer extends GuiScreen {
 	private boolean doubleClick;
 	private ItemStack shiftClickedSlot;
 
+	private int primaryTouchPoint = -1;
+
+	private int lastTouchX = -1;
+
+	private int lastTouchY = -1;
+
 	public GuiContainer(Container inventorySlotsIn) {
 		this.inventorySlots = inventorySlotsIn;
 		this.ignoreMouseUp = true;
 	}
 
-	/**+
-	 * Adds the buttons (and other controls) to the screen in
-	 * question. Called when the GUI is displayed and when the
-	 * window resizes, the buttonList is cleared beforehand.
+	/**
+	 * + This function is what controls the hotbar shortcut check when you press a
+	 * number key when hovering a stack. Args : keyCode, Returns true if a Hotbar
+	 * key is pressed, else false
 	 */
-	public void initGui() {
-		super.initGui();
-		if (primaryTouchPoint != -1 && Touch.fetchPointIdx(primaryTouchPoint) == -1) {
-			primaryTouchPoint = -1;
-			mouseReleased(lastTouchX, lastTouchY, 0);
+	protected boolean checkHotbarKeys(int keyCode) {
+		if (this.mc.thePlayer.inventory.getItemStack() == null && this.theSlot != null) {
+			for (int i = 0; i < 9; ++i) {
+				if (keyCode == this.mc.gameSettings.keyBindsHotbar[i].getKeyCode()) {
+					this.handleMouseClick(this.theSlot, this.theSlot.slotNumber, i, 2);
+					return true;
+				}
+			}
 		}
-		this.mc.thePlayer.openContainer = this.inventorySlots;
-		this.guiLeft = (this.width - this.xSize) / 2;
-		this.guiTop = (this.height - this.ySize) / 2;
+
+		return false;
 	}
 
-	/**+
-	 * Draws the screen and all the components in it. Args : mouseX,
-	 * mouseY, renderPartialTicks
+	/**
+	 * + Returns true if this GUI should pause the game when it is displayed in
+	 * single-player
+	 */
+	public boolean doesGuiPauseGame() {
+		return false;
+	}
+
+	protected abstract void drawGuiContainerBackgroundLayer(float var1, int var2, int var3);
+
+	/**
+	 * + Draw the foreground layer for the GuiContainer (everything in front of the
+	 * items). Args : mouseX, mouseY
+	 */
+	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+	}
+
+	/**
+	 * + Render an ItemStack. Args : stack, x, y, format
+	 */
+	private void drawItemStack(ItemStack stack, int x, int y, String altText) {
+		GlStateManager.translate(0.0F, 0.0F, 32.0F);
+		this.zLevel = 200.0F;
+		this.itemRender.zLevel = 200.0F;
+		this.itemRender.renderItemAndEffectIntoGUI(stack, x, y);
+		this.itemRender.renderItemOverlayIntoGUI(this.fontRendererObj, stack, x,
+				y - (this.draggedStack == null ? 0 : 8), altText);
+		this.zLevel = 0.0F;
+		this.itemRender.zLevel = 0.0F;
+	}
+
+	/**
+	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
+	 * renderPartialTicks
 	 */
 	public void drawScreen(int i, int j, float f) {
 		this.drawDefaultBackground();
@@ -196,29 +238,6 @@ public abstract class GuiContainer extends GuiScreen {
 		RenderHelper.enableStandardItemLighting();
 	}
 
-	/**+
-	 * Render an ItemStack. Args : stack, x, y, format
-	 */
-	private void drawItemStack(ItemStack stack, int x, int y, String altText) {
-		GlStateManager.translate(0.0F, 0.0F, 32.0F);
-		this.zLevel = 200.0F;
-		this.itemRender.zLevel = 200.0F;
-		this.itemRender.renderItemAndEffectIntoGUI(stack, x, y);
-		this.itemRender.renderItemOverlayIntoGUI(this.fontRendererObj, stack, x,
-				y - (this.draggedStack == null ? 0 : 8), altText);
-		this.zLevel = 0.0F;
-		this.itemRender.zLevel = 0.0F;
-	}
-
-	/**+
-	 * Draw the foreground layer for the GuiContainer (everything in
-	 * front of the items). Args : mouseX, mouseY
-	 */
-	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-	}
-
-	protected abstract void drawGuiContainerBackgroundLayer(float var1, int var2, int var3);
-
 	private void drawSlot(Slot slotIn) {
 		int i = slotIn.xDisplayPosition;
 		int j = slotIn.yDisplayPosition;
@@ -283,32 +302,8 @@ public abstract class GuiContainer extends GuiScreen {
 		this.zLevel = 0.0F;
 	}
 
-	private void updateDragSplitting() {
-		ItemStack itemstack = this.mc.thePlayer.inventory.getItemStack();
-		if (itemstack != null && this.dragSplitting) {
-			this.dragSplittingRemnant = itemstack.stackSize;
-
-			for (Slot slot : this.dragSplittingSlots) {
-				ItemStack itemstack1 = itemstack.copy();
-				int i = slot.getStack() == null ? 0 : slot.getStack().stackSize;
-				Container.computeStackSize(this.dragSplittingSlots, this.dragSplittingLimit, itemstack1, i);
-				if (itemstack1.stackSize > itemstack1.getMaxStackSize()) {
-					itemstack1.stackSize = itemstack1.getMaxStackSize();
-				}
-
-				if (itemstack1.stackSize > slot.getItemStackLimit(itemstack1)) {
-					itemstack1.stackSize = slot.getItemStackLimit(itemstack1);
-				}
-
-				this.dragSplittingRemnant -= itemstack1.stackSize - i;
-			}
-
-		}
-	}
-
-	/**+
-	 * Returns the slot at the given coordinates or null if there is
-	 * none.
+	/**
+	 * + Returns the slot at the given coordinates or null if there is none.
 	 */
 	private Slot getSlotAtPosition(int x, int y) {
 		for (int i = 0; i < this.inventorySlots.inventorySlots.size(); ++i) {
@@ -321,9 +316,87 @@ public abstract class GuiContainer extends GuiScreen {
 		return null;
 	}
 
-	/**+
-	 * Called when the mouse is clicked. Args : mouseX, mouseY,
-	 * clickedButton
+	protected float getTouchModeScale() {
+		return 1.25f;
+	}
+
+	/**
+	 * + Called when the mouse is clicked over a slot or outside the gui.
+	 */
+	protected void handleMouseClick(Slot slotIn, int slotId, int clickedButton, int clickType) {
+		if (slotIn != null) {
+			slotId = slotIn.slotNumber;
+		}
+
+		this.mc.playerController.windowClick(this.inventorySlots.windowId, slotId, clickedButton, clickType,
+				this.mc.thePlayer);
+	}
+
+	/**
+	 * + Adds the buttons (and other controls) to the screen in question. Called
+	 * when the GUI is displayed and when the window resizes, the buttonList is
+	 * cleared beforehand.
+	 */
+	public void initGui() {
+		super.initGui();
+		if (primaryTouchPoint != -1 && Touch.fetchPointIdx(primaryTouchPoint) == -1) {
+			primaryTouchPoint = -1;
+			mouseReleased(lastTouchX, lastTouchY, 0);
+		}
+		this.mc.thePlayer.openContainer = this.inventorySlots;
+		this.guiLeft = (this.width - this.xSize) / 2;
+		this.guiTop = (this.height - this.ySize) / 2;
+	}
+
+	/**
+	 * + Returns if the passed mouse position is over the specified slot. Args :
+	 * slot, mouseX, mouseY
+	 */
+	private boolean isMouseOverSlot(Slot slotIn, int mouseX, int mouseY) {
+		return this.isPointInRegion(slotIn.xDisplayPosition, slotIn.yDisplayPosition, 16, 16, mouseX, mouseY);
+	}
+
+	/**
+	 * + Test if the 2D point is in a rectangle (relative to the GUI). Args : rectX,
+	 * rectY, rectWidth, rectHeight, pointX, pointY
+	 */
+	protected boolean isPointInRegion(int left, int top, int right, int bottom, int pointX, int pointY) {
+		int i = this.guiLeft;
+		int j = this.guiTop;
+		pointX = pointX - i;
+		pointY = pointY - j;
+		return pointX >= left - 1 && pointX < left + right + 1 && pointY >= top - 1 && pointY < top + bottom + 1;
+	}
+
+	/**
+	 * + Fired when a key is typed (except F11 which toggles full screen). This is
+	 * the equivalent of KeyListener.keyTyped(KeyEvent e). Args : character
+	 * (character on the key), keyCode (lwjgl Keyboard key code)
+	 */
+	protected void keyTyped(char parChar1, int parInt1) {
+		if (parInt1 == this.mc.gameSettings.keyBindClose.getKeyCode()
+				|| parInt1 == this.mc.gameSettings.keyBindInventory.getKeyCode()
+				|| (parInt1 == 1 && (this.mc.gameSettings.keyBindClose.getKeyCode() == 0 || this.mc.areKeysLocked()))) {
+			this.mc.thePlayer.closeScreen();
+			if (this.mc.currentScreen == null) {
+				this.mc.setIngameFocus();
+			}
+		} else if (parInt1 == 1) {
+			showingCloseKey = EagRuntime.steadyTimeMillis();
+		} else {
+			this.checkHotbarKeys(parInt1);
+			if (this.theSlot != null && this.theSlot.getHasStack()) {
+				if (parInt1 == this.mc.gameSettings.keyBindPickBlock.getKeyCode()) {
+					this.handleMouseClick(this.theSlot, this.theSlot.slotNumber, 0, 3);
+				} else if (parInt1 == this.mc.gameSettings.keyBindDrop.getKeyCode()) {
+					this.handleMouseClick(this.theSlot, this.theSlot.slotNumber, isCtrlKeyDown() ? 1 : 0, 4);
+				}
+			}
+		}
+	}
+
+	/**
+	 * + Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
 	 */
 	protected void mouseClicked(int parInt1, int parInt2, int parInt3) {
 		super.mouseClicked(parInt1, parInt2, parInt3);
@@ -399,10 +472,9 @@ public abstract class GuiContainer extends GuiScreen {
 		this.lastClickButton = parInt3;
 	}
 
-	/**+
-	 * Called when a mouse button is pressed and the mouse is moved
-	 * around. Parameters are : mouseX, mouseY, lastButtonClicked &
-	 * timeSinceMouseClick.
+	/**
+	 * + Called when a mouse button is pressed and the mouse is moved around.
+	 * Parameters are : mouseX, mouseY, lastButtonClicked & timeSinceMouseClick.
 	 */
 	protected void mouseClickMove(int i, int j, int k, long var4) {
 		Slot slot = this.getSlotAtPosition(i, j);
@@ -440,9 +512,9 @@ public abstract class GuiContainer extends GuiScreen {
 
 	}
 
-	/**+
-	 * Called when a mouse button is released. Args : mouseX,
-	 * mouseY, releaseButton
+	/**
+	 * + Called when a mouse button is released. Args : mouseX, mouseY,
+	 * releaseButton
 	 */
 	protected void mouseReleased(int i, int j, int k) {
 		Slot slot = this.getSlotAtPosition(i, j);
@@ -551,88 +623,8 @@ public abstract class GuiContainer extends GuiScreen {
 		this.dragSplitting = false;
 	}
 
-	/**+
-	 * Returns if the passed mouse position is over the specified
-	 * slot. Args : slot, mouseX, mouseY
-	 */
-	private boolean isMouseOverSlot(Slot slotIn, int mouseX, int mouseY) {
-		return this.isPointInRegion(slotIn.xDisplayPosition, slotIn.yDisplayPosition, 16, 16, mouseX, mouseY);
-	}
-
-	/**+
-	 * Test if the 2D point is in a rectangle (relative to the GUI).
-	 * Args : rectX, rectY, rectWidth, rectHeight, pointX, pointY
-	 */
-	protected boolean isPointInRegion(int left, int top, int right, int bottom, int pointX, int pointY) {
-		int i = this.guiLeft;
-		int j = this.guiTop;
-		pointX = pointX - i;
-		pointY = pointY - j;
-		return pointX >= left - 1 && pointX < left + right + 1 && pointY >= top - 1 && pointY < top + bottom + 1;
-	}
-
-	/**+
-	 * Called when the mouse is clicked over a slot or outside the
-	 * gui.
-	 */
-	protected void handleMouseClick(Slot slotIn, int slotId, int clickedButton, int clickType) {
-		if (slotIn != null) {
-			slotId = slotIn.slotNumber;
-		}
-
-		this.mc.playerController.windowClick(this.inventorySlots.windowId, slotId, clickedButton, clickType,
-				this.mc.thePlayer);
-	}
-
-	/**+
-	 * Fired when a key is typed (except F11 which toggles full
-	 * screen). This is the equivalent of
-	 * KeyListener.keyTyped(KeyEvent e). Args : character (character
-	 * on the key), keyCode (lwjgl Keyboard key code)
-	 */
-	protected void keyTyped(char parChar1, int parInt1) {
-		if (parInt1 == this.mc.gameSettings.keyBindClose.getKeyCode()
-				|| parInt1 == this.mc.gameSettings.keyBindInventory.getKeyCode()
-				|| (parInt1 == 1 && (this.mc.gameSettings.keyBindClose.getKeyCode() == 0 || this.mc.areKeysLocked()))) {
-			this.mc.thePlayer.closeScreen();
-			if (this.mc.currentScreen == null) {
-				this.mc.setIngameFocus();
-			}
-		} else if (parInt1 == 1) {
-			showingCloseKey = EagRuntime.steadyTimeMillis();
-		} else {
-			this.checkHotbarKeys(parInt1);
-			if (this.theSlot != null && this.theSlot.getHasStack()) {
-				if (parInt1 == this.mc.gameSettings.keyBindPickBlock.getKeyCode()) {
-					this.handleMouseClick(this.theSlot, this.theSlot.slotNumber, 0, 3);
-				} else if (parInt1 == this.mc.gameSettings.keyBindDrop.getKeyCode()) {
-					this.handleMouseClick(this.theSlot, this.theSlot.slotNumber, isCtrlKeyDown() ? 1 : 0, 4);
-				}
-			}
-		}
-	}
-
-	/**+
-	 * This function is what controls the hotbar shortcut check when
-	 * you press a number key when hovering a stack. Args : keyCode,
-	 * Returns true if a Hotbar key is pressed, else false
-	 */
-	protected boolean checkHotbarKeys(int keyCode) {
-		if (this.mc.thePlayer.inventory.getItemStack() == null && this.theSlot != null) {
-			for (int i = 0; i < 9; ++i) {
-				if (keyCode == this.mc.gameSettings.keyBindsHotbar[i].getKeyCode()) {
-					this.handleMouseClick(this.theSlot, this.theSlot.slotNumber, i, 2);
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
-	/**+
-	 * Called when the screen is unloaded. Used to disable keyboard
-	 * repeat events
+	/**
+	 * + Called when the screen is unloaded. Used to disable keyboard repeat events
 	 */
 	public void onGuiClosed() {
 		if (this.mc.thePlayer != null) {
@@ -640,43 +632,16 @@ public abstract class GuiContainer extends GuiScreen {
 		}
 	}
 
-	/**+
-	 * Returns true if this GUI should pause the game when it is
-	 * displayed in single-player
-	 */
-	public boolean doesGuiPauseGame() {
+	protected boolean shouldTouchGenerateMouseEvents() {
 		return false;
 	}
 
-	/**+
-	 * Called from the main game loop to update the screen.
-	 */
-	public void updateScreen() {
-		super.updateScreen();
-		if (!this.mc.thePlayer.isEntityAlive() || this.mc.thePlayer.isDead) {
-			this.mc.thePlayer.closeScreen();
-			return;
-		}
-		if (primaryTouchPoint != -1 && Touch.fetchPointIdx(primaryTouchPoint) == -1) {
+	protected void touchEndMove(int touchX, int touchY, int uid) {
+		if (primaryTouchPoint == uid) {
 			primaryTouchPoint = -1;
-			mouseReleased(lastTouchX, lastTouchY, 0);
-		}
-	}
-
-	protected float getTouchModeScale() {
-		return 1.25f;
-	}
-
-	private int primaryTouchPoint = -1;
-	private int lastTouchX = -1;
-	private int lastTouchY = -1;
-
-	protected void touchStarted(int touchX, int touchY, int uid) {
-		if (primaryTouchPoint == -1) {
-			primaryTouchPoint = uid;
 			lastTouchX = touchX;
 			lastTouchY = touchY;
-			mouseClicked(touchX, touchY, 0);
+			mouseReleased(touchX, touchY, 0);
 		}
 	}
 
@@ -688,12 +653,12 @@ public abstract class GuiContainer extends GuiScreen {
 		}
 	}
 
-	protected void touchEndMove(int touchX, int touchY, int uid) {
-		if (primaryTouchPoint == uid) {
-			primaryTouchPoint = -1;
+	protected void touchStarted(int touchX, int touchY, int uid) {
+		if (primaryTouchPoint == -1) {
+			primaryTouchPoint = uid;
 			lastTouchX = touchX;
 			lastTouchY = touchY;
-			mouseReleased(touchX, touchY, 0);
+			mouseClicked(touchX, touchY, 0);
 		}
 	}
 
@@ -706,7 +671,41 @@ public abstract class GuiContainer extends GuiScreen {
 		}
 	}
 
-	protected boolean shouldTouchGenerateMouseEvents() {
-		return false;
+	private void updateDragSplitting() {
+		ItemStack itemstack = this.mc.thePlayer.inventory.getItemStack();
+		if (itemstack != null && this.dragSplitting) {
+			this.dragSplittingRemnant = itemstack.stackSize;
+
+			for (Slot slot : this.dragSplittingSlots) {
+				ItemStack itemstack1 = itemstack.copy();
+				int i = slot.getStack() == null ? 0 : slot.getStack().stackSize;
+				Container.computeStackSize(this.dragSplittingSlots, this.dragSplittingLimit, itemstack1, i);
+				if (itemstack1.stackSize > itemstack1.getMaxStackSize()) {
+					itemstack1.stackSize = itemstack1.getMaxStackSize();
+				}
+
+				if (itemstack1.stackSize > slot.getItemStackLimit(itemstack1)) {
+					itemstack1.stackSize = slot.getItemStackLimit(itemstack1);
+				}
+
+				this.dragSplittingRemnant -= itemstack1.stackSize - i;
+			}
+
+		}
+	}
+
+	/**
+	 * + Called from the main game loop to update the screen.
+	 */
+	public void updateScreen() {
+		super.updateScreen();
+		if (!this.mc.thePlayer.isEntityAlive() || this.mc.thePlayer.isDead) {
+			this.mc.thePlayer.closeScreen();
+			return;
+		}
+		if (primaryTouchPoint != -1 && Touch.fetchPointIdx(primaryTouchPoint) == -1) {
+			primaryTouchPoint = -1;
+			mouseReleased(lastTouchX, lastTouchY, 0);
+		}
 	}
 }

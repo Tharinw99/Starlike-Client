@@ -24,6 +24,8 @@ import com.google.common.annotations.GwtCompatible;
 /** An ordering that tries several comparators in order. */
 @GwtCompatible(serializable = true)
 final class CompoundOrdering<T> extends Ordering<T> implements Serializable {
+	private static final long serialVersionUID = 0;
+
 	final ImmutableList<Comparator<? super T>> comparators;
 
 	CompoundOrdering(Comparator<? super T> primary, Comparator<? super T> secondary) {
@@ -68,6 +70,4 @@ final class CompoundOrdering<T> extends Ordering<T> implements Serializable {
 	public String toString() {
 		return "Ordering.compound(" + comparators + ")";
 	}
-
-	private static final long serialVersionUID = 0;
 }

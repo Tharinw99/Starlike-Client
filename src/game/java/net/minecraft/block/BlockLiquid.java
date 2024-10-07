@@ -21,22 +21,25 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeColorHelper;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -44,25 +47,25 @@ import net.minecraft.world.biome.BiomeColorHelper;
 public abstract class BlockLiquid extends Block {
 	public static final PropertyInteger LEVEL = PropertyInteger.create("level", 0, 15);
 
-	protected BlockLiquid(Material materialIn) {
-		super(materialIn);
-		this.setDefaultState(this.blockState.getBaseState().withProperty(LEVEL, Integer.valueOf(0)));
-		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
-		this.setTickRandomly(true);
+	public static double getFlowDirection(IBlockAccess worldIn, BlockPos pos, Material materialIn) {
+		Vec3 vec3 = getFlowingBlock(materialIn).getFlowVector(worldIn, pos);
+		return vec3.xCoord == 0.0D && vec3.zCoord == 0.0D ? -1000.0D
+				: MathHelper.func_181159_b(vec3.zCoord, vec3.xCoord) - 1.5707963267948966D;
 	}
 
-	public boolean isPassable(IBlockAccess var1, BlockPos var2) {
-		return this.blockMaterial != Material.lava;
+	public static BlockDynamicLiquid getFlowingBlock(Material materialIn) {
+		if (materialIn == Material.water) {
+			return Blocks.flowing_water;
+		} else if (materialIn == Material.lava) {
+			return Blocks.flowing_lava;
+		} else {
+			throw new IllegalArgumentException("Invalid material");
+		}
 	}
 
-	public int colorMultiplier(IBlockAccess iblockaccess, BlockPos blockpos, int var3) {
-		return this.blockMaterial == Material.water ? BiomeColorHelper.getWaterColorAtPos(iblockaccess, blockpos)
-				: 16777215;
-	}
-
-	/**+
-	 * Returns the percentage of the liquid block that is air, based
-	 * on the given flow decay of the liquid
+	/**
+	 * + Returns the percentage of the liquid block that is air, based on the given
+	 * flow decay of the liquid
 	 */
 	public static float getLiquidHeightPercent(int meta) {
 		if (meta >= 8) {
@@ -72,46 +75,67 @@ public abstract class BlockLiquid extends Block {
 		return (float) (meta + 1) / 9.0F;
 	}
 
-	protected int getLevel(IBlockAccess worldIn, BlockPos pos) {
-		return worldIn.getBlockState(pos).getBlock().getMaterial() == this.blockMaterial
-				? ((Integer) worldIn.getBlockState(pos).getValue(LEVEL)).intValue()
-				: -1;
+	public static BlockStaticLiquid getStaticBlock(Material materialIn) {
+		if (materialIn == Material.water) {
+			return Blocks.water;
+		} else if (materialIn == Material.lava) {
+			return Blocks.lava;
+		} else {
+			throw new IllegalArgumentException("Invalid material");
+		}
 	}
 
-	protected int getEffectiveFlowDecay(IBlockAccess worldIn, BlockPos pos) {
-		int i = this.getLevel(worldIn, pos);
-		return i >= 8 ? 0 : i;
-	}
-
-	public boolean isFullCube() {
-		return false;
-	}
-
-	/**+
-	 * Used to determine ambient occlusion and culling when
-	 * rebuilding chunks for render
-	 */
-	public boolean isOpaqueCube() {
-		return false;
+	protected BlockLiquid(Material materialIn) {
+		super(materialIn);
+		this.setDefaultState(this.blockState.getBaseState().withProperty(LEVEL, Integer.valueOf(0)));
+		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
+		this.setTickRandomly(true);
 	}
 
 	public boolean canCollideCheck(IBlockState iblockstate, boolean flag) {
 		return flag && ((Integer) iblockstate.getValue(LEVEL)).intValue() == 0;
 	}
 
-	/**+
-	 * Whether this Block is solid on the given Side
-	 */
-	public boolean isBlockSolid(IBlockAccess iblockaccess, BlockPos blockpos, EnumFacing enumfacing) {
-		Material material = iblockaccess.getBlockState(blockpos).getBlock().getMaterial();
-		return material == this.blockMaterial ? false
-				: (enumfacing == EnumFacing.UP ? true
-						: (material == Material.ice ? false : super.isBlockSolid(iblockaccess, blockpos, enumfacing)));
+	public boolean checkForMixing(World worldIn, BlockPos pos, IBlockState state) {
+		if (this.blockMaterial == Material.lava) {
+			boolean flag = false;
+
+			EnumFacing[] facings = EnumFacing._VALUES;
+			for (int j = 0; j < facings.length; ++j) {
+				EnumFacing enumfacing = facings[j];
+				if (enumfacing != EnumFacing.DOWN
+						&& worldIn.getBlockState(pos.offset(enumfacing)).getBlock().getMaterial() == Material.water) {
+					flag = true;
+					break;
+				}
+			}
+
+			if (flag) {
+				Integer integer = (Integer) state.getValue(LEVEL);
+				if (integer.intValue() == 0) {
+					worldIn.setBlockState(pos, Blocks.obsidian.getDefaultState());
+					this.triggerMixEffects(worldIn, pos);
+					return true;
+				}
+
+				if (integer.intValue() <= 4) {
+					worldIn.setBlockState(pos, Blocks.cobblestone.getDefaultState());
+					this.triggerMixEffects(worldIn, pos);
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
-	public boolean shouldSideBeRendered(IBlockAccess iblockaccess, BlockPos blockpos, EnumFacing enumfacing) {
-		return iblockaccess.getBlockState(blockpos).getBlock().getMaterial() == this.blockMaterial ? false
-				: (enumfacing == EnumFacing.UP ? true : super.shouldSideBeRendered(iblockaccess, blockpos, enumfacing));
+	public int colorMultiplier(IBlockAccess iblockaccess, BlockPos blockpos, int var3) {
+		return this.blockMaterial == Material.water ? BiomeColorHelper.getWaterColorAtPos(iblockaccess, blockpos)
+				: 16777215;
+	}
+
+	protected BlockState createBlockState() {
+		return new BlockState(this, new IProperty[] { LEVEL });
 	}
 
 	public boolean func_176364_g(IBlockAccess blockAccess, BlockPos pos) {
@@ -129,30 +153,20 @@ public abstract class BlockLiquid extends Block {
 		return false;
 	}
 
+	public EnumWorldBlockLayer getBlockLayer() {
+		return this.blockMaterial == Material.water
+				? (DeferredStateManager.isRenderingRealisticWater() ? EnumWorldBlockLayer.REALISTIC_WATER
+						: EnumWorldBlockLayer.TRANSLUCENT)
+				: EnumWorldBlockLayer.SOLID;
+	}
+
 	public AxisAlignedBB getCollisionBoundingBox(World var1, BlockPos var2, IBlockState var3) {
 		return null;
 	}
 
-	/**+
-	 * The type of render function called. 3 for standard block
-	 * models, 2 for TESR's, 1 for liquids, -1 is no render
-	 */
-	public int getRenderType() {
-		return 1;
-	}
-
-	/**+
-	 * Get the Item that this Block should drop when harvested.
-	 */
-	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
-		return null;
-	}
-
-	/**+
-	 * Returns the quantity of items to drop on block destruction.
-	 */
-	public int quantityDropped(EaglercraftRandom var1) {
-		return 0;
+	protected int getEffectiveFlowDecay(IBlockAccess worldIn, BlockPos pos) {
+		int i = this.getLevel(worldIn, pos);
+		return i >= 8 ? 0 : i;
 	}
 
 	protected Vec3 getFlowVector(IBlockAccess worldIn, BlockPos pos) {
@@ -196,16 +210,24 @@ public abstract class BlockLiquid extends Block {
 		return vec3.normalize();
 	}
 
-	public Vec3 modifyAcceleration(World world, BlockPos blockpos, Entity var3, Vec3 vec3) {
-		return vec3.add(this.getFlowVector(world, blockpos));
+	/**
+	 * + Get the Item that this Block should drop when harvested.
+	 */
+	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
+		return null;
 	}
 
-	/**+
-	 * How many world ticks before ticking
+	protected int getLevel(IBlockAccess worldIn, BlockPos pos) {
+		return worldIn.getBlockState(pos).getBlock().getMaterial() == this.blockMaterial
+				? ((Integer) worldIn.getBlockState(pos).getValue(LEVEL)).intValue()
+				: -1;
+	}
+
+	/**
+	 * + Convert the BlockState into the correct metadata value
 	 */
-	public int tickRate(World world) {
-		return this.blockMaterial == Material.water ? 5
-				: (this.blockMaterial == Material.lava ? (world.provider.getHasNoSky() ? 10 : 30) : 0);
+	public int getMetaFromState(IBlockState iblockstate) {
+		return ((Integer) iblockstate.getValue(LEVEL)).intValue();
 	}
 
 	public int getMixedBrightnessForBlock(IBlockAccess iblockaccess, BlockPos blockpos) {
@@ -218,11 +240,67 @@ public abstract class BlockLiquid extends Block {
 		return (k > l ? k : l) | (i1 > j1 ? i1 : j1) << 16;
 	}
 
-	public EnumWorldBlockLayer getBlockLayer() {
-		return this.blockMaterial == Material.water
-				? (DeferredStateManager.isRenderingRealisticWater() ? EnumWorldBlockLayer.REALISTIC_WATER
-						: EnumWorldBlockLayer.TRANSLUCENT)
-				: EnumWorldBlockLayer.SOLID;
+	/**
+	 * + The type of render function called. 3 for standard block models, 2 for
+	 * TESR's, 1 for liquids, -1 is no render
+	 */
+	public int getRenderType() {
+		return 1;
+	}
+
+	/**
+	 * + Convert the given metadata into a BlockState for this Block
+	 */
+	public IBlockState getStateFromMeta(int i) {
+		return this.getDefaultState().withProperty(LEVEL, Integer.valueOf(i));
+	}
+
+	/**
+	 * + Whether this Block is solid on the given Side
+	 */
+	public boolean isBlockSolid(IBlockAccess iblockaccess, BlockPos blockpos, EnumFacing enumfacing) {
+		Material material = iblockaccess.getBlockState(blockpos).getBlock().getMaterial();
+		return material == this.blockMaterial ? false
+				: (enumfacing == EnumFacing.UP ? true
+						: (material == Material.ice ? false : super.isBlockSolid(iblockaccess, blockpos, enumfacing)));
+	}
+
+	public boolean isFullCube() {
+		return false;
+	}
+
+	/**
+	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
+	 * render
+	 */
+	public boolean isOpaqueCube() {
+		return false;
+	}
+
+	public boolean isPassable(IBlockAccess var1, BlockPos var2) {
+		return this.blockMaterial != Material.lava;
+	}
+
+	public Vec3 modifyAcceleration(World world, BlockPos blockpos, Entity var3, Vec3 vec3) {
+		return vec3.add(this.getFlowVector(world, blockpos));
+	}
+
+	public void onBlockAdded(World world, BlockPos blockpos, IBlockState iblockstate) {
+		this.checkForMixing(world, blockpos, iblockstate);
+	}
+
+	/**
+	 * + Called when a neighboring block changes.
+	 */
+	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block var4) {
+		this.checkForMixing(world, blockpos, iblockstate);
+	}
+
+	/**
+	 * + Returns the quantity of items to drop on block destruction.
+	 */
+	public int quantityDropped(EaglercraftRandom var1) {
+		return 0;
 	}
 
 	public void randomDisplayTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom random) {
@@ -277,54 +355,17 @@ public abstract class BlockLiquid extends Block {
 
 	}
 
-	public static double getFlowDirection(IBlockAccess worldIn, BlockPos pos, Material materialIn) {
-		Vec3 vec3 = getFlowingBlock(materialIn).getFlowVector(worldIn, pos);
-		return vec3.xCoord == 0.0D && vec3.zCoord == 0.0D ? -1000.0D
-				: MathHelper.func_181159_b(vec3.zCoord, vec3.xCoord) - 1.5707963267948966D;
+	public boolean shouldSideBeRendered(IBlockAccess iblockaccess, BlockPos blockpos, EnumFacing enumfacing) {
+		return iblockaccess.getBlockState(blockpos).getBlock().getMaterial() == this.blockMaterial ? false
+				: (enumfacing == EnumFacing.UP ? true : super.shouldSideBeRendered(iblockaccess, blockpos, enumfacing));
 	}
 
-	public void onBlockAdded(World world, BlockPos blockpos, IBlockState iblockstate) {
-		this.checkForMixing(world, blockpos, iblockstate);
-	}
-
-	/**+
-	 * Called when a neighboring block changes.
+	/**
+	 * + How many world ticks before ticking
 	 */
-	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block var4) {
-		this.checkForMixing(world, blockpos, iblockstate);
-	}
-
-	public boolean checkForMixing(World worldIn, BlockPos pos, IBlockState state) {
-		if (this.blockMaterial == Material.lava) {
-			boolean flag = false;
-
-			EnumFacing[] facings = EnumFacing._VALUES;
-			for (int j = 0; j < facings.length; ++j) {
-				EnumFacing enumfacing = facings[j];
-				if (enumfacing != EnumFacing.DOWN
-						&& worldIn.getBlockState(pos.offset(enumfacing)).getBlock().getMaterial() == Material.water) {
-					flag = true;
-					break;
-				}
-			}
-
-			if (flag) {
-				Integer integer = (Integer) state.getValue(LEVEL);
-				if (integer.intValue() == 0) {
-					worldIn.setBlockState(pos, Blocks.obsidian.getDefaultState());
-					this.triggerMixEffects(worldIn, pos);
-					return true;
-				}
-
-				if (integer.intValue() <= 4) {
-					worldIn.setBlockState(pos, Blocks.cobblestone.getDefaultState());
-					this.triggerMixEffects(worldIn, pos);
-					return true;
-				}
-			}
-		}
-
-		return false;
+	public int tickRate(World world) {
+		return this.blockMaterial == Material.water ? 5
+				: (this.blockMaterial == Material.lava ? (world.provider.getHasNoSky() ? 10 : 30) : 0);
 	}
 
 	protected void triggerMixEffects(World worldIn, BlockPos pos) {
@@ -339,43 +380,5 @@ public abstract class BlockLiquid extends Block {
 					0.0D, 0.0D, 0.0D, new int[0]);
 		}
 
-	}
-
-	/**+
-	 * Convert the given metadata into a BlockState for this Block
-	 */
-	public IBlockState getStateFromMeta(int i) {
-		return this.getDefaultState().withProperty(LEVEL, Integer.valueOf(i));
-	}
-
-	/**+
-	 * Convert the BlockState into the correct metadata value
-	 */
-	public int getMetaFromState(IBlockState iblockstate) {
-		return ((Integer) iblockstate.getValue(LEVEL)).intValue();
-	}
-
-	protected BlockState createBlockState() {
-		return new BlockState(this, new IProperty[] { LEVEL });
-	}
-
-	public static BlockDynamicLiquid getFlowingBlock(Material materialIn) {
-		if (materialIn == Material.water) {
-			return Blocks.flowing_water;
-		} else if (materialIn == Material.lava) {
-			return Blocks.flowing_lava;
-		} else {
-			throw new IllegalArgumentException("Invalid material");
-		}
-	}
-
-	public static BlockStaticLiquid getStaticBlock(Material materialIn) {
-		if (materialIn == Material.water) {
-			return Blocks.water;
-		} else if (materialIn == Material.lava) {
-			return Blocks.lava;
-		} else {
-			throw new IllegalArgumentException("Invalid material");
-		}
 	}
 }

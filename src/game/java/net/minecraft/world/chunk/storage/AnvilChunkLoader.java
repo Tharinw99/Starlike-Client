@@ -1,6 +1,9 @@
 package net.minecraft.world.chunk.storage;
 
 import java.util.List;
+
+import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
+import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
@@ -13,25 +16,26 @@ import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.NibbleArray;
-import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
-import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -39,9 +43,8 @@ import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 public abstract class AnvilChunkLoader implements IChunkLoader {
 	private static final Logger logger = LogManager.getLogger("AnvilChunkLoader");
 
-	/**+
-	 * Wraps readChunkFromNBT. Checks the coordinates and several
-	 * NBT tags.
+	/**
+	 * + Wraps readChunkFromNBT. Checks the coordinates and several NBT tags.
 	 */
 	protected Chunk checkedReadChunkFromNBT(World worldIn, int x, int z, NBTTagCompound parNBTTagCompound) {
 		if (!parNBTTagCompound.hasKey("Level", 10)) {
@@ -67,120 +70,9 @@ public abstract class AnvilChunkLoader implements IChunkLoader {
 		}
 	}
 
-	/**+
-	 * Writes the Chunk passed as an argument to the NBTTagCompound
-	 * also passed, using the World argument to retrieve the Chunk's
-	 * last update time.
-	 */
-	protected void writeChunkToNBT(Chunk chunkIn, World worldIn, NBTTagCompound parNBTTagCompound) {
-		parNBTTagCompound.setByte("V", (byte) 1);
-		parNBTTagCompound.setInteger("xPos", chunkIn.xPosition);
-		parNBTTagCompound.setInteger("zPos", chunkIn.zPosition);
-		parNBTTagCompound.setLong("LastUpdate", worldIn.getTotalWorldTime());
-		parNBTTagCompound.setIntArray("HeightMap", chunkIn.getHeightMap());
-		parNBTTagCompound.setBoolean("TerrainPopulated", chunkIn.isTerrainPopulated());
-		parNBTTagCompound.setBoolean("LightPopulated", chunkIn.isLightPopulated());
-		parNBTTagCompound.setLong("InhabitedTime", chunkIn.getInhabitedTime());
-		ExtendedBlockStorage[] aextendedblockstorage = chunkIn.getBlockStorageArray();
-		NBTTagList nbttaglist = new NBTTagList();
-		boolean flag = !worldIn.provider.getHasNoSky();
-
-		for (ExtendedBlockStorage extendedblockstorage : aextendedblockstorage) {
-			if (extendedblockstorage != null) {
-				NBTTagCompound nbttagcompound = new NBTTagCompound();
-				nbttagcompound.setByte("Y", (byte) (extendedblockstorage.getYLocation() >> 4 & 255));
-				byte[] abyte = new byte[extendedblockstorage.getData().length];
-				NibbleArray nibblearray = new NibbleArray();
-				NibbleArray nibblearray1 = null;
-
-				for (int i = 0; i < extendedblockstorage.getData().length; ++i) {
-					char c0 = extendedblockstorage.getData()[i];
-					int j = i & 15;
-					int k = i >> 8 & 15;
-					int l = i >> 4 & 15;
-					if (c0 >> 12 != 0) {
-						if (nibblearray1 == null) {
-							nibblearray1 = new NibbleArray();
-						}
-
-						nibblearray1.set(j, k, l, c0 >> 12);
-					}
-
-					abyte[i] = (byte) (c0 >> 4 & 255);
-					nibblearray.set(j, k, l, c0 & 15);
-				}
-
-				nbttagcompound.setByteArray("Blocks", abyte);
-				nbttagcompound.setByteArray("Data", nibblearray.getData());
-				if (nibblearray1 != null) {
-					nbttagcompound.setByteArray("Add", nibblearray1.getData());
-				}
-
-				nbttagcompound.setByteArray("BlockLight", extendedblockstorage.getBlocklightArray().getData());
-				if (flag) {
-					nbttagcompound.setByteArray("SkyLight", extendedblockstorage.getSkylightArray().getData());
-				} else {
-					nbttagcompound.setByteArray("SkyLight",
-							new byte[extendedblockstorage.getBlocklightArray().getData().length]);
-				}
-
-				nbttaglist.appendTag(nbttagcompound);
-			}
-		}
-
-		parNBTTagCompound.setTag("Sections", nbttaglist);
-		parNBTTagCompound.setByteArray("Biomes", chunkIn.getBiomeArray());
-		chunkIn.setHasEntities(false);
-		NBTTagList nbttaglist1 = new NBTTagList();
-
-		for (int i1 = 0; i1 < chunkIn.getEntityLists().length; ++i1) {
-			for (Entity entity : chunkIn.getEntityLists()[i1]) {
-				NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-				if (entity.writeToNBTOptional(nbttagcompound1)) {
-					chunkIn.setHasEntities(true);
-					nbttaglist1.appendTag(nbttagcompound1);
-				}
-			}
-		}
-
-		parNBTTagCompound.setTag("Entities", nbttaglist1);
-		NBTTagList nbttaglist2 = new NBTTagList();
-
-		for (TileEntity tileentity : chunkIn.getTileEntityMap().values()) {
-			NBTTagCompound nbttagcompound2 = new NBTTagCompound();
-			tileentity.writeToNBT(nbttagcompound2);
-			nbttaglist2.appendTag(nbttagcompound2);
-		}
-
-		parNBTTagCompound.setTag("TileEntities", nbttaglist2);
-		List<NextTickListEntry> list = worldIn.getPendingBlockUpdates(chunkIn, false);
-		if (list != null) {
-			long j1 = worldIn.getTotalWorldTime();
-			NBTTagList nbttaglist3 = new NBTTagList();
-
-			for (int k = 0, l = list.size(); k < l; ++k) {
-				NextTickListEntry nextticklistentry = list.get(k);
-				NBTTagCompound nbttagcompound3 = new NBTTagCompound();
-				ResourceLocation resourcelocation = (ResourceLocation) Block.blockRegistry
-						.getNameForObject(nextticklistentry.getBlock());
-				nbttagcompound3.setString("i", resourcelocation == null ? "" : resourcelocation.toString());
-				nbttagcompound3.setInteger("x", nextticklistentry.position.getX());
-				nbttagcompound3.setInteger("y", nextticklistentry.position.getY());
-				nbttagcompound3.setInteger("z", nextticklistentry.position.getZ());
-				nbttagcompound3.setInteger("t", (int) (nextticklistentry.scheduledTime - j1));
-				nbttagcompound3.setInteger("p", nextticklistentry.priority);
-				nbttaglist3.appendTag(nbttagcompound3);
-			}
-
-			parNBTTagCompound.setTag("TileTicks", nbttaglist3);
-		}
-
-	}
-
-	/**+
-	 * Reads the data stored in the passed NBTTagCompound and
-	 * creates a Chunk with that data in the passed World. Returns
-	 * the created Chunk.
+	/**
+	 * + Reads the data stored in the passed NBTTagCompound and creates a Chunk with
+	 * that data in the passed World. Returns the created Chunk.
 	 */
 	protected Chunk readChunkFromNBT(World worldIn, NBTTagCompound parNBTTagCompound) {
 		int i = parNBTTagCompound.getInteger("xPos");
@@ -286,5 +178,114 @@ public abstract class AnvilChunkLoader implements IChunkLoader {
 		}
 
 		return chunk;
+	}
+
+	/**
+	 * + Writes the Chunk passed as an argument to the NBTTagCompound also passed,
+	 * using the World argument to retrieve the Chunk's last update time.
+	 */
+	protected void writeChunkToNBT(Chunk chunkIn, World worldIn, NBTTagCompound parNBTTagCompound) {
+		parNBTTagCompound.setByte("V", (byte) 1);
+		parNBTTagCompound.setInteger("xPos", chunkIn.xPosition);
+		parNBTTagCompound.setInteger("zPos", chunkIn.zPosition);
+		parNBTTagCompound.setLong("LastUpdate", worldIn.getTotalWorldTime());
+		parNBTTagCompound.setIntArray("HeightMap", chunkIn.getHeightMap());
+		parNBTTagCompound.setBoolean("TerrainPopulated", chunkIn.isTerrainPopulated());
+		parNBTTagCompound.setBoolean("LightPopulated", chunkIn.isLightPopulated());
+		parNBTTagCompound.setLong("InhabitedTime", chunkIn.getInhabitedTime());
+		ExtendedBlockStorage[] aextendedblockstorage = chunkIn.getBlockStorageArray();
+		NBTTagList nbttaglist = new NBTTagList();
+		boolean flag = !worldIn.provider.getHasNoSky();
+
+		for (ExtendedBlockStorage extendedblockstorage : aextendedblockstorage) {
+			if (extendedblockstorage != null) {
+				NBTTagCompound nbttagcompound = new NBTTagCompound();
+				nbttagcompound.setByte("Y", (byte) (extendedblockstorage.getYLocation() >> 4 & 255));
+				byte[] abyte = new byte[extendedblockstorage.getData().length];
+				NibbleArray nibblearray = new NibbleArray();
+				NibbleArray nibblearray1 = null;
+
+				for (int i = 0; i < extendedblockstorage.getData().length; ++i) {
+					char c0 = extendedblockstorage.getData()[i];
+					int j = i & 15;
+					int k = i >> 8 & 15;
+					int l = i >> 4 & 15;
+					if (c0 >> 12 != 0) {
+						if (nibblearray1 == null) {
+							nibblearray1 = new NibbleArray();
+						}
+
+						nibblearray1.set(j, k, l, c0 >> 12);
+					}
+
+					abyte[i] = (byte) (c0 >> 4 & 255);
+					nibblearray.set(j, k, l, c0 & 15);
+				}
+
+				nbttagcompound.setByteArray("Blocks", abyte);
+				nbttagcompound.setByteArray("Data", nibblearray.getData());
+				if (nibblearray1 != null) {
+					nbttagcompound.setByteArray("Add", nibblearray1.getData());
+				}
+
+				nbttagcompound.setByteArray("BlockLight", extendedblockstorage.getBlocklightArray().getData());
+				if (flag) {
+					nbttagcompound.setByteArray("SkyLight", extendedblockstorage.getSkylightArray().getData());
+				} else {
+					nbttagcompound.setByteArray("SkyLight",
+							new byte[extendedblockstorage.getBlocklightArray().getData().length]);
+				}
+
+				nbttaglist.appendTag(nbttagcompound);
+			}
+		}
+
+		parNBTTagCompound.setTag("Sections", nbttaglist);
+		parNBTTagCompound.setByteArray("Biomes", chunkIn.getBiomeArray());
+		chunkIn.setHasEntities(false);
+		NBTTagList nbttaglist1 = new NBTTagList();
+
+		for (int i1 = 0; i1 < chunkIn.getEntityLists().length; ++i1) {
+			for (Entity entity : chunkIn.getEntityLists()[i1]) {
+				NBTTagCompound nbttagcompound1 = new NBTTagCompound();
+				if (entity.writeToNBTOptional(nbttagcompound1)) {
+					chunkIn.setHasEntities(true);
+					nbttaglist1.appendTag(nbttagcompound1);
+				}
+			}
+		}
+
+		parNBTTagCompound.setTag("Entities", nbttaglist1);
+		NBTTagList nbttaglist2 = new NBTTagList();
+
+		for (TileEntity tileentity : chunkIn.getTileEntityMap().values()) {
+			NBTTagCompound nbttagcompound2 = new NBTTagCompound();
+			tileentity.writeToNBT(nbttagcompound2);
+			nbttaglist2.appendTag(nbttagcompound2);
+		}
+
+		parNBTTagCompound.setTag("TileEntities", nbttaglist2);
+		List<NextTickListEntry> list = worldIn.getPendingBlockUpdates(chunkIn, false);
+		if (list != null) {
+			long j1 = worldIn.getTotalWorldTime();
+			NBTTagList nbttaglist3 = new NBTTagList();
+
+			for (int k = 0, l = list.size(); k < l; ++k) {
+				NextTickListEntry nextticklistentry = list.get(k);
+				NBTTagCompound nbttagcompound3 = new NBTTagCompound();
+				ResourceLocation resourcelocation = (ResourceLocation) Block.blockRegistry
+						.getNameForObject(nextticklistentry.getBlock());
+				nbttagcompound3.setString("i", resourcelocation == null ? "" : resourcelocation.toString());
+				nbttagcompound3.setInteger("x", nextticklistentry.position.getX());
+				nbttagcompound3.setInteger("y", nextticklistentry.position.getY());
+				nbttagcompound3.setInteger("z", nextticklistentry.position.getZ());
+				nbttagcompound3.setInteger("t", (int) (nextticklistentry.scheduledTime - j1));
+				nbttagcompound3.setInteger("p", nextticklistentry.priority);
+				nbttaglist3.appendTag(nbttagcompound3);
+			}
+
+			parNBTTagCompound.setTag("TileTicks", nbttaglist3);
+		}
+
 	}
 }

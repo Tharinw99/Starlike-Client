@@ -9,22 +9,25 @@ import com.google.common.collect.Sets;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.IntHashMap;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -33,12 +36,10 @@ public class KeyBinding implements Comparable<KeyBinding> {
 	private static final List<KeyBinding> keybindArray = Lists.newArrayList();
 	private static final IntHashMap<KeyBinding> hash = new IntHashMap();
 	private static final Set<String> keybindSet = Sets.newHashSet();
-	private final String keyDescription;
-	private final int keyCodeDefault;
-	private final String keyCategory;
-	private int keyCode;
-	private boolean pressed;
-	private int pressTime;
+
+	public static Set<String> getKeybinds() {
+		return keybindSet;
+	}
 
 	public static void onTick(int keyCode) {
 		if (keyCode != 0) {
@@ -48,6 +49,16 @@ public class KeyBinding implements Comparable<KeyBinding> {
 			}
 
 		}
+	}
+
+	public static void resetKeyBindingArrayAndHash() {
+		hash.clearMap();
+
+		for (int i = 0, l = keybindArray.size(); i < l; ++i) {
+			KeyBinding keybinding = keybindArray.get(i);
+			hash.addKey(keybinding.keyCode, keybinding);
+		}
+
 	}
 
 	public static void setKeyBindState(int keyCode, boolean pressed) {
@@ -67,19 +78,17 @@ public class KeyBinding implements Comparable<KeyBinding> {
 
 	}
 
-	public static void resetKeyBindingArrayAndHash() {
-		hash.clearMap();
+	private final String keyDescription;
 
-		for (int i = 0, l = keybindArray.size(); i < l; ++i) {
-			KeyBinding keybinding = keybindArray.get(i);
-			hash.addKey(keybinding.keyCode, keybinding);
-		}
+	private final int keyCodeDefault;
 
-	}
+	private final String keyCategory;
 
-	public static Set<String> getKeybinds() {
-		return keybindSet;
-	}
+	private int keyCode;
+
+	private boolean pressed;
+
+	private int pressTime;
 
 	public KeyBinding(String description, int keyCode, String category) {
 		this.keyDescription = description;
@@ -91,22 +100,44 @@ public class KeyBinding implements Comparable<KeyBinding> {
 		keybindSet.add(category);
 	}
 
-	/**+
-	 * Returns true if the key is pressed (used for continuous
-	 * querying). Should be used in tickers.
-	 */
-	public boolean isKeyDown() {
-		return this.pressed;
+	public int compareTo(KeyBinding keybinding) {
+		int i = I18n.format(this.keyCategory, new Object[0])
+				.compareTo(I18n.format(keybinding.keyCategory, new Object[0]));
+		if (i == 0) {
+			i = I18n.format(this.keyDescription, new Object[0])
+					.compareTo(I18n.format(keybinding.keyDescription, new Object[0]));
+		}
+
+		return i;
 	}
 
 	public String getKeyCategory() {
 		return this.keyCategory;
 	}
 
-	/**+
-	 * Returns true on the initial key press. For continuous
-	 * querying use {@link isKeyDown()}. Should be used in key
-	 * events.
+	public int getKeyCode() {
+		return this.keyCode;
+	}
+
+	public int getKeyCodeDefault() {
+		return this.keyCodeDefault;
+	}
+
+	public String getKeyDescription() {
+		return this.keyDescription;
+	}
+
+	/**
+	 * + Returns true if the key is pressed (used for continuous querying). Should
+	 * be used in tickers.
+	 */
+	public boolean isKeyDown() {
+		return this.pressed;
+	}
+
+	/**
+	 * + Returns true on the initial key press. For continuous querying use
+	 * {@link isKeyDown()}. Should be used in key events.
 	 */
 	public boolean isPressed() {
 		if (this.pressTime == 0) {
@@ -117,35 +148,12 @@ public class KeyBinding implements Comparable<KeyBinding> {
 		}
 	}
 
-	private void unpressKey() {
-		this.pressTime = 0;
-		this.pressed = false;
-	}
-
-	public String getKeyDescription() {
-		return this.keyDescription;
-	}
-
-	public int getKeyCodeDefault() {
-		return this.keyCodeDefault;
-	}
-
-	public int getKeyCode() {
-		return this.keyCode;
-	}
-
 	public void setKeyCode(int keyCode) {
 		this.keyCode = keyCode;
 	}
 
-	public int compareTo(KeyBinding keybinding) {
-		int i = I18n.format(this.keyCategory, new Object[0])
-				.compareTo(I18n.format(keybinding.keyCategory, new Object[0]));
-		if (i == 0) {
-			i = I18n.format(this.keyDescription, new Object[0])
-					.compareTo(I18n.format(keybinding.keyDescription, new Object[0]));
-		}
-
-		return i;
+	private void unpressKey() {
+		this.pressTime = 0;
+		this.pressed = false;
 	}
 }

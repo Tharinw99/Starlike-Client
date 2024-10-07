@@ -35,18 +35,8 @@ final class EmptyImmutableSortedMultiset<E> extends ImmutableSortedMultiset<E> {
 	}
 
 	@Override
-	public Entry<E> firstEntry() {
-		return null;
-	}
-
-	@Override
-	public Entry<E> lastEntry() {
-		return null;
-	}
-
-	@Override
-	public int count(@Nullable Object element) {
-		return 0;
+	public ImmutableList<E> asList() {
+		return ImmutableList.of();
 	}
 
 	@Override
@@ -55,13 +45,32 @@ final class EmptyImmutableSortedMultiset<E> extends ImmutableSortedMultiset<E> {
 	}
 
 	@Override
-	public int size() {
+	int copyIntoArray(Object[] dst, int offset) {
+		return offset;
+	}
+
+	@Override
+	public int count(@Nullable Object element) {
 		return 0;
 	}
 
 	@Override
 	public ImmutableSortedSet<E> elementSet() {
 		return elementSet;
+	}
+
+	@Override
+	public boolean equals(@Nullable Object object) {
+		if (object instanceof Multiset) {
+			Multiset<?> other = (Multiset<?>) object;
+			return other.isEmpty();
+		}
+		return false;
+	}
+
+	@Override
+	public Entry<E> firstEntry() {
+		return null;
 	}
 
 	@Override
@@ -77,10 +86,8 @@ final class EmptyImmutableSortedMultiset<E> extends ImmutableSortedMultiset<E> {
 	}
 
 	@Override
-	public ImmutableSortedMultiset<E> tailMultiset(E lowerBound, BoundType boundType) {
-		checkNotNull(lowerBound);
-		checkNotNull(boundType);
-		return this;
+	boolean isPartialView() {
+		return false;
 	}
 
 	@Override
@@ -89,26 +96,19 @@ final class EmptyImmutableSortedMultiset<E> extends ImmutableSortedMultiset<E> {
 	}
 
 	@Override
-	public boolean equals(@Nullable Object object) {
-		if (object instanceof Multiset) {
-			Multiset<?> other = (Multiset<?>) object;
-			return other.isEmpty();
-		}
-		return false;
+	public Entry<E> lastEntry() {
+		return null;
 	}
 
 	@Override
-	boolean isPartialView() {
-		return false;
+	public int size() {
+		return 0;
 	}
 
 	@Override
-	int copyIntoArray(Object[] dst, int offset) {
-		return offset;
-	}
-
-	@Override
-	public ImmutableList<E> asList() {
-		return ImmutableList.of();
+	public ImmutableSortedMultiset<E> tailMultiset(E lowerBound, BoundType boundType) {
+		checkNotNull(lowerBound);
+		checkNotNull(boundType);
+		return this;
 	}
 }

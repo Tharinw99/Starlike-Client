@@ -38,6 +38,28 @@ import com.google.common.annotations.Beta;
 @Beta
 public interface RangeMap<K extends Comparable, V> {
 	/**
+	 * Returns a view of this range map as an unmodifiable {@code Map<Range<K>, V>}.
+	 * Modifications to this range map are guaranteed to read through to the
+	 * returned {@code Map}.
+	 *
+	 * <p>
+	 * It is guaranteed that no empty ranges will be in the returned {@code Map}.
+	 */
+	Map<Range<K>, V> asMapOfRanges();
+
+	/**
+	 * Removes all associations from this range map (optional operation).
+	 */
+	void clear();
+
+	/**
+	 * Returns {@code true} if {@code obj} is another {@code RangeMap} that has an
+	 * equivalent {@link #asMapOfRanges()}.
+	 */
+	@Override
+	boolean equals(@Nullable Object o);
+
+	/**
 	 * Returns the value associated with the specified key, or {@code null} if there
 	 * is no such value.
 	 *
@@ -56,12 +78,10 @@ public interface RangeMap<K extends Comparable, V> {
 	Map.Entry<Range<K>, V> getEntry(K key);
 
 	/**
-	 * Returns the minimal range {@linkplain Range#encloses(Range) enclosing} the
-	 * ranges in this {@code RangeMap}.
-	 *
-	 * @throws NoSuchElementException if this range map is empty
+	 * Returns {@code asMapOfRanges().hashCode()}.
 	 */
-	Range<K> span();
+	@Override
+	int hashCode();
 
 	/**
 	 * Maps a range to a specified value (optional operation).
@@ -83,11 +103,6 @@ public interface RangeMap<K extends Comparable, V> {
 	void putAll(RangeMap<K, V> rangeMap);
 
 	/**
-	 * Removes all associations from this range map (optional operation).
-	 */
-	void clear();
-
-	/**
 	 * Removes all associations from this range map in the specified range (optional
 	 * operation).
 	 *
@@ -100,14 +115,12 @@ public interface RangeMap<K extends Comparable, V> {
 	void remove(Range<K> range);
 
 	/**
-	 * Returns a view of this range map as an unmodifiable {@code Map<Range<K>, V>}.
-	 * Modifications to this range map are guaranteed to read through to the
-	 * returned {@code Map}.
+	 * Returns the minimal range {@linkplain Range#encloses(Range) enclosing} the
+	 * ranges in this {@code RangeMap}.
 	 *
-	 * <p>
-	 * It is guaranteed that no empty ranges will be in the returned {@code Map}.
+	 * @throws NoSuchElementException if this range map is empty
 	 */
-	Map<Range<K>, V> asMapOfRanges();
+	Range<K> span();
 
 	/**
 	 * Returns a view of the part of this range map that intersects with
@@ -129,19 +142,6 @@ public interface RangeMap<K extends Comparable, V> {
 	 * {@code range}.
 	 */
 	RangeMap<K, V> subRangeMap(Range<K> range);
-
-	/**
-	 * Returns {@code true} if {@code obj} is another {@code RangeMap} that has an
-	 * equivalent {@link #asMapOfRanges()}.
-	 */
-	@Override
-	boolean equals(@Nullable Object o);
-
-	/**
-	 * Returns {@code asMapOfRanges().hashCode()}.
-	 */
-	@Override
-	int hashCode();
 
 	/**
 	 * Returns a readable string representation of this range map.

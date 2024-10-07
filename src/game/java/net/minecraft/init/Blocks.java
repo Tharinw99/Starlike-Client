@@ -10,6 +10,7 @@ import net.minecraft.block.BlockDaylightDetector;
 import net.minecraft.block.BlockDeadBush;
 import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.block.BlockDynamicLiquid;
+import net.minecraft.block.BlockFabricator;
 import net.minecraft.block.BlockFire;
 import net.minecraft.block.BlockFlower;
 import net.minecraft.block.BlockGrass;
@@ -34,22 +35,25 @@ import net.minecraft.block.BlockTallGrass;
 import net.minecraft.block.BlockTripWireHook;
 import net.minecraft.util.ResourceLocation;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -253,18 +257,18 @@ public class Blocks {
 	public static Block red_sandstone_stairs;
 	public static BlockSlab double_stone_slab2;
 	public static BlockSlab stone_slab2;
-	public static Block iron_grate;
+	public static Block deepstone;
+	public static Block cobbled_deepstone;
+	public static Block steel_block;
+	public static Block steel_grate;
 	public static Block platinum_ore;
 	public static Block platinum_block;
+	public static Block titanium_ore;
+	public static Block titanium_block;
 	public static Block uranium_ore;
-
-	/**+
-	 * Returns the Block in the blockRegistry with the specified
-	 * name.
-	 */
-	private static Block getRegisteredBlock(String parString1) {
-		return (Block) Block.blockRegistry.getObject(new ResourceLocation(parString1));
-	}
+	public static Block uranium_block;
+	public static Block mosaic;
+	public static Block fabricator;
 
 	static void doBootstrap() {
 		if (!Bootstrap.isRegistered()) {
@@ -468,10 +472,27 @@ public class Blocks {
 			red_sandstone_stairs = getRegisteredBlock("red_sandstone_stairs");
 			double_stone_slab2 = (BlockSlab) getRegisteredBlock("double_stone_slab2");
 			stone_slab2 = (BlockSlab) getRegisteredBlock("stone_slab2");
-			iron_grate = getRegisteredBlock("starlike:iron_grate");
+
+			deepstone = getRegisteredBlock("starlike:deepstone");
+			cobbled_deepstone = getRegisteredBlock("starlike:cobbled_deepstone");
+			steel_block = getRegisteredBlock("starlike:steel_block");
+			steel_grate = getRegisteredBlock("starlike:steel_grate");
 			platinum_ore = getRegisteredBlock("starlike:platinum_ore");
 			platinum_block = getRegisteredBlock("starlike:platinum_block");
+			titanium_ore = getRegisteredBlock("starlike:titanium_ore");
+			titanium_block = getRegisteredBlock("starlike:titanium_block");
 			uranium_ore = getRegisteredBlock("starlike:uranium_ore");
+			uranium_block = getRegisteredBlock("starlike:uranium_block");
+			mosaic = getRegisteredBlock("starlike:mosaic");
+			fabricator = (BlockFabricator) getRegisteredBlock("starlike:fabricator");
+
 		}
+	}
+
+	/**
+	 * + Returns the Block in the blockRegistry with the specified name.
+	 */
+	private static Block getRegisteredBlock(String parString1) {
+		return (Block) Block.blockRegistry.getObject(new ResourceLocation(parString1));
 	}
 }

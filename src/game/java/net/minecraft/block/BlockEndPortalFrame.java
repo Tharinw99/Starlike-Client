@@ -1,8 +1,8 @@
 package net.minecraft.block;
 
 import java.util.List;
-import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 
+import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -18,22 +18,25 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -48,24 +51,9 @@ public class BlockEndPortalFrame extends Block {
 				Boolean.valueOf(false)));
 	}
 
-	/**+
-	 * Used to determine ambient occlusion and culling when
-	 * rebuilding chunks for render
-	 */
-	public boolean isOpaqueCube() {
-		return false;
-	}
-
-	/**+
-	 * Sets the block's bounds for rendering it as an item
-	 */
-	public void setBlockBoundsForItemRender() {
-		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.8125F, 1.0F);
-	}
-
-	/**+
-	 * Add all collision boxes of this Block to the list that
-	 * intersect with the given mask.
+	/**
+	 * + Add all collision boxes of this Block to the list that intersect with the
+	 * given mask.
 	 */
 	public void addCollisionBoxesToList(World world, BlockPos blockpos, IBlockState iblockstate,
 			AxisAlignedBB axisalignedbb, List<AxisAlignedBB> list, Entity entity) {
@@ -79,41 +67,23 @@ public class BlockEndPortalFrame extends Block {
 		this.setBlockBoundsForItemRender();
 	}
 
-	/**+
-	 * Get the Item that this Block should drop when harvested.
-	 */
-	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
-		return null;
-	}
-
-	/**+
-	 * Called by ItemBlocks just before a block is actually set in
-	 * the world, to allow for adjustments to the IBlockstate
-	 */
-	public IBlockState onBlockPlaced(World var1, BlockPos var2, EnumFacing var3, float var4, float var5, float var6,
-			int var7, EntityLivingBase entitylivingbase) {
-		return this.getDefaultState().withProperty(FACING, entitylivingbase.getHorizontalFacing().getOpposite())
-				.withProperty(EYE, Boolean.valueOf(false));
-	}
-
-	public boolean hasComparatorInputOverride() {
-		return true;
+	protected BlockState createBlockState() {
+		return new BlockState(this, new IProperty[] { FACING, EYE });
 	}
 
 	public int getComparatorInputOverride(World world, BlockPos blockpos) {
 		return ((Boolean) world.getBlockState(blockpos).getValue(EYE)).booleanValue() ? 15 : 0;
 	}
 
-	/**+
-	 * Convert the given metadata into a BlockState for this Block
+	/**
+	 * + Get the Item that this Block should drop when harvested.
 	 */
-	public IBlockState getStateFromMeta(int i) {
-		return this.getDefaultState().withProperty(EYE, Boolean.valueOf((i & 4) != 0)).withProperty(FACING,
-				EnumFacing.getHorizontal(i & 3));
+	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
+		return null;
 	}
 
-	/**+
-	 * Convert the BlockState into the correct metadata value
+	/**
+	 * + Convert the BlockState into the correct metadata value
 	 */
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
@@ -125,7 +95,40 @@ public class BlockEndPortalFrame extends Block {
 		return i;
 	}
 
-	protected BlockState createBlockState() {
-		return new BlockState(this, new IProperty[] { FACING, EYE });
+	/**
+	 * + Convert the given metadata into a BlockState for this Block
+	 */
+	public IBlockState getStateFromMeta(int i) {
+		return this.getDefaultState().withProperty(EYE, Boolean.valueOf((i & 4) != 0)).withProperty(FACING,
+				EnumFacing.getHorizontal(i & 3));
+	}
+
+	public boolean hasComparatorInputOverride() {
+		return true;
+	}
+
+	/**
+	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
+	 * render
+	 */
+	public boolean isOpaqueCube() {
+		return false;
+	}
+
+	/**
+	 * + Called by ItemBlocks just before a block is actually set in the world, to
+	 * allow for adjustments to the IBlockstate
+	 */
+	public IBlockState onBlockPlaced(World var1, BlockPos var2, EnumFacing var3, float var4, float var5, float var6,
+			int var7, EntityLivingBase entitylivingbase) {
+		return this.getDefaultState().withProperty(FACING, entitylivingbase.getHorizontalFacing().getOpposite())
+				.withProperty(EYE, Boolean.valueOf(false));
+	}
+
+	/**
+	 * + Sets the block's bounds for rendering it as an item
+	 */
+	public void setBlockBoundsForItemRender() {
+		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.8125F, 1.0F);
 	}
 }

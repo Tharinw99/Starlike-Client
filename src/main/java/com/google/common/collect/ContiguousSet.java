@@ -44,6 +44,20 @@ import com.google.common.annotations.GwtIncompatible;
 @SuppressWarnings("rawtypes") // allow ungenerified Comparable types
 public abstract class ContiguousSet<C extends Comparable> extends ImmutableSortedSet<C> {
 	/**
+	 * Not supported. {@code ContiguousSet} instances are constructed with
+	 * {@link #create}. This method exists only to hide {@link ImmutableSet#builder}
+	 * from consumers of {@code
+	 * ContiguousSet}.
+	 *
+	 * @throws UnsupportedOperationException always
+	 * @deprecated Use {@link #create}.
+	 */
+	@Deprecated
+	public static <E> ImmutableSortedSet.Builder<E> builder() {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
 	 * Returns a {@code ContiguousSet} containing the same values in the given
 	 * domain {@linkplain Range#contains contained} by the range.
 	 *
@@ -95,50 +109,11 @@ public abstract class ContiguousSet<C extends Comparable> extends ImmutableSorte
 		return headSetImpl(checkNotNull(toElement), inclusive);
 	}
 
-	@Override
-	public ContiguousSet<C> subSet(C fromElement, C toElement) {
-		checkNotNull(fromElement);
-		checkNotNull(toElement);
-		checkArgument(comparator().compare(fromElement, toElement) <= 0);
-		return subSetImpl(fromElement, true, toElement, false);
-	}
-
-	/**
-	 * @since 12.0
-	 */
-	@GwtIncompatible("NavigableSet")
-	@Override
-	public ContiguousSet<C> subSet(C fromElement, boolean fromInclusive, C toElement, boolean toInclusive) {
-		checkNotNull(fromElement);
-		checkNotNull(toElement);
-		checkArgument(comparator().compare(fromElement, toElement) <= 0);
-		return subSetImpl(fromElement, fromInclusive, toElement, toInclusive);
-	}
-
-	@Override
-	public ContiguousSet<C> tailSet(C fromElement) {
-		return tailSetImpl(checkNotNull(fromElement), true);
-	}
-
-	/**
-	 * @since 12.0
-	 */
-	@GwtIncompatible("NavigableSet")
-	@Override
-	public ContiguousSet<C> tailSet(C fromElement, boolean inclusive) {
-		return tailSetImpl(checkNotNull(fromElement), inclusive);
-	}
-
 	/*
 	 * These methods perform most headSet, subSet, and tailSet logic, besides
 	 * parameter validation.
 	 */
 	/* @Override */ abstract ContiguousSet<C> headSetImpl(C toElement, boolean inclusive);
-
-	/* @Override */ abstract ContiguousSet<C> subSetImpl(C fromElement, boolean fromInclusive, C toElement,
-			boolean toInclusive);
-
-	/* @Override */ abstract ContiguousSet<C> tailSetImpl(C fromElement, boolean inclusive);
 
 	/**
 	 * Returns the set of values that are contained in both this set and the other.
@@ -175,25 +150,50 @@ public abstract class ContiguousSet<C extends Comparable> extends ImmutableSorte
 	public abstract Range<C> range(BoundType lowerBoundType, BoundType upperBoundType);
 
 	/**
+	 * @since 12.0
+	 */
+	@GwtIncompatible("NavigableSet")
+	@Override
+	public ContiguousSet<C> subSet(C fromElement, boolean fromInclusive, C toElement, boolean toInclusive) {
+		checkNotNull(fromElement);
+		checkNotNull(toElement);
+		checkArgument(comparator().compare(fromElement, toElement) <= 0);
+		return subSetImpl(fromElement, fromInclusive, toElement, toInclusive);
+	}
+
+	@Override
+	public ContiguousSet<C> subSet(C fromElement, C toElement) {
+		checkNotNull(fromElement);
+		checkNotNull(toElement);
+		checkArgument(comparator().compare(fromElement, toElement) <= 0);
+		return subSetImpl(fromElement, true, toElement, false);
+	}
+
+	/* @Override */ abstract ContiguousSet<C> subSetImpl(C fromElement, boolean fromInclusive, C toElement,
+			boolean toInclusive);
+
+	@Override
+	public ContiguousSet<C> tailSet(C fromElement) {
+		return tailSetImpl(checkNotNull(fromElement), true);
+	}
+
+	/**
+	 * @since 12.0
+	 */
+	@GwtIncompatible("NavigableSet")
+	@Override
+	public ContiguousSet<C> tailSet(C fromElement, boolean inclusive) {
+		return tailSetImpl(checkNotNull(fromElement), inclusive);
+	}
+
+	/* @Override */ abstract ContiguousSet<C> tailSetImpl(C fromElement, boolean inclusive);
+
+	/**
 	 * Returns a short-hand representation of the contents such as
 	 * {@code "[1..100]"}.
 	 */
 	@Override
 	public String toString() {
 		return range().toString();
-	}
-
-	/**
-	 * Not supported. {@code ContiguousSet} instances are constructed with
-	 * {@link #create}. This method exists only to hide {@link ImmutableSet#builder}
-	 * from consumers of {@code
-	 * ContiguousSet}.
-	 *
-	 * @throws UnsupportedOperationException always
-	 * @deprecated Use {@link #create}.
-	 */
-	@Deprecated
-	public static <E> ImmutableSortedSet.Builder<E> builder() {
-		throw new UnsupportedOperationException();
 	}
 }

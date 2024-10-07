@@ -63,6 +63,19 @@ import com.google.common.annotations.Beta;
  */
 @Beta
 public interface Hasher extends PrimitiveSink {
+	/**
+	 * Computes a hash code based on the data that have been provided to this
+	 * hasher. The result is unspecified if this method is called more than once on
+	 * the same instance.
+	 */
+	HashCode hash();
+
+	/**
+	 * Equivalent to {@code putByte(b ? (byte) 1 : (byte) 0)}.
+	 */
+	@Override
+	Hasher putBoolean(boolean b);
+
 	@Override
 	Hasher putByte(byte b);
 
@@ -73,19 +86,7 @@ public interface Hasher extends PrimitiveSink {
 	Hasher putBytes(byte[] bytes, int off, int len);
 
 	@Override
-	Hasher putShort(short s);
-
-	@Override
-	Hasher putInt(int i);
-
-	@Override
-	Hasher putLong(long l);
-
-	/**
-	 * Equivalent to {@code putInt(Float.floatToRawIntBits(f))}.
-	 */
-	@Override
-	Hasher putFloat(float f);
+	Hasher putChar(char c);
 
 	/**
 	 * Equivalent to {@code putLong(Double.doubleToRawLongBits(d))}.
@@ -94,13 +95,30 @@ public interface Hasher extends PrimitiveSink {
 	Hasher putDouble(double d);
 
 	/**
-	 * Equivalent to {@code putByte(b ? (byte) 1 : (byte) 0)}.
+	 * Equivalent to {@code putInt(Float.floatToRawIntBits(f))}.
 	 */
 	@Override
-	Hasher putBoolean(boolean b);
+	Hasher putFloat(float f);
 
 	@Override
-	Hasher putChar(char c);
+	Hasher putInt(int i);
+
+	@Override
+	Hasher putLong(long l);
+
+	/**
+	 * A simple convenience for {@code funnel.funnel(object, this)}.
+	 */
+	<T> Hasher putObject(T instance, Funnel<? super T> funnel);
+
+	@Override
+	Hasher putShort(short s);
+
+	/**
+	 * Equivalent to {@code putBytes(charSequence.toString().getBytes(charset))}.
+	 */
+	@Override
+	Hasher putString(CharSequence charSequence, Charset charset);
 
 	/**
 	 * Equivalent to processing each {@code char} value in the {@code CharSequence},
@@ -110,22 +128,4 @@ public interface Hasher extends PrimitiveSink {
 	 */
 	@Override
 	Hasher putUnencodedChars(CharSequence charSequence);
-
-	/**
-	 * Equivalent to {@code putBytes(charSequence.toString().getBytes(charset))}.
-	 */
-	@Override
-	Hasher putString(CharSequence charSequence, Charset charset);
-
-	/**
-	 * A simple convenience for {@code funnel.funnel(object, this)}.
-	 */
-	<T> Hasher putObject(T instance, Funnel<? super T> funnel);
-
-	/**
-	 * Computes a hash code based on the data that have been provided to this
-	 * hasher. The result is unspecified if this method is called more than once on
-	 * the same instance.
-	 */
-	HashCode hash();
 }

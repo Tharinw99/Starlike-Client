@@ -50,6 +50,29 @@ import java.nio.charset.Charset;
 public abstract class ByteSink implements OutputSupplier<OutputStream> {
 
 	/**
+	 * A char sink that encodes written characters with a charset and writes
+	 * resulting bytes to this byte sink.
+	 */
+	private final class AsCharSink extends CharSink {
+
+		private final Charset charset;
+
+		private AsCharSink(Charset charset) {
+			this.charset = checkNotNull(charset);
+		}
+
+		@Override
+		public Writer openStream() throws IOException {
+			return new OutputStreamWriter(ByteSink.this.openStream(), charset);
+		}
+
+		@Override
+		public String toString() {
+			return ByteSink.this.toString() + ".asCharSink(" + charset + ")";
+		}
+	}
+
+	/**
 	 * Constructor for use by subclasses.
 	 */
 	protected ByteSink() {
@@ -63,18 +86,6 @@ public abstract class ByteSink implements OutputSupplier<OutputStream> {
 	public CharSink asCharSink(Charset charset) {
 		return new AsCharSink(charset);
 	}
-
-	/**
-	 * Opens a new {@link OutputStream} for writing to this sink. This method should
-	 * return a new, independent stream each time it is called.
-	 *
-	 * <p>
-	 * The caller is responsible for ensuring that the returned stream is closed.
-	 *
-	 * @throws IOException if an I/O error occurs in the process of opening the
-	 *                     stream
-	 */
-	public abstract OutputStream openStream() throws IOException;
 
 	/**
 	 * This method is a temporary method provided for easing migration from
@@ -111,6 +122,18 @@ public abstract class ByteSink implements OutputSupplier<OutputStream> {
 		OutputStream out = openStream();
 		return (out instanceof BufferedOutputStream) ? (BufferedOutputStream) out : new BufferedOutputStream(out);
 	}
+
+	/**
+	 * Opens a new {@link OutputStream} for writing to this sink. This method should
+	 * return a new, independent stream each time it is called.
+	 *
+	 * <p>
+	 * The caller is responsible for ensuring that the returned stream is closed.
+	 *
+	 * @throws IOException if an I/O error occurs in the process of opening the
+	 *                     stream
+	 */
+	public abstract OutputStream openStream() throws IOException;
 
 	/**
 	 * Writes all the given bytes to this sink.
@@ -152,29 +175,6 @@ public abstract class ByteSink implements OutputSupplier<OutputStream> {
 			throw closer.rethrow(e);
 		} finally {
 			closer.close();
-		}
-	}
-
-	/**
-	 * A char sink that encodes written characters with a charset and writes
-	 * resulting bytes to this byte sink.
-	 */
-	private final class AsCharSink extends CharSink {
-
-		private final Charset charset;
-
-		private AsCharSink(Charset charset) {
-			this.charset = checkNotNull(charset);
-		}
-
-		@Override
-		public Writer openStream() throws IOException {
-			return new OutputStreamWriter(ByteSink.this.openStream(), charset);
-		}
-
-		@Override
-		public String toString() {
-			return ByteSink.this.toString() + ".asCharSink(" + charset + ")";
 		}
 	}
 }

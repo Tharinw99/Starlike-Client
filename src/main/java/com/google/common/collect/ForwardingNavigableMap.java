@@ -58,222 +58,6 @@ import com.google.common.annotations.Beta;
  */
 public abstract class ForwardingNavigableMap<K, V> extends ForwardingSortedMap<K, V> implements NavigableMap<K, V> {
 
-	/** Constructor for use by subclasses. */
-	protected ForwardingNavigableMap() {
-	}
-
-	@Override
-	protected abstract NavigableMap<K, V> delegate();
-
-	@Override
-	public Entry<K, V> lowerEntry(K key) {
-		return delegate().lowerEntry(key);
-	}
-
-	/**
-	 * A sensible definition of {@link #lowerEntry} in terms of the
-	 * {@code lastEntry()} of {@link #headMap(Object, boolean)}. If you override
-	 * {@code headMap}, you may wish to override {@code lowerEntry} to forward to
-	 * this implementation.
-	 */
-	protected Entry<K, V> standardLowerEntry(K key) {
-		return headMap(key, false).lastEntry();
-	}
-
-	@Override
-	public K lowerKey(K key) {
-		return delegate().lowerKey(key);
-	}
-
-	/**
-	 * A sensible definition of {@link #lowerKey} in terms of {@code lowerEntry}. If
-	 * you override {@link #lowerEntry}, you may wish to override {@code lowerKey}
-	 * to forward to this implementation.
-	 */
-	protected K standardLowerKey(K key) {
-		return keyOrNull(lowerEntry(key));
-	}
-
-	@Override
-	public Entry<K, V> floorEntry(K key) {
-		return delegate().floorEntry(key);
-	}
-
-	/**
-	 * A sensible definition of {@link #floorEntry} in terms of the
-	 * {@code lastEntry()} of {@link #headMap(Object, boolean)}. If you override
-	 * {@code headMap}, you may wish to override {@code floorEntry} to forward to
-	 * this implementation.
-	 */
-	protected Entry<K, V> standardFloorEntry(K key) {
-		return headMap(key, true).lastEntry();
-	}
-
-	@Override
-	public K floorKey(K key) {
-		return delegate().floorKey(key);
-	}
-
-	/**
-	 * A sensible definition of {@link #floorKey} in terms of {@code floorEntry}. If
-	 * you override {@code floorEntry}, you may wish to override {@code floorKey} to
-	 * forward to this implementation.
-	 */
-	protected K standardFloorKey(K key) {
-		return keyOrNull(floorEntry(key));
-	}
-
-	@Override
-	public Entry<K, V> ceilingEntry(K key) {
-		return delegate().ceilingEntry(key);
-	}
-
-	/**
-	 * A sensible definition of {@link #ceilingEntry} in terms of the
-	 * {@code firstEntry()} of {@link #tailMap(Object, boolean)}. If you override
-	 * {@code tailMap}, you may wish to override {@code ceilingEntry} to forward to
-	 * this implementation.
-	 */
-	protected Entry<K, V> standardCeilingEntry(K key) {
-		return tailMap(key, true).firstEntry();
-	}
-
-	@Override
-	public K ceilingKey(K key) {
-		return delegate().ceilingKey(key);
-	}
-
-	/**
-	 * A sensible definition of {@link #ceilingKey} in terms of
-	 * {@code ceilingEntry}. If you override {@code ceilingEntry}, you may wish to
-	 * override {@code ceilingKey} to forward to this implementation.
-	 */
-	protected K standardCeilingKey(K key) {
-		return keyOrNull(ceilingEntry(key));
-	}
-
-	@Override
-	public Entry<K, V> higherEntry(K key) {
-		return delegate().higherEntry(key);
-	}
-
-	/**
-	 * A sensible definition of {@link #higherEntry} in terms of the
-	 * {@code firstEntry()} of {@link #tailMap(Object, boolean)}. If you override
-	 * {@code tailMap}, you may wish to override {@code higherEntry} to forward to
-	 * this implementation.
-	 */
-	protected Entry<K, V> standardHigherEntry(K key) {
-		return tailMap(key, false).firstEntry();
-	}
-
-	@Override
-	public K higherKey(K key) {
-		return delegate().higherKey(key);
-	}
-
-	/**
-	 * A sensible definition of {@link #higherKey} in terms of {@code higherEntry}.
-	 * If you override {@code higherEntry}, you may wish to override
-	 * {@code higherKey} to forward to this implementation.
-	 */
-	protected K standardHigherKey(K key) {
-		return keyOrNull(higherEntry(key));
-	}
-
-	@Override
-	public Entry<K, V> firstEntry() {
-		return delegate().firstEntry();
-	}
-
-	/**
-	 * A sensible definition of {@link #firstEntry} in terms of the
-	 * {@code iterator()} of {@link #entrySet}. If you override {@code entrySet},
-	 * you may wish to override {@code firstEntry} to forward to this
-	 * implementation.
-	 */
-	protected Entry<K, V> standardFirstEntry() {
-		return Iterables.getFirst(entrySet(), null);
-	}
-
-	/**
-	 * A sensible definition of {@link #firstKey} in terms of {@code firstEntry}. If
-	 * you override {@code firstEntry}, you may wish to override {@code firstKey} to
-	 * forward to this implementation.
-	 */
-	protected K standardFirstKey() {
-		Entry<K, V> entry = firstEntry();
-		if (entry == null) {
-			throw new NoSuchElementException();
-		} else {
-			return entry.getKey();
-		}
-	}
-
-	@Override
-	public Entry<K, V> lastEntry() {
-		return delegate().lastEntry();
-	}
-
-	/**
-	 * A sensible definition of {@link #lastEntry} in terms of the
-	 * {@code iterator()} of the {@link #entrySet} of {@link #descendingMap}. If you
-	 * override {@code descendingMap}, you may wish to override {@code lastEntry} to
-	 * forward to this implementation.
-	 */
-	protected Entry<K, V> standardLastEntry() {
-		return Iterables.getFirst(descendingMap().entrySet(), null);
-	}
-
-	/**
-	 * A sensible definition of {@link #lastKey} in terms of {@code lastEntry}. If
-	 * you override {@code lastEntry}, you may wish to override {@code lastKey} to
-	 * forward to this implementation.
-	 */
-	protected K standardLastKey() {
-		Entry<K, V> entry = lastEntry();
-		if (entry == null) {
-			throw new NoSuchElementException();
-		} else {
-			return entry.getKey();
-		}
-	}
-
-	@Override
-	public Entry<K, V> pollFirstEntry() {
-		return delegate().pollFirstEntry();
-	}
-
-	/**
-	 * A sensible definition of {@link #pollFirstEntry} in terms of the
-	 * {@code iterator} of {@code entrySet}. If you override {@code entrySet}, you
-	 * may wish to override {@code pollFirstEntry} to forward to this
-	 * implementation.
-	 */
-	protected Entry<K, V> standardPollFirstEntry() {
-		return Iterators.pollNext(entrySet().iterator());
-	}
-
-	@Override
-	public Entry<K, V> pollLastEntry() {
-		return delegate().pollLastEntry();
-	}
-
-	/**
-	 * A sensible definition of {@link #pollFirstEntry} in terms of the
-	 * {@code iterator} of the {@code entrySet} of {@code descendingMap}. If you
-	 * override {@code descendingMap}, you may wish to override
-	 * {@code pollFirstEntry} to forward to this implementation.
-	 */
-	protected Entry<K, V> standardPollLastEntry() {
-		return Iterators.pollNext(descendingMap().entrySet().iterator());
-	}
-
-	@Override
-	public NavigableMap<K, V> descendingMap() {
-		return delegate().descendingMap();
-	}
-
 	/**
 	 * A sensible implementation of {@link NavigableMap#descendingMap} in terms of
 	 * the methods of this {@code NavigableMap}. In many cases, you may wish to
@@ -292,11 +76,6 @@ public abstract class ForwardingNavigableMap<K, V> extends ForwardingSortedMap<K
 	protected class StandardDescendingMap extends Maps.DescendingMap<K, V> {
 		/** Constructor for use by subclasses. */
 		public StandardDescendingMap() {
-		}
-
-		@Override
-		NavigableMap<K, V> forward() {
-			return ForwardingNavigableMap.this;
 		}
 
 		@Override
@@ -331,11 +110,11 @@ public abstract class ForwardingNavigableMap<K, V> extends ForwardingSortedMap<K
 				}
 			};
 		}
-	}
 
-	@Override
-	public NavigableSet<K> navigableKeySet() {
-		return delegate().navigableKeySet();
+		@Override
+		NavigableMap<K, V> forward() {
+			return ForwardingNavigableMap.this;
+		}
 	}
 
 	/**
@@ -354,9 +133,110 @@ public abstract class ForwardingNavigableMap<K, V> extends ForwardingSortedMap<K
 		}
 	}
 
+	/** Constructor for use by subclasses. */
+	protected ForwardingNavigableMap() {
+	}
+
+	@Override
+	public Entry<K, V> ceilingEntry(K key) {
+		return delegate().ceilingEntry(key);
+	}
+
+	@Override
+	public K ceilingKey(K key) {
+		return delegate().ceilingKey(key);
+	}
+
+	@Override
+	protected abstract NavigableMap<K, V> delegate();
+
 	@Override
 	public NavigableSet<K> descendingKeySet() {
 		return delegate().descendingKeySet();
+	}
+
+	@Override
+	public NavigableMap<K, V> descendingMap() {
+		return delegate().descendingMap();
+	}
+
+	@Override
+	public Entry<K, V> firstEntry() {
+		return delegate().firstEntry();
+	}
+
+	@Override
+	public Entry<K, V> floorEntry(K key) {
+		return delegate().floorEntry(key);
+	}
+
+	@Override
+	public K floorKey(K key) {
+		return delegate().floorKey(key);
+	}
+
+	@Override
+	public NavigableMap<K, V> headMap(K toKey, boolean inclusive) {
+		return delegate().headMap(toKey, inclusive);
+	}
+
+	@Override
+	public Entry<K, V> higherEntry(K key) {
+		return delegate().higherEntry(key);
+	}
+
+	@Override
+	public K higherKey(K key) {
+		return delegate().higherKey(key);
+	}
+
+	@Override
+	public Entry<K, V> lastEntry() {
+		return delegate().lastEntry();
+	}
+
+	@Override
+	public Entry<K, V> lowerEntry(K key) {
+		return delegate().lowerEntry(key);
+	}
+
+	@Override
+	public K lowerKey(K key) {
+		return delegate().lowerKey(key);
+	}
+
+	@Override
+	public NavigableSet<K> navigableKeySet() {
+		return delegate().navigableKeySet();
+	}
+
+	@Override
+	public Entry<K, V> pollFirstEntry() {
+		return delegate().pollFirstEntry();
+	}
+
+	@Override
+	public Entry<K, V> pollLastEntry() {
+		return delegate().pollLastEntry();
+	}
+
+	/**
+	 * A sensible definition of {@link #ceilingEntry} in terms of the
+	 * {@code firstEntry()} of {@link #tailMap(Object, boolean)}. If you override
+	 * {@code tailMap}, you may wish to override {@code ceilingEntry} to forward to
+	 * this implementation.
+	 */
+	protected Entry<K, V> standardCeilingEntry(K key) {
+		return tailMap(key, true).firstEntry();
+	}
+
+	/**
+	 * A sensible definition of {@link #ceilingKey} in terms of
+	 * {@code ceilingEntry}. If you override {@code ceilingEntry}, you may wish to
+	 * override {@code ceilingKey} to forward to this implementation.
+	 */
+	protected K standardCeilingKey(K key) {
+		return keyOrNull(ceilingEntry(key));
 	}
 
 	/**
@@ -373,29 +253,46 @@ public abstract class ForwardingNavigableMap<K, V> extends ForwardingSortedMap<K
 	}
 
 	/**
-	 * A sensible definition of {@link #subMap(Object, Object)} in terms of
-	 * {@link #subMap(Object, boolean, Object, boolean)}. If you override
-	 * {@code subMap(K, boolean, K, boolean)}, you may wish to override
-	 * {@code subMap} to forward to this implementation.
+	 * A sensible definition of {@link #firstEntry} in terms of the
+	 * {@code iterator()} of {@link #entrySet}. If you override {@code entrySet},
+	 * you may wish to override {@code firstEntry} to forward to this
+	 * implementation.
 	 */
-	@Override
-	protected SortedMap<K, V> standardSubMap(K fromKey, K toKey) {
-		return subMap(fromKey, true, toKey, false);
+	protected Entry<K, V> standardFirstEntry() {
+		return Iterables.getFirst(entrySet(), null);
 	}
 
-	@Override
-	public NavigableMap<K, V> subMap(K fromKey, boolean fromInclusive, K toKey, boolean toInclusive) {
-		return delegate().subMap(fromKey, fromInclusive, toKey, toInclusive);
+	/**
+	 * A sensible definition of {@link #firstKey} in terms of {@code firstEntry}. If
+	 * you override {@code firstEntry}, you may wish to override {@code firstKey} to
+	 * forward to this implementation.
+	 */
+	protected K standardFirstKey() {
+		Entry<K, V> entry = firstEntry();
+		if (entry == null) {
+			throw new NoSuchElementException();
+		} else {
+			return entry.getKey();
+		}
 	}
 
-	@Override
-	public NavigableMap<K, V> headMap(K toKey, boolean inclusive) {
-		return delegate().headMap(toKey, inclusive);
+	/**
+	 * A sensible definition of {@link #floorEntry} in terms of the
+	 * {@code lastEntry()} of {@link #headMap(Object, boolean)}. If you override
+	 * {@code headMap}, you may wish to override {@code floorEntry} to forward to
+	 * this implementation.
+	 */
+	protected Entry<K, V> standardFloorEntry(K key) {
+		return headMap(key, true).lastEntry();
 	}
 
-	@Override
-	public NavigableMap<K, V> tailMap(K fromKey, boolean inclusive) {
-		return delegate().tailMap(fromKey, inclusive);
+	/**
+	 * A sensible definition of {@link #floorKey} in terms of {@code floorEntry}. If
+	 * you override {@code floorEntry}, you may wish to override {@code floorKey} to
+	 * forward to this implementation.
+	 */
+	protected K standardFloorKey(K key) {
+		return keyOrNull(floorEntry(key));
 	}
 
 	/**
@@ -409,6 +306,99 @@ public abstract class ForwardingNavigableMap<K, V> extends ForwardingSortedMap<K
 	}
 
 	/**
+	 * A sensible definition of {@link #higherEntry} in terms of the
+	 * {@code firstEntry()} of {@link #tailMap(Object, boolean)}. If you override
+	 * {@code tailMap}, you may wish to override {@code higherEntry} to forward to
+	 * this implementation.
+	 */
+	protected Entry<K, V> standardHigherEntry(K key) {
+		return tailMap(key, false).firstEntry();
+	}
+
+	/**
+	 * A sensible definition of {@link #higherKey} in terms of {@code higherEntry}.
+	 * If you override {@code higherEntry}, you may wish to override
+	 * {@code higherKey} to forward to this implementation.
+	 */
+	protected K standardHigherKey(K key) {
+		return keyOrNull(higherEntry(key));
+	}
+
+	/**
+	 * A sensible definition of {@link #lastEntry} in terms of the
+	 * {@code iterator()} of the {@link #entrySet} of {@link #descendingMap}. If you
+	 * override {@code descendingMap}, you may wish to override {@code lastEntry} to
+	 * forward to this implementation.
+	 */
+	protected Entry<K, V> standardLastEntry() {
+		return Iterables.getFirst(descendingMap().entrySet(), null);
+	}
+
+	/**
+	 * A sensible definition of {@link #lastKey} in terms of {@code lastEntry}. If
+	 * you override {@code lastEntry}, you may wish to override {@code lastKey} to
+	 * forward to this implementation.
+	 */
+	protected K standardLastKey() {
+		Entry<K, V> entry = lastEntry();
+		if (entry == null) {
+			throw new NoSuchElementException();
+		} else {
+			return entry.getKey();
+		}
+	}
+
+	/**
+	 * A sensible definition of {@link #lowerEntry} in terms of the
+	 * {@code lastEntry()} of {@link #headMap(Object, boolean)}. If you override
+	 * {@code headMap}, you may wish to override {@code lowerEntry} to forward to
+	 * this implementation.
+	 */
+	protected Entry<K, V> standardLowerEntry(K key) {
+		return headMap(key, false).lastEntry();
+	}
+
+	/**
+	 * A sensible definition of {@link #lowerKey} in terms of {@code lowerEntry}. If
+	 * you override {@link #lowerEntry}, you may wish to override {@code lowerKey}
+	 * to forward to this implementation.
+	 */
+	protected K standardLowerKey(K key) {
+		return keyOrNull(lowerEntry(key));
+	}
+
+	/**
+	 * A sensible definition of {@link #pollFirstEntry} in terms of the
+	 * {@code iterator} of {@code entrySet}. If you override {@code entrySet}, you
+	 * may wish to override {@code pollFirstEntry} to forward to this
+	 * implementation.
+	 */
+	protected Entry<K, V> standardPollFirstEntry() {
+		return Iterators.pollNext(entrySet().iterator());
+	}
+
+	/**
+	 * A sensible definition of {@link #pollFirstEntry} in terms of the
+	 * {@code iterator} of the {@code entrySet} of {@code descendingMap}. If you
+	 * override {@code descendingMap}, you may wish to override
+	 * {@code pollFirstEntry} to forward to this implementation.
+	 */
+	protected Entry<K, V> standardPollLastEntry() {
+		return Iterators.pollNext(descendingMap().entrySet().iterator());
+	}
+
+	/**
+	 * A sensible definition of {@link #subMap(Object, Object)} in terms of
+	 * {@link #subMap(Object, boolean, Object, boolean)}. If you override
+	 * {@code subMap(K, boolean, K, boolean)}, you may wish to override
+	 * {@code subMap} to forward to this implementation.
+	 */
+	@Override
+	protected SortedMap<K, V> standardSubMap(K fromKey, K toKey) {
+		return subMap(fromKey, true, toKey, false);
+	}
+
+	/**
 	 * A sensible definition of {@link #tailMap(Object)} in terms of
 	 * {@link #tailMap(Object, boolean)}. If you override
 	 * {@code tailMap(K, boolean)}, you may wish to override {@code tailMap} to
@@ -416,5 +406,15 @@ public abstract class ForwardingNavigableMap<K, V> extends ForwardingSortedMap<K
 	 */
 	protected SortedMap<K, V> standardTailMap(K fromKey) {
 		return tailMap(fromKey, true);
+	}
+
+	@Override
+	public NavigableMap<K, V> subMap(K fromKey, boolean fromInclusive, K toKey, boolean toInclusive) {
+		return delegate().subMap(fromKey, fromInclusive, toKey, toInclusive);
+	}
+
+	@Override
+	public NavigableMap<K, V> tailMap(K fromKey, boolean inclusive) {
+		return delegate().tailMap(fromKey, inclusive);
 	}
 }

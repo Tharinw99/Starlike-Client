@@ -16,21 +16,23 @@ import net.minecraft.util.ResourceLocation;
 /**
  * Copyright (c) 2023 lax1dude. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class EaglerDeferredConfig {
 
-	public static final ResourceLocation shaderPackInfoFile = new ResourceLocation("eagler:glsl/deferred/shader_pack_info.json");
+	public static final ResourceLocation shaderPackInfoFile = new ResourceLocation(
+			"eagler:glsl/deferred/shader_pack_info.json");
 
 	public ShaderPackInfo shaderPackInfo = null;
 
@@ -66,7 +68,7 @@ public class EaglerDeferredConfig {
 	public boolean is_rendering_fxaa = true;
 
 	public void readOption(String key, String value) {
-		switch(key) {
+		switch (key) {
 		case "shaders_deferred_wavingBlocks":
 			wavingBlocks = value.equals("true");
 			break;
@@ -114,30 +116,14 @@ public class EaglerDeferredConfig {
 		}
 	}
 
-	public void writeOptions(PrintWriter output) {
-		output.println("shaders_deferred_wavingBlocks:" + wavingBlocks);
-		output.println("shaders_deferred_dynamicLights:" + dynamicLights);
-		output.println("shaders_deferred_ssao:" + ssao);
-		output.println("shaders_deferred_shadowsSun:" + shadowsSun);
-		output.println("shaders_deferred_shadowsColored:" + shadowsColored);
-		output.println("shaders_deferred_shadowsSmoothed:" + shadowsSmoothed);
-		output.println("shaders_deferred_useEnvMap:" + useEnvMap);
-		output.println("shaders_deferred_realisticWater:" + realisticWater);
-		output.println("shaders_deferred_lightShafts:" + lightShafts);
-		output.println("shaders_deferred_raytracing:" + raytracing);
-		output.println("shaders_deferred_lensDistortion:" + lensDistortion);
-		output.println("shaders_deferred_lensFlares:" + lensFlares);
-		output.println("shaders_deferred_bloom:" + bloom);
-		output.println("shaders_deferred_fxaa:" + fxaa);
-	}
-
 	public void reloadShaderPackInfo(IResourceManager mgr) throws IOException {
 		IResource res = mgr.getResource(shaderPackInfoFile);
-		try(InputStream is = res.getInputStream()) {
+		try (InputStream is = res.getInputStream()) {
 			try {
-				JSONObject shaderInfoJSON = new JSONObject(new String(EaglerInputStream.inputStreamToBytes(is), StandardCharsets.UTF_8));
+				JSONObject shaderInfoJSON = new JSONObject(
+						new String(EaglerInputStream.inputStreamToBytes(is), StandardCharsets.UTF_8));
 				shaderPackInfo = new ShaderPackInfo(shaderInfoJSON);
-			}catch(JSONException ex) {
+			} catch (JSONException ex) {
 				throw new IOException("Invalid shader pack info json!", ex);
 			}
 		}
@@ -158,6 +144,23 @@ public class EaglerDeferredConfig {
 		is_rendering_lensFlares = lensFlares && shaderPackInfo.POST_LENS_FLARES;
 		is_rendering_bloom = bloom && shaderPackInfo.POST_BLOOM;
 		is_rendering_fxaa = fxaa && shaderPackInfo.POST_FXAA;
+	}
+
+	public void writeOptions(PrintWriter output) {
+		output.println("shaders_deferred_wavingBlocks:" + wavingBlocks);
+		output.println("shaders_deferred_dynamicLights:" + dynamicLights);
+		output.println("shaders_deferred_ssao:" + ssao);
+		output.println("shaders_deferred_shadowsSun:" + shadowsSun);
+		output.println("shaders_deferred_shadowsColored:" + shadowsColored);
+		output.println("shaders_deferred_shadowsSmoothed:" + shadowsSmoothed);
+		output.println("shaders_deferred_useEnvMap:" + useEnvMap);
+		output.println("shaders_deferred_realisticWater:" + realisticWater);
+		output.println("shaders_deferred_lightShafts:" + lightShafts);
+		output.println("shaders_deferred_raytracing:" + raytracing);
+		output.println("shaders_deferred_lensDistortion:" + lensDistortion);
+		output.println("shaders_deferred_lensFlares:" + lensFlares);
+		output.println("shaders_deferred_bloom:" + bloom);
+		output.println("shaders_deferred_fxaa:" + fxaa);
 	}
 
 }

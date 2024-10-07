@@ -84,11 +84,10 @@ import java.lang.annotation.Target;
 @Target({ PACKAGE, TYPE, ANNOTATION_TYPE, METHOD, CONSTRUCTOR, FIELD, LOCAL_VARIABLE, PARAMETER })
 public @interface Generated {
 	/**
-	 * The value element must have the name of the code generator. The recommended
-	 * convention is to use the fully qualified name of the code generator. For
-	 * example: <code>com.acme.generator.CodeGen</code>.
+	 * A place holder for any comments that the code generator may want to include
+	 * in the generated code.
 	 */
-	String[] value();
+	String comments() default "";
 
 	/**
 	 * Date when the source was generated.
@@ -96,8 +95,9 @@ public @interface Generated {
 	String date() default "";
 
 	/**
-	 * A place holder for any comments that the code generator may want to include
-	 * in the generated code.
+	 * The value element must have the name of the code generator. The recommended
+	 * convention is to use the fully qualified name of the code generator. For
+	 * example: <code>com.acme.generator.CodeGen</code>.
 	 */
-	String comments() default "";
+	String[] value();
 }

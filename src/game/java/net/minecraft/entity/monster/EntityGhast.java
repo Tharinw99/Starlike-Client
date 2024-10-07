@@ -21,185 +21,30 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class EntityGhast extends EntityFlying implements IMob {
-	/**+
-	 * The explosion radius of spawned fireballs.
-	 */
-	private int explosionStrength = 1;
-
-	public EntityGhast(World worldIn) {
-		super(worldIn);
-		this.setSize(4.0F, 4.0F);
-		this.isImmuneToFire = true;
-		this.experienceValue = 5;
-		this.moveHelper = new EntityGhast.GhastMoveHelper(this);
-		this.tasks.addTask(5, new EntityGhast.AIRandomFly(this));
-		this.tasks.addTask(7, new EntityGhast.AILookAround(this));
-		this.tasks.addTask(7, new EntityGhast.AIFireballAttack(this));
-		this.targetTasks.addTask(1, new EntityAIFindEntityNearestPlayer(this));
-	}
-
-	public boolean isAttacking() {
-		return this.dataWatcher.getWatchableObjectByte(16) != 0;
-	}
-
-	public void setAttacking(boolean parFlag) {
-		this.dataWatcher.updateObject(16, Byte.valueOf((byte) (parFlag ? 1 : 0)));
-	}
-
-	public int getFireballStrength() {
-		return this.explosionStrength;
-	}
-
-	/**+
-	 * Called to update the entity's position/logic.
-	 */
-	public void onUpdate() {
-		super.onUpdate();
-		if (!this.worldObj.isRemote && this.worldObj.getDifficulty() == EnumDifficulty.PEACEFUL) {
-			this.setDead();
-		}
-
-	}
-
-	/**+
-	 * Called when the entity is attacked.
-	 */
-	public boolean attackEntityFrom(DamageSource damagesource, float f) {
-		if (this.isEntityInvulnerable(damagesource)) {
-			return false;
-		} else if ("fireball".equals(damagesource.getDamageType())
-				&& damagesource.getEntity() instanceof EntityPlayer) {
-			super.attackEntityFrom(damagesource, 1000.0F);
-			((EntityPlayer) damagesource.getEntity()).triggerAchievement(AchievementList.ghast);
-			return true;
-		} else {
-			return super.attackEntityFrom(damagesource, f);
-		}
-	}
-
-	protected void entityInit() {
-		super.entityInit();
-		this.dataWatcher.addObject(16, Byte.valueOf((byte) 0));
-	}
-
-	protected void applyEntityAttributes() {
-		super.applyEntityAttributes();
-		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(10.0D);
-		this.getEntityAttribute(SharedMonsterAttributes.followRange).setBaseValue(100.0D);
-	}
-
-	/**+
-	 * Returns the sound this mob makes while it's alive.
-	 */
-	protected String getLivingSound() {
-		return "mob.ghast.moan";
-	}
-
-	/**+
-	 * Returns the sound this mob makes when it is hurt.
-	 */
-	protected String getHurtSound() {
-		return "mob.ghast.scream";
-	}
-
-	/**+
-	 * Returns the sound this mob makes on death.
-	 */
-	protected String getDeathSound() {
-		return "mob.ghast.death";
-	}
-
-	protected Item getDropItem() {
-		return Items.gunpowder;
-	}
-
-	/**+
-	 * Drop 0-2 items of this living's type
-	 */
-	protected void dropFewItems(boolean var1, int i) {
-		int j = this.rand.nextInt(2) + this.rand.nextInt(1 + i);
-
-		for (int k = 0; k < j; ++k) {
-			this.dropItem(Items.ghast_tear, 1);
-		}
-
-		j = this.rand.nextInt(3) + this.rand.nextInt(1 + i);
-
-		for (int l = 0; l < j; ++l) {
-			this.dropItem(Items.gunpowder, 1);
-		}
-
-	}
-
-	/**+
-	 * Returns the volume for the sounds this mob makes.
-	 */
-	protected float getSoundVolume() {
-		return 10.0F;
-	}
-
-	/**+
-	 * Checks if the entity's current position is a valid location
-	 * to spawn this entity.
-	 */
-	public boolean getCanSpawnHere() {
-		return this.rand.nextInt(20) == 0 && super.getCanSpawnHere()
-				&& this.worldObj.getDifficulty() != EnumDifficulty.PEACEFUL;
-	}
-
-	/**+
-	 * Will return how many at most can spawn in a chunk at once.
-	 */
-	public int getMaxSpawnedInChunk() {
-		return 1;
-	}
-
-	/**+
-	 * (abstract) Protected helper method to write subclass entity
-	 * data to NBT.
-	 */
-	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
-		super.writeEntityToNBT(nbttagcompound);
-		nbttagcompound.setInteger("ExplosionPower", this.explosionStrength);
-	}
-
-	/**+
-	 * (abstract) Protected helper method to read subclass entity
-	 * data from NBT.
-	 */
-	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
-		super.readEntityFromNBT(nbttagcompound);
-		if (nbttagcompound.hasKey("ExplosionPower", 99)) {
-			this.explosionStrength = nbttagcompound.getInteger("ExplosionPower");
-		}
-
-	}
-
-	public float getEyeHeight() {
-		return 2.6F;
-	}
-
 	static class AIFireballAttack extends EntityAIBase {
 		private EntityGhast parentEntity;
 		public int attackTimer;
@@ -208,16 +53,16 @@ public class EntityGhast extends EntityFlying implements IMob {
 			this.parentEntity = parEntityGhast;
 		}
 
+		public void resetTask() {
+			this.parentEntity.setAttacking(false);
+		}
+
 		public boolean shouldExecute() {
 			return this.parentEntity.getAttackTarget() != null;
 		}
 
 		public void startExecuting() {
 			this.attackTimer = 0;
-		}
-
-		public void resetTask() {
-			this.parentEntity.setAttacking(false);
 		}
 
 		public void updateTask() {
@@ -295,6 +140,10 @@ public class EntityGhast extends EntityFlying implements IMob {
 			this.setMutexBits(1);
 		}
 
+		public boolean continueExecuting() {
+			return false;
+		}
+
 		public boolean shouldExecute() {
 			EntityMoveHelper entitymovehelper = this.parentEntity.getMoveHelper();
 			if (!entitymovehelper.isUpdating()) {
@@ -306,10 +155,6 @@ public class EntityGhast extends EntityFlying implements IMob {
 				double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 				return d3 < 1.0D || d3 > 3600.0D;
 			}
-		}
-
-		public boolean continueExecuting() {
-			return false;
 		}
 
 		public void startExecuting() {
@@ -328,6 +173,22 @@ public class EntityGhast extends EntityFlying implements IMob {
 		public GhastMoveHelper(EntityGhast parEntityGhast) {
 			super(parEntityGhast);
 			this.parentEntity = parEntityGhast;
+		}
+
+		private boolean isNotColliding(double parDouble1, double parDouble2, double parDouble3, double parDouble4) {
+			double d0 = (parDouble1 - this.parentEntity.posX) / parDouble4;
+			double d1 = (parDouble2 - this.parentEntity.posY) / parDouble4;
+			double d2 = (parDouble3 - this.parentEntity.posZ) / parDouble4;
+			AxisAlignedBB axisalignedbb = this.parentEntity.getEntityBoundingBox();
+
+			for (int i = 1; (double) i < parDouble4; ++i) {
+				axisalignedbb = axisalignedbb.offset(d0, d1, d2);
+				if (!this.parentEntity.worldObj.getCollidingBoundingBoxes(this.parentEntity, axisalignedbb).isEmpty()) {
+					return false;
+				}
+			}
+
+			return true;
 		}
 
 		public void onUpdateMoveHelper() {
@@ -350,21 +211,161 @@ public class EntityGhast extends EntityFlying implements IMob {
 
 			}
 		}
+	}
 
-		private boolean isNotColliding(double parDouble1, double parDouble2, double parDouble3, double parDouble4) {
-			double d0 = (parDouble1 - this.parentEntity.posX) / parDouble4;
-			double d1 = (parDouble2 - this.parentEntity.posY) / parDouble4;
-			double d2 = (parDouble3 - this.parentEntity.posZ) / parDouble4;
-			AxisAlignedBB axisalignedbb = this.parentEntity.getEntityBoundingBox();
+	/**
+	 * + The explosion radius of spawned fireballs.
+	 */
+	private int explosionStrength = 1;
 
-			for (int i = 1; (double) i < parDouble4; ++i) {
-				axisalignedbb = axisalignedbb.offset(d0, d1, d2);
-				if (!this.parentEntity.worldObj.getCollidingBoundingBoxes(this.parentEntity, axisalignedbb).isEmpty()) {
-					return false;
-				}
-			}
+	public EntityGhast(World worldIn) {
+		super(worldIn);
+		this.setSize(4.0F, 4.0F);
+		this.isImmuneToFire = true;
+		this.experienceValue = 5;
+		this.moveHelper = new EntityGhast.GhastMoveHelper(this);
+		this.tasks.addTask(5, new EntityGhast.AIRandomFly(this));
+		this.tasks.addTask(7, new EntityGhast.AILookAround(this));
+		this.tasks.addTask(7, new EntityGhast.AIFireballAttack(this));
+		this.targetTasks.addTask(1, new EntityAIFindEntityNearestPlayer(this));
+	}
 
+	protected void applyEntityAttributes() {
+		super.applyEntityAttributes();
+		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(10.0D);
+		this.getEntityAttribute(SharedMonsterAttributes.followRange).setBaseValue(100.0D);
+	}
+
+	/**
+	 * + Called when the entity is attacked.
+	 */
+	public boolean attackEntityFrom(DamageSource damagesource, float f) {
+		if (this.isEntityInvulnerable(damagesource)) {
+			return false;
+		} else if ("fireball".equals(damagesource.getDamageType())
+				&& damagesource.getEntity() instanceof EntityPlayer) {
+			super.attackEntityFrom(damagesource, 1000.0F);
+			((EntityPlayer) damagesource.getEntity()).triggerAchievement(AchievementList.ghast);
 			return true;
+		} else {
+			return super.attackEntityFrom(damagesource, f);
 		}
+	}
+
+	/**
+	 * + Drop 0-2 items of this living's type
+	 */
+	protected void dropFewItems(boolean var1, int i) {
+		int j = this.rand.nextInt(2) + this.rand.nextInt(1 + i);
+
+		for (int k = 0; k < j; ++k) {
+			this.dropItem(Items.ghast_tear, 1);
+		}
+
+		j = this.rand.nextInt(3) + this.rand.nextInt(1 + i);
+
+		for (int l = 0; l < j; ++l) {
+			this.dropItem(Items.gunpowder, 1);
+		}
+
+	}
+
+	protected void entityInit() {
+		super.entityInit();
+		this.dataWatcher.addObject(16, Byte.valueOf((byte) 0));
+	}
+
+	/**
+	 * + Checks if the entity's current position is a valid location to spawn this
+	 * entity.
+	 */
+	public boolean getCanSpawnHere() {
+		return this.rand.nextInt(20) == 0 && super.getCanSpawnHere()
+				&& this.worldObj.getDifficulty() != EnumDifficulty.PEACEFUL;
+	}
+
+	/**
+	 * + Returns the sound this mob makes on death.
+	 */
+	protected String getDeathSound() {
+		return "mob.ghast.death";
+	}
+
+	protected Item getDropItem() {
+		return Items.gunpowder;
+	}
+
+	public float getEyeHeight() {
+		return 2.6F;
+	}
+
+	public int getFireballStrength() {
+		return this.explosionStrength;
+	}
+
+	/**
+	 * + Returns the sound this mob makes when it is hurt.
+	 */
+	protected String getHurtSound() {
+		return "mob.ghast.scream";
+	}
+
+	/**
+	 * + Returns the sound this mob makes while it's alive.
+	 */
+	protected String getLivingSound() {
+		return "mob.ghast.moan";
+	}
+
+	/**
+	 * + Will return how many at most can spawn in a chunk at once.
+	 */
+	public int getMaxSpawnedInChunk() {
+		return 1;
+	}
+
+	/**
+	 * + Returns the volume for the sounds this mob makes.
+	 */
+	protected float getSoundVolume() {
+		return 10.0F;
+	}
+
+	public boolean isAttacking() {
+		return this.dataWatcher.getWatchableObjectByte(16) != 0;
+	}
+
+	/**
+	 * + Called to update the entity's position/logic.
+	 */
+	public void onUpdate() {
+		super.onUpdate();
+		if (!this.worldObj.isRemote && this.worldObj.getDifficulty() == EnumDifficulty.PEACEFUL) {
+			this.setDead();
+		}
+
+	}
+
+	/**
+	 * + (abstract) Protected helper method to read subclass entity data from NBT.
+	 */
+	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
+		super.readEntityFromNBT(nbttagcompound);
+		if (nbttagcompound.hasKey("ExplosionPower", 99)) {
+			this.explosionStrength = nbttagcompound.getInteger("ExplosionPower");
+		}
+
+	}
+
+	public void setAttacking(boolean parFlag) {
+		this.dataWatcher.updateObject(16, Byte.valueOf((byte) (parFlag ? 1 : 0)));
+	}
+
+	/**
+	 * + (abstract) Protected helper method to write subclass entity data to NBT.
+	 */
+	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
+		super.writeEntityToNBT(nbttagcompound);
+		nbttagcompound.setInteger("ExplosionPower", this.explosionStrength);
 	}
 }

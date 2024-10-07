@@ -35,92 +35,32 @@ import com.google.common.annotations.GwtIncompatible;
 @GwtCompatible(emulated = true)
 @SuppressWarnings("unchecked") // allow ungenerified Comparable types
 final class RegularContiguousSet<C extends Comparable> extends ContiguousSet<C> {
-	private final Range<C> range;
+	@GwtIncompatible("serialization")
+	private static final class SerializedForm<C extends Comparable> implements Serializable {
+		final Range<C> range;
+		final DiscreteDomain<C> domain;
 
-	RegularContiguousSet(Range<C> range, DiscreteDomain<C> domain) {
-		super(domain);
-		this.range = range;
-	}
-
-	private ContiguousSet<C> intersectionInCurrentDomain(Range<C> other) {
-		return (range.isConnected(other)) ? ContiguousSet.create(range.intersection(other), domain)
-				: new EmptyContiguousSet<C>(domain);
-	}
-
-	@Override
-	ContiguousSet<C> headSetImpl(C toElement, boolean inclusive) {
-		return intersectionInCurrentDomain(Range.upTo(toElement, BoundType.forBoolean(inclusive)));
-	}
-
-	@Override
-	ContiguousSet<C> subSetImpl(C fromElement, boolean fromInclusive, C toElement, boolean toInclusive) {
-		if (fromElement.compareTo(toElement) == 0 && !fromInclusive && !toInclusive) {
-			// Range would reject our attempt to create (x, x).
-			return new EmptyContiguousSet<C>(domain);
+		private SerializedForm(Range<C> range, DiscreteDomain<C> domain) {
+			this.range = range;
+			this.domain = domain;
 		}
-		return intersectionInCurrentDomain(Range.range(fromElement, BoundType.forBoolean(fromInclusive), toElement,
-				BoundType.forBoolean(toInclusive)));
+
+		private Object readResolve() {
+			return new RegularContiguousSet<C>(range, domain);
+		}
 	}
 
-	@Override
-	ContiguousSet<C> tailSetImpl(C fromElement, boolean inclusive) {
-		return intersectionInCurrentDomain(Range.downTo(fromElement, BoundType.forBoolean(inclusive)));
-	}
-
-	@GwtIncompatible("not used by GWT emulation")
-	@Override
-	int indexOf(Object target) {
-		return contains(target) ? (int) domain.distance(first(), (C) target) : -1;
-	}
-
-	@Override
-	public UnmodifiableIterator<C> iterator() {
-		return new AbstractSequentialIterator<C>(first()) {
-			final C last = last();
-
-			@Override
-			protected C computeNext(C previous) {
-				return equalsOrThrow(previous, last) ? null : domain.next(previous);
-			}
-		};
-	}
-
-	@GwtIncompatible("NavigableSet")
-	@Override
-	public UnmodifiableIterator<C> descendingIterator() {
-		return new AbstractSequentialIterator<C>(last()) {
-			final C first = first();
-
-			@Override
-			protected C computeNext(C previous) {
-				return equalsOrThrow(previous, first) ? null : domain.previous(previous);
-			}
-		};
-	}
+	private static final long serialVersionUID = 0;
 
 	private static boolean equalsOrThrow(Comparable<?> left, @Nullable Comparable<?> right) {
 		return right != null && Range.compareOrThrow(left, right) == 0;
 	}
 
-	@Override
-	boolean isPartialView() {
-		return false;
-	}
+	private final Range<C> range;
 
-	@Override
-	public C first() {
-		return range.lowerBound.leastValueAbove(domain);
-	}
-
-	@Override
-	public C last() {
-		return range.upperBound.greatestValueBelow(domain);
-	}
-
-	@Override
-	public int size() {
-		long distance = domain.distance(first(), last());
-		return (distance >= Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int) distance + 1;
+	RegularContiguousSet(Range<C> range, DiscreteDomain<C> domain) {
+		super(domain);
+		this.range = range;
 	}
 
 	@Override
@@ -140,9 +80,52 @@ final class RegularContiguousSet<C extends Comparable> extends ContiguousSet<C> 
 		return Collections2.containsAllImpl(this, targets);
 	}
 
+	@GwtIncompatible("NavigableSet")
 	@Override
-	public boolean isEmpty() {
-		return false;
+	public UnmodifiableIterator<C> descendingIterator() {
+		return new AbstractSequentialIterator<C>(last()) {
+			final C first = first();
+
+			@Override
+			protected C computeNext(C previous) {
+				return equalsOrThrow(previous, first) ? null : domain.previous(previous);
+			}
+		};
+	}
+
+	@Override
+	public boolean equals(@Nullable Object object) {
+		if (object == this) {
+			return true;
+		} else if (object instanceof RegularContiguousSet) {
+			RegularContiguousSet<?> that = (RegularContiguousSet<?>) object;
+			if (this.domain.equals(that.domain)) {
+				return this.first().equals(that.first()) && this.last().equals(that.last());
+			}
+		}
+		return super.equals(object);
+	}
+
+	@Override
+	public C first() {
+		return range.lowerBound.leastValueAbove(domain);
+	}
+
+	// copied to make sure not to use the GWT-emulated version
+	@Override
+	public int hashCode() {
+		return Sets.hashCodeImpl(this);
+	}
+
+	@Override
+	ContiguousSet<C> headSetImpl(C toElement, boolean inclusive) {
+		return intersectionInCurrentDomain(Range.upTo(toElement, BoundType.forBoolean(inclusive)));
+	}
+
+	@GwtIncompatible("not used by GWT emulation")
+	@Override
+	int indexOf(Object target) {
+		return contains(target) ? (int) domain.distance(first(), (C) target) : -1;
 	}
 
 	@Override
@@ -160,6 +143,38 @@ final class RegularContiguousSet<C extends Comparable> extends ContiguousSet<C> 
 		}
 	}
 
+	private ContiguousSet<C> intersectionInCurrentDomain(Range<C> other) {
+		return (range.isConnected(other)) ? ContiguousSet.create(range.intersection(other), domain)
+				: new EmptyContiguousSet<C>(domain);
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return false;
+	}
+
+	@Override
+	boolean isPartialView() {
+		return false;
+	}
+
+	@Override
+	public UnmodifiableIterator<C> iterator() {
+		return new AbstractSequentialIterator<C>(first()) {
+			final C last = last();
+
+			@Override
+			protected C computeNext(C previous) {
+				return equalsOrThrow(previous, last) ? null : domain.next(previous);
+			}
+		};
+	}
+
+	@Override
+	public C last() {
+		return range.upperBound.greatestValueBelow(domain);
+	}
+
 	@Override
 	public Range<C> range() {
 		return range(CLOSED, CLOSED);
@@ -172,37 +187,24 @@ final class RegularContiguousSet<C extends Comparable> extends ContiguousSet<C> 
 	}
 
 	@Override
-	public boolean equals(@Nullable Object object) {
-		if (object == this) {
-			return true;
-		} else if (object instanceof RegularContiguousSet) {
-			RegularContiguousSet<?> that = (RegularContiguousSet<?>) object;
-			if (this.domain.equals(that.domain)) {
-				return this.first().equals(that.first()) && this.last().equals(that.last());
-			}
-		}
-		return super.equals(object);
+	public int size() {
+		long distance = domain.distance(first(), last());
+		return (distance >= Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int) distance + 1;
 	}
 
-	// copied to make sure not to use the GWT-emulated version
 	@Override
-	public int hashCode() {
-		return Sets.hashCodeImpl(this);
+	ContiguousSet<C> subSetImpl(C fromElement, boolean fromInclusive, C toElement, boolean toInclusive) {
+		if (fromElement.compareTo(toElement) == 0 && !fromInclusive && !toInclusive) {
+			// Range would reject our attempt to create (x, x).
+			return new EmptyContiguousSet<C>(domain);
+		}
+		return intersectionInCurrentDomain(Range.range(fromElement, BoundType.forBoolean(fromInclusive), toElement,
+				BoundType.forBoolean(toInclusive)));
 	}
 
-	@GwtIncompatible("serialization")
-	private static final class SerializedForm<C extends Comparable> implements Serializable {
-		final Range<C> range;
-		final DiscreteDomain<C> domain;
-
-		private SerializedForm(Range<C> range, DiscreteDomain<C> domain) {
-			this.range = range;
-			this.domain = domain;
-		}
-
-		private Object readResolve() {
-			return new RegularContiguousSet<C>(range, domain);
-		}
+	@Override
+	ContiguousSet<C> tailSetImpl(C fromElement, boolean inclusive) {
+		return intersectionInCurrentDomain(Range.downTo(fromElement, BoundType.forBoolean(inclusive)));
 	}
 
 	@GwtIncompatible("serialization")
@@ -210,6 +212,4 @@ final class RegularContiguousSet<C extends Comparable> extends ContiguousSet<C> 
 	Object writeReplace() {
 		return new SerializedForm<C>(range, domain);
 	}
-
-	private static final long serialVersionUID = 0;
 }

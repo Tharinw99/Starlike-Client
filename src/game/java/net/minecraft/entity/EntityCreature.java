@@ -1,7 +1,6 @@
 package net.minecraft.entity;
 
 import net.lax1dude.eaglercraft.v1_8.EaglercraftUUID;
-
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.EntityAIMoveTowardsRestriction;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -10,22 +9,25 @@ import net.minecraft.pathfinding.PathNavigateGround;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -36,8 +38,8 @@ public abstract class EntityCreature extends EntityLiving {
 	public static final AttributeModifier FLEEING_SPEED_MODIFIER = (new AttributeModifier(FLEEING_SPEED_MODIFIER_UUID,
 			"Fleeing speed bonus", 2.0D, 2)).setSaved(false);
 	private BlockPos homePosition = BlockPos.ORIGIN;
-	/**+
-	 * If -1 there is no maximum distance
+	/**
+	 * + If -1 there is no maximum distance
 	 */
 	private float maximumHomeDistance = -1.0F;
 	private EntityAIBase aiBase = new EntityAIMoveTowardsRestriction(this, 1.0D);
@@ -47,21 +49,43 @@ public abstract class EntityCreature extends EntityLiving {
 		super(worldIn);
 	}
 
+	public void detachHome() {
+		this.maximumHomeDistance = -1.0F;
+	}
+
+	protected void func_142017_o(float parFloat1) {
+	}
+
 	public float getBlockPathWeight(BlockPos pos) {
 		return 0.0F;
 	}
 
-	/**+
-	 * Checks if the entity's current position is a valid location
-	 * to spawn this entity.
+	/**
+	 * + Checks if the entity's current position is a valid location to spawn this
+	 * entity.
 	 */
 	public boolean getCanSpawnHere() {
 		return super.getCanSpawnHere() && this
 				.getBlockPathWeight(new BlockPos(this.posX, this.getEntityBoundingBox().minY, this.posZ)) >= 0.0F;
 	}
 
-	/**+
-	 * if the entity got a PathEntity it returns true, else false
+	public BlockPos getHomePosition() {
+		return this.homePosition;
+	}
+
+	public float getMaximumHomeDistance() {
+		return this.maximumHomeDistance;
+	}
+
+	/**
+	 * + Returns whether a home area is defined for this entity.
+	 */
+	public boolean hasHome() {
+		return this.maximumHomeDistance != -1.0F;
+	}
+
+	/**
+	 * + if the entity got a PathEntity it returns true, else false
 	 */
 	public boolean hasPath() {
 		return !this.navigator.noPath();
@@ -76,36 +100,17 @@ public abstract class EntityCreature extends EntityLiving {
 				: this.homePosition.distanceSq(pos) < (double) (this.maximumHomeDistance * this.maximumHomeDistance);
 	}
 
-	/**+
-	 * Sets home position and max distance for it
+	/**
+	 * + Sets home position and max distance for it
 	 */
 	public void setHomePosAndDistance(BlockPos pos, int distance) {
 		this.homePosition = pos;
 		this.maximumHomeDistance = (float) distance;
 	}
 
-	public BlockPos getHomePosition() {
-		return this.homePosition;
-	}
-
-	public float getMaximumHomeDistance() {
-		return this.maximumHomeDistance;
-	}
-
-	public void detachHome() {
-		this.maximumHomeDistance = -1.0F;
-	}
-
-	/**+
-	 * Returns whether a home area is defined for this entity.
-	 */
-	public boolean hasHome() {
-		return this.maximumHomeDistance != -1.0F;
-	}
-
-	/**+
-	 * Applies logic related to leashes, for example dragging the
-	 * entity or breaking the leash.
+	/**
+	 * + Applies logic related to leashes, for example dragging the entity or
+	 * breaking the leash.
 	 */
 	protected void updateLeashedState() {
 		super.updateLeashedState();
@@ -158,8 +163,5 @@ public abstract class EntityCreature extends EntityLiving {
 			this.detachHome();
 		}
 
-	}
-
-	protected void func_142017_o(float parFloat1) {
 	}
 }

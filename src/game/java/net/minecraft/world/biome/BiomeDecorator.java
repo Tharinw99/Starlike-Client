@@ -23,22 +23,25 @@ import net.minecraft.world.gen.feature.WorldGenSand;
 import net.minecraft.world.gen.feature.WorldGenWaterlily;
 import net.minecraft.world.gen.feature.WorldGenerator;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -49,16 +52,16 @@ public class BiomeDecorator {
 	protected EaglercraftRandom randomGenerator;
 	protected BlockPos field_180294_c;
 	protected ChunkProviderSettings chunkProviderSettings;
-	/**+
-	 * The clay generator.
+	/**
+	 * + The clay generator.
 	 */
 	protected WorldGenerator clayGen = new WorldGenClay(4);
-	/**+
-	 * The sand generator.
+	/**
+	 * + The sand generator.
 	 */
 	protected WorldGenerator sandGen = new WorldGenSand(Blocks.sand, 7);
-	/**+
-	 * The gravel generator.
+	/**
+	 * + The gravel generator.
 	 */
 	protected WorldGenerator gravelAsSandGen = new WorldGenSand(Blocks.gravel, 6);
 	protected WorldGenerator dirtGen;
@@ -73,68 +76,69 @@ public class BiomeDecorator {
 	protected WorldGenerator diamondGen;
 	protected WorldGenerator lapisGen;
 	protected WorldGenerator platinumGen;
+	protected WorldGenerator titaniumGen;
 
 	protected WorldGenFlowers yellowFlowerGen = new WorldGenFlowers(Blocks.yellow_flower,
 			BlockFlower.EnumFlowerType.DANDELION);
-	/**+
-	 * Field that holds mushroomBrown WorldGenFlowers
+	/**
+	 * + Field that holds mushroomBrown WorldGenFlowers
 	 */
 	protected WorldGenerator mushroomBrownGen = new GeneratorBushFeature(Blocks.brown_mushroom);
-	/**+
-	 * Field that holds mushroomRed WorldGenFlowers
+	/**
+	 * + Field that holds mushroomRed WorldGenFlowers
 	 */
 	protected WorldGenerator mushroomRedGen = new GeneratorBushFeature(Blocks.red_mushroom);
-	/**+
-	 * Field that holds big mushroom generator
+	/**
+	 * + Field that holds big mushroom generator
 	 */
 	protected WorldGenerator bigMushroomGen = new WorldGenBigMushroom();
-	/**+
-	 * Field that holds WorldGenReed
+	/**
+	 * + Field that holds WorldGenReed
 	 */
 	protected WorldGenerator reedGen = new WorldGenReed();
-	/**+
-	 * Field that holds WorldGenCactus
+	/**
+	 * + Field that holds WorldGenCactus
 	 */
 	protected WorldGenerator cactusGen = new WorldGenCactus();
-	/**+
-	 * The water lily generation!
+	/**
+	 * + The water lily generation!
 	 */
 	protected WorldGenerator waterlilyGen = new WorldGenWaterlily();
 	protected int waterlilyPerChunk;
 	protected int treesPerChunk;
-	/**+
-	 * The number of yellow flower patches to generate per chunk.
-	 * The game generates much less than this number, since it
-	 * attempts to generate them at a random altitude.
+	/**
+	 * + The number of yellow flower patches to generate per chunk. The game
+	 * generates much less than this number, since it attempts to generate them at a
+	 * random altitude.
 	 */
 	protected int flowersPerChunk = 2;
-	/**+
-	 * The amount of tall grass to generate per chunk.
+	/**
+	 * + The amount of tall grass to generate per chunk.
 	 */
 	protected int grassPerChunk = 1;
 	protected int deadBushPerChunk;
 	protected int mushroomsPerChunk;
 	protected int reedsPerChunk;
 	protected int cactiPerChunk;
-	/**+
-	 * The number of sand patches to generate per chunk. Sand
-	 * patches only generate when part of it is underwater.
+	/**
+	 * + The number of sand patches to generate per chunk. Sand patches only
+	 * generate when part of it is underwater.
 	 */
 	protected int sandPerChunk = 1;
-	/**+
-	 * The number of sand patches to generate per chunk. Sand
-	 * patches only generate when part of it is underwater. There
-	 * appear to be two separate fields for this.
+	/**
+	 * + The number of sand patches to generate per chunk. Sand patches only
+	 * generate when part of it is underwater. There appear to be two separate
+	 * fields for this.
 	 */
 	protected int sandPerChunk2 = 3;
-	/**+
-	 * The number of clay patches to generate per chunk. Only
-	 * generates when part of it is underwater.
+	/**
+	 * + The number of clay patches to generate per chunk. Only generates when part
+	 * of it is underwater.
 	 */
 	protected int clayPerChunk = 1;
 	protected int bigMushroomsPerChunk;
-	/**+
-	 * True if decorator should generate surface lava & water
+	/**
+	 * + True if decorator should generate surface lava & water
 	 */
 	public boolean generateLakes = true;
 
@@ -175,6 +179,8 @@ public class BiomeDecorator {
 					this.chunkProviderSettings.lapisSize);
 			this.platinumGen = new WorldGenMinable(Blocks.platinum_ore.getDefaultState(),
 					this.chunkProviderSettings.platinumSize);
+			this.titaniumGen = new WorldGenMinable(Blocks.titanium_ore.getDefaultState(),
+					this.chunkProviderSettings.titaniumSize);
 			this.genDecorations(parBiomeGenBase);
 			this.currentWorld = null;
 			this.randomGenerator = null;
@@ -395,49 +401,10 @@ public class BiomeDecorator {
 
 	}
 
-	/**+
-	 * Standard ore generation helper. Generates most ores.
-	 */
-	protected void genStandardOre1(int blockCount, WorldGenerator generator, int minHeight, int maxHeight) {
-		if (maxHeight < minHeight) {
-			int i = minHeight;
-			minHeight = maxHeight;
-			maxHeight = i;
-		} else if (maxHeight == minHeight) {
-			if (minHeight < 255) {
-				++maxHeight;
-			} else {
-				--minHeight;
-			}
-		}
-
-		for (int j = 0; j < blockCount; ++j) {
-			BlockPos blockpos = this.field_180294_c.add(this.randomGenerator.nextInt(16),
-					this.randomGenerator.nextInt(maxHeight - minHeight) + minHeight, this.randomGenerator.nextInt(16));
-			generator.generate(this.currentWorld, this.randomGenerator, blockpos);
-		}
-
-	}
-
-	/**+
-	 * Standard ore generation helper. Generates Lapis Lazuli.
-	 */
-	protected void genStandardOre2(int blockCount, WorldGenerator generator, int centerHeight, int spread) {
-		for (int i = 0; i < blockCount; ++i) {
-			BlockPos blockpos = this.field_180294_c.add(this.randomGenerator.nextInt(16),
-					this.randomGenerator.nextInt(spread) + this.randomGenerator.nextInt(spread) + centerHeight - spread,
-					this.randomGenerator.nextInt(16));
-			generator.generate(this.currentWorld, this.randomGenerator, blockpos);
-		}
-
-	}
-
-	/**+
-	 * Generates ores in the current chunk
+	/**
+	 * + Generates ores in the current chunk
 	 */
 	protected void generateOres() {
-		this.genStandardOre1(this.chunkProviderSettings.dirtCount, this.dirtGen,
-				this.chunkProviderSettings.dirtMinHeight, this.chunkProviderSettings.dirtMaxHeight);
 		this.genStandardOre1(this.chunkProviderSettings.gravelCount, this.gravelGen,
 				this.chunkProviderSettings.gravelMinHeight, this.chunkProviderSettings.gravelMaxHeight);
 		this.genStandardOre1(this.chunkProviderSettings.dioriteCount, this.dioriteGen,
@@ -460,5 +427,44 @@ public class BiomeDecorator {
 				this.chunkProviderSettings.lapisCenterHeight, this.chunkProviderSettings.lapisSpread);
 		this.genStandardOre1(this.chunkProviderSettings.platinumCount, this.platinumGen,
 				this.chunkProviderSettings.platinumMinHeight, this.chunkProviderSettings.platinumMaxHeight);
+		this.genStandardOre1(this.chunkProviderSettings.titaniumCount, this.titaniumGen,
+				this.chunkProviderSettings.titaniumMinHeight, this.chunkProviderSettings.titaniumMaxHeight);
+	}
+
+	/**
+	 * + Standard ore generation helper. Generates most ores.
+	 */
+	protected void genStandardOre1(int blockCount, WorldGenerator generator, int minHeight, int maxHeight) {
+		if (maxHeight < minHeight) {
+			int i = minHeight;
+			minHeight = maxHeight;
+			maxHeight = i;
+		} else if (maxHeight == minHeight) {
+			if (minHeight < 255) {
+				++maxHeight;
+			} else {
+				--minHeight;
+			}
+		}
+
+		for (int j = 0; j < blockCount; ++j) {
+			BlockPos blockpos = this.field_180294_c.add(this.randomGenerator.nextInt(16),
+					this.randomGenerator.nextInt(maxHeight - minHeight) + minHeight, this.randomGenerator.nextInt(16));
+			generator.generate(this.currentWorld, this.randomGenerator, blockpos);
+		}
+
+	}
+
+	/**
+	 * + Standard ore generation helper. Generates Lapis Lazuli.
+	 */
+	protected void genStandardOre2(int blockCount, WorldGenerator generator, int centerHeight, int spread) {
+		for (int i = 0; i < blockCount; ++i) {
+			BlockPos blockpos = this.field_180294_c.add(this.randomGenerator.nextInt(16),
+					this.randomGenerator.nextInt(spread) + this.randomGenerator.nextInt(spread) + centerHeight - spread,
+					this.randomGenerator.nextInt(16));
+			generator.generate(this.currentWorld, this.randomGenerator, blockpos);
+		}
+
 	}
 }

@@ -1,6 +1,7 @@
 package net.minecraft.client.model;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_BACK;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_FRONT;
 
 import net.lax1dude.eaglercraft.v1_8.opengl.GlStateManager;
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.DeferredStateManager;
@@ -8,22 +9,25 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.boss.EntityDragon;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -121,18 +125,8 @@ public class ModelDragon extends ModelBase {
 		this.rearLegTip.addChild(this.rearFoot);
 	}
 
-	/**+
-	 * Used for easily adding entity-dependent animations. The
-	 * second and third float params here are the same second and
-	 * third as in the setRotationAngles method.
-	 */
-	public void setLivingAnimations(EntityLivingBase var1, float var2, float var3, float f) {
-		this.partialTicks = f;
-	}
-
-	/**+
-	 * Sets the models various rotation angles then renders the
-	 * model.
+	/**
+	 * + Sets the models various rotation angles then renders the model.
 	 */
 	public void render(Entity entity, float var2, float var3, float var4, float var5, float var6, float f) {
 		GlStateManager.pushMatrix();
@@ -241,11 +235,20 @@ public class ModelDragon extends ModelBase {
 		GlStateManager.popMatrix();
 	}
 
-	/**+
-	 * Updates the rotations in the parameters for rotations greater
-	 * than 180 degrees or less than -180 degrees. It adds or
-	 * subtracts 360 degrees, so that the appearance is the same,
-	 * although the numbers are then simplified to range -180 to 180
+	/**
+	 * + Used for easily adding entity-dependent animations. The second and third
+	 * float params here are the same second and third as in the setRotationAngles
+	 * method.
+	 */
+	public void setLivingAnimations(EntityLivingBase var1, float var2, float var3, float f) {
+		this.partialTicks = f;
+	}
+
+	/**
+	 * + Updates the rotations in the parameters for rotations greater than 180
+	 * degrees or less than -180 degrees. It adds or subtracts 360 degrees, so that
+	 * the appearance is the same, although the numbers are then simplified to range
+	 * -180 to 180
 	 */
 	private float updateRotations(double parDouble1) {
 		while (parDouble1 >= 180.0D) {

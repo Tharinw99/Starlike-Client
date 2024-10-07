@@ -100,9 +100,6 @@ public class CharSet implements Serializable {
 		COMMON.put("0-9", ASCII_NUMERIC);
 	}
 
-	/** The set of CharRange objects. */
-	private final Set<CharRange> set = Collections.synchronizedSet(new HashSet<>());
-
 	// -----------------------------------------------------------------------
 	/**
 	 * <p>
@@ -194,6 +191,9 @@ public class CharSet implements Serializable {
 		return new CharSet(setStrs);
 	}
 
+	/** The set of CharRange objects. */
+	private final Set<CharRange> set = Collections.synchronizedSet(new HashSet<>());
+
 	// -----------------------------------------------------------------------
 	/**
 	 * <p>
@@ -250,21 +250,6 @@ public class CharSet implements Serializable {
 	// -----------------------------------------------------------------------
 	/**
 	 * <p>
-	 * Gets the internal set as an array of CharRange objects.
-	 * </p>
-	 *
-	 * @return an array of immutable CharRange objects
-	 * @since 2.0
-	 */
-// NOTE: This is no longer public as CharRange is no longer a public class.
-//       It may be replaced when CharSet moves to Range.
-	/* public */ CharRange[] getCharRanges() {
-		return set.toArray(CharRange.EMPTY_ARRAY);
-	}
-
-	// -----------------------------------------------------------------------
-	/**
-	 * <p>
 	 * Does the {@code CharSet} contain the specified character {@code ch}.
 	 * </p>
 	 *
@@ -309,6 +294,21 @@ public class CharSet implements Serializable {
 		}
 		final CharSet other = (CharSet) obj;
 		return set.equals(other.set);
+	}
+
+	// -----------------------------------------------------------------------
+	/**
+	 * <p>
+	 * Gets the internal set as an array of CharRange objects.
+	 * </p>
+	 *
+	 * @return an array of immutable CharRange objects
+	 * @since 2.0
+	 */
+// NOTE: This is no longer public as CharRange is no longer a public class.
+//       It may be replaced when CharSet moves to Range.
+	/* public */ CharRange[] getCharRanges() {
+		return set.toArray(CharRange.EMPTY_ARRAY);
 	}
 
 	/**

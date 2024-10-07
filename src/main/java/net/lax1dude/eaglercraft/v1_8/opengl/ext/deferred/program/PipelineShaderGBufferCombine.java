@@ -1,60 +1,33 @@
 package net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.program;
 
-import net.lax1dude.eaglercraft.v1_8.internal.IProgramGL;
-import net.lax1dude.eaglercraft.v1_8.internal.IShaderGL;
-import net.lax1dude.eaglercraft.v1_8.internal.IUniformGL;
-
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetUniformLocation;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniform1i;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_FRAGMENT_SHADER;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL.*;
+import net.lax1dude.eaglercraft.v1_8.internal.IProgramGL;
+import net.lax1dude.eaglercraft.v1_8.internal.IShaderGL;
+import net.lax1dude.eaglercraft.v1_8.internal.IUniformGL;
 
 /**
  * Copyright (c) 2023 lax1dude. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class PipelineShaderGBufferCombine extends ShaderProgram<PipelineShaderGBufferCombine.Uniforms> {
-
-	public static PipelineShaderGBufferCombine compile(boolean ssao, boolean env, boolean ssr) throws ShaderException {
-		IShaderGL coreGBuffer = null;
-		List<String> compileFlags = new ArrayList<>(2);
-		if(ssao) {
-			compileFlags.add("COMPILE_GLOBAL_AMBIENT_OCCLUSION");
-		}
-		if(env) {
-			compileFlags.add("COMPILE_ENV_MAP_REFLECTIONS");
-		}
-		if(ssr) {
-			compileFlags.add("COMPILE_SCREEN_SPACE_REFLECTIONS");
-		}
-		coreGBuffer = ShaderCompiler.compileShader("deferred_combine", GL_FRAGMENT_SHADER,
-				ShaderSource.deferred_combine_fsh, compileFlags);
-		try {
-			IProgramGL prog = ShaderCompiler.linkProgram("deferred_combine", SharedPipelineShaders.deferred_local, coreGBuffer);
-			return new PipelineShaderGBufferCombine(prog, ssao, env, ssr);
-		}finally {
-			if(coreGBuffer != null) {
-				coreGBuffer.free();
-			}
-		}
-	}
-
-	private PipelineShaderGBufferCombine(IProgramGL program, boolean ssao, boolean env, boolean ssr) {
-		super(program, new Uniforms(ssao, env, ssr));
-	}
 
 	public static class Uniforms implements IProgramUniforms {
 
@@ -93,6 +66,35 @@ public class PipelineShaderGBufferCombine extends ShaderProgram<PipelineShaderGB
 			u_skyLightFactor1f = _wglGetUniformLocation(prog, "u_skyLightFactor1f");
 		}
 
+	}
+
+	public static PipelineShaderGBufferCombine compile(boolean ssao, boolean env, boolean ssr) throws ShaderException {
+		IShaderGL coreGBuffer = null;
+		List<String> compileFlags = new ArrayList<>(2);
+		if (ssao) {
+			compileFlags.add("COMPILE_GLOBAL_AMBIENT_OCCLUSION");
+		}
+		if (env) {
+			compileFlags.add("COMPILE_ENV_MAP_REFLECTIONS");
+		}
+		if (ssr) {
+			compileFlags.add("COMPILE_SCREEN_SPACE_REFLECTIONS");
+		}
+		coreGBuffer = ShaderCompiler.compileShader("deferred_combine", GL_FRAGMENT_SHADER,
+				ShaderSource.deferred_combine_fsh, compileFlags);
+		try {
+			IProgramGL prog = ShaderCompiler.linkProgram("deferred_combine", SharedPipelineShaders.deferred_local,
+					coreGBuffer);
+			return new PipelineShaderGBufferCombine(prog, ssao, env, ssr);
+		} finally {
+			if (coreGBuffer != null) {
+				coreGBuffer.free();
+			}
+		}
+	}
+
+	private PipelineShaderGBufferCombine(IProgramGL program, boolean ssao, boolean env, boolean ssr) {
+		super(program, new Uniforms(ssao, env, ssr));
 	}
 
 }

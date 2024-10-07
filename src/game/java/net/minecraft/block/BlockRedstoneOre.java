@@ -1,7 +1,6 @@
 package net.minecraft.block;
 
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
-
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -15,22 +14,25 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -47,33 +49,6 @@ public class BlockRedstoneOre extends Block {
 		this.isOn = isOn;
 	}
 
-	/**+
-	 * How many world ticks before ticking
-	 */
-	public int tickRate(World var1) {
-		return 30;
-	}
-
-	public void onBlockClicked(World world, BlockPos blockpos, EntityPlayer entityplayer) {
-		this.activate(world, blockpos);
-		super.onBlockClicked(world, blockpos, entityplayer);
-	}
-
-	/**+
-	 * Triggered whenever an entity collides with this block (enters
-	 * into the block)
-	 */
-	public void onEntityCollidedWithBlock(World world, BlockPos blockpos, Entity entity) {
-		this.activate(world, blockpos);
-		super.onEntityCollidedWithBlock(world, blockpos, entity);
-	}
-
-	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState iblockstate, EntityPlayer entityplayer,
-			EnumFacing enumfacing, float f, float f1, float f2) {
-		this.activate(world, blockpos);
-		return super.onBlockActivated(world, blockpos, iblockstate, entityplayer, enumfacing, f, f1, f2);
-	}
-
 	private void activate(World worldIn, BlockPos pos) {
 		this.spawnParticles(worldIn, pos);
 		if (this == Blocks.redstone_ore) {
@@ -82,36 +57,12 @@ public class BlockRedstoneOre extends Block {
 
 	}
 
-	public void updateTick(World world, BlockPos blockpos, IBlockState var3, EaglercraftRandom var4) {
-		if (this == Blocks.lit_redstone_ore) {
-			world.setBlockState(blockpos, Blocks.redstone_ore.getDefaultState());
-		}
-
+	protected ItemStack createStackedBlock(IBlockState var1) {
+		return new ItemStack(Blocks.redstone_ore);
 	}
 
-	/**+
-	 * Get the Item that this Block should drop when harvested.
-	 */
-	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
-		return Items.redstone;
-	}
-
-	/**+
-	 * Get the quantity dropped based on the given fortune level
-	 */
-	public int quantityDroppedWithBonus(int i, EaglercraftRandom random) {
-		return this.quantityDropped(random) + random.nextInt(i + 1);
-	}
-
-	/**+
-	 * Returns the quantity of items to drop on block destruction.
-	 */
-	public int quantityDropped(EaglercraftRandom random) {
-		return 4 + random.nextInt(2);
-	}
-
-	/**+
-	 * Spawns this Block's drops into the World as EntityItems.
+	/**
+	 * + Spawns this Block's drops into the World as EntityItems.
 	 */
 	public void dropBlockAsItemWithChance(World world, BlockPos blockpos, IBlockState iblockstate, float f, int i) {
 		super.dropBlockAsItemWithChance(world, blockpos, iblockstate, f, i);
@@ -120,6 +71,47 @@ public class BlockRedstoneOre extends Block {
 			this.dropXpOnBlockBreak(world, blockpos, j);
 		}
 
+	}
+
+	/**
+	 * + Get the Item that this Block should drop when harvested.
+	 */
+	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
+		return Items.redstone;
+	}
+
+	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState iblockstate, EntityPlayer entityplayer,
+			EnumFacing enumfacing, float f, float f1, float f2) {
+		this.activate(world, blockpos);
+		return super.onBlockActivated(world, blockpos, iblockstate, entityplayer, enumfacing, f, f1, f2);
+	}
+
+	public void onBlockClicked(World world, BlockPos blockpos, EntityPlayer entityplayer) {
+		this.activate(world, blockpos);
+		super.onBlockClicked(world, blockpos, entityplayer);
+	}
+
+	/**
+	 * + Triggered whenever an entity collides with this block (enters into the
+	 * block)
+	 */
+	public void onEntityCollidedWithBlock(World world, BlockPos blockpos, Entity entity) {
+		this.activate(world, blockpos);
+		super.onEntityCollidedWithBlock(world, blockpos, entity);
+	}
+
+	/**
+	 * + Returns the quantity of items to drop on block destruction.
+	 */
+	public int quantityDropped(EaglercraftRandom random) {
+		return 4 + random.nextInt(2);
+	}
+
+	/**
+	 * + Get the quantity dropped based on the given fortune level
+	 */
+	public int quantityDroppedWithBonus(int i, EaglercraftRandom random) {
+		return this.quantityDropped(random) + random.nextInt(i + 1);
 	}
 
 	public void randomDisplayTick(World world, BlockPos blockpos, IBlockState var3, EaglercraftRandom var4) {
@@ -169,7 +161,17 @@ public class BlockRedstoneOre extends Block {
 
 	}
 
-	protected ItemStack createStackedBlock(IBlockState var1) {
-		return new ItemStack(Blocks.redstone_ore);
+	/**
+	 * + How many world ticks before ticking
+	 */
+	public int tickRate(World var1) {
+		return 30;
+	}
+
+	public void updateTick(World world, BlockPos blockpos, IBlockState var3, EaglercraftRandom var4) {
+		if (this == Blocks.lit_redstone_ore) {
+			world.setBlockState(blockpos, Blocks.redstone_ore.getDefaultState());
+		}
+
 	}
 }

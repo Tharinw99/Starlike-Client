@@ -6,14 +6,15 @@ import net.minecraft.client.Minecraft;
 /**
  * Copyright (c) 2024 lax1dude, ayunami2000. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -40,6 +41,50 @@ public class PointerInputAbstraction {
 	protected static boolean draggingNotTouching = false;
 	protected static boolean touchMode = false;
 
+	public static void enterMouseModeHook() {
+		if (touchMode) {
+			touchMode = false;
+			touchingScreen = false;
+			touchingScreenNotButton = false;
+			if (mc.inGameHasFocus && mc.mouseGrabSupported) {
+				mc.mouseHelper.grabMouseCursor();
+			}
+		}
+	}
+
+	public static void enterTouchModeHook() {
+		if (!touchMode) {
+			touchMode = true;
+			if (mc.mouseGrabSupported) {
+				mc.mouseHelper.ungrabMouseCursor();
+			}
+		}
+	}
+
+	public static boolean getVCursorButtonDown(int bt) {
+		return (touchingScreenNotButton && bt == 0) || Mouse.isButtonDown(bt);
+	}
+
+	public static int getVCursorDX() {
+		int tmp = cursorDX;
+		cursorDX = 0;
+		return tmp;
+	}
+
+	public static int getVCursorDY() {
+		int tmp = cursorDY;
+		cursorDY = 0;
+		return tmp;
+	}
+
+	public static int getVCursorX() {
+		return cursorX;
+	}
+
+	public static int getVCursorY() {
+		return cursorY;
+	}
+
 	public static void init(Minecraft mcIn) {
 		mc = mcIn;
 		oldMX = -1;
@@ -61,10 +106,26 @@ public class PointerInputAbstraction {
 		touchMode = !mcIn.mouseGrabSupported;
 	}
 
+	public static boolean isDraggingNotTouching() {
+		return draggingNotTouching;
+	}
+
+	public static boolean isTouchingScreen() {
+		return touchingScreen;
+	}
+
+	public static boolean isTouchingScreenNotButton() {
+		return touchingScreenNotButton;
+	}
+
+	public static boolean isTouchMode() {
+		return touchMode;
+	}
+
 	public static void runGameLoop() {
-		if(touchMode) {
+		if (touchMode) {
 			runTouchUpdate();
-		}else {
+		} else {
 			oldTX = -1;
 			oldTY = -1;
 			cursorX = oldMX = Mouse.getX();
@@ -74,22 +135,51 @@ public class PointerInputAbstraction {
 		}
 	}
 
+	private static void runTouchDeltaUpdate(int uid) {
+		if (uid != dragUID) {
+			dragStartX = oldTX;
+			dragStartY = oldTY;
+			dragStepStartX = -1;
+			dragStepStartY = -1;
+			dragUID = uid;
+			draggingNotTouching = false;
+			return;
+		}
+		if (dragStepStartX != -1) {
+			cursorDX += oldTX - dragStepStartX;
+		}
+		dragStepStartX = oldTX;
+		if (dragStepStartY != -1) {
+			cursorDY += oldTY - dragStepStartY;
+		}
+		dragStepStartY = oldTY;
+		if (dragStartX != -1 && dragStartY != -1) {
+			int dx = oldTX - dragStartX;
+			int dy = oldTY - dragStartY;
+			int len = dx * dx + dy * dy;
+			int dm = Math.max((int) (6 * Display.getDPI()), 2);
+			if (len > dm * dm) {
+				draggingNotTouching = true;
+			}
+		}
+	}
+
 	private static void runTouchUpdate() {
 		int tc = Touch.touchPointCount();
 		if (tc > 0) {
 			TouchControls.update(true);
 			touchingScreen = true;
-			for(int i = 0; i < tc; ++i) {
+			for (int i = 0; i < tc; ++i) {
 				int uid = Touch.touchPointUID(i);
-				if(TouchControls.touchControls.containsKey(uid)) {
+				if (TouchControls.touchControls.containsKey(uid)) {
 					continue;
 				}
 				int tx = Touch.touchPointX(i);
 				int ty = Touch.touchPointY(i);
-				if(TouchControls.overlappingControl(tx, ty) != null) {
+				if (TouchControls.overlappingControl(tx, ty) != null) {
 					continue;
 				}
-				if(mc.currentScreen == null && mc.ingameGUI.isTouchOverlapEagler(uid, tx, ty)) {
+				if (mc.currentScreen == null && mc.ingameGUI.isTouchOverlapEagler(uid, tx, ty)) {
 					continue;
 				}
 				cursorX = oldTX = tx;
@@ -112,7 +202,7 @@ public class PointerInputAbstraction {
 			dragUID = -1;
 			final int tmp = Mouse.getX();
 			final int tmp2 = Mouse.getY();
-			if(oldTX == -1 || oldTY == -1) {
+			if (oldTX == -1 || oldTY == -1) {
 				cursorX = oldMX = tmp;
 				cursorY = oldMY = tmp2;
 				cursorDX += Mouse.getDX();
@@ -126,102 +216,13 @@ public class PointerInputAbstraction {
 			if (oldMX == tmp && oldMY == tmp2) {
 				cursorX = oldTX;
 				cursorY = oldTY;
-			}else {
+			} else {
 				cursorX = oldMX = tmp;
 				cursorY = oldMY = tmp2;
 				cursorDX += Mouse.getDX();
 				cursorDY += Mouse.getDY();
 			}
 		}
-	}
-
-	private static void runTouchDeltaUpdate(int uid) {
-		if(uid != dragUID) {
-			dragStartX = oldTX;
-			dragStartY = oldTY;
-			dragStepStartX = -1;
-			dragStepStartY = -1;
-			dragUID = uid;
-			draggingNotTouching = false;
-			return;
-		}
-		if(dragStepStartX != -1) {
-			cursorDX += oldTX - dragStepStartX;
-		}
-		dragStepStartX = oldTX;
-		if(dragStepStartY != -1) {
-			cursorDY += oldTY - dragStepStartY;
-		}
-		dragStepStartY = oldTY;
-		if(dragStartX != -1 && dragStartY != -1) {
-			int dx = oldTX - dragStartX;
-			int dy = oldTY - dragStartY;
-			int len = dx * dx + dy * dy;
-			int dm = Math.max((int)(6 * Display.getDPI()), 2);
-			if(len > dm * dm) {
-				draggingNotTouching = true;
-			}
-		}
-	}
-
-	public static boolean isTouchMode() {
-		return touchMode;
-	}
-
-	public static boolean isTouchingScreen() {
-		return touchingScreen;
-	}
-
-	public static boolean isTouchingScreenNotButton() {
-		return touchingScreenNotButton;
-	}
-
-	public static boolean isDraggingNotTouching() {
-		return draggingNotTouching;
-	}
-
-	public static void enterTouchModeHook() {
-		if(!touchMode) {
-			touchMode = true;
-			if(mc.mouseGrabSupported) {
-				mc.mouseHelper.ungrabMouseCursor();
-			}
-		}
-	}
-
-	public static void enterMouseModeHook() {
-		if(touchMode) {
-			touchMode = false;
-			touchingScreen = false;
-			touchingScreenNotButton = false;
-			if(mc.inGameHasFocus && mc.mouseGrabSupported) {
-				mc.mouseHelper.grabMouseCursor();
-			}
-		}
-	}
-
-	public static int getVCursorX() {
-		return cursorX;
-	}
-
-	public static int getVCursorY() {
-		return cursorY;
-	}
-
-	public static int getVCursorDX() {
-		int tmp = cursorDX;
-		cursorDX = 0;
-		return tmp;
-	}
-
-	public static int getVCursorDY() {
-		int tmp = cursorDY;
-		cursorDY = 0;
-		return tmp;
-	}
-
-	public static boolean getVCursorButtonDown(int bt) {
-		return (touchingScreenNotButton && bt == 0) || Mouse.isButtonDown(bt);
 	}
 
 }

@@ -39,9 +39,6 @@ public abstract class ForwardingTable<R, C, V> extends ForwardingObject implemen
 	}
 
 	@Override
-	protected abstract Table<R, C, V> delegate();
-
-	@Override
 	public Set<Cell<R, C, V>> cellSet() {
 		return delegate().cellSet();
 	}
@@ -87,8 +84,21 @@ public abstract class ForwardingTable<R, C, V> extends ForwardingObject implemen
 	}
 
 	@Override
+	protected abstract Table<R, C, V> delegate();
+
+	@Override
+	public boolean equals(Object obj) {
+		return (obj == this) || delegate().equals(obj);
+	}
+
+	@Override
 	public V get(Object rowKey, Object columnKey) {
 		return delegate().get(rowKey, columnKey);
+	}
+
+	@Override
+	public int hashCode() {
+		return delegate().hashCode();
 	}
 
 	@Override
@@ -134,15 +144,5 @@ public abstract class ForwardingTable<R, C, V> extends ForwardingObject implemen
 	@Override
 	public Collection<V> values() {
 		return delegate().values();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return (obj == this) || delegate().equals(obj);
-	}
-
-	@Override
-	public int hashCode() {
-		return delegate().hashCode();
 	}
 }

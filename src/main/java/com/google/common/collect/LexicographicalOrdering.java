@@ -29,6 +29,8 @@ import com.google.common.annotations.GwtCompatible;
  */
 @GwtCompatible(serializable = true)
 final class LexicographicalOrdering<T> extends Ordering<Iterable<T>> implements Serializable {
+	private static final long serialVersionUID = 0;
+
 	final Ordering<? super T> elementOrder;
 
 	LexicographicalOrdering(Ordering<? super T> elementOrder) {
@@ -75,6 +77,4 @@ final class LexicographicalOrdering<T> extends Ordering<Iterable<T>> implements 
 	public String toString() {
 		return elementOrder + ".lexicographical()";
 	}
-
-	private static final long serialVersionUID = 0;
 }

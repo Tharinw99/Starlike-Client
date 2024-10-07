@@ -14,22 +14,25 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.SpawnerAnimals;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -49,49 +52,17 @@ public class VillageSiege {
 		this.worldObj = worldIn;
 	}
 
-	/**+
-	 * Runs a single tick for the village siege
-	 */
-	public void tick() {
-		if (this.worldObj.isDaytime()) {
-			this.field_75536_c = 0;
-		} else if (this.field_75536_c != 2) {
-			if (this.field_75536_c == 0) {
-				float f = this.worldObj.getCelestialAngle(0.0F);
-				if ((double) f < 0.5D || (double) f > 0.501D) {
-					return;
-				}
-
-				this.field_75536_c = this.worldObj.rand.nextInt(10) == 0 ? 1 : 2;
-				this.field_75535_b = false;
-				if (this.field_75536_c == 2) {
-					return;
-				}
-			}
-
-			if (this.field_75536_c != -1) {
-				if (!this.field_75535_b) {
-					if (!this.func_75529_b()) {
-						return;
-					}
-
-					this.field_75535_b = true;
-				}
-
-				if (this.field_75534_e > 0) {
-					--this.field_75534_e;
-				} else {
-					this.field_75534_e = 2;
-					if (this.field_75533_d > 0) {
-						this.spawnZombie();
-						--this.field_75533_d;
-					} else {
-						this.field_75536_c = 2;
-					}
-
-				}
+	private Vec3 func_179867_a(BlockPos parBlockPos) {
+		for (int i = 0; i < 10; ++i) {
+			BlockPos blockpos = parBlockPos.add(this.worldObj.rand.nextInt(16) - 8, this.worldObj.rand.nextInt(6) - 3,
+					this.worldObj.rand.nextInt(16) - 8);
+			if (this.theVillage.func_179866_a(blockpos) && SpawnerAnimals.canCreatureTypeSpawnAtLocation(
+					EntityLiving.SpawnPlacementType.ON_GROUND, this.worldObj, blockpos)) {
+				return new Vec3((double) blockpos.getX(), (double) blockpos.getY(), (double) blockpos.getZ());
 			}
 		}
+
+		return null;
 	}
 
 	private boolean func_75529_b() {
@@ -178,16 +149,48 @@ public class VillageSiege {
 		}
 	}
 
-	private Vec3 func_179867_a(BlockPos parBlockPos) {
-		for (int i = 0; i < 10; ++i) {
-			BlockPos blockpos = parBlockPos.add(this.worldObj.rand.nextInt(16) - 8, this.worldObj.rand.nextInt(6) - 3,
-					this.worldObj.rand.nextInt(16) - 8);
-			if (this.theVillage.func_179866_a(blockpos) && SpawnerAnimals.canCreatureTypeSpawnAtLocation(
-					EntityLiving.SpawnPlacementType.ON_GROUND, this.worldObj, blockpos)) {
-				return new Vec3((double) blockpos.getX(), (double) blockpos.getY(), (double) blockpos.getZ());
+	/**
+	 * + Runs a single tick for the village siege
+	 */
+	public void tick() {
+		if (this.worldObj.isDaytime()) {
+			this.field_75536_c = 0;
+		} else if (this.field_75536_c != 2) {
+			if (this.field_75536_c == 0) {
+				float f = this.worldObj.getCelestialAngle(0.0F);
+				if ((double) f < 0.5D || (double) f > 0.501D) {
+					return;
+				}
+
+				this.field_75536_c = this.worldObj.rand.nextInt(10) == 0 ? 1 : 2;
+				this.field_75535_b = false;
+				if (this.field_75536_c == 2) {
+					return;
+				}
+			}
+
+			if (this.field_75536_c != -1) {
+				if (!this.field_75535_b) {
+					if (!this.func_75529_b()) {
+						return;
+					}
+
+					this.field_75535_b = true;
+				}
+
+				if (this.field_75534_e > 0) {
+					--this.field_75534_e;
+				} else {
+					this.field_75534_e = 2;
+					if (this.field_75533_d > 0) {
+						this.spawnZombie();
+						--this.field_75533_d;
+					} else {
+						this.field_75536_c = 2;
+					}
+
+				}
 			}
 		}
-
-		return null;
 	}
 }

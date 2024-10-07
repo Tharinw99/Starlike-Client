@@ -34,6 +34,11 @@ abstract class TransformedListIterator<F, T> extends TransformedIterator<F, T> i
 		super(backingIterator);
 	}
 
+	@Override
+	public void add(T element) {
+		throw new UnsupportedOperationException();
+	}
+
 	private ListIterator<? extends F> backingIterator() {
 		return Iterators.cast(backingIterator);
 	}
@@ -44,13 +49,13 @@ abstract class TransformedListIterator<F, T> extends TransformedIterator<F, T> i
 	}
 
 	@Override
-	public final T previous() {
-		return transform(backingIterator().previous());
+	public final int nextIndex() {
+		return backingIterator().nextIndex();
 	}
 
 	@Override
-	public final int nextIndex() {
-		return backingIterator().nextIndex();
+	public final T previous() {
+		return transform(backingIterator().previous());
 	}
 
 	@Override
@@ -60,11 +65,6 @@ abstract class TransformedListIterator<F, T> extends TransformedIterator<F, T> i
 
 	@Override
 	public void set(T element) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void add(T element) {
 		throw new UnsupportedOperationException();
 	}
 }

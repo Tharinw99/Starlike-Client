@@ -45,6 +45,9 @@ import com.google.common.annotations.GwtIncompatible;
 @SuppressWarnings("serial") // we're overriding default serialization
 public final class LinkedHashMultiset<E> extends AbstractMapBasedMultiset<E> {
 
+	@GwtIncompatible("not needed in emulated source")
+	private static final long serialVersionUID = 0;
+
 	/**
 	 * Creates a new, empty {@code LinkedHashMultiset} using the default initial
 	 * capacity.
@@ -88,6 +91,14 @@ public final class LinkedHashMultiset<E> extends AbstractMapBasedMultiset<E> {
 		super(new LinkedHashMap<E, Count>(Maps.capacity(distinctElements)));
 	}
 
+	@GwtIncompatible("java.io.ObjectInputStream")
+	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+		stream.defaultReadObject();
+		int distinctElements = Serialization.readCount(stream);
+		setBackingMap(new LinkedHashMap<E, Count>(Maps.capacity(distinctElements)));
+		Serialization.populateMultiset(this, stream, distinctElements);
+	}
+
 	/**
 	 * @serialData the number of distinct elements, the first element, its count,
 	 *             the second element, its count, and so on
@@ -97,15 +108,4 @@ public final class LinkedHashMultiset<E> extends AbstractMapBasedMultiset<E> {
 		stream.defaultWriteObject();
 		Serialization.writeMultiset(this, stream);
 	}
-
-	@GwtIncompatible("java.io.ObjectInputStream")
-	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
-		stream.defaultReadObject();
-		int distinctElements = Serialization.readCount(stream);
-		setBackingMap(new LinkedHashMap<E, Count>(Maps.capacity(distinctElements)));
-		Serialization.populateMultiset(this, stream, distinctElements);
-	}
-
-	@GwtIncompatible("not needed in emulated source")
-	private static final long serialVersionUID = 0;
 }

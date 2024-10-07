@@ -19,33 +19,62 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class EntityPigZombie extends EntityZombie {
+	static class AIHurtByAggressor extends EntityAIHurtByTarget {
+		public AIHurtByAggressor(EntityPigZombie parEntityPigZombie) {
+			super(parEntityPigZombie, true, new Class[0]);
+		}
+
+		protected void setEntityAttackTarget(EntityCreature entitycreature, EntityLivingBase entitylivingbase) {
+			super.setEntityAttackTarget(entitycreature, entitylivingbase);
+			if (entitycreature instanceof EntityPigZombie) {
+				((EntityPigZombie) entitycreature).becomeAngryAt(entitylivingbase);
+			}
+
+		}
+	}
+
+	static class AITargetAggressor extends EntityAINearestAttackableTarget<EntityPlayer> {
+		public AITargetAggressor(EntityPigZombie parEntityPigZombie) {
+			super(parEntityPigZombie, EntityPlayer.class, true);
+		}
+
+		public boolean shouldExecute() {
+			return ((EntityPigZombie) this.taskOwner).isAngry() && super.shouldExecute();
+		}
+	}
+
 	private static final EaglercraftUUID ATTACK_SPEED_BOOST_MODIFIER_UUID = EaglercraftUUID
 			.fromString("49455A49-7EC5-45BA-B886-3B90B23A1718");
 	private static final AttributeModifier ATTACK_SPEED_BOOST_MODIFIER = (new AttributeModifier(
 			ATTACK_SPEED_BOOST_MODIFIER_UUID, "Attacking speed boost", 0.05D, 0)).setSaved(false);
 	private int angerLevel;
+
 	private int randomSoundDelay;
+
 	private EaglercraftUUID angerTargetUUID;
 
 	public EntityPigZombie(World worldIn) {
@@ -53,17 +82,18 @@ public class EntityPigZombie extends EntityZombie {
 		this.isImmuneToFire = true;
 	}
 
-	public void setRevengeTarget(EntityLivingBase entitylivingbase) {
-		super.setRevengeTarget(entitylivingbase);
-		if (entitylivingbase != null) {
-			this.angerTargetUUID = entitylivingbase.getUniqueID();
-		}
-
+	/**
+	 * + Causes this Entity to drop a random item.
+	 */
+	protected void addRandomDrop() {
+		this.dropItem(Items.gold_ingot, 1);
 	}
 
 	protected void applyEntityAI() {
+
 		this.targetTasks.addTask(1, new EntityPigZombie.AIHurtByAggressor(this));
 		this.targetTasks.addTask(2, new EntityPigZombie.AITargetAggressor(this));
+
 	}
 
 	protected void applyEntityAttributes() {
@@ -73,11 +103,154 @@ public class EntityPigZombie extends EntityZombie {
 		this.getEntityAttribute(SharedMonsterAttributes.attackDamage).setBaseValue(5.0D);
 	}
 
-	/**+
-	 * Called to update the entity's position/logic.
+	/**
+	 * + Called when the entity is attacked.
+	 */
+	public boolean attackEntityFrom(DamageSource damagesource, float f) {
+		if (this.isEntityInvulnerable(damagesource)) {
+			return false;
+		} else {
+			Entity entity = damagesource.getEntity();
+			if (entity instanceof EntityPlayer) {
+				this.becomeAngryAt(entity);
+			}
+
+			return super.attackEntityFrom(damagesource, f);
+		}
+	}
+
+	/**
+	 * + Causes this PigZombie to become angry at the supplied Entity (which will be
+	 * a player).
+	 */
+	private void becomeAngryAt(Entity parEntity) {
+		this.angerLevel = 400 + this.rand.nextInt(400);
+		this.randomSoundDelay = this.rand.nextInt(40);
+		if (parEntity instanceof EntityLivingBase) {
+			this.setRevengeTarget((EntityLivingBase) parEntity);
+		}
+
+	}
+
+	/**
+	 * + Drop 0-2 items of this living's type
+	 */
+	protected void dropFewItems(boolean var1, int i) {
+		int j = this.rand.nextInt(2 + i);
+
+		for (int k = 0; k < j; ++k) {
+			this.dropItem(Items.rotten_flesh, 1);
+		}
+
+		j = this.rand.nextInt(2 + i);
+
+		for (int l = 0; l < j; ++l) {
+			this.dropItem(Items.gold_nugget, 1);
+		}
+
+	}
+
+	/**
+	 * + Checks if the entity's current position is a valid location to spawn this
+	 * entity.
+	 */
+	public boolean getCanSpawnHere() {
+		return this.worldObj.getDifficulty() != EnumDifficulty.PEACEFUL;
+	}
+
+	/**
+	 * + Returns the sound this mob makes on death.
+	 */
+	protected String getDeathSound() {
+		return "mob.zombiepig.zpigdeath";
+	}
+
+	/**
+	 * + Returns the sound this mob makes when it is hurt.
+	 */
+	protected String getHurtSound() {
+		return "mob.zombiepig.zpighurt";
+	}
+
+	/**
+	 * + Returns the sound this mob makes while it's alive.
+	 */
+	protected String getLivingSound() {
+		return "mob.zombiepig.zpig";
+	}
+
+	/**
+	 * + Called when a player interacts with a mob. e.g. gets milk from a cow, gets
+	 * into the saddle on a pig.
+	 */
+	public boolean interact(EntityPlayer var1) {
+		return false;
+	}
+
+	public boolean isAngry() {
+		return this.angerLevel > 0;
+	}
+
+	/**
+	 * + Checks that the entity is not colliding with any blocks / liquids
+	 */
+	public boolean isNotColliding() {
+		return this.worldObj.checkNoEntityCollision(this.getEntityBoundingBox(), this)
+				&& this.worldObj.getCollidingBoundingBoxes(this, this.getEntityBoundingBox()).isEmpty()
+				&& !this.worldObj.isAnyLiquid(this.getEntityBoundingBox());
+	}
+
+	/**
+	 * + Called only once on an entity when first time spawned, via egg, mob
+	 * spawner, natural spawning etc, but not called when entity is reloaded from
+	 * nbt. Mainly used for initializing attributes and inventory
+	 */
+	public IEntityLivingData onInitialSpawn(DifficultyInstance difficultyinstance,
+			IEntityLivingData ientitylivingdata) {
+		super.onInitialSpawn(difficultyinstance, ientitylivingdata);
+		this.setVillager(false);
+		return ientitylivingdata;
+	}
+
+	/**
+	 * + Called to update the entity's position/logic.
 	 */
 	public void onUpdate() {
 		super.onUpdate();
+	}
+
+	/**
+	 * + (abstract) Protected helper method to read subclass entity data from NBT.
+	 */
+	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
+		super.readEntityFromNBT(nbttagcompound);
+		this.angerLevel = nbttagcompound.getShort("Anger");
+		String s = nbttagcompound.getString("HurtBy");
+		if (s.length() > 0) {
+			this.angerTargetUUID = EaglercraftUUID.fromString(s);
+			EntityPlayer entityplayer = this.worldObj.getPlayerEntityByUUID(this.angerTargetUUID);
+			this.setRevengeTarget(entityplayer);
+			if (entityplayer != null) {
+				this.attackingPlayer = entityplayer;
+				this.recentlyHit = this.getRevengeTimer();
+			}
+		}
+
+	}
+
+	/**
+	 * + Gives armor or weapon for entity based on given DifficultyInstance
+	 */
+	protected void setEquipmentBasedOnDifficulty(DifficultyInstance var1) {
+		this.setCurrentItemOrArmor(0, new ItemStack(Items.golden_sword));
+	}
+
+	public void setRevengeTarget(EntityLivingBase entitylivingbase) {
+		super.setRevengeTarget(entitylivingbase);
+		if (entitylivingbase != null) {
+			this.angerTargetUUID = entitylivingbase.getUniqueID();
+		}
+
 	}
 
 	protected void updateAITasks() {
@@ -107,27 +280,8 @@ public class EntityPigZombie extends EntityZombie {
 		super.updateAITasks();
 	}
 
-	/**+
-	 * Checks if the entity's current position is a valid location
-	 * to spawn this entity.
-	 */
-	public boolean getCanSpawnHere() {
-		return this.worldObj.getDifficulty() != EnumDifficulty.PEACEFUL;
-	}
-
-	/**+
-	 * Checks that the entity is not colliding with any blocks /
-	 * liquids
-	 */
-	public boolean isNotColliding() {
-		return this.worldObj.checkNoEntityCollision(this.getEntityBoundingBox(), this)
-				&& this.worldObj.getCollidingBoundingBoxes(this, this.getEntityBoundingBox()).isEmpty()
-				&& !this.worldObj.isAnyLiquid(this.getEntityBoundingBox());
-	}
-
-	/**+
-	 * (abstract) Protected helper method to write subclass entity
-	 * data to NBT.
+	/**
+	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
@@ -138,157 +292,5 @@ public class EntityPigZombie extends EntityZombie {
 			nbttagcompound.setString("HurtBy", "");
 		}
 
-	}
-
-	/**+
-	 * (abstract) Protected helper method to read subclass entity
-	 * data from NBT.
-	 */
-	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
-		super.readEntityFromNBT(nbttagcompound);
-		this.angerLevel = nbttagcompound.getShort("Anger");
-		String s = nbttagcompound.getString("HurtBy");
-		if (s.length() > 0) {
-			this.angerTargetUUID = EaglercraftUUID.fromString(s);
-			EntityPlayer entityplayer = this.worldObj.getPlayerEntityByUUID(this.angerTargetUUID);
-			this.setRevengeTarget(entityplayer);
-			if (entityplayer != null) {
-				this.attackingPlayer = entityplayer;
-				this.recentlyHit = this.getRevengeTimer();
-			}
-		}
-
-	}
-
-	/**+
-	 * Called when the entity is attacked.
-	 */
-	public boolean attackEntityFrom(DamageSource damagesource, float f) {
-		if (this.isEntityInvulnerable(damagesource)) {
-			return false;
-		} else {
-			Entity entity = damagesource.getEntity();
-			if (entity instanceof EntityPlayer) {
-				this.becomeAngryAt(entity);
-			}
-
-			return super.attackEntityFrom(damagesource, f);
-		}
-	}
-
-	/**+
-	 * Causes this PigZombie to become angry at the supplied Entity
-	 * (which will be a player).
-	 */
-	private void becomeAngryAt(Entity parEntity) {
-		this.angerLevel = 400 + this.rand.nextInt(400);
-		this.randomSoundDelay = this.rand.nextInt(40);
-		if (parEntity instanceof EntityLivingBase) {
-			this.setRevengeTarget((EntityLivingBase) parEntity);
-		}
-
-	}
-
-	public boolean isAngry() {
-		return this.angerLevel > 0;
-	}
-
-	/**+
-	 * Returns the sound this mob makes while it's alive.
-	 */
-	protected String getLivingSound() {
-		return "mob.zombiepig.zpig";
-	}
-
-	/**+
-	 * Returns the sound this mob makes when it is hurt.
-	 */
-	protected String getHurtSound() {
-		return "mob.zombiepig.zpighurt";
-	}
-
-	/**+
-	 * Returns the sound this mob makes on death.
-	 */
-	protected String getDeathSound() {
-		return "mob.zombiepig.zpigdeath";
-	}
-
-	/**+
-	 * Drop 0-2 items of this living's type
-	 */
-	protected void dropFewItems(boolean var1, int i) {
-		int j = this.rand.nextInt(2 + i);
-
-		for (int k = 0; k < j; ++k) {
-			this.dropItem(Items.rotten_flesh, 1);
-		}
-
-		j = this.rand.nextInt(2 + i);
-
-		for (int l = 0; l < j; ++l) {
-			this.dropItem(Items.gold_nugget, 1);
-		}
-
-	}
-
-	/**+
-	 * Called when a player interacts with a mob. e.g. gets milk
-	 * from a cow, gets into the saddle on a pig.
-	 */
-	public boolean interact(EntityPlayer var1) {
-		return false;
-	}
-
-	/**+
-	 * Causes this Entity to drop a random item.
-	 */
-	protected void addRandomDrop() {
-		this.dropItem(Items.gold_ingot, 1);
-	}
-
-	/**+
-	 * Gives armor or weapon for entity based on given
-	 * DifficultyInstance
-	 */
-	protected void setEquipmentBasedOnDifficulty(DifficultyInstance var1) {
-		this.setCurrentItemOrArmor(0, new ItemStack(Items.golden_sword));
-	}
-
-	/**+
-	 * Called only once on an entity when first time spawned, via
-	 * egg, mob spawner, natural spawning etc, but not called when
-	 * entity is reloaded from nbt. Mainly used for initializing
-	 * attributes and inventory
-	 */
-	public IEntityLivingData onInitialSpawn(DifficultyInstance difficultyinstance,
-			IEntityLivingData ientitylivingdata) {
-		super.onInitialSpawn(difficultyinstance, ientitylivingdata);
-		this.setVillager(false);
-		return ientitylivingdata;
-	}
-
-	static class AIHurtByAggressor extends EntityAIHurtByTarget {
-		public AIHurtByAggressor(EntityPigZombie parEntityPigZombie) {
-			super(parEntityPigZombie, true, new Class[0]);
-		}
-
-		protected void setEntityAttackTarget(EntityCreature entitycreature, EntityLivingBase entitylivingbase) {
-			super.setEntityAttackTarget(entitycreature, entitylivingbase);
-			if (entitycreature instanceof EntityPigZombie) {
-				((EntityPigZombie) entitycreature).becomeAngryAt(entitylivingbase);
-			}
-
-		}
-	}
-
-	static class AITargetAggressor extends EntityAINearestAttackableTarget<EntityPlayer> {
-		public AITargetAggressor(EntityPigZombie parEntityPigZombie) {
-			super(parEntityPigZombie, EntityPlayer.class, true);
-		}
-
-		public boolean shouldExecute() {
-			return ((EntityPigZombie) this.taskOwner).isAngry() && super.shouldExecute();
-		}
 	}
 }

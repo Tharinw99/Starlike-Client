@@ -46,53 +46,9 @@
 			]
 		},
 		{
-			"name": "EaglercraftX 1.8 Demo",
-			"conf": "conf_template_eaglercraftX_1_8.json",
-			"opts": "opts_template_eaglercraftX_1_8_demo.txt",
-			"allow": [
-				"EAGLER_STANDARD_OFFLINE"
-			],
-			"parseTypes": [
-				"EAGLERCRAFTX_1_8_OFFLINE"
-			]
-		},
-		{
-			"name": "EaglercraftX 1.8 HTML5 Cursors",
-			"conf": "conf_template_eaglercraftX_1_8.json",
-			"opts": "opts_template_eaglercraftX_1_8_html5Cursors.txt",
-			"allow": [
-				"EAGLER_STANDARD_OFFLINE"
-			],
-			"parseTypes": [
-				"EAGLERCRAFTX_1_8_OFFLINE"
-			]
-		},
-		{
 			"name": "EaglercraftX 1.8 Signed",
 			"conf": "conf_template_eaglercraftX_1_8_signed.json",
 			"opts": "opts_template_eaglercraftX_1_8.txt",
-			"allow": [
-				"EAGLER_SIGNED_OFFLINE"
-			],
-			"parseTypes": [
-				"EAGLERCRAFTX_1_8_SIGNED"
-			]
-		},
-		{
-			"name": "EaglercraftX 1.8 Signed Demo",
-			"conf": "conf_template_eaglercraftX_1_8_signed.json",
-			"opts": "opts_template_eaglercraftX_1_8_demo.txt",
-			"allow": [
-				"EAGLER_SIGNED_OFFLINE"
-			],
-			"parseTypes": [
-				"EAGLERCRAFTX_1_8_SIGNED"
-			]
-		},
-		{
-			"name": "EaglercraftX 1.8 Signed HTML5 Cursors",
-			"conf": "conf_template_eaglercraftX_1_8_signed.json",
-			"opts": "opts_template_eaglercraftX_1_8_html5Cursors.txt",
 			"allow": [
 				"EAGLER_SIGNED_OFFLINE"
 			],

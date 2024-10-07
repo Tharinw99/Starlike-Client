@@ -46,7 +46,8 @@ import com.google.common.annotations.GwtIncompatible;
  */
 @GwtCompatible(emulated = true)
 public final class EnumHashBiMap<K extends Enum<K>, V> extends AbstractBiMap<K, V> {
-	private transient Class<K> keyType;
+	@GwtIncompatible("only needed in emulated source.")
+	private static final long serialVersionUID = 0;
 
 	/**
 	 * Returns a new, empty {@code EnumHashBiMap} using the specified key type.
@@ -74,22 +75,19 @@ public final class EnumHashBiMap<K extends Enum<K>, V> extends AbstractBiMap<K, 
 		return bimap;
 	}
 
+	private transient Class<K> keyType;
+
+	// Overriding these 3 methods to show that values may be null (but not keys)
+
 	private EnumHashBiMap(Class<K> keyType) {
 		super(WellBehavedMap.wrap(new EnumMap<K, V>(keyType)),
 				Maps.<V, K>newHashMapWithExpectedSize(keyType.getEnumConstants().length));
 		this.keyType = keyType;
 	}
 
-	// Overriding these 3 methods to show that values may be null (but not keys)
-
 	@Override
 	K checkKey(K key) {
 		return checkNotNull(key);
-	}
-
-	@Override
-	public V put(K key, @Nullable V value) {
-		return super.put(key, value);
 	}
 
 	@Override
@@ -102,15 +100,9 @@ public final class EnumHashBiMap<K extends Enum<K>, V> extends AbstractBiMap<K, 
 		return keyType;
 	}
 
-	/**
-	 * @serialData the key class, number of entries, first key, first value, second
-	 *             key, second value, and so on.
-	 */
-	@GwtIncompatible("java.io.ObjectOutputStream")
-	private void writeObject(ObjectOutputStream stream) throws IOException {
-		stream.defaultWriteObject();
-		stream.writeObject(keyType);
-		Serialization.writeMap(this, stream);
+	@Override
+	public V put(K key, @Nullable V value) {
+		return super.put(key, value);
 	}
 
 	@SuppressWarnings("unchecked") // reading field populated by writeObject
@@ -123,6 +115,14 @@ public final class EnumHashBiMap<K extends Enum<K>, V> extends AbstractBiMap<K, 
 		Serialization.populateMap(this, stream);
 	}
 
-	@GwtIncompatible("only needed in emulated source.")
-	private static final long serialVersionUID = 0;
+	/**
+	 * @serialData the key class, number of entries, first key, first value, second
+	 *             key, second value, and so on.
+	 */
+	@GwtIncompatible("java.io.ObjectOutputStream")
+	private void writeObject(ObjectOutputStream stream) throws IOException {
+		stream.defaultWriteObject();
+		stream.writeObject(keyType);
+		Serialization.writeMap(this, stream);
+	}
 }

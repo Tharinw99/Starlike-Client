@@ -35,8 +35,33 @@ final class DescendingImmutableSortedMultiset<E> extends ImmutableSortedMultiset
 	}
 
 	@Override
+	public ImmutableSortedMultiset<E> descendingMultiset() {
+		return forward;
+	}
+
+	@Override
+	public ImmutableSortedSet<E> elementSet() {
+		return forward.elementSet().descendingSet();
+	}
+
+	@Override
 	public Entry<E> firstEntry() {
 		return forward.lastEntry();
+	}
+
+	@Override
+	Entry<E> getEntry(int index) {
+		return forward.entrySet().asList().reverse().get(index);
+	}
+
+	@Override
+	public ImmutableSortedMultiset<E> headMultiset(E upperBound, BoundType boundType) {
+		return forward.tailMultiset(upperBound, boundType).descendingMultiset();
+	}
+
+	@Override
+	boolean isPartialView() {
+		return forward.isPartialView();
 	}
 
 	@Override
@@ -50,32 +75,7 @@ final class DescendingImmutableSortedMultiset<E> extends ImmutableSortedMultiset
 	}
 
 	@Override
-	public ImmutableSortedSet<E> elementSet() {
-		return forward.elementSet().descendingSet();
-	}
-
-	@Override
-	Entry<E> getEntry(int index) {
-		return forward.entrySet().asList().reverse().get(index);
-	}
-
-	@Override
-	public ImmutableSortedMultiset<E> descendingMultiset() {
-		return forward;
-	}
-
-	@Override
-	public ImmutableSortedMultiset<E> headMultiset(E upperBound, BoundType boundType) {
-		return forward.tailMultiset(upperBound, boundType).descendingMultiset();
-	}
-
-	@Override
 	public ImmutableSortedMultiset<E> tailMultiset(E lowerBound, BoundType boundType) {
 		return forward.headMultiset(lowerBound, boundType).descendingMultiset();
-	}
-
-	@Override
-	boolean isPartialView() {
-		return forward.isPartialView();
 	}
 }

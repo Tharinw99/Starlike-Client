@@ -1,6 +1,9 @@
 package net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.program;
 
-import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL.*;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetUniformBlockIndex;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetUniformLocation;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniform1i;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniformBlockBinding;
 
 import net.lax1dude.eaglercraft.v1_8.internal.IProgramGL;
 import net.lax1dude.eaglercraft.v1_8.internal.IUniformGL;
@@ -8,28 +11,20 @@ import net.lax1dude.eaglercraft.v1_8.internal.IUniformGL;
 /**
  * Copyright (c) 2023 lax1dude. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class GBufferExtPipelineShader extends ShaderProgram<GBufferExtPipelineShader.Uniforms> {
-
-	public final int coreState;
-	public final int extState;
-
-	public GBufferExtPipelineShader(IProgramGL program, int coreState, int extState) {
-		super(program, new Uniforms());
-		this.coreState = coreState;
-		this.extState = extState;
-	}
 
 	public static class Uniforms implements IProgramUniforms {
 
@@ -112,21 +107,31 @@ public class GBufferExtPipelineShader extends ShaderProgram<GBufferExtPipelineSh
 			_wglUniform1i(_wglGetUniformLocation(prog, "u_irradianceMap"), 10);
 			_wglUniform1i(_wglGetUniformLocation(prog, "u_lightShaftsTexture"), 11);
 			int blockIndex = _wglGetUniformBlockIndex(prog, "u_worldLightingData");
-			if(blockIndex != -1) {
+			if (blockIndex != -1) {
 				_wglUniformBlockBinding(prog, blockIndex, 0);
 				u_worldLightingDataBlockBinding = 0;
-			}else {
+			} else {
 				u_worldLightingDataBlockBinding = -1;
 			}
 			blockIndex = _wglGetUniformBlockIndex(prog, "u_chunkLightingData");
-			if(blockIndex != -1) {
+			if (blockIndex != -1) {
 				_wglUniformBlockBinding(prog, blockIndex, 1);
 				u_chunkLightingDataBlockBinding = 1;
-			}else {
+			} else {
 				u_chunkLightingDataBlockBinding = -1;
 			}
 		}
 
+	}
+
+	public final int coreState;
+
+	public final int extState;
+
+	public GBufferExtPipelineShader(IProgramGL program, int coreState, int extState) {
+		super(program, new Uniforms());
+		this.coreState = coreState;
+		this.extState = extState;
 	}
 
 }

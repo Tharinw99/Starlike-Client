@@ -98,23 +98,107 @@ public interface Multiset<E> extends Collection<E> {
 	// Query Operations
 
 	/**
-	 * Returns the number of occurrences of an element in this multiset (the
-	 * <i>count</i> of the element). Note that for an {@link Object#equals}-based
-	 * multiset, this gives the same result as {@link Collections#frequency} (which
-	 * would presumably perform more poorly).
+	 * An unmodifiable element-count pair for a multiset. The
+	 * {@link Multiset#entrySet} method returns a view of the multiset whose
+	 * elements are of this class. A multiset implementation may return Entry
+	 * instances that are either live "read-through" views to the Multiset, or
+	 * immutable snapshots. Note that this type is unrelated to the similarly-named
+	 * type {@code Map.Entry}.
 	 *
-	 * <p>
-	 * <b>Note:</b> the utility method {@link Iterables#frequency} generalizes this
-	 * operation; it correctly delegates to this method when dealing with a
-	 * multiset, but it can also accept any other iterable type.
-	 *
-	 * @param element the element to count occurrences of
-	 * @return the number of occurrences of the element in this multiset; possibly
-	 *         zero but never negative
+	 * @since 2.0 (imported from Google Collections Library)
 	 */
-	int count(@Nullable Object element);
+	interface Entry<E> {
+
+		/**
+		 * {@inheritDoc}
+		 *
+		 * <p>
+		 * Returns {@code true} if the given object is also a multiset entry and the two
+		 * entries represent the same element and count. That is, two entries {@code a}
+		 * and {@code b} are equal if:
+		 * 
+		 * <pre>
+		 *    {@code
+		 *
+		 * Objects.equal(a.getElement(), b.getElement()) && a.getCount() == b.getCount()
+		 * }
+		 * </pre>
+		 */
+		@Override
+		// TODO(kevinb): check this wrt TreeMultiset?
+		boolean equals(Object o);
+
+		/**
+		 * Returns the count of the associated element in the underlying multiset. This
+		 * count may either be an unchanging snapshot of the count at the time the entry
+		 * was retrieved, or a live view of the current count of the element in the
+		 * multiset, depending on the implementation. Note that in the former case, this
+		 * method can never return zero, while in the latter, it will return zero if all
+		 * occurrences of the element were since removed from the multiset.
+		 *
+		 * @return the count of the element; never negative
+		 */
+		int getCount();
+
+		/**
+		 * Returns the multiset element corresponding to this entry. Multiple calls to
+		 * this method always return the same instance.
+		 *
+		 * @return the element corresponding to this entry
+		 */
+		E getElement();
+
+		/**
+		 * {@inheritDoc}
+		 *
+		 * <p>
+		 * The hash code of a multiset entry for element {@code element} and count
+		 * {@code count} is defined as:
+		 * 
+		 * <pre>
+		 *    {@code
+		 *
+		 * ((element == null) ? 0 : element.hashCode()) ^ count
+		 * }
+		 * </pre>
+		 */
+		@Override
+		int hashCode();
+
+		/**
+		 * Returns the canonical string representation of this entry, defined as
+		 * follows. If the count for this entry is one, this is simply the string
+		 * representation of the corresponding element. Otherwise, it is the string
+		 * representation of the element, followed by the three characters {@code
+		 * " x "} (space, letter x, space), followed by the count.
+		 */
+		@Override
+		String toString();
+	}
 
 	// Bulk Operations
+
+	/**
+	 * Adds a single occurrence of the specified element to this multiset.
+	 *
+	 * <p>
+	 * This method refines {@link Collection#add}, which only <i>ensures</i> the
+	 * presence of the element, to further specify that a successful call must
+	 * always increment the count of the element, and the overall size of the
+	 * collection, by one.
+	 *
+	 * @param element the element to add one occurrence of; may be null only if
+	 *                explicitly allowed by the implementation
+	 * @return {@code true} always, since this call is required to modify the
+	 *         multiset, unlike other {@link Collection} types
+	 * @throws NullPointerException     if {@code element} is null and this
+	 *                                  implementation does not permit null elements
+	 * @throws IllegalArgumentException if {@link Integer#MAX_VALUE} occurrences of
+	 *                                  {@code element} are already contained in
+	 *                                  this multiset
+	 */
+	@Override
+	boolean add(E element);
 
 	/**
 	 * Adds a number of occurrences of an element to this multiset. Note that if
@@ -141,61 +225,64 @@ public interface Multiset<E> extends Collection<E> {
 	int add(@Nullable E element, int occurrences);
 
 	/**
-	 * Removes a number of occurrences of the specified element from this multiset.
-	 * If the multiset contains fewer than this number of occurrences to begin with,
-	 * all occurrences will be removed. Note that if {@code occurrences == 1}, this
-	 * is functionally equivalent to the call {@code remove(element)}.
+	 * Determines whether this multiset contains the specified element.
 	 *
-	 * @param element     the element to conditionally remove occurrences of
-	 * @param occurrences the number of occurrences of the element to remove. May be
-	 *                    zero, in which case no change will be made.
-	 * @return the count of the element before the operation; possibly zero
-	 * @throws IllegalArgumentException if {@code occurrences} is negative
+	 * <p>
+	 * This method refines {@link Collection#contains} to further specify that it
+	 * <b>may not</b> throw an exception in response to {@code element} being null
+	 * or of the wrong type.
+	 *
+	 * @param element the element to check for
+	 * @return {@code true} if this multiset contains at least one occurrence of the
+	 *         element
 	 */
-	int remove(@Nullable Object element, int occurrences);
+	@Override
+	boolean contains(@Nullable Object element);
 
 	/**
-	 * Adds or removes the necessary occurrences of an element such that the element
-	 * attains the desired count.
+	 * Returns {@code true} if this multiset contains at least one occurrence of
+	 * each element in the specified collection.
 	 *
-	 * @param element the element to add or remove occurrences of; may be null only
-	 *                if explicitly allowed by the implementation
-	 * @param count   the desired count of the element in this multiset
-	 * @return the count of the element before the operation; possibly zero
-	 * @throws IllegalArgumentException if {@code count} is negative
-	 * @throws NullPointerException     if {@code element} is null and this
-	 *                                  implementation does not permit null
-	 *                                  elements. Note that if {@code
-	 *     count}                    is zero, the implementor may optionally
-	 *                                  return zero instead.
-	 */
-	int setCount(E element, int count);
-
-	/**
-	 * Conditionally sets the count of an element to a new value, as described in
-	 * {@link #setCount(Object, int)}, provided that the element has the expected
-	 * current count. If the current count is not {@code oldCount}, no change is
-	 * made.
+	 * <p>
+	 * This method refines {@link Collection#containsAll} to further specify that it
+	 * <b>may not</b> throw an exception in response to any of {@code
+	 * elements} being null or of the wrong type.
 	 *
-	 * @param element  the element to conditionally set the count of; may be null
-	 *                 only if explicitly allowed by the implementation
-	 * @param oldCount the expected present count of the element in this multiset
-	 * @param newCount the desired count of the element in this multiset
-	 * @return {@code true} if the condition for modification was met. This implies
-	 *         that the multiset was indeed modified, unless
-	 *         {@code oldCount == newCount}.
-	 * @throws IllegalArgumentException if {@code oldCount} or {@code newCount} is
-	 *                                  negative
-	 * @throws NullPointerException     if {@code element} is null and the
-	 *                                  implementation does not permit null
-	 *                                  elements. Note that if {@code
-	 *     oldCount}                 and {@code newCount} are both zero, the
-	 *                                  implementor may optionally return
-	 *                                  {@code true} instead.
+	 * <p>
+	 * <b>Note:</b> this method does not take into account the occurrence count of
+	 * an element in the two collections; it may still return {@code
+	 * true} even if {@code elements} contains several occurrences of an element and
+	 * this multiset contains only one. This is no different than any other
+	 * collection type like {@link List}, but it may be unexpected to the user of a
+	 * multiset.
+	 *
+	 * @param elements the collection of elements to be checked for containment in
+	 *                 this multiset
+	 * @return {@code true} if this multiset contains at least one occurrence of
+	 *         each element contained in {@code elements}
+	 * @throws NullPointerException if {@code elements} is null
 	 */
-	boolean setCount(E element, int oldCount, int newCount);
+	@Override
+	boolean containsAll(Collection<?> elements);
 
 	// Views
+
+	/**
+	 * Returns the number of occurrences of an element in this multiset (the
+	 * <i>count</i> of the element). Note that for an {@link Object#equals}-based
+	 * multiset, this gives the same result as {@link Collections#frequency} (which
+	 * would presumably perform more poorly).
+	 *
+	 * <p>
+	 * <b>Note:</b> the utility method {@link Iterables#frequency} generalizes this
+	 * operation; it correctly delegates to this method when dealing with a
+	 * multiset, but it can also accept any other iterable type.
+	 *
+	 * @param element the element to count occurrences of
+	 * @return the number of occurrences of the element in this multiset; possibly
+	 *         zero but never negative
+	 */
+	int count(@Nullable Object element);
 
 	/**
 	 * Returns the set of distinct elements contained in this multiset. The element
@@ -239,84 +326,6 @@ public interface Multiset<E> extends Collection<E> {
 	 */
 	Set<Entry<E>> entrySet();
 
-	/**
-	 * An unmodifiable element-count pair for a multiset. The
-	 * {@link Multiset#entrySet} method returns a view of the multiset whose
-	 * elements are of this class. A multiset implementation may return Entry
-	 * instances that are either live "read-through" views to the Multiset, or
-	 * immutable snapshots. Note that this type is unrelated to the similarly-named
-	 * type {@code Map.Entry}.
-	 *
-	 * @since 2.0 (imported from Google Collections Library)
-	 */
-	interface Entry<E> {
-
-		/**
-		 * Returns the multiset element corresponding to this entry. Multiple calls to
-		 * this method always return the same instance.
-		 *
-		 * @return the element corresponding to this entry
-		 */
-		E getElement();
-
-		/**
-		 * Returns the count of the associated element in the underlying multiset. This
-		 * count may either be an unchanging snapshot of the count at the time the entry
-		 * was retrieved, or a live view of the current count of the element in the
-		 * multiset, depending on the implementation. Note that in the former case, this
-		 * method can never return zero, while in the latter, it will return zero if all
-		 * occurrences of the element were since removed from the multiset.
-		 *
-		 * @return the count of the element; never negative
-		 */
-		int getCount();
-
-		/**
-		 * {@inheritDoc}
-		 *
-		 * <p>
-		 * Returns {@code true} if the given object is also a multiset entry and the two
-		 * entries represent the same element and count. That is, two entries {@code a}
-		 * and {@code b} are equal if:
-		 * 
-		 * <pre>
-		 *    {@code
-		 *
-		 *   Objects.equal(a.getElement(), b.getElement())
-		 *       && a.getCount() == b.getCount()}
-		 * </pre>
-		 */
-		@Override
-		// TODO(kevinb): check this wrt TreeMultiset?
-		boolean equals(Object o);
-
-		/**
-		 * {@inheritDoc}
-		 *
-		 * <p>
-		 * The hash code of a multiset entry for element {@code element} and count
-		 * {@code count} is defined as:
-		 * 
-		 * <pre>
-		 *    {@code
-		 *
-		 *   ((element == null) ? 0 : element.hashCode()) ^ count}
-		 * </pre>
-		 */
-		@Override
-		int hashCode();
-
-		/**
-		 * Returns the canonical string representation of this entry, defined as
-		 * follows. If the count for this entry is one, this is simply the string
-		 * representation of the corresponding element. Otherwise, it is the string
-		 * representation of the element, followed by the three characters {@code
-		 * " x "} (space, letter x, space), followed by the count.
-		 */
-		@Override
-		String toString();
-	}
-
 	// Comparison and hashing
 
 	/**
@@ -334,7 +343,8 @@ public interface Multiset<E> extends Collection<E> {
 	 * <pre>
 	 *    {@code
 	 *
-	 *   ((element == null) ? 0 : element.hashCode()) ^ count(element)}
+	 * ((element == null) ? 0 : element.hashCode()) ^ count(element)
+	 * }
 	 * </pre>
 	 *
 	 * <p>
@@ -348,87 +358,13 @@ public interface Multiset<E> extends Collection<E> {
 	 * {@inheritDoc}
 	 *
 	 * <p>
-	 * It is recommended, though not mandatory, that this method return the result
-	 * of invoking {@link #toString} on the {@link #entrySet}, yielding a result
-	 * such as {@code [a x 3, c, d x 2, e]}.
-	 */
-	@Override
-	String toString();
-
-	// Refined Collection Methods
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>
 	 * Elements that occur multiple times in the multiset will appear multiple times
 	 * in this iterator, though not necessarily sequentially.
 	 */
 	@Override
 	Iterator<E> iterator();
 
-	/**
-	 * Determines whether this multiset contains the specified element.
-	 *
-	 * <p>
-	 * This method refines {@link Collection#contains} to further specify that it
-	 * <b>may not</b> throw an exception in response to {@code element} being null
-	 * or of the wrong type.
-	 *
-	 * @param element the element to check for
-	 * @return {@code true} if this multiset contains at least one occurrence of the
-	 *         element
-	 */
-	@Override
-	boolean contains(@Nullable Object element);
-
-	/**
-	 * Returns {@code true} if this multiset contains at least one occurrence of
-	 * each element in the specified collection.
-	 *
-	 * <p>
-	 * This method refines {@link Collection#containsAll} to further specify that it
-	 * <b>may not</b> throw an exception in response to any of {@code
-	 * elements} being null or of the wrong type.
-	 *
-	 * <p>
-	 * <b>Note:</b> this method does not take into account the occurrence count of
-	 * an element in the two collections; it may still return {@code
-	 * true} even if {@code elements} contains several occurrences of an element and
-	 * this multiset contains only one. This is no different than any other
-	 * collection type like {@link List}, but it may be unexpected to the user of a
-	 * multiset.
-	 *
-	 * @param elements the collection of elements to be checked for containment in
-	 *                 this multiset
-	 * @return {@code true} if this multiset contains at least one occurrence of
-	 *         each element contained in {@code elements}
-	 * @throws NullPointerException if {@code elements} is null
-	 */
-	@Override
-	boolean containsAll(Collection<?> elements);
-
-	/**
-	 * Adds a single occurrence of the specified element to this multiset.
-	 *
-	 * <p>
-	 * This method refines {@link Collection#add}, which only <i>ensures</i> the
-	 * presence of the element, to further specify that a successful call must
-	 * always increment the count of the element, and the overall size of the
-	 * collection, by one.
-	 *
-	 * @param element the element to add one occurrence of; may be null only if
-	 *                explicitly allowed by the implementation
-	 * @return {@code true} always, since this call is required to modify the
-	 *         multiset, unlike other {@link Collection} types
-	 * @throws NullPointerException     if {@code element} is null and this
-	 *                                  implementation does not permit null elements
-	 * @throws IllegalArgumentException if {@link Integer#MAX_VALUE} occurrences of
-	 *                                  {@code element} are already contained in
-	 *                                  this multiset
-	 */
-	@Override
-	boolean add(E element);
+	// Refined Collection Methods
 
 	/**
 	 * Removes a <i>single</i> occurrence of the specified element from this
@@ -444,6 +380,20 @@ public interface Multiset<E> extends Collection<E> {
 	 */
 	@Override
 	boolean remove(@Nullable Object element);
+
+	/**
+	 * Removes a number of occurrences of the specified element from this multiset.
+	 * If the multiset contains fewer than this number of occurrences to begin with,
+	 * all occurrences will be removed. Note that if {@code occurrences == 1}, this
+	 * is functionally equivalent to the call {@code remove(element)}.
+	 *
+	 * @param element     the element to conditionally remove occurrences of
+	 * @param occurrences the number of occurrences of the element to remove. May be
+	 *                    zero, in which case no change will be made.
+	 * @return the count of the element before the operation; possibly zero
+	 * @throws IllegalArgumentException if {@code occurrences} is negative
+	 */
+	int remove(@Nullable Object element, int occurrences);
 
 	/**
 	 * {@inheritDoc}
@@ -480,4 +430,56 @@ public interface Multiset<E> extends Collection<E> {
 	 */
 	@Override
 	boolean retainAll(Collection<?> c);
+
+	/**
+	 * Adds or removes the necessary occurrences of an element such that the element
+	 * attains the desired count.
+	 *
+	 * @param element the element to add or remove occurrences of; may be null only
+	 *                if explicitly allowed by the implementation
+	 * @param count   the desired count of the element in this multiset
+	 * @return the count of the element before the operation; possibly zero
+	 * @throws IllegalArgumentException if {@code count} is negative
+	 * @throws NullPointerException     if {@code element} is null and this
+	 *                                  implementation does not permit null
+	 *                                  elements. Note that if {@code
+	 *     count}                    is zero, the implementor may optionally
+	 *                                  return zero instead.
+	 */
+	int setCount(E element, int count);
+
+	/**
+	 * Conditionally sets the count of an element to a new value, as described in
+	 * {@link #setCount(Object, int)}, provided that the element has the expected
+	 * current count. If the current count is not {@code oldCount}, no change is
+	 * made.
+	 *
+	 * @param element  the element to conditionally set the count of; may be null
+	 *                 only if explicitly allowed by the implementation
+	 * @param oldCount the expected present count of the element in this multiset
+	 * @param newCount the desired count of the element in this multiset
+	 * @return {@code true} if the condition for modification was met. This implies
+	 *         that the multiset was indeed modified, unless
+	 *         {@code oldCount == newCount}.
+	 * @throws IllegalArgumentException if {@code oldCount} or {@code newCount} is
+	 *                                  negative
+	 * @throws NullPointerException     if {@code element} is null and the
+	 *                                  implementation does not permit null
+	 *                                  elements. Note that if {@code
+	 *     oldCount}                 and {@code newCount} are both zero, the
+	 *                                  implementor may optionally return
+	 *                                  {@code true} instead.
+	 */
+	boolean setCount(E element, int oldCount, int newCount);
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * It is recommended, though not mandatory, that this method return the result
+	 * of invoking {@link #toString} on the {@link #entrySet}, yielding a result
+	 * such as {@code [a x 3, c, d x 2, e]}.
+	 */
+	@Override
+	String toString();
 }

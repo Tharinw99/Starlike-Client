@@ -33,15 +33,96 @@ import com.google.common.collect.ImmutableMapEntry.TerminalEntry;
 @GwtCompatible(serializable = true, emulated = true)
 final class RegularImmutableMap<K, V> extends ImmutableMap<K, V> {
 
+	@SuppressWarnings("serial") // uses writeReplace(), not default serialization
+	private class EntrySet extends ImmutableMapEntrySet<K, V> {
+		@Override
+		ImmutableList<Entry<K, V>> createAsList() {
+			return new RegularImmutableAsList<Entry<K, V>>(this, entries);
+		}
+
+		@Override
+		public UnmodifiableIterator<Entry<K, V>> iterator() {
+			return asList().iterator();
+		}
+
+		@Override
+		ImmutableMap<K, V> map() {
+			return RegularImmutableMap.this;
+		}
+	}
+
+	private static final class NonTerminalMapEntry<K, V> extends ImmutableMapEntry<K, V> {
+		private final ImmutableMapEntry<K, V> nextInKeyBucket;
+
+		NonTerminalMapEntry(ImmutableMapEntry<K, V> contents, ImmutableMapEntry<K, V> nextInKeyBucket) {
+			super(contents);
+			this.nextInKeyBucket = nextInKeyBucket;
+		}
+
+		NonTerminalMapEntry(K key, V value, ImmutableMapEntry<K, V> nextInKeyBucket) {
+			super(key, value);
+			this.nextInKeyBucket = nextInKeyBucket;
+		}
+
+		@Override
+		ImmutableMapEntry<K, V> getNextInKeyBucket() {
+			return nextInKeyBucket;
+		}
+
+		@Override
+		@Nullable
+		ImmutableMapEntry<K, V> getNextInValueBucket() {
+			return null;
+		}
+
+	}
+
+	/**
+	 * Closed addressing tends to perform well even with high load factors. Being
+	 * conservative here ensures that the table is still likely to be relatively
+	 * sparse (hence it misses fast) while saving space.
+	 */
+	private static final double MAX_LOAD_FACTOR = 1.2;
+
+	// This class is never actually serialized directly, but we have to make the
+	// warning go away (and suppressing would suppress for all nested classes too)
+	private static final long serialVersionUID = 0;
+
 	// entries in insertion order
 	private final transient ImmutableMapEntry<K, V>[] entries;
+
 	// array of linked lists of entries
 	private final transient ImmutableMapEntry<K, V>[] table;
+
 	// 'and' with an int to get a table index
 	private final transient int mask;
 
-	RegularImmutableMap(TerminalEntry<?, ?>... theEntries) {
-		this(theEntries.length, theEntries);
+	/**
+	 * Constructor for RegularImmutableMap that makes no assumptions about the input
+	 * entries.
+	 */
+	RegularImmutableMap(Entry<?, ?>[] theEntries) {
+		int size = theEntries.length;
+		entries = createEntryArray(size);
+		int tableSize = Hashing.closedTableSize(size, MAX_LOAD_FACTOR);
+		table = createEntryArray(tableSize);
+		mask = tableSize - 1;
+		for (int entryIndex = 0; entryIndex < size; entryIndex++) {
+			@SuppressWarnings("unchecked") // all our callers carefully put in only Entry<K, V>s
+			Entry<K, V> entry = (Entry<K, V>) theEntries[entryIndex];
+			K key = entry.getKey();
+			V value = entry.getValue();
+			checkEntryNotNull(key, value);
+			int tableIndex = Hashing.smear(key.hashCode()) & mask;
+			@Nullable
+			ImmutableMapEntry<K, V> existing = table[tableIndex];
+			// prepend, not append, so the entries can be immutable
+			ImmutableMapEntry<K, V> newEntry = (existing == null) ? new TerminalEntry<K, V>(key, value)
+					: new NonTerminalMapEntry<K, V>(key, value, existing);
+			table[tableIndex] = newEntry;
+			entries[entryIndex] = newEntry;
+			checkNoConflictInBucket(key, newEntry, existing);
+		}
 	}
 
 	/**
@@ -74,32 +155,8 @@ final class RegularImmutableMap<K, V> extends ImmutableMap<K, V> {
 		}
 	}
 
-	/**
-	 * Constructor for RegularImmutableMap that makes no assumptions about the input
-	 * entries.
-	 */
-	RegularImmutableMap(Entry<?, ?>[] theEntries) {
-		int size = theEntries.length;
-		entries = createEntryArray(size);
-		int tableSize = Hashing.closedTableSize(size, MAX_LOAD_FACTOR);
-		table = createEntryArray(tableSize);
-		mask = tableSize - 1;
-		for (int entryIndex = 0; entryIndex < size; entryIndex++) {
-			@SuppressWarnings("unchecked") // all our callers carefully put in only Entry<K, V>s
-			Entry<K, V> entry = (Entry<K, V>) theEntries[entryIndex];
-			K key = entry.getKey();
-			V value = entry.getValue();
-			checkEntryNotNull(key, value);
-			int tableIndex = Hashing.smear(key.hashCode()) & mask;
-			@Nullable
-			ImmutableMapEntry<K, V> existing = table[tableIndex];
-			// prepend, not append, so the entries can be immutable
-			ImmutableMapEntry<K, V> newEntry = (existing == null) ? new TerminalEntry<K, V>(key, value)
-					: new NonTerminalMapEntry<K, V>(key, value, existing);
-			table[tableIndex] = newEntry;
-			entries[entryIndex] = newEntry;
-			checkNoConflictInBucket(key, newEntry, existing);
-		}
+	RegularImmutableMap(TerminalEntry<?, ?>... theEntries) {
+		this(theEntries.length, theEntries);
 	}
 
 	private void checkNoConflictInBucket(K key, ImmutableMapEntry<K, V> entry, ImmutableMapEntry<K, V> bucketHead) {
@@ -107,39 +164,6 @@ final class RegularImmutableMap<K, V> extends ImmutableMap<K, V> {
 			checkNoConflict(!key.equals(bucketHead.getKey()), "key", entry, bucketHead);
 		}
 	}
-
-	private static final class NonTerminalMapEntry<K, V> extends ImmutableMapEntry<K, V> {
-		private final ImmutableMapEntry<K, V> nextInKeyBucket;
-
-		NonTerminalMapEntry(K key, V value, ImmutableMapEntry<K, V> nextInKeyBucket) {
-			super(key, value);
-			this.nextInKeyBucket = nextInKeyBucket;
-		}
-
-		NonTerminalMapEntry(ImmutableMapEntry<K, V> contents, ImmutableMapEntry<K, V> nextInKeyBucket) {
-			super(contents);
-			this.nextInKeyBucket = nextInKeyBucket;
-		}
-
-		@Override
-		ImmutableMapEntry<K, V> getNextInKeyBucket() {
-			return nextInKeyBucket;
-		}
-
-		@Override
-		@Nullable
-		ImmutableMapEntry<K, V> getNextInValueBucket() {
-			return null;
-		}
-
-	}
-
-	/**
-	 * Closed addressing tends to perform well even with high load factors. Being
-	 * conservative here ensures that the table is still likely to be relatively
-	 * sparse (hence it misses fast) while saving space.
-	 */
-	private static final double MAX_LOAD_FACTOR = 1.2;
 
 	/**
 	 * Creates an {@code ImmutableMapEntry} array to hold parameterized entries. The
@@ -149,6 +173,11 @@ final class RegularImmutableMap<K, V> extends ImmutableMap<K, V> {
 	@SuppressWarnings("unchecked") // Safe as long as the javadocs are followed
 	private ImmutableMapEntry<K, V>[] createEntryArray(int size) {
 		return new ImmutableMapEntry[size];
+	}
+
+	@Override
+	ImmutableSet<Entry<K, V>> createEntrySet() {
+		return new EntrySet();
 	}
 
 	@Override
@@ -174,39 +203,12 @@ final class RegularImmutableMap<K, V> extends ImmutableMap<K, V> {
 	}
 
 	@Override
-	public int size() {
-		return entries.length;
-	}
-
-	@Override
 	boolean isPartialView() {
 		return false;
 	}
 
 	@Override
-	ImmutableSet<Entry<K, V>> createEntrySet() {
-		return new EntrySet();
+	public int size() {
+		return entries.length;
 	}
-
-	@SuppressWarnings("serial") // uses writeReplace(), not default serialization
-	private class EntrySet extends ImmutableMapEntrySet<K, V> {
-		@Override
-		ImmutableMap<K, V> map() {
-			return RegularImmutableMap.this;
-		}
-
-		@Override
-		public UnmodifiableIterator<Entry<K, V>> iterator() {
-			return asList().iterator();
-		}
-
-		@Override
-		ImmutableList<Entry<K, V>> createAsList() {
-			return new RegularImmutableAsList<Entry<K, V>>(this, entries);
-		}
-	}
-
-	// This class is never actually serialized directly, but we have to make the
-	// warning go away (and suppressing would suppress for all nested classes too)
-	private static final long serialVersionUID = 0;
 }

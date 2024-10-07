@@ -18,7 +18,13 @@ import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
 import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 import net.lax1dude.eaglercraft.v1_8.profile.EaglerProfile;
 import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.GameMessagePacket;
-import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.client.*;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.client.CPacketVoiceSignalConnectEAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.client.CPacketVoiceSignalDescEAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.client.CPacketVoiceSignalDisconnectPeerV4EAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.client.CPacketVoiceSignalDisconnectV3EAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.client.CPacketVoiceSignalDisconnectV4EAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.client.CPacketVoiceSignalICEEAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.client.CPacketVoiceSignalRequestEAG;
 import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketVoiceSignalGlobalEAG;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -26,14 +32,15 @@ import net.minecraft.entity.player.EntityPlayer;
 /**
  * Copyright (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -57,54 +64,93 @@ public class VoiceClientController {
 	});
 	private static final Map<EaglercraftUUID, String> uuidToNameLookup = new HashMap<>(256);
 
-	public static boolean isSupported() {
-		return isClientSupported() && isServerSupported();
-	}
-
 	private static boolean checked = false;
 
-	public static boolean isClientSupported() {
-		if (!checked) {
-			checked = true;
-			clientSupport = EagRuntime.getConfiguration().isAllowVoiceClient() && PlatformVoiceClient.isSupported();
-		}
-		return clientSupport;
-	}
+	private static boolean talkStatus = false;
 
-	public static boolean isServerSupported() {
-		return serverSupport;
-	}
+	private static int proximity = 16;
 
-	public static void initializeVoiceClient(Consumer<GameMessagePacket> signalSendCallbackIn, int proto) {
-		packetSendCallback = signalSendCallbackIn;
-		protocolVersion = proto;
-		uuidToNameLookup.clear();
-		if (getVoiceChannel() != EnumVoiceChannelType.NONE) sendInitialVoice();
-	}
+	private static float volumeListen = 0.5f;
 
-	public static void handleVoiceSignalPacketTypeGlobal(EaglercraftUUID[] voicePlayers, String[] voiceNames) {
-		uuidToNameLookup.clear();
-		for (int i = 0; i < voicePlayers.length; i++) {
-			if(voiceNames != null) {
-				uuidToNameLookup.put(voicePlayers[i], voiceNames[i]);
-			}
-			sendPacketRequestIfNeeded(voicePlayers[i]);
+	private static float volumeSpeak = 0.5f;
+
+	private static final Set<EaglercraftUUID> listeningSet = new HashSet<>();
+
+	private static final Set<EaglercraftUUID> speakingSet = new HashSet<>();
+
+	private static final Set<EaglercraftUUID> mutedSet = new HashSet<>();
+
+	public static void activateVoice(boolean talk) {
+		if (talkStatus != talk) {
+			PlatformVoiceClient.activateVoice(talk);
+			talkStatus = talk;
 		}
 	}
 
-	public static void handleVoiceSignalPacketTypeGlobalNew(Collection<SPacketVoiceSignalGlobalEAG.UserData> voicePlayers) {
-		uuidToNameLookup.clear();
-		for (SPacketVoiceSignalGlobalEAG.UserData player : voicePlayers) {
-			EaglercraftUUID uuid = new EaglercraftUUID(player.uuidMost, player.uuidLeast);
-			if(player.username != null) {
-				uuidToNameLookup.put(uuid, player.username);
-			}
+	public static final boolean addNearbyPlayer(EaglercraftUUID uuid) {
+		recentlyNearbyPlayers.remove(uuid);
+		if (nearbyPlayers.add(uuid)) {
 			sendPacketRequestIfNeeded(uuid);
+			return true;
 		}
+		return false;
+	}
+
+	public static final void cleanupNearbyPlayers(HashSet<EaglercraftUUID> existingPlayers) {
+		nearbyPlayers.stream().filter(ud -> !existingPlayers.contains(ud)).collect(Collectors.toSet())
+				.forEach(VoiceClientController::removeNearbyPlayer);
+	}
+
+	public static EnumVoiceChannelType getVoiceChannel() {
+		return voiceChannel;
+	}
+
+	public static Set<EaglercraftUUID> getVoiceListening() {
+		return listeningSet;
+	}
+
+	public static float getVoiceListenVolume() {
+		return volumeListen;
+	}
+
+	public static Set<EaglercraftUUID> getVoiceMuted() {
+		return mutedSet;
+	}
+
+	public static int getVoiceProximity() {
+		return proximity;
+	}
+
+	public static List<EaglercraftUUID> getVoiceRecent() {
+		return new ArrayList<>(listeningSet);
+	}
+
+	public static Set<EaglercraftUUID> getVoiceSpeaking() {
+		return speakingSet;
+	}
+
+	public static float getVoiceSpeakVolume() {
+		return volumeSpeak;
+	}
+
+	public static EnumVoiceChannelStatus getVoiceStatus() {
+		return (!isClientSupported() || !isServerSupported()) ? EnumVoiceChannelStatus.UNAVAILABLE
+				: (PlatformVoiceClient.getReadyState() != EnumVoiceChannelReadyState.DEVICE_INITIALIZED
+						? EnumVoiceChannelStatus.CONNECTING
+						: (voicePeerErrored() ? EnumVoiceChannelStatus.UNAVAILABLE : EnumVoiceChannelStatus.CONNECTED));
+	}
+
+	public static String getVoiceUsername(EaglercraftUUID uuid) {
+		if (uuid == null) {
+			return "null";
+		}
+		String ret = uuidToNameLookup.get(uuid);
+		return ret == null ? uuid.toString() : ret;
 	}
 
 	public static void handleServerDisconnect() {
-		if(!isClientSupported()) return;
+		if (!isClientSupported())
+			return;
 		serverSupport = false;
 		uuidToNameLookup.clear();
 		for (EaglercraftUUID uuid : nearbyPlayers) {
@@ -125,10 +171,10 @@ public class VoiceClientController {
 	public static void handleVoiceSignalPacketTypeAllowed(boolean voiceAvailableStat, String[] servs) {
 		serverSupport = voiceAvailableStat;
 		PlatformVoiceClient.setICEServers(servs);
-		if(isSupported()) {
+		if (isSupported()) {
 			EnumVoiceChannelType ch = getVoiceChannel();
-	        setVoiceChannel(EnumVoiceChannelType.NONE);
-	        setVoiceChannel(ch);
+			setVoiceChannel(EnumVoiceChannelType.NONE);
+			setVoiceChannel(ch);
 		}
 	}
 
@@ -140,75 +186,128 @@ public class VoiceClientController {
 		sendPacketRequest(user);
 	}
 
+	public static void handleVoiceSignalPacketTypeDescription(EaglercraftUUID user, String desc) {
+		PlatformVoiceClient.signalDescription(user, desc);
+	}
+
 	public static void handleVoiceSignalPacketTypeDisconnect(EaglercraftUUID user) {
 		PlatformVoiceClient.signalDisconnect(user, true);
+	}
+
+	public static void handleVoiceSignalPacketTypeGlobal(EaglercraftUUID[] voicePlayers, String[] voiceNames) {
+		uuidToNameLookup.clear();
+		for (int i = 0; i < voicePlayers.length; i++) {
+			if (voiceNames != null) {
+				uuidToNameLookup.put(voicePlayers[i], voiceNames[i]);
+			}
+			sendPacketRequestIfNeeded(voicePlayers[i]);
+		}
+	}
+
+	public static void handleVoiceSignalPacketTypeGlobalNew(
+			Collection<SPacketVoiceSignalGlobalEAG.UserData> voicePlayers) {
+		uuidToNameLookup.clear();
+		for (SPacketVoiceSignalGlobalEAG.UserData player : voicePlayers) {
+			EaglercraftUUID uuid = new EaglercraftUUID(player.uuidMost, player.uuidLeast);
+			if (player.username != null) {
+				uuidToNameLookup.put(uuid, player.username);
+			}
+			sendPacketRequestIfNeeded(uuid);
+		}
 	}
 
 	public static void handleVoiceSignalPacketTypeICECandidate(EaglercraftUUID user, String ice) {
 		PlatformVoiceClient.signalICECandidate(user, ice);
 	}
 
-	public static void handleVoiceSignalPacketTypeDescription(EaglercraftUUID user, String desc) {
-		PlatformVoiceClient.signalDescription(user, desc);
+	public static void initializeVoiceClient(Consumer<GameMessagePacket> signalSendCallbackIn, int proto) {
+		packetSendCallback = signalSendCallbackIn;
+		protocolVersion = proto;
+		uuidToNameLookup.clear();
+		if (getVoiceChannel() != EnumVoiceChannelType.NONE)
+			sendInitialVoice();
 	}
 
-	public static void tickVoiceClient(Minecraft mc) {
-		if(!isClientSupported()) return;
-		recentlyNearbyPlayers.checkForExpirations();
-		speakingSet.clear();
-		PlatformVoiceClient.tickVoiceClient();
-
-		if (getVoiceChannel() != EnumVoiceChannelType.NONE && (getVoiceStatus() == EnumVoiceChannelStatus.CONNECTING || getVoiceStatus() == EnumVoiceChannelStatus.CONNECTED)) {
-			activateVoice((mc.currentScreen == null || !mc.currentScreen.blockPTTKey()) && Keyboard.isKeyDown(mc.gameSettings.voicePTTKey));
-
-			if (mc.theWorld != null && mc.thePlayer != null) {
-				HashSet<EaglercraftUUID> seenPlayers = new HashSet<>();
-				for (EntityPlayer player : mc.theWorld.playerEntities) {
-					if (player == mc.thePlayer) continue;
-					if (getVoiceChannel() == EnumVoiceChannelType.PROXIMITY) updateVoicePosition(player.getUniqueID(), player.posX, player.posY + player.getEyeHeight(), player.posZ);
-					int prox = 22;
-					// cube
-					if (Math.abs(mc.thePlayer.posX - player.posX) <= prox && Math.abs(mc.thePlayer.posY - player.posY) <= prox && Math.abs(mc.thePlayer.posZ - player.posZ) <= prox) {
-						if (!uuidToNameLookup.containsKey(player.getUniqueID())) {
-							uuidToNameLookup.put(player.getUniqueID(), player.getName());
-						}
-						if (addNearbyPlayer(player.getUniqueID())) {
-							seenPlayers.add(player.getUniqueID());
-						}
-					}
-				}
-				cleanupNearbyPlayers(seenPlayers);
-			}
+	public static boolean isClientSupported() {
+		if (!checked) {
+			checked = true;
+			clientSupport = EagRuntime.getConfiguration().isAllowVoiceClient() && PlatformVoiceClient.isSupported();
 		}
+		return clientSupport;
 	}
 
-	public static final boolean addNearbyPlayer(EaglercraftUUID uuid) {
-		recentlyNearbyPlayers.remove(uuid);
-		if (nearbyPlayers.add(uuid)) {
-			sendPacketRequestIfNeeded(uuid);
-			return true;
-		}
-		return false;
+	public static boolean isServerSupported() {
+		return serverSupport;
+	}
+
+	public static boolean isSupported() {
+		return isClientSupported() && isServerSupported();
 	}
 
 	public static final void removeNearbyPlayer(EaglercraftUUID uuid) {
 		if (nearbyPlayers.remove(uuid)) {
-			if (getVoiceStatus() == EnumVoiceChannelStatus.DISCONNECTED || getVoiceStatus() == EnumVoiceChannelStatus.UNAVAILABLE) return;
-			if (voiceChannel == EnumVoiceChannelType.PROXIMITY) recentlyNearbyPlayers.add(uuid);
+			if (getVoiceStatus() == EnumVoiceChannelStatus.DISCONNECTED
+					|| getVoiceStatus() == EnumVoiceChannelStatus.UNAVAILABLE)
+				return;
+			if (voiceChannel == EnumVoiceChannelType.PROXIMITY)
+				recentlyNearbyPlayers.add(uuid);
 		}
 	}
 
-	public static final void cleanupNearbyPlayers(HashSet<EaglercraftUUID> existingPlayers) {
-		nearbyPlayers.stream().filter(ud -> !existingPlayers.contains(ud)).collect(Collectors.toSet()).forEach(VoiceClientController::removeNearbyPlayer);
+	public static void sendInitialVoice() {
+		sendPacketConnect();
+		for (EaglercraftUUID uuid : nearbyPlayers) {
+			sendPacketRequest(uuid);
+		}
 	}
 
-	public static final void updateVoicePosition(EaglercraftUUID uuid, double x, double y, double z) {
-		PlatformVoiceClient.updateVoicePosition(uuid, x, y, z);
+	public static void sendPacketConnect() {
+		packetSendCallback.accept(new CPacketVoiceSignalConnectEAG());
+	}
+
+	public static void sendPacketDesc(EaglercraftUUID peerId, String desc) {
+		packetSendCallback.accept(new CPacketVoiceSignalDescEAG(peerId.msb, peerId.lsb, desc));
+	}
+
+	public static void sendPacketDisconnect() {
+		if (protocolVersion <= 3) {
+			packetSendCallback.accept(new CPacketVoiceSignalDisconnectV3EAG());
+		} else {
+			packetSendCallback.accept(new CPacketVoiceSignalDisconnectV4EAG());
+		}
+	}
+
+	public static void sendPacketDisconnectPeer(EaglercraftUUID peerId) {
+		if (protocolVersion <= 3) {
+			packetSendCallback.accept(new CPacketVoiceSignalDisconnectV3EAG(true, peerId.msb, peerId.lsb));
+		} else {
+			packetSendCallback.accept(new CPacketVoiceSignalDisconnectPeerV4EAG(peerId.msb, peerId.lsb));
+		}
+	}
+
+	public static void sendPacketICE(EaglercraftUUID peerId, String candidate) {
+		packetSendCallback.accept(new CPacketVoiceSignalICEEAG(peerId.msb, peerId.lsb, candidate));
+	}
+
+	public static void sendPacketRequest(EaglercraftUUID peerId) {
+		packetSendCallback.accept(new CPacketVoiceSignalRequestEAG(peerId.msb, peerId.lsb));
+	}
+
+	private static void sendPacketRequestIfNeeded(EaglercraftUUID uuid) {
+		if (getVoiceStatus() == EnumVoiceChannelStatus.DISCONNECTED
+				|| getVoiceStatus() == EnumVoiceChannelStatus.UNAVAILABLE)
+			return;
+		if (uuid.equals(EaglerProfile.getPlayerUUID()))
+			return;
+		if (!getVoiceListening().contains(uuid))
+			sendPacketRequest(uuid);
 	}
 
 	public static void setVoiceChannel(EnumVoiceChannelType channel) {
-		if (voiceChannel == channel) return;
-		if (channel != EnumVoiceChannelType.NONE) PlatformVoiceClient.initializeDevices();
+		if (voiceChannel == channel)
+			return;
+		if (channel != EnumVoiceChannelType.NONE)
+			PlatformVoiceClient.initializeDevices();
 		PlatformVoiceClient.resetPeerStates();
 		if (channel == EnumVoiceChannelType.NONE) {
 			for (EaglercraftUUID uuid : nearbyPlayers) {
@@ -235,7 +334,7 @@ public class VoiceClientController {
 			nearbyPlayers.clear();
 			recentlyNearbyPlayers.clear();
 			sendPacketDisconnect();
-		} else if(voiceChannel == EnumVoiceChannelType.GLOBAL) {
+		} else if (voiceChannel == EnumVoiceChannelType.GLOBAL) {
 			Set<EaglercraftUUID> antiConcurrentModificationUUIDs = new HashSet<>(listeningSet);
 			antiConcurrentModificationUUIDs.removeAll(nearbyPlayers);
 			antiConcurrentModificationUUIDs.removeAll(recentlyNearbyPlayers);
@@ -250,80 +349,9 @@ public class VoiceClientController {
 		}
 	}
 
-	public static void sendInitialVoice() {
-		sendPacketConnect();
-		for (EaglercraftUUID uuid : nearbyPlayers) {
-			sendPacketRequest(uuid);
-		}
-	}
-
-	public static EnumVoiceChannelType getVoiceChannel() {
-		return voiceChannel;
-	}
-
-	private static boolean voicePeerErrored() {
-		return PlatformVoiceClient.getPeerState() == EnumVoiceChannelPeerState.FAILED || PlatformVoiceClient.getPeerStateConnect() == EnumVoiceChannelPeerState.FAILED || PlatformVoiceClient.getPeerStateInitial() == EnumVoiceChannelPeerState.FAILED || PlatformVoiceClient.getPeerStateDesc() == EnumVoiceChannelPeerState.FAILED || PlatformVoiceClient.getPeerStateIce() == EnumVoiceChannelPeerState.FAILED;
-	}
-	public static EnumVoiceChannelStatus getVoiceStatus() {
-		return (!isClientSupported() || !isServerSupported()) ? EnumVoiceChannelStatus.UNAVAILABLE :
-				(PlatformVoiceClient.getReadyState() != EnumVoiceChannelReadyState.DEVICE_INITIALIZED ?
-						EnumVoiceChannelStatus.CONNECTING : (voicePeerErrored() ? EnumVoiceChannelStatus.UNAVAILABLE : EnumVoiceChannelStatus.CONNECTED));
-	}
-
-	private static boolean talkStatus = false;
-
-	public static void activateVoice(boolean talk) {
-		if (talkStatus != talk) {
-			PlatformVoiceClient.activateVoice(talk);
-			talkStatus = talk;
-		}
-	}
-
-	private static int proximity = 16;
-
-	public static void setVoiceProximity(int prox) {
-		PlatformVoiceClient.setVoiceProximity(prox);
-		proximity = prox;
-	}
-
-	public static int getVoiceProximity() {
-		return proximity;
-	}
-
-	private static float volumeListen = 0.5f;
-
 	public static void setVoiceListenVolume(float f) {
 		PlatformVoiceClient.setVoiceListenVolume(f);
 		volumeListen = f;
-	}
-
-	public static float getVoiceListenVolume() {
-		return volumeListen;
-	}
-
-	private static float volumeSpeak = 0.5f;
-
-	public static void setVoiceSpeakVolume(float f) {
-		if (volumeSpeak != f) {
-			PlatformVoiceClient.setMicVolume(f);
-		}
-		volumeSpeak = f;
-	}
-
-	public static float getVoiceSpeakVolume() {
-		return volumeSpeak;
-	}
-
-	private static final Set<EaglercraftUUID> listeningSet = new HashSet<>();
-	private static final Set<EaglercraftUUID> speakingSet = new HashSet<>();
-	private static final Set<EaglercraftUUID> mutedSet = new HashSet<>();
-
-	public static Set<EaglercraftUUID> getVoiceListening() {
-		return listeningSet;
-	}
-
-	public static Set<EaglercraftUUID> getVoiceSpeaking() {
-		return speakingSet;
 	}
 
 	public static void setVoiceMuted(EaglercraftUUID uuid, boolean mute) {
@@ -335,57 +363,65 @@ public class VoiceClientController {
 		}
 	}
 
-	public static Set<EaglercraftUUID> getVoiceMuted() {
-		return mutedSet;
+	public static void setVoiceProximity(int prox) {
+		PlatformVoiceClient.setVoiceProximity(prox);
+		proximity = prox;
 	}
 
-	public static List<EaglercraftUUID> getVoiceRecent() {
-		return new ArrayList<>(listeningSet);
-	}
-
-	public static String getVoiceUsername(EaglercraftUUID uuid) {
-		if(uuid == null) {
-			return "null";
+	public static void setVoiceSpeakVolume(float f) {
+		if (volumeSpeak != f) {
+			PlatformVoiceClient.setMicVolume(f);
 		}
-		String ret = uuidToNameLookup.get(uuid);
-		return ret == null ? uuid.toString() : ret;
+		volumeSpeak = f;
 	}
 
-	public static void sendPacketICE(EaglercraftUUID peerId, String candidate) {
-		packetSendCallback.accept(new CPacketVoiceSignalICEEAG(peerId.msb, peerId.lsb, candidate));
-	}
+	public static void tickVoiceClient(Minecraft mc) {
+		if (!isClientSupported())
+			return;
+		recentlyNearbyPlayers.checkForExpirations();
+		speakingSet.clear();
+		PlatformVoiceClient.tickVoiceClient();
 
-	public static void sendPacketDesc(EaglercraftUUID peerId, String desc) {
-		packetSendCallback.accept(new CPacketVoiceSignalDescEAG(peerId.msb, peerId.lsb, desc));
-	}
+		if (getVoiceChannel() != EnumVoiceChannelType.NONE && (getVoiceStatus() == EnumVoiceChannelStatus.CONNECTING
+				|| getVoiceStatus() == EnumVoiceChannelStatus.CONNECTED)) {
+			activateVoice((mc.currentScreen == null || !mc.currentScreen.blockPTTKey())
+					&& Keyboard.isKeyDown(mc.gameSettings.voicePTTKey));
 
-	public static void sendPacketDisconnect() {
-		if(protocolVersion <= 3) {
-			packetSendCallback.accept(new CPacketVoiceSignalDisconnectV3EAG());
-		}else {
-			packetSendCallback.accept(new CPacketVoiceSignalDisconnectV4EAG());
+			if (mc.theWorld != null && mc.thePlayer != null) {
+				HashSet<EaglercraftUUID> seenPlayers = new HashSet<>();
+				for (EntityPlayer player : mc.theWorld.playerEntities) {
+					if (player == mc.thePlayer)
+						continue;
+					if (getVoiceChannel() == EnumVoiceChannelType.PROXIMITY)
+						updateVoicePosition(player.getUniqueID(), player.posX, player.posY + player.getEyeHeight(),
+								player.posZ);
+					int prox = 22;
+					// cube
+					if (Math.abs(mc.thePlayer.posX - player.posX) <= prox
+							&& Math.abs(mc.thePlayer.posY - player.posY) <= prox
+							&& Math.abs(mc.thePlayer.posZ - player.posZ) <= prox) {
+						if (!uuidToNameLookup.containsKey(player.getUniqueID())) {
+							uuidToNameLookup.put(player.getUniqueID(), player.getName());
+						}
+						if (addNearbyPlayer(player.getUniqueID())) {
+							seenPlayers.add(player.getUniqueID());
+						}
+					}
+				}
+				cleanupNearbyPlayers(seenPlayers);
+			}
 		}
 	}
 
-	public static void sendPacketDisconnectPeer(EaglercraftUUID peerId) {
-		if(protocolVersion <= 3) {
-			packetSendCallback.accept(new CPacketVoiceSignalDisconnectV3EAG(true, peerId.msb, peerId.lsb));
-		}else {
-			packetSendCallback.accept(new CPacketVoiceSignalDisconnectPeerV4EAG(peerId.msb, peerId.lsb));
-		}
+	public static final void updateVoicePosition(EaglercraftUUID uuid, double x, double y, double z) {
+		PlatformVoiceClient.updateVoicePosition(uuid, x, y, z);
 	}
 
-	public static void sendPacketConnect() {
-		packetSendCallback.accept(new CPacketVoiceSignalConnectEAG());
-	}
-
-	public static void sendPacketRequest(EaglercraftUUID peerId) {
-		packetSendCallback.accept(new CPacketVoiceSignalRequestEAG(peerId.msb, peerId.lsb));
-	}
-
-	private static void sendPacketRequestIfNeeded(EaglercraftUUID uuid) {
-		if (getVoiceStatus() == EnumVoiceChannelStatus.DISCONNECTED || getVoiceStatus() == EnumVoiceChannelStatus.UNAVAILABLE) return;
-		if(uuid.equals(EaglerProfile.getPlayerUUID())) return;
-		if (!getVoiceListening().contains(uuid)) sendPacketRequest(uuid);
+	private static boolean voicePeerErrored() {
+		return PlatformVoiceClient.getPeerState() == EnumVoiceChannelPeerState.FAILED
+				|| PlatformVoiceClient.getPeerStateConnect() == EnumVoiceChannelPeerState.FAILED
+				|| PlatformVoiceClient.getPeerStateInitial() == EnumVoiceChannelPeerState.FAILED
+				|| PlatformVoiceClient.getPeerStateDesc() == EnumVoiceChannelPeerState.FAILED
+				|| PlatformVoiceClient.getPeerStateIce() == EnumVoiceChannelPeerState.FAILED;
 	}
 }

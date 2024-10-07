@@ -25,22 +25,25 @@ import net.minecraft.util.IChatComponent;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -48,10 +51,9 @@ import net.minecraft.util.MovingObjectPosition;
 public class GuiChat extends GuiScreenVisualViewport {
 	private static final Logger logger = LogManager.getLogger();
 	private String historyBuffer = "";
-	/**+
-	 * keeps position of which chat message you will select when you
-	 * press up, (does not increase for duplicated messages sent
-	 * immediately after each other)
+	/**
+	 * + keeps position of which chat message you will select when you press up,
+	 * (does not increase for duplicated messages sent immediately after each other)
 	 */
 	private int sentHistoryCursor = -1;
 	private boolean playerNamesFound;
@@ -59,9 +61,9 @@ public class GuiChat extends GuiScreenVisualViewport {
 	private int autocompleteIndex;
 	private List<String> foundPlayerNames = Lists.newArrayList();
 	protected GuiTextField inputField;
-	/**+
-	 * is the text that appears when you press the chat key and the
-	 * input box appears pre-filled
+	/**
+	 * + is the text that appears when you press the chat key and the input box
+	 * appears pre-filled
 	 */
 	private String defaultInputFieldText = "";
 
@@ -75,145 +77,12 @@ public class GuiChat extends GuiScreenVisualViewport {
 		this.defaultInputFieldText = defaultText;
 	}
 
-	/**+
-	 * Adds the buttons (and other controls) to the screen in
-	 * question. Called when the GUI is displayed and when the
-	 * window resizes, the buttonList is cleared beforehand.
-	 */
-	public void initGui() {
-		Keyboard.enableRepeatEvents(true);
-		if (!(this instanceof GuiSleepMP)) {
-			this.buttonList.add(exitButton = new GuiButton(69, this.width - 100, 3, 97, 20, I18n.format("chat.exit")));
-			if (!this.mc.isIntegratedServerRunning() && this.mc.thePlayer != null
-					&& this.mc.thePlayer.sendQueue.getEaglerMessageProtocol().ver >= 4) {
-				this.buttonList.add(notifBellButton = new GuiButtonNotifBell(70, this.width - 122, 3));
-				notifBellButton.setUnread(mc.thePlayer.sendQueue.getNotifManager().getUnread());
-			}
-		}
-		this.sentHistoryCursor = this.mc.ingameGUI.getChatGUI().getSentMessages().size();
-		this.inputField = new GuiTextField(0, this.fontRendererObj, 4, this.height - 12, this.width - 4, 12);
-		this.inputField.setMaxStringLength(100);
-		this.inputField.setEnableBackgroundDrawing(false);
-		this.inputField.setFocused(true);
-		this.inputField.setText(this.defaultInputFieldText);
-		this.inputField.setCanLoseFocus(false);
-	}
-
-	/**+
-	 * Called when the screen is unloaded. Used to disable keyboard
-	 * repeat events
-	 */
-	public void onGuiClosed() {
-		Keyboard.enableRepeatEvents(false);
-		this.mc.ingameGUI.getChatGUI().resetScroll();
-	}
-
-	public void updateScreen0() {
-		this.inputField.updateCursorCounter();
-		if (notifBellButton != null && mc.thePlayer != null) {
-			notifBellButton.setUnread(mc.thePlayer.sendQueue.getNotifManager().getUnread());
-		}
-	}
-
-	/**+
-	 * Fired when a key is typed (except F11 which toggles full
-	 * screen). This is the equivalent of
-	 * KeyListener.keyTyped(KeyEvent e). Args : character (character
-	 * on the key), keyCode (lwjgl Keyboard key code)
-	 */
-	protected void keyTyped(char parChar1, int parInt1) {
-		if (parInt1 == 1 && (this.mc.gameSettings.keyBindClose.getKeyCode() == 0 || this.mc.areKeysLocked())) {
-			this.mc.displayGuiScreen((GuiScreen) null);
-		} else {
-			this.waitingOnAutocomplete = false;
-			if (parInt1 == 15) {
-				this.autocompletePlayerNames();
-			} else {
-				this.playerNamesFound = false;
-			}
-
-			if (parInt1 != 28 && parInt1 != 156) {
-				if (parInt1 == 200) {
-					this.getSentHistory(-1);
-				} else if (parInt1 == 208) {
-					this.getSentHistory(1);
-				} else if (parInt1 == 201) {
-					this.mc.ingameGUI.getChatGUI().scroll(this.mc.ingameGUI.getChatGUI().getLineCount() - 1);
-				} else if (parInt1 == 209) {
-					this.mc.ingameGUI.getChatGUI().scroll(-this.mc.ingameGUI.getChatGUI().getLineCount() + 1);
-				} else {
-					this.inputField.textboxKeyTyped(parChar1, parInt1);
-				}
-			} else {
-				String s = this.inputField.getText().trim();
-				if (s.length() > 0) {
-					this.sendChatMessage(s);
-				}
-
-				this.mc.displayGuiScreen((GuiScreen) null);
-			}
-		}
-
-	}
-
-	/**+
-	 * Handles mouse input.
-	 */
-	public void handleMouseInput() throws IOException {
-		super.handleMouseInput();
-		int i = Mouse.getEventDWheel();
-		if (i != 0) {
-			if (i > 1) {
-				i = 1;
-			}
-
-			if (i < -1) {
-				i = -1;
-			}
-
-			if (!isShiftKeyDown()) {
-				i *= 7;
-			}
-
-			this.mc.ingameGUI.getChatGUI().scroll(i);
-		}
-
-	}
-
-	protected void mouseClicked0(int parInt1, int parInt2, int parInt3) {
-		if (parInt3 == 0) {
-			IChatComponent ichatcomponent = this.mc.ingameGUI.getChatGUI()
-					.getChatComponent(PointerInputAbstraction.getVCursorX(), PointerInputAbstraction.getVCursorY());
-			if (this.handleComponentClick(ichatcomponent)) {
-				return;
-			}
-			if (mc.notifRenderer.handleClicked(this, parInt1, parInt2)) {
-				return;
-			}
-		}
-
-		this.inputField.mouseClicked(parInt1, parInt2, parInt3);
-		super.mouseClicked0(parInt1, parInt2, parInt3);
-	}
-
 	protected void actionPerformed(GuiButton par1GuiButton) {
 		if (par1GuiButton.id == 69) {
 			this.mc.displayGuiScreen(null);
 		} else if (par1GuiButton.id == 70) {
 			this.mc.displayGuiScreen(new GuiScreenNotifications(this));
 		}
-	}
-
-	/**+
-	 * Sets the text of the chat
-	 */
-	protected void setText(String newChatText, boolean shouldOverwrite) {
-		if (shouldOverwrite) {
-			this.inputField.setText(newChatText);
-		} else {
-			this.inputField.writeText(newChatText);
-		}
-
 	}
 
 	public void autocompletePlayerNames() {
@@ -258,23 +127,42 @@ public class GuiChat extends GuiScreenVisualViewport {
 		this.inputField.writeText((String) this.foundPlayerNames.get(this.autocompleteIndex++));
 	}
 
-	private void sendAutocompleteRequest(String parString1, String parString2) {
-		if (parString1.length() >= 1) {
-			BlockPos blockpos = null;
-			if (this.mc.objectMouseOver != null
-					&& this.mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-				blockpos = this.mc.objectMouseOver.getBlockPos();
-			}
-
-			this.mc.thePlayer.sendQueue.addToSendQueue(new C14PacketTabComplete(parString1, blockpos));
-			this.waitingOnAutocomplete = true;
-		}
+	public boolean blockPTTKey() {
+		return true;
 	}
 
-	/**+
-	 * input is relative and is applied directly to the
-	 * sentHistoryCursor so -1 is the previous message, 1 is the
-	 * next message from the current cursor position
+	/**
+	 * + Returns true if this GUI should pause the game when it is displayed in
+	 * single-player
+	 */
+	public boolean doesGuiPauseGame() {
+		return false;
+	}
+
+	public void drawScreen0(int i, int j, float f) {
+		drawRect(2, this.height - 14, this.width - 2, this.height - 2, Integer.MIN_VALUE);
+		this.inputField.drawTextBox();
+		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+		IChatComponent ichatcomponent = this.mc.ingameGUI.getChatGUI()
+				.getChatComponent(PointerInputAbstraction.getVCursorX(), PointerInputAbstraction.getVCursorY());
+		if (ichatcomponent != null && ichatcomponent.getChatStyle().getChatHoverEvent() != null) {
+			this.handleComponentHover(ichatcomponent, i, j);
+		}
+
+		if (exitButton != null) {
+			exitButton.yPosition = 3 + mc.guiAchievement.getHeight();
+		}
+
+		super.drawScreen0(i, j, f);
+	}
+
+	public void fireInputEvent(EnumInputEvent event, String str) {
+		inputField.fireInputEvent(event, str);
+	}
+
+	/**
+	 * + input is relative and is applied directly to the sentHistoryCursor so -1 is
+	 * the previous message, 1 is the next message from the current cursor position
 	 */
 	public void getSentHistory(int msgPos) {
 		int i = this.sentHistoryCursor + msgPos;
@@ -295,21 +183,108 @@ public class GuiChat extends GuiScreenVisualViewport {
 		}
 	}
 
-	public void drawScreen0(int i, int j, float f) {
-		drawRect(2, this.height - 14, this.width - 2, this.height - 2, Integer.MIN_VALUE);
-		this.inputField.drawTextBox();
-		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
-		IChatComponent ichatcomponent = this.mc.ingameGUI.getChatGUI()
-				.getChatComponent(PointerInputAbstraction.getVCursorX(), PointerInputAbstraction.getVCursorY());
-		if (ichatcomponent != null && ichatcomponent.getChatStyle().getChatHoverEvent() != null) {
-			this.handleComponentHover(ichatcomponent, i, j);
+	/**
+	 * + Handles mouse input.
+	 */
+	public void handleMouseInput() throws IOException {
+		super.handleMouseInput();
+		int i = Mouse.getEventDWheel();
+		if (i != 0) {
+			if (i > 1) {
+				i = 1;
+			}
+
+			if (i < -1) {
+				i = -1;
+			}
+
+			if (!isShiftKeyDown()) {
+				i *= 7;
+			}
+
+			this.mc.ingameGUI.getChatGUI().scroll(i);
 		}
 
-		if (exitButton != null) {
-			exitButton.yPosition = 3 + mc.guiAchievement.getHeight();
+	}
+
+	/**
+	 * + Adds the buttons (and other controls) to the screen in question. Called
+	 * when the GUI is displayed and when the window resizes, the buttonList is
+	 * cleared beforehand.
+	 */
+	public void initGui() {
+		Keyboard.enableRepeatEvents(true);
+		if (!(this instanceof GuiSleepMP)) {
+			this.buttonList.add(exitButton = new GuiButton(69, this.width - 100, 3, 97, 20, I18n.format("chat.exit")));
+			if (!this.mc.isIntegratedServerRunning() && this.mc.thePlayer != null
+					&& this.mc.thePlayer.sendQueue.getEaglerMessageProtocol().ver >= 4) {
+				this.buttonList.add(notifBellButton = new GuiButtonNotifBell(70, this.width - 122, 3));
+				notifBellButton.setUnread(mc.thePlayer.sendQueue.getNotifManager().getUnread());
+			}
+		}
+		this.sentHistoryCursor = this.mc.ingameGUI.getChatGUI().getSentMessages().size();
+		this.inputField = new GuiTextField(0, this.fontRendererObj, 4, this.height - 12, this.width - 4, 12);
+		this.inputField.setMaxStringLength(100);
+		this.inputField.setEnableBackgroundDrawing(false);
+		this.inputField.setFocused(true);
+		this.inputField.setText(this.defaultInputFieldText);
+		this.inputField.setCanLoseFocus(false);
+	}
+
+	/**
+	 * + Fired when a key is typed (except F11 which toggles full screen). This is
+	 * the equivalent of KeyListener.keyTyped(KeyEvent e). Args : character
+	 * (character on the key), keyCode (lwjgl Keyboard key code)
+	 */
+	protected void keyTyped(char parChar1, int parInt1) {
+		if (parInt1 == 1 && (this.mc.gameSettings.keyBindClose.getKeyCode() == 0 || this.mc.areKeysLocked())) {
+			this.mc.displayGuiScreen((GuiScreen) null);
+		} else {
+			this.waitingOnAutocomplete = false;
+			if (parInt1 == 15) {
+				this.autocompletePlayerNames();
+			} else {
+				this.playerNamesFound = false;
+			}
+
+			if (parInt1 != 28 && parInt1 != 156) {
+				if (parInt1 == 200) {
+					this.getSentHistory(-1);
+				} else if (parInt1 == 208) {
+					this.getSentHistory(1);
+				} else if (parInt1 == 201) {
+					this.mc.ingameGUI.getChatGUI().scroll(this.mc.ingameGUI.getChatGUI().getLineCount() - 1);
+				} else if (parInt1 == 209) {
+					this.mc.ingameGUI.getChatGUI().scroll(-this.mc.ingameGUI.getChatGUI().getLineCount() + 1);
+				} else {
+					this.inputField.textboxKeyTyped(parChar1, parInt1);
+				}
+			} else {
+				String s = this.inputField.getText().trim();
+				if (s.length() > 0) {
+					this.sendChatMessage(s);
+				}
+
+				this.mc.displayGuiScreen((GuiScreen) null);
+			}
 		}
 
-		super.drawScreen0(i, j, f);
+	}
+
+	protected void mouseClicked0(int parInt1, int parInt2, int parInt3) {
+		if (parInt3 == 0) {
+			IChatComponent ichatcomponent = this.mc.ingameGUI.getChatGUI()
+					.getChatComponent(PointerInputAbstraction.getVCursorX(), PointerInputAbstraction.getVCursorY());
+			if (this.handleComponentClick(ichatcomponent)) {
+				return;
+			}
+			if (mc.notifRenderer.handleClicked(this, parInt1, parInt2)) {
+				return;
+			}
+		}
+
+		this.inputField.mouseClicked(parInt1, parInt2, parInt3);
+		super.mouseClicked0(parInt1, parInt2, parInt3);
 	}
 
 	public void onAutocompleteResponse(String[] parArrayOfString) {
@@ -340,24 +315,48 @@ public class GuiChat extends GuiScreenVisualViewport {
 
 	}
 
-	/**+
-	 * Returns true if this GUI should pause the game when it is
-	 * displayed in single-player
+	/**
+	 * + Called when the screen is unloaded. Used to disable keyboard repeat events
 	 */
-	public boolean doesGuiPauseGame() {
-		return false;
+	public void onGuiClosed() {
+		Keyboard.enableRepeatEvents(false);
+		this.mc.ingameGUI.getChatGUI().resetScroll();
 	}
 
-	public boolean blockPTTKey() {
-		return true;
+	private void sendAutocompleteRequest(String parString1, String parString2) {
+		if (parString1.length() >= 1) {
+			BlockPos blockpos = null;
+			if (this.mc.objectMouseOver != null
+					&& this.mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+				blockpos = this.mc.objectMouseOver.getBlockPos();
+			}
+
+			this.mc.thePlayer.sendQueue.addToSendQueue(new C14PacketTabComplete(parString1, blockpos));
+			this.waitingOnAutocomplete = true;
+		}
+	}
+
+	/**
+	 * + Sets the text of the chat
+	 */
+	protected void setText(String newChatText, boolean shouldOverwrite) {
+		if (shouldOverwrite) {
+			this.inputField.setText(newChatText);
+		} else {
+			this.inputField.writeText(newChatText);
+		}
+
 	}
 
 	public boolean showCopyPasteButtons() {
 		return true;
 	}
 
-	public void fireInputEvent(EnumInputEvent event, String str) {
-		inputField.fireInputEvent(event, str);
+	public void updateScreen0() {
+		this.inputField.updateCursorCounter();
+		if (notifBellButton != null && mc.thePlayer != null) {
+			notifBellButton.setUnread(mc.thePlayer.sendQueue.getNotifManager().getUnread());
+		}
 	}
 
 }

@@ -60,43 +60,6 @@ import com.google.common.annotations.GwtCompatible;
 public abstract class ForwardingSortedMap<K, V> extends ForwardingMap<K, V> implements SortedMap<K, V> {
 	// TODO(user): identify places where thread safety is actually lost
 
-	/** Constructor for use by subclasses. */
-	protected ForwardingSortedMap() {
-	}
-
-	@Override
-	protected abstract SortedMap<K, V> delegate();
-
-	@Override
-	public Comparator<? super K> comparator() {
-		return delegate().comparator();
-	}
-
-	@Override
-	public K firstKey() {
-		return delegate().firstKey();
-	}
-
-	@Override
-	public SortedMap<K, V> headMap(K toKey) {
-		return delegate().headMap(toKey);
-	}
-
-	@Override
-	public K lastKey() {
-		return delegate().lastKey();
-	}
-
-	@Override
-	public SortedMap<K, V> subMap(K fromKey, K toKey) {
-		return delegate().subMap(fromKey, toKey);
-	}
-
-	@Override
-	public SortedMap<K, V> tailMap(K fromKey) {
-		return delegate().tailMap(fromKey);
-	}
-
 	/**
 	 * A sensible implementation of {@link SortedMap#keySet} in terms of the methods
 	 * of {@code ForwardingSortedMap}. In many cases, you may wish to override
@@ -113,15 +76,31 @@ public abstract class ForwardingSortedMap<K, V> extends ForwardingMap<K, V> impl
 		}
 	}
 
-	// unsafe, but worst case is a CCE is thrown, which callers will be expecting
-	@SuppressWarnings("unchecked")
-	private int unsafeCompare(Object k1, Object k2) {
-		Comparator<? super K> comparator = comparator();
-		if (comparator == null) {
-			return ((Comparable<Object>) k1).compareTo(k2);
-		} else {
-			return ((Comparator<Object>) comparator).compare(k1, k2);
-		}
+	/** Constructor for use by subclasses. */
+	protected ForwardingSortedMap() {
+	}
+
+	@Override
+	public Comparator<? super K> comparator() {
+		return delegate().comparator();
+	}
+
+	@Override
+	protected abstract SortedMap<K, V> delegate();
+
+	@Override
+	public K firstKey() {
+		return delegate().firstKey();
+	}
+
+	@Override
+	public SortedMap<K, V> headMap(K toKey) {
+		return delegate().headMap(toKey);
+	}
+
+	@Override
+	public K lastKey() {
+		return delegate().lastKey();
 	}
 
 	/**
@@ -161,5 +140,26 @@ public abstract class ForwardingSortedMap<K, V> extends ForwardingMap<K, V> impl
 	protected SortedMap<K, V> standardSubMap(K fromKey, K toKey) {
 		checkArgument(unsafeCompare(fromKey, toKey) <= 0, "fromKey must be <= toKey");
 		return tailMap(fromKey).headMap(toKey);
+	}
+
+	@Override
+	public SortedMap<K, V> subMap(K fromKey, K toKey) {
+		return delegate().subMap(fromKey, toKey);
+	}
+
+	@Override
+	public SortedMap<K, V> tailMap(K fromKey) {
+		return delegate().tailMap(fromKey);
+	}
+
+	// unsafe, but worst case is a CCE is thrown, which callers will be expecting
+	@SuppressWarnings("unchecked")
+	private int unsafeCompare(Object k1, Object k2) {
+		Comparator<? super K> comparator = comparator();
+		if (comparator == null) {
+			return ((Comparable<Object>) k1).compareTo(k2);
+		} else {
+			return ((Comparator<Object>) comparator).compare(k1, k2);
+		}
 	}
 }

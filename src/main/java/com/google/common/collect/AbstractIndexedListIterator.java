@@ -36,12 +36,6 @@ abstract class AbstractIndexedListIterator<E> extends UnmodifiableListIterator<E
 	private int position;
 
 	/**
-	 * Returns the element with the specified index. This method is called by
-	 * {@link #next()}.
-	 */
-	protected abstract E get(int index);
-
-	/**
 	 * Constructs an iterator across a sequence of the given size whose initial
 	 * position is 0. That is, the first call to {@link #next()} will return the
 	 * first element (or throw {@link NoSuchElementException} if {@code size} is
@@ -70,9 +64,20 @@ abstract class AbstractIndexedListIterator<E> extends UnmodifiableListIterator<E
 		this.position = position;
 	}
 
+	/**
+	 * Returns the element with the specified index. This method is called by
+	 * {@link #next()}.
+	 */
+	protected abstract E get(int index);
+
 	@Override
 	public final boolean hasNext() {
 		return position < size;
+	}
+
+	@Override
+	public final boolean hasPrevious() {
+		return position > 0;
 	}
 
 	@Override
@@ -86,11 +91,6 @@ abstract class AbstractIndexedListIterator<E> extends UnmodifiableListIterator<E
 	@Override
 	public final int nextIndex() {
 		return position;
-	}
-
-	@Override
-	public final boolean hasPrevious() {
-		return position > 0;
 	}
 
 	@Override

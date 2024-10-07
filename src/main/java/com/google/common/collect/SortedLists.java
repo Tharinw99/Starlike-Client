@@ -40,7 +40,55 @@ import com.google.common.base.Function;
 @GwtCompatible
 @Beta
 final class SortedLists {
-	private SortedLists() {
+	/**
+	 * A specification for which index to return if the list contains no elements
+	 * that compare as equal to the key.
+	 */
+	public enum KeyAbsentBehavior {
+		/**
+		 * Return the index of the next lower element in the list, or {@code -1} if
+		 * there is no such element.
+		 */
+		NEXT_LOWER {
+			@Override
+			int resultIndex(int higherIndex) {
+				return higherIndex - 1;
+			}
+		},
+		/**
+		 * Return the index of the next higher element in the list, or
+		 * {@code list.size()} if there is no such element.
+		 */
+		NEXT_HIGHER {
+			@Override
+			public int resultIndex(int higherIndex) {
+				return higherIndex;
+			}
+		},
+		/**
+		 * Return {@code ~insertionIndex}, where {@code insertionIndex} is defined as
+		 * the point at which the key would be inserted into the list: the index of the
+		 * next higher element in the list, or {@code list.size()} if there is no such
+		 * element.
+		 *
+		 * <p>
+		 * Note that the return value will be {@code >= 0} if and only if there is an
+		 * element of the list that compares as equal to the key.
+		 *
+		 * <p>
+		 * This is equivalent to the behavior of
+		 * {@link java.util.Collections#binarySearch(List, Object)} when the key isn't
+		 * present, since {@code ~insertionIndex} is equal to
+		 * {@code -1 - insertionIndex}.
+		 */
+		INVERTED_INSERTION_INDEX {
+			@Override
+			public int resultIndex(int higherIndex) {
+				return ~higherIndex;
+			}
+		};
+
+		abstract int resultIndex(int higherIndex);
 	}
 
 	/**
@@ -134,101 +182,6 @@ final class SortedLists {
 	}
 
 	/**
-	 * A specification for which index to return if the list contains no elements
-	 * that compare as equal to the key.
-	 */
-	public enum KeyAbsentBehavior {
-		/**
-		 * Return the index of the next lower element in the list, or {@code -1} if
-		 * there is no such element.
-		 */
-		NEXT_LOWER {
-			@Override
-			int resultIndex(int higherIndex) {
-				return higherIndex - 1;
-			}
-		},
-		/**
-		 * Return the index of the next higher element in the list, or
-		 * {@code list.size()} if there is no such element.
-		 */
-		NEXT_HIGHER {
-			@Override
-			public int resultIndex(int higherIndex) {
-				return higherIndex;
-			}
-		},
-		/**
-		 * Return {@code ~insertionIndex}, where {@code insertionIndex} is defined as
-		 * the point at which the key would be inserted into the list: the index of the
-		 * next higher element in the list, or {@code list.size()} if there is no such
-		 * element.
-		 *
-		 * <p>
-		 * Note that the return value will be {@code >= 0} if and only if there is an
-		 * element of the list that compares as equal to the key.
-		 *
-		 * <p>
-		 * This is equivalent to the behavior of
-		 * {@link java.util.Collections#binarySearch(List, Object)} when the key isn't
-		 * present, since {@code ~insertionIndex} is equal to
-		 * {@code -1 - insertionIndex}.
-		 */
-		INVERTED_INSERTION_INDEX {
-			@Override
-			public int resultIndex(int higherIndex) {
-				return ~higherIndex;
-			}
-		};
-
-		abstract int resultIndex(int higherIndex);
-	}
-
-	/**
-	 * Searches the specified naturally ordered list for the specified object using
-	 * the binary search algorithm.
-	 *
-	 * <p>
-	 * Equivalent to
-	 * {@link #binarySearch(List, Function, Object, Comparator, KeyPresentBehavior, KeyAbsentBehavior)}
-	 * using {@link Ordering#natural}.
-	 */
-	public static <E extends Comparable> int binarySearch(List<? extends E> list, E e,
-			KeyPresentBehavior presentBehavior, KeyAbsentBehavior absentBehavior) {
-		checkNotNull(e);
-		return binarySearch(list, checkNotNull(e), Ordering.natural(), presentBehavior, absentBehavior);
-	}
-
-	/**
-	 * Binary searches the list for the specified key, using the specified key
-	 * function.
-	 *
-	 * <p>
-	 * Equivalent to
-	 * {@link #binarySearch(List, Function, Object, Comparator, KeyPresentBehavior, KeyAbsentBehavior)}
-	 * using {@link Ordering#natural}.
-	 */
-	public static <E, K extends Comparable> int binarySearch(List<E> list, Function<? super E, K> keyFunction,
-			@Nullable K key, KeyPresentBehavior presentBehavior, KeyAbsentBehavior absentBehavior) {
-		return binarySearch(list, keyFunction, key, Ordering.natural(), presentBehavior, absentBehavior);
-	}
-
-	/**
-	 * Binary searches the list for the specified key, using the specified key
-	 * function.
-	 *
-	 * <p>
-	 * Equivalent to
-	 * {@link #binarySearch(List, Object, Comparator, KeyPresentBehavior, KeyAbsentBehavior)}
-	 * using {@link Lists#transform(List, Function) Lists.transform(list,
-	 * keyFunction)}.
-	 */
-	public static <E, K> int binarySearch(List<E> list, Function<? super E, K> keyFunction, @Nullable K key,
-			Comparator<? super K> keyComparator, KeyPresentBehavior presentBehavior, KeyAbsentBehavior absentBehavior) {
-		return binarySearch(Lists.transform(list, keyFunction), key, keyComparator, presentBehavior, absentBehavior);
-	}
-
-	/**
 	 * Searches the specified list for the specified object using the binary search
 	 * algorithm. The list must be sorted into ascending order according to the
 	 * specified comparator (as by the {@link Collections#sort(List, Comparator)
@@ -283,5 +236,52 @@ final class SortedLists {
 			}
 		}
 		return absentBehavior.resultIndex(lower);
+	}
+
+	/**
+	 * Searches the specified naturally ordered list for the specified object using
+	 * the binary search algorithm.
+	 *
+	 * <p>
+	 * Equivalent to
+	 * {@link #binarySearch(List, Function, Object, Comparator, KeyPresentBehavior, KeyAbsentBehavior)}
+	 * using {@link Ordering#natural}.
+	 */
+	public static <E extends Comparable> int binarySearch(List<? extends E> list, E e,
+			KeyPresentBehavior presentBehavior, KeyAbsentBehavior absentBehavior) {
+		checkNotNull(e);
+		return binarySearch(list, checkNotNull(e), Ordering.natural(), presentBehavior, absentBehavior);
+	}
+
+	/**
+	 * Binary searches the list for the specified key, using the specified key
+	 * function.
+	 *
+	 * <p>
+	 * Equivalent to
+	 * {@link #binarySearch(List, Object, Comparator, KeyPresentBehavior, KeyAbsentBehavior)}
+	 * using {@link Lists#transform(List, Function) Lists.transform(list,
+	 * keyFunction)}.
+	 */
+	public static <E, K> int binarySearch(List<E> list, Function<? super E, K> keyFunction, @Nullable K key,
+			Comparator<? super K> keyComparator, KeyPresentBehavior presentBehavior, KeyAbsentBehavior absentBehavior) {
+		return binarySearch(Lists.transform(list, keyFunction), key, keyComparator, presentBehavior, absentBehavior);
+	}
+
+	/**
+	 * Binary searches the list for the specified key, using the specified key
+	 * function.
+	 *
+	 * <p>
+	 * Equivalent to
+	 * {@link #binarySearch(List, Function, Object, Comparator, KeyPresentBehavior, KeyAbsentBehavior)}
+	 * using {@link Ordering#natural}.
+	 */
+	public static <E, K extends Comparable> int binarySearch(List<E> list, Function<? super E, K> keyFunction,
+			@Nullable K key, KeyPresentBehavior presentBehavior, KeyAbsentBehavior absentBehavior) {
+		return binarySearch(list, keyFunction, key, Ordering.natural(), presentBehavior, absentBehavior);
+	}
+
+	private SortedLists() {
 	}
 }

@@ -9,22 +9,25 @@ import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -37,6 +40,68 @@ public class DemoWorldManager extends ItemInWorldManager {
 
 	public DemoWorldManager(World worldIn) {
 		super(worldIn);
+	}
+
+	/**
+	 * + Activate the clicked on block, otherwise use the held item.
+	 */
+	public boolean activateBlockOrUseItem(EntityPlayer player, World worldIn, ItemStack stack, BlockPos pos,
+			EnumFacing side, float offsetX, float offsetY, float offsetZ) {
+		if (this.demoTimeExpired) {
+			this.sendDemoReminder();
+			return false;
+		} else {
+			return super.activateBlockOrUseItem(player, worldIn, stack, pos, side, offsetX, offsetY, offsetZ);
+		}
+	}
+
+	public void blockRemoving(BlockPos pos) {
+		if (!this.demoTimeExpired) {
+			super.blockRemoving(pos);
+		}
+	}
+
+	/**
+	 * + If not creative, it calls sendBlockBreakProgress until the block is broken
+	 * first. tryHarvestBlock can also be the result of this call.
+	 */
+	public void onBlockClicked(BlockPos pos, EnumFacing side) {
+		if (this.demoTimeExpired) {
+			this.sendDemoReminder();
+		} else {
+			super.onBlockClicked(pos, side);
+		}
+	}
+
+	/**
+	 * + Sends a message to the player reminding them that this is the demo version
+	 */
+	private void sendDemoReminder() {
+		if (this.field_73104_e > 100) {
+			this.thisPlayerMP.addChatMessage(new ChatComponentTranslation("demo.reminder", new Object[0]));
+			this.field_73104_e = 0;
+		}
+
+	}
+
+	/**
+	 * + Attempts to harvest a block
+	 */
+	public boolean tryHarvestBlock(BlockPos pos) {
+		return this.demoTimeExpired ? false : super.tryHarvestBlock(pos);
+	}
+
+	/**
+	 * + Attempts to right-click use an item by the given EntityPlayer in the given
+	 * World
+	 */
+	public boolean tryUseItem(EntityPlayer player, World worldIn, ItemStack stack) {
+		if (this.demoTimeExpired) {
+			this.sendDemoReminder();
+			return false;
+		} else {
+			return super.tryUseItem(player, worldIn, stack);
+		}
 	}
 
 	public void updateBlockRemoving() {
@@ -70,69 +135,5 @@ public class DemoWorldManager extends ItemInWorldManager {
 			this.thisPlayerMP.addChatMessage(new ChatComponentTranslation("demo.day.warning", new Object[0]));
 		}
 
-	}
-
-	/**+
-	 * Sends a message to the player reminding them that this is the
-	 * demo version
-	 */
-	private void sendDemoReminder() {
-		if (this.field_73104_e > 100) {
-			this.thisPlayerMP.addChatMessage(new ChatComponentTranslation("demo.reminder", new Object[0]));
-			this.field_73104_e = 0;
-		}
-
-	}
-
-	/**+
-	 * If not creative, it calls sendBlockBreakProgress until the
-	 * block is broken first. tryHarvestBlock can also be the result
-	 * of this call.
-	 */
-	public void onBlockClicked(BlockPos pos, EnumFacing side) {
-		if (this.demoTimeExpired) {
-			this.sendDemoReminder();
-		} else {
-			super.onBlockClicked(pos, side);
-		}
-	}
-
-	public void blockRemoving(BlockPos pos) {
-		if (!this.demoTimeExpired) {
-			super.blockRemoving(pos);
-		}
-	}
-
-	/**+
-	 * Attempts to harvest a block
-	 */
-	public boolean tryHarvestBlock(BlockPos pos) {
-		return this.demoTimeExpired ? false : super.tryHarvestBlock(pos);
-	}
-
-	/**+
-	 * Attempts to right-click use an item by the given EntityPlayer
-	 * in the given World
-	 */
-	public boolean tryUseItem(EntityPlayer player, World worldIn, ItemStack stack) {
-		if (this.demoTimeExpired) {
-			this.sendDemoReminder();
-			return false;
-		} else {
-			return super.tryUseItem(player, worldIn, stack);
-		}
-	}
-
-	/**+
-	 * Activate the clicked on block, otherwise use the held item.
-	 */
-	public boolean activateBlockOrUseItem(EntityPlayer player, World worldIn, ItemStack stack, BlockPos pos,
-			EnumFacing side, float offsetX, float offsetY, float offsetZ) {
-		if (this.demoTimeExpired) {
-			this.sendDemoReminder();
-			return false;
-		} else {
-			return super.activateBlockOrUseItem(player, worldIn, stack, pos, side, offsetX, offsetY, offsetZ);
-		}
 	}
 }

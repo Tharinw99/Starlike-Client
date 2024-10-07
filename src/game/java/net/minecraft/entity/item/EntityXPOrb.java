@@ -10,37 +10,63 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class EntityXPOrb extends Entity {
+	/**
+	 * + Get a fragment of the maximum experience points value for the supplied
+	 * value of experience points value.
+	 */
+	public static int getXPSplit(int expValue) {
+		return expValue >= 2477 ? 2477
+				: (expValue >= 1237 ? 1237
+						: (expValue >= 617 ? 617
+								: (expValue >= 307 ? 307
+										: (expValue >= 149 ? 149
+												: (expValue >= 73 ? 73
+														: (expValue >= 37 ? 37
+																: (expValue >= 17 ? 17
+																		: (expValue >= 7 ? 7
+																				: (expValue >= 3 ? 3 : 1)))))))));
+	}
+
 	public int xpColor;
 	public int xpOrbAge;
 	public int delayBeforeCanPickup;
-	/**+
-	 * The health of this XP orb.
+	/**
+	 * + The health of this XP orb.
 	 */
 	private int xpOrbHealth = 5;
 	private int xpValue;
 	private EntityPlayer closestPlayer;
+
 	private int xpTargetColor;
+
+	public EntityXPOrb(World worldIn) {
+		super(worldIn);
+		this.setSize(0.25F, 0.25F);
+	}
 
 	public EntityXPOrb(World worldIn, double x, double y, double z, int expValue) {
 		super(worldIn);
@@ -53,18 +79,44 @@ public class EntityXPOrb extends Entity {
 		this.xpValue = expValue;
 	}
 
-	/**+
-	 * returns if this entity triggers Block.onEntityWalking on the
-	 * blocks they walk on. used for spiders and wolves to prevent
-	 * them from trampling crops
+	/**
+	 * + Called when the entity is attacked.
+	 */
+	public boolean attackEntityFrom(DamageSource damagesource, float f) {
+		if (this.isEntityInvulnerable(damagesource)) {
+			return false;
+		} else {
+			this.setBeenAttacked();
+			this.xpOrbHealth = (int) ((float) this.xpOrbHealth - f);
+			if (this.xpOrbHealth <= 0) {
+				this.setDead();
+			}
+
+			return false;
+		}
+	}
+
+	/**
+	 * + If returns false, the item will not inflict any damage against entities.
+	 */
+	public boolean canAttackWithItem() {
+		return false;
+	}
+
+	/**
+	 * + returns if this entity triggers Block.onEntityWalking on the blocks they
+	 * walk on. used for spiders and wolves to prevent them from trampling crops
 	 */
 	protected boolean canTriggerWalking() {
 		return false;
 	}
 
-	public EntityXPOrb(World worldIn) {
-		super(worldIn);
-		this.setSize(0.25F, 0.25F);
+	/**
+	 * + Will deal the specified amount of damage to the entity if the entity isn't
+	 * immune to fire damage. Args: amountDamage
+	 */
+	protected void dealFireDamage(int i) {
+		this.attackEntityFrom(DamageSource.inFire, (float) i);
 	}
 
 	protected void entityInit() {
@@ -88,8 +140,57 @@ public class EntityXPOrb extends Entity {
 		return 0.25f;
 	}
 
-	/**+
-	 * Called to update the entity's position/logic.
+	/**
+	 * + Returns a number from 1 to 10 based on how much XP this orb is worth. This
+	 * is used by RenderXPOrb to determine what texture to use.
+	 */
+	public int getTextureByXP() {
+		return this.xpValue >= 2477 ? 10
+				: (this.xpValue >= 1237 ? 9
+						: (this.xpValue >= 617 ? 8
+								: (this.xpValue >= 307 ? 7
+										: (this.xpValue >= 149 ? 6
+												: (this.xpValue >= 73 ? 5
+														: (this.xpValue >= 37 ? 4
+																: (this.xpValue >= 17 ? 3
+																		: (this.xpValue >= 7 ? 2
+																				: (this.xpValue >= 3 ? 1 : 0)))))))));
+	}
+
+	/**
+	 * + Returns the XP value of this XP orb.
+	 */
+	public int getXpValue() {
+		return this.xpValue;
+	}
+
+	/**
+	 * + Returns if this entity is in water and will end up adding the waters
+	 * velocity to the entity
+	 */
+	public boolean handleWaterMovement() {
+		return this.worldObj.handleMaterialAcceleration(this.getEntityBoundingBox(), Material.water, this);
+	}
+
+	/**
+	 * + Called by a player entity when they collide with an entity
+	 */
+	public void onCollideWithPlayer(EntityPlayer entityplayer) {
+		if (!this.worldObj.isRemote) {
+			if (this.delayBeforeCanPickup == 0 && entityplayer.xpCooldown == 0) {
+				entityplayer.xpCooldown = 2;
+				this.worldObj.playSoundAtEntity(entityplayer, "random.orb", 0.1F,
+						0.5F * ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7F + 1.8F));
+				entityplayer.onItemPickup(this, 1);
+				entityplayer.addExperience(this.xpValue);
+				this.setDead();
+			}
+
+		}
+	}
+
+	/**
+	 * + Called to update the entity's position/logic.
 	 */
 	public void onUpdate() {
 		super.onUpdate();
@@ -160,124 +261,13 @@ public class EntityXPOrb extends Entity {
 
 	}
 
-	/**+
-	 * Returns if this entity is in water and will end up adding the
-	 * waters velocity to the entity
-	 */
-	public boolean handleWaterMovement() {
-		return this.worldObj.handleMaterialAcceleration(this.getEntityBoundingBox(), Material.water, this);
-	}
-
-	/**+
-	 * Will deal the specified amount of damage to the entity if the
-	 * entity isn't immune to fire damage. Args: amountDamage
-	 */
-	protected void dealFireDamage(int i) {
-		this.attackEntityFrom(DamageSource.inFire, (float) i);
-	}
-
-	/**+
-	 * Called when the entity is attacked.
-	 */
-	public boolean attackEntityFrom(DamageSource damagesource, float f) {
-		if (this.isEntityInvulnerable(damagesource)) {
-			return false;
-		} else {
-			this.setBeenAttacked();
-			this.xpOrbHealth = (int) ((float) this.xpOrbHealth - f);
-			if (this.xpOrbHealth <= 0) {
-				this.setDead();
-			}
-
-			return false;
-		}
-	}
-
-	/**+
-	 * (abstract) Protected helper method to write subclass entity
-	 * data to NBT.
-	 */
-	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
-		nbttagcompound.setShort("Health", (short) ((byte) this.xpOrbHealth));
-		nbttagcompound.setShort("Age", (short) this.xpOrbAge);
-		nbttagcompound.setShort("Value", (short) this.xpValue);
-	}
-
-	/**+
-	 * (abstract) Protected helper method to read subclass entity
-	 * data from NBT.
+	/**
+	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		this.xpOrbHealth = nbttagcompound.getShort("Health") & 255;
 		this.xpOrbAge = nbttagcompound.getShort("Age");
 		this.xpValue = nbttagcompound.getShort("Value");
-	}
-
-	/**+
-	 * Called by a player entity when they collide with an entity
-	 */
-	public void onCollideWithPlayer(EntityPlayer entityplayer) {
-		if (!this.worldObj.isRemote) {
-			if (this.delayBeforeCanPickup == 0 && entityplayer.xpCooldown == 0) {
-				entityplayer.xpCooldown = 2;
-				this.worldObj.playSoundAtEntity(entityplayer, "random.orb", 0.1F,
-						0.5F * ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7F + 1.8F));
-				entityplayer.onItemPickup(this, 1);
-				entityplayer.addExperience(this.xpValue);
-				this.setDead();
-			}
-
-		}
-	}
-
-	/**+
-	 * Returns the XP value of this XP orb.
-	 */
-	public int getXpValue() {
-		return this.xpValue;
-	}
-
-	/**+
-	 * Returns a number from 1 to 10 based on how much XP this orb
-	 * is worth. This is used by RenderXPOrb to determine what
-	 * texture to use.
-	 */
-	public int getTextureByXP() {
-		return this.xpValue >= 2477 ? 10
-				: (this.xpValue >= 1237 ? 9
-						: (this.xpValue >= 617 ? 8
-								: (this.xpValue >= 307 ? 7
-										: (this.xpValue >= 149 ? 6
-												: (this.xpValue >= 73 ? 5
-														: (this.xpValue >= 37 ? 4
-																: (this.xpValue >= 17 ? 3
-																		: (this.xpValue >= 7 ? 2
-																				: (this.xpValue >= 3 ? 1 : 0)))))))));
-	}
-
-	/**+
-	 * Get a fragment of the maximum experience points value for the
-	 * supplied value of experience points value.
-	 */
-	public static int getXPSplit(int expValue) {
-		return expValue >= 2477 ? 2477
-				: (expValue >= 1237 ? 1237
-						: (expValue >= 617 ? 617
-								: (expValue >= 307 ? 307
-										: (expValue >= 149 ? 149
-												: (expValue >= 73 ? 73
-														: (expValue >= 37 ? 37
-																: (expValue >= 17 ? 17
-																		: (expValue >= 7 ? 7
-																				: (expValue >= 3 ? 3 : 1)))))))));
-	}
-
-	/**+
-	 * If returns false, the item will not inflict any damage
-	 * against entities.
-	 */
-	public boolean canAttackWithItem() {
-		return false;
 	}
 
 	protected void renderDynamicLightsEaglerAt(double entityX, double entityY, double entityZ, double renderX,
@@ -289,5 +279,14 @@ public class EntityXPOrb extends Entity {
 			DynamicLightManager.renderDynamicLight("entity_" + getEntityId() + "_xp", entityX, entityY + 0.2, entityZ,
 					mag * 0.3f, mag, mag * 0.2f, false);
 		}
+	}
+
+	/**
+	 * + (abstract) Protected helper method to write subclass entity data to NBT.
+	 */
+	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
+		nbttagcompound.setShort("Health", (short) ((byte) this.xpOrbHealth));
+		nbttagcompound.setShort("Age", (short) this.xpOrbAge);
+		nbttagcompound.setShort("Value", (short) this.xpValue);
 	}
 }

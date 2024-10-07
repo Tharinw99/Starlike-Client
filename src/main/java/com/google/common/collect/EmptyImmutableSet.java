@@ -32,17 +32,14 @@ import com.google.common.annotations.GwtCompatible;
 final class EmptyImmutableSet extends ImmutableSet<Object> {
 	static final EmptyImmutableSet INSTANCE = new EmptyImmutableSet();
 
+	private static final long serialVersionUID = 0;
+
 	private EmptyImmutableSet() {
 	}
 
 	@Override
-	public int size() {
-		return 0;
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return true;
+	public ImmutableList<Object> asList() {
+		return ImmutableList.of();
 	}
 
 	@Override
@@ -56,23 +53,8 @@ final class EmptyImmutableSet extends ImmutableSet<Object> {
 	}
 
 	@Override
-	public UnmodifiableIterator<Object> iterator() {
-		return Iterators.emptyIterator();
-	}
-
-	@Override
-	boolean isPartialView() {
-		return false;
-	}
-
-	@Override
 	int copyIntoArray(Object[] dst, int offset) {
 		return offset;
-	}
-
-	@Override
-	public ImmutableList<Object> asList() {
-		return ImmutableList.of();
 	}
 
 	@Override
@@ -90,18 +72,36 @@ final class EmptyImmutableSet extends ImmutableSet<Object> {
 	}
 
 	@Override
+	public boolean isEmpty() {
+		return true;
+	}
+
+	@Override
 	boolean isHashCodeFast() {
 		return true;
 	}
 
 	@Override
-	public String toString() {
-		return "[]";
+	boolean isPartialView() {
+		return false;
+	}
+
+	@Override
+	public UnmodifiableIterator<Object> iterator() {
+		return Iterators.emptyIterator();
 	}
 
 	Object readResolve() {
 		return INSTANCE; // preserve singleton property
 	}
 
-	private static final long serialVersionUID = 0;
+	@Override
+	public int size() {
+		return 0;
+	}
+
+	@Override
+	public String toString() {
+		return "[]";
+	}
 }

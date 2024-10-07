@@ -28,7 +28,14 @@ import com.google.common.annotations.GwtCompatible;
  */
 @GwtCompatible
 final class SortedIterables {
-	private SortedIterables() {
+	@SuppressWarnings("unchecked")
+	// if sortedSet.comparator() is null, the set must be naturally ordered
+	public static <E> Comparator<? super E> comparator(SortedSet<E> sortedSet) {
+		Comparator<? super E> result = sortedSet.comparator();
+		if (result == null) {
+			result = (Comparator<? super E>) Ordering.natural();
+		}
+		return result;
 	}
 
 	/**
@@ -49,13 +56,6 @@ final class SortedIterables {
 		return comparator.equals(comparator2);
 	}
 
-	@SuppressWarnings("unchecked")
-	// if sortedSet.comparator() is null, the set must be naturally ordered
-	public static <E> Comparator<? super E> comparator(SortedSet<E> sortedSet) {
-		Comparator<? super E> result = sortedSet.comparator();
-		if (result == null) {
-			result = (Comparator<? super E>) Ordering.natural();
-		}
-		return result;
+	private SortedIterables() {
 	}
 }

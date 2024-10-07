@@ -35,6 +35,12 @@ final class SingletonImmutableBiMap<K, V> extends ImmutableBiMap<K, V> {
 	final transient K singleKey;
 	final transient V singleValue;
 
+	transient ImmutableBiMap<V, K> inverse;
+
+	SingletonImmutableBiMap(Entry<? extends K, ? extends V> entry) {
+		this(entry.getKey(), entry.getValue());
+	}
+
 	SingletonImmutableBiMap(K singleKey, V singleValue) {
 		checkEntryNotNull(singleKey, singleValue);
 		this.singleKey = singleKey;
@@ -45,20 +51,6 @@ final class SingletonImmutableBiMap<K, V> extends ImmutableBiMap<K, V> {
 		this.singleKey = singleKey;
 		this.singleValue = singleValue;
 		this.inverse = inverse;
-	}
-
-	SingletonImmutableBiMap(Entry<? extends K, ? extends V> entry) {
-		this(entry.getKey(), entry.getValue());
-	}
-
-	@Override
-	public V get(@Nullable Object key) {
-		return singleKey.equals(key) ? singleValue : null;
-	}
-
-	@Override
-	public int size() {
-		return 1;
 	}
 
 	@Override
@@ -72,11 +64,6 @@ final class SingletonImmutableBiMap<K, V> extends ImmutableBiMap<K, V> {
 	}
 
 	@Override
-	boolean isPartialView() {
-		return false;
-	}
-
-	@Override
 	ImmutableSet<Entry<K, V>> createEntrySet() {
 		return ImmutableSet.of(Maps.immutableEntry(singleKey, singleValue));
 	}
@@ -86,7 +73,10 @@ final class SingletonImmutableBiMap<K, V> extends ImmutableBiMap<K, V> {
 		return ImmutableSet.of(singleKey);
 	}
 
-	transient ImmutableBiMap<V, K> inverse;
+	@Override
+	public V get(@Nullable Object key) {
+		return singleKey.equals(key) ? singleValue : null;
+	}
 
 	@Override
 	public ImmutableBiMap<V, K> inverse() {
@@ -97,5 +87,15 @@ final class SingletonImmutableBiMap<K, V> extends ImmutableBiMap<K, V> {
 		} else {
 			return result;
 		}
+	}
+
+	@Override
+	boolean isPartialView() {
+		return false;
+	}
+
+	@Override
+	public int size() {
+		return 1;
 	}
 }

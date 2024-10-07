@@ -13,19 +13,53 @@ import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 /**
  * Copyright (c) 2022-2023 lax1dude, ayunami2000. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class Futures {
+
+	private static class ImmediateCancelledFuture<V> extends ImmediateFuture<V> {
+
+		private final CancellationException thrown;
+
+		ImmediateCancelledFuture() {
+			this.thrown = new CancellationException("Immediate cancelled future.");
+		}
+
+		@Override
+		public V get() {
+			throw new CancellationException("Task was cancelled.", thrown);
+		}
+
+		@Override
+		public boolean isCancelled() {
+			return true;
+		}
+	}
+
+	private static class ImmediateFailedFuture<V> extends ImmediateFuture<V> {
+
+		private final Throwable thrown;
+
+		ImmediateFailedFuture(Throwable thrown) {
+			this.thrown = thrown;
+		}
+
+		@Override
+		public V get() throws ExecutionException {
+			throw new ExecutionException(thrown);
+		}
+	}
 
 	private abstract static class ImmediateFuture<V> implements ListenableFuture<V> {
 
@@ -82,41 +116,8 @@ public class Futures {
 		}
 	}
 
-	private static class ImmediateFailedFuture<V> extends ImmediateFuture<V> {
-
-		private final Throwable thrown;
-
-		ImmediateFailedFuture(Throwable thrown) {
-			this.thrown = thrown;
-		}
-
-		@Override
-		public V get() throws ExecutionException {
-			throw new ExecutionException(thrown);
-		}
-	}
-
-	private static class ImmediateCancelledFuture<V> extends ImmediateFuture<V> {
-
-		private final CancellationException thrown;
-
-		ImmediateCancelledFuture() {
-			this.thrown = new CancellationException("Immediate cancelled future.");
-		}
-
-		@Override
-		public boolean isCancelled() {
-			return true;
-		}
-
-		@Override
-		public V get() {
-			throw new CancellationException("Task was cancelled.", thrown);
-		}
-	}
-
-	public static <V> ListenableFuture<V> immediateFuture(@Nullable V value) {
-		return new ImmediateSuccessfulFuture<V>(value);
+	public static <V> ListenableFuture<V> immediateCancelledFuture() {
+		return new ImmediateCancelledFuture<V>();
 	}
 
 	public static <V> ListenableFuture<V> immediateFailedFuture(Throwable throwable) {
@@ -124,8 +125,8 @@ public class Futures {
 		return new ImmediateFailedFuture<V>(throwable);
 	}
 
-	public static <V> ListenableFuture<V> immediateCancelledFuture() {
-		return new ImmediateCancelledFuture<V>();
+	public static <V> ListenableFuture<V> immediateFuture(@Nullable V value) {
+		return new ImmediateSuccessfulFuture<V>(value);
 	}
 
 }

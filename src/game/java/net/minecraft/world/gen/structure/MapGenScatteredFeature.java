@@ -1,42 +1,76 @@
 package net.minecraft.world.gen.structure;
 
-import com.google.common.collect.Lists;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import java.util.Map.Entry;
+
+import com.google.common.collect.Lists;
+
+import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import net.minecraft.entity.monster.EntityWitch;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class MapGenScatteredFeature extends MapGenStructure {
+	public static class Start extends StructureStart {
+		public Start() {
+		}
+
+		public Start(World worldIn, EaglercraftRandom parRandom, int parInt1, int parInt2) {
+			super(parInt1, parInt2);
+			BiomeGenBase biomegenbase = worldIn
+					.getBiomeGenForCoords(new BlockPos(parInt1 * 16 + 8, 0, parInt2 * 16 + 8));
+			if (biomegenbase != BiomeGenBase.jungle && biomegenbase != BiomeGenBase.jungleHills) {
+				if (biomegenbase == BiomeGenBase.swampland) {
+					ComponentScatteredFeaturePieces.SwampHut componentscatteredfeaturepieces$swamphut = new ComponentScatteredFeaturePieces.SwampHut(
+							parRandom, parInt1 * 16, parInt2 * 16);
+					this.components.add(componentscatteredfeaturepieces$swamphut);
+				} else if (biomegenbase == BiomeGenBase.desert || biomegenbase == BiomeGenBase.desertHills) {
+					ComponentScatteredFeaturePieces.DesertPyramid componentscatteredfeaturepieces$desertpyramid = new ComponentScatteredFeaturePieces.DesertPyramid(
+							parRandom, parInt1 * 16, parInt2 * 16);
+					this.components.add(componentscatteredfeaturepieces$desertpyramid);
+				}
+			} else {
+				ComponentScatteredFeaturePieces.JunglePyramid componentscatteredfeaturepieces$junglepyramid = new ComponentScatteredFeaturePieces.JunglePyramid(
+						parRandom, parInt1 * 16, parInt2 * 16);
+				this.components.add(componentscatteredfeaturepieces$junglepyramid);
+			}
+
+			this.updateBoundingBox();
+		}
+	}
+
 	private static final List<BiomeGenBase> biomelist = Arrays.asList(new BiomeGenBase[] { BiomeGenBase.desert,
 			BiomeGenBase.desertHills, BiomeGenBase.jungle, BiomeGenBase.jungleHills, BiomeGenBase.swampland });
 	private List<BiomeGenBase.SpawnListEntry> scatteredFeatureSpawnList;
 	private int maxDistanceBetweenScatteredFeatures;
+
 	private int minDistanceBetweenScatteredFeatures;
 
 	public MapGenScatteredFeature(boolean scramble) {
@@ -58,10 +92,6 @@ public class MapGenScatteredFeature extends MapGenStructure {
 			}
 		}
 
-	}
-
-	public String getStructureName() {
-		return "Temple";
 	}
 
 	protected boolean canSpawnStructureAtCoords(int i, int j) {
@@ -99,10 +129,6 @@ public class MapGenScatteredFeature extends MapGenStructure {
 		return false;
 	}
 
-	protected StructureStart getStructureStart(int i, int j) {
-		return new MapGenScatteredFeature.Start(this.worldObj, this.rand, i, j);
-	}
-
 	public boolean func_175798_a(BlockPos parBlockPos) {
 		StructureStart structurestart = this.func_175797_c(parBlockPos);
 		if (structurestart != null && structurestart instanceof MapGenScatteredFeature.Start
@@ -114,38 +140,18 @@ public class MapGenScatteredFeature extends MapGenStructure {
 		}
 	}
 
-	/**+
-	 * returns possible spawns for scattered features
+	/**
+	 * + returns possible spawns for scattered features
 	 */
 	public List<BiomeGenBase.SpawnListEntry> getScatteredFeatureSpawnList() {
 		return this.scatteredFeatureSpawnList;
 	}
 
-	public static class Start extends StructureStart {
-		public Start() {
-		}
+	public String getStructureName() {
+		return "Temple";
+	}
 
-		public Start(World worldIn, EaglercraftRandom parRandom, int parInt1, int parInt2) {
-			super(parInt1, parInt2);
-			BiomeGenBase biomegenbase = worldIn
-					.getBiomeGenForCoords(new BlockPos(parInt1 * 16 + 8, 0, parInt2 * 16 + 8));
-			if (biomegenbase != BiomeGenBase.jungle && biomegenbase != BiomeGenBase.jungleHills) {
-				if (biomegenbase == BiomeGenBase.swampland) {
-					ComponentScatteredFeaturePieces.SwampHut componentscatteredfeaturepieces$swamphut = new ComponentScatteredFeaturePieces.SwampHut(
-							parRandom, parInt1 * 16, parInt2 * 16);
-					this.components.add(componentscatteredfeaturepieces$swamphut);
-				} else if (biomegenbase == BiomeGenBase.desert || biomegenbase == BiomeGenBase.desertHills) {
-					ComponentScatteredFeaturePieces.DesertPyramid componentscatteredfeaturepieces$desertpyramid = new ComponentScatteredFeaturePieces.DesertPyramid(
-							parRandom, parInt1 * 16, parInt2 * 16);
-					this.components.add(componentscatteredfeaturepieces$desertpyramid);
-				}
-			} else {
-				ComponentScatteredFeaturePieces.JunglePyramid componentscatteredfeaturepieces$junglepyramid = new ComponentScatteredFeaturePieces.JunglePyramid(
-						parRandom, parInt1 * 16, parInt2 * 16);
-				this.components.add(componentscatteredfeaturepieces$junglepyramid);
-			}
-
-			this.updateBoundingBox();
-		}
+	protected StructureStart getStructureStart(int i, int j) {
+		return new MapGenScatteredFeature.Start(this.worldObj, this.rand, i, j);
 	}
 }

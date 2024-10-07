@@ -1,6 +1,9 @@
 package net.minecraft.client.gui;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_FLAT;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ONE_MINUS_SRC_ALPHA;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_SMOOTH;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_SRC_ALPHA;
 
 import net.lax1dude.eaglercraft.v1_8.Mouse;
 import net.lax1dude.eaglercraft.v1_8.PointerInputAbstraction;
@@ -16,22 +19,25 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.MathHelper;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -53,22 +59,20 @@ public abstract class GuiSlot {
 	protected int mouseX;
 	protected int mouseY;
 	protected boolean field_148163_i = true;
-	/**+
-	 * Where the mouse was in the window when you first clicked to
-	 * scroll
+	/**
+	 * + Where the mouse was in the window when you first clicked to scroll
 	 */
 	protected int initialClickY = -2;
 	protected float scrollMultiplier;
 	protected float amountScrolled;
-	/**+
-	 * The element in the list that was selected
+	/**
+	 * + The element in the list that was selected
 	 */
 	protected int selectedElement = -1;
 	protected long lastClicked;
 	protected boolean field_178041_q = true;
-	/**+
-	 * Set to true if a selected element in this gui will show an
-	 * outline box
+	/**
+	 * + Set to true if a selected element in this gui will show an outline box
 	 */
 	protected boolean showSelectionBox = true;
 	protected boolean hasListHeader;
@@ -86,116 +90,6 @@ public abstract class GuiSlot {
 		this.right = width;
 	}
 
-	public void setDimensions(int widthIn, int heightIn, int topIn, int bottomIn) {
-		this.width = widthIn;
-		this.height = heightIn;
-		this.top = topIn;
-		this.bottom = bottomIn;
-		this.left = 0;
-		this.right = widthIn;
-	}
-
-	public void setShowSelectionBox(boolean showSelectionBoxIn) {
-		this.showSelectionBox = showSelectionBoxIn;
-	}
-
-	/**+
-	 * Sets hasListHeader and headerHeight. Params: hasListHeader,
-	 * headerHeight. If hasListHeader is false headerHeight is set
-	 * to 0.
-	 */
-	protected void setHasListHeader(boolean hasListHeaderIn, int headerPaddingIn) {
-		this.hasListHeader = hasListHeaderIn;
-		this.headerPadding = headerPaddingIn;
-		if (!hasListHeaderIn) {
-			this.headerPadding = 0;
-		}
-
-	}
-
-	protected abstract int getSize();
-
-	protected abstract void elementClicked(int var1, boolean var2, int var3, int var4);
-
-	protected abstract boolean isSelected(int var1);
-
-	/**+
-	 * Return the height of the content being scrolled
-	 */
-	protected int getContentHeight() {
-		return (this.getSize() + 1) * this.slotHeight + this.headerPadding;
-	}
-
-	protected abstract void drawBackground();
-
-	protected void func_178040_a(int var1, int var2, int var3) {
-	}
-
-	protected abstract void drawSlot(int var1, int var2, int var3, int var4, int var5, int var6);
-
-	/**+
-	 * Handles drawing a list's header row.
-	 */
-	protected void drawListHeader(int parInt1, int parInt2, Tessellator parTessellator) {
-	}
-
-	protected void func_148132_a(int parInt1, int parInt2) {
-	}
-
-	protected void func_148142_b(int parInt1, int parInt2) {
-	}
-
-	public int getSlotIndexFromScreenCoords(int parInt1, int parInt2) {
-		int i = this.left + this.width / 2 - this.getListWidth() / 2;
-		int j = this.left + this.width / 2 + this.getListWidth() / 2;
-		int k = parInt2 - this.top - this.headerPadding + (int) this.amountScrolled - 4;
-		int l = k / this.slotHeight;
-		return parInt1 < this.getScrollBarX() && parInt1 >= i && parInt1 <= j && l >= 0 && k >= 0 && l < this.getSize()
-				? l
-				: -1;
-	}
-
-	/**+
-	 * Registers the IDs that can be used for the scrollbar's
-	 * up/down buttons.
-	 */
-	public void registerScrollButtons(int scrollUpButtonIDIn, int scrollDownButtonIDIn) {
-		this.scrollUpButtonID = scrollUpButtonIDIn;
-		this.scrollDownButtonID = scrollDownButtonIDIn;
-	}
-
-	/**+
-	 * Stop the thing from scrolling out of bounds
-	 */
-	protected void bindAmountScrolled() {
-		this.amountScrolled = MathHelper.clamp_float(this.amountScrolled, 0.0F, (float) this.func_148135_f());
-	}
-
-	public int func_148135_f() {
-		return Math.max(0, this.getContentHeight() - (this.bottom - this.top - 4));
-	}
-
-	/**+
-	 * Returns the amountScrolled field as an integer.
-	 */
-	public int getAmountScrolled() {
-		return (int) this.amountScrolled;
-	}
-
-	public boolean isMouseYWithinSlotBounds(int parInt1) {
-		return parInt1 >= this.top && parInt1 <= this.bottom && this.mouseX >= this.left && this.mouseX <= this.right;
-	}
-
-	/**+
-	 * Scrolls the slot by the given amount. A positive value
-	 * scrolls down, and a negative value scrolls up.
-	 */
-	public void scrollBy(int amount) {
-		this.amountScrolled += (float) amount;
-		this.bindAmountScrolled();
-		this.initialClickY = -2;
-	}
-
 	public void actionPerformed(GuiButton button) {
 		if (button.enabled) {
 			if (button.id == this.scrollUpButtonID) {
@@ -209,6 +103,21 @@ public abstract class GuiSlot {
 			}
 
 		}
+	}
+
+	/**
+	 * + Stop the thing from scrolling out of bounds
+	 */
+	protected void bindAmountScrolled() {
+		this.amountScrolled = MathHelper.clamp_float(this.amountScrolled, 0.0F, (float) this.func_148135_f());
+	}
+
+	protected abstract void drawBackground();
+
+	/**
+	 * + Handles drawing a list's header row.
+	 */
+	protected void drawListHeader(int parInt1, int parInt2, Tessellator parTessellator) {
 	}
 
 	public void drawScreen(int mouseXIn, int mouseYIn, float parFloat1) {
@@ -324,14 +233,120 @@ public abstract class GuiSlot {
 		}
 	}
 
-	public void handleMouseInput() {
-		handleInput(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getDWheel());
+	/**
+	 * + Draws the selection box around the selected slot element.
+	 */
+	protected void drawSelectionBox(int mouseXIn, int mouseYIn, int parInt3, int parInt4, int i) {
+		Tessellator tessellator = Tessellator.getInstance();
+		WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+
+		for (int j = 0; j < i; ++j) {
+			int k = mouseYIn + j * this.slotHeight + this.headerPadding;
+			int l = this.slotHeight - 4;
+			if (k > this.bottom || k + l < this.top) {
+				this.func_178040_a(j, mouseXIn, k);
+			}
+
+			if (this.showSelectionBox && this.isSelected(j)) {
+				int i1 = this.left + (this.width / 2 - this.getListWidth() / 2);
+				int j1 = this.left + this.width / 2 + this.getListWidth() / 2;
+				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+				GlStateManager.disableTexture2D();
+				worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+				worldrenderer.pos((double) i1, (double) (k + l + 2), 0.0D).tex(0.0D, 1.0D).color(128, 128, 128, 255)
+						.endVertex();
+				worldrenderer.pos((double) j1, (double) (k + l + 2), 0.0D).tex(1.0D, 1.0D).color(128, 128, 128, 255)
+						.endVertex();
+				worldrenderer.pos((double) j1, (double) (k - 2), 0.0D).tex(1.0D, 0.0D).color(128, 128, 128, 255)
+						.endVertex();
+				worldrenderer.pos((double) i1, (double) (k - 2), 0.0D).tex(0.0D, 0.0D).color(128, 128, 128, 255)
+						.endVertex();
+				worldrenderer.pos((double) (i1 + 1), (double) (k + l + 1), 0.0D).tex(0.0D, 1.0D).color(0, 0, 0, 255)
+						.endVertex();
+				worldrenderer.pos((double) (j1 - 1), (double) (k + l + 1), 0.0D).tex(1.0D, 1.0D).color(0, 0, 0, 255)
+						.endVertex();
+				worldrenderer.pos((double) (j1 - 1), (double) (k - 1), 0.0D).tex(1.0D, 0.0D).color(0, 0, 0, 255)
+						.endVertex();
+				worldrenderer.pos((double) (i1 + 1), (double) (k - 1), 0.0D).tex(0.0D, 0.0D).color(0, 0, 0, 255)
+						.endVertex();
+				tessellator.draw();
+				GlStateManager.enableTexture2D();
+				if (parInt3 >= i1 && parInt3 <= j1 && parInt4 >= k - 2 && parInt4 <= k + l + 1) {
+					Mouse.showCursor(EnumCursorType.HAND);
+				}
+			}
+
+			try {
+				this.drawSlot(j, mouseXIn, k, l, parInt3, parInt4);
+			} catch (Throwable t) {
+				excLogger.error(
+						"Exception caught rendering a slot of a list on the screen! Game will continue running due to the suspicion that this could be an intentional crash attempt, and therefore it would be inconvenient if the user were to be locked out of this gui due to repeatedly triggering a full crash report");
+				excLogger.error(t);
+			}
+		}
+
 	}
 
-	public void handleTouchInput() {
-		mouseX = PointerInputAbstraction.getVCursorX() * width / mc.displayWidth;
-		mouseY = height - PointerInputAbstraction.getVCursorY() * height / mc.displayHeight - 1;
-		handleInput(0, Touch.getEventType() == EnumTouchEvent.TOUCHSTART, 0);
+	protected abstract void drawSlot(int var1, int var2, int var3, int var4, int var5, int var6);
+
+	protected abstract void elementClicked(int var1, boolean var2, int var3, int var4);
+
+	protected void func_148132_a(int parInt1, int parInt2) {
+	}
+
+	public int func_148135_f() {
+		return Math.max(0, this.getContentHeight() - (this.bottom - this.top - 4));
+	}
+
+	protected void func_148142_b(int parInt1, int parInt2) {
+	}
+
+	protected void func_178040_a(int var1, int var2, int var3) {
+	}
+
+	/**
+	 * + Returns the amountScrolled field as an integer.
+	 */
+	public int getAmountScrolled() {
+		return (int) this.amountScrolled;
+	}
+
+	/**
+	 * + Return the height of the content being scrolled
+	 */
+	protected int getContentHeight() {
+		return (this.getSize() + 1) * this.slotHeight + this.headerPadding;
+	}
+
+	public boolean getEnabled() {
+		return this.enabled;
+	}
+
+	/**
+	 * + Gets the width of the list
+	 */
+	public int getListWidth() {
+		return 220;
+	}
+
+	protected int getScrollBarX() {
+		return this.width / 2 + 124;
+	}
+
+	protected abstract int getSize();
+
+	public int getSlotHeight() {
+		return this.slotHeight;
+	}
+
+	public int getSlotIndexFromScreenCoords(int parInt1, int parInt2) {
+		int i = this.left + this.width / 2 - this.getListWidth() / 2;
+		int j = this.left + this.width / 2 + this.getListWidth() / 2;
+		int k = parInt2 - this.top - this.headerPadding + (int) this.amountScrolled - 4;
+		int l = k / this.slotHeight;
+		return parInt1 < this.getScrollBarX() && parInt1 >= i && parInt1 <= j && l >= 0 && k >= 0 && l < this.getSize()
+				? l
+				: -1;
 	}
 
 	protected void handleInput(int eventButton, boolean eventState, int dWheel) {
@@ -415,81 +430,24 @@ public abstract class GuiSlot {
 		}
 	}
 
-	public void setEnabled(boolean enabledIn) {
-		this.enabled = enabledIn;
+	public void handleMouseInput() {
+		handleInput(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getDWheel());
 	}
 
-	public boolean getEnabled() {
-		return this.enabled;
+	public void handleTouchInput() {
+		mouseX = PointerInputAbstraction.getVCursorX() * width / mc.displayWidth;
+		mouseY = height - PointerInputAbstraction.getVCursorY() * height / mc.displayHeight - 1;
+		handleInput(0, Touch.getEventType() == EnumTouchEvent.TOUCHSTART, 0);
 	}
 
-	/**+
-	 * Gets the width of the list
-	 */
-	public int getListWidth() {
-		return 220;
+	public boolean isMouseYWithinSlotBounds(int parInt1) {
+		return parInt1 >= this.top && parInt1 <= this.bottom && this.mouseX >= this.left && this.mouseX <= this.right;
 	}
 
-	/**+
-	 * Draws the selection box around the selected slot element.
-	 */
-	protected void drawSelectionBox(int mouseXIn, int mouseYIn, int parInt3, int parInt4, int i) {
-		Tessellator tessellator = Tessellator.getInstance();
-		WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+	protected abstract boolean isSelected(int var1);
 
-		for (int j = 0; j < i; ++j) {
-			int k = mouseYIn + j * this.slotHeight + this.headerPadding;
-			int l = this.slotHeight - 4;
-			if (k > this.bottom || k + l < this.top) {
-				this.func_178040_a(j, mouseXIn, k);
-			}
-
-			if (this.showSelectionBox && this.isSelected(j)) {
-				int i1 = this.left + (this.width / 2 - this.getListWidth() / 2);
-				int j1 = this.left + this.width / 2 + this.getListWidth() / 2;
-				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-				GlStateManager.disableTexture2D();
-				worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-				worldrenderer.pos((double) i1, (double) (k + l + 2), 0.0D).tex(0.0D, 1.0D).color(128, 128, 128, 255)
-						.endVertex();
-				worldrenderer.pos((double) j1, (double) (k + l + 2), 0.0D).tex(1.0D, 1.0D).color(128, 128, 128, 255)
-						.endVertex();
-				worldrenderer.pos((double) j1, (double) (k - 2), 0.0D).tex(1.0D, 0.0D).color(128, 128, 128, 255)
-						.endVertex();
-				worldrenderer.pos((double) i1, (double) (k - 2), 0.0D).tex(0.0D, 0.0D).color(128, 128, 128, 255)
-						.endVertex();
-				worldrenderer.pos((double) (i1 + 1), (double) (k + l + 1), 0.0D).tex(0.0D, 1.0D).color(0, 0, 0, 255)
-						.endVertex();
-				worldrenderer.pos((double) (j1 - 1), (double) (k + l + 1), 0.0D).tex(1.0D, 1.0D).color(0, 0, 0, 255)
-						.endVertex();
-				worldrenderer.pos((double) (j1 - 1), (double) (k - 1), 0.0D).tex(1.0D, 0.0D).color(0, 0, 0, 255)
-						.endVertex();
-				worldrenderer.pos((double) (i1 + 1), (double) (k - 1), 0.0D).tex(0.0D, 0.0D).color(0, 0, 0, 255)
-						.endVertex();
-				tessellator.draw();
-				GlStateManager.enableTexture2D();
-				if (parInt3 >= i1 && parInt3 <= j1 && parInt4 >= k - 2 && parInt4 <= k + l + 1) {
-					Mouse.showCursor(EnumCursorType.HAND);
-				}
-			}
-
-			try {
-				this.drawSlot(j, mouseXIn, k, l, parInt3, parInt4);
-			} catch (Throwable t) {
-				excLogger.error(
-						"Exception caught rendering a slot of a list on the screen! Game will continue running due to the suspicion that this could be an intentional crash attempt, and therefore it would be inconvenient if the user were to be locked out of this gui due to repeatedly triggering a full crash report");
-				excLogger.error(t);
-			}
-		}
-
-	}
-
-	protected int getScrollBarX() {
-		return this.width / 2 + 124;
-	}
-
-	/**+
-	 * Overlays the background to hide scrolled items
+	/**
+	 * + Overlays the background to hide scrolled items
 	 */
 	protected void overlayBackground(int startY, int endY, int startAlpha, int endAlpha) {
 		Tessellator tessellator = Tessellator.getInstance();
@@ -511,16 +469,60 @@ public abstract class GuiSlot {
 		tessellator.draw();
 	}
 
-	/**+
-	 * Sets the left and right bounds of the slot. Param is the left
-	 * bound, right is calculated as left + width.
+	/**
+	 * + Registers the IDs that can be used for the scrollbar's up/down buttons.
+	 */
+	public void registerScrollButtons(int scrollUpButtonIDIn, int scrollDownButtonIDIn) {
+		this.scrollUpButtonID = scrollUpButtonIDIn;
+		this.scrollDownButtonID = scrollDownButtonIDIn;
+	}
+
+	/**
+	 * + Scrolls the slot by the given amount. A positive value scrolls down, and a
+	 * negative value scrolls up.
+	 */
+	public void scrollBy(int amount) {
+		this.amountScrolled += (float) amount;
+		this.bindAmountScrolled();
+		this.initialClickY = -2;
+	}
+
+	public void setDimensions(int widthIn, int heightIn, int topIn, int bottomIn) {
+		this.width = widthIn;
+		this.height = heightIn;
+		this.top = topIn;
+		this.bottom = bottomIn;
+		this.left = 0;
+		this.right = widthIn;
+	}
+
+	public void setEnabled(boolean enabledIn) {
+		this.enabled = enabledIn;
+	}
+
+	/**
+	 * + Sets hasListHeader and headerHeight. Params: hasListHeader, headerHeight.
+	 * If hasListHeader is false headerHeight is set to 0.
+	 */
+	protected void setHasListHeader(boolean hasListHeaderIn, int headerPaddingIn) {
+		this.hasListHeader = hasListHeaderIn;
+		this.headerPadding = headerPaddingIn;
+		if (!hasListHeaderIn) {
+			this.headerPadding = 0;
+		}
+
+	}
+
+	public void setShowSelectionBox(boolean showSelectionBoxIn) {
+		this.showSelectionBox = showSelectionBoxIn;
+	}
+
+	/**
+	 * + Sets the left and right bounds of the slot. Param is the left bound, right
+	 * is calculated as left + width.
 	 */
 	public void setSlotXBoundsFromLeft(int leftIn) {
 		this.left = leftIn;
 		this.right = leftIn + this.width;
-	}
-
-	public int getSlotHeight() {
-		return this.slotHeight;
 	}
 }

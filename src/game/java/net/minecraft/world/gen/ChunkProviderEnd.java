@@ -1,6 +1,7 @@
 package net.minecraft.world.gen;
 
 import java.util.List;
+
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.material.Material;
@@ -16,22 +17,25 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.chunk.IChunkProvider;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -60,6 +64,60 @@ public class ChunkProviderEnd implements IChunkProvider {
 		this.noiseGen3 = new NoiseGeneratorOctaves(this.endRNG, 8);
 		this.noiseGen4 = new NoiseGeneratorOctaves(this.endRNG, 10);
 		this.noiseGen5 = new NoiseGeneratorOctaves(this.endRNG, 16);
+	}
+
+	/**
+	 * + Returns if the IChunkProvider supports saving.
+	 */
+	public boolean canSave() {
+		return true;
+	}
+
+	/**
+	 * + Checks to see if a chunk exists at x, z
+	 */
+	public boolean chunkExists(int var1, int var2) {
+		return true;
+	}
+
+	public boolean func_177460_a(IChunkProvider var1, Chunk var2, int var3, int var4) {
+		return false;
+	}
+
+	public void func_180519_a(ChunkPrimer parChunkPrimer) {
+		for (int i = 0; i < 16; ++i) {
+			for (int j = 0; j < 16; ++j) {
+				byte b0 = 1;
+				int k = -1;
+				IBlockState iblockstate = Blocks.end_stone.getDefaultState();
+				IBlockState iblockstate1 = Blocks.end_stone.getDefaultState();
+
+				for (int l = 127; l >= 0; --l) {
+					IBlockState iblockstate2 = parChunkPrimer.getBlockState(i, l, j);
+					if (iblockstate2.getBlock().getMaterial() == Material.air) {
+						k = -1;
+					} else if (iblockstate2.getBlock() == Blocks.stone) {
+						if (k == -1) {
+							if (b0 <= 0) {
+								iblockstate = Blocks.air.getDefaultState();
+								iblockstate1 = Blocks.end_stone.getDefaultState();
+							}
+
+							k = b0;
+							if (l >= 0) {
+								parChunkPrimer.setBlockState(i, l, j, iblockstate);
+							} else {
+								parChunkPrimer.setBlockState(i, l, j, iblockstate1);
+							}
+						} else if (k > 0) {
+							--k;
+							parChunkPrimer.setBlockState(i, l, j, iblockstate1);
+						}
+					}
+				}
+			}
+		}
+
 	}
 
 	public void func_180520_a(int parInt1, int parInt2, ChunkPrimer parChunkPrimer) {
@@ -122,69 +180,22 @@ public class ChunkProviderEnd implements IChunkProvider {
 
 	}
 
-	public void func_180519_a(ChunkPrimer parChunkPrimer) {
-		for (int i = 0; i < 16; ++i) {
-			for (int j = 0; j < 16; ++j) {
-				byte b0 = 1;
-				int k = -1;
-				IBlockState iblockstate = Blocks.end_stone.getDefaultState();
-				IBlockState iblockstate1 = Blocks.end_stone.getDefaultState();
-
-				for (int l = 127; l >= 0; --l) {
-					IBlockState iblockstate2 = parChunkPrimer.getBlockState(i, l, j);
-					if (iblockstate2.getBlock().getMaterial() == Material.air) {
-						k = -1;
-					} else if (iblockstate2.getBlock() == Blocks.stone) {
-						if (k == -1) {
-							if (b0 <= 0) {
-								iblockstate = Blocks.air.getDefaultState();
-								iblockstate1 = Blocks.end_stone.getDefaultState();
-							}
-
-							k = b0;
-							if (l >= 0) {
-								parChunkPrimer.setBlockState(i, l, j, iblockstate);
-							} else {
-								parChunkPrimer.setBlockState(i, l, j, iblockstate1);
-							}
-						} else if (k > 0) {
-							--k;
-							parChunkPrimer.setBlockState(i, l, j, iblockstate1);
-						}
-					}
-				}
-			}
-		}
-
+	public int getLoadedChunkCount() {
+		return 0;
 	}
 
-	/**+
-	 * Will return back a chunk, if it doesn't exist and its not a
-	 * MP client it will generates all the blocks for the specified
-	 * chunk from the map seed and chunk seed
-	 */
-	public Chunk provideChunk(int i, int j) {
-		this.endRNG.setSeed((long) i * 341873128712L + (long) j * 132897987541L);
-		ChunkPrimer chunkprimer = new ChunkPrimer();
-		this.biomesForGeneration = this.endWorld.getWorldChunkManager().loadBlockGeneratorData(this.biomesForGeneration,
-				i * 16, j * 16, 16, 16);
-		this.func_180520_a(i, j, chunkprimer);
-		this.func_180519_a(chunkprimer);
-		Chunk chunk = new Chunk(this.endWorld, chunkprimer, i, j);
-		byte[] abyte = chunk.getBiomeArray();
-
-		for (int k = 0; k < abyte.length; ++k) {
-			abyte[k] = (byte) this.biomesForGeneration[k].biomeID;
-		}
-
-		chunk.generateSkylightMap();
-		return chunk;
+	public List<BiomeGenBase.SpawnListEntry> getPossibleCreatures(EnumCreatureType enumcreaturetype,
+			BlockPos blockpos) {
+		return this.endWorld.getBiomeGenForCoords(blockpos).getSpawnableList(enumcreaturetype);
 	}
 
-	/**+
-	 * generates a subset of the level's terrain data. Takes 7
-	 * arguments: the [empty] noise array, the position, and the
-	 * size.
+	public BlockPos getStrongholdGen(World var1, String var2, BlockPos var3) {
+		return null;
+	}
+
+	/**
+	 * + generates a subset of the level's terrain data. Takes 7 arguments: the
+	 * [empty] noise array, the position, and the size.
 	 */
 	private double[] initializeNoiseField(double[] parArrayOfDouble, int parInt1, int parInt2, int parInt3, int parInt4,
 			int parInt5, int parInt6) {
@@ -257,15 +268,15 @@ public class ChunkProviderEnd implements IChunkProvider {
 		return parArrayOfDouble;
 	}
 
-	/**+
-	 * Checks to see if a chunk exists at x, z
+	/**
+	 * + Converts the instance data to a readable string.
 	 */
-	public boolean chunkExists(int var1, int var2) {
-		return true;
+	public String makeString() {
+		return "RandomLevelSource";
 	}
 
-	/**+
-	 * Populates chunk with ores etc etc
+	/**
+	 * + Populates chunk with ores etc etc
 	 */
 	public void populate(IChunkProvider var1, int i, int j) {
 		BlockFalling.fallInstantly = true;
@@ -275,71 +286,62 @@ public class ChunkProviderEnd implements IChunkProvider {
 		BlockFalling.fallInstantly = false;
 	}
 
-	public boolean func_177460_a(IChunkProvider var1, Chunk var2, int var3, int var4) {
-		return false;
-	}
-
-	/**+
-	 * Two modes of operation: if passed true, save all Chunks in
-	 * one go. If passed false, save up to two chunks. Return true
-	 * if all chunks have been saved.
+	/**
+	 * + Will return back a chunk, if it doesn't exist and its not a MP client it
+	 * will generates all the blocks for the specified chunk from the map seed and
+	 * chunk seed
 	 */
-	public boolean saveChunks(boolean var1, IProgressUpdate var2) {
-		return true;
+	public Chunk provideChunk(BlockPos blockpos) {
+		return this.provideChunk(blockpos.getX() >> 4, blockpos.getZ() >> 4);
 	}
 
-	/**+
-	 * Save extra data not associated with any Chunk. Not saved
-	 * during autosave, only during world unload. Currently
-	 * unimplemented.
+	/**
+	 * + Will return back a chunk, if it doesn't exist and its not a MP client it
+	 * will generates all the blocks for the specified chunk from the map seed and
+	 * chunk seed
 	 */
-	public void saveExtraData() {
-	}
+	public Chunk provideChunk(int i, int j) {
+		this.endRNG.setSeed((long) i * 341873128712L + (long) j * 132897987541L);
+		ChunkPrimer chunkprimer = new ChunkPrimer();
+		this.biomesForGeneration = this.endWorld.getWorldChunkManager().loadBlockGeneratorData(this.biomesForGeneration,
+				i * 16, j * 16, 16, 16);
+		this.func_180520_a(i, j, chunkprimer);
+		this.func_180519_a(chunkprimer);
+		Chunk chunk = new Chunk(this.endWorld, chunkprimer, i, j);
+		byte[] abyte = chunk.getBiomeArray();
 
-	/**+
-	 * Unloads chunks that are marked to be unloaded. This is not
-	 * guaranteed to unload every such chunk.
-	 */
-	public boolean unloadQueuedChunks() {
-		return false;
-	}
+		for (int k = 0; k < abyte.length; ++k) {
+			abyte[k] = (byte) this.biomesForGeneration[k].biomeID;
+		}
 
-	/**+
-	 * Returns if the IChunkProvider supports saving.
-	 */
-	public boolean canSave() {
-		return true;
-	}
-
-	/**+
-	 * Converts the instance data to a readable string.
-	 */
-	public String makeString() {
-		return "RandomLevelSource";
-	}
-
-	public List<BiomeGenBase.SpawnListEntry> getPossibleCreatures(EnumCreatureType enumcreaturetype,
-			BlockPos blockpos) {
-		return this.endWorld.getBiomeGenForCoords(blockpos).getSpawnableList(enumcreaturetype);
-	}
-
-	public BlockPos getStrongholdGen(World var1, String var2, BlockPos var3) {
-		return null;
-	}
-
-	public int getLoadedChunkCount() {
-		return 0;
+		chunk.generateSkylightMap();
+		return chunk;
 	}
 
 	public void recreateStructures(Chunk var1, int var2, int var3) {
 	}
 
-	/**+
-	 * Will return back a chunk, if it doesn't exist and its not a
-	 * MP client it will generates all the blocks for the specified
-	 * chunk from the map seed and chunk seed
+	/**
+	 * + Two modes of operation: if passed true, save all Chunks in one go. If
+	 * passed false, save up to two chunks. Return true if all chunks have been
+	 * saved.
 	 */
-	public Chunk provideChunk(BlockPos blockpos) {
-		return this.provideChunk(blockpos.getX() >> 4, blockpos.getZ() >> 4);
+	public boolean saveChunks(boolean var1, IProgressUpdate var2) {
+		return true;
+	}
+
+	/**
+	 * + Save extra data not associated with any Chunk. Not saved during autosave,
+	 * only during world unload. Currently unimplemented.
+	 */
+	public void saveExtraData() {
+	}
+
+	/**
+	 * + Unloads chunks that are marked to be unloaded. This is not guaranteed to
+	 * unload every such chunk.
+	 */
+	public boolean unloadQueuedChunks() {
+		return false;
 	}
 }

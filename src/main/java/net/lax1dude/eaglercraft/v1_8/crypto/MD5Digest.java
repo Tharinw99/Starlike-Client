@@ -28,8 +28,46 @@ package net.lax1dude.eaglercraft.v1_8.crypto;
 public class MD5Digest extends GeneralDigest {
 	private static final int DIGEST_LENGTH = 16;
 
-	private int H1, H2, H3, H4; // IV's
+	//
+	// round 1 left rotates
+	//
+	private static final int S11 = 7;
 
+	private static final int S12 = 12;
+	private static final int S13 = 17;
+
+	private static final int S14 = 22;
+
+	//
+	// round 2 left rotates
+	//
+	private static final int S21 = 5;
+
+	private static final int S22 = 9;
+
+	private static final int S23 = 14;
+
+	private static final int S24 = 20;
+
+	//
+	// round 3 left rotates
+	//
+	private static final int S31 = 4;
+
+	private static final int S32 = 11;
+
+	private static final int S33 = 16;
+
+	private static final int S34 = 23;
+	//
+	// round 4 left rotates
+	//
+	private static final int S41 = 6;
+	private static final int S42 = 10;
+	private static final int S43 = 15;
+
+	private static final int S44 = 21;
+	private int H1, H2, H3, H4; // IV's
 	private int[] X = new int[16];
 	private int xOff;
 
@@ -38,39 +76,6 @@ public class MD5Digest extends GeneralDigest {
 	 */
 	public MD5Digest() {
 		reset();
-	}
-
-	public String getAlgorithmName() {
-		return "MD5";
-	}
-
-	public int getDigestSize() {
-		return DIGEST_LENGTH;
-	}
-
-	protected void processWord(byte[] in, int inOff) {
-		X[xOff++] = (in[inOff] & 0xff) | ((in[inOff + 1] & 0xff) << 8) | ((in[inOff + 2] & 0xff) << 16)
-				| ((in[inOff + 3] & 0xff) << 24);
-
-		if (xOff == 16) {
-			processBlock();
-		}
-	}
-
-	protected void processLength(long bitLength) {
-		if (xOff > 14) {
-			processBlock();
-		}
-
-		X[14] = (int) (bitLength & 0xffffffff);
-		X[15] = (int) (bitLength >>> 32);
-	}
-
-	private void unpackWord(int word, byte[] out, int outOff) {
-		out[outOff] = (byte) word;
-		out[outOff + 1] = (byte) (word >>> 8);
-		out[outOff + 2] = (byte) (word >>> 16);
-		out[outOff + 3] = (byte) (word >>> 24);
 	}
 
 	public int doFinal(byte[] out, int outOff) {
@@ -86,63 +91,6 @@ public class MD5Digest extends GeneralDigest {
 		return DIGEST_LENGTH;
 	}
 
-	/**
-	 * reset the chaining variables to the IV values.
-	 */
-	public void reset() {
-		super.reset();
-
-		H1 = 0x67452301;
-		H2 = 0xefcdab89;
-		H3 = 0x98badcfe;
-		H4 = 0x10325476;
-
-		xOff = 0;
-
-		for (int i = 0; i != X.length; i++) {
-			X[i] = 0;
-		}
-	}
-
-	//
-	// round 1 left rotates
-	//
-	private static final int S11 = 7;
-	private static final int S12 = 12;
-	private static final int S13 = 17;
-	private static final int S14 = 22;
-
-	//
-	// round 2 left rotates
-	//
-	private static final int S21 = 5;
-	private static final int S22 = 9;
-	private static final int S23 = 14;
-	private static final int S24 = 20;
-
-	//
-	// round 3 left rotates
-	//
-	private static final int S31 = 4;
-	private static final int S32 = 11;
-	private static final int S33 = 16;
-	private static final int S34 = 23;
-
-	//
-	// round 4 left rotates
-	//
-	private static final int S41 = 6;
-	private static final int S42 = 10;
-	private static final int S43 = 15;
-	private static final int S44 = 21;
-
-	/*
-	 * rotate int x left n bits.
-	 */
-	private int rotateLeft(int x, int n) {
-		return (x << n) | (x >>> (32 - n));
-	}
-
 	/*
 	 * F, G, H and I are the basic MD5 functions.
 	 */
@@ -152,6 +100,14 @@ public class MD5Digest extends GeneralDigest {
 
 	private int G(int u, int v, int w) {
 		return (u & w) | (v & ~w);
+	}
+
+	public String getAlgorithmName() {
+		return "MD5";
+	}
+
+	public int getDigestSize() {
+		return DIGEST_LENGTH;
 	}
 
 	private int H(int u, int v, int w) {
@@ -260,6 +216,56 @@ public class MD5Digest extends GeneralDigest {
 		for (int i = 0; i != X.length; i++) {
 			X[i] = 0;
 		}
+	}
+
+	protected void processLength(long bitLength) {
+		if (xOff > 14) {
+			processBlock();
+		}
+
+		X[14] = (int) (bitLength & 0xffffffff);
+		X[15] = (int) (bitLength >>> 32);
+	}
+
+	protected void processWord(byte[] in, int inOff) {
+		X[xOff++] = (in[inOff] & 0xff) | ((in[inOff + 1] & 0xff) << 8) | ((in[inOff + 2] & 0xff) << 16)
+				| ((in[inOff + 3] & 0xff) << 24);
+
+		if (xOff == 16) {
+			processBlock();
+		}
+	}
+
+	/**
+	 * reset the chaining variables to the IV values.
+	 */
+	public void reset() {
+		super.reset();
+
+		H1 = 0x67452301;
+		H2 = 0xefcdab89;
+		H3 = 0x98badcfe;
+		H4 = 0x10325476;
+
+		xOff = 0;
+
+		for (int i = 0; i != X.length; i++) {
+			X[i] = 0;
+		}
+	}
+
+	/*
+	 * rotate int x left n bits.
+	 */
+	private int rotateLeft(int x, int n) {
+		return (x << n) | (x >>> (32 - n));
+	}
+
+	private void unpackWord(int word, byte[] out, int outOff) {
+		out[outOff] = (byte) word;
+		out[outOff + 1] = (byte) (word >>> 8);
+		out[outOff + 2] = (byte) (word >>> 16);
+		out[outOff + 3] = (byte) (word >>> 24);
 	}
 
 }

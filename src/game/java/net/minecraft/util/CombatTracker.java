@@ -11,29 +11,32 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class CombatTracker {
-	/**+
-	 * The CombatEntry objects that we've tracked so far.
+	/**
+	 * + The CombatEntry objects that we've tracked so far.
 	 */
 	private final List<CombatEntry> combatEntries = Lists.newArrayList();
 	private final EntityLivingBase fighter;
@@ -46,6 +49,51 @@ public class CombatTracker {
 
 	public CombatTracker(EntityLivingBase fighterIn) {
 		this.fighter = fighterIn;
+	}
+
+	public int func_180134_f() {
+		return this.field_94552_d ? this.fighter.ticksExisted - this.field_152775_d
+				: this.field_152776_e - this.field_152775_d;
+	}
+
+	private void func_94542_g() {
+		this.field_94551_f = null;
+	}
+
+	private CombatEntry func_94544_f() {
+		CombatEntry combatentry = null;
+		CombatEntry combatentry1 = null;
+		byte b0 = 0;
+		float f = 0.0F;
+
+		for (int i = 0; i < this.combatEntries.size(); ++i) {
+			CombatEntry combatentry2 = (CombatEntry) this.combatEntries.get(i);
+			CombatEntry combatentry3 = i > 0 ? (CombatEntry) this.combatEntries.get(i - 1) : null;
+			if ((combatentry2.getDamageSrc() == DamageSource.fall
+					|| combatentry2.getDamageSrc() == DamageSource.outOfWorld) && combatentry2.getDamageAmount() > 0.0F
+					&& (combatentry == null || combatentry2.getDamageAmount() > f)) {
+				if (i > 0) {
+					combatentry = combatentry3;
+				} else {
+					combatentry = combatentry2;
+				}
+
+				f = combatentry2.getDamageAmount();
+			}
+
+			if (combatentry2.func_94562_g() != null
+					&& (combatentry1 == null || combatentry2.func_94563_c() > (float) b0)) {
+				combatentry1 = combatentry2;
+			}
+		}
+
+		if (f > 5.0F && combatentry != null) {
+			return combatentry;
+		} else if (b0 > 5 && combatentry1 != null) {
+			return combatentry1;
+		} else {
+			return null;
+		}
 	}
 
 	public void func_94545_a() {
@@ -65,24 +113,36 @@ public class CombatTracker {
 
 	}
 
-	/**+
-	 * Adds an entry for the combat tracker
-	 */
-	public void trackDamage(DamageSource damageSrc, float healthIn, float damageAmount) {
-		this.reset();
-		this.func_94545_a();
-		CombatEntry combatentry = new CombatEntry(damageSrc, this.fighter.ticksExisted, healthIn, damageAmount,
-				this.field_94551_f, this.fighter.fallDistance);
-		this.combatEntries.add(combatentry);
-		this.field_94555_c = this.fighter.ticksExisted;
-		this.field_94553_e = true;
-		if (combatentry.isLivingDamageSrc() && !this.field_94552_d && this.fighter.isEntityAlive()) {
-			this.field_94552_d = true;
-			this.field_152775_d = this.fighter.ticksExisted;
-			this.field_152776_e = this.field_152775_d;
-			this.fighter.sendEnterCombat();
+	private String func_94548_b(CombatEntry parCombatEntry) {
+		return parCombatEntry.func_94562_g() == null ? "generic" : parCombatEntry.func_94562_g();
+	}
+
+	public EntityLivingBase func_94550_c() {
+		EntityLivingBase entitylivingbase = null;
+		EntityPlayer entityplayer = null;
+		float f = 0.0F;
+		float f1 = 0.0F;
+
+		for (int i = 0, l = this.combatEntries.size(); i < l; ++i) {
+			CombatEntry combatentry = this.combatEntries.get(i);
+			if (combatentry.getDamageSrc().getEntity() instanceof EntityPlayer
+					&& (entityplayer == null || combatentry.func_94563_c() > f1)) {
+				f1 = combatentry.func_94563_c();
+				entityplayer = (EntityPlayer) combatentry.getDamageSrc().getEntity();
+			}
+
+			if (combatentry.getDamageSrc().getEntity() instanceof EntityLivingBase
+					&& (entitylivingbase == null || combatentry.func_94563_c() > f)) {
+				f = combatentry.func_94563_c();
+				entitylivingbase = (EntityLivingBase) combatentry.getDamageSrc().getEntity();
+			}
 		}
 
+		if (entityplayer != null && f1 >= f / 3.0F) {
+			return entityplayer;
+		} else {
+			return entitylivingbase;
+		}
 	}
 
 	public IChatComponent getDeathMessage() {
@@ -138,85 +198,15 @@ public class CombatTracker {
 		}
 	}
 
-	public EntityLivingBase func_94550_c() {
-		EntityLivingBase entitylivingbase = null;
-		EntityPlayer entityplayer = null;
-		float f = 0.0F;
-		float f1 = 0.0F;
-
-		for (int i = 0, l = this.combatEntries.size(); i < l; ++i) {
-			CombatEntry combatentry = this.combatEntries.get(i);
-			if (combatentry.getDamageSrc().getEntity() instanceof EntityPlayer
-					&& (entityplayer == null || combatentry.func_94563_c() > f1)) {
-				f1 = combatentry.func_94563_c();
-				entityplayer = (EntityPlayer) combatentry.getDamageSrc().getEntity();
-			}
-
-			if (combatentry.getDamageSrc().getEntity() instanceof EntityLivingBase
-					&& (entitylivingbase == null || combatentry.func_94563_c() > f)) {
-				f = combatentry.func_94563_c();
-				entitylivingbase = (EntityLivingBase) combatentry.getDamageSrc().getEntity();
-			}
-		}
-
-		if (entityplayer != null && f1 >= f / 3.0F) {
-			return entityplayer;
-		} else {
-			return entitylivingbase;
-		}
+	/**
+	 * + Returns EntityLivingBase assigned for this CombatTracker
+	 */
+	public EntityLivingBase getFighter() {
+		return this.fighter;
 	}
 
-	private CombatEntry func_94544_f() {
-		CombatEntry combatentry = null;
-		CombatEntry combatentry1 = null;
-		byte b0 = 0;
-		float f = 0.0F;
-
-		for (int i = 0; i < this.combatEntries.size(); ++i) {
-			CombatEntry combatentry2 = (CombatEntry) this.combatEntries.get(i);
-			CombatEntry combatentry3 = i > 0 ? (CombatEntry) this.combatEntries.get(i - 1) : null;
-			if ((combatentry2.getDamageSrc() == DamageSource.fall
-					|| combatentry2.getDamageSrc() == DamageSource.outOfWorld) && combatentry2.getDamageAmount() > 0.0F
-					&& (combatentry == null || combatentry2.getDamageAmount() > f)) {
-				if (i > 0) {
-					combatentry = combatentry3;
-				} else {
-					combatentry = combatentry2;
-				}
-
-				f = combatentry2.getDamageAmount();
-			}
-
-			if (combatentry2.func_94562_g() != null
-					&& (combatentry1 == null || combatentry2.func_94563_c() > (float) b0)) {
-				combatentry1 = combatentry2;
-			}
-		}
-
-		if (f > 5.0F && combatentry != null) {
-			return combatentry;
-		} else if (b0 > 5 && combatentry1 != null) {
-			return combatentry1;
-		} else {
-			return null;
-		}
-	}
-
-	private String func_94548_b(CombatEntry parCombatEntry) {
-		return parCombatEntry.func_94562_g() == null ? "generic" : parCombatEntry.func_94562_g();
-	}
-
-	public int func_180134_f() {
-		return this.field_94552_d ? this.fighter.ticksExisted - this.field_152775_d
-				: this.field_152776_e - this.field_152775_d;
-	}
-
-	private void func_94542_g() {
-		this.field_94551_f = null;
-	}
-
-	/**+
-	 * Resets this trackers list of combat entries
+	/**
+	 * + Resets this trackers list of combat entries
 	 */
 	public void reset() {
 		int i = this.field_94552_d ? 300 : 100;
@@ -235,10 +225,23 @@ public class CombatTracker {
 
 	}
 
-	/**+
-	 * Returns EntityLivingBase assigned for this CombatTracker
+	/**
+	 * + Adds an entry for the combat tracker
 	 */
-	public EntityLivingBase getFighter() {
-		return this.fighter;
+	public void trackDamage(DamageSource damageSrc, float healthIn, float damageAmount) {
+		this.reset();
+		this.func_94545_a();
+		CombatEntry combatentry = new CombatEntry(damageSrc, this.fighter.ticksExisted, healthIn, damageAmount,
+				this.field_94551_f, this.fighter.fallDistance);
+		this.combatEntries.add(combatentry);
+		this.field_94555_c = this.fighter.ticksExisted;
+		this.field_94553_e = true;
+		if (combatentry.isLivingDamageSrc() && !this.field_94552_d && this.fighter.isEntityAlive()) {
+			this.field_94552_d = true;
+			this.field_152775_d = this.fighter.ticksExisted;
+			this.field_152776_e = this.field_152775_d;
+			this.fighter.sendEnterCombat();
+		}
+
 	}
 }

@@ -13,22 +13,25 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -53,40 +56,28 @@ public class TileEntityPiston extends TileEntity implements ITickable {
 		this.shouldHeadBeRendered = shouldHeadBeRenderedIn;
 	}
 
-	public IBlockState getPistonState() {
-		return this.pistonState;
+	/**
+	 * + removes a piston's tile entity (and if the piston is moving, stops it)
+	 */
+	public void clearPistonTileEntity() {
+		if (this.lastProgress < 1.0F && this.worldObj != null) {
+			this.lastProgress = this.progress = 1.0F;
+			this.worldObj.removeTileEntity(this.pos);
+			this.invalidate();
+			if (this.worldObj.getBlockState(this.pos).getBlock() == Blocks.piston_extension) {
+				this.worldObj.setBlockState(this.pos, this.pistonState, 3);
+				this.worldObj.notifyBlockOfStateChange(this.pos, this.pistonState.getBlock());
+			}
+		}
+
 	}
 
 	public int getBlockMetadata() {
 		return 0;
 	}
 
-	/**+
-	 * Returns true if a piston is extending
-	 */
-	public boolean isExtending() {
-		return this.extending;
-	}
-
 	public EnumFacing getFacing() {
 		return this.pistonFacing;
-	}
-
-	public boolean shouldPistonHeadBeRendered() {
-		return this.shouldHeadBeRendered;
-	}
-
-	/**+
-	 * Get interpolated progress value (between lastProgress and
-	 * progress) given the fractional time between ticks as an
-	 * argument
-	 */
-	public float getProgress(float ticks) {
-		if (ticks > 1.0F) {
-			ticks = 1.0F;
-		}
-
-		return this.lastProgress + (this.progress - this.lastProgress) * ticks;
 	}
 
 	public float getOffsetX(float ticks) {
@@ -102,6 +93,29 @@ public class TileEntityPiston extends TileEntity implements ITickable {
 	public float getOffsetZ(float ticks) {
 		return this.extending ? (this.getProgress(ticks) - 1.0F) * (float) this.pistonFacing.getFrontOffsetZ()
 				: (1.0F - this.getProgress(ticks)) * (float) this.pistonFacing.getFrontOffsetZ();
+	}
+
+	public IBlockState getPistonState() {
+		return this.pistonState;
+	}
+
+	/**
+	 * + Get interpolated progress value (between lastProgress and progress) given
+	 * the fractional time between ticks as an argument
+	 */
+	public float getProgress(float ticks) {
+		if (ticks > 1.0F) {
+			ticks = 1.0F;
+		}
+
+		return this.lastProgress + (this.progress - this.lastProgress) * ticks;
+	}
+
+	/**
+	 * + Returns true if a piston is extending
+	 */
+	public boolean isExtending() {
+		return this.extending;
 	}
 
 	private void launchWithSlimeBlock(float parFloat1, float parFloat2) {
@@ -144,25 +158,21 @@ public class TileEntityPiston extends TileEntity implements ITickable {
 
 	}
 
-	/**+
-	 * removes a piston's tile entity (and if the piston is moving,
-	 * stops it)
-	 */
-	public void clearPistonTileEntity() {
-		if (this.lastProgress < 1.0F && this.worldObj != null) {
-			this.lastProgress = this.progress = 1.0F;
-			this.worldObj.removeTileEntity(this.pos);
-			this.invalidate();
-			if (this.worldObj.getBlockState(this.pos).getBlock() == Blocks.piston_extension) {
-				this.worldObj.setBlockState(this.pos, this.pistonState, 3);
-				this.worldObj.notifyBlockOfStateChange(this.pos, this.pistonState.getBlock());
-			}
-		}
-
+	public void readFromNBT(NBTTagCompound nbttagcompound) {
+		super.readFromNBT(nbttagcompound);
+		this.pistonState = Block.getBlockById(nbttagcompound.getInteger("blockId"))
+				.getStateFromMeta(nbttagcompound.getInteger("blockData"));
+		this.pistonFacing = EnumFacing.getFront(nbttagcompound.getInteger("facing"));
+		this.lastProgress = this.progress = nbttagcompound.getFloat("progress");
+		this.extending = nbttagcompound.getBoolean("extending");
 	}
 
-	/**+
-	 * Like the old updateEntity(), except more generic.
+	public boolean shouldPistonHeadBeRendered() {
+		return this.shouldHeadBeRendered;
+	}
+
+	/**
+	 * + Like the old updateEntity(), except more generic.
 	 */
 	public void update() {
 		this.lastProgress = this.progress;
@@ -186,15 +196,6 @@ public class TileEntityPiston extends TileEntity implements ITickable {
 			}
 
 		}
-	}
-
-	public void readFromNBT(NBTTagCompound nbttagcompound) {
-		super.readFromNBT(nbttagcompound);
-		this.pistonState = Block.getBlockById(nbttagcompound.getInteger("blockId"))
-				.getStateFromMeta(nbttagcompound.getInteger("blockData"));
-		this.pistonFacing = EnumFacing.getFront(nbttagcompound.getInteger("facing"));
-		this.lastProgress = this.progress = nbttagcompound.getFloat("progress");
-		this.extending = nbttagcompound.getBoolean("extending");
 	}
 
 	public void writeToNBT(NBTTagCompound nbttagcompound) {

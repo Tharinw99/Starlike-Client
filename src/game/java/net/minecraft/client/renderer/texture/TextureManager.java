@@ -1,6 +1,6 @@
 package net.minecraft.client.renderer.texture;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE2;
 
 import java.io.IOException;
 import java.util.List;
@@ -24,22 +24,25 @@ import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.util.ReportedException;
 import net.minecraft.util.ResourceLocation;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -83,12 +86,34 @@ public class TextureManager implements ITickable, IResourceManagerReloadListener
 		}
 	}
 
-	public boolean loadTickableTexture(ResourceLocation textureLocation, ITickableTextureObject textureObj) {
-		if (this.loadTexture(textureLocation, textureObj)) {
-			this.listTickables.add(textureObj);
-			return true;
+	public void deleteTexture(ResourceLocation textureLocation) {
+		ITextureObject itextureobject = this.mapTextureObjects.remove(textureLocation);
+		if (itextureobject != null) {
+			TextureUtil.deleteTexture(itextureobject.getGlTextureId());
+		}
+	}
+
+	public ResourceLocation getDynamicTextureLocation(String name, DynamicTexture texture) {
+		Integer integer = (Integer) this.mapTextureCounters.get(name);
+		if (integer == null) {
+			integer = Integer.valueOf(1);
 		} else {
-			return false;
+			integer = Integer.valueOf(integer.intValue() + 1);
+		}
+
+		this.mapTextureCounters.put(name, integer);
+		ResourceLocation resourcelocation = new ResourceLocation(
+				HString.format("dynamic/%s_%d", new Object[] { name, integer }));
+		this.loadTexture(resourcelocation, texture);
+		return resourcelocation;
+	}
+
+	public ITextureObject getTexture(ResourceLocation textureLocation) {
+		if (textureLocation.cachedPointerType == ResourceLocation.CACHED_POINTER_TEXTURE) {
+			return (ITextureObject) textureLocation.cachedPointer;
+		} else {
+			textureLocation.cachedPointerType = ResourceLocation.CACHED_POINTER_TEXTURE;
+			return (ITextureObject) (textureLocation.cachedPointer = this.mapTextureObjects.get(textureLocation));
 		}
 	}
 
@@ -121,47 +146,25 @@ public class TextureManager implements ITickable, IResourceManagerReloadListener
 		return flag;
 	}
 
-	public ITextureObject getTexture(ResourceLocation textureLocation) {
-		if (textureLocation.cachedPointerType == ResourceLocation.CACHED_POINTER_TEXTURE) {
-			return (ITextureObject) textureLocation.cachedPointer;
+	public boolean loadTickableTexture(ResourceLocation textureLocation, ITickableTextureObject textureObj) {
+		if (this.loadTexture(textureLocation, textureObj)) {
+			this.listTickables.add(textureObj);
+			return true;
 		} else {
-			textureLocation.cachedPointerType = ResourceLocation.CACHED_POINTER_TEXTURE;
-			return (ITextureObject) (textureLocation.cachedPointer = this.mapTextureObjects.get(textureLocation));
-		}
-	}
-
-	public ResourceLocation getDynamicTextureLocation(String name, DynamicTexture texture) {
-		Integer integer = (Integer) this.mapTextureCounters.get(name);
-		if (integer == null) {
-			integer = Integer.valueOf(1);
-		} else {
-			integer = Integer.valueOf(integer.intValue() + 1);
-		}
-
-		this.mapTextureCounters.put(name, integer);
-		ResourceLocation resourcelocation = new ResourceLocation(
-				HString.format("dynamic/%s_%d", new Object[] { name, integer }));
-		this.loadTexture(resourcelocation, texture);
-		return resourcelocation;
-	}
-
-	public void tick() {
-		for (int i = 0, l = this.listTickables.size(); i < l; ++i) {
-			this.listTickables.get(i).tick();
-		}
-
-	}
-
-	public void deleteTexture(ResourceLocation textureLocation) {
-		ITextureObject itextureobject = this.mapTextureObjects.remove(textureLocation);
-		if (itextureobject != null) {
-			TextureUtil.deleteTexture(itextureobject.getGlTextureId());
+			return false;
 		}
 	}
 
 	public void onResourceManagerReload(IResourceManager var1) {
 		for (Entry entry : this.mapTextureObjects.entrySet()) {
 			this.loadTexture((ResourceLocation) entry.getKey(), (ITextureObject) entry.getValue());
+		}
+
+	}
+
+	public void tick() {
+		for (int i = 0, l = this.listTickables.size(); i < l; ++i) {
+			this.listTickables.get(i).tick();
 		}
 
 	}

@@ -55,22 +55,25 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IInteractionObject;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -110,181 +113,46 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 		this.statWriter = statWriter;
 	}
 
-	/**+
-	 * Called when the entity is attacked.
+	public void addChatComponentMessage(IChatComponent chatComponent) {
+		this.mc.ingameGUI.getChatGUI().printChatMessage(chatComponent);
+	}
+
+	/**
+	 * + Send a chat message to the CommandSender
+	 */
+	public void addChatMessage(IChatComponent ichatcomponent) {
+		this.mc.ingameGUI.getChatGUI().printChatMessage(ichatcomponent);
+	}
+
+	/**
+	 * + Adds a value to a statistic field.
+	 */
+	public void addStat(StatBase stat, int amount) {
+		if (stat != null) {
+			if (stat.isIndependent) {
+				super.addStat(stat, amount);
+			}
+
+		}
+	}
+
+	/**
+	 * + Called when the entity is attacked.
 	 */
 	public boolean attackEntityFrom(DamageSource source, float amount) {
 		return false;
 	}
 
-	/**+
-	 * Heal living entity (param: amount of half-hearts)
+	/**
+	 * + Returns {@code true} if the CommandSender is allowed to execute the
+	 * command, {@code false} if not
 	 */
-	public void heal(float healAmount) {
+	public boolean canCommandSenderUseCommand(int i, String var2) {
+		return i <= 0;
 	}
 
-	/**+
-	 * Called when a player mounts an entity. e.g. mounts a pig,
-	 * mounts a boat.
-	 */
-	public void mountEntity(Entity entityIn) {
-		super.mountEntity(entityIn);
-		if (entityIn instanceof EntityMinecart) {
-			this.mc.getSoundHandler().playSound(new MovingSoundMinecartRiding(this, (EntityMinecart) entityIn));
-		}
-
-	}
-
-	/**+
-	 * Called to update the entity's position/logic.
-	 */
-	public void onUpdate() {
-		if (this.worldObj.isBlockLoaded(new BlockPos(this.posX, 0.0D, this.posZ))) {
-			super.onUpdate();
-			if (this.isRiding()) {
-				this.sendQueue.addToSendQueue(
-						new C03PacketPlayer.C05PacketPlayerLook(this.rotationYaw, this.rotationPitch, this.onGround));
-				this.sendQueue.addToSendQueue(new C0CPacketInput(this.moveStrafing, this.moveForward,
-						this.movementInput.jump, this.movementInput.sneak));
-			} else {
-				this.onUpdateWalkingPlayer();
-			}
-
-		}
-	}
-
-	/**+
-	 * called every tick when the player is on foot. Performs all
-	 * the things that normally happen during movement.
-	 */
-	public void onUpdateWalkingPlayer() {
-		boolean flag = this.isSprinting();
-		if (flag != this.serverSprintState) {
-			if (flag) {
-				this.sendQueue
-						.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.START_SPRINTING));
-			} else {
-				this.sendQueue
-						.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.STOP_SPRINTING));
-			}
-
-			this.serverSprintState = flag;
-		}
-
-		boolean flag1 = this.isSneaking();
-		if (flag1 != this.serverSneakState) {
-			if (flag1) {
-				this.sendQueue
-						.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.START_SNEAKING));
-			} else {
-				this.sendQueue
-						.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.STOP_SNEAKING));
-			}
-
-			this.serverSneakState = flag1;
-		}
-
-		if (this.isCurrentViewEntity()) {
-			double d0 = this.posX - this.lastReportedPosX;
-			double d1 = this.getEntityBoundingBox().minY - this.lastReportedPosY;
-			double d2 = this.posZ - this.lastReportedPosZ;
-			double d3 = (double) (this.rotationYaw - this.lastReportedYaw);
-			double d4 = (double) (this.rotationPitch - this.lastReportedPitch);
-			boolean flag2 = d0 * d0 + d1 * d1 + d2 * d2 > 9.0E-4D || this.positionUpdateTicks >= 20;
-			boolean flag3 = d3 != 0.0D || d4 != 0.0D;
-			if (this.ridingEntity == null) {
-				if (flag2 && flag3) {
-					this.sendQueue.addToSendQueue(
-							new C03PacketPlayer.C06PacketPlayerPosLook(this.posX, this.getEntityBoundingBox().minY,
-									this.posZ, this.rotationYaw, this.rotationPitch, this.onGround));
-				} else if (flag2) {
-					this.sendQueue.addToSendQueue(new C03PacketPlayer.C04PacketPlayerPosition(this.posX,
-							this.getEntityBoundingBox().minY, this.posZ, this.onGround));
-				} else if (flag3) {
-					this.sendQueue.addToSendQueue(new C03PacketPlayer.C05PacketPlayerLook(this.rotationYaw,
-							this.rotationPitch, this.onGround));
-				} else {
-					this.sendQueue.addToSendQueue(new C03PacketPlayer(this.onGround));
-				}
-			} else {
-				this.sendQueue.addToSendQueue(new C03PacketPlayer.C06PacketPlayerPosLook(this.motionX, -999.0D,
-						this.motionZ, this.rotationYaw, this.rotationPitch, this.onGround));
-				flag2 = false;
-			}
-
-			++this.positionUpdateTicks;
-			if (flag2) {
-				this.lastReportedPosX = this.posX;
-				this.lastReportedPosY = this.getEntityBoundingBox().minY;
-				this.lastReportedPosZ = this.posZ;
-				this.positionUpdateTicks = 0;
-			}
-
-			if (flag3) {
-				this.lastReportedYaw = this.rotationYaw;
-				this.lastReportedPitch = this.rotationPitch;
-			}
-		}
-
-	}
-
-	/**+
-	 * Called when player presses the drop item key
-	 */
-	public EntityItem dropOneItem(boolean dropAll) {
-		C07PacketPlayerDigging.Action c07packetplayerdigging$action = dropAll
-				? C07PacketPlayerDigging.Action.DROP_ALL_ITEMS
-				: C07PacketPlayerDigging.Action.DROP_ITEM;
-		this.sendQueue.addToSendQueue(
-				new C07PacketPlayerDigging(c07packetplayerdigging$action, BlockPos.ORIGIN, EnumFacing.DOWN));
-		return null;
-	}
-
-	/**+
-	 * Joins the passed in entity item with the world. Args:
-	 * entityItem
-	 */
-	protected void joinEntityItemWithWorld(EntityItem itemIn) {
-	}
-
-	/**+
-	 * Sends a chat message from the player. Args: chatMessage
-	 */
-	public void sendChatMessage(String message) {
-		if (((sendQueue.getNetworkManager() instanceof ClientIntegratedServerNetworkManager)
-				|| (sendQueue.getNetworkManager() instanceof LANClientNetworkManager))
-				&& message.startsWith("/eagskull")) {
-			this.mc.eagskullCommand.openFileChooser();
-		} else {
-			this.sendQueue.addToSendQueue(new C01PacketChatMessage(message));
-		}
-	}
-
-	/**+
-	 * Swings the item the player is holding.
-	 */
-	public void swingItem() {
-		super.swingItem();
-		this.sendQueue.addToSendQueue(new C0APacketAnimation());
-	}
-
-	public void respawnPlayer() {
-		this.sendQueue.addToSendQueue(new C16PacketClientStatus(C16PacketClientStatus.EnumState.PERFORM_RESPAWN));
-	}
-
-	/**+
-	 * Deals damage to the entity. If its a EntityPlayer then will
-	 * take damage from the armor first and then health second with
-	 * the reduced value. Args: damageAmount
-	 */
-	protected void damageEntity(DamageSource damageSrc, float damageAmount) {
-		if (!this.isEntityInvulnerable(damageSrc)) {
-			this.setHealth(this.getHealth() - damageAmount);
-		}
-	}
-
-	/**+
-	 * set current crafting inventory back to the 2x2 square
+	/**
+	 * + set current crafting inventory back to the 2x2 square
 	 */
 	public void closeScreen() {
 		this.sendQueue.addToSendQueue(new C0DPacketCloseWindow(this.openContainer.windowId));
@@ -297,215 +165,31 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 		this.mc.displayGuiScreen((GuiScreen) null);
 	}
 
-	/**+
-	 * Updates health locally.
+	/**
+	 * + Deals damage to the entity. If its a EntityPlayer then will take damage
+	 * from the armor first and then health second with the reduced value. Args:
+	 * damageAmount
 	 */
-	public void setPlayerSPHealth(float health) {
-		if (this.hasValidHealth) {
-			float f = this.getHealth() - health;
-			if (f <= 0.0F) {
-				this.setHealth(health);
-				if (f < 0.0F) {
-					this.hurtResistantTime = this.maxHurtResistantTime / 2;
-				}
-			} else {
-				this.lastDamage = f;
-				this.setHealth(this.getHealth());
-				this.hurtResistantTime = this.maxHurtResistantTime;
-				this.damageEntity(DamageSource.generic, f);
-				this.hurtTime = this.maxHurtTime = 10;
-			}
-		} else {
-			this.setHealth(health);
-			this.hasValidHealth = true;
+	protected void damageEntity(DamageSource damageSrc, float damageAmount) {
+		if (!this.isEntityInvulnerable(damageSrc)) {
+			this.setHealth(this.getHealth() - damageAmount);
+		}
+	}
+
+	public void displayGui(IInteractionObject guiOwner) {
+		String s = guiOwner.getGuiID();
+		if ("minecraft:crafting_table".equals(s)) {
+			this.mc.displayGuiScreen(new GuiCrafting(this.inventory, this.worldObj));
+		} else if ("minecraft:enchanting_table".equals(s)) {
+			this.mc.displayGuiScreen(new GuiEnchantment(this.inventory, this.worldObj, guiOwner));
+		} else if ("minecraft:anvil".equals(s)) {
+			this.mc.displayGuiScreen(new GuiRepair(this.inventory, this.worldObj));
 		}
 
 	}
 
-	/**+
-	 * Adds a value to a statistic field.
-	 */
-	public void addStat(StatBase stat, int amount) {
-		if (stat != null) {
-			if (stat.isIndependent) {
-				super.addStat(stat, amount);
-			}
-
-		}
-	}
-
-	/**+
-	 * Sends the player's abilities to the server (if there is one).
-	 */
-	public void sendPlayerAbilities() {
-		this.sendQueue.addToSendQueue(new C13PacketPlayerAbilities(this.capabilities));
-	}
-
-	/**+
-	 * returns true if this is an EntityPlayerSP, or the logged in
-	 * player.
-	 */
-	public boolean isUser() {
-		return true;
-	}
-
-	protected void sendHorseJump() {
-		this.sendQueue.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.RIDING_JUMP,
-				(int) (this.getHorseJumpPower() * 100.0F)));
-	}
-
-	public void sendHorseInventory() {
-		this.sendQueue.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.OPEN_INVENTORY));
-	}
-
-	public void setClientBrand(String brand) {
-		this.clientBrand = brand;
-	}
-
-	public String getClientBrand() {
-		return this.clientBrand;
-	}
-
-	public StatFileWriter getStatFileWriter() {
-		return this.statWriter;
-	}
-
-	public void addChatComponentMessage(IChatComponent chatComponent) {
-		this.mc.ingameGUI.getChatGUI().printChatMessage(chatComponent);
-	}
-
-	protected boolean pushOutOfBlocks(double x, double y, double z) {
-		if (this.noClip) {
-			return false;
-		} else {
-			BlockPos blockpos = new BlockPos(x, y, z);
-			double d0 = x - (double) blockpos.getX();
-			double d1 = z - (double) blockpos.getZ();
-			if (!this.isOpenBlockSpace(blockpos)) {
-				byte b0 = -1;
-				double d2 = 9999.0D;
-				if (this.isOpenBlockSpace(blockpos.west()) && d0 < d2) {
-					d2 = d0;
-					b0 = 0;
-				}
-
-				if (this.isOpenBlockSpace(blockpos.east()) && 1.0D - d0 < d2) {
-					d2 = 1.0D - d0;
-					b0 = 1;
-				}
-
-				if (this.isOpenBlockSpace(blockpos.north()) && d1 < d2) {
-					d2 = d1;
-					b0 = 4;
-				}
-
-				if (this.isOpenBlockSpace(blockpos.south()) && 1.0D - d1 < d2) {
-					d2 = 1.0D - d1;
-					b0 = 5;
-				}
-
-				float f = 0.1F;
-				if (b0 == 0) {
-					this.motionX = (double) (-f);
-				}
-
-				if (b0 == 1) {
-					this.motionX = (double) f;
-				}
-
-				if (b0 == 4) {
-					this.motionZ = (double) (-f);
-				}
-
-				if (b0 == 5) {
-					this.motionZ = (double) f;
-				}
-			}
-
-			return false;
-		}
-	}
-
-	/**+
-	 * Returns true if the block at the given BlockPos and the block
-	 * above it are NOT full cubes.
-	 */
-	private boolean isOpenBlockSpace(BlockPos pos) {
-		return !this.worldObj.getBlockState(pos).getBlock().isNormalCube()
-				&& !this.worldObj.getBlockState(pos.up()).getBlock().isNormalCube();
-	}
-
-	/**+
-	 * Set sprinting switch for Entity.
-	 */
-	public void setSprinting(boolean sprinting) {
-		super.setSprinting(sprinting);
-		this.sprintingTicksLeft = sprinting ? 600 : 0;
-	}
-
-	/**+
-	 * Sets the current XP, total XP, and level number.
-	 */
-	public void setXPStats(float currentXP, int maxXP, int level) {
-		this.experience = currentXP;
-		this.experienceTotal = maxXP;
-		this.experienceLevel = level;
-	}
-
-	/**+
-	 * Send a chat message to the CommandSender
-	 */
-	public void addChatMessage(IChatComponent ichatcomponent) {
-		this.mc.ingameGUI.getChatGUI().printChatMessage(ichatcomponent);
-	}
-
-	/**+
-	 * Returns {@code true} if the CommandSender is allowed to
-	 * execute the command, {@code false} if not
-	 */
-	public boolean canCommandSenderUseCommand(int i, String var2) {
-		return i <= 0;
-	}
-
-	/**+
-	 * Get the position in the world. <b>{@code null} is not
-	 * allowed!</b> If you are not an entity in the world, return
-	 * the coordinates 0, 0, 0
-	 */
-	public BlockPos getPosition() {
-		return new BlockPos(this.posX + 0.5D, this.posY + 0.5D, this.posZ + 0.5D);
-	}
-
-	public void playSound(String name, float volume, float pitch) {
-		this.worldObj.playSound(this.posX, this.posY, this.posZ, name, volume, pitch, false);
-	}
-
-	/**+
-	 * Returns whether the entity is in a server world
-	 */
-	public boolean isServerWorld() {
-		return true;
-	}
-
-	public boolean isRidingHorse() {
-		return this.ridingEntity != null && this.ridingEntity instanceof EntityHorse
-				&& ((EntityHorse) this.ridingEntity).isHorseSaddled();
-	}
-
-	public float getHorseJumpPower() {
-		return this.horseJumpPower;
-	}
-
-	public void openEditSign(TileEntitySign signTile) {
-		this.mc.displayGuiScreen(new GuiEditSign(signTile));
-	}
-
-	public void openEditCommandBlock(CommandBlockLogic cmdBlockLogic) {
-		this.mc.displayGuiScreen(new GuiCommandBlock(cmdBlockLogic));
-	}
-
-	/**+
-	 * Displays the GUI for interacting with a book.
+	/**
+	 * + Displays the GUI for interacting with a book.
 	 */
 	public void displayGUIBook(ItemStack bookStack) {
 		Item item = bookStack.getItem();
@@ -515,9 +199,9 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 
 	}
 
-	/**+
-	 * Displays the GUI for interacting with a chest inventory.
-	 * Args: chestInventory
+	/**
+	 * + Displays the GUI for interacting with a chest inventory. Args:
+	 * chestInventory
 	 */
 	public void displayGUIChest(IInventory chestInventory) {
 		String s = chestInventory instanceof IInteractionObject ? ((IInteractionObject) chestInventory).getGuiID()
@@ -544,25 +228,108 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 		this.mc.displayGuiScreen(new GuiScreenHorseInventory(this.inventory, horseInventory, horse));
 	}
 
-	public void displayGui(IInteractionObject guiOwner) {
-		String s = guiOwner.getGuiID();
-		if ("minecraft:crafting_table".equals(s)) {
-			this.mc.displayGuiScreen(new GuiCrafting(this.inventory, this.worldObj));
-		} else if ("minecraft:enchanting_table".equals(s)) {
-			this.mc.displayGuiScreen(new GuiEnchantment(this.inventory, this.worldObj, guiOwner));
-		} else if ("minecraft:anvil".equals(s)) {
-			this.mc.displayGuiScreen(new GuiRepair(this.inventory, this.worldObj));
-		}
-
-	}
-
 	public void displayVillagerTradeGui(IMerchant villager) {
 		this.mc.displayGuiScreen(new GuiMerchant(this.inventory, villager, this.worldObj));
 	}
 
-	/**+
-	 * Called when the player performs a critical hit on the Entity.
-	 * Args: entity that was hit critically
+	/**
+	 * + Called when player presses the drop item key
+	 */
+	public EntityItem dropOneItem(boolean dropAll) {
+		C07PacketPlayerDigging.Action c07packetplayerdigging$action = dropAll
+				? C07PacketPlayerDigging.Action.DROP_ALL_ITEMS
+				: C07PacketPlayerDigging.Action.DROP_ITEM;
+		this.sendQueue.addToSendQueue(
+				new C07PacketPlayerDigging(c07packetplayerdigging$action, BlockPos.ORIGIN, EnumFacing.DOWN));
+		return null;
+	}
+
+	public String getClientBrand() {
+		return this.clientBrand;
+	}
+
+	public float getHorseJumpPower() {
+		return this.horseJumpPower;
+	}
+
+	/**
+	 * + Get the position in the world. <b>{@code null} is not allowed!</b> If you
+	 * are not an entity in the world, return the coordinates 0, 0, 0
+	 */
+	public BlockPos getPosition() {
+		return new BlockPos(this.posX + 0.5D, this.posY + 0.5D, this.posZ + 0.5D);
+	}
+
+	public StatFileWriter getStatFileWriter() {
+		return this.statWriter;
+	}
+
+	/**
+	 * + Heal living entity (param: amount of half-hearts)
+	 */
+	public void heal(float healAmount) {
+	}
+
+	protected boolean isCurrentViewEntity() {
+		return this.mc.getRenderViewEntity() == this;
+	}
+
+	/**
+	 * + Returns true if the block at the given BlockPos and the block above it are
+	 * NOT full cubes.
+	 */
+	private boolean isOpenBlockSpace(BlockPos pos) {
+		return !this.worldObj.getBlockState(pos).getBlock().isNormalCube()
+				&& !this.worldObj.getBlockState(pos.up()).getBlock().isNormalCube();
+	}
+
+	public boolean isRidingHorse() {
+		return this.ridingEntity != null && this.ridingEntity instanceof EntityHorse
+				&& ((EntityHorse) this.ridingEntity).isHorseSaddled();
+	}
+
+	/**
+	 * + Returns whether the entity is in a server world
+	 */
+	public boolean isServerWorld() {
+		return true;
+	}
+
+	/**
+	 * + Returns if this entity is sneaking.
+	 */
+	public boolean isSneaking() {
+		boolean flag = this.movementInput != null ? this.movementInput.sneak : false;
+		return flag && !this.sleeping;
+	}
+
+	/**
+	 * + returns true if this is an EntityPlayerSP, or the logged in player.
+	 */
+	public boolean isUser() {
+		return true;
+	}
+
+	/**
+	 * + Joins the passed in entity item with the world. Args: entityItem
+	 */
+	protected void joinEntityItemWithWorld(EntityItem itemIn) {
+	}
+
+	/**
+	 * + Called when a player mounts an entity. e.g. mounts a pig, mounts a boat.
+	 */
+	public void mountEntity(Entity entityIn) {
+		super.mountEntity(entityIn);
+		if (entityIn instanceof EntityMinecart) {
+			this.mc.getSoundHandler().playSound(new MovingSoundMinecartRiding(this, (EntityMinecart) entityIn));
+		}
+
+	}
+
+	/**
+	 * + Called when the player performs a critical hit on the Entity. Args: entity
+	 * that was hit critically
 	 */
 	public void onCriticalHit(Entity entityHit) {
 		this.mc.effectRenderer.emitParticleAtEntity(entityHit, EnumParticleTypes.CRIT);
@@ -572,38 +339,10 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 		this.mc.effectRenderer.emitParticleAtEntity(entityHit, EnumParticleTypes.CRIT_MAGIC);
 	}
 
-	/**+
-	 * Returns if this entity is sneaking.
-	 */
-	public boolean isSneaking() {
-		boolean flag = this.movementInput != null ? this.movementInput.sneak : false;
-		return flag && !this.sleeping;
-	}
-
-	public void updateEntityActionState() {
-		super.updateEntityActionState();
-		if (this.isCurrentViewEntity()) {
-			this.moveStrafing = this.movementInput.moveStrafe;
-			this.moveForward = this.movementInput.moveForward;
-			this.isJumping = this.movementInput.jump;
-			this.prevRenderArmYaw = this.renderArmYaw;
-			this.prevRenderArmPitch = this.renderArmPitch;
-			this.renderArmPitch = (float) ((double) this.renderArmPitch
-					+ (double) (this.rotationPitch - this.renderArmPitch) * 0.5D);
-			this.renderArmYaw = (float) ((double) this.renderArmYaw
-					+ (double) (this.rotationYaw - this.renderArmYaw) * 0.5D);
-		}
-
-	}
-
-	protected boolean isCurrentViewEntity() {
-		return this.mc.getRenderViewEntity() == this;
-	}
-
-	/**+
-	 * Called frequently so the entity can update its state every
-	 * tick as required. For example, zombies and skeletons use this
-	 * to react to sunlight and start to burn.
+	/**
+	 * + Called frequently so the entity can update its state every tick as
+	 * required. For example, zombies and skeletons use this to react to sunlight
+	 * and start to burn.
 	 */
 	public void onLivingUpdate() {
 		if (this.sprintingTicksLeft > 0) {
@@ -749,6 +488,266 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 		if (this.onGround && this.capabilities.isFlying && !this.mc.playerController.isSpectatorMode()) {
 			this.capabilities.isFlying = false;
 			this.sendPlayerAbilities();
+		}
+
+	}
+
+	/**
+	 * + Called to update the entity's position/logic.
+	 */
+	public void onUpdate() {
+		if (this.worldObj.isBlockLoaded(new BlockPos(this.posX, 0.0D, this.posZ))) {
+			super.onUpdate();
+			if (this.isRiding()) {
+				this.sendQueue.addToSendQueue(
+						new C03PacketPlayer.C05PacketPlayerLook(this.rotationYaw, this.rotationPitch, this.onGround));
+				this.sendQueue.addToSendQueue(new C0CPacketInput(this.moveStrafing, this.moveForward,
+						this.movementInput.jump, this.movementInput.sneak));
+			} else {
+				this.onUpdateWalkingPlayer();
+			}
+
+		}
+	}
+
+	/**
+	 * + called every tick when the player is on foot. Performs all the things that
+	 * normally happen during movement.
+	 */
+	public void onUpdateWalkingPlayer() {
+		boolean flag = this.isSprinting();
+		if (flag != this.serverSprintState) {
+			if (flag) {
+				this.sendQueue
+						.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.START_SPRINTING));
+			} else {
+				this.sendQueue
+						.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.STOP_SPRINTING));
+			}
+
+			this.serverSprintState = flag;
+		}
+
+		boolean flag1 = this.isSneaking();
+		if (flag1 != this.serverSneakState) {
+			if (flag1) {
+				this.sendQueue
+						.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.START_SNEAKING));
+			} else {
+				this.sendQueue
+						.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.STOP_SNEAKING));
+			}
+
+			this.serverSneakState = flag1;
+		}
+
+		if (this.isCurrentViewEntity()) {
+			double d0 = this.posX - this.lastReportedPosX;
+			double d1 = this.getEntityBoundingBox().minY - this.lastReportedPosY;
+			double d2 = this.posZ - this.lastReportedPosZ;
+			double d3 = (double) (this.rotationYaw - this.lastReportedYaw);
+			double d4 = (double) (this.rotationPitch - this.lastReportedPitch);
+			boolean flag2 = d0 * d0 + d1 * d1 + d2 * d2 > 9.0E-4D || this.positionUpdateTicks >= 20;
+			boolean flag3 = d3 != 0.0D || d4 != 0.0D;
+			if (this.ridingEntity == null) {
+				if (flag2 && flag3) {
+					this.sendQueue.addToSendQueue(
+							new C03PacketPlayer.C06PacketPlayerPosLook(this.posX, this.getEntityBoundingBox().minY,
+									this.posZ, this.rotationYaw, this.rotationPitch, this.onGround));
+				} else if (flag2) {
+					this.sendQueue.addToSendQueue(new C03PacketPlayer.C04PacketPlayerPosition(this.posX,
+							this.getEntityBoundingBox().minY, this.posZ, this.onGround));
+				} else if (flag3) {
+					this.sendQueue.addToSendQueue(new C03PacketPlayer.C05PacketPlayerLook(this.rotationYaw,
+							this.rotationPitch, this.onGround));
+				} else {
+					this.sendQueue.addToSendQueue(new C03PacketPlayer(this.onGround));
+				}
+			} else {
+				this.sendQueue.addToSendQueue(new C03PacketPlayer.C06PacketPlayerPosLook(this.motionX, -999.0D,
+						this.motionZ, this.rotationYaw, this.rotationPitch, this.onGround));
+				flag2 = false;
+			}
+
+			++this.positionUpdateTicks;
+			if (flag2) {
+				this.lastReportedPosX = this.posX;
+				this.lastReportedPosY = this.getEntityBoundingBox().minY;
+				this.lastReportedPosZ = this.posZ;
+				this.positionUpdateTicks = 0;
+			}
+
+			if (flag3) {
+				this.lastReportedYaw = this.rotationYaw;
+				this.lastReportedPitch = this.rotationPitch;
+			}
+		}
+
+	}
+
+	public void openEditCommandBlock(CommandBlockLogic cmdBlockLogic) {
+		this.mc.displayGuiScreen(new GuiCommandBlock(cmdBlockLogic));
+	}
+
+	public void openEditSign(TileEntitySign signTile) {
+		this.mc.displayGuiScreen(new GuiEditSign(signTile));
+	}
+
+	public void playSound(String name, float volume, float pitch) {
+		this.worldObj.playSound(this.posX, this.posY, this.posZ, name, volume, pitch, false);
+	}
+
+	protected boolean pushOutOfBlocks(double x, double y, double z) {
+		if (this.noClip) {
+			return false;
+		} else {
+			BlockPos blockpos = new BlockPos(x, y, z);
+			double d0 = x - (double) blockpos.getX();
+			double d1 = z - (double) blockpos.getZ();
+			if (!this.isOpenBlockSpace(blockpos)) {
+				byte b0 = -1;
+				double d2 = 9999.0D;
+				if (this.isOpenBlockSpace(blockpos.west()) && d0 < d2) {
+					d2 = d0;
+					b0 = 0;
+				}
+
+				if (this.isOpenBlockSpace(blockpos.east()) && 1.0D - d0 < d2) {
+					d2 = 1.0D - d0;
+					b0 = 1;
+				}
+
+				if (this.isOpenBlockSpace(blockpos.north()) && d1 < d2) {
+					d2 = d1;
+					b0 = 4;
+				}
+
+				if (this.isOpenBlockSpace(blockpos.south()) && 1.0D - d1 < d2) {
+					d2 = 1.0D - d1;
+					b0 = 5;
+				}
+
+				float f = 0.1F;
+				if (b0 == 0) {
+					this.motionX = (double) (-f);
+				}
+
+				if (b0 == 1) {
+					this.motionX = (double) f;
+				}
+
+				if (b0 == 4) {
+					this.motionZ = (double) (-f);
+				}
+
+				if (b0 == 5) {
+					this.motionZ = (double) f;
+				}
+			}
+
+			return false;
+		}
+	}
+
+	public void respawnPlayer() {
+		this.sendQueue.addToSendQueue(new C16PacketClientStatus(C16PacketClientStatus.EnumState.PERFORM_RESPAWN));
+	}
+
+	/**
+	 * + Sends a chat message from the player. Args: chatMessage
+	 */
+	public void sendChatMessage(String message) {
+		if (((sendQueue.getNetworkManager() instanceof ClientIntegratedServerNetworkManager)
+				|| (sendQueue.getNetworkManager() instanceof LANClientNetworkManager))
+				&& message.startsWith("/eagskull")) {
+			this.mc.eagskullCommand.openFileChooser();
+		} else {
+			this.sendQueue.addToSendQueue(new C01PacketChatMessage(message));
+		}
+	}
+
+	public void sendHorseInventory() {
+		this.sendQueue.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.OPEN_INVENTORY));
+	}
+
+	protected void sendHorseJump() {
+		this.sendQueue.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.RIDING_JUMP,
+				(int) (this.getHorseJumpPower() * 100.0F)));
+	}
+
+	/**
+	 * + Sends the player's abilities to the server (if there is one).
+	 */
+	public void sendPlayerAbilities() {
+		this.sendQueue.addToSendQueue(new C13PacketPlayerAbilities(this.capabilities));
+	}
+
+	public void setClientBrand(String brand) {
+		this.clientBrand = brand;
+	}
+
+	/**
+	 * + Updates health locally.
+	 */
+	public void setPlayerSPHealth(float health) {
+		if (this.hasValidHealth) {
+			float f = this.getHealth() - health;
+			if (f <= 0.0F) {
+				this.setHealth(health);
+				if (f < 0.0F) {
+					this.hurtResistantTime = this.maxHurtResistantTime / 2;
+				}
+			} else {
+				this.lastDamage = f;
+				this.setHealth(this.getHealth());
+				this.hurtResistantTime = this.maxHurtResistantTime;
+				this.damageEntity(DamageSource.generic, f);
+				this.hurtTime = this.maxHurtTime = 10;
+			}
+		} else {
+			this.setHealth(health);
+			this.hasValidHealth = true;
+		}
+
+	}
+
+	/**
+	 * + Set sprinting switch for Entity.
+	 */
+	public void setSprinting(boolean sprinting) {
+		super.setSprinting(sprinting);
+		this.sprintingTicksLeft = sprinting ? 600 : 0;
+	}
+
+	/**
+	 * + Sets the current XP, total XP, and level number.
+	 */
+	public void setXPStats(float currentXP, int maxXP, int level) {
+		this.experience = currentXP;
+		this.experienceTotal = maxXP;
+		this.experienceLevel = level;
+	}
+
+	/**
+	 * + Swings the item the player is holding.
+	 */
+	public void swingItem() {
+		super.swingItem();
+		this.sendQueue.addToSendQueue(new C0APacketAnimation());
+	}
+
+	public void updateEntityActionState() {
+		super.updateEntityActionState();
+		if (this.isCurrentViewEntity()) {
+			this.moveStrafing = this.movementInput.moveStrafe;
+			this.moveForward = this.movementInput.moveForward;
+			this.isJumping = this.movementInput.jump;
+			this.prevRenderArmYaw = this.renderArmYaw;
+			this.prevRenderArmPitch = this.renderArmPitch;
+			this.renderArmPitch = (float) ((double) this.renderArmPitch
+					+ (double) (this.rotationPitch - this.renderArmPitch) * 0.5D);
+			this.renderArmYaw = (float) ((double) this.renderArmYaw
+					+ (double) (this.rotationYaw - this.renderArmYaw) * 0.5D);
 		}
 
 	}

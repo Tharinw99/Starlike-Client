@@ -66,6 +66,222 @@ import com.google.common.annotations.GwtIncompatible;
 @GwtCompatible(emulated = true)
 public abstract class CharMatcher implements Predicate<Character> {
 
+	private static class And extends CharMatcher {
+		final CharMatcher first;
+		final CharMatcher second;
+
+		And(CharMatcher a, CharMatcher b) {
+			this(a, b, "CharMatcher.and(" + a + ", " + b + ")");
+		}
+
+		And(CharMatcher a, CharMatcher b, String description) {
+			super(description);
+			first = checkNotNull(a);
+			second = checkNotNull(b);
+		}
+
+		@Override
+		public boolean matches(char c) {
+			return first.matches(c) && second.matches(c);
+		}
+
+		@GwtIncompatible("java.util.BitSet")
+		@Override
+		void setBits(BitSet table) {
+			BitSet tmp1 = new BitSet();
+			first.setBits(tmp1);
+			BitSet tmp2 = new BitSet();
+			second.setBits(tmp2);
+			tmp1.and(tmp2);
+			table.or(tmp1);
+		}
+
+		@Override
+		CharMatcher withToString(String description) {
+			return new And(first, second, description);
+		}
+	}
+
+	@GwtIncompatible("java.util.BitSet")
+	private static class BitSetMatcher extends FastMatcher {
+		private final BitSet table;
+
+		private BitSetMatcher(BitSet table, String description) {
+			super(description);
+			if (table.length() + Long.SIZE < table.size()) {
+				table = (BitSet) table.clone();
+				// If only we could actually call BitSet.trimToSize() ourselves...
+			}
+			this.table = table;
+		}
+
+		@Override
+		public boolean matches(char c) {
+			return table.get(c);
+		}
+
+		@Override
+		void setBits(BitSet bitSet) {
+			bitSet.or(table);
+		}
+	}
+
+	/**
+	 * A matcher for which precomputation will not yield any significant benefit.
+	 */
+	abstract static class FastMatcher extends CharMatcher {
+		FastMatcher() {
+			super();
+		}
+
+		FastMatcher(String description) {
+			super(description);
+		}
+
+		@Override
+		public CharMatcher negate() {
+			return new NegatedFastMatcher(this);
+		}
+
+		@Override
+		public final CharMatcher precomputed() {
+			return this;
+		}
+	}
+
+	static final class NegatedFastMatcher extends NegatedMatcher {
+		NegatedFastMatcher(CharMatcher original) {
+			super(original);
+		}
+
+		NegatedFastMatcher(String toString, CharMatcher original) {
+			super(toString, original);
+		}
+
+		@Override
+		public final CharMatcher precomputed() {
+			return this;
+		}
+
+		@Override
+		CharMatcher withToString(String description) {
+			return new NegatedFastMatcher(description, original);
+		}
+	}
+
+	private static class NegatedMatcher extends CharMatcher {
+		final CharMatcher original;
+
+		NegatedMatcher(CharMatcher original) {
+			this(original + ".negate()", original);
+		}
+
+		NegatedMatcher(String toString, CharMatcher original) {
+			super(toString);
+			this.original = original;
+		}
+
+		@Override
+		public int countIn(CharSequence sequence) {
+			return sequence.length() - original.countIn(sequence);
+		}
+
+		@Override
+		public boolean matches(char c) {
+			return !original.matches(c);
+		}
+
+		@Override
+		public boolean matchesAllOf(CharSequence sequence) {
+			return original.matchesNoneOf(sequence);
+		}
+
+		@Override
+		public boolean matchesNoneOf(CharSequence sequence) {
+			return original.matchesAllOf(sequence);
+		}
+
+		@Override
+		public CharMatcher negate() {
+			return original;
+		}
+
+		@GwtIncompatible("java.util.BitSet")
+		@Override
+		void setBits(BitSet table) {
+			BitSet tmp = new BitSet();
+			original.setBits(tmp);
+			tmp.flip(Character.MIN_VALUE, Character.MAX_VALUE + 1);
+			table.or(tmp);
+		}
+
+		@Override
+		CharMatcher withToString(String description) {
+			return new NegatedMatcher(description, original);
+		}
+	}
+
+	private static class Or extends CharMatcher {
+		final CharMatcher first;
+		final CharMatcher second;
+
+		Or(CharMatcher a, CharMatcher b) {
+			this(a, b, "CharMatcher.or(" + a + ", " + b + ")");
+		}
+
+		Or(CharMatcher a, CharMatcher b, String description) {
+			super(description);
+			first = checkNotNull(a);
+			second = checkNotNull(b);
+		}
+
+		@Override
+		public boolean matches(char c) {
+			return first.matches(c) || second.matches(c);
+		}
+
+		@GwtIncompatible("java.util.BitSet")
+		@Override
+		void setBits(BitSet table) {
+			first.setBits(table);
+			second.setBits(table);
+		}
+
+		@Override
+		CharMatcher withToString(String description) {
+			return new Or(first, second, description);
+		}
+	}
+
+	private static class RangesMatcher extends CharMatcher {
+		private final char[] rangeStarts;
+		private final char[] rangeEnds;
+
+		RangesMatcher(String description, char[] rangeStarts, char[] rangeEnds) {
+			super(description);
+			this.rangeStarts = rangeStarts;
+			this.rangeEnds = rangeEnds;
+			checkArgument(rangeStarts.length == rangeEnds.length);
+			for (int i = 0; i < rangeStarts.length; i++) {
+				checkArgument(rangeStarts[i] <= rangeEnds[i]);
+				if (i + 1 < rangeStarts.length) {
+					checkArgument(rangeEnds[i] < rangeStarts[i + 1]);
+				}
+			}
+		}
+
+		@Override
+		public boolean matches(char c) {
+			int index = Arrays.binarySearch(rangeStarts, c);
+			if (index >= 0) {
+				return true;
+			} else {
+				index = ~index - 1;
+				return index >= 0 && c <= rangeEnds[index];
+			}
+		}
+	}
+
 	// Constants
 	/**
 	 * Determines whether a character is a breaking whitespace (that is, a
@@ -110,41 +326,13 @@ public abstract class CharMatcher implements Predicate<Character> {
 	 */
 	public static final CharMatcher ASCII = inRange('\0', '\u007f', "CharMatcher.ASCII");
 
-	private static class RangesMatcher extends CharMatcher {
-		private final char[] rangeStarts;
-		private final char[] rangeEnds;
-
-		RangesMatcher(String description, char[] rangeStarts, char[] rangeEnds) {
-			super(description);
-			this.rangeStarts = rangeStarts;
-			this.rangeEnds = rangeEnds;
-			checkArgument(rangeStarts.length == rangeEnds.length);
-			for (int i = 0; i < rangeStarts.length; i++) {
-				checkArgument(rangeStarts[i] <= rangeEnds[i]);
-				if (i + 1 < rangeStarts.length) {
-					checkArgument(rangeEnds[i] < rangeStarts[i + 1]);
-				}
-			}
-		}
-
-		@Override
-		public boolean matches(char c) {
-			int index = Arrays.binarySearch(rangeStarts, c);
-			if (index >= 0) {
-				return true;
-			} else {
-				index = ~index - 1;
-				return index >= 0 && c <= rangeEnds[index];
-			}
-		}
-	}
-
 	// Must be in ascending order.
 	private static final String ZEROES = new String(new char[] { '0', 0x0660, 0x06f0, 0x07c0, 0x0966, 0x09e6, 0x0a66,
 			0x0ae6, 0x0b66, 0x0be6, 0x0c66, 0x0ce6, 0x0d66, 0x0e50, 0x0ed0, 0x0f20, 0x1040, 0x1090, 0x17e0, 0x1810,
 			0x1946, 0x19d0, 0x1b50, 0x1bb0, 0x1c40, 0x1c50, 0xa620, 0xa8d0, 0xa900, 0xaa50, 0xff10 });
 
 	private static final String NINES;
+
 	static {
 		StringBuilder builder = new StringBuilder(ZEROES.length());
 		for (int i = 0; i < ZEROES.length(); i++) {
@@ -221,6 +409,8 @@ public abstract class CharMatcher implements Predicate<Character> {
 		}
 	};
 
+	// Static factories
+
 	/**
 	 * Determines whether a character is an ISO control character as specified by
 	 * {@link Character#isISOControl(char)}.
@@ -239,17 +429,6 @@ public abstract class CharMatcher implements Predicate<Character> {
 			new char[] { 0x0020, 0x00a0, 0x00ad, 0x0604, 0x061c, 0x06dd, 0x070f, 0x1680, 0x180e, 0x200f, 0x202f, 0x2064,
 					0x2066, 0x2067, 0x2068, 0x2069, 0x206f, 0x3000, 0xf8ff, 0xfeff, 0xfff9, 0xfffb });
 
-	private static String showCharacter(char c) {
-		String hex = "0123456789ABCDEF";
-		char[] tmp = { '\\', 'u', '\0', '\0', '\0', '\0' };
-		for (int i = 0; i < 4; i++) {
-			tmp[5 - i] = hex.charAt(c & 0xF);
-			c >>= 4;
-		}
-		return String.copyValueOf(tmp);
-
-	}
-
 	/**
 	 * Determines whether a character is single-width (not double-width). When in
 	 * doubt, this matcher errs on the side of returning {@code false} (that is, it
@@ -260,14 +439,26 @@ public abstract class CharMatcher implements Predicate<Character> {
 	 * keep it up to date.
 	 */
 	public static final CharMatcher SINGLE_WIDTH = new RangesMatcher("CharMatcher.SINGLE_WIDTH",
-			new char[] { 0x0000, 0x05be, 0x05d0, 0x05f3, 0x0600, 0x0750, 0x0e00, 0x1e00, 0x2100, 0xfb50, 0xfe70, 0xff61 },
-			new char[] { 0x04f9, 0x05be, 0x05ea, 0x05f4, 0x06ff, 0x077f, 0x0e7f, 0x20af, 0x213a, 0xfdff, 0xfeff, 0xffdc });
+			new char[] { 0x0000, 0x05be, 0x05d0, 0x05f3, 0x0600, 0x0750, 0x0e00, 0x1e00, 0x2100, 0xfb50, 0xfe70,
+					0xff61 },
+			new char[] { 0x04f9, 0x05be, 0x05ea, 0x05f4, 0x06ff, 0x077f, 0x0e7f, 0x20af, 0x213a, 0xfdff, 0xfeff,
+					0xffdc });
 
 	/** Matches any character. */
 	public static final CharMatcher ANY = new FastMatcher("CharMatcher.ANY") {
 		@Override
-		public boolean matches(char c) {
-			return true;
+		public CharMatcher and(CharMatcher other) {
+			return checkNotNull(other);
+		}
+
+		@Override
+		public String collapseFrom(CharSequence sequence, char replacement) {
+			return (sequence.length() == 0) ? "" : String.valueOf(replacement);
+		}
+
+		@Override
+		public int countIn(CharSequence sequence) {
+			return sequence.length();
 		}
 
 		@Override
@@ -288,6 +479,11 @@ public abstract class CharMatcher implements Predicate<Character> {
 		}
 
 		@Override
+		public boolean matches(char c) {
+			return true;
+		}
+
+		@Override
 		public boolean matchesAllOf(CharSequence sequence) {
 			checkNotNull(sequence);
 			return true;
@@ -296,6 +492,17 @@ public abstract class CharMatcher implements Predicate<Character> {
 		@Override
 		public boolean matchesNoneOf(CharSequence sequence) {
 			return sequence.length() == 0;
+		}
+
+		@Override
+		public CharMatcher negate() {
+			return NONE;
+		}
+
+		@Override
+		public CharMatcher or(CharMatcher other) {
+			checkNotNull(other);
+			return this;
 		}
 
 		@Override
@@ -321,43 +528,29 @@ public abstract class CharMatcher implements Predicate<Character> {
 		}
 
 		@Override
-		public String collapseFrom(CharSequence sequence, char replacement) {
-			return (sequence.length() == 0) ? "" : String.valueOf(replacement);
-		}
-
-		@Override
 		public String trimFrom(CharSequence sequence) {
 			checkNotNull(sequence);
 			return "";
-		}
-
-		@Override
-		public int countIn(CharSequence sequence) {
-			return sequence.length();
-		}
-
-		@Override
-		public CharMatcher and(CharMatcher other) {
-			return checkNotNull(other);
-		}
-
-		@Override
-		public CharMatcher or(CharMatcher other) {
-			checkNotNull(other);
-			return this;
-		}
-
-		@Override
-		public CharMatcher negate() {
-			return NONE;
 		}
 	};
 
 	/** Matches no characters. */
 	public static final CharMatcher NONE = new FastMatcher("CharMatcher.NONE") {
 		@Override
-		public boolean matches(char c) {
-			return false;
+		public CharMatcher and(CharMatcher other) {
+			checkNotNull(other);
+			return this;
+		}
+
+		@Override
+		public String collapseFrom(CharSequence sequence, char replacement) {
+			return sequence.toString();
+		}
+
+		@Override
+		public int countIn(CharSequence sequence) {
+			checkNotNull(sequence);
+			return 0;
 		}
 
 		@Override
@@ -380,6 +573,11 @@ public abstract class CharMatcher implements Predicate<Character> {
 		}
 
 		@Override
+		public boolean matches(char c) {
+			return false;
+		}
+
+		@Override
 		public boolean matchesAllOf(CharSequence sequence) {
 			return sequence.length() == 0;
 		}
@@ -388,6 +586,16 @@ public abstract class CharMatcher implements Predicate<Character> {
 		public boolean matchesNoneOf(CharSequence sequence) {
 			checkNotNull(sequence);
 			return true;
+		}
+
+		@Override
+		public CharMatcher negate() {
+			return ANY;
+		}
+
+		@Override
+		public CharMatcher or(CharMatcher other) {
+			return checkNotNull(other);
 		}
 
 		@Override
@@ -407,11 +615,6 @@ public abstract class CharMatcher implements Predicate<Character> {
 		}
 
 		@Override
-		public String collapseFrom(CharSequence sequence, char replacement) {
-			return sequence.toString();
-		}
-
-		@Override
 		public String trimFrom(CharSequence sequence) {
 			return sequence.toString();
 		}
@@ -425,109 +628,46 @@ public abstract class CharMatcher implements Predicate<Character> {
 		public String trimTrailingFrom(CharSequence sequence) {
 			return sequence.toString();
 		}
-
-		@Override
-		public int countIn(CharSequence sequence) {
-			checkNotNull(sequence);
-			return 0;
-		}
-
-		@Override
-		public CharMatcher and(CharMatcher other) {
-			checkNotNull(other);
-			return this;
-		}
-
-		@Override
-		public CharMatcher or(CharMatcher other) {
-			return checkNotNull(other);
-		}
-
-		@Override
-		public CharMatcher negate() {
-			return ANY;
-		}
 	};
 
-	// Static factories
+	private static final int DISTINCT_CHARS = Character.MAX_VALUE - Character.MIN_VALUE + 1;
+
+	static final String WHITESPACE_TABLE = new String(new char[] { 0x2002, 0x3000, '\r', 0x0085, 0x200A, 0x2005, 0x2000,
+			0x3000, 0x2029, 0x000B, 0x3000, 0x2008, 0x2003, 0x205F, 0x3000, 0x1680, 0x0009, 0x0020, 0x2006, 0x2001,
+			0x202F, 0x00A0, 0x000C, 0x2009, 0x3000, 0x2004, 0x3000, 0x3000, 0x2028, '\n', 0x2007, 0x3000 });
+
+	static final int WHITESPACE_MULTIPLIER = 1682554634;
+
+	static final int WHITESPACE_SHIFT = Integer.numberOfLeadingZeros(WHITESPACE_TABLE.length() - 1);
+
+	// Constructors
 
 	/**
-	 * Returns a {@code char} matcher that matches only one specified character.
-	 */
-	public static CharMatcher is(final char match) {
-		String description = "CharMatcher.is('" + showCharacter(match) + "')";
-		return new FastMatcher(description) {
-			@Override
-			public boolean matches(char c) {
-				return c == match;
-			}
-
-			@Override
-			public String replaceFrom(CharSequence sequence, char replacement) {
-				return sequence.toString().replace(match, replacement);
-			}
-
-			@Override
-			public CharMatcher and(CharMatcher other) {
-				return other.matches(match) ? this : NONE;
-			}
-
-			@Override
-			public CharMatcher or(CharMatcher other) {
-				return other.matches(match) ? other : super.or(other);
-			}
-
-			@Override
-			public CharMatcher negate() {
-				return isNot(match);
-			}
-
-			@GwtIncompatible("java.util.BitSet")
-			@Override
-			void setBits(BitSet table) {
-				table.set(match);
-			}
-		};
-	}
-
-	/**
-	 * Returns a {@code char} matcher that matches any character except the one
-	 * specified.
+	 * Determines whether a character is whitespace according to the latest Unicode
+	 * standard, as illustrated <a href=
+	 * "http://unicode.org/cldr/utility/list-unicodeset.jsp?a=%5Cp%7Bwhitespace%7D">here</a>.
+	 * This is not the same definition used by other Java APIs. (See a <a href=
+	 * "http://spreadsheets.google.com/pub?key=pd8dAQyHbdewRsnE5x5GzKQ">comparison
+	 * of several definitions of "whitespace"</a>.)
 	 *
 	 * <p>
-	 * To negate another {@code CharMatcher}, use {@link #negate()}.
+	 * <b>Note:</b> as the Unicode definition evolves, we will modify this constant
+	 * to keep it up to date.
 	 */
-	public static CharMatcher isNot(final char match) {
-		String description = "CharMatcher.isNot('" + showCharacter(match) + "')";
-		return new FastMatcher(description) {
-			@Override
-			public boolean matches(char c) {
-				return c != match;
-			}
+	public static final CharMatcher WHITESPACE = new FastMatcher("WHITESPACE") {
+		@Override
+		public boolean matches(char c) {
+			return WHITESPACE_TABLE.charAt((WHITESPACE_MULTIPLIER * c) >>> WHITESPACE_SHIFT) == c;
+		}
 
-			@Override
-			public CharMatcher and(CharMatcher other) {
-				return other.matches(match) ? super.and(other) : other;
+		@GwtIncompatible("java.util.BitSet")
+		@Override
+		void setBits(BitSet table) {
+			for (int i = 0; i < WHITESPACE_TABLE.length(); i++) {
+				table.set(WHITESPACE_TABLE.charAt(i));
 			}
-
-			@Override
-			public CharMatcher or(CharMatcher other) {
-				return other.matches(match) ? ANY : this;
-			}
-
-			@GwtIncompatible("java.util.BitSet")
-			@Override
-			void setBits(BitSet table) {
-				table.set(0, match);
-				table.set(match + 1, Character.MAX_VALUE + 1);
-			}
-
-			@Override
-			public CharMatcher negate() {
-				return is(match);
-			}
-		};
-	}
+		}
+	};
 
 	/**
 	 * Returns a {@code char} matcher that matches any character present in the
@@ -569,30 +709,33 @@ public abstract class CharMatcher implements Predicate<Character> {
 		};
 	}
 
-	private static CharMatcher isEither(final char match1, final char match2) {
-		String description = "CharMatcher.anyOf(\"" + showCharacter(match1) + showCharacter(match2) + "\")";
-		return new FastMatcher(description) {
+	// Abstract methods
+
+	/**
+	 * Returns a matcher with identical behavior to the given
+	 * {@link Character}-based predicate, but which operates on primitive
+	 * {@code char} instances instead.
+	 */
+	public static CharMatcher forPredicate(final Predicate<? super Character> predicate) {
+		checkNotNull(predicate);
+		if (predicate instanceof CharMatcher) {
+			return (CharMatcher) predicate;
+		}
+		String description = "CharMatcher.forPredicate(" + predicate + ")";
+		return new CharMatcher(description) {
 			@Override
-			public boolean matches(char c) {
-				return c == match1 || c == match2;
+			public boolean apply(Character character) {
+				return predicate.apply(checkNotNull(character));
 			}
 
-			@GwtIncompatible("java.util.BitSet")
 			@Override
-			void setBits(BitSet table) {
-				table.set(match1);
-				table.set(match2);
+			public boolean matches(char c) {
+				return predicate.apply(c);
 			}
 		};
 	}
 
-	/**
-	 * Returns a {@code char} matcher that matches any character not present in the
-	 * given character sequence.
-	 */
-	public static CharMatcher noneOf(CharSequence sequence) {
-		return anyOf(sequence).negate();
-	}
+	// Non-static factories
 
 	/**
 	 * Returns a {@code char} matcher that matches any character in a given range
@@ -625,303 +768,112 @@ public abstract class CharMatcher implements Predicate<Character> {
 	}
 
 	/**
-	 * Returns a matcher with identical behavior to the given
-	 * {@link Character}-based predicate, but which operates on primitive
-	 * {@code char} instances instead.
+	 * Returns a {@code char} matcher that matches only one specified character.
 	 */
-	public static CharMatcher forPredicate(final Predicate<? super Character> predicate) {
-		checkNotNull(predicate);
-		if (predicate instanceof CharMatcher) {
-			return (CharMatcher) predicate;
-		}
-		String description = "CharMatcher.forPredicate(" + predicate + ")";
-		return new CharMatcher(description) {
+	public static CharMatcher is(final char match) {
+		String description = "CharMatcher.is('" + showCharacter(match) + "')";
+		return new FastMatcher(description) {
 			@Override
-			public boolean matches(char c) {
-				return predicate.apply(c);
+			public CharMatcher and(CharMatcher other) {
+				return other.matches(match) ? this : NONE;
 			}
 
 			@Override
-			public boolean apply(Character character) {
-				return predicate.apply(checkNotNull(character));
+			public boolean matches(char c) {
+				return c == match;
+			}
+
+			@Override
+			public CharMatcher negate() {
+				return isNot(match);
+			}
+
+			@Override
+			public CharMatcher or(CharMatcher other) {
+				return other.matches(match) ? other : super.or(other);
+			}
+
+			@Override
+			public String replaceFrom(CharSequence sequence, char replacement) {
+				return sequence.toString().replace(match, replacement);
+			}
+
+			@GwtIncompatible("java.util.BitSet")
+			@Override
+			void setBits(BitSet table) {
+				table.set(match);
 			}
 		};
 	}
 
-	// State
-	final String description;
+	private static CharMatcher isEither(final char match1, final char match2) {
+		String description = "CharMatcher.anyOf(\"" + showCharacter(match1) + showCharacter(match2) + "\")";
+		return new FastMatcher(description) {
+			@Override
+			public boolean matches(char c) {
+				return c == match1 || c == match2;
+			}
 
-	// Constructors
-
-	/**
-	 * Sets the {@code toString()} from the given description.
-	 */
-	CharMatcher(String description) {
-		this.description = description;
+			@GwtIncompatible("java.util.BitSet")
+			@Override
+			void setBits(BitSet table) {
+				table.set(match1);
+				table.set(match2);
+			}
+		};
 	}
 
 	/**
-	 * Constructor for use by subclasses. When subclassing, you may want to override
-	 * {@code toString()} to provide a useful description.
-	 */
-	protected CharMatcher() {
-		description = super.toString();
-	}
-
-	// Abstract methods
-
-	/** Determines a true or false value for the given character. */
-	public abstract boolean matches(char c);
-
-	// Non-static factories
-
-	/**
-	 * Returns a matcher that matches any character not matched by this matcher.
-	 */
-	public CharMatcher negate() {
-		return new NegatedMatcher(this);
-	}
-
-	private static class NegatedMatcher extends CharMatcher {
-		final CharMatcher original;
-
-		NegatedMatcher(String toString, CharMatcher original) {
-			super(toString);
-			this.original = original;
-		}
-
-		NegatedMatcher(CharMatcher original) {
-			this(original + ".negate()", original);
-		}
-
-		@Override
-		public boolean matches(char c) {
-			return !original.matches(c);
-		}
-
-		@Override
-		public boolean matchesAllOf(CharSequence sequence) {
-			return original.matchesNoneOf(sequence);
-		}
-
-		@Override
-		public boolean matchesNoneOf(CharSequence sequence) {
-			return original.matchesAllOf(sequence);
-		}
-
-		@Override
-		public int countIn(CharSequence sequence) {
-			return sequence.length() - original.countIn(sequence);
-		}
-
-		@GwtIncompatible("java.util.BitSet")
-		@Override
-		void setBits(BitSet table) {
-			BitSet tmp = new BitSet();
-			original.setBits(tmp);
-			tmp.flip(Character.MIN_VALUE, Character.MAX_VALUE + 1);
-			table.or(tmp);
-		}
-
-		@Override
-		public CharMatcher negate() {
-			return original;
-		}
-
-		@Override
-		CharMatcher withToString(String description) {
-			return new NegatedMatcher(description, original);
-		}
-	}
-
-	/**
-	 * Returns a matcher that matches any character matched by both this matcher and
-	 * {@code other}.
-	 */
-	public CharMatcher and(CharMatcher other) {
-		return new And(this, checkNotNull(other));
-	}
-
-	private static class And extends CharMatcher {
-		final CharMatcher first;
-		final CharMatcher second;
-
-		And(CharMatcher a, CharMatcher b) {
-			this(a, b, "CharMatcher.and(" + a + ", " + b + ")");
-		}
-
-		And(CharMatcher a, CharMatcher b, String description) {
-			super(description);
-			first = checkNotNull(a);
-			second = checkNotNull(b);
-		}
-
-		@Override
-		public boolean matches(char c) {
-			return first.matches(c) && second.matches(c);
-		}
-
-		@GwtIncompatible("java.util.BitSet")
-		@Override
-		void setBits(BitSet table) {
-			BitSet tmp1 = new BitSet();
-			first.setBits(tmp1);
-			BitSet tmp2 = new BitSet();
-			second.setBits(tmp2);
-			tmp1.and(tmp2);
-			table.or(tmp1);
-		}
-
-		@Override
-		CharMatcher withToString(String description) {
-			return new And(first, second, description);
-		}
-	}
-
-	/**
-	 * Returns a matcher that matches any character matched by either this matcher
-	 * or {@code other}.
-	 */
-	public CharMatcher or(CharMatcher other) {
-		return new Or(this, checkNotNull(other));
-	}
-
-	private static class Or extends CharMatcher {
-		final CharMatcher first;
-		final CharMatcher second;
-
-		Or(CharMatcher a, CharMatcher b, String description) {
-			super(description);
-			first = checkNotNull(a);
-			second = checkNotNull(b);
-		}
-
-		Or(CharMatcher a, CharMatcher b) {
-			this(a, b, "CharMatcher.or(" + a + ", " + b + ")");
-		}
-
-		@GwtIncompatible("java.util.BitSet")
-		@Override
-		void setBits(BitSet table) {
-			first.setBits(table);
-			second.setBits(table);
-		}
-
-		@Override
-		public boolean matches(char c) {
-			return first.matches(c) || second.matches(c);
-		}
-
-		@Override
-		CharMatcher withToString(String description) {
-			return new Or(first, second, description);
-		}
-	}
-
-	/**
-	 * Returns a {@code char} matcher functionally equivalent to this one, but which
-	 * may be faster to query than the original; your mileage may vary.
-	 * Precomputation takes time and is likely to be worthwhile only if the
-	 * precomputed matcher is queried many thousands of times.
+	 * Returns a {@code char} matcher that matches any character except the one
+	 * specified.
 	 *
 	 * <p>
-	 * This method has no effect (returns {@code this}) when called in GWT: it's
-	 * unclear whether a precomputed matcher is faster, but it certainly consumes
-	 * more memory, which doesn't seem like a worthwhile tradeoff in a browser.
+	 * To negate another {@code CharMatcher}, use {@link #negate()}.
 	 */
-	public CharMatcher precomputed() {
-		return Platform.precomputeCharMatcher(this);
+	public static CharMatcher isNot(final char match) {
+		String description = "CharMatcher.isNot('" + showCharacter(match) + "')";
+		return new FastMatcher(description) {
+			@Override
+			public CharMatcher and(CharMatcher other) {
+				return other.matches(match) ? super.and(other) : other;
+			}
+
+			@Override
+			public boolean matches(char c) {
+				return c != match;
+			}
+
+			@Override
+			public CharMatcher negate() {
+				return is(match);
+			}
+
+			@Override
+			public CharMatcher or(CharMatcher other) {
+				return other.matches(match) ? ANY : this;
+			}
+
+			@GwtIncompatible("java.util.BitSet")
+			@Override
+			void setBits(BitSet table) {
+				table.set(0, match);
+				table.set(match + 1, Character.MAX_VALUE + 1);
+			}
+		};
+	}
+
+	@GwtIncompatible("SmallCharMatcher")
+	private static boolean isSmall(int totalCharacters, int tableLength) {
+		return totalCharacters <= SmallCharMatcher.MAX_SIZE && tableLength > (totalCharacters * 4 * Character.SIZE);
+		// err on the side of BitSetMatcher
 	}
 
 	/**
-	 * Subclasses should provide a new CharMatcher with the same characteristics as
-	 * {@code this}, but with their {@code toString} method overridden with the new
-	 * description.
-	 *
-	 * <p>
-	 * This is unsupported by default.
+	 * Returns a {@code char} matcher that matches any character not present in the
+	 * given character sequence.
 	 */
-	CharMatcher withToString(String description) {
-		throw new UnsupportedOperationException();
-	}
-
-	private static final int DISTINCT_CHARS = Character.MAX_VALUE - Character.MIN_VALUE + 1;
-
-	/**
-	 * This is the actual implementation of {@link #precomputed}, but we bounce
-	 * calls through a method on {@link Platform} so that we can have different
-	 * behavior in GWT.
-	 *
-	 * <p>
-	 * This implementation tries to be smart in a number of ways. It recognizes
-	 * cases where the negation is cheaper to precompute than the matcher itself; it
-	 * tries to build small hash tables for matchers that only match a few
-	 * characters, and so on. In the worst-case scenario, it constructs an
-	 * eight-kilobyte bit array and queries that. In many situations this produces a
-	 * matcher which is faster to query than the original.
-	 */
-	@GwtIncompatible("java.util.BitSet")
-	CharMatcher precomputedInternal() {
-		final BitSet table = new BitSet();
-		setBits(table);
-		int totalCharacters = table.cardinality();
-		if (totalCharacters * 2 <= DISTINCT_CHARS) {
-			return precomputedPositive(totalCharacters, table, description);
-		} else {
-			// TODO(user): is it worth it to worry about the last character of large
-			// matchers?
-			table.flip(Character.MIN_VALUE, Character.MAX_VALUE + 1);
-			int negatedCharacters = DISTINCT_CHARS - totalCharacters;
-			String suffix = ".negate()";
-			String negatedDescription = description.endsWith(suffix)
-					? description.substring(0, description.length() - suffix.length())
-					: description + suffix;
-			return new NegatedFastMatcher(toString(),
-					precomputedPositive(negatedCharacters, table, negatedDescription));
-		}
-	}
-
-	/**
-	 * A matcher for which precomputation will not yield any significant benefit.
-	 */
-	abstract static class FastMatcher extends CharMatcher {
-		FastMatcher() {
-			super();
-		}
-
-		FastMatcher(String description) {
-			super(description);
-		}
-
-		@Override
-		public final CharMatcher precomputed() {
-			return this;
-		}
-
-		@Override
-		public CharMatcher negate() {
-			return new NegatedFastMatcher(this);
-		}
-	}
-
-	static final class NegatedFastMatcher extends NegatedMatcher {
-		NegatedFastMatcher(CharMatcher original) {
-			super(original);
-		}
-
-		NegatedFastMatcher(String toString, CharMatcher original) {
-			super(toString, original);
-		}
-
-		@Override
-		public final CharMatcher precomputed() {
-			return this;
-		}
-
-		@Override
-		CharMatcher withToString(String description) {
-			return new NegatedFastMatcher(description, original);
-		}
+	public static CharMatcher noneOf(CharSequence sequence) {
+		return anyOf(sequence).negate();
 	}
 
 	/**
@@ -945,105 +897,129 @@ public abstract class CharMatcher implements Predicate<Character> {
 		}
 	}
 
-	@GwtIncompatible("SmallCharMatcher")
-	private static boolean isSmall(int totalCharacters, int tableLength) {
-		return totalCharacters <= SmallCharMatcher.MAX_SIZE && tableLength > (totalCharacters * 4 * Character.SIZE);
-		// err on the side of BitSetMatcher
+	private static String showCharacter(char c) {
+		String hex = "0123456789ABCDEF";
+		char[] tmp = { '\\', 'u', '\0', '\0', '\0', '\0' };
+		for (int i = 0; i < 4; i++) {
+			tmp[5 - i] = hex.charAt(c & 0xF);
+			c >>= 4;
+		}
+		return String.copyValueOf(tmp);
+
 	}
 
-	@GwtIncompatible("java.util.BitSet")
-	private static class BitSetMatcher extends FastMatcher {
-		private final BitSet table;
+	// State
+	final String description;
 
-		private BitSetMatcher(BitSet table, String description) {
-			super(description);
-			if (table.length() + Long.SIZE < table.size()) {
-				table = (BitSet) table.clone();
-				// If only we could actually call BitSet.trimToSize() ourselves...
-			}
-			this.table = table;
-		}
-
-		@Override
-		public boolean matches(char c) {
-			return table.get(c);
-		}
-
-		@Override
-		void setBits(BitSet bitSet) {
-			bitSet.or(table);
-		}
+	/**
+	 * Constructor for use by subclasses. When subclassing, you may want to override
+	 * {@code toString()} to provide a useful description.
+	 */
+	protected CharMatcher() {
+		description = super.toString();
 	}
 
 	/**
-	 * Sets bits in {@code table} matched by this matcher.
+	 * Sets the {@code toString()} from the given description.
 	 */
-	@GwtIncompatible("java.util.BitSet")
-	void setBits(BitSet table) {
-		for (int c = Character.MAX_VALUE; c >= Character.MIN_VALUE; c--) {
-			if (matches((char) c)) {
-				table.set(c);
+	CharMatcher(String description) {
+		this.description = description;
+	}
+
+	/**
+	 * Returns a matcher that matches any character matched by both this matcher and
+	 * {@code other}.
+	 */
+	public CharMatcher and(CharMatcher other) {
+		return new And(this, checkNotNull(other));
+	}
+
+	/**
+	 * @deprecated Provided only to satisfy the {@link Predicate} interface; use
+	 *             {@link #matches} instead.
+	 */
+	@Deprecated
+	@Override
+	public boolean apply(Character character) {
+		return matches(character);
+	}
+
+	/**
+	 * Returns a string copy of the input character sequence, with each group of
+	 * consecutive characters that match this matcher replaced by a single
+	 * replacement character. For example:
+	 * 
+	 * <pre>
+	 *    {@code
+	 *
+	 * CharMatcher.anyOf("eko").collapseFrom("bookkeeper", '-')
+	 * }
+	 * </pre>
+	 *
+	 * ... returns {@code "b-p-r"}.
+	 *
+	 * <p>
+	 * The default implementation uses {@link #indexIn(CharSequence)} to find the
+	 * first matching character, then iterates the remainder of the sequence calling
+	 * {@link #matches(char)} for each character.
+	 *
+	 * @param sequence    the character sequence to replace matching groups of
+	 *                    characters in
+	 * @param replacement the character to append to the result string in place of
+	 *                    each group of matching characters in {@code sequence}
+	 * @return the new string
+	 */
+	@CheckReturnValue
+	public String collapseFrom(CharSequence sequence, char replacement) {
+		// This implementation avoids unnecessary allocation.
+		int len = sequence.length();
+		for (int i = 0; i < len; i++) {
+			char c = sequence.charAt(i);
+			if (matches(c)) {
+				if (c == replacement && (i == len - 1 || !matches(sequence.charAt(i + 1)))) {
+					// a no-op replacement
+					i++;
+				} else {
+					StringBuilder builder = new StringBuilder(len).append(sequence.subSequence(0, i))
+							.append(replacement);
+					return finishCollapseFrom(sequence, i + 1, len, replacement, builder, true);
+				}
 			}
 		}
+		// no replacement needed
+		return sequence.toString();
+	}
+
+	/**
+	 * Returns the number of matching characters found in a character sequence.
+	 */
+	public int countIn(CharSequence sequence) {
+		int count = 0;
+		for (int i = 0; i < sequence.length(); i++) {
+			if (matches(sequence.charAt(i))) {
+				count++;
+			}
+		}
+		return count;
 	}
 
 	// Text processing routines
 
-	/**
-	 * Returns {@code true} if a character sequence contains at least one matching
-	 * character. Equivalent to {@code !matchesNoneOf(sequence)}.
-	 *
-	 * <p>
-	 * The default implementation iterates over the sequence, invoking
-	 * {@link #matches} for each character, until this returns {@code true} or the
-	 * end is reached.
-	 *
-	 * @param sequence the character sequence to examine, possibly empty
-	 * @return {@code true} if this matcher matches at least one character in the
-	 *         sequence
-	 * @since 8.0
-	 */
-	public boolean matchesAnyOf(CharSequence sequence) {
-		return !matchesNoneOf(sequence);
-	}
-
-	/**
-	 * Returns {@code true} if a character sequence contains only matching
-	 * characters.
-	 *
-	 * <p>
-	 * The default implementation iterates over the sequence, invoking
-	 * {@link #matches} for each character, until this returns {@code false} or the
-	 * end is reached.
-	 *
-	 * @param sequence the character sequence to examine, possibly empty
-	 * @return {@code true} if this matcher matches every character in the sequence,
-	 *         including when the sequence is empty
-	 */
-	public boolean matchesAllOf(CharSequence sequence) {
-		for (int i = sequence.length() - 1; i >= 0; i--) {
-			if (!matches(sequence.charAt(i))) {
-				return false;
+	private String finishCollapseFrom(CharSequence sequence, int start, int end, char replacement,
+			StringBuilder builder, boolean inMatchingGroup) {
+		for (int i = start; i < end; i++) {
+			char c = sequence.charAt(i);
+			if (matches(c)) {
+				if (!inMatchingGroup) {
+					builder.append(replacement);
+					inMatchingGroup = true;
+				}
+			} else {
+				builder.append(c);
+				inMatchingGroup = false;
 			}
 		}
-		return true;
-	}
-
-	/**
-	 * Returns {@code true} if a character sequence contains no matching characters.
-	 * Equivalent to {@code !matchesAnyOf(sequence)}.
-	 *
-	 * <p>
-	 * The default implementation iterates over the sequence, invoking
-	 * {@link #matches} for each character, until this returns {@code false} or the
-	 * end is reached.
-	 *
-	 * @param sequence the character sequence to examine, possibly empty
-	 * @return {@code true} if this matcher matches every character in the sequence,
-	 *         including when the sequence is empty
-	 */
-	public boolean matchesNoneOf(CharSequence sequence) {
-		return indexIn(sequence) == -1;
+		return builder.toString();
 	}
 
 	/**
@@ -1117,17 +1093,128 @@ public abstract class CharMatcher implements Predicate<Character> {
 		return -1;
 	}
 
+	/** Determines a true or false value for the given character. */
+	public abstract boolean matches(char c);
+
 	/**
-	 * Returns the number of matching characters found in a character sequence.
+	 * Returns {@code true} if a character sequence contains only matching
+	 * characters.
+	 *
+	 * <p>
+	 * The default implementation iterates over the sequence, invoking
+	 * {@link #matches} for each character, until this returns {@code false} or the
+	 * end is reached.
+	 *
+	 * @param sequence the character sequence to examine, possibly empty
+	 * @return {@code true} if this matcher matches every character in the sequence,
+	 *         including when the sequence is empty
 	 */
-	public int countIn(CharSequence sequence) {
-		int count = 0;
-		for (int i = 0; i < sequence.length(); i++) {
-			if (matches(sequence.charAt(i))) {
-				count++;
+	public boolean matchesAllOf(CharSequence sequence) {
+		for (int i = sequence.length() - 1; i >= 0; i--) {
+			if (!matches(sequence.charAt(i))) {
+				return false;
 			}
 		}
-		return count;
+		return true;
+	}
+
+	/**
+	 * Returns {@code true} if a character sequence contains at least one matching
+	 * character. Equivalent to {@code !matchesNoneOf(sequence)}.
+	 *
+	 * <p>
+	 * The default implementation iterates over the sequence, invoking
+	 * {@link #matches} for each character, until this returns {@code true} or the
+	 * end is reached.
+	 *
+	 * @param sequence the character sequence to examine, possibly empty
+	 * @return {@code true} if this matcher matches at least one character in the
+	 *         sequence
+	 * @since 8.0
+	 */
+	public boolean matchesAnyOf(CharSequence sequence) {
+		return !matchesNoneOf(sequence);
+	}
+
+	/**
+	 * Returns {@code true} if a character sequence contains no matching characters.
+	 * Equivalent to {@code !matchesAnyOf(sequence)}.
+	 *
+	 * <p>
+	 * The default implementation iterates over the sequence, invoking
+	 * {@link #matches} for each character, until this returns {@code false} or the
+	 * end is reached.
+	 *
+	 * @param sequence the character sequence to examine, possibly empty
+	 * @return {@code true} if this matcher matches every character in the sequence,
+	 *         including when the sequence is empty
+	 */
+	public boolean matchesNoneOf(CharSequence sequence) {
+		return indexIn(sequence) == -1;
+	}
+
+	/**
+	 * Returns a matcher that matches any character not matched by this matcher.
+	 */
+	public CharMatcher negate() {
+		return new NegatedMatcher(this);
+	}
+
+	/**
+	 * Returns a matcher that matches any character matched by either this matcher
+	 * or {@code other}.
+	 */
+	public CharMatcher or(CharMatcher other) {
+		return new Or(this, checkNotNull(other));
+	}
+
+	/**
+	 * Returns a {@code char} matcher functionally equivalent to this one, but which
+	 * may be faster to query than the original; your mileage may vary.
+	 * Precomputation takes time and is likely to be worthwhile only if the
+	 * precomputed matcher is queried many thousands of times.
+	 *
+	 * <p>
+	 * This method has no effect (returns {@code this}) when called in GWT: it's
+	 * unclear whether a precomputed matcher is faster, but it certainly consumes
+	 * more memory, which doesn't seem like a worthwhile tradeoff in a browser.
+	 */
+	public CharMatcher precomputed() {
+		return Platform.precomputeCharMatcher(this);
+	}
+
+	/**
+	 * This is the actual implementation of {@link #precomputed}, but we bounce
+	 * calls through a method on {@link Platform} so that we can have different
+	 * behavior in GWT.
+	 *
+	 * <p>
+	 * This implementation tries to be smart in a number of ways. It recognizes
+	 * cases where the negation is cheaper to precompute than the matcher itself; it
+	 * tries to build small hash tables for matchers that only match a few
+	 * characters, and so on. In the worst-case scenario, it constructs an
+	 * eight-kilobyte bit array and queries that. In many situations this produces a
+	 * matcher which is faster to query than the original.
+	 */
+	@GwtIncompatible("java.util.BitSet")
+	CharMatcher precomputedInternal() {
+		final BitSet table = new BitSet();
+		setBits(table);
+		int totalCharacters = table.cardinality();
+		if (totalCharacters * 2 <= DISTINCT_CHARS) {
+			return precomputedPositive(totalCharacters, table, description);
+		} else {
+			// TODO(user): is it worth it to worry about the last character of large
+			// matchers?
+			table.flip(Character.MIN_VALUE, Character.MAX_VALUE + 1);
+			int negatedCharacters = DISTINCT_CHARS - totalCharacters;
+			String suffix = ".negate()";
+			String negatedDescription = description.endsWith(suffix)
+					? description.substring(0, description.length() - suffix.length())
+					: description + suffix;
+			return new NegatedFastMatcher(toString(),
+					precomputedPositive(negatedCharacters, table, negatedDescription));
+		}
 	}
 
 	/**
@@ -1137,7 +1224,8 @@ public abstract class CharMatcher implements Predicate<Character> {
 	 * <pre>
 	 *    {@code
 	 *
-	 *   CharMatcher.is('a').removeFrom("bazaar")}
+	 * CharMatcher.is('a').removeFrom("bazaar")
+	 * }
 	 * </pre>
 	 *
 	 * ... returns {@code "bzr"}.
@@ -1172,23 +1260,6 @@ public abstract class CharMatcher implements Predicate<Character> {
 	}
 
 	/**
-	 * Returns a string containing all matching characters of a character sequence,
-	 * in order. For example:
-	 * 
-	 * <pre>
-	 *    {@code
-	 *
-	 *   CharMatcher.is('a').retainFrom("bazaar")}
-	 * </pre>
-	 *
-	 * ... returns {@code "aaa"}.
-	 */
-	@CheckReturnValue
-	public String retainFrom(CharSequence sequence) {
-		return negate().removeFrom(sequence);
-	}
-
-	/**
 	 * Returns a string copy of the input character sequence, with each character
 	 * that matches this matcher replaced by a given replacement character. For
 	 * example:
@@ -1196,7 +1267,8 @@ public abstract class CharMatcher implements Predicate<Character> {
 	 * <pre>
 	 *    {@code
 	 *
-	 *   CharMatcher.is('a').replaceFrom("radar", 'o')}
+	 * CharMatcher.is('a').replaceFrom("radar", 'o')
+	 * }
 	 * </pre>
 	 *
 	 * ... returns {@code "rodor"}.
@@ -1236,7 +1308,8 @@ public abstract class CharMatcher implements Predicate<Character> {
 	 * <pre>
 	 *    {@code
 	 *
-	 *   CharMatcher.is('a').replaceFrom("yaha", "oo")}
+	 * CharMatcher.is('a').replaceFrom("yaha", "oo")
+	 * }
 	 * </pre>
 	 *
 	 * ... returns {@code "yoohoo"}.
@@ -1282,6 +1355,67 @@ public abstract class CharMatcher implements Predicate<Character> {
 	}
 
 	/**
+	 * Returns a string containing all matching characters of a character sequence,
+	 * in order. For example:
+	 * 
+	 * <pre>
+	 *    {@code
+	 *
+	 * CharMatcher.is('a').retainFrom("bazaar")
+	 * }
+	 * </pre>
+	 *
+	 * ... returns {@code "aaa"}.
+	 */
+	@CheckReturnValue
+	public String retainFrom(CharSequence sequence) {
+		return negate().removeFrom(sequence);
+	}
+
+	/**
+	 * Sets bits in {@code table} matched by this matcher.
+	 */
+	@GwtIncompatible("java.util.BitSet")
+	void setBits(BitSet table) {
+		for (int c = Character.MAX_VALUE; c >= Character.MIN_VALUE; c--) {
+			if (matches((char) c)) {
+				table.set(c);
+			}
+		}
+	}
+
+	/**
+	 * Returns a string representation of this {@code CharMatcher}, such as
+	 * {@code CharMatcher.or(WHITESPACE, JAVA_DIGIT)}.
+	 */
+	@Override
+	public String toString() {
+		return description;
+	}
+
+	/**
+	 * Collapses groups of matching characters exactly as {@link #collapseFrom}
+	 * does, except that groups of matching characters at the start or end of the
+	 * sequence are removed without replacement.
+	 */
+	@CheckReturnValue
+	public String trimAndCollapseFrom(CharSequence sequence, char replacement) {
+		// This implementation avoids unnecessary allocation.
+		int len = sequence.length();
+		int first;
+		int last;
+
+		for (first = 0; first < len && matches(sequence.charAt(first)); first++) {
+		}
+		for (last = len - 1; last > first && matches(sequence.charAt(last)); last--) {
+		}
+
+		return (first == 0 && last == len - 1) ? collapseFrom(sequence, replacement)
+				: finishCollapseFrom(sequence, first, last + 1, replacement, new StringBuilder(last + 1 - first),
+						false);
+	}
+
+	/**
 	 * Returns a substring of the input character sequence that omits all characters
 	 * this matcher matches from the beginning and from the end of the string. For
 	 * example:
@@ -1289,7 +1423,8 @@ public abstract class CharMatcher implements Predicate<Character> {
 	 * <pre>
 	 *    {@code
 	 *
-	 *   CharMatcher.anyOf("ab").trimFrom("abacatbab")}
+	 * CharMatcher.anyOf("ab").trimFrom("abacatbab")
+	 * }
 	 * </pre>
 	 *
 	 * ... returns {@code "cat"}.
@@ -1300,7 +1435,8 @@ public abstract class CharMatcher implements Predicate<Character> {
 	 * <pre>
 	 *    {@code
 	 *
-	 *   CharMatcher.inRange('\0', ' ').trimFrom(str)}
+	 * CharMatcher.inRange('\0', ' ').trimFrom(str)
+	 * }
 	 * </pre>
 	 *
 	 * ... is equivalent to {@link String#trim()}.
@@ -1332,7 +1468,8 @@ public abstract class CharMatcher implements Predicate<Character> {
 	 * <pre>
 	 *  {@code
 	 *
-	 *   CharMatcher.anyOf("ab").trimLeadingFrom("abacatbab")}
+	 * CharMatcher.anyOf("ab").trimLeadingFrom("abacatbab")
+	 * }
 	 * </pre>
 	 *
 	 * ... returns {@code "catbab"}.
@@ -1355,7 +1492,8 @@ public abstract class CharMatcher implements Predicate<Character> {
 	 * <pre>
 	 *  {@code
 	 *
-	 *   CharMatcher.anyOf("ab").trimTrailingFrom("abacatbab")}
+	 * CharMatcher.anyOf("ab").trimTrailingFrom("abacatbab")
+	 * }
 	 * </pre>
 	 *
 	 * ... returns {@code "abacat"}.
@@ -1372,138 +1510,14 @@ public abstract class CharMatcher implements Predicate<Character> {
 	}
 
 	/**
-	 * Returns a string copy of the input character sequence, with each group of
-	 * consecutive characters that match this matcher replaced by a single
-	 * replacement character. For example:
-	 * 
-	 * <pre>
-	 *    {@code
-	 *
-	 *   CharMatcher.anyOf("eko").collapseFrom("bookkeeper", '-')}
-	 * </pre>
-	 *
-	 * ... returns {@code "b-p-r"}.
+	 * Subclasses should provide a new CharMatcher with the same characteristics as
+	 * {@code this}, but with their {@code toString} method overridden with the new
+	 * description.
 	 *
 	 * <p>
-	 * The default implementation uses {@link #indexIn(CharSequence)} to find the
-	 * first matching character, then iterates the remainder of the sequence calling
-	 * {@link #matches(char)} for each character.
-	 *
-	 * @param sequence    the character sequence to replace matching groups of
-	 *                    characters in
-	 * @param replacement the character to append to the result string in place of
-	 *                    each group of matching characters in {@code sequence}
-	 * @return the new string
+	 * This is unsupported by default.
 	 */
-	@CheckReturnValue
-	public String collapseFrom(CharSequence sequence, char replacement) {
-		// This implementation avoids unnecessary allocation.
-		int len = sequence.length();
-		for (int i = 0; i < len; i++) {
-			char c = sequence.charAt(i);
-			if (matches(c)) {
-				if (c == replacement && (i == len - 1 || !matches(sequence.charAt(i + 1)))) {
-					// a no-op replacement
-					i++;
-				} else {
-					StringBuilder builder = new StringBuilder(len).append(sequence.subSequence(0, i))
-							.append(replacement);
-					return finishCollapseFrom(sequence, i + 1, len, replacement, builder, true);
-				}
-			}
-		}
-		// no replacement needed
-		return sequence.toString();
+	CharMatcher withToString(String description) {
+		throw new UnsupportedOperationException();
 	}
-
-	/**
-	 * Collapses groups of matching characters exactly as {@link #collapseFrom}
-	 * does, except that groups of matching characters at the start or end of the
-	 * sequence are removed without replacement.
-	 */
-	@CheckReturnValue
-	public String trimAndCollapseFrom(CharSequence sequence, char replacement) {
-		// This implementation avoids unnecessary allocation.
-		int len = sequence.length();
-		int first;
-		int last;
-
-		for (first = 0; first < len && matches(sequence.charAt(first)); first++) {
-		}
-		for (last = len - 1; last > first && matches(sequence.charAt(last)); last--) {
-		}
-
-		return (first == 0 && last == len - 1) ? collapseFrom(sequence, replacement)
-				: finishCollapseFrom(sequence, first, last + 1, replacement, new StringBuilder(last + 1 - first),
-						false);
-	}
-
-	private String finishCollapseFrom(CharSequence sequence, int start, int end, char replacement,
-			StringBuilder builder, boolean inMatchingGroup) {
-		for (int i = start; i < end; i++) {
-			char c = sequence.charAt(i);
-			if (matches(c)) {
-				if (!inMatchingGroup) {
-					builder.append(replacement);
-					inMatchingGroup = true;
-				}
-			} else {
-				builder.append(c);
-				inMatchingGroup = false;
-			}
-		}
-		return builder.toString();
-	}
-
-	/**
-	 * @deprecated Provided only to satisfy the {@link Predicate} interface; use
-	 *             {@link #matches} instead.
-	 */
-	@Deprecated
-	@Override
-	public boolean apply(Character character) {
-		return matches(character);
-	}
-
-	/**
-	 * Returns a string representation of this {@code CharMatcher}, such as
-	 * {@code CharMatcher.or(WHITESPACE, JAVA_DIGIT)}.
-	 */
-	@Override
-	public String toString() {
-		return description;
-	}
-
-	static final String WHITESPACE_TABLE = new String(new char[] { 0x2002, 0x3000, '\r', 0x0085, 0x200A, 0x2005, 0x2000,
-			0x3000, 0x2029, 0x000B, 0x3000, 0x2008, 0x2003, 0x205F, 0x3000, 0x1680, 0x0009, 0x0020, 0x2006, 0x2001,
-			0x202F, 0x00A0, 0x000C, 0x2009, 0x3000, 0x2004, 0x3000, 0x3000, 0x2028, '\n', 0x2007, 0x3000 });
-	static final int WHITESPACE_MULTIPLIER = 1682554634;
-	static final int WHITESPACE_SHIFT = Integer.numberOfLeadingZeros(WHITESPACE_TABLE.length() - 1);
-
-	/**
-	 * Determines whether a character is whitespace according to the latest Unicode
-	 * standard, as illustrated <a href=
-	 * "http://unicode.org/cldr/utility/list-unicodeset.jsp?a=%5Cp%7Bwhitespace%7D">here</a>.
-	 * This is not the same definition used by other Java APIs. (See a <a href=
-	 * "http://spreadsheets.google.com/pub?key=pd8dAQyHbdewRsnE5x5GzKQ">comparison
-	 * of several definitions of "whitespace"</a>.)
-	 *
-	 * <p>
-	 * <b>Note:</b> as the Unicode definition evolves, we will modify this constant
-	 * to keep it up to date.
-	 */
-	public static final CharMatcher WHITESPACE = new FastMatcher("WHITESPACE") {
-		@Override
-		public boolean matches(char c) {
-			return WHITESPACE_TABLE.charAt((WHITESPACE_MULTIPLIER * c) >>> WHITESPACE_SHIFT) == c;
-		}
-
-		@GwtIncompatible("java.util.BitSet")
-		@Override
-		void setBits(BitSet table) {
-			for (int i = 0; i < WHITESPACE_TABLE.length(); i++) {
-				table.set(WHITESPACE_TABLE.charAt(i));
-			}
-		}
-	};
 }

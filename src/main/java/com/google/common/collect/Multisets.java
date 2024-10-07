@@ -55,49 +55,322 @@ import com.google.common.primitives.Ints;
  */
 @GwtCompatible
 public final class Multisets {
-	private Multisets() {
-	}
-
 	/**
-	 * Returns an unmodifiable view of the specified multiset. Query operations on
-	 * the returned multiset "read through" to the specified multiset, and attempts
-	 * to modify the returned multiset result in an
-	 * {@link UnsupportedOperationException}.
-	 *
-	 * <p>
-	 * The returned multiset will be serializable if the specified multiset is
-	 * serializable.
-	 *
-	 * @param multiset the multiset for which an unmodifiable view is to be
-	 *                 generated
-	 * @return an unmodifiable view of the multiset
+	 * Implementation of the {@code equals}, {@code hashCode}, and {@code toString}
+	 * methods of {@link Multiset.Entry}.
 	 */
-	public static <E> Multiset<E> unmodifiableMultiset(Multiset<? extends E> multiset) {
-		if (multiset instanceof UnmodifiableMultiset || multiset instanceof ImmutableMultiset) {
-			// Since it's unmodifiable, the covariant cast is safe
-			@SuppressWarnings("unchecked")
-			Multiset<E> result = (Multiset<E>) multiset;
-			return result;
+	abstract static class AbstractEntry<E> implements Multiset.Entry<E> {
+		/**
+		 * Indicates whether an object equals this entry, following the behavior
+		 * specified in {@link Multiset.Entry#equals}.
+		 */
+		@Override
+		public boolean equals(@Nullable Object object) {
+			if (object instanceof Multiset.Entry) {
+				Multiset.Entry<?> that = (Multiset.Entry<?>) object;
+				return this.getCount() == that.getCount() && Objects.equal(this.getElement(), that.getElement());
+			}
+			return false;
 		}
-		return new UnmodifiableMultiset<E>(checkNotNull(multiset));
+
+		/**
+		 * Return this entry's hash code, following the behavior specified in
+		 * {@link Multiset.Entry#hashCode}.
+		 */
+		@Override
+		public int hashCode() {
+			E e = getElement();
+			return ((e == null) ? 0 : e.hashCode()) ^ getCount();
+		}
+
+		/**
+		 * Returns a string representation of this multiset entry. The string
+		 * representation consists of the associated element if the associated count is
+		 * one, and otherwise the associated element followed by the characters " x "
+		 * (space, x and space) followed by the count. Elements and counts are converted
+		 * to strings as by {@code String.valueOf}.
+		 */
+		@Override
+		public String toString() {
+			String text = String.valueOf(getElement());
+			int n = getCount();
+			return (n == 1) ? text : (text + " x " + n);
+		}
 	}
 
-	/**
-	 * Simply returns its argument.
-	 *
-	 * @deprecated no need to use this
-	 * @since 10.0
-	 */
-	@Deprecated
-	public static <E> Multiset<E> unmodifiableMultiset(ImmutableMultiset<E> multiset) {
-		return checkNotNull(multiset);
+	abstract static class ElementSet<E> extends Sets.ImprovedAbstractSet<E> {
+		@Override
+		public void clear() {
+			multiset().clear();
+		}
+
+		@Override
+		public boolean contains(Object o) {
+			return multiset().contains(o);
+		}
+
+		@Override
+		public boolean containsAll(Collection<?> c) {
+			return multiset().containsAll(c);
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return multiset().isEmpty();
+		}
+
+		@Override
+		public Iterator<E> iterator() {
+			return new TransformedIterator<Entry<E>, E>(multiset().entrySet().iterator()) {
+				@Override
+				E transform(Entry<E> entry) {
+					return entry.getElement();
+				}
+			};
+		}
+
+		abstract Multiset<E> multiset();
+
+		@Override
+		public boolean remove(Object o) {
+			int count = multiset().count(o);
+			if (count > 0) {
+				multiset().remove(o, count);
+				return true;
+			}
+			return false;
+		}
+
+		@Override
+		public int size() {
+			return multiset().entrySet().size();
+		}
+	}
+
+	abstract static class EntrySet<E> extends Sets.ImprovedAbstractSet<Entry<E>> {
+		@Override
+		public void clear() {
+			multiset().clear();
+		}
+
+		@Override
+		public boolean contains(@Nullable Object o) {
+			if (o instanceof Entry) {
+				/*
+				 * The GWT compiler wrongly issues a warning here.
+				 */
+				@SuppressWarnings("cast")
+				Entry<?> entry = (Entry<?>) o;
+				if (entry.getCount() <= 0) {
+					return false;
+				}
+				int count = multiset().count(entry.getElement());
+				return count == entry.getCount();
+
+			}
+			return false;
+		}
+
+		abstract Multiset<E> multiset();
+
+		// GWT compiler warning; see contains().
+		@SuppressWarnings("cast")
+		@Override
+		public boolean remove(Object object) {
+			if (object instanceof Multiset.Entry) {
+				Entry<?> entry = (Entry<?>) object;
+				Object element = entry.getElement();
+				int entryCount = entry.getCount();
+				if (entryCount != 0) {
+					// Safe as long as we never add a new entry, which we won't.
+					@SuppressWarnings("unchecked")
+					Multiset<Object> multiset = (Multiset) multiset();
+					return multiset.setCount(element, entryCount, 0);
+				}
+			}
+			return false;
+		}
+	}
+
+	private static final class FilteredMultiset<E> extends AbstractMultiset<E> {
+		final Multiset<E> unfiltered;
+		final Predicate<? super E> predicate;
+
+		FilteredMultiset(Multiset<E> unfiltered, Predicate<? super E> predicate) {
+			this.unfiltered = checkNotNull(unfiltered);
+			this.predicate = checkNotNull(predicate);
+		}
+
+		@Override
+		public int add(@Nullable E element, int occurrences) {
+			checkArgument(predicate.apply(element), "Element %s does not match predicate %s", element, predicate);
+			return unfiltered.add(element, occurrences);
+		}
+
+		@Override
+		public void clear() {
+			elementSet().clear();
+		}
+
+		@Override
+		public int count(@Nullable Object element) {
+			int count = unfiltered.count(element);
+			if (count > 0) {
+				@SuppressWarnings("unchecked") // element is equal to an E
+				E e = (E) element;
+				return predicate.apply(e) ? count : 0;
+			}
+			return 0;
+		}
+
+		@Override
+		Set<E> createElementSet() {
+			return Sets.filter(unfiltered.elementSet(), predicate);
+		}
+
+		@Override
+		Set<Entry<E>> createEntrySet() {
+			return Sets.filter(unfiltered.entrySet(), new Predicate<Entry<E>>() {
+				@Override
+				public boolean apply(Entry<E> entry) {
+					return predicate.apply(entry.getElement());
+				}
+			});
+		}
+
+		@Override
+		int distinctElements() {
+			return elementSet().size();
+		}
+
+		@Override
+		Iterator<Entry<E>> entryIterator() {
+			throw new AssertionError("should never be called");
+		}
+
+		@Override
+		public UnmodifiableIterator<E> iterator() {
+			return Iterators.filter(unfiltered.iterator(), predicate);
+		}
+
+		@Override
+		public int remove(@Nullable Object element, int occurrences) {
+			checkNonnegative(occurrences, "occurrences");
+			if (occurrences == 0) {
+				return count(element);
+			} else {
+				return contains(element) ? unfiltered.remove(element, occurrences) : 0;
+			}
+		}
+	}
+
+	static final class ImmutableEntry<E> extends AbstractEntry<E> implements Serializable {
+		private static final long serialVersionUID = 0;
+		@Nullable
+		final E element;
+
+		final int count;
+
+		ImmutableEntry(@Nullable E element, int count) {
+			this.element = element;
+			this.count = count;
+			checkNonnegative(count, "count");
+		}
+
+		@Override
+		public int getCount() {
+			return count;
+		}
+
+		@Override
+		@Nullable
+		public E getElement() {
+			return element;
+		}
+	}
+
+	static final class MultisetIteratorImpl<E> implements Iterator<E> {
+		private final Multiset<E> multiset;
+		private final Iterator<Entry<E>> entryIterator;
+		private Entry<E> currentEntry;
+		/** Count of subsequent elements equal to current element */
+		private int laterCount;
+		/** Count of all elements equal to current element */
+		private int totalCount;
+		private boolean canRemove;
+
+		MultisetIteratorImpl(Multiset<E> multiset, Iterator<Entry<E>> entryIterator) {
+			this.multiset = multiset;
+			this.entryIterator = entryIterator;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return laterCount > 0 || entryIterator.hasNext();
+		}
+
+		@Override
+		public E next() {
+			if (!hasNext()) {
+				throw new NoSuchElementException();
+			}
+			if (laterCount == 0) {
+				currentEntry = entryIterator.next();
+				totalCount = laterCount = currentEntry.getCount();
+			}
+			laterCount--;
+			canRemove = true;
+			return currentEntry.getElement();
+		}
+
+		@Override
+		public void remove() {
+			checkRemove(canRemove);
+			if (totalCount == 1) {
+				entryIterator.remove();
+			} else {
+				multiset.remove(currentEntry.getElement());
+			}
+			totalCount--;
+			canRemove = false;
+		}
 	}
 
 	static class UnmodifiableMultiset<E> extends ForwardingMultiset<E> implements Serializable {
+		private static final long serialVersionUID = 0;
+
 		final Multiset<? extends E> delegate;
+
+		transient Set<E> elementSet;
+
+		transient Set<Multiset.Entry<E>> entrySet;
 
 		UnmodifiableMultiset(Multiset<? extends E> delegate) {
 			this.delegate = delegate;
+		}
+
+		@Override
+		public boolean add(E element) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public int add(E element, int occurences) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean addAll(Collection<? extends E> elementsToAdd) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void clear() {
+			throw new UnsupportedOperationException();
+		}
+
+		Set<E> createElementSet() {
+			return Collections.<E>unmodifiableSet(delegate.elementSet());
 		}
 
 		@SuppressWarnings("unchecked")
@@ -107,19 +380,11 @@ public final class Multisets {
 			return (Multiset<E>) delegate;
 		}
 
-		transient Set<E> elementSet;
-
-		Set<E> createElementSet() {
-			return Collections.<E>unmodifiableSet(delegate.elementSet());
-		}
-
 		@Override
 		public Set<E> elementSet() {
 			Set<E> es = elementSet;
 			return (es == null) ? elementSet = createElementSet() : es;
 		}
-
-		transient Set<Multiset.Entry<E>> entrySet;
 
 		@SuppressWarnings("unchecked")
 		@Override
@@ -137,21 +402,6 @@ public final class Multisets {
 		public Iterator<E> iterator() {
 			// Safe because the returned Iterator is made unmodifiable
 			return (Iterator<E>) Iterators.unmodifiableIterator(delegate.iterator());
-		}
-
-		@Override
-		public boolean add(E element) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public int add(E element, int occurences) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public boolean addAll(Collection<? extends E> elementsToAdd) {
-			throw new UnsupportedOperationException();
 		}
 
 		@Override
@@ -175,11 +425,6 @@ public final class Multisets {
 		}
 
 		@Override
-		public void clear() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
 		public int setCount(E element, int count) {
 			throw new UnsupportedOperationException();
 		}
@@ -188,66 +433,152 @@ public final class Multisets {
 		public boolean setCount(E element, int oldCount, int newCount) {
 			throw new UnsupportedOperationException();
 		}
+	}
 
-		private static final long serialVersionUID = 0;
+	private static final Ordering<Entry<?>> DECREASING_COUNT_ORDERING = new Ordering<Entry<?>>() {
+		@Override
+		public int compare(Entry<?> entry1, Entry<?> entry2) {
+			return Ints.compare(entry2.getCount(), entry1.getCount());
+		}
+	};
+
+	/**
+	 * An implementation of {@link Multiset#addAll}.
+	 */
+	static <E> boolean addAllImpl(Multiset<E> self, Collection<? extends E> elements) {
+		if (elements.isEmpty()) {
+			return false;
+		}
+		if (elements instanceof Multiset) {
+			Multiset<? extends E> that = cast(elements);
+			for (Entry<? extends E> entry : that.entrySet()) {
+				self.add(entry.getElement(), entry.getCount());
+			}
+		} else {
+			Iterators.addAll(self, elements.iterator());
+		}
+		return true;
 	}
 
 	/**
-	 * Returns an unmodifiable view of the specified sorted multiset. Query
-	 * operations on the returned multiset "read through" to the specified multiset,
-	 * and attempts to modify the returned multiset result in an
-	 * {@link UnsupportedOperationException}.
+	 * Used to avoid http://bugs.sun.com/view_bug.do?bug_id=6558557
+	 */
+	static <T> Multiset<T> cast(Iterable<T> iterable) {
+		return (Multiset<T>) iterable;
+	}
+
+	/**
+	 * Returns {@code true} if {@code subMultiset.count(o) <=
+	 * superMultiset.count(o)} for all {@code o}.
 	 *
-	 * <p>
-	 * The returned multiset will be serializable if the specified multiset is
-	 * serializable.
+	 * @since 10.0
+	 */
+	public static boolean containsOccurrences(Multiset<?> superMultiset, Multiset<?> subMultiset) {
+		checkNotNull(superMultiset);
+		checkNotNull(subMultiset);
+		for (Entry<?> entry : subMultiset.entrySet()) {
+			int superCount = superMultiset.count(entry.getElement());
+			if (superCount < entry.getCount()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Returns a copy of {@code multiset} as an {@link ImmutableMultiset} whose
+	 * iteration order is highest count first, with ties broken by the iteration
+	 * order of the original multiset.
 	 *
-	 * @param sortedMultiset the sorted multiset for which an unmodifiable view is
-	 *                       to be generated
-	 * @return an unmodifiable view of the multiset
 	 * @since 11.0
 	 */
 	@Beta
-	public static <E> SortedMultiset<E> unmodifiableSortedMultiset(SortedMultiset<E> sortedMultiset) {
-		// it's in its own file so it can be emulated for GWT
-		return new UnmodifiableSortedMultiset<E>(checkNotNull(sortedMultiset));
+	public static <E> ImmutableMultiset<E> copyHighestCountFirst(Multiset<E> multiset) {
+		List<Entry<E>> sortedEntries = Multisets.DECREASING_COUNT_ORDERING.immutableSortedCopy(multiset.entrySet());
+		return ImmutableMultiset.copyFromEntries(sortedEntries);
 	}
 
 	/**
-	 * Returns an immutable multiset entry with the specified element and count. The
-	 * entry will be serializable if {@code e} is.
+	 * Returns an unmodifiable view of the difference of two multisets. In the
+	 * returned multiset, the count of each element is the result of the
+	 * <i>zero-truncated subtraction</i> of its count in the second multiset from
+	 * its count in the first multiset, with elements that would have a count of 0
+	 * not included. The iteration order of the returned multiset matches that of
+	 * the element set of {@code multiset1}, with repeated occurrences of the same
+	 * element appearing consecutively.
 	 *
-	 * @param e the element to be associated with the returned entry
-	 * @param n the count to be associated with the returned entry
-	 * @throws IllegalArgumentException if {@code n} is negative
+	 * <p>
+	 * Results are undefined if {@code multiset1} and {@code multiset2} are based on
+	 * different equivalence relations (as {@code HashMultiset} and
+	 * {@code TreeMultiset} are).
+	 *
+	 * @since 14.0
 	 */
-	public static <E> Multiset.Entry<E> immutableEntry(@Nullable E e, int n) {
-		return new ImmutableEntry<E>(e, n);
+	@Beta
+	public static <E> Multiset<E> difference(final Multiset<E> multiset1, final Multiset<?> multiset2) {
+		checkNotNull(multiset1);
+		checkNotNull(multiset2);
+
+		// TODO(user): consider making the entries live views
+		return new AbstractMultiset<E>() {
+			@Override
+			public int count(@Nullable Object element) {
+				int count1 = multiset1.count(element);
+				return (count1 == 0) ? 0 : Math.max(0, count1 - multiset2.count(element));
+			}
+
+			@Override
+			int distinctElements() {
+				return Iterators.size(entryIterator());
+			}
+
+			@Override
+			Iterator<Entry<E>> entryIterator() {
+				final Iterator<Entry<E>> iterator1 = multiset1.entrySet().iterator();
+				return new AbstractIterator<Entry<E>>() {
+					@Override
+					protected Entry<E> computeNext() {
+						while (iterator1.hasNext()) {
+							Entry<E> entry1 = iterator1.next();
+							E element = entry1.getElement();
+							int count = entry1.getCount() - multiset2.count(element);
+							if (count > 0) {
+								return immutableEntry(element, count);
+							}
+						}
+						return endOfData();
+					}
+				};
+			}
+		};
 	}
 
-	static final class ImmutableEntry<E> extends AbstractEntry<E> implements Serializable {
-		@Nullable
-		final E element;
-		final int count;
-
-		ImmutableEntry(@Nullable E element, int count) {
-			this.element = element;
-			this.count = count;
-			checkNonnegative(count, "count");
+	/**
+	 * An implementation of {@link Multiset#equals}.
+	 */
+	static boolean equalsImpl(Multiset<?> multiset, @Nullable Object object) {
+		if (object == multiset) {
+			return true;
 		}
+		if (object instanceof Multiset) {
+			Multiset<?> that = (Multiset<?>) object;
+			/*
+			 * We can't simply check whether the entry sets are equal, since that approach
+			 * fails when a TreeMultiset has a comparator that returns 0 when passed unequal
+			 * elements.
+			 */
 
-		@Override
-		@Nullable
-		public E getElement() {
-			return element;
+			if (multiset.size() != that.size() || multiset.entrySet().size() != that.entrySet().size()) {
+				return false;
+			}
+			for (Entry<?> entry : that.entrySet()) {
+				if (multiset.count(entry.getElement()) != entry.getCount()) {
+					return false;
+				}
+			}
+			return true;
 		}
-
-		@Override
-		public int getCount() {
-			return count;
-		}
-
-		private static final long serialVersionUID = 0;
+		return false;
 	}
 
 	/**
@@ -296,76 +627,16 @@ public final class Multisets {
 		return new FilteredMultiset<E>(unfiltered, predicate);
 	}
 
-	private static final class FilteredMultiset<E> extends AbstractMultiset<E> {
-		final Multiset<E> unfiltered;
-		final Predicate<? super E> predicate;
-
-		FilteredMultiset(Multiset<E> unfiltered, Predicate<? super E> predicate) {
-			this.unfiltered = checkNotNull(unfiltered);
-			this.predicate = checkNotNull(predicate);
-		}
-
-		@Override
-		public UnmodifiableIterator<E> iterator() {
-			return Iterators.filter(unfiltered.iterator(), predicate);
-		}
-
-		@Override
-		Set<E> createElementSet() {
-			return Sets.filter(unfiltered.elementSet(), predicate);
-		}
-
-		@Override
-		Set<Entry<E>> createEntrySet() {
-			return Sets.filter(unfiltered.entrySet(), new Predicate<Entry<E>>() {
-				@Override
-				public boolean apply(Entry<E> entry) {
-					return predicate.apply(entry.getElement());
-				}
-			});
-		}
-
-		@Override
-		Iterator<Entry<E>> entryIterator() {
-			throw new AssertionError("should never be called");
-		}
-
-		@Override
-		int distinctElements() {
-			return elementSet().size();
-		}
-
-		@Override
-		public int count(@Nullable Object element) {
-			int count = unfiltered.count(element);
-			if (count > 0) {
-				@SuppressWarnings("unchecked") // element is equal to an E
-				E e = (E) element;
-				return predicate.apply(e) ? count : 0;
-			}
-			return 0;
-		}
-
-		@Override
-		public int add(@Nullable E element, int occurrences) {
-			checkArgument(predicate.apply(element), "Element %s does not match predicate %s", element, predicate);
-			return unfiltered.add(element, occurrences);
-		}
-
-		@Override
-		public int remove(@Nullable Object element, int occurrences) {
-			checkNonnegative(occurrences, "occurrences");
-			if (occurrences == 0) {
-				return count(element);
-			} else {
-				return contains(element) ? unfiltered.remove(element, occurrences) : 0;
-			}
-		}
-
-		@Override
-		public void clear() {
-			elementSet().clear();
-		}
+	/**
+	 * Returns an immutable multiset entry with the specified element and count. The
+	 * entry will be serializable if {@code e} is.
+	 *
+	 * @param e the element to be associated with the returned entry
+	 * @param n the count to be associated with the returned entry
+	 * @throws IllegalArgumentException if {@code n} is negative
+	 */
+	public static <E> Multiset.Entry<E> immutableEntry(@Nullable E e, int n) {
+		return new ImmutableEntry<E>(e, n);
 	}
 
 	/**
@@ -379,81 +650,6 @@ public final class Multisets {
 			return ((Multiset<?>) elements).elementSet().size();
 		}
 		return 11; // initial capacity will be rounded up to 16
-	}
-
-	/**
-	 * Returns an unmodifiable view of the union of two multisets. In the returned
-	 * multiset, the count of each element is the <i>maximum</i> of its counts in
-	 * the two backing multisets. The iteration order of the returned multiset
-	 * matches that of the element set of {@code multiset1} followed by the members
-	 * of the element set of {@code multiset2} that are not contained in
-	 * {@code multiset1}, with repeated occurrences of the same element appearing
-	 * consecutively.
-	 *
-	 * <p>
-	 * Results are undefined if {@code multiset1} and {@code multiset2} are based on
-	 * different equivalence relations (as {@code HashMultiset} and
-	 * {@code TreeMultiset} are).
-	 *
-	 * @since 14.0
-	 */
-	@Beta
-	public static <E> Multiset<E> union(final Multiset<? extends E> multiset1, final Multiset<? extends E> multiset2) {
-		checkNotNull(multiset1);
-		checkNotNull(multiset2);
-
-		return new AbstractMultiset<E>() {
-			@Override
-			public boolean contains(@Nullable Object element) {
-				return multiset1.contains(element) || multiset2.contains(element);
-			}
-
-			@Override
-			public boolean isEmpty() {
-				return multiset1.isEmpty() && multiset2.isEmpty();
-			}
-
-			@Override
-			public int count(Object element) {
-				return Math.max(multiset1.count(element), multiset2.count(element));
-			}
-
-			@Override
-			Set<E> createElementSet() {
-				return Sets.union(multiset1.elementSet(), multiset2.elementSet());
-			}
-
-			@Override
-			Iterator<Entry<E>> entryIterator() {
-				final Iterator<? extends Entry<? extends E>> iterator1 = multiset1.entrySet().iterator();
-				final Iterator<? extends Entry<? extends E>> iterator2 = multiset2.entrySet().iterator();
-				// TODO(user): consider making the entries live views
-				return new AbstractIterator<Entry<E>>() {
-					@Override
-					protected Entry<E> computeNext() {
-						if (iterator1.hasNext()) {
-							Entry<? extends E> entry1 = iterator1.next();
-							E element = entry1.getElement();
-							int count = Math.max(entry1.getCount(), multiset2.count(element));
-							return immutableEntry(element, count);
-						}
-						while (iterator2.hasNext()) {
-							Entry<? extends E> entry2 = iterator2.next();
-							E element = entry2.getElement();
-							if (!multiset1.contains(element)) {
-								return immutableEntry(element, entry2.getCount());
-							}
-						}
-						return endOfData();
-					}
-				};
-			}
-
-			@Override
-			int distinctElements() {
-				return elementSet().size();
-			}
-		};
 	}
 
 	/**
@@ -488,6 +684,11 @@ public final class Multisets {
 			}
 
 			@Override
+			int distinctElements() {
+				return elementSet().size();
+			}
+
+			@Override
 			Iterator<Entry<E>> entryIterator() {
 				final Iterator<Entry<E>> iterator1 = multiset1.entrySet().iterator();
 				// TODO(user): consider making the entries live views
@@ -506,164 +707,95 @@ public final class Multisets {
 					}
 				};
 			}
-
-			@Override
-			int distinctElements() {
-				return elementSet().size();
-			}
 		};
 	}
 
 	/**
-	 * Returns an unmodifiable view of the sum of two multisets. In the returned
-	 * multiset, the count of each element is the <i>sum</i> of its counts in the
-	 * two backing multisets. The iteration order of the returned multiset matches
-	 * that of the element set of {@code multiset1} followed by the members of the
-	 * element set of {@code multiset2} that are not contained in {@code multiset1},
-	 * with repeated occurrences of the same element appearing consecutively.
+	 * An implementation of {@link Multiset#iterator}.
+	 */
+	static <E> Iterator<E> iteratorImpl(Multiset<E> multiset) {
+		return new MultisetIteratorImpl<E>(multiset, multiset.entrySet().iterator());
+	}
+
+	/**
+	 * An implementation of {@link Multiset#removeAll}.
+	 */
+	static boolean removeAllImpl(Multiset<?> self, Collection<?> elementsToRemove) {
+		Collection<?> collection = (elementsToRemove instanceof Multiset)
+				? ((Multiset<?>) elementsToRemove).elementSet()
+				: elementsToRemove;
+
+		return self.elementSet().removeAll(collection);
+	}
+
+	/**
+	 * For each occurrence of an element {@code e} in {@code occurrencesToRemove},
+	 * removes one occurrence of {@code e} in {@code multisetToModify}.
 	 *
 	 * <p>
-	 * Results are undefined if {@code multiset1} and {@code multiset2} are based on
-	 * different equivalence relations (as {@code HashMultiset} and
-	 * {@code TreeMultiset} are).
-	 *
-	 * @since 14.0
-	 */
-	@Beta
-	public static <E> Multiset<E> sum(final Multiset<? extends E> multiset1, final Multiset<? extends E> multiset2) {
-		checkNotNull(multiset1);
-		checkNotNull(multiset2);
-
-		// TODO(user): consider making the entries live views
-		return new AbstractMultiset<E>() {
-			@Override
-			public boolean contains(@Nullable Object element) {
-				return multiset1.contains(element) || multiset2.contains(element);
-			}
-
-			@Override
-			public boolean isEmpty() {
-				return multiset1.isEmpty() && multiset2.isEmpty();
-			}
-
-			@Override
-			public int size() {
-				return multiset1.size() + multiset2.size();
-			}
-
-			@Override
-			public int count(Object element) {
-				return multiset1.count(element) + multiset2.count(element);
-			}
-
-			@Override
-			Set<E> createElementSet() {
-				return Sets.union(multiset1.elementSet(), multiset2.elementSet());
-			}
-
-			@Override
-			Iterator<Entry<E>> entryIterator() {
-				final Iterator<? extends Entry<? extends E>> iterator1 = multiset1.entrySet().iterator();
-				final Iterator<? extends Entry<? extends E>> iterator2 = multiset2.entrySet().iterator();
-				return new AbstractIterator<Entry<E>>() {
-					@Override
-					protected Entry<E> computeNext() {
-						if (iterator1.hasNext()) {
-							Entry<? extends E> entry1 = iterator1.next();
-							E element = entry1.getElement();
-							int count = entry1.getCount() + multiset2.count(element);
-							return immutableEntry(element, count);
-						}
-						while (iterator2.hasNext()) {
-							Entry<? extends E> entry2 = iterator2.next();
-							E element = entry2.getElement();
-							if (!multiset1.contains(element)) {
-								return immutableEntry(element, entry2.getCount());
-							}
-						}
-						return endOfData();
-					}
-				};
-			}
-
-			@Override
-			int distinctElements() {
-				return elementSet().size();
-			}
-		};
-	}
-
-	/**
-	 * Returns an unmodifiable view of the difference of two multisets. In the
-	 * returned multiset, the count of each element is the result of the
-	 * <i>zero-truncated subtraction</i> of its count in the second multiset from
-	 * its count in the first multiset, with elements that would have a count of 0
-	 * not included. The iteration order of the returned multiset matches that of
-	 * the element set of {@code multiset1}, with repeated occurrences of the same
-	 * element appearing consecutively.
+	 * Equivalently, this method modifies {@code multisetToModify} so that
+	 * {@code multisetToModify.count(e)} is set to
+	 * {@code Math.max(0, multisetToModify.count(e) -
+	 * occurrencesToRemove.count(e))}.
 	 *
 	 * <p>
-	 * Results are undefined if {@code multiset1} and {@code multiset2} are based on
-	 * different equivalence relations (as {@code HashMultiset} and
-	 * {@code TreeMultiset} are).
+	 * This is <i>not</i> the same as {@code multisetToModify.}
+	 * {@link Multiset#removeAll removeAll}{@code (occurrencesToRemove)}, which
+	 * removes all occurrences of elements that appear in
+	 * {@code occurrencesToRemove}. However, this operation <i>is</i> equivalent to,
+	 * albeit more efficient than, the following:
+	 * 
+	 * <pre>
+	 *    {@code
 	 *
-	 * @since 14.0
-	 */
-	@Beta
-	public static <E> Multiset<E> difference(final Multiset<E> multiset1, final Multiset<?> multiset2) {
-		checkNotNull(multiset1);
-		checkNotNull(multiset2);
-
-		// TODO(user): consider making the entries live views
-		return new AbstractMultiset<E>() {
-			@Override
-			public int count(@Nullable Object element) {
-				int count1 = multiset1.count(element);
-				return (count1 == 0) ? 0 : Math.max(0, count1 - multiset2.count(element));
-			}
-
-			@Override
-			Iterator<Entry<E>> entryIterator() {
-				final Iterator<Entry<E>> iterator1 = multiset1.entrySet().iterator();
-				return new AbstractIterator<Entry<E>>() {
-					@Override
-					protected Entry<E> computeNext() {
-						while (iterator1.hasNext()) {
-							Entry<E> entry1 = iterator1.next();
-							E element = entry1.getElement();
-							int count = entry1.getCount() - multiset2.count(element);
-							if (count > 0) {
-								return immutableEntry(element, count);
-							}
-						}
-						return endOfData();
-					}
-				};
-			}
-
-			@Override
-			int distinctElements() {
-				return Iterators.size(entryIterator());
-			}
-		};
-	}
-
-	/**
-	 * Returns {@code true} if {@code subMultiset.count(o) <=
-	 * superMultiset.count(o)} for all {@code o}.
+	 * for (E e : occurrencesToRemove) {
+	 * 	multisetToModify.remove(e);
+	 * }
+	 * }
+	 * </pre>
 	 *
+	 * @return {@code true} if {@code multisetToModify} was changed as a result of
+	 *         this operation
 	 * @since 10.0
 	 */
-	public static boolean containsOccurrences(Multiset<?> superMultiset, Multiset<?> subMultiset) {
-		checkNotNull(superMultiset);
-		checkNotNull(subMultiset);
-		for (Entry<?> entry : subMultiset.entrySet()) {
-			int superCount = superMultiset.count(entry.getElement());
-			if (superCount < entry.getCount()) {
-				return false;
+	public static boolean removeOccurrences(Multiset<?> multisetToModify, Multiset<?> occurrencesToRemove) {
+		return removeOccurrencesImpl(multisetToModify, occurrencesToRemove);
+	}
+
+	/**
+	 * Delegate that cares about the element types in occurrencesToRemove.
+	 */
+	private static <E> boolean removeOccurrencesImpl(Multiset<E> multisetToModify, Multiset<?> occurrencesToRemove) {
+		// TODO(user): generalize to removing an Iterable, perhaps
+		checkNotNull(multisetToModify);
+		checkNotNull(occurrencesToRemove);
+
+		boolean changed = false;
+		Iterator<Entry<E>> entryIterator = multisetToModify.entrySet().iterator();
+		while (entryIterator.hasNext()) {
+			Entry<E> entry = entryIterator.next();
+			int removeCount = occurrencesToRemove.count(entry.getElement());
+			if (removeCount >= entry.getCount()) {
+				entryIterator.remove();
+				changed = true;
+			} else if (removeCount > 0) {
+				multisetToModify.remove(entry.getElement(), removeCount);
+				changed = true;
 			}
 		}
-		return true;
+		return changed;
+	}
+
+	/**
+	 * An implementation of {@link Multiset#retainAll}.
+	 */
+	static boolean retainAllImpl(Multiset<?> self, Collection<?> elementsToRetain) {
+		checkNotNull(elementsToRetain);
+		Collection<?> collection = (elementsToRetain instanceof Multiset)
+				? ((Multiset<?>) elementsToRetain).elementSet()
+				: elementsToRetain;
+
+		return self.elementSet().retainAll(collection);
 	}
 
 	/**
@@ -715,175 +847,6 @@ public final class Multisets {
 	}
 
 	/**
-	 * For each occurrence of an element {@code e} in {@code occurrencesToRemove},
-	 * removes one occurrence of {@code e} in {@code multisetToModify}.
-	 *
-	 * <p>
-	 * Equivalently, this method modifies {@code multisetToModify} so that
-	 * {@code multisetToModify.count(e)} is set to
-	 * {@code Math.max(0, multisetToModify.count(e) -
-	 * occurrencesToRemove.count(e))}.
-	 *
-	 * <p>
-	 * This is <i>not</i> the same as {@code multisetToModify.}
-	 * {@link Multiset#removeAll removeAll}{@code (occurrencesToRemove)}, which
-	 * removes all occurrences of elements that appear in
-	 * {@code occurrencesToRemove}. However, this operation <i>is</i> equivalent to,
-	 * albeit more efficient than, the following:
-	 * 
-	 * <pre>
-	 *    {@code
-	 *
-	 *   for (E e : occurrencesToRemove) {
-	 *     multisetToModify.remove(e);
-	 *   }}
-	 * </pre>
-	 *
-	 * @return {@code true} if {@code multisetToModify} was changed as a result of
-	 *         this operation
-	 * @since 10.0
-	 */
-	public static boolean removeOccurrences(Multiset<?> multisetToModify, Multiset<?> occurrencesToRemove) {
-		return removeOccurrencesImpl(multisetToModify, occurrencesToRemove);
-	}
-
-	/**
-	 * Delegate that cares about the element types in occurrencesToRemove.
-	 */
-	private static <E> boolean removeOccurrencesImpl(Multiset<E> multisetToModify, Multiset<?> occurrencesToRemove) {
-		// TODO(user): generalize to removing an Iterable, perhaps
-		checkNotNull(multisetToModify);
-		checkNotNull(occurrencesToRemove);
-
-		boolean changed = false;
-		Iterator<Entry<E>> entryIterator = multisetToModify.entrySet().iterator();
-		while (entryIterator.hasNext()) {
-			Entry<E> entry = entryIterator.next();
-			int removeCount = occurrencesToRemove.count(entry.getElement());
-			if (removeCount >= entry.getCount()) {
-				entryIterator.remove();
-				changed = true;
-			} else if (removeCount > 0) {
-				multisetToModify.remove(entry.getElement(), removeCount);
-				changed = true;
-			}
-		}
-		return changed;
-	}
-
-	/**
-	 * Implementation of the {@code equals}, {@code hashCode}, and {@code toString}
-	 * methods of {@link Multiset.Entry}.
-	 */
-	abstract static class AbstractEntry<E> implements Multiset.Entry<E> {
-		/**
-		 * Indicates whether an object equals this entry, following the behavior
-		 * specified in {@link Multiset.Entry#equals}.
-		 */
-		@Override
-		public boolean equals(@Nullable Object object) {
-			if (object instanceof Multiset.Entry) {
-				Multiset.Entry<?> that = (Multiset.Entry<?>) object;
-				return this.getCount() == that.getCount() && Objects.equal(this.getElement(), that.getElement());
-			}
-			return false;
-		}
-
-		/**
-		 * Return this entry's hash code, following the behavior specified in
-		 * {@link Multiset.Entry#hashCode}.
-		 */
-		@Override
-		public int hashCode() {
-			E e = getElement();
-			return ((e == null) ? 0 : e.hashCode()) ^ getCount();
-		}
-
-		/**
-		 * Returns a string representation of this multiset entry. The string
-		 * representation consists of the associated element if the associated count is
-		 * one, and otherwise the associated element followed by the characters " x "
-		 * (space, x and space) followed by the count. Elements and counts are converted
-		 * to strings as by {@code String.valueOf}.
-		 */
-		@Override
-		public String toString() {
-			String text = String.valueOf(getElement());
-			int n = getCount();
-			return (n == 1) ? text : (text + " x " + n);
-		}
-	}
-
-	/**
-	 * An implementation of {@link Multiset#equals}.
-	 */
-	static boolean equalsImpl(Multiset<?> multiset, @Nullable Object object) {
-		if (object == multiset) {
-			return true;
-		}
-		if (object instanceof Multiset) {
-			Multiset<?> that = (Multiset<?>) object;
-			/*
-			 * We can't simply check whether the entry sets are equal, since that approach
-			 * fails when a TreeMultiset has a comparator that returns 0 when passed unequal
-			 * elements.
-			 */
-
-			if (multiset.size() != that.size() || multiset.entrySet().size() != that.entrySet().size()) {
-				return false;
-			}
-			for (Entry<?> entry : that.entrySet()) {
-				if (multiset.count(entry.getElement()) != entry.getCount()) {
-					return false;
-				}
-			}
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * An implementation of {@link Multiset#addAll}.
-	 */
-	static <E> boolean addAllImpl(Multiset<E> self, Collection<? extends E> elements) {
-		if (elements.isEmpty()) {
-			return false;
-		}
-		if (elements instanceof Multiset) {
-			Multiset<? extends E> that = cast(elements);
-			for (Entry<? extends E> entry : that.entrySet()) {
-				self.add(entry.getElement(), entry.getCount());
-			}
-		} else {
-			Iterators.addAll(self, elements.iterator());
-		}
-		return true;
-	}
-
-	/**
-	 * An implementation of {@link Multiset#removeAll}.
-	 */
-	static boolean removeAllImpl(Multiset<?> self, Collection<?> elementsToRemove) {
-		Collection<?> collection = (elementsToRemove instanceof Multiset)
-				? ((Multiset<?>) elementsToRemove).elementSet()
-				: elementsToRemove;
-
-		return self.elementSet().removeAll(collection);
-	}
-
-	/**
-	 * An implementation of {@link Multiset#retainAll}.
-	 */
-	static boolean retainAllImpl(Multiset<?> self, Collection<?> elementsToRetain) {
-		checkNotNull(elementsToRetain);
-		Collection<?> collection = (elementsToRetain instanceof Multiset)
-				? ((Multiset<?>) elementsToRetain).elementSet()
-				: elementsToRetain;
-
-		return self.elementSet().retainAll(collection);
-	}
-
-	/**
 	 * An implementation of {@link Multiset#setCount(Object, int)}.
 	 */
 	static <E> int setCountImpl(Multiset<E> self, E element, int count) {
@@ -916,154 +879,6 @@ public final class Multisets {
 		}
 	}
 
-	abstract static class ElementSet<E> extends Sets.ImprovedAbstractSet<E> {
-		abstract Multiset<E> multiset();
-
-		@Override
-		public void clear() {
-			multiset().clear();
-		}
-
-		@Override
-		public boolean contains(Object o) {
-			return multiset().contains(o);
-		}
-
-		@Override
-		public boolean containsAll(Collection<?> c) {
-			return multiset().containsAll(c);
-		}
-
-		@Override
-		public boolean isEmpty() {
-			return multiset().isEmpty();
-		}
-
-		@Override
-		public Iterator<E> iterator() {
-			return new TransformedIterator<Entry<E>, E>(multiset().entrySet().iterator()) {
-				@Override
-				E transform(Entry<E> entry) {
-					return entry.getElement();
-				}
-			};
-		}
-
-		@Override
-		public boolean remove(Object o) {
-			int count = multiset().count(o);
-			if (count > 0) {
-				multiset().remove(o, count);
-				return true;
-			}
-			return false;
-		}
-
-		@Override
-		public int size() {
-			return multiset().entrySet().size();
-		}
-	}
-
-	abstract static class EntrySet<E> extends Sets.ImprovedAbstractSet<Entry<E>> {
-		abstract Multiset<E> multiset();
-
-		@Override
-		public boolean contains(@Nullable Object o) {
-			if (o instanceof Entry) {
-				/*
-				 * The GWT compiler wrongly issues a warning here.
-				 */
-				@SuppressWarnings("cast")
-				Entry<?> entry = (Entry<?>) o;
-				if (entry.getCount() <= 0) {
-					return false;
-				}
-				int count = multiset().count(entry.getElement());
-				return count == entry.getCount();
-
-			}
-			return false;
-		}
-
-		// GWT compiler warning; see contains().
-		@SuppressWarnings("cast")
-		@Override
-		public boolean remove(Object object) {
-			if (object instanceof Multiset.Entry) {
-				Entry<?> entry = (Entry<?>) object;
-				Object element = entry.getElement();
-				int entryCount = entry.getCount();
-				if (entryCount != 0) {
-					// Safe as long as we never add a new entry, which we won't.
-					@SuppressWarnings("unchecked")
-					Multiset<Object> multiset = (Multiset) multiset();
-					return multiset.setCount(element, entryCount, 0);
-				}
-			}
-			return false;
-		}
-
-		@Override
-		public void clear() {
-			multiset().clear();
-		}
-	}
-
-	/**
-	 * An implementation of {@link Multiset#iterator}.
-	 */
-	static <E> Iterator<E> iteratorImpl(Multiset<E> multiset) {
-		return new MultisetIteratorImpl<E>(multiset, multiset.entrySet().iterator());
-	}
-
-	static final class MultisetIteratorImpl<E> implements Iterator<E> {
-		private final Multiset<E> multiset;
-		private final Iterator<Entry<E>> entryIterator;
-		private Entry<E> currentEntry;
-		/** Count of subsequent elements equal to current element */
-		private int laterCount;
-		/** Count of all elements equal to current element */
-		private int totalCount;
-		private boolean canRemove;
-
-		MultisetIteratorImpl(Multiset<E> multiset, Iterator<Entry<E>> entryIterator) {
-			this.multiset = multiset;
-			this.entryIterator = entryIterator;
-		}
-
-		@Override
-		public boolean hasNext() {
-			return laterCount > 0 || entryIterator.hasNext();
-		}
-
-		@Override
-		public E next() {
-			if (!hasNext()) {
-				throw new NoSuchElementException();
-			}
-			if (laterCount == 0) {
-				currentEntry = entryIterator.next();
-				totalCount = laterCount = currentEntry.getCount();
-			}
-			laterCount--;
-			canRemove = true;
-			return currentEntry.getElement();
-		}
-
-		@Override
-		public void remove() {
-			checkRemove(canRemove);
-			if (totalCount == 1) {
-				entryIterator.remove();
-			} else {
-				multiset.remove(currentEntry.getElement());
-			}
-			totalCount--;
-			canRemove = false;
-		}
-	}
-
 	/**
 	 * An implementation of {@link Multiset#size}.
 	 */
@@ -1076,29 +891,215 @@ public final class Multisets {
 	}
 
 	/**
-	 * Used to avoid http://bugs.sun.com/view_bug.do?bug_id=6558557
+	 * Returns an unmodifiable view of the sum of two multisets. In the returned
+	 * multiset, the count of each element is the <i>sum</i> of its counts in the
+	 * two backing multisets. The iteration order of the returned multiset matches
+	 * that of the element set of {@code multiset1} followed by the members of the
+	 * element set of {@code multiset2} that are not contained in {@code multiset1},
+	 * with repeated occurrences of the same element appearing consecutively.
+	 *
+	 * <p>
+	 * Results are undefined if {@code multiset1} and {@code multiset2} are based on
+	 * different equivalence relations (as {@code HashMultiset} and
+	 * {@code TreeMultiset} are).
+	 *
+	 * @since 14.0
 	 */
-	static <T> Multiset<T> cast(Iterable<T> iterable) {
-		return (Multiset<T>) iterable;
+	@Beta
+	public static <E> Multiset<E> sum(final Multiset<? extends E> multiset1, final Multiset<? extends E> multiset2) {
+		checkNotNull(multiset1);
+		checkNotNull(multiset2);
+
+		// TODO(user): consider making the entries live views
+		return new AbstractMultiset<E>() {
+			@Override
+			public boolean contains(@Nullable Object element) {
+				return multiset1.contains(element) || multiset2.contains(element);
+			}
+
+			@Override
+			public int count(Object element) {
+				return multiset1.count(element) + multiset2.count(element);
+			}
+
+			@Override
+			Set<E> createElementSet() {
+				return Sets.union(multiset1.elementSet(), multiset2.elementSet());
+			}
+
+			@Override
+			int distinctElements() {
+				return elementSet().size();
+			}
+
+			@Override
+			Iterator<Entry<E>> entryIterator() {
+				final Iterator<? extends Entry<? extends E>> iterator1 = multiset1.entrySet().iterator();
+				final Iterator<? extends Entry<? extends E>> iterator2 = multiset2.entrySet().iterator();
+				return new AbstractIterator<Entry<E>>() {
+					@Override
+					protected Entry<E> computeNext() {
+						if (iterator1.hasNext()) {
+							Entry<? extends E> entry1 = iterator1.next();
+							E element = entry1.getElement();
+							int count = entry1.getCount() + multiset2.count(element);
+							return immutableEntry(element, count);
+						}
+						while (iterator2.hasNext()) {
+							Entry<? extends E> entry2 = iterator2.next();
+							E element = entry2.getElement();
+							if (!multiset1.contains(element)) {
+								return immutableEntry(element, entry2.getCount());
+							}
+						}
+						return endOfData();
+					}
+				};
+			}
+
+			@Override
+			public boolean isEmpty() {
+				return multiset1.isEmpty() && multiset2.isEmpty();
+			}
+
+			@Override
+			public int size() {
+				return multiset1.size() + multiset2.size();
+			}
+		};
 	}
 
-	private static final Ordering<Entry<?>> DECREASING_COUNT_ORDERING = new Ordering<Entry<?>>() {
-		@Override
-		public int compare(Entry<?> entry1, Entry<?> entry2) {
-			return Ints.compare(entry2.getCount(), entry1.getCount());
-		}
-	};
+	/**
+	 * Returns an unmodifiable view of the union of two multisets. In the returned
+	 * multiset, the count of each element is the <i>maximum</i> of its counts in
+	 * the two backing multisets. The iteration order of the returned multiset
+	 * matches that of the element set of {@code multiset1} followed by the members
+	 * of the element set of {@code multiset2} that are not contained in
+	 * {@code multiset1}, with repeated occurrences of the same element appearing
+	 * consecutively.
+	 *
+	 * <p>
+	 * Results are undefined if {@code multiset1} and {@code multiset2} are based on
+	 * different equivalence relations (as {@code HashMultiset} and
+	 * {@code TreeMultiset} are).
+	 *
+	 * @since 14.0
+	 */
+	@Beta
+	public static <E> Multiset<E> union(final Multiset<? extends E> multiset1, final Multiset<? extends E> multiset2) {
+		checkNotNull(multiset1);
+		checkNotNull(multiset2);
+
+		return new AbstractMultiset<E>() {
+			@Override
+			public boolean contains(@Nullable Object element) {
+				return multiset1.contains(element) || multiset2.contains(element);
+			}
+
+			@Override
+			public int count(Object element) {
+				return Math.max(multiset1.count(element), multiset2.count(element));
+			}
+
+			@Override
+			Set<E> createElementSet() {
+				return Sets.union(multiset1.elementSet(), multiset2.elementSet());
+			}
+
+			@Override
+			int distinctElements() {
+				return elementSet().size();
+			}
+
+			@Override
+			Iterator<Entry<E>> entryIterator() {
+				final Iterator<? extends Entry<? extends E>> iterator1 = multiset1.entrySet().iterator();
+				final Iterator<? extends Entry<? extends E>> iterator2 = multiset2.entrySet().iterator();
+				// TODO(user): consider making the entries live views
+				return new AbstractIterator<Entry<E>>() {
+					@Override
+					protected Entry<E> computeNext() {
+						if (iterator1.hasNext()) {
+							Entry<? extends E> entry1 = iterator1.next();
+							E element = entry1.getElement();
+							int count = Math.max(entry1.getCount(), multiset2.count(element));
+							return immutableEntry(element, count);
+						}
+						while (iterator2.hasNext()) {
+							Entry<? extends E> entry2 = iterator2.next();
+							E element = entry2.getElement();
+							if (!multiset1.contains(element)) {
+								return immutableEntry(element, entry2.getCount());
+							}
+						}
+						return endOfData();
+					}
+				};
+			}
+
+			@Override
+			public boolean isEmpty() {
+				return multiset1.isEmpty() && multiset2.isEmpty();
+			}
+		};
+	}
 
 	/**
-	 * Returns a copy of {@code multiset} as an {@link ImmutableMultiset} whose
-	 * iteration order is highest count first, with ties broken by the iteration
-	 * order of the original multiset.
+	 * Simply returns its argument.
 	 *
+	 * @deprecated no need to use this
+	 * @since 10.0
+	 */
+	@Deprecated
+	public static <E> Multiset<E> unmodifiableMultiset(ImmutableMultiset<E> multiset) {
+		return checkNotNull(multiset);
+	}
+
+	/**
+	 * Returns an unmodifiable view of the specified multiset. Query operations on
+	 * the returned multiset "read through" to the specified multiset, and attempts
+	 * to modify the returned multiset result in an
+	 * {@link UnsupportedOperationException}.
+	 *
+	 * <p>
+	 * The returned multiset will be serializable if the specified multiset is
+	 * serializable.
+	 *
+	 * @param multiset the multiset for which an unmodifiable view is to be
+	 *                 generated
+	 * @return an unmodifiable view of the multiset
+	 */
+	public static <E> Multiset<E> unmodifiableMultiset(Multiset<? extends E> multiset) {
+		if (multiset instanceof UnmodifiableMultiset || multiset instanceof ImmutableMultiset) {
+			// Since it's unmodifiable, the covariant cast is safe
+			@SuppressWarnings("unchecked")
+			Multiset<E> result = (Multiset<E>) multiset;
+			return result;
+		}
+		return new UnmodifiableMultiset<E>(checkNotNull(multiset));
+	}
+
+	/**
+	 * Returns an unmodifiable view of the specified sorted multiset. Query
+	 * operations on the returned multiset "read through" to the specified multiset,
+	 * and attempts to modify the returned multiset result in an
+	 * {@link UnsupportedOperationException}.
+	 *
+	 * <p>
+	 * The returned multiset will be serializable if the specified multiset is
+	 * serializable.
+	 *
+	 * @param sortedMultiset the sorted multiset for which an unmodifiable view is
+	 *                       to be generated
+	 * @return an unmodifiable view of the multiset
 	 * @since 11.0
 	 */
 	@Beta
-	public static <E> ImmutableMultiset<E> copyHighestCountFirst(Multiset<E> multiset) {
-		List<Entry<E>> sortedEntries = Multisets.DECREASING_COUNT_ORDERING.immutableSortedCopy(multiset.entrySet());
-		return ImmutableMultiset.copyFromEntries(sortedEntries);
+	public static <E> SortedMultiset<E> unmodifiableSortedMultiset(SortedMultiset<E> sortedMultiset) {
+		// it's in its own file so it can be emulated for GWT
+		return new UnmodifiableSortedMultiset<E>(checkNotNull(sortedMultiset));
+	}
+
+	private Multisets() {
 	}
 }

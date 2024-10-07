@@ -25,14 +25,6 @@ import com.google.common.annotations.GwtCompatible;
  */
 @GwtCompatible(emulated = true)
 final class Platform {
-	private Platform() {
-	}
-
-	/** Returns a thread-local 1024-char array. */
-	static char[] charBufferFromThreadLocal() {
-		return DEST_TL.get();
-	}
-
 	/**
 	 * A thread-local destination buffer to keep us from creating new buffers. The
 	 * starting size is 1024 characters. If we grow past this we don't put it back
@@ -44,4 +36,12 @@ final class Platform {
 			return new char[1024];
 		}
 	};
+
+	/** Returns a thread-local 1024-char array. */
+	static char[] charBufferFromThreadLocal() {
+		return DEST_TL.get();
+	}
+
+	private Platform() {
+	}
 }

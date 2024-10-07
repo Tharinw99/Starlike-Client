@@ -10,82 +10,30 @@ import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.EnumChatFormatting;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class GuiKeyBindingList extends GuiListExtended {
-	private final GuiControls field_148191_k;
-	private final Minecraft mc;
-	private final GuiListExtended.IGuiListEntry[] listEntries;
-	private int maxListLabelWidth = 0;
-
-	public GuiKeyBindingList(GuiControls controls, Minecraft mcIn) {
-		super(mcIn, controls.width, controls.height, 66, controls.height - 32, 20);
-		this.field_148191_k = controls;
-		this.mc = mcIn;
-		KeyBinding[] akeybinding = (KeyBinding[]) ArrayUtils.clone(mcIn.gameSettings.keyBindings);
-		this.listEntries = new GuiListExtended.IGuiListEntry[akeybinding.length + KeyBinding.getKeybinds().size()];
-		Arrays.sort(akeybinding);
-		int i = 0;
-		String s = null;
-
-		for (int l = 0; l < akeybinding.length; ++l) {
-			KeyBinding keybinding = akeybinding[l];
-			String s1 = keybinding.getKeyCategory();
-			if (!s1.equals(s)) {
-				s = s1;
-				this.listEntries[i++] = new GuiKeyBindingList.CategoryEntry(s1);
-			}
-
-			int j = mcIn.fontRendererObj.getStringWidth(I18n.format(keybinding.getKeyDescription(), new Object[0]));
-			if (j > this.maxListLabelWidth) {
-				this.maxListLabelWidth = j;
-			}
-
-			this.listEntries[i++] = new GuiKeyBindingList.KeyEntry(keybinding);
-		}
-
-	}
-
-	protected int getSize() {
-		return this.listEntries.length;
-	}
-
-	/**+
-	 * Gets the IGuiListEntry object for the given index
-	 */
-	public GuiListExtended.IGuiListEntry getListEntry(int i) {
-		return this.listEntries[i];
-	}
-
-	protected int getScrollBarX() {
-		return super.getScrollBarX() + 15;
-	}
-
-	/**+
-	 * Gets the width of the list
-	 */
-	public int getListWidth() {
-		return super.getListWidth() + 32;
-	}
-
 	public class CategoryEntry implements GuiListExtended.IGuiListEntry {
 		private final String labelText;
 		private final int labelWidth;
@@ -192,5 +140,62 @@ public class GuiKeyBindingList extends GuiListExtended {
 
 		public void setSelected(int var1, int var2, int var3) {
 		}
+	}
+
+	private final GuiControls field_148191_k;
+	private final Minecraft mc;
+
+	private final GuiListExtended.IGuiListEntry[] listEntries;
+
+	private int maxListLabelWidth = 0;
+
+	public GuiKeyBindingList(GuiControls controls, Minecraft mcIn) {
+		super(mcIn, controls.width, controls.height, 66, controls.height - 32, 20);
+		this.field_148191_k = controls;
+		this.mc = mcIn;
+		KeyBinding[] akeybinding = (KeyBinding[]) ArrayUtils.clone(mcIn.gameSettings.keyBindings);
+		this.listEntries = new GuiListExtended.IGuiListEntry[akeybinding.length + KeyBinding.getKeybinds().size()];
+		Arrays.sort(akeybinding);
+		int i = 0;
+		String s = null;
+
+		for (int l = 0; l < akeybinding.length; ++l) {
+			KeyBinding keybinding = akeybinding[l];
+			String s1 = keybinding.getKeyCategory();
+			if (!s1.equals(s)) {
+				s = s1;
+				this.listEntries[i++] = new GuiKeyBindingList.CategoryEntry(s1);
+			}
+
+			int j = mcIn.fontRendererObj.getStringWidth(I18n.format(keybinding.getKeyDescription(), new Object[0]));
+			if (j > this.maxListLabelWidth) {
+				this.maxListLabelWidth = j;
+			}
+
+			this.listEntries[i++] = new GuiKeyBindingList.KeyEntry(keybinding);
+		}
+
+	}
+
+	/**
+	 * + Gets the IGuiListEntry object for the given index
+	 */
+	public GuiListExtended.IGuiListEntry getListEntry(int i) {
+		return this.listEntries[i];
+	}
+
+	/**
+	 * + Gets the width of the list
+	 */
+	public int getListWidth() {
+		return super.getListWidth() + 32;
+	}
+
+	protected int getScrollBarX() {
+		return super.getScrollBarX() + 15;
+	}
+
+	protected int getSize() {
+		return this.listEntries.length;
 	}
 }

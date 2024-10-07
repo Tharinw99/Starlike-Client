@@ -30,220 +30,30 @@ import net.minecraft.stats.StatFileWriter;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.ResourceLocation;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class GuiStats extends GuiScreen implements IProgressMeter {
-	protected GuiScreen parentScreen;
-	protected String screenTitle = "Select world";
-	private GuiStats.StatsGeneral generalStats;
-	private GuiStats.StatsItem itemStats;
-	private GuiStats.StatsBlock blockStats;
-	private GuiStats.StatsMobsList mobStats;
-	private StatFileWriter field_146546_t;
-	private GuiSlot displaySlot;
-	/**+
-	 * When true, the game will be paused when the gui is shown
-	 */
-	private boolean doesGuiPauseGame = true;
-
-	public GuiStats(GuiScreen parGuiScreen, StatFileWriter parStatFileWriter) {
-		this.parentScreen = parGuiScreen;
-		this.field_146546_t = parStatFileWriter;
-	}
-
-	/**+
-	 * Adds the buttons (and other controls) to the screen in
-	 * question. Called when the GUI is displayed and when the
-	 * window resizes, the buttonList is cleared beforehand.
-	 */
-	public void initGui() {
-		this.screenTitle = I18n.format("gui.stats", new Object[0]);
-		this.doesGuiPauseGame = true;
-		this.mc.getNetHandler()
-				.addToSendQueue(new C16PacketClientStatus(C16PacketClientStatus.EnumState.REQUEST_STATS));
-	}
-
-	/**+
-	 * Handles mouse input.
-	 */
-	public void handleMouseInput() throws IOException {
-		super.handleMouseInput();
-		if (this.displaySlot != null) {
-			this.displaySlot.handleMouseInput();
-		}
-
-	}
-
-	public void handleTouchInput() throws IOException {
-		super.handleTouchInput();
-		if (this.displaySlot != null) {
-			this.displaySlot.handleTouchInput();
-		}
-	}
-
-	public void func_175366_f() {
-		this.generalStats = new GuiStats.StatsGeneral(this.mc);
-		this.generalStats.registerScrollButtons(1, 1);
-		this.itemStats = new GuiStats.StatsItem(this.mc);
-		this.itemStats.registerScrollButtons(1, 1);
-		this.blockStats = new GuiStats.StatsBlock(this.mc);
-		this.blockStats.registerScrollButtons(1, 1);
-		this.mobStats = new GuiStats.StatsMobsList(this.mc);
-		this.mobStats.registerScrollButtons(1, 1);
-	}
-
-	public void createButtons() {
-		this.buttonList.add(new GuiButton(0, this.width / 2 + 4, this.height - 28, 150, 20,
-				I18n.format("gui.done", new Object[0])));
-		this.buttonList.add(new GuiButton(1, this.width / 2 - 160, this.height - 52, 80, 20,
-				I18n.format("stat.generalButton", new Object[0])));
-		GuiButton guibutton;
-		this.buttonList.add(guibutton = new GuiButton(2, this.width / 2 - 80, this.height - 52, 80, 20,
-				I18n.format("stat.blocksButton", new Object[0])));
-		GuiButton guibutton1;
-		this.buttonList.add(guibutton1 = new GuiButton(3, this.width / 2, this.height - 52, 80, 20,
-				I18n.format("stat.itemsButton", new Object[0])));
-		GuiButton guibutton2;
-		this.buttonList.add(guibutton2 = new GuiButton(4, this.width / 2 + 80, this.height - 52, 80, 20,
-				I18n.format("stat.mobsButton", new Object[0])));
-		if (this.blockStats.getSize() == 0) {
-			guibutton.enabled = false;
-		}
-
-		if (this.itemStats.getSize() == 0) {
-			guibutton1.enabled = false;
-		}
-
-		if (this.mobStats.getSize() == 0) {
-			guibutton2.enabled = false;
-		}
-
-	}
-
-	/**+
-	 * Called by the controls from the buttonList when activated.
-	 * (Mouse pressed for buttons)
-	 */
-	protected void actionPerformed(GuiButton parGuiButton) {
-		if (parGuiButton.enabled) {
-			if (parGuiButton.id == 0) {
-				this.mc.displayGuiScreen(this.parentScreen);
-			} else if (parGuiButton.id == 1) {
-				this.displaySlot = this.generalStats;
-			} else if (parGuiButton.id == 3) {
-				this.displaySlot = this.itemStats;
-			} else if (parGuiButton.id == 2) {
-				this.displaySlot = this.blockStats;
-			} else if (parGuiButton.id == 4) {
-				this.displaySlot = this.mobStats;
-			} else {
-				this.displaySlot.actionPerformed(parGuiButton);
-			}
-
-		}
-	}
-
-	/**+
-	 * Draws the screen and all the components in it. Args : mouseX,
-	 * mouseY, renderPartialTicks
-	 */
-	public void drawScreen(int i, int j, float f) {
-		if (this.doesGuiPauseGame) {
-			this.drawDefaultBackground();
-			this.drawCenteredString(this.fontRendererObj, I18n.format("multiplayer.downloadingStats", new Object[0]),
-					this.width / 2, this.height / 2, 16777215);
-			this.drawCenteredString(this.fontRendererObj,
-					lanSearchStates[(int) (Minecraft.getSystemTime() / 150L % (long) lanSearchStates.length)],
-					this.width / 2, this.height / 2 + this.fontRendererObj.FONT_HEIGHT * 2, 16777215);
-		} else {
-			this.displaySlot.drawScreen(i, j, f);
-			this.drawCenteredString(this.fontRendererObj, this.screenTitle, this.width / 2, 20, 16777215);
-			super.drawScreen(i, j, f);
-		}
-
-	}
-
-	public void doneLoading() {
-		if (this.doesGuiPauseGame) {
-			this.func_175366_f();
-			this.createButtons();
-			this.displaySlot = this.generalStats;
-			this.doesGuiPauseGame = false;
-		}
-
-	}
-
-	/**+
-	 * Returns true if this GUI should pause the game when it is
-	 * displayed in single-player
-	 */
-	public boolean doesGuiPauseGame() {
-		return !this.doesGuiPauseGame;
-	}
-
-	private void drawStatsScreen(int parInt1, int parInt2, Item parItem) {
-		this.drawButtonBackground(parInt1 + 1, parInt2 + 1);
-		GlStateManager.enableRescaleNormal();
-		RenderHelper.enableGUIStandardItemLighting();
-		this.itemRender.renderItemIntoGUI(new ItemStack(parItem, 1, 0), parInt1 + 2, parInt2 + 2);
-		RenderHelper.disableStandardItemLighting();
-		GlStateManager.disableRescaleNormal();
-	}
-
-	/**+
-	 * Draws a gray box that serves as a button background.
-	 */
-	private void drawButtonBackground(int parInt1, int parInt2) {
-		this.drawSprite(parInt1, parInt2, 0, 0);
-	}
-
-	/**+
-	 * Draws a sprite from
-	 * assets/textures/gui/container/stats_icons.png
-	 */
-	private void drawSprite(int parInt1, int parInt2, int parInt3, int parInt4) {
-		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-		this.mc.getTextureManager().bindTexture(statIcons);
-		float f = 0.0078125F;
-		float f1 = 0.0078125F;
-		boolean flag = true;
-		boolean flag1 = true;
-		Tessellator tessellator = Tessellator.getInstance();
-		WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-		worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
-		worldrenderer.pos((double) (parInt1 + 0), (double) (parInt2 + 18), (double) this.zLevel)
-				.tex((double) ((float) (parInt3 + 0) * 0.0078125F), (double) ((float) (parInt4 + 18) * 0.0078125F))
-				.endVertex();
-		worldrenderer.pos((double) (parInt1 + 18), (double) (parInt2 + 18), (double) this.zLevel)
-				.tex((double) ((float) (parInt3 + 18) * 0.0078125F), (double) ((float) (parInt4 + 18) * 0.0078125F))
-				.endVertex();
-		worldrenderer.pos((double) (parInt1 + 18), (double) (parInt2 + 0), (double) this.zLevel)
-				.tex((double) ((float) (parInt3 + 18) * 0.0078125F), (double) ((float) (parInt4 + 0) * 0.0078125F))
-				.endVertex();
-		worldrenderer.pos((double) (parInt1 + 0), (double) (parInt2 + 0), (double) this.zLevel)
-				.tex((double) ((float) (parInt3 + 0) * 0.0078125F), (double) ((float) (parInt4 + 0) * 0.0078125F))
-				.endVertex();
-		tessellator.draw();
-	}
-
 	abstract class Stats extends GuiSlot {
 		protected int field_148218_l = -1;
 		protected List<StatCrafting> statsHolder;
@@ -255,13 +65,6 @@ public class GuiStats extends GuiScreen implements IProgressMeter {
 			super(mcIn, GuiStats.this.width, GuiStats.this.height, 32, GuiStats.this.height - 64, 20);
 			this.setShowSelectionBox(false);
 			this.setHasListHeader(true, 20);
-		}
-
-		protected void elementClicked(int var1, boolean var2, int var3, int var4) {
-		}
-
-		protected boolean isSelected(int var1) {
-			return false;
 		}
 
 		protected void drawBackground() {
@@ -309,6 +112,9 @@ public class GuiStats extends GuiScreen implements IProgressMeter {
 
 		}
 
+		protected void elementClicked(int var1, boolean var2, int var3, int var4) {
+		}
+
 		protected void func_148132_a(int i, int var2) {
 			this.field_148218_l = -1;
 			if (i >= 79 && i < 115) {
@@ -323,31 +129,6 @@ public class GuiStats extends GuiScreen implements IProgressMeter {
 				this.func_148212_h(this.field_148218_l);
 				this.mc.getSoundHandler()
 						.playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
-			}
-
-		}
-
-		protected final int getSize() {
-			return this.statsHolder.size();
-		}
-
-		protected final StatCrafting func_148211_c(int parInt1) {
-			return (StatCrafting) this.statsHolder.get(parInt1);
-		}
-
-		protected abstract String func_148210_b(int var1);
-
-		protected void func_148209_a(StatBase parStatBase, int parInt1, int parInt2, boolean parFlag) {
-			if (parStatBase != null) {
-				String s = parStatBase.format(GuiStats.this.field_146546_t.readStat(parStatBase));
-				GuiStats.this.drawString(GuiStats.this.fontRendererObj, s,
-						parInt1 - GuiStats.this.fontRendererObj.getStringWidth(s), parInt2 + 5,
-						parFlag ? 16777215 : 9474192);
-			} else {
-				String s1 = "-";
-				GuiStats.this.drawString(GuiStats.this.fontRendererObj, s1,
-						parInt1 - GuiStats.this.fontRendererObj.getStringWidth(s1), parInt2 + 5,
-						parFlag ? 16777215 : 9474192);
 			}
 
 		}
@@ -391,6 +172,41 @@ public class GuiStats extends GuiScreen implements IProgressMeter {
 			}
 		}
 
+		protected void func_148209_a(StatBase parStatBase, int parInt1, int parInt2, boolean parFlag) {
+			if (parStatBase != null) {
+				String s = parStatBase.format(GuiStats.this.field_146546_t.readStat(parStatBase));
+				GuiStats.this.drawString(GuiStats.this.fontRendererObj, s,
+						parInt1 - GuiStats.this.fontRendererObj.getStringWidth(s), parInt2 + 5,
+						parFlag ? 16777215 : 9474192);
+			} else {
+				String s1 = "-";
+				GuiStats.this.drawString(GuiStats.this.fontRendererObj, s1,
+						parInt1 - GuiStats.this.fontRendererObj.getStringWidth(s1), parInt2 + 5,
+						parFlag ? 16777215 : 9474192);
+			}
+
+		}
+
+		protected abstract String func_148210_b(int var1);
+
+		protected final StatCrafting func_148211_c(int parInt1) {
+			return (StatCrafting) this.statsHolder.get(parInt1);
+		}
+
+		protected void func_148212_h(int parInt1) {
+			if (parInt1 != this.field_148217_o) {
+				this.field_148217_o = parInt1;
+				this.field_148215_p = -1;
+			} else if (this.field_148215_p == -1) {
+				this.field_148215_p = 1;
+			} else {
+				this.field_148217_o = -1;
+				this.field_148215_p = 0;
+			}
+
+			Collections.sort(this.statsHolder, this.statSorter);
+		}
+
 		protected void func_148213_a(StatCrafting parStatCrafting, int parInt1, int parInt2) {
 			if (parStatCrafting != null) {
 				Item item = parStatCrafting.func_150959_a();
@@ -408,18 +224,12 @@ public class GuiStats extends GuiScreen implements IProgressMeter {
 			}
 		}
 
-		protected void func_148212_h(int parInt1) {
-			if (parInt1 != this.field_148217_o) {
-				this.field_148217_o = parInt1;
-				this.field_148215_p = -1;
-			} else if (this.field_148215_p == -1) {
-				this.field_148215_p = 1;
-			} else {
-				this.field_148217_o = -1;
-				this.field_148215_p = 0;
-			}
+		protected final int getSize() {
+			return this.statsHolder.size();
+		}
 
-			Collections.sort(this.statsHolder, this.statSorter);
+		protected boolean isSelected(int var1) {
+			return false;
 		}
 	}
 
@@ -528,21 +338,6 @@ public class GuiStats extends GuiScreen implements IProgressMeter {
 			this.setShowSelectionBox(false);
 		}
 
-		protected int getSize() {
-			return StatList.generalStats.size();
-		}
-
-		protected void elementClicked(int var1, boolean var2, int var3, int var4) {
-		}
-
-		protected boolean isSelected(int var1) {
-			return false;
-		}
-
-		protected int getContentHeight() {
-			return this.getSize() * 10;
-		}
-
 		protected void drawBackground() {
 			GuiStats.this.drawDefaultBackground();
 		}
@@ -555,6 +350,21 @@ public class GuiStats extends GuiScreen implements IProgressMeter {
 			GuiStats.this.drawString(GuiStats.this.fontRendererObj, s,
 					j + 2 + 213 - GuiStats.this.fontRendererObj.getStringWidth(s), k + 1,
 					i % 2 == 0 ? 16777215 : 9474192);
+		}
+
+		protected void elementClicked(int var1, boolean var2, int var3, int var4) {
+		}
+
+		protected int getContentHeight() {
+			return this.getSize() * 10;
+		}
+
+		protected int getSize() {
+			return StatList.generalStats.size();
+		}
+
+		protected boolean isSelected(int var1) {
+			return false;
 		}
 	}
 
@@ -674,21 +484,6 @@ public class GuiStats extends GuiScreen implements IProgressMeter {
 
 		}
 
-		protected int getSize() {
-			return this.field_148222_l.size();
-		}
-
-		protected void elementClicked(int var1, boolean var2, int var3, int var4) {
-		}
-
-		protected boolean isSelected(int var1) {
-			return false;
-		}
-
-		protected int getContentHeight() {
-			return this.getSize() * GuiStats.this.fontRendererObj.FONT_HEIGHT * 4;
-		}
-
 		protected void drawBackground() {
 			GuiStats.this.drawDefaultBackground();
 		}
@@ -715,5 +510,217 @@ public class GuiStats extends GuiScreen implements IProgressMeter {
 			GuiStats.this.drawString(GuiStats.this.fontRendererObj, s2, j + 2,
 					k + 1 + GuiStats.this.fontRendererObj.FONT_HEIGHT * 2, i1 == 0 ? 6316128 : 9474192);
 		}
+
+		protected void elementClicked(int var1, boolean var2, int var3, int var4) {
+		}
+
+		protected int getContentHeight() {
+			return this.getSize() * GuiStats.this.fontRendererObj.FONT_HEIGHT * 4;
+		}
+
+		protected int getSize() {
+			return this.field_148222_l.size();
+		}
+
+		protected boolean isSelected(int var1) {
+			return false;
+		}
+	}
+
+	protected GuiScreen parentScreen;
+	protected String screenTitle = "Select world";
+	private GuiStats.StatsGeneral generalStats;
+	private GuiStats.StatsItem itemStats;
+
+	private GuiStats.StatsBlock blockStats;
+
+	private GuiStats.StatsMobsList mobStats;
+
+	private StatFileWriter field_146546_t;
+
+	private GuiSlot displaySlot;
+
+	/**
+	 * + When true, the game will be paused when the gui is shown
+	 */
+	private boolean doesGuiPauseGame = true;
+
+	public GuiStats(GuiScreen parGuiScreen, StatFileWriter parStatFileWriter) {
+		this.parentScreen = parGuiScreen;
+		this.field_146546_t = parStatFileWriter;
+	}
+
+	/**
+	 * + Called by the controls from the buttonList when activated. (Mouse pressed
+	 * for buttons)
+	 */
+	protected void actionPerformed(GuiButton parGuiButton) {
+		if (parGuiButton.enabled) {
+			if (parGuiButton.id == 0) {
+				this.mc.displayGuiScreen(this.parentScreen);
+			} else if (parGuiButton.id == 1) {
+				this.displaySlot = this.generalStats;
+			} else if (parGuiButton.id == 3) {
+				this.displaySlot = this.itemStats;
+			} else if (parGuiButton.id == 2) {
+				this.displaySlot = this.blockStats;
+			} else if (parGuiButton.id == 4) {
+				this.displaySlot = this.mobStats;
+			} else {
+				this.displaySlot.actionPerformed(parGuiButton);
+			}
+
+		}
+	}
+
+	public void createButtons() {
+		this.buttonList.add(new GuiButton(0, this.width / 2 + 4, this.height - 28, 150, 20,
+				I18n.format("gui.done", new Object[0])));
+		this.buttonList.add(new GuiButton(1, this.width / 2 - 160, this.height - 52, 80, 20,
+				I18n.format("stat.generalButton", new Object[0])));
+		GuiButton guibutton;
+		this.buttonList.add(guibutton = new GuiButton(2, this.width / 2 - 80, this.height - 52, 80, 20,
+				I18n.format("stat.blocksButton", new Object[0])));
+		GuiButton guibutton1;
+		this.buttonList.add(guibutton1 = new GuiButton(3, this.width / 2, this.height - 52, 80, 20,
+				I18n.format("stat.itemsButton", new Object[0])));
+		GuiButton guibutton2;
+		this.buttonList.add(guibutton2 = new GuiButton(4, this.width / 2 + 80, this.height - 52, 80, 20,
+				I18n.format("stat.mobsButton", new Object[0])));
+		if (this.blockStats.getSize() == 0) {
+			guibutton.enabled = false;
+		}
+
+		if (this.itemStats.getSize() == 0) {
+			guibutton1.enabled = false;
+		}
+
+		if (this.mobStats.getSize() == 0) {
+			guibutton2.enabled = false;
+		}
+
+	}
+
+	/**
+	 * + Returns true if this GUI should pause the game when it is displayed in
+	 * single-player
+	 */
+	public boolean doesGuiPauseGame() {
+		return !this.doesGuiPauseGame;
+	}
+
+	public void doneLoading() {
+		if (this.doesGuiPauseGame) {
+			this.func_175366_f();
+			this.createButtons();
+			this.displaySlot = this.generalStats;
+			this.doesGuiPauseGame = false;
+		}
+
+	}
+
+	/**
+	 * + Draws a gray box that serves as a button background.
+	 */
+	private void drawButtonBackground(int parInt1, int parInt2) {
+		this.drawSprite(parInt1, parInt2, 0, 0);
+	}
+
+	/**
+	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
+	 * renderPartialTicks
+	 */
+	public void drawScreen(int i, int j, float f) {
+		if (this.doesGuiPauseGame) {
+			this.drawDefaultBackground();
+			this.drawCenteredString(this.fontRendererObj, I18n.format("multiplayer.downloadingStats", new Object[0]),
+					this.width / 2, this.height / 2, 16777215);
+			this.drawCenteredString(this.fontRendererObj,
+					lanSearchStates[(int) (Minecraft.getSystemTime() / 150L % (long) lanSearchStates.length)],
+					this.width / 2, this.height / 2 + this.fontRendererObj.FONT_HEIGHT * 2, 16777215);
+		} else {
+			this.displaySlot.drawScreen(i, j, f);
+			this.drawCenteredString(this.fontRendererObj, this.screenTitle, this.width / 2, 20, 16777215);
+			super.drawScreen(i, j, f);
+		}
+
+	}
+
+	/**
+	 * + Draws a sprite from assets/textures/gui/container/stats_icons.png
+	 */
+	private void drawSprite(int parInt1, int parInt2, int parInt3, int parInt4) {
+		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+		this.mc.getTextureManager().bindTexture(statIcons);
+		float f = 0.0078125F;
+		float f1 = 0.0078125F;
+		boolean flag = true;
+		boolean flag1 = true;
+		Tessellator tessellator = Tessellator.getInstance();
+		WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+		worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
+		worldrenderer.pos((double) (parInt1 + 0), (double) (parInt2 + 18), (double) this.zLevel)
+				.tex((double) ((float) (parInt3 + 0) * 0.0078125F), (double) ((float) (parInt4 + 18) * 0.0078125F))
+				.endVertex();
+		worldrenderer.pos((double) (parInt1 + 18), (double) (parInt2 + 18), (double) this.zLevel)
+				.tex((double) ((float) (parInt3 + 18) * 0.0078125F), (double) ((float) (parInt4 + 18) * 0.0078125F))
+				.endVertex();
+		worldrenderer.pos((double) (parInt1 + 18), (double) (parInt2 + 0), (double) this.zLevel)
+				.tex((double) ((float) (parInt3 + 18) * 0.0078125F), (double) ((float) (parInt4 + 0) * 0.0078125F))
+				.endVertex();
+		worldrenderer.pos((double) (parInt1 + 0), (double) (parInt2 + 0), (double) this.zLevel)
+				.tex((double) ((float) (parInt3 + 0) * 0.0078125F), (double) ((float) (parInt4 + 0) * 0.0078125F))
+				.endVertex();
+		tessellator.draw();
+	}
+
+	private void drawStatsScreen(int parInt1, int parInt2, Item parItem) {
+		this.drawButtonBackground(parInt1 + 1, parInt2 + 1);
+		GlStateManager.enableRescaleNormal();
+		RenderHelper.enableGUIStandardItemLighting();
+		this.itemRender.renderItemIntoGUI(new ItemStack(parItem, 1, 0), parInt1 + 2, parInt2 + 2);
+		RenderHelper.disableStandardItemLighting();
+		GlStateManager.disableRescaleNormal();
+	}
+
+	public void func_175366_f() {
+		this.generalStats = new GuiStats.StatsGeneral(this.mc);
+		this.generalStats.registerScrollButtons(1, 1);
+		this.itemStats = new GuiStats.StatsItem(this.mc);
+		this.itemStats.registerScrollButtons(1, 1);
+		this.blockStats = new GuiStats.StatsBlock(this.mc);
+		this.blockStats.registerScrollButtons(1, 1);
+		this.mobStats = new GuiStats.StatsMobsList(this.mc);
+		this.mobStats.registerScrollButtons(1, 1);
+	}
+
+	/**
+	 * + Handles mouse input.
+	 */
+	public void handleMouseInput() throws IOException {
+		super.handleMouseInput();
+		if (this.displaySlot != null) {
+			this.displaySlot.handleMouseInput();
+		}
+
+	}
+
+	public void handleTouchInput() throws IOException {
+		super.handleTouchInput();
+		if (this.displaySlot != null) {
+			this.displaySlot.handleTouchInput();
+		}
+	}
+
+	/**
+	 * + Adds the buttons (and other controls) to the screen in question. Called
+	 * when the GUI is displayed and when the window resizes, the buttonList is
+	 * cleared beforehand.
+	 */
+	public void initGui() {
+		this.screenTitle = I18n.format("gui.stats", new Object[0]);
+		this.doesGuiPauseGame = true;
+		this.mc.getNetHandler()
+				.addToSendQueue(new C16PacketClientStatus(C16PacketClientStatus.EnumState.REQUEST_STATS));
 	}
 }

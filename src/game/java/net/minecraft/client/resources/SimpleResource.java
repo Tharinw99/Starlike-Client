@@ -15,22 +15,25 @@ import net.minecraft.client.resources.data.IMetadataSection;
 import net.minecraft.client.resources.data.IMetadataSerializer;
 import net.minecraft.util.ResourceLocation;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -53,48 +56,6 @@ public class SimpleResource implements IResource {
 		this.resourceInputStream = resourceInputStreamIn;
 		this.mcmetaInputStream = mcmetaInputStreamIn;
 		this.srMetadataSerializer = srMetadataSerializerIn;
-	}
-
-	public ResourceLocation getResourceLocation() {
-		return this.srResourceLocation;
-	}
-
-	public InputStream getInputStream() {
-		return this.resourceInputStream;
-	}
-
-	public boolean hasMetadata() {
-		return this.mcmetaInputStream != null;
-	}
-
-	public <T extends IMetadataSection> T getMetadata(String s) {
-		if (!this.hasMetadata()) {
-			return (T) null;
-		} else {
-			if (this.mcmetaJson == null && !this.mcmetaJsonChecked) {
-				this.mcmetaJsonChecked = true;
-
-				try {
-					this.mcmetaJson = new JSONObject(
-							IOUtils.inputStreamToString(this.mcmetaInputStream, StandardCharsets.UTF_8));
-				} catch (IOException e) {
-					throw new JSONException(e);
-				} finally {
-					IOUtils.closeQuietly(this.mcmetaInputStream);
-				}
-			}
-
-			IMetadataSection imetadatasection = (IMetadataSection) this.mapMetadataSections.get(s);
-			if (imetadatasection == null) {
-				imetadatasection = this.srMetadataSerializer.parseMetadataSection(s, this.mcmetaJson);
-			}
-
-			return (T) imetadatasection;
-		}
-	}
-
-	public String getResourcePackName() {
-		return this.resourcePackName;
 	}
 
 	public boolean equals(Object object) {
@@ -124,9 +85,51 @@ public class SimpleResource implements IResource {
 		}
 	}
 
+	public InputStream getInputStream() {
+		return this.resourceInputStream;
+	}
+
+	public <T extends IMetadataSection> T getMetadata(String s) {
+		if (!this.hasMetadata()) {
+			return (T) null;
+		} else {
+			if (this.mcmetaJson == null && !this.mcmetaJsonChecked) {
+				this.mcmetaJsonChecked = true;
+
+				try {
+					this.mcmetaJson = new JSONObject(
+							IOUtils.inputStreamToString(this.mcmetaInputStream, StandardCharsets.UTF_8));
+				} catch (IOException e) {
+					throw new JSONException(e);
+				} finally {
+					IOUtils.closeQuietly(this.mcmetaInputStream);
+				}
+			}
+
+			IMetadataSection imetadatasection = (IMetadataSection) this.mapMetadataSections.get(s);
+			if (imetadatasection == null) {
+				imetadatasection = this.srMetadataSerializer.parseMetadataSection(s, this.mcmetaJson);
+			}
+
+			return (T) imetadatasection;
+		}
+	}
+
+	public ResourceLocation getResourceLocation() {
+		return this.srResourceLocation;
+	}
+
+	public String getResourcePackName() {
+		return this.resourcePackName;
+	}
+
 	public int hashCode() {
 		int i = this.resourcePackName != null ? this.resourcePackName.hashCode() : 0;
 		i = 31 * i + (this.srResourceLocation != null ? this.srResourceLocation.hashCode() : 0);
 		return i;
+	}
+
+	public boolean hasMetadata() {
+		return this.mcmetaInputStream != null;
 	}
 }

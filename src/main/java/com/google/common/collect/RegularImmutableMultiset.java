@@ -41,24 +41,14 @@ class RegularImmutableMultiset<E> extends ImmutableMultiset<E> {
 	}
 
 	@Override
-	boolean isPartialView() {
-		return map.isPartialView();
+	public boolean contains(@Nullable Object element) {
+		return map.containsKey(element);
 	}
 
 	@Override
 	public int count(@Nullable Object element) {
 		Integer value = map.get(element);
 		return (value == null) ? 0 : value;
-	}
-
-	@Override
-	public int size() {
-		return size;
-	}
-
-	@Override
-	public boolean contains(@Nullable Object element) {
-		return map.containsKey(element);
 	}
 
 	@Override
@@ -75,5 +65,15 @@ class RegularImmutableMultiset<E> extends ImmutableMultiset<E> {
 	@Override
 	public int hashCode() {
 		return map.hashCode();
+	}
+
+	@Override
+	boolean isPartialView() {
+		return map.isPartialView();
+	}
+
+	@Override
+	public int size() {
+		return size;
 	}
 }

@@ -12,22 +12,25 @@ import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemShears;
 import net.minecraft.util.ResourceLocation;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -220,14 +223,22 @@ public class Items {
 	public static Item prismarine_shard;
 	public static Item prismarine_crystals;
 	public static Item banner;
+	public static Item steel;
 	public static Item platinum_ingot;
 	public static Item platinum_sword;
 	public static Item platinum_pickaxe;
-	public static Item normal_drill;
-
-	private static Item getRegisteredItem(String name) {
-		return (Item) Item.itemRegistry.getObject(new ResourceLocation(name));
-	}
+	public static Item platinum_shovel;
+	public static Item platinum_axe;
+	public static Item platinum_hoe;
+	public static Item platinum_helmet;
+	public static Item platinum_chestplate;
+	public static Item platinum_leggings;
+	public static Item platinum_boots;
+	public static Item titanium_ingot;
+	public static Item uranium_crystal;
+	public static Item uranium_rod;
+	public static Item platinum_drill;
+	public static Item titanium_drill;
 
 	static void doBootstrap() {
 		if (!Bootstrap.isRegistered()) {
@@ -420,10 +431,27 @@ public class Items {
 			prismarine_shard = getRegisteredItem("prismarine_shard");
 			prismarine_crystals = getRegisteredItem("prismarine_crystals");
 			banner = getRegisteredItem("banner");
+
+			steel = getRegisteredItem("starlike:steel");
 			platinum_ingot = getRegisteredItem("starlike:platinum_ingot");
 			platinum_sword = getRegisteredItem("starlike:platinum_sword");
 			platinum_pickaxe = getRegisteredItem("starlike:platinum_pickaxe");
-			normal_drill = getRegisteredItem("starlike:normal_drill");
+			platinum_shovel = getRegisteredItem("starlike:platinum_shovel");
+			platinum_axe = getRegisteredItem("starlike:platinum_axe");
+			platinum_hoe = getRegisteredItem("starlike:platinum_hoe");
+			platinum_helmet = getRegisteredItem("starlike:platinum_helmet");
+			platinum_chestplate = getRegisteredItem("starlike:platinum_chestplate");
+			platinum_leggings = getRegisteredItem("starlike:platinum_leggings");
+			platinum_boots = getRegisteredItem("starlike:platinum_boots");
+			titanium_ingot = getRegisteredItem("starlike:titanium_ingot");
+			uranium_crystal = getRegisteredItem("starlike:uranium_crystal");
+			uranium_rod = getRegisteredItem("starlike:uranium_rod");
+			platinum_drill = getRegisteredItem("starlike:platinum_drill");
+			titanium_drill = getRegisteredItem("starlike:titanium_drill");
 		}
+	}
+
+	private static Item getRegisteredItem(String name) {
+		return (Item) Item.itemRegistry.getObject(new ResourceLocation(name));
 	}
 }

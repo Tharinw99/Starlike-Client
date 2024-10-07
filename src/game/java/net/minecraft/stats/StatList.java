@@ -20,22 +20,25 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.ResourceLocation;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -45,125 +48,124 @@ public class StatList {
 	public static List<StatBase> allStats = Lists.newArrayList();
 	public static List<StatBase> generalStats = Lists.newArrayList();
 	public static List<StatCrafting> itemStats = Lists.newArrayList();
-	/**+
-	 * Tracks the number of times a given block or item has been
-	 * mined.
+	/**
+	 * + Tracks the number of times a given block or item has been mined.
 	 */
 	public static List<StatCrafting> objectMineStats = Lists.newArrayList();
-	/**+
-	 * number of times you've left a game
+	/**
+	 * + number of times you've left a game
 	 */
 	public static StatBase leaveGameStat = (new StatBasic("stat.leaveGame",
 			new ChatComponentTranslation("stat.leaveGame", new Object[0]))).initIndependentStat().registerStat();
-	/**+
-	 * number of minutes you have played
+	/**
+	 * + number of minutes you have played
 	 */
 	public static StatBase minutesPlayedStat = (new StatBasic("stat.playOneMinute",
 			new ChatComponentTranslation("stat.playOneMinute", new Object[0]), StatBase.timeStatType))
-					.initIndependentStat().registerStat();
+			.initIndependentStat().registerStat();
 	public static StatBase timeSinceDeathStat = (new StatBasic("stat.timeSinceDeath",
 			new ChatComponentTranslation("stat.timeSinceDeath", new Object[0]), StatBase.timeStatType))
-					.initIndependentStat().registerStat();
-	/**+
-	 * distance you've walked
+			.initIndependentStat().registerStat();
+	/**
+	 * + distance you've walked
 	 */
 	public static StatBase distanceWalkedStat = (new StatBasic("stat.walkOneCm",
 			new ChatComponentTranslation("stat.walkOneCm", new Object[0]), StatBase.distanceStatType))
-					.initIndependentStat().registerStat();
+			.initIndependentStat().registerStat();
 	public static StatBase distanceCrouchedStat = (new StatBasic("stat.crouchOneCm",
 			new ChatComponentTranslation("stat.crouchOneCm", new Object[0]), StatBase.distanceStatType))
-					.initIndependentStat().registerStat();
+			.initIndependentStat().registerStat();
 	public static StatBase distanceSprintedStat = (new StatBasic("stat.sprintOneCm",
 			new ChatComponentTranslation("stat.sprintOneCm", new Object[0]), StatBase.distanceStatType))
-					.initIndependentStat().registerStat();
-	/**+
-	 * distance you have swam
+			.initIndependentStat().registerStat();
+	/**
+	 * + distance you have swam
 	 */
 	public static StatBase distanceSwumStat = (new StatBasic("stat.swimOneCm",
 			new ChatComponentTranslation("stat.swimOneCm", new Object[0]), StatBase.distanceStatType))
-					.initIndependentStat().registerStat();
-	/**+
-	 * the distance you have fallen
+			.initIndependentStat().registerStat();
+	/**
+	 * + the distance you have fallen
 	 */
 	public static StatBase distanceFallenStat = (new StatBasic("stat.fallOneCm",
 			new ChatComponentTranslation("stat.fallOneCm", new Object[0]), StatBase.distanceStatType))
-					.initIndependentStat().registerStat();
-	/**+
-	 * the distance you've climbed
+			.initIndependentStat().registerStat();
+	/**
+	 * + the distance you've climbed
 	 */
 	public static StatBase distanceClimbedStat = (new StatBasic("stat.climbOneCm",
 			new ChatComponentTranslation("stat.climbOneCm", new Object[0]), StatBase.distanceStatType))
-					.initIndependentStat().registerStat();
-	/**+
-	 * the distance you've flown
+			.initIndependentStat().registerStat();
+	/**
+	 * + the distance you've flown
 	 */
 	public static StatBase distanceFlownStat = (new StatBasic("stat.flyOneCm",
 			new ChatComponentTranslation("stat.flyOneCm", new Object[0]), StatBase.distanceStatType))
-					.initIndependentStat().registerStat();
-	/**+
-	 * the distance you've dived
+			.initIndependentStat().registerStat();
+	/**
+	 * + the distance you've dived
 	 */
 	public static StatBase distanceDoveStat = (new StatBasic("stat.diveOneCm",
 			new ChatComponentTranslation("stat.diveOneCm", new Object[0]), StatBase.distanceStatType))
-					.initIndependentStat().registerStat();
-	/**+
-	 * the distance you've traveled by minecart
+			.initIndependentStat().registerStat();
+	/**
+	 * + the distance you've traveled by minecart
 	 */
 	public static StatBase distanceByMinecartStat = (new StatBasic("stat.minecartOneCm",
 			new ChatComponentTranslation("stat.minecartOneCm", new Object[0]), StatBase.distanceStatType))
-					.initIndependentStat().registerStat();
-	/**+
-	 * the distance you've traveled by boat
+			.initIndependentStat().registerStat();
+	/**
+	 * + the distance you've traveled by boat
 	 */
 	public static StatBase distanceByBoatStat = (new StatBasic("stat.boatOneCm",
 			new ChatComponentTranslation("stat.boatOneCm", new Object[0]), StatBase.distanceStatType))
-					.initIndependentStat().registerStat();
-	/**+
-	 * the distance you've traveled by pig
+			.initIndependentStat().registerStat();
+	/**
+	 * + the distance you've traveled by pig
 	 */
 	public static StatBase distanceByPigStat = (new StatBasic("stat.pigOneCm",
 			new ChatComponentTranslation("stat.pigOneCm", new Object[0]), StatBase.distanceStatType))
-					.initIndependentStat().registerStat();
+			.initIndependentStat().registerStat();
 	public static StatBase distanceByHorseStat = (new StatBasic("stat.horseOneCm",
 			new ChatComponentTranslation("stat.horseOneCm", new Object[0]), StatBase.distanceStatType))
-					.initIndependentStat().registerStat();
-	/**+
-	 * the times you've jumped
+			.initIndependentStat().registerStat();
+	/**
+	 * + the times you've jumped
 	 */
 	public static StatBase jumpStat = (new StatBasic("stat.jump",
 			new ChatComponentTranslation("stat.jump", new Object[0]))).initIndependentStat().registerStat();
-	/**+
-	 * the distance you've dropped (or times you've fallen?)
+	/**
+	 * + the distance you've dropped (or times you've fallen?)
 	 */
 	public static StatBase dropStat = (new StatBasic("stat.drop",
 			new ChatComponentTranslation("stat.drop", new Object[0]))).initIndependentStat().registerStat();
-	/**+
-	 * the amount of damage you've dealt
+	/**
+	 * + the amount of damage you've dealt
 	 */
 	public static StatBase damageDealtStat = (new StatBasic("stat.damageDealt",
 			new ChatComponentTranslation("stat.damageDealt", new Object[0]), StatBase.field_111202_k)).registerStat();
-	/**+
-	 * the amount of damage you have taken
+	/**
+	 * + the amount of damage you have taken
 	 */
 	public static StatBase damageTakenStat = (new StatBasic("stat.damageTaken",
 			new ChatComponentTranslation("stat.damageTaken", new Object[0]), StatBase.field_111202_k)).registerStat();
-	/**+
-	 * the number of times you have died
+	/**
+	 * + the number of times you have died
 	 */
 	public static StatBase deathsStat = (new StatBasic("stat.deaths",
 			new ChatComponentTranslation("stat.deaths", new Object[0]))).registerStat();
-	/**+
-	 * the number of mobs you have killed
+	/**
+	 * + the number of mobs you have killed
 	 */
 	public static StatBase mobKillsStat = (new StatBasic("stat.mobKills",
 			new ChatComponentTranslation("stat.mobKills", new Object[0]))).registerStat();
-	/**+
-	 * the number of animals you have bred
+	/**
+	 * + the number of animals you have bred
 	 */
 	public static StatBase animalsBredStat = (new StatBasic("stat.animalsBred",
 			new ChatComponentTranslation("stat.animalsBred", new Object[0]))).registerStat();
-	/**+
-	 * counts the number of times you've killed a player
+	/**
+	 * + counts the number of times you've killed a player
 	 */
 	public static StatBase playerKillsStat = (new StatBasic("stat.playerKills",
 			new ChatComponentTranslation("stat.playerKills", new Object[0]))).registerStat();
@@ -218,21 +220,45 @@ public class StatList {
 	public static StatBase field_181723_aa = (new StatBasic("stat.chestOpened",
 			new ChatComponentTranslation("stat.chestOpened", new Object[0]))).registerStat();
 	public static final StatBase[] mineBlockStatArray = new StatBase[4096];
-	/**+
-	 * Tracks the number of items a given block or item has been
-	 * crafted.
+	/**
+	 * + Tracks the number of items a given block or item has been crafted.
 	 */
 	public static final StatBase[] objectCraftStats = new StatBase[32000];
-	/**+
-	 * Tracks the number of times a given block or item has been
-	 * used.
+	/**
+	 * + Tracks the number of times a given block or item has been used.
 	 */
 	public static final StatBase[] objectUseStats = new StatBase[32000];
-	/**+
-	 * Tracks the number of times a given block or item has been
-	 * broken.
+	/**
+	 * + Tracks the number of times a given block or item has been broken.
 	 */
 	public static final StatBase[] objectBreakStats = new StatBase[32000];
+
+	private static String func_180204_a(Item parItem) {
+		ResourceLocation resourcelocation = (ResourceLocation) Item.itemRegistry.getNameForObject(parItem);
+		return resourcelocation != null ? resourcelocation.toString().replace(':', '.') : null;
+	}
+
+	public static StatBase getOneShotStat(String parString1) {
+		return (StatBase) oneShotStats.get(parString1);
+	}
+
+	public static StatBase getStatEntityKilledBy(EntityList.EntityEggInfo eggInfo) {
+		String s = EntityList.getStringFromID(eggInfo.spawnedID);
+		return s == null ? null
+				: (new StatBase("stat.entityKilledBy." + s,
+						new ChatComponentTranslation("stat.entityKilledBy",
+								new Object[] { new ChatComponentTranslation("entity." + s + ".name", new Object[0]) })))
+						.registerStat();
+	}
+
+	public static StatBase getStatKillEntity(EntityList.EntityEggInfo eggInfo) {
+		String s = EntityList.getStringFromID(eggInfo.spawnedID);
+		return s == null ? null
+				: (new StatBase("stat.killEntity." + s,
+						new ChatComponentTranslation("stat.entityKill",
+								new Object[] { new ChatComponentTranslation("entity." + s + ".name", new Object[0]) })))
+						.registerStat();
+	}
 
 	public static void init() {
 		initMiningStats();
@@ -243,9 +269,9 @@ public class StatList {
 		EntityList.func_151514_a();
 	}
 
-	/**+
-	 * Initializes statistics related to craftable items. Is only
-	 * called after both block and item stats have been initialized.
+	/**
+	 * + Initializes statistics related to craftable items. Is only called after
+	 * both block and item stats have been initialized.
 	 */
 	private static void initCraftableStats() {
 		HashSet hashset = Sets.newHashSet();
@@ -267,12 +293,28 @@ public class StatList {
 				if (s != null) {
 					objectCraftStats[i] = (new StatCrafting("stat.craftItem.", s, new ChatComponentTranslation(
 							"stat.craftItem", new Object[] { (new ItemStack(item)).getChatComponent() }), item))
-									.registerStat();
+							.registerStat();
 				}
 			}
 		}
 
 		replaceAllSimilarBlocks(objectCraftStats);
+	}
+
+	private static void initItemDepleteStats() {
+		for (Item item : Item.itemRegistry) {
+			if (item != null) {
+				int i = Item.getIdFromItem(item);
+				String s = func_180204_a(item);
+				if (s != null && item.isDamageable()) {
+					objectBreakStats[i] = (new StatCrafting("stat.breakItem.", s, new ChatComponentTranslation(
+							"stat.breakItem", new Object[] { (new ItemStack(item)).getChatComponent() }), item))
+							.registerStat();
+				}
+			}
+		}
+
+		replaceAllSimilarBlocks(objectBreakStats);
 	}
 
 	private static void initMiningStats() {
@@ -284,7 +326,7 @@ public class StatList {
 				if (s != null && block.getEnableStats()) {
 					mineBlockStatArray[i] = (new StatCrafting("stat.mineBlock.", s, new ChatComponentTranslation(
 							"stat.mineBlock", new Object[] { (new ItemStack(block)).getChatComponent() }), item))
-									.registerStat();
+							.registerStat();
 					objectMineStats.add((StatCrafting) mineBlockStatArray[i]);
 				}
 			}
@@ -301,7 +343,7 @@ public class StatList {
 				if (s != null) {
 					objectUseStats[i] = (new StatCrafting("stat.useItem.", s, new ChatComponentTranslation(
 							"stat.useItem", new Object[] { (new ItemStack(item)).getChatComponent() }), item))
-									.registerStat();
+							.registerStat();
 					if (!(item instanceof ItemBlock)) {
 						itemStats.add((StatCrafting) objectUseStats[i]);
 					}
@@ -312,30 +354,24 @@ public class StatList {
 		replaceAllSimilarBlocks(objectUseStats);
 	}
 
-	private static void initItemDepleteStats() {
-		for (Item item : Item.itemRegistry) {
-			if (item != null) {
-				int i = Item.getIdFromItem(item);
-				String s = func_180204_a(item);
-				if (s != null && item.isDamageable()) {
-					objectBreakStats[i] = (new StatCrafting("stat.breakItem.", s, new ChatComponentTranslation(
-							"stat.breakItem", new Object[] { (new ItemStack(item)).getChatComponent() }), item))
-									.registerStat();
-				}
-			}
+	/**
+	 * + Merge {@link StatBase} object references for similar blocks
+	 */
+	private static void mergeStatBases(StatBase[] statBaseIn, Block parBlock, Block parBlock2) {
+		int i = Block.getIdFromBlock(parBlock);
+		int j = Block.getIdFromBlock(parBlock2);
+		if (statBaseIn[i] != null && statBaseIn[j] == null) {
+			statBaseIn[j] = statBaseIn[i];
+		} else {
+			allStats.remove(statBaseIn[i]);
+			objectMineStats.remove(statBaseIn[i]);
+			generalStats.remove(statBaseIn[i]);
+			statBaseIn[i] = statBaseIn[j];
 		}
-
-		replaceAllSimilarBlocks(objectBreakStats);
 	}
 
-	private static String func_180204_a(Item parItem) {
-		ResourceLocation resourcelocation = (ResourceLocation) Item.itemRegistry.getNameForObject(parItem);
-		return resourcelocation != null ? resourcelocation.toString().replace(':', '.') : null;
-	}
-
-	/**+
-	 * Forces all dual blocks to count for each other on the stats
-	 * list
+	/**
+	 * + Forces all dual blocks to count for each other on the stats list
 	 */
 	private static void replaceAllSimilarBlocks(StatBase[] parArrayOfStatBase) {
 		mergeStatBases(parArrayOfStatBase, Blocks.water, Blocks.flowing_water);
@@ -352,43 +388,5 @@ public class StatList {
 		mergeStatBases(parArrayOfStatBase, Blocks.double_stone_slab2, Blocks.stone_slab2);
 		mergeStatBases(parArrayOfStatBase, Blocks.grass, Blocks.dirt);
 		mergeStatBases(parArrayOfStatBase, Blocks.farmland, Blocks.dirt);
-	}
-
-	/**+
-	 * Merge {@link StatBase} object references for similar blocks
-	 */
-	private static void mergeStatBases(StatBase[] statBaseIn, Block parBlock, Block parBlock2) {
-		int i = Block.getIdFromBlock(parBlock);
-		int j = Block.getIdFromBlock(parBlock2);
-		if (statBaseIn[i] != null && statBaseIn[j] == null) {
-			statBaseIn[j] = statBaseIn[i];
-		} else {
-			allStats.remove(statBaseIn[i]);
-			objectMineStats.remove(statBaseIn[i]);
-			generalStats.remove(statBaseIn[i]);
-			statBaseIn[i] = statBaseIn[j];
-		}
-	}
-
-	public static StatBase getStatKillEntity(EntityList.EntityEggInfo eggInfo) {
-		String s = EntityList.getStringFromID(eggInfo.spawnedID);
-		return s == null ? null
-				: (new StatBase("stat.killEntity." + s,
-						new ChatComponentTranslation("stat.entityKill",
-								new Object[] { new ChatComponentTranslation("entity." + s + ".name", new Object[0]) })))
-										.registerStat();
-	}
-
-	public static StatBase getStatEntityKilledBy(EntityList.EntityEggInfo eggInfo) {
-		String s = EntityList.getStringFromID(eggInfo.spawnedID);
-		return s == null ? null
-				: (new StatBase("stat.entityKilledBy." + s,
-						new ChatComponentTranslation("stat.entityKilledBy",
-								new Object[] { new ChatComponentTranslation("entity." + s + ".name", new Object[0]) })))
-										.registerStat();
-	}
-
-	public static StatBase getOneShotStat(String parString1) {
-		return (StatBase) oneShotStats.get(parString1);
 	}
 }

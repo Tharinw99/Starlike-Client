@@ -1,8 +1,22 @@
 package net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred;
 
-import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL.*;
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
-import static net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.ExtGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglBindBuffer;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglBufferData;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDeleteBuffers;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDeleteVertexArrays;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDrawElements;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglEnableVertexAttribArray;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGenBuffers;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGenVertexArrays;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglVertexAttribPointer;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ARRAY_BUFFER;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ELEMENT_ARRAY_BUFFER;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_STATIC_DRAW;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TRIANGLES;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_UNSIGNED_BYTE;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_UNSIGNED_INT;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_UNSIGNED_SHORT;
+import static net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.ExtGLEnums._GL_HALF_FLOAT;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -20,14 +34,15 @@ import net.minecraft.util.ResourceLocation;
 /**
  * Copyright (c) 2023 lax1dude. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -49,37 +64,58 @@ public class LightSourceMesh {
 		typeBytes = type.getBytes(StandardCharsets.UTF_8);
 	}
 
+	public void destroy() {
+		if (meshVBO != null) {
+			_wglDeleteBuffers(meshVBO);
+			meshVBO = null;
+		}
+		if (meshIBO != null) {
+			_wglDeleteBuffers(meshIBO);
+			meshIBO = null;
+		}
+		if (meshVAO != null) {
+			_wglDeleteVertexArrays(meshVAO);
+			meshVAO = null;
+		}
+	}
+
+	public void drawMeshVAO() {
+		EaglercraftGPU.bindGLBufferArray(meshVAO);
+		_wglDrawElements(GL_TRIANGLES, meshIndexCount, meshIndexType, 0);
+	}
+
 	public void load() throws IOException {
 		destroy();
 		try (DataInputStream is = new DataInputStream(
 				Minecraft.getMinecraft().getResourceManager().getResource(meshLocation).getInputStream())) {
-			if(is.read() != 0xEE || is.read() != 0xAA || is.read() != 0x66 || is.read() != '%') {
+			if (is.read() != 0xEE || is.read() != 0xAA || is.read() != 0x66 || is.read() != '%') {
 				throw new IOException("Bad file type for: " + meshLocation.toString());
 			}
 			byte[] bb = new byte[is.read()];
 			is.read(bb);
-			if(!Arrays.equals(bb, typeBytes)) {
-				throw new IOException("Bad file type \"" + new String(bb, StandardCharsets.UTF_8) + "\" for: " + meshLocation.toString());
+			if (!Arrays.equals(bb, typeBytes)) {
+				throw new IOException("Bad file type \"" + new String(bb, StandardCharsets.UTF_8) + "\" for: "
+						+ meshLocation.toString());
 			}
-			
+
 			int vboLength = is.readInt() * 6;
 			byte[] readBuffer = new byte[vboLength];
 			is.read(readBuffer);
-			
+
 			ByteBuffer buf = EagRuntime.allocateByteBuffer(readBuffer.length);
 			buf.put(readBuffer);
 			buf.flip();
-			
+
 			meshVBO = _wglGenBuffers();
 			EaglercraftGPU.bindGLArrayBuffer(meshVBO);
 			_wglBufferData(GL_ARRAY_BUFFER, buf, GL_STATIC_DRAW);
-			
+
 			EagRuntime.freeByteBuffer(buf);
-			
+
 			int iboLength = meshIndexCount = is.readInt();
 			int iboType = is.read();
 			iboLength *= iboType;
-			switch(iboType) {
+			switch (iboType) {
 			case 1:
 				meshIndexType = GL_UNSIGNED_BYTE;
 				break;
@@ -92,46 +128,26 @@ public class LightSourceMesh {
 			default:
 				throw new IOException("Unsupported index buffer type: " + iboType);
 			}
-			
+
 			readBuffer = new byte[iboLength];
 			is.read(readBuffer);
-			
+
 			buf = EagRuntime.allocateByteBuffer(readBuffer.length);
 			buf.put(readBuffer);
 			buf.flip();
-			
+
 			meshVAO = _wglGenVertexArrays();
 			EaglercraftGPU.bindGLBufferArray(meshVAO);
-			
+
 			meshIBO = _wglGenBuffers();
 			_wglBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshIBO);
 			_wglBufferData(GL_ELEMENT_ARRAY_BUFFER, buf, GL_STATIC_DRAW);
 			EagRuntime.freeByteBuffer(buf);
-			
+
 			EaglercraftGPU.bindGLArrayBuffer(meshVBO);
-			
+
 			_wglEnableVertexAttribArray(0);
 			_wglVertexAttribPointer(0, 3, _GL_HALF_FLOAT, false, 6, 0);
-		}
-	}
-
-	public void drawMeshVAO() {
-		EaglercraftGPU.bindGLBufferArray(meshVAO);
-		_wglDrawElements(GL_TRIANGLES, meshIndexCount, meshIndexType, 0);
-	}
-
-	public void destroy() {
-		if(meshVBO != null) {
-			_wglDeleteBuffers(meshVBO);
-			meshVBO = null;
-		}
-		if(meshIBO != null) {
-			_wglDeleteBuffers(meshIBO);
-			meshIBO = null;
-		}
-		if(meshVAO != null) {
-			_wglDeleteVertexArrays(meshVAO);
-			meshVAO = null;
 		}
 	}
 }

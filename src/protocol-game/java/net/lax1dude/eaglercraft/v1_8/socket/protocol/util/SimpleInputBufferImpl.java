@@ -13,14 +13,15 @@ import net.lax1dude.eaglercraft.v1_8.socket.protocol.GamePacketInputBuffer;
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -39,66 +40,42 @@ public class SimpleInputBufferImpl extends DataInputStream implements GamePacket
 		this.toByteArrayReturns = toByteArrayReturns;
 	}
 
-	public void setStream(InputStream parent) {
-		in = parent;
-		toByteArrayReturns = null;
-	}
-
-	public void setToByteArrayReturns(byte[] toByteArrayReturns) {
-		this.toByteArrayReturns = toByteArrayReturns;
+	@Override
+	public byte[] readByteArrayMC() throws IOException {
+		byte[] abyte = new byte[this.readVarInt()];
+		this.readFully(abyte);
+		return abyte;
 	}
 
 	@Override
-	public void skipAllBytes(int n) throws IOException {
-		if(skipBytes(n) != n) {
+	public String readStringEaglerASCII16() throws IOException {
+		int len = readUnsignedShort();
+		char[] ret = new char[len];
+		for (int i = 0, j; i < len; ++i) {
+			j = in.read();
+			if (j < 0) {
+				throw new EOFException();
+			}
+			ret[i] = (char) j;
+		}
+		return new String(ret);
+	}
+
+	@Override
+	public String readStringEaglerASCII8() throws IOException {
+		int len = in.read();
+		if (len < 0) {
 			throw new EOFException();
 		}
-	}
-
-	@Override
-	public int readVarInt() throws IOException {
-		int i = 0;
-		int j = 0;
-
-		while (true) {
-			int b0 = in.read();
-			if(b0 < 0) {
+		char[] ret = new char[len];
+		for (int i = 0, j; i < len; ++i) {
+			j = in.read();
+			if (j < 0) {
 				throw new EOFException();
 			}
-			i |= (b0 & 127) << j++ * 7;
-			if (j > 5) {
-				throw new IOException("VarInt too big");
-			}
-
-			if ((b0 & 128) != 128) {
-				break;
-			}
+			ret[i] = (char) j;
 		}
-
-		return i;
-	}
-
-	@Override
-	public long readVarLong() throws IOException {
-		long i = 0L;
-		int j = 0;
-
-		while (true) {
-			int b0 = in.read();
-			if(b0 < 0) {
-				throw new EOFException();
-			}
-			i |= (long) (b0 & 127) << j++ * 7;
-			if (j > 10) {
-				throw new IOException("VarLong too big");
-			}
-
-			if ((b0 & 128) != 128) {
-				break;
-			}
-		}
-
-		return i;
+		return new String(ret);
 	}
 
 	@Override
@@ -123,41 +100,65 @@ public class SimpleInputBufferImpl extends DataInputStream implements GamePacket
 	}
 
 	@Override
-	public String readStringEaglerASCII8() throws IOException {
-		int len = in.read();
-		if(len < 0) {
+	public int readVarInt() throws IOException {
+		int i = 0;
+		int j = 0;
+
+		while (true) {
+			int b0 = in.read();
+			if (b0 < 0) {
+				throw new EOFException();
+			}
+			i |= (b0 & 127) << j++ * 7;
+			if (j > 5) {
+				throw new IOException("VarInt too big");
+			}
+
+			if ((b0 & 128) != 128) {
+				break;
+			}
+		}
+
+		return i;
+	}
+
+	@Override
+	public long readVarLong() throws IOException {
+		long i = 0L;
+		int j = 0;
+
+		while (true) {
+			int b0 = in.read();
+			if (b0 < 0) {
+				throw new EOFException();
+			}
+			i |= (long) (b0 & 127) << j++ * 7;
+			if (j > 10) {
+				throw new IOException("VarLong too big");
+			}
+
+			if ((b0 & 128) != 128) {
+				break;
+			}
+		}
+
+		return i;
+	}
+
+	public void setStream(InputStream parent) {
+		in = parent;
+		toByteArrayReturns = null;
+	}
+
+	public void setToByteArrayReturns(byte[] toByteArrayReturns) {
+		this.toByteArrayReturns = toByteArrayReturns;
+	}
+
+	@Override
+	public void skipAllBytes(int n) throws IOException {
+		if (skipBytes(n) != n) {
 			throw new EOFException();
 		}
-		char[] ret = new char[len];
-		for(int i = 0, j; i < len; ++i) {
-			j = in.read();
-			if(j < 0) {
-				throw new EOFException();
-			}
-			ret[i] = (char)j;
-		}
-		return new String(ret);
-	}
-
-	@Override
-	public String readStringEaglerASCII16() throws IOException {
-		int len = readUnsignedShort();
-		char[] ret = new char[len];
-		for(int i = 0, j; i < len; ++i) {
-			j = in.read();
-			if(j < 0) {
-				throw new EOFException();
-			}
-			ret[i] = (char)j;
-		}
-		return new String(ret);
-	}
-
-	@Override
-	public byte[] readByteArrayMC() throws IOException {
-		byte[] abyte = new byte[this.readVarInt()];
-		this.readFully(abyte);
-		return abyte;
 	}
 
 	@Override
@@ -167,39 +168,39 @@ public class SimpleInputBufferImpl extends DataInputStream implements GamePacket
 
 	@Override
 	public byte[] toByteArray() throws IOException {
-		if(toByteArrayReturns != null) {
+		if (toByteArrayReturns != null) {
 			return toByteArrayReturns;
-		}else if(in instanceof ByteArrayInputStream) {
-			ByteArrayInputStream bis = (ByteArrayInputStream)in;
+		} else if (in instanceof ByteArrayInputStream) {
+			ByteArrayInputStream bis = (ByteArrayInputStream) in;
 			byte[] ret = new byte[bis.available()];
 			bis.read(ret);
 			return ret;
-		}else {
+		} else {
 			ByteArrayOutputStream bao = null;
 			byte[] copyBuffer = new byte[in.available()];
 			int i = in.read(copyBuffer);
-			if(i == copyBuffer.length) {
+			if (i == copyBuffer.length) {
 				int j = in.read();
-				if(j == -1) {
+				if (j == -1) {
 					return copyBuffer;
-				}else {
+				} else {
 					int k = Math.max(copyBuffer.length, 64);
 					bao = new ByteArrayOutputStream(k + 1);
 					bao.write(copyBuffer);
 					bao.write(j);
-					if(k != copyBuffer.length) {
+					if (k != copyBuffer.length) {
 						copyBuffer = new byte[k];
 					}
 				}
-			}else {
+			} else {
 				int j = Math.max(copyBuffer.length, 64);
 				bao = new ByteArrayOutputStream(j);
 				bao.write(copyBuffer);
-				if(j != copyBuffer.length) {
+				if (j != copyBuffer.length) {
 					copyBuffer = new byte[j];
 				}
 			}
-			while((i = in.read(copyBuffer)) != -1) {
+			while ((i = in.read(copyBuffer)) != -1) {
 				bao.write(copyBuffer, 0, i);
 			}
 			return bao.toByteArray();

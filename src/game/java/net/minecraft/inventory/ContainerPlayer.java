@@ -9,29 +9,32 @@ import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class ContainerPlayer extends Container {
-	/**+
-	 * The crafting matrix inventory.
+	/**
+	 * + The crafting matrix inventory.
 	 */
 	public InventoryCrafting craftMatrix = new InventoryCrafting(this, 2, 2);
 	public IInventory craftResult = new InventoryCraftResult();
@@ -58,16 +61,16 @@ public class ContainerPlayer extends Container {
 							return 1;
 						}
 
+						public String getSlotTexture() {
+							return ItemArmor.EMPTY_SLOT_NAMES[k2];
+						}
+
 						public boolean isItemValid(ItemStack itemstack) {
 							return itemstack == null ? false
 									: (itemstack.getItem() instanceof ItemArmor
 											? ((ItemArmor) itemstack.getItem()).armorType == k2
 											: (itemstack.getItem() != Item.getItemFromBlock(Blocks.pumpkin)
 													&& itemstack.getItem() != Items.skull ? false : k2 == 0));
-						}
-
-						public String getSlotTexture() {
-							return ItemArmor.EMPTY_SLOT_NAMES[k2];
 						}
 					});
 		}
@@ -85,16 +88,21 @@ public class ContainerPlayer extends Container {
 		this.onCraftMatrixChanged(this.craftMatrix);
 	}
 
-	/**+
-	 * Callback for when the crafting matrix is changed.
-	 */
-	public void onCraftMatrixChanged(IInventory var1) {
-		this.craftResult.setInventorySlotContents(0,
-				CraftingManager.getInstance().findMatchingRecipe(this.craftMatrix, this.thePlayer.worldObj));
+	public boolean canInteractWith(EntityPlayer var1) {
+		return true;
 	}
 
-	/**+
-	 * Called when the container is closed.
+	/**
+	 * + Called to determine if the current slot is valid for the stack merging
+	 * (double-click) code. The stack passed in is null for the initial slot that
+	 * was double-clicked.
+	 */
+	public boolean canMergeSlot(ItemStack itemstack, Slot slot) {
+		return slot.inventory != this.craftResult && super.canMergeSlot(itemstack, slot);
+	}
+
+	/**
+	 * + Called when the container is closed.
 	 */
 	public void onContainerClosed(EntityPlayer entityplayer) {
 		super.onContainerClosed(entityplayer);
@@ -109,12 +117,16 @@ public class ContainerPlayer extends Container {
 		this.craftResult.setInventorySlotContents(0, (ItemStack) null);
 	}
 
-	public boolean canInteractWith(EntityPlayer var1) {
-		return true;
+	/**
+	 * + Callback for when the crafting matrix is changed.
+	 */
+	public void onCraftMatrixChanged(IInventory var1) {
+		this.craftResult.setInventorySlotContents(0,
+				CraftingManager.getInstance().findMatchingRecipe(this.craftMatrix, this.thePlayer.worldObj));
 	}
 
-	/**+
-	 * Take a stack from the specified inventory slot.
+	/**
+	 * + Take a stack from the specified inventory slot.
 	 */
 	public ItemStack transferStackInSlot(EntityPlayer entityplayer, int i) {
 		ItemStack itemstack = null;
@@ -169,14 +181,5 @@ public class ContainerPlayer extends Container {
 		}
 
 		return itemstack;
-	}
-
-	/**+
-	 * Called to determine if the current slot is valid for the
-	 * stack merging (double-click) code. The stack passed in is
-	 * null for the initial slot that was double-clicked.
-	 */
-	public boolean canMergeSlot(ItemStack itemstack, Slot slot) {
-		return slot.inventory != this.craftResult && super.canMergeSlot(itemstack, slot);
 	}
 }

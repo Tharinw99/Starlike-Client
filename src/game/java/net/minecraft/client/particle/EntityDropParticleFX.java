@@ -8,28 +8,46 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class EntityDropParticleFX extends EntityFX {
+	public static class LavaFactory implements IParticleFactory {
+		public EntityFX getEntityFX(int var1, World world, double d0, double d1, double d2, double var9, double var11,
+				double var13, int... var15) {
+			return new EntityDropParticleFX(world, d0, d1, d2, Material.lava);
+		}
+	}
+
+	public static class WaterFactory implements IParticleFactory {
+		public EntityFX getEntityFX(int var1, World world, double d0, double d1, double d2, double var9, double var11,
+				double var13, int... var15) {
+			return new EntityDropParticleFX(world, d0, d1, d2, Material.water);
+		}
+	}
+
 	private Material materialType;
+
 	private int bobTimer;
 
 	protected EntityDropParticleFX(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn,
@@ -55,19 +73,19 @@ public class EntityDropParticleFX extends EntityFX {
 		this.motionX = this.motionY = this.motionZ = 0.0D;
 	}
 
-	public int getBrightnessForRender(float partialTicks) {
-		return this.materialType == Material.water ? super.getBrightnessForRender(partialTicks) : 257;
-	}
-
-	/**+
-	 * Gets how bright this entity is.
+	/**
+	 * + Gets how bright this entity is.
 	 */
 	public float getBrightness(float partialTicks) {
 		return this.materialType == Material.water ? super.getBrightness(partialTicks) : 1.0F;
 	}
 
-	/**+
-	 * Called to update the entity's position/logic.
+	public int getBrightnessForRender(float partialTicks) {
+		return this.materialType == Material.water ? super.getBrightnessForRender(partialTicks) : 257;
+	}
+
+	/**
+	 * + Called to update the entity's position/logic.
 	 */
 	public void onUpdate() {
 		this.prevPosX = this.posX;
@@ -130,19 +148,5 @@ public class EntityDropParticleFX extends EntityFX {
 			}
 		}
 
-	}
-
-	public static class LavaFactory implements IParticleFactory {
-		public EntityFX getEntityFX(int var1, World world, double d0, double d1, double d2, double var9, double var11,
-				double var13, int... var15) {
-			return new EntityDropParticleFX(world, d0, d1, d2, Material.lava);
-		}
-	}
-
-	public static class WaterFactory implements IParticleFactory {
-		public EntityFX getEntityFX(int var1, World world, double d0, double d1, double d2, double var9, double var11,
-				double var13, int... var15) {
-			return new EntityDropParticleFX(world, d0, d1, d2, Material.water);
-		}
 	}
 }

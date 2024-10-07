@@ -1,6 +1,7 @@
 package net.minecraft.world.gen;
 
 import java.util.List;
+
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.material.Material;
@@ -25,22 +26,25 @@ import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraft.world.gen.feature.WorldGenerator;
 import net.minecraft.world.gen.structure.MapGenNetherBridge;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -49,15 +53,15 @@ public class ChunkProviderHell implements IChunkProvider {
 	private final World worldObj;
 	private final boolean field_177466_i;
 	private final EaglercraftRandom hellRNG;
-	/**+
-	 * Holds the noise used to determine whether slowsand can be
-	 * generated at a location
+	/**
+	 * + Holds the noise used to determine whether slowsand can be generated at a
+	 * location
 	 */
 	private double[] slowsandNoise = new double[256];
 	private double[] gravelNoise = new double[256];
-	/**+
-	 * Holds the noise used to determine whether something other
-	 * than netherrack can be generated at a location
+	/**
+	 * + Holds the noise used to determine whether something other than netherrack
+	 * can be generated at a location
 	 */
 	private double[] netherrackExclusivityNoise = new double[256];
 	private double[] noiseField;
@@ -103,6 +107,24 @@ public class ChunkProviderHell implements IChunkProvider {
 		this.netherNoiseGen6 = new NoiseGeneratorOctaves(this.hellRNG, 10);
 		this.netherNoiseGen7 = new NoiseGeneratorOctaves(this.hellRNG, 16);
 		worldIn.func_181544_b(63);
+	}
+
+	/**
+	 * + Returns if the IChunkProvider supports saving.
+	 */
+	public boolean canSave() {
+		return true;
+	}
+
+	/**
+	 * + Checks to see if a chunk exists at x, z
+	 */
+	public boolean chunkExists(int var1, int var2) {
+		return true;
+	}
+
+	public boolean func_177460_a(IChunkProvider var1, Chunk var2, int var3, int var4) {
+		return false;
 	}
 
 	public void func_180515_a(int parInt1, int parInt2, ChunkPrimer parChunkPrimer) {
@@ -242,38 +264,34 @@ public class ChunkProviderHell implements IChunkProvider {
 
 	}
 
-	/**+
-	 * Will return back a chunk, if it doesn't exist and its not a
-	 * MP client it will generates all the blocks for the specified
-	 * chunk from the map seed and chunk seed
-	 */
-	public Chunk provideChunk(int i, int j) {
-		this.hellRNG.setSeed((long) i * 341873128712L + (long) j * 132897987541L);
-		ChunkPrimer chunkprimer = new ChunkPrimer();
-		this.func_180515_a(i, j, chunkprimer);
-		this.func_180516_b(i, j, chunkprimer);
-		this.netherCaveGenerator.generate(this, this.worldObj, i, j, chunkprimer);
-		if (this.field_177466_i) {
-			this.genNetherBridge.generate(this, this.worldObj, i, j, chunkprimer);
-		}
-
-		Chunk chunk = new Chunk(this.worldObj, chunkprimer, i, j);
-		BiomeGenBase[] abiomegenbase = this.worldObj.getWorldChunkManager()
-				.loadBlockGeneratorData((BiomeGenBase[]) null, i * 16, j * 16, 16, 16);
-		byte[] abyte = chunk.getBiomeArray();
-
-		for (int k = 0; k < abyte.length; ++k) {
-			abyte[k] = (byte) abiomegenbase[k].biomeID;
-		}
-
-		chunk.resetRelightChecks();
-		return chunk;
+	public int getLoadedChunkCount() {
+		return 0;
 	}
 
-	/**+
-	 * generates a subset of the level's terrain data. Takes 7
-	 * arguments: the [empty] noise array, the position, and the
-	 * size.
+	public List<BiomeGenBase.SpawnListEntry> getPossibleCreatures(EnumCreatureType enumcreaturetype,
+			BlockPos blockpos) {
+		if (enumcreaturetype == EnumCreatureType.MONSTER) {
+			if (this.genNetherBridge.func_175795_b(blockpos)) {
+				return this.genNetherBridge.getSpawnList();
+			}
+
+			if (this.genNetherBridge.func_175796_a(this.worldObj, blockpos)
+					&& this.worldObj.getBlockState(blockpos.down()).getBlock() == Blocks.nether_brick) {
+				return this.genNetherBridge.getSpawnList();
+			}
+		}
+
+		BiomeGenBase biomegenbase = this.worldObj.getBiomeGenForCoords(blockpos);
+		return biomegenbase.getSpawnableList(enumcreaturetype);
+	}
+
+	public BlockPos getStrongholdGen(World var1, String var2, BlockPos var3) {
+		return null;
+	}
+
+	/**
+	 * + generates a subset of the level's terrain data. Takes 7 arguments: the
+	 * [empty] noise array, the position, and the size.
 	 */
 	private double[] initializeNoiseField(double[] parArrayOfDouble, int parInt1, int parInt2, int parInt3, int parInt4,
 			int parInt5, int parInt6) {
@@ -348,15 +366,15 @@ public class ChunkProviderHell implements IChunkProvider {
 		return parArrayOfDouble;
 	}
 
-	/**+
-	 * Checks to see if a chunk exists at x, z
+	/**
+	 * + Converts the instance data to a readable string.
 	 */
-	public boolean chunkExists(int var1, int var2) {
-		return true;
+	public String makeString() {
+		return "HellRandomLevelSource";
 	}
 
-	/**+
-	 * Populates chunk with ores etc etc
+	/**
+	 * + Populates chunk with ores etc etc
 	 */
 	public void populate(IChunkProvider var1, int i, int j) {
 		BlockFalling.fallInstantly = true;
@@ -394,10 +412,10 @@ public class ChunkProviderHell implements IChunkProvider {
 					this.hellRNG.nextInt(128), this.hellRNG.nextInt(16) + 8));
 		}
 
-	  for (int k1 = 0; k1 < 8; ++k1) {
-	    this.uraniumOreGen.generate(this.worldObj, this.hellRNG, blockpos.add(this.hellRNG.nextInt(16),
-			this.hellRNG.nextInt(108) + 10, this.hellRNG.nextInt(16)));
-	  }
+		for (int k1 = 0; k1 < 8; ++k1) {
+			this.uraniumOreGen.generate(this.worldObj, this.hellRNG,
+					blockpos.add(this.hellRNG.nextInt(16), this.hellRNG.nextInt(108) + 10, this.hellRNG.nextInt(16)));
+		}
 
 		for (int k1 = 0; k1 < 16; ++k1) {
 			this.field_177467_w.generate(this.worldObj, this.hellRNG,
@@ -412,84 +430,68 @@ public class ChunkProviderHell implements IChunkProvider {
 		BlockFalling.fallInstantly = false;
 	}
 
-	public boolean func_177460_a(IChunkProvider var1, Chunk var2, int var3, int var4) {
-		return false;
-	}
-
-	/**+
-	 * Two modes of operation: if passed true, save all Chunks in
-	 * one go. If passed false, save up to two chunks. Return true
-	 * if all chunks have been saved.
+	/**
+	 * + Will return back a chunk, if it doesn't exist and its not a MP client it
+	 * will generates all the blocks for the specified chunk from the map seed and
+	 * chunk seed
 	 */
-	public boolean saveChunks(boolean var1, IProgressUpdate var2) {
-		return true;
+	public Chunk provideChunk(BlockPos blockpos) {
+		return this.provideChunk(blockpos.getX() >> 4, blockpos.getZ() >> 4);
 	}
 
-	/**+
-	 * Save extra data not associated with any Chunk. Not saved
-	 * during autosave, only during world unload. Currently
-	 * unimplemented.
+	/**
+	 * + Will return back a chunk, if it doesn't exist and its not a MP client it
+	 * will generates all the blocks for the specified chunk from the map seed and
+	 * chunk seed
 	 */
-	public void saveExtraData() {
-	}
-
-	/**+
-	 * Unloads chunks that are marked to be unloaded. This is not
-	 * guaranteed to unload every such chunk.
-	 */
-	public boolean unloadQueuedChunks() {
-		return false;
-	}
-
-	/**+
-	 * Returns if the IChunkProvider supports saving.
-	 */
-	public boolean canSave() {
-		return true;
-	}
-
-	/**+
-	 * Converts the instance data to a readable string.
-	 */
-	public String makeString() {
-		return "HellRandomLevelSource";
-	}
-
-	public List<BiomeGenBase.SpawnListEntry> getPossibleCreatures(EnumCreatureType enumcreaturetype,
-			BlockPos blockpos) {
-		if (enumcreaturetype == EnumCreatureType.MONSTER) {
-			if (this.genNetherBridge.func_175795_b(blockpos)) {
-				return this.genNetherBridge.getSpawnList();
-			}
-
-			if (this.genNetherBridge.func_175796_a(this.worldObj, blockpos)
-					&& this.worldObj.getBlockState(blockpos.down()).getBlock() == Blocks.nether_brick) {
-				return this.genNetherBridge.getSpawnList();
-			}
+	public Chunk provideChunk(int i, int j) {
+		this.hellRNG.setSeed((long) i * 341873128712L + (long) j * 132897987541L);
+		ChunkPrimer chunkprimer = new ChunkPrimer();
+		this.func_180515_a(i, j, chunkprimer);
+		this.func_180516_b(i, j, chunkprimer);
+		this.netherCaveGenerator.generate(this, this.worldObj, i, j, chunkprimer);
+		if (this.field_177466_i) {
+			this.genNetherBridge.generate(this, this.worldObj, i, j, chunkprimer);
 		}
 
-		BiomeGenBase biomegenbase = this.worldObj.getBiomeGenForCoords(blockpos);
-		return biomegenbase.getSpawnableList(enumcreaturetype);
-	}
+		Chunk chunk = new Chunk(this.worldObj, chunkprimer, i, j);
+		BiomeGenBase[] abiomegenbase = this.worldObj.getWorldChunkManager()
+				.loadBlockGeneratorData((BiomeGenBase[]) null, i * 16, j * 16, 16, 16);
+		byte[] abyte = chunk.getBiomeArray();
 
-	public BlockPos getStrongholdGen(World var1, String var2, BlockPos var3) {
-		return null;
-	}
+		for (int k = 0; k < abyte.length; ++k) {
+			abyte[k] = (byte) abiomegenbase[k].biomeID;
+		}
 
-	public int getLoadedChunkCount() {
-		return 0;
+		chunk.resetRelightChecks();
+		return chunk;
 	}
 
 	public void recreateStructures(Chunk var1, int i, int j) {
 		this.genNetherBridge.generate(this, this.worldObj, i, j, (ChunkPrimer) null);
 	}
 
-	/**+
-	 * Will return back a chunk, if it doesn't exist and its not a
-	 * MP client it will generates all the blocks for the specified
-	 * chunk from the map seed and chunk seed
+	/**
+	 * + Two modes of operation: if passed true, save all Chunks in one go. If
+	 * passed false, save up to two chunks. Return true if all chunks have been
+	 * saved.
 	 */
-	public Chunk provideChunk(BlockPos blockpos) {
-		return this.provideChunk(blockpos.getX() >> 4, blockpos.getZ() >> 4);
+	public boolean saveChunks(boolean var1, IProgressUpdate var2) {
+		return true;
+	}
+
+	/**
+	 * + Save extra data not associated with any Chunk. Not saved during autosave,
+	 * only during world unload. Currently unimplemented.
+	 */
+	public void saveExtraData() {
+	}
+
+	/**
+	 * + Unloads chunks that are marked to be unloaded. This is not guaranteed to
+	 * unload every such chunk.
+	 */
+	public boolean unloadQueuedChunks() {
+		return false;
 	}
 }

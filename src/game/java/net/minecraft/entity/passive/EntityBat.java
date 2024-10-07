@@ -1,6 +1,7 @@
 package net.minecraft.entity.passive;
 
 import java.util.Calendar;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -11,22 +12,25 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -40,51 +44,39 @@ public class EntityBat extends EntityAmbientCreature {
 		this.setIsBatHanging(true);
 	}
 
-	protected void entityInit() {
-		super.entityInit();
-		this.dataWatcher.addObject(16, Byte.valueOf((byte) 0));
+	protected void applyEntityAttributes() {
+		super.applyEntityAttributes();
+		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(6.0D);
 	}
 
-	/**+
-	 * Returns the volume for the sounds this mob makes.
+	/**
+	 * + Called when the entity is attacked.
 	 */
-	protected float getSoundVolume() {
-		return 0.1F;
+	public boolean attackEntityFrom(DamageSource damagesource, float f) {
+		if (this.isEntityInvulnerable(damagesource)) {
+			return false;
+		} else {
+			if (!this.worldObj.isRemote && this.getIsBatHanging()) {
+				this.setIsBatHanging(false);
+			}
+
+			return super.attackEntityFrom(damagesource, f);
+		}
 	}
 
-	/**+
-	 * Gets the pitch of living sounds in living entities.
-	 */
-	protected float getSoundPitch() {
-		return super.getSoundPitch() * 0.95F;
-	}
-
-	/**+
-	 * Returns the sound this mob makes while it's alive.
-	 */
-	protected String getLivingSound() {
-		return this.getIsBatHanging() && this.rand.nextInt(4) != 0 ? null : "mob.bat.idle";
-	}
-
-	/**+
-	 * Returns the sound this mob makes when it is hurt.
-	 */
-	protected String getHurtSound() {
-		return "mob.bat.hurt";
-	}
-
-	/**+
-	 * Returns the sound this mob makes on death.
-	 */
-	protected String getDeathSound() {
-		return "mob.bat.death";
-	}
-
-	/**+
-	 * Returns true if this entity should push and be pushed by
-	 * other entities when colliding.
+	/**
+	 * + Returns true if this entity should push and be pushed by other entities
+	 * when colliding.
 	 */
 	public boolean canBePushed() {
+		return false;
+	}
+
+	/**
+	 * + returns if this entity triggers Block.onEntityWalking on the blocks they
+	 * walk on. used for spiders and wolves to prevent them from trampling crops
+	 */
+	protected boolean canTriggerWalking() {
 		return false;
 	}
 
@@ -94,27 +86,93 @@ public class EntityBat extends EntityAmbientCreature {
 	protected void collideWithNearbyEntities() {
 	}
 
-	protected void applyEntityAttributes() {
-		super.applyEntityAttributes();
-		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(6.0D);
+	/**
+	 * + Return whether this entity should NOT trigger a pressure plate or a
+	 * tripwire.
+	 */
+	public boolean doesEntityNotTriggerPressurePlate() {
+		return true;
+	}
+
+	protected void entityInit() {
+		super.entityInit();
+		this.dataWatcher.addObject(16, Byte.valueOf((byte) 0));
+	}
+
+	public void fall(float var1, float var2) {
+	}
+
+	/**
+	 * + Checks if the entity's current position is a valid location to spawn this
+	 * entity.
+	 */
+	public boolean getCanSpawnHere() {
+		BlockPos blockpos = new BlockPos(this.posX, this.getEntityBoundingBox().minY, this.posZ);
+		if (blockpos.getY() >= this.worldObj.func_181545_F()) {
+			return false;
+		} else {
+			int i = this.worldObj.getLightFromNeighbors(blockpos);
+			byte b0 = 4;
+			if (this.isDateAroundHalloween(this.worldObj.getCurrentDate())) {
+				b0 = 7;
+			} else if (this.rand.nextBoolean()) {
+				return false;
+			}
+
+			return i > this.rand.nextInt(b0) ? false : super.getCanSpawnHere();
+		}
+	}
+
+	/**
+	 * + Returns the sound this mob makes on death.
+	 */
+	protected String getDeathSound() {
+		return "mob.bat.death";
+	}
+
+	public float getEyeHeight() {
+		return this.height / 2.0F;
+	}
+
+	/**
+	 * + Returns the sound this mob makes when it is hurt.
+	 */
+	protected String getHurtSound() {
+		return "mob.bat.hurt";
 	}
 
 	public boolean getIsBatHanging() {
 		return (this.dataWatcher.getWatchableObjectByte(16) & 1) != 0;
 	}
 
-	public void setIsBatHanging(boolean isHanging) {
-		byte b0 = this.dataWatcher.getWatchableObjectByte(16);
-		if (isHanging) {
-			this.dataWatcher.updateObject(16, Byte.valueOf((byte) (b0 | 1)));
-		} else {
-			this.dataWatcher.updateObject(16, Byte.valueOf((byte) (b0 & -2)));
-		}
-
+	/**
+	 * + Returns the sound this mob makes while it's alive.
+	 */
+	protected String getLivingSound() {
+		return this.getIsBatHanging() && this.rand.nextInt(4) != 0 ? null : "mob.bat.idle";
 	}
 
-	/**+
-	 * Called to update the entity's position/logic.
+	/**
+	 * + Gets the pitch of living sounds in living entities.
+	 */
+	protected float getSoundPitch() {
+		return super.getSoundPitch() * 0.95F;
+	}
+
+	/**
+	 * + Returns the volume for the sounds this mob makes.
+	 */
+	protected float getSoundVolume() {
+		return 0.1F;
+	}
+
+	private boolean isDateAroundHalloween(Calendar parCalendar) {
+		return parCalendar.get(2) + 1 == 10 && parCalendar.get(5) >= 20
+				|| parCalendar.get(2) + 1 == 11 && parCalendar.get(5) <= 3;
+	}
+
+	/**
+	 * + Called to update the entity's position/logic.
 	 */
 	public void onUpdate() {
 		super.onUpdate();
@@ -123,6 +181,24 @@ public class EntityBat extends EntityAmbientCreature {
 			this.posY = (double) MathHelper.floor_double(this.posY) + 1.0D - (double) this.height;
 		} else {
 			this.motionY *= 0.6000000238418579D;
+		}
+
+	}
+
+	/**
+	 * + (abstract) Protected helper method to read subclass entity data from NBT.
+	 */
+	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
+		super.readEntityFromNBT(nbttagcompound);
+		this.dataWatcher.updateObject(16, Byte.valueOf(nbttagcompound.getByte("BatFlags")));
+	}
+
+	public void setIsBatHanging(boolean isHanging) {
+		byte b0 = this.dataWatcher.getWatchableObjectByte(16);
+		if (isHanging) {
+			this.dataWatcher.updateObject(16, Byte.valueOf((byte) (b0 | 1)));
+		} else {
+			this.dataWatcher.updateObject(16, Byte.valueOf((byte) (b0 & -2)));
 		}
 
 	}
@@ -177,89 +253,14 @@ public class EntityBat extends EntityAmbientCreature {
 
 	}
 
-	/**+
-	 * returns if this entity triggers Block.onEntityWalking on the
-	 * blocks they walk on. used for spiders and wolves to prevent
-	 * them from trampling crops
-	 */
-	protected boolean canTriggerWalking() {
-		return false;
-	}
-
-	public void fall(float var1, float var2) {
-	}
-
 	protected void updateFallState(double var1, boolean var3, Block var4, BlockPos var5) {
 	}
 
-	/**+
-	 * Return whether this entity should NOT trigger a pressure
-	 * plate or a tripwire.
-	 */
-	public boolean doesEntityNotTriggerPressurePlate() {
-		return true;
-	}
-
-	/**+
-	 * Called when the entity is attacked.
-	 */
-	public boolean attackEntityFrom(DamageSource damagesource, float f) {
-		if (this.isEntityInvulnerable(damagesource)) {
-			return false;
-		} else {
-			if (!this.worldObj.isRemote && this.getIsBatHanging()) {
-				this.setIsBatHanging(false);
-			}
-
-			return super.attackEntityFrom(damagesource, f);
-		}
-	}
-
-	/**+
-	 * (abstract) Protected helper method to read subclass entity
-	 * data from NBT.
-	 */
-	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
-		super.readEntityFromNBT(nbttagcompound);
-		this.dataWatcher.updateObject(16, Byte.valueOf(nbttagcompound.getByte("BatFlags")));
-	}
-
-	/**+
-	 * (abstract) Protected helper method to write subclass entity
-	 * data to NBT.
+	/**
+	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		nbttagcompound.setByte("BatFlags", this.dataWatcher.getWatchableObjectByte(16));
-	}
-
-	/**+
-	 * Checks if the entity's current position is a valid location
-	 * to spawn this entity.
-	 */
-	public boolean getCanSpawnHere() {
-		BlockPos blockpos = new BlockPos(this.posX, this.getEntityBoundingBox().minY, this.posZ);
-		if (blockpos.getY() >= this.worldObj.func_181545_F()) {
-			return false;
-		} else {
-			int i = this.worldObj.getLightFromNeighbors(blockpos);
-			byte b0 = 4;
-			if (this.isDateAroundHalloween(this.worldObj.getCurrentDate())) {
-				b0 = 7;
-			} else if (this.rand.nextBoolean()) {
-				return false;
-			}
-
-			return i > this.rand.nextInt(b0) ? false : super.getCanSpawnHere();
-		}
-	}
-
-	private boolean isDateAroundHalloween(Calendar parCalendar) {
-		return parCalendar.get(2) + 1 == 10 && parCalendar.get(5) >= 20
-				|| parCalendar.get(2) + 1 == 11 && parCalendar.get(5) <= 3;
-	}
-
-	public float getEyeHeight() {
-		return this.height / 2.0F;
 	}
 }

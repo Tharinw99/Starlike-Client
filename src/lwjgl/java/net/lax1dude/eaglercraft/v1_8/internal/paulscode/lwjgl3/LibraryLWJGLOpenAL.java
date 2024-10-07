@@ -1,12 +1,13 @@
 package net.lax1dude.eaglercraft.v1_8.internal.paulscode.lwjgl3;
 
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.nio.FloatBuffer;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
+
 import javax.sound.sampled.AudioFormat;
 
 import org.lwjgl.BufferUtils;
@@ -89,6 +90,68 @@ import paulscode.sound.Source;
  */
 public class LibraryLWJGLOpenAL extends Library {
 	/**
+	 * The LibraryLWJGLOpenAL.Exception class provides library-specific error
+	 * information.
+	 */
+	public static class Exception extends SoundSystemException {
+		private static final long serialVersionUID = -7502452059037798035L;
+		/**
+		 * Global identifier for an exception during AL.create(). Probably means that
+		 * OpenAL is not supported.
+		 */
+		public static final int CREATE = 101;
+		/**
+		 * Global identifier for an invalid name parameter in OpenAL.
+		 */
+		public static final int INVALID_NAME = 102;
+		/**
+		 * Global identifier for an invalid parameter in OpenAL.
+		 */
+		public static final int INVALID_ENUM = 103;
+		/**
+		 * Global identifier for an invalid enumerated parameter value in OpenAL.
+		 */
+		public static final int INVALID_VALUE = 104;
+		/**
+		 * Global identifier for an illegal call in OpenAL.
+		 */
+		public static final int INVALID_OPERATION = 105;
+		/**
+		 * Global identifier for OpenAL out of memory.
+		 */
+		public static final int OUT_OF_MEMORY = 106;
+		/**
+		 * Global identifier for an exception while creating the OpenAL Listener.
+		 */
+		public static final int LISTENER = 107;
+		/**
+		 * Global identifier for OpenAL AL_PITCH not supported.
+		 */
+		public static final int NO_AL_PITCH = 108;
+
+		/**
+		 * Constructor: Generates a standard "unknown error" exception with the
+		 * specified message.
+		 * 
+		 * @param message A brief description of the problem that occurred.
+		 */
+		public Exception(String message) {
+			super(message);
+		}
+
+		/**
+		 * Constructor: Generates an exception of the specified type, with the specified
+		 * message.
+		 * 
+		 * @param message A brief description of the problem that occurred.
+		 * @param type    Identifier indicating they type of error.
+		 */
+		public Exception(String message, int type) {
+			super(message, type);
+		}
+	}
+
+	/**
 	 * Used to return a current value from one of the synchronized boolean-interface
 	 * methods.
 	 */
@@ -97,33 +160,90 @@ public class LibraryLWJGLOpenAL extends Library {
 	 * Used to set the value in one of the synchronized boolean-interface methods.
 	 */
 	private static final boolean SET = true;
+
 	/**
 	 * Used when a parameter for one of the synchronized boolean-interface methods
 	 * is not aplicable.
 	 */
 	private static final boolean XXX = false;
+	/**
+	 * Whether or not the AL_PITCH control is supported.
+	 */
+	private static boolean alPitchSupported = true;
+	private static final Logger logger = LogManager.getLogger("SoundSystem");
+
+	/**
+	 * Whether or not the AL_PITCH control is supported.
+	 * 
+	 * @return True if AL_PITCH is supported.
+	 */
+	public static boolean alPitchSupported() {
+		return alPitchSupported(GET, XXX);
+	}
+
+	/**
+	 * Sets or returns the value of boolean 'alPitchSupported'.
+	 * 
+	 * @param action Action to perform (GET or SET).
+	 * @param value  New value if action is SET, otherwise XXX.
+	 * @return value of boolean 'alPitchSupported'.
+	 */
+	private static synchronized boolean alPitchSupported(boolean action, boolean value) {
+		if (action == SET)
+			alPitchSupported = value;
+		return alPitchSupported;
+	}
+
+	/**
+	 * Returns a longer description of this library type.
+	 * 
+	 * @return A longer description.
+	 */
+	public static String getDescription() {
+		return "The Eaglercraft LWJGL3 binding of OpenAL";
+	}
+
+	/**
+	 * Returns the short title of this library type.
+	 * 
+	 * @return A short title.
+	 */
+	public static String getTitle() {
+		return "LWJGL OpenAL (Eaglercraft)";
+	}
+
+	/**
+	 * Checks if the OpenAL library type is compatible.
+	 * 
+	 * @return True or false.
+	 */
+	public static boolean libraryCompatible() {
+		return true;
+	}
 
 	/**
 	 * Position of the listener in 3D space.
 	 */
 	private FloatBuffer listenerPositionAL = null;
+
 	/**
 	 * Information about the listener's orientation.
 	 */
 	private FloatBuffer listenerOrientation = null;
+
 	/**
 	 * Velocity of the listener.
 	 */
 	private FloatBuffer listenerVelocity = null;
+
 	/**
 	 * Map containing OpenAL identifiers for sound buffers.
 	 */
 	private HashMap<String, IntBuffer> ALBufferMap = null;
 
-	/**
-	 * Whether or not the AL_PITCH control is supported.
-	 */
-	private static boolean alPitchSupported = true;
+	private long openALDevice = 0l;
+
+	private long openALContext = 0l;
 
 	/**
 	 * Constructor: Instantiates the source map, buffer map and listener
@@ -135,10 +255,168 @@ public class LibraryLWJGLOpenAL extends Library {
 		reverseByteOrder = true;
 	}
 
-	private long openALDevice = 0l;
-	private long openALContext = 0l;
-	
-	private static final Logger logger = LogManager.getLogger("SoundSystem");
+	/**
+	 * Checks for OpenAL errors, and prints a message if there is an error.
+	 * 
+	 * @return True if there was an error, False if not.
+	 */
+	private boolean checkALError() {
+		switch (AL10.alGetError()) {
+		case AL10.AL_NO_ERROR:
+			return false;
+		case AL10.AL_INVALID_NAME:
+			errorMessage("Invalid name parameter.");
+			return true;
+		case AL10.AL_INVALID_ENUM:
+			errorMessage("Invalid parameter.");
+			return true;
+		case AL10.AL_INVALID_VALUE:
+			errorMessage("Invalid enumerated parameter value.");
+			return true;
+		case AL10.AL_INVALID_OPERATION:
+			errorMessage("Illegal call.");
+			return true;
+		case AL10.AL_OUT_OF_MEMORY:
+			errorMessage("Unable to allocate memory.");
+			return true;
+		default:
+			errorMessage("An unrecognized error occurred.");
+			return true;
+		}
+	}
+
+	/**
+	 * Stops all sources, shuts down OpenAL, and removes references to all
+	 * instantiated objects.
+	 */
+	@Override
+	public void cleanup() {
+		super.cleanup();
+
+		Set<String> keys = bufferMap.keySet();
+		Iterator<String> iter = keys.iterator();
+		String filename;
+		IntBuffer buffer;
+
+		// loop through and clear all sound buffers:
+		while (iter.hasNext()) {
+			filename = iter.next();
+			buffer = ALBufferMap.get(filename);
+			if (buffer != null) {
+				AL10.alDeleteBuffers(buffer);
+				checkALError();
+				buffer.clear();
+			}
+		}
+
+		bufferMap.clear();
+
+		ALC11.alcMakeContextCurrent(0l);
+		ALC11.alcDestroyContext(openALContext);
+		ALC11.alcCloseDevice(openALDevice);
+		ALC.destroy();
+
+		bufferMap = null;
+		listenerPositionAL = null;
+		listenerOrientation = null;
+		listenerVelocity = null;
+	}
+
+	/**
+	 * Creates sources based on the source map provided.
+	 * 
+	 * @param srcMap Sources to copy.
+	 */
+	@Override
+	public void copySources(HashMap<String, Source> srcMap) {
+		if (srcMap == null)
+			return;
+		Set<String> keys = srcMap.keySet();
+		Iterator<String> iter = keys.iterator();
+		String sourcename;
+		Source source;
+
+		// Make sure the buffer map exists:
+		if (bufferMap == null) {
+			bufferMap = new HashMap<String, SoundBuffer>();
+			importantMessage("Buffer Map was null in method 'copySources'");
+		}
+		// Make sure the OpenAL buffer map exists:
+		if (ALBufferMap == null) {
+			ALBufferMap = new HashMap<String, IntBuffer>();
+			importantMessage("Open AL Buffer Map was null in method" + "'copySources'");
+		}
+
+		// remove any existing sources before starting:
+		sourceMap.clear();
+
+		SoundBuffer buffer;
+		// loop through and copy all the sources:
+		while (iter.hasNext()) {
+			sourcename = iter.next();
+			source = srcMap.get(sourcename);
+			if (source != null) {
+				buffer = null;
+				if (!source.toStream) {
+					loadSound(source.filenameURL);
+					buffer = bufferMap.get(source.filenameURL.getFilename());
+				}
+				if (source.toStream || buffer != null)
+					sourceMap.put(sourcename, new SourceLWJGLOpenAL(listenerPositionAL,
+							ALBufferMap.get(source.filenameURL.getFilename()), source, buffer));
+			}
+		}
+	}
+
+	/**
+	 * Creates a new channel of the specified type (normal or streaming). Possible
+	 * values for channel type can be found in the
+	 * {@link paulscode.sound.SoundSystemConfig SoundSystemConfig} class.
+	 * 
+	 * @param type Type of channel.
+	 */
+	@Override
+	protected Channel createChannel(int type) {
+		ChannelLWJGLOpenAL channel;
+		IntBuffer ALSource;
+
+		ALSource = BufferUtils.createIntBuffer(1);
+		try {
+			AL10.alGenSources(ALSource);
+		} catch (java.lang.Exception e) {
+			AL10.alGetError();
+			return null; // no more voices left
+		}
+
+		if (AL10.alGetError() != AL10.AL_NO_ERROR)
+			return null;
+
+		channel = new ChannelLWJGLOpenAL(type, ALSource);
+		return channel;
+	}
+
+	/**
+	 * The Doppler parameters have changed.
+	 */
+	@Override
+	public void dopplerChanged() {
+		super.dopplerChanged();
+
+		AL10.alDopplerFactor(SoundSystemConfig.getDopplerFactor());
+		checkALError();
+		AL10.alDopplerVelocity(SoundSystemConfig.getDopplerVelocity());
+		checkALError();
+	}
+
+	/**
+	 * Returns the name of the class.
+	 * 
+	 * @return "Library" + library title.
+	 */
+	@Override
+	public String getClassName() {
+		return "LibraryLWJGLOpenAL";
+	}
 
 	/**
 	 * Initializes OpenAL, creates the listener, and grabs up audio channels.
@@ -147,28 +425,28 @@ public class LibraryLWJGLOpenAL extends Library {
 	public void init() throws SoundSystemException {
 		boolean errors = false; // set to 'true' if error(s) occur:
 
-		//TODO: eaglercraft
-		
-		openALDevice = ALC11.alcOpenDevice((String)null);
-		
+		// TODO: eaglercraft
+
+		openALDevice = ALC11.alcOpenDevice((String) null);
+
 		ALCCapabilities caps;
 		if (openALDevice == 0l) {
 			logger.error("Unable to initialize OpenAL!");
 			throw new LibraryLWJGLOpenAL.Exception("Unable to initialize OpenAL", LibraryLWJGLOpenAL.Exception.CREATE);
-		}else {
+		} else {
 			caps = ALC.createCapabilities(openALDevice);
 			logger.info("Device opened: {}", openALDevice);
 		}
 
 		openALContext = ALC11.alcCreateContext(openALDevice, new int[] { SOFTHRTF.ALC_HRTF_SOFT, 1, 0 });
-		if(!ALC11.alcMakeContextCurrent(openALContext)) {
+		if (!ALC11.alcMakeContextCurrent(openALContext)) {
 			ALC11.alcCloseDevice(openALDevice);
 			logger.error("Unable to initialize AL context!");
 			throw new LibraryLWJGLOpenAL.Exception("Unable to initialize OpenAL", LibraryLWJGLOpenAL.Exception.CREATE);
 		}
-		
+
 		AL.createCapabilities(caps);
-		
+
 		// Let user know if the library loaded properly
 		if (errors)
 			importantMessage("OpenAL did not initialize properly!");
@@ -227,79 +505,6 @@ public class LibraryLWJGLOpenAL extends Library {
 			throw new LibraryLWJGLOpenAL.Exception("OpenAL: AL_PITCH not " + "supported.",
 					LibraryLWJGLOpenAL.Exception.NO_AL_PITCH);
 		}
-	}
-
-	/**
-	 * Checks if the OpenAL library type is compatible.
-	 * 
-	 * @return True or false.
-	 */
-	public static boolean libraryCompatible() {
-		return true;
-	}
-
-	/**
-	 * Creates a new channel of the specified type (normal or streaming). Possible
-	 * values for channel type can be found in the
-	 * {@link paulscode.sound.SoundSystemConfig SoundSystemConfig} class.
-	 * 
-	 * @param type Type of channel.
-	 */
-	@Override
-	protected Channel createChannel(int type) {
-		ChannelLWJGLOpenAL channel;
-		IntBuffer ALSource;
-
-		ALSource = BufferUtils.createIntBuffer(1);
-		try {
-			AL10.alGenSources(ALSource);
-		} catch (java.lang.Exception e) {
-			AL10.alGetError();
-			return null; // no more voices left
-		}
-
-		if (AL10.alGetError() != AL10.AL_NO_ERROR)
-			return null;
-
-		channel = new ChannelLWJGLOpenAL(type, ALSource);
-		return channel;
-	}
-
-	/**
-	 * Stops all sources, shuts down OpenAL, and removes references to all
-	 * instantiated objects.
-	 */
-	@Override
-	public void cleanup() {
-		super.cleanup();
-
-		Set<String> keys = bufferMap.keySet();
-		Iterator<String> iter = keys.iterator();
-		String filename;
-		IntBuffer buffer;
-
-		// loop through and clear all sound buffers:
-		while (iter.hasNext()) {
-			filename = iter.next();
-			buffer = ALBufferMap.get(filename);
-			if (buffer != null) {
-				AL10.alDeleteBuffers(buffer);
-				checkALError();
-				buffer.clear();
-			}
-		}
-
-		bufferMap.clear();
-		
-		ALC11.alcMakeContextCurrent(0l);
-		ALC11.alcDestroyContext(openALContext);
-		ALC11.alcCloseDevice(openALDevice);
-		ALC.destroy();
-
-		bufferMap = null;
-		listenerPositionAL = null;
-		listenerOrientation = null;
-		listenerVelocity = null;
 	}
 
 	/**
@@ -480,33 +685,6 @@ public class LibraryLWJGLOpenAL extends Library {
 	}
 
 	/**
-	 * Removes a pre-loaded sound from memory. This is a good method to use for
-	 * freeing up memory after a large sound file is no longer needed. NOTE: the
-	 * source will remain in memory after this method has been called, for as long
-	 * as the sound is attached to an existing source.
-	 * 
-	 * @param filename Filename/identifier of the sound file to unload.
-	 */
-	@Override
-	public void unloadSound(String filename) {
-		ALBufferMap.remove(filename);
-		super.unloadSound(filename);
-	}
-
-	/**
-	 * Sets the overall volume to the specified value, affecting all sources.
-	 * 
-	 * @param value New volume, float value ( 0.0f - 1.0f ).
-	 */
-	@Override
-	public void setMasterVolume(float value) {
-		super.setMasterVolume(value);
-
-		AL10.alListenerf(AL10.AL_GAIN, value);
-		checkALError();
-	}
-
-	/**
 	 * Creates a new source and places it into the source map.
 	 * 
 	 * @param priority    Setting this to true will prevent other sounds from
@@ -575,28 +753,6 @@ public class LibraryLWJGLOpenAL extends Library {
 
 		sourceMap.put(sourcename, new SourceLWJGLOpenAL(listenerPositionAL, myBuffer, priority, toStream, toLoop,
 				sourcename, filenameURL, buffer, x, y, z, attModel, distOrRoll, false));
-	}
-
-	/**
-	 * Opens a direct line for streaming audio data.
-	 * 
-	 * @param audioFormat Format that the data will be in.
-	 * @param priority    Setting this to true will prevent other sounds from
-	 *                    overriding this one.
-	 * @param sourcename  A unique identifier for this source. Two sources may not
-	 *                    use the same sourcename.
-	 * @param x           X position for this source.
-	 * @param y           Y position for this source.
-	 * @param z           Z position for this source.
-	 * @param attModel    Attenuation model to use.
-	 * @param distOrRoll  Either the fading distance or rolloff factor, depending on
-	 *                    the value of "attmodel".
-	 */
-	@Override
-	public void rawDataStream(AudioFormat audioFormat, boolean priority, String sourcename, float x, float y, float z,
-			int attModel, float distOrRoll) {
-		sourceMap.put(sourcename, new SourceLWJGLOpenAL(listenerPositionAL, audioFormat, priority, sourcename, x, y, z,
-				attModel, distOrRoll));
 	}
 
 	/**
@@ -670,70 +826,25 @@ public class LibraryLWJGLOpenAL extends Library {
 	}
 
 	/**
-	 * Creates sources based on the source map provided.
+	 * Opens a direct line for streaming audio data.
 	 * 
-	 * @param srcMap Sources to copy.
+	 * @param audioFormat Format that the data will be in.
+	 * @param priority    Setting this to true will prevent other sounds from
+	 *                    overriding this one.
+	 * @param sourcename  A unique identifier for this source. Two sources may not
+	 *                    use the same sourcename.
+	 * @param x           X position for this source.
+	 * @param y           Y position for this source.
+	 * @param z           Z position for this source.
+	 * @param attModel    Attenuation model to use.
+	 * @param distOrRoll  Either the fading distance or rolloff factor, depending on
+	 *                    the value of "attmodel".
 	 */
 	@Override
-	public void copySources(HashMap<String, Source> srcMap) {
-		if (srcMap == null)
-			return;
-		Set<String> keys = srcMap.keySet();
-		Iterator<String> iter = keys.iterator();
-		String sourcename;
-		Source source;
-
-		// Make sure the buffer map exists:
-		if (bufferMap == null) {
-			bufferMap = new HashMap<String, SoundBuffer>();
-			importantMessage("Buffer Map was null in method 'copySources'");
-		}
-		// Make sure the OpenAL buffer map exists:
-		if (ALBufferMap == null) {
-			ALBufferMap = new HashMap<String, IntBuffer>();
-			importantMessage("Open AL Buffer Map was null in method" + "'copySources'");
-		}
-
-		// remove any existing sources before starting:
-		sourceMap.clear();
-
-		SoundBuffer buffer;
-		// loop through and copy all the sources:
-		while (iter.hasNext()) {
-			sourcename = iter.next();
-			source = srcMap.get(sourcename);
-			if (source != null) {
-				buffer = null;
-				if (!source.toStream) {
-					loadSound(source.filenameURL);
-					buffer = bufferMap.get(source.filenameURL.getFilename());
-				}
-				if (source.toStream || buffer != null)
-					sourceMap.put(sourcename, new SourceLWJGLOpenAL(listenerPositionAL,
-							ALBufferMap.get(source.filenameURL.getFilename()), source, buffer));
-			}
-		}
-	}
-
-	/**
-	 * Changes the listener's position.
-	 * 
-	 * @param x Destination X coordinate.
-	 * @param y Destination Y coordinate.
-	 * @param z Destination Z coordinate.
-	 */
-	@Override
-	public void setListenerPosition(float x, float y, float z) {
-		super.setListenerPosition(x, y, z);
-
-		listenerPositionAL.put(0, x);
-		listenerPositionAL.put(1, y);
-		listenerPositionAL.put(2, z);
-
-		// Update OpenAL listener position:
-		AL10.alListenerfv(AL10.AL_POSITION, listenerPositionAL);
-		// Check for errors:
-		checkALError();
+	public void rawDataStream(AudioFormat audioFormat, boolean priority, String sourcename, float x, float y, float z,
+			int attModel, float distOrRoll) {
+		sourceMap.put(sourcename, new SourceLWJGLOpenAL(listenerPositionAL, audioFormat, priority, sourcename, x, y, z,
+				attModel, distOrRoll));
 	}
 
 	/**
@@ -752,29 +863,6 @@ public class LibraryLWJGLOpenAL extends Library {
 		// Update OpenAL listener orientation:
 		AL10.alListenerfv(AL10.AL_ORIENTATION, listenerOrientation);
 		// Check for errors:
-		checkALError();
-	}
-
-	/**
-	 * Changes the listeners orientation using the specified coordinates.
-	 * 
-	 * @param lookX X element of the look-at direction.
-	 * @param lookY Y element of the look-at direction.
-	 * @param lookZ Z element of the look-at direction.
-	 * @param upX   X element of the up direction.
-	 * @param upY   Y element of the up direction.
-	 * @param upZ   Z element of the up direction.
-	 */
-	@Override
-	public void setListenerOrientation(float lookX, float lookY, float lookZ, float upX, float upY, float upZ) {
-		super.setListenerOrientation(lookX, lookY, lookZ, upX, upY, upZ);
-		listenerOrientation.put(0, lookX);
-		listenerOrientation.put(1, lookY);
-		listenerOrientation.put(2, lookZ);
-		listenerOrientation.put(3, upX);
-		listenerOrientation.put(4, upY);
-		listenerOrientation.put(5, upZ);
-		AL10.alListenerfv(AL10.AL_ORIENTATION, listenerOrientation);
 		checkALError();
 	}
 
@@ -811,6 +899,50 @@ public class LibraryLWJGLOpenAL extends Library {
 	}
 
 	/**
+	 * Changes the listeners orientation using the specified coordinates.
+	 * 
+	 * @param lookX X element of the look-at direction.
+	 * @param lookY Y element of the look-at direction.
+	 * @param lookZ Z element of the look-at direction.
+	 * @param upX   X element of the up direction.
+	 * @param upY   Y element of the up direction.
+	 * @param upZ   Z element of the up direction.
+	 */
+	@Override
+	public void setListenerOrientation(float lookX, float lookY, float lookZ, float upX, float upY, float upZ) {
+		super.setListenerOrientation(lookX, lookY, lookZ, upX, upY, upZ);
+		listenerOrientation.put(0, lookX);
+		listenerOrientation.put(1, lookY);
+		listenerOrientation.put(2, lookZ);
+		listenerOrientation.put(3, upX);
+		listenerOrientation.put(4, upY);
+		listenerOrientation.put(5, upZ);
+		AL10.alListenerfv(AL10.AL_ORIENTATION, listenerOrientation);
+		checkALError();
+	}
+
+	/**
+	 * Changes the listener's position.
+	 * 
+	 * @param x Destination X coordinate.
+	 * @param y Destination Y coordinate.
+	 * @param z Destination Z coordinate.
+	 */
+	@Override
+	public void setListenerPosition(float x, float y, float z) {
+		super.setListenerPosition(x, y, z);
+
+		listenerPositionAL.put(0, x);
+		listenerPositionAL.put(1, y);
+		listenerPositionAL.put(2, z);
+
+		// Update OpenAL listener position:
+		AL10.alListenerfv(AL10.AL_POSITION, listenerPositionAL);
+		// Check for errors:
+		checkALError();
+	}
+
+	/**
 	 * Sets the listener's velocity, for use in Doppler effect.
 	 * 
 	 * @param x Velocity along world x-axis.
@@ -828,157 +960,29 @@ public class LibraryLWJGLOpenAL extends Library {
 	}
 
 	/**
-	 * The Doppler parameters have changed.
+	 * Sets the overall volume to the specified value, affecting all sources.
+	 * 
+	 * @param value New volume, float value ( 0.0f - 1.0f ).
 	 */
 	@Override
-	public void dopplerChanged() {
-		super.dopplerChanged();
+	public void setMasterVolume(float value) {
+		super.setMasterVolume(value);
 
-		AL10.alDopplerFactor(SoundSystemConfig.getDopplerFactor());
-		checkALError();
-		AL10.alDopplerVelocity(SoundSystemConfig.getDopplerVelocity());
+		AL10.alListenerf(AL10.AL_GAIN, value);
 		checkALError();
 	}
 
 	/**
-	 * Checks for OpenAL errors, and prints a message if there is an error.
+	 * Removes a pre-loaded sound from memory. This is a good method to use for
+	 * freeing up memory after a large sound file is no longer needed. NOTE: the
+	 * source will remain in memory after this method has been called, for as long
+	 * as the sound is attached to an existing source.
 	 * 
-	 * @return True if there was an error, False if not.
-	 */
-	private boolean checkALError() {
-		switch (AL10.alGetError()) {
-		case AL10.AL_NO_ERROR:
-			return false;
-		case AL10.AL_INVALID_NAME:
-			errorMessage("Invalid name parameter.");
-			return true;
-		case AL10.AL_INVALID_ENUM:
-			errorMessage("Invalid parameter.");
-			return true;
-		case AL10.AL_INVALID_VALUE:
-			errorMessage("Invalid enumerated parameter value.");
-			return true;
-		case AL10.AL_INVALID_OPERATION:
-			errorMessage("Illegal call.");
-			return true;
-		case AL10.AL_OUT_OF_MEMORY:
-			errorMessage("Unable to allocate memory.");
-			return true;
-		default:
-			errorMessage("An unrecognized error occurred.");
-			return true;
-		}
-	}
-
-	/**
-	 * Whether or not the AL_PITCH control is supported.
-	 * 
-	 * @return True if AL_PITCH is supported.
-	 */
-	public static boolean alPitchSupported() {
-		return alPitchSupported(GET, XXX);
-	}
-
-	/**
-	 * Sets or returns the value of boolean 'alPitchSupported'.
-	 * 
-	 * @param action Action to perform (GET or SET).
-	 * @param value  New value if action is SET, otherwise XXX.
-	 * @return value of boolean 'alPitchSupported'.
-	 */
-	private static synchronized boolean alPitchSupported(boolean action, boolean value) {
-		if (action == SET)
-			alPitchSupported = value;
-		return alPitchSupported;
-	}
-
-	/**
-	 * Returns the short title of this library type.
-	 * 
-	 * @return A short title.
-	 */
-	public static String getTitle() {
-		return "LWJGL OpenAL (Eaglercraft)";
-	}
-
-	/**
-	 * Returns a longer description of this library type.
-	 * 
-	 * @return A longer description.
-	 */
-	public static String getDescription() {
-		return "The Eaglercraft LWJGL3 binding of OpenAL";
-	}
-
-	/**
-	 * Returns the name of the class.
-	 * 
-	 * @return "Library" + library title.
+	 * @param filename Filename/identifier of the sound file to unload.
 	 */
 	@Override
-	public String getClassName() {
-		return "LibraryLWJGLOpenAL";
-	}
-
-	/**
-	 * The LibraryLWJGLOpenAL.Exception class provides library-specific error
-	 * information.
-	 */
-	public static class Exception extends SoundSystemException {
-		private static final long serialVersionUID = -7502452059037798035L;
-		/**
-		 * Global identifier for an exception during AL.create(). Probably means that
-		 * OpenAL is not supported.
-		 */
-		public static final int CREATE = 101;
-		/**
-		 * Global identifier for an invalid name parameter in OpenAL.
-		 */
-		public static final int INVALID_NAME = 102;
-		/**
-		 * Global identifier for an invalid parameter in OpenAL.
-		 */
-		public static final int INVALID_ENUM = 103;
-		/**
-		 * Global identifier for an invalid enumerated parameter value in OpenAL.
-		 */
-		public static final int INVALID_VALUE = 104;
-		/**
-		 * Global identifier for an illegal call in OpenAL.
-		 */
-		public static final int INVALID_OPERATION = 105;
-		/**
-		 * Global identifier for OpenAL out of memory.
-		 */
-		public static final int OUT_OF_MEMORY = 106;
-		/**
-		 * Global identifier for an exception while creating the OpenAL Listener.
-		 */
-		public static final int LISTENER = 107;
-		/**
-		 * Global identifier for OpenAL AL_PITCH not supported.
-		 */
-		public static final int NO_AL_PITCH = 108;
-
-		/**
-		 * Constructor: Generates a standard "unknown error" exception with the
-		 * specified message.
-		 * 
-		 * @param message A brief description of the problem that occurred.
-		 */
-		public Exception(String message) {
-			super(message);
-		}
-
-		/**
-		 * Constructor: Generates an exception of the specified type, with the specified
-		 * message.
-		 * 
-		 * @param message A brief description of the problem that occurred.
-		 * @param type    Identifier indicating they type of error.
-		 */
-		public Exception(String message, int type) {
-			super(message, type);
-		}
+	public void unloadSound(String filename) {
+		ALBufferMap.remove(filename);
+		super.unloadSound(filename);
 	}
 }

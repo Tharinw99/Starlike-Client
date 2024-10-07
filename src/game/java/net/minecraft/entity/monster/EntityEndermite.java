@@ -17,22 +17,25 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -54,10 +57,6 @@ public class EntityEndermite extends EntityMob {
 		this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityPlayer.class, true));
 	}
 
-	public float getEyeHeight() {
-		return 0.1F;
-	}
-
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(8.0D);
@@ -65,87 +64,78 @@ public class EntityEndermite extends EntityMob {
 		this.getEntityAttribute(SharedMonsterAttributes.attackDamage).setBaseValue(2.0D);
 	}
 
-	/**+
-	 * returns if this entity triggers Block.onEntityWalking on the
-	 * blocks they walk on. used for spiders and wolves to prevent
-	 * them from trampling crops
+	/**
+	 * + returns if this entity triggers Block.onEntityWalking on the blocks they
+	 * walk on. used for spiders and wolves to prevent them from trampling crops
 	 */
 	protected boolean canTriggerWalking() {
 		return false;
 	}
 
-	/**+
-	 * Returns the sound this mob makes while it's alive.
+	/**
+	 * + Checks if the entity's current position is a valid location to spawn this
+	 * entity.
 	 */
-	protected String getLivingSound() {
-		return "mob.silverfish.say";
+	public boolean getCanSpawnHere() {
+		if (super.getCanSpawnHere()) {
+			EntityPlayer entityplayer = this.worldObj.getClosestPlayerToEntity(this, 5.0D);
+			return entityplayer == null;
+		} else {
+			return false;
+		}
 	}
 
-	/**+
-	 * Returns the sound this mob makes when it is hurt.
+	/**
+	 * + Get this Entity's EnumCreatureAttribute
 	 */
-	protected String getHurtSound() {
-		return "mob.silverfish.hit";
+	public EnumCreatureAttribute getCreatureAttribute() {
+		return EnumCreatureAttribute.ARTHROPOD;
 	}
 
-	/**+
-	 * Returns the sound this mob makes on death.
+	/**
+	 * + Returns the sound this mob makes on death.
 	 */
 	protected String getDeathSound() {
 		return "mob.silverfish.kill";
-	}
-
-	protected void playStepSound(BlockPos var1, Block var2) {
-		this.playSound("mob.silverfish.step", 0.15F, 1.0F);
 	}
 
 	protected Item getDropItem() {
 		return null;
 	}
 
-	/**+
-	 * (abstract) Protected helper method to read subclass entity
-	 * data from NBT.
-	 */
-	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
-		super.readEntityFromNBT(nbttagcompound);
-		this.lifetime = nbttagcompound.getInteger("Lifetime");
-		this.playerSpawned = nbttagcompound.getBoolean("PlayerSpawned");
+	public float getEyeHeight() {
+		return 0.1F;
 	}
 
-	/**+
-	 * (abstract) Protected helper method to write subclass entity
-	 * data to NBT.
+	/**
+	 * + Returns the sound this mob makes when it is hurt.
 	 */
-	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
-		super.writeEntityToNBT(nbttagcompound);
-		nbttagcompound.setInteger("Lifetime", this.lifetime);
-		nbttagcompound.setBoolean("PlayerSpawned", this.playerSpawned);
+	protected String getHurtSound() {
+		return "mob.silverfish.hit";
 	}
 
-	/**+
-	 * Called to update the entity's position/logic.
+	/**
+	 * + Returns the sound this mob makes while it's alive.
 	 */
-	public void onUpdate() {
-		this.renderYawOffset = this.rotationYaw;
-		super.onUpdate();
+	protected String getLivingSound() {
+		return "mob.silverfish.say";
 	}
 
 	public boolean isSpawnedByPlayer() {
 		return this.playerSpawned;
 	}
 
-	/**+
-	 * Sets if this mob was spawned by a player or not.
+	/**
+	 * + Checks to make sure the light is not too bright where the mob is spawning
 	 */
-	public void setSpawnedByPlayer(boolean spawnedByPlayer) {
-		this.playerSpawned = spawnedByPlayer;
+	protected boolean isValidLightLevel() {
+		return true;
 	}
 
-	/**+
-	 * Called frequently so the entity can update its state every
-	 * tick as required. For example, zombies and skeletons use this
-	 * to react to sunlight and start to burn.
+	/**
+	 * + Called frequently so the entity can update its state every tick as
+	 * required. For example, zombies and skeletons use this to react to sunlight
+	 * and start to burn.
 	 */
 	public void onLivingUpdate() {
 		super.onLivingUpdate();
@@ -170,31 +160,40 @@ public class EntityEndermite extends EntityMob {
 
 	}
 
-	/**+
-	 * Checks to make sure the light is not too bright where the mob
-	 * is spawning
+	/**
+	 * + Called to update the entity's position/logic.
 	 */
-	protected boolean isValidLightLevel() {
-		return true;
+	public void onUpdate() {
+		this.renderYawOffset = this.rotationYaw;
+		super.onUpdate();
 	}
 
-	/**+
-	 * Checks if the entity's current position is a valid location
-	 * to spawn this entity.
-	 */
-	public boolean getCanSpawnHere() {
-		if (super.getCanSpawnHere()) {
-			EntityPlayer entityplayer = this.worldObj.getClosestPlayerToEntity(this, 5.0D);
-			return entityplayer == null;
-		} else {
-			return false;
-		}
+	protected void playStepSound(BlockPos var1, Block var2) {
+		this.playSound("mob.silverfish.step", 0.15F, 1.0F);
 	}
 
-	/**+
-	 * Get this Entity's EnumCreatureAttribute
+	/**
+	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
-	public EnumCreatureAttribute getCreatureAttribute() {
-		return EnumCreatureAttribute.ARTHROPOD;
+	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
+		super.readEntityFromNBT(nbttagcompound);
+		this.lifetime = nbttagcompound.getInteger("Lifetime");
+		this.playerSpawned = nbttagcompound.getBoolean("PlayerSpawned");
+	}
+
+	/**
+	 * + Sets if this mob was spawned by a player or not.
+	 */
+	public void setSpawnedByPlayer(boolean spawnedByPlayer) {
+		this.playerSpawned = spawnedByPlayer;
+	}
+
+	/**
+	 * + (abstract) Protected helper method to write subclass entity data to NBT.
+	 */
+	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
+		super.writeEntityToNBT(nbttagcompound);
+		nbttagcompound.setInteger("Lifetime", this.lifetime);
+		nbttagcompound.setBoolean("PlayerSpawned", this.playerSpawned);
 	}
 }

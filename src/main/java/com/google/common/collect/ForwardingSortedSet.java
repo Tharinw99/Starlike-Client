@@ -65,12 +65,12 @@ public abstract class ForwardingSortedSet<E> extends ForwardingSet<E> implements
 	}
 
 	@Override
-	protected abstract SortedSet<E> delegate();
-
-	@Override
 	public Comparator<? super E> comparator() {
 		return delegate().comparator();
 	}
+
+	@Override
+	protected abstract SortedSet<E> delegate();
 
 	@Override
 	public E first() {
@@ -85,24 +85,6 @@ public abstract class ForwardingSortedSet<E> extends ForwardingSet<E> implements
 	@Override
 	public E last() {
 		return delegate().last();
-	}
-
-	@Override
-	public SortedSet<E> subSet(E fromElement, E toElement) {
-		return delegate().subSet(fromElement, toElement);
-	}
-
-	@Override
-	public SortedSet<E> tailSet(E fromElement) {
-		return delegate().tailSet(fromElement);
-	}
-
-	// unsafe, but worst case is a CCE is thrown, which callers will be expecting
-	@SuppressWarnings("unchecked")
-	private int unsafeCompare(Object o1, Object o2) {
-		Comparator<? super E> comparator = comparator();
-		return (comparator == null) ? ((Comparable<Object>) o1).compareTo(o2)
-				: ((Comparator<Object>) comparator).compare(o1, o2);
 	}
 
 	/**
@@ -171,5 +153,23 @@ public abstract class ForwardingSortedSet<E> extends ForwardingSet<E> implements
 	@Beta
 	protected SortedSet<E> standardSubSet(E fromElement, E toElement) {
 		return tailSet(fromElement).headSet(toElement);
+	}
+
+	@Override
+	public SortedSet<E> subSet(E fromElement, E toElement) {
+		return delegate().subSet(fromElement, toElement);
+	}
+
+	@Override
+	public SortedSet<E> tailSet(E fromElement) {
+		return delegate().tailSet(fromElement);
+	}
+
+	// unsafe, but worst case is a CCE is thrown, which callers will be expecting
+	@SuppressWarnings("unchecked")
+	private int unsafeCompare(Object o1, Object o2) {
+		Comparator<? super E> comparator = comparator();
+		return (comparator == null) ? ((Comparable<Object>) o1).compareTo(o2)
+				: ((Comparator<Object>) comparator).compare(o1, o2);
 	}
 }

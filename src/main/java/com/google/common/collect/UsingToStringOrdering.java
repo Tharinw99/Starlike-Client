@@ -28,6 +28,11 @@ import com.google.common.annotations.GwtCompatible;
 final class UsingToStringOrdering extends Ordering<Object> implements Serializable {
 	static final UsingToStringOrdering INSTANCE = new UsingToStringOrdering();
 
+	private static final long serialVersionUID = 0;
+
+	private UsingToStringOrdering() {
+	}
+
 	@Override
 	public int compare(Object left, Object right) {
 		return left.toString().compareTo(right.toString());
@@ -42,9 +47,4 @@ final class UsingToStringOrdering extends Ordering<Object> implements Serializab
 	public String toString() {
 		return "Ordering.usingToString()";
 	}
-
-	private UsingToStringOrdering() {
-	}
-
-	private static final long serialVersionUID = 0;
 }

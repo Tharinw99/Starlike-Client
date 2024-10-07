@@ -11,22 +11,25 @@ import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -59,8 +62,47 @@ public class S27PacketExplosion implements Packet<INetHandlerPlayClient> {
 
 	}
 
-	/**+
-	 * Reads the raw packet data from the data stream.
+	public float func_149144_d() {
+		return this.field_149153_g;
+	}
+
+	public float func_149147_e() {
+		return this.field_149159_h;
+	}
+
+	public float func_149149_c() {
+		return this.field_149152_f;
+	}
+
+	public List<BlockPos> getAffectedBlockPositions() {
+		return this.affectedBlockPositions;
+	}
+
+	public float getStrength() {
+		return this.strength;
+	}
+
+	public double getX() {
+		return this.posX;
+	}
+
+	public double getY() {
+		return this.posY;
+	}
+
+	public double getZ() {
+		return this.posZ;
+	}
+
+	/**
+	 * + Passes this Packet on to the NetHandler for processing.
+	 */
+	public void processPacket(INetHandlerPlayClient inethandlerplayclient) {
+		inethandlerplayclient.handleExplosion(this);
+	}
+
+	/**
+	 * + Reads the raw packet data from the data stream.
 	 */
 	public void readPacketData(PacketBuffer parPacketBuffer) throws IOException {
 		this.posX = (double) parPacketBuffer.readFloat();
@@ -85,8 +127,8 @@ public class S27PacketExplosion implements Packet<INetHandlerPlayClient> {
 		this.field_149159_h = parPacketBuffer.readFloat();
 	}
 
-	/**+
-	 * Writes the raw packet data to the data stream.
+	/**
+	 * + Writes the raw packet data to the data stream.
 	 */
 	public void writePacketData(PacketBuffer parPacketBuffer) throws IOException {
 		parPacketBuffer.writeFloat((float) this.posX);
@@ -111,44 +153,5 @@ public class S27PacketExplosion implements Packet<INetHandlerPlayClient> {
 		parPacketBuffer.writeFloat(this.field_149152_f);
 		parPacketBuffer.writeFloat(this.field_149153_g);
 		parPacketBuffer.writeFloat(this.field_149159_h);
-	}
-
-	/**+
-	 * Passes this Packet on to the NetHandler for processing.
-	 */
-	public void processPacket(INetHandlerPlayClient inethandlerplayclient) {
-		inethandlerplayclient.handleExplosion(this);
-	}
-
-	public float func_149149_c() {
-		return this.field_149152_f;
-	}
-
-	public float func_149144_d() {
-		return this.field_149153_g;
-	}
-
-	public float func_149147_e() {
-		return this.field_149159_h;
-	}
-
-	public double getX() {
-		return this.posX;
-	}
-
-	public double getY() {
-		return this.posY;
-	}
-
-	public double getZ() {
-		return this.posZ;
-	}
-
-	public float getStrength() {
-		return this.strength;
-	}
-
-	public List<BlockPos> getAffectedBlockPositions() {
-		return this.affectedBlockPositions;
 	}
 }

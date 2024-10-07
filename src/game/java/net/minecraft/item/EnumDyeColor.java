@@ -4,22 +4,25 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IStringSerializable;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -44,37 +47,14 @@ public enum EnumDyeColor implements IStringSerializable {
 
 	public static final EnumDyeColor[] META_LOOKUP = new EnumDyeColor[16];
 	public static final EnumDyeColor[] DYE_DMG_LOOKUP = new EnumDyeColor[16];
-	private final int meta;
-	private final int dyeDamage;
-	private final String name;
-	private final String unlocalizedName;
-	private final MapColor mapColor;
-	private final EnumChatFormatting chatColor;
+	static {
+		EnumDyeColor[] colors = values();
+		for (int i = 0; i < colors.length; ++i) {
+			EnumDyeColor enumdyecolor = colors[i];
+			META_LOOKUP[enumdyecolor.getMetadata()] = enumdyecolor;
+			DYE_DMG_LOOKUP[enumdyecolor.getDyeDamage()] = enumdyecolor;
+		}
 
-	private EnumDyeColor(int meta, int dyeDamage, String name, String unlocalizedName, MapColor mapColorIn,
-			EnumChatFormatting chatColor) {
-		this.meta = meta;
-		this.dyeDamage = dyeDamage;
-		this.name = name;
-		this.unlocalizedName = unlocalizedName;
-		this.mapColor = mapColorIn;
-		this.chatColor = chatColor;
-	}
-
-	public int getMetadata() {
-		return this.meta;
-	}
-
-	public int getDyeDamage() {
-		return this.dyeDamage;
-	}
-
-	public String getUnlocalizedName() {
-		return this.unlocalizedName;
-	}
-
-	public MapColor getMapColor() {
-		return this.mapColor;
 	}
 
 	public static EnumDyeColor byDyeDamage(int damage) {
@@ -93,21 +73,47 @@ public enum EnumDyeColor implements IStringSerializable {
 		return META_LOOKUP[meta];
 	}
 
-	public String toString() {
-		return this.unlocalizedName;
+	private final int meta;
+	private final int dyeDamage;
+	private final String name;
+
+	private final String unlocalizedName;
+
+	private final MapColor mapColor;
+
+	private final EnumChatFormatting chatColor;
+
+	private EnumDyeColor(int meta, int dyeDamage, String name, String unlocalizedName, MapColor mapColorIn,
+			EnumChatFormatting chatColor) {
+		this.meta = meta;
+		this.dyeDamage = dyeDamage;
+		this.name = name;
+		this.unlocalizedName = unlocalizedName;
+		this.mapColor = mapColorIn;
+		this.chatColor = chatColor;
+	}
+
+	public int getDyeDamage() {
+		return this.dyeDamage;
+	}
+
+	public MapColor getMapColor() {
+		return this.mapColor;
+	}
+
+	public int getMetadata() {
+		return this.meta;
 	}
 
 	public String getName() {
 		return this.name;
 	}
 
-	static {
-		EnumDyeColor[] colors = values();
-		for (int i = 0; i < colors.length; ++i) {
-			EnumDyeColor enumdyecolor = colors[i];
-			META_LOOKUP[enumdyecolor.getMetadata()] = enumdyecolor;
-			DYE_DMG_LOOKUP[enumdyecolor.getDyeDamage()] = enumdyecolor;
-		}
+	public String getUnlocalizedName() {
+		return this.unlocalizedName;
+	}
 
+	public String toString() {
+		return this.unlocalizedName;
 	}
 }

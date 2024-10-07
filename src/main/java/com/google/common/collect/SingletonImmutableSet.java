@@ -54,28 +54,8 @@ final class SingletonImmutableSet<E> extends ImmutableSet<E> {
 	}
 
 	@Override
-	public int size() {
-		return 1;
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return false;
-	}
-
-	@Override
 	public boolean contains(Object target) {
 		return element.equals(target);
-	}
-
-	@Override
-	public UnmodifiableIterator<E> iterator() {
-		return Iterators.singletonIterator(element);
-	}
-
-	@Override
-	boolean isPartialView() {
-		return false;
 	}
 
 	@Override
@@ -107,8 +87,28 @@ final class SingletonImmutableSet<E> extends ImmutableSet<E> {
 	}
 
 	@Override
+	public boolean isEmpty() {
+		return false;
+	}
+
+	@Override
 	boolean isHashCodeFast() {
 		return cachedHashCode != 0;
+	}
+
+	@Override
+	boolean isPartialView() {
+		return false;
+	}
+
+	@Override
+	public UnmodifiableIterator<E> iterator() {
+		return Iterators.singletonIterator(element);
+	}
+
+	@Override
+	public int size() {
+		return 1;
 	}
 
 	@Override

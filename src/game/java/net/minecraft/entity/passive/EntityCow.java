@@ -19,22 +19,25 @@ import net.minecraft.pathfinding.PathNavigateGround;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -60,44 +63,12 @@ public class EntityCow extends EntityAnimal {
 		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.20000000298023224D);
 	}
 
-	/**+
-	 * Returns the sound this mob makes while it's alive.
-	 */
-	protected String getLivingSound() {
-		return "mob.cow.say";
+	public EntityCow createChild(EntityAgeable var1) {
+		return new EntityCow(this.worldObj);
 	}
 
-	/**+
-	 * Returns the sound this mob makes when it is hurt.
-	 */
-	protected String getHurtSound() {
-		return "mob.cow.hurt";
-	}
-
-	/**+
-	 * Returns the sound this mob makes on death.
-	 */
-	protected String getDeathSound() {
-		return "mob.cow.hurt";
-	}
-
-	protected void playStepSound(BlockPos var1, Block var2) {
-		this.playSound("mob.cow.step", 0.15F, 1.0F);
-	}
-
-	/**+
-	 * Returns the volume for the sounds this mob makes.
-	 */
-	protected float getSoundVolume() {
-		return 0.4F;
-	}
-
-	protected Item getDropItem() {
-		return Items.leather;
-	}
-
-	/**+
-	 * Drop 0-2 items of this living's type
+	/**
+	 * + Drop 0-2 items of this living's type
 	 */
 	protected void dropFewItems(boolean var1, int i) {
 		int j = this.rand.nextInt(3) + this.rand.nextInt(1 + i);
@@ -118,9 +89,45 @@ public class EntityCow extends EntityAnimal {
 
 	}
 
-	/**+
-	 * Called when a player interacts with a mob. e.g. gets milk
-	 * from a cow, gets into the saddle on a pig.
+	/**
+	 * + Returns the sound this mob makes on death.
+	 */
+	protected String getDeathSound() {
+		return "mob.cow.hurt";
+	}
+
+	protected Item getDropItem() {
+		return Items.leather;
+	}
+
+	public float getEyeHeight() {
+		return this.height;
+	}
+
+	/**
+	 * + Returns the sound this mob makes when it is hurt.
+	 */
+	protected String getHurtSound() {
+		return "mob.cow.hurt";
+	}
+
+	/**
+	 * + Returns the sound this mob makes while it's alive.
+	 */
+	protected String getLivingSound() {
+		return "mob.cow.say";
+	}
+
+	/**
+	 * + Returns the volume for the sounds this mob makes.
+	 */
+	protected float getSoundVolume() {
+		return 0.4F;
+	}
+
+	/**
+	 * + Called when a player interacts with a mob. e.g. gets milk from a cow, gets
+	 * into the saddle on a pig.
 	 */
 	public boolean interact(EntityPlayer entityplayer) {
 		ItemStack itemstack = entityplayer.inventory.getCurrentItem();
@@ -139,11 +146,7 @@ public class EntityCow extends EntityAnimal {
 		}
 	}
 
-	public EntityCow createChild(EntityAgeable var1) {
-		return new EntityCow(this.worldObj);
-	}
-
-	public float getEyeHeight() {
-		return this.height;
+	protected void playStepSound(BlockPos var1, Block var2) {
+		this.playSound("mob.cow.step", 0.15F, 1.0F);
 	}
 }

@@ -28,6 +28,8 @@ import com.google.common.annotations.GwtCompatible;
 /** An ordering for a pre-existing comparator. */
 @GwtCompatible(serializable = true)
 final class ComparatorOrdering<T> extends Ordering<T> implements Serializable {
+	private static final long serialVersionUID = 0;
+
 	final Comparator<T> comparator;
 
 	ComparatorOrdering(Comparator<T> comparator) {
@@ -60,6 +62,4 @@ final class ComparatorOrdering<T> extends Ordering<T> implements Serializable {
 	public String toString() {
 		return comparator.toString();
 	}
-
-	private static final long serialVersionUID = 0;
 }

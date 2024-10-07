@@ -20,22 +20,25 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -53,51 +56,12 @@ public class BlockCarpet extends Block {
 		this.setBlockBoundsFromMeta(0);
 	}
 
-	/**+
-	 * Get the MapColor for this Block and the given BlockState
-	 */
-	public MapColor getMapColor(IBlockState iblockstate) {
-		return ((EnumDyeColor) iblockstate.getValue(COLOR)).getMapColor();
-	}
-
-	/**+
-	 * Used to determine ambient occlusion and culling when
-	 * rebuilding chunks for render
-	 */
-	public boolean isOpaqueCube() {
-		return false;
-	}
-
-	public boolean isFullCube() {
-		return false;
-	}
-
-	/**+
-	 * Sets the block's bounds for rendering it as an item
-	 */
-	public void setBlockBoundsForItemRender() {
-		this.setBlockBoundsFromMeta(0);
-	}
-
-	public void setBlockBoundsBasedOnState(IBlockAccess var1, BlockPos var2) {
-		this.setBlockBoundsFromMeta(0);
-	}
-
-	protected void setBlockBoundsFromMeta(int meta) {
-		byte b0 = 0;
-		float f = (float) (1 * (1 + b0)) / 16.0F;
-		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, f, 1.0F);
+	private boolean canBlockStay(World worldIn, BlockPos pos) {
+		return !worldIn.isAirBlock(pos.down());
 	}
 
 	public boolean canPlaceBlockAt(World world, BlockPos blockpos) {
 		return super.canPlaceBlockAt(world, blockpos) && this.canBlockStay(world, blockpos);
-	}
-
-	/**+
-	 * Called when a neighboring block changes.
-	 */
-	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block var4) {
-		this.checkForDrop(world, blockpos, iblockstate);
 	}
 
 	private boolean checkForDrop(World worldIn, BlockPos pos, IBlockState state) {
@@ -110,27 +74,43 @@ public class BlockCarpet extends Block {
 		}
 	}
 
-	private boolean canBlockStay(World worldIn, BlockPos pos) {
-		return !worldIn.isAirBlock(pos.down());
+	protected BlockState createBlockState() {
+		return new BlockState(this, new IProperty[] { COLOR });
 	}
 
-	public boolean shouldSideBeRendered(IBlockAccess iblockaccess, BlockPos blockpos, EnumFacing enumfacing) {
-		return enumfacing == EnumFacing.UP ? true : super.shouldSideBeRendered(iblockaccess, blockpos, enumfacing);
-	}
-
-	/**+
-	 * Gets the metadata of the item this Block can drop. This
-	 * method is called when the block gets destroyed. It returns
-	 * the metadata of the dropped item based on the old metadata of
-	 * the block.
+	/**
+	 * + Gets the metadata of the item this Block can drop. This method is called
+	 * when the block gets destroyed. It returns the metadata of the dropped item
+	 * based on the old metadata of the block.
 	 */
 	public int damageDropped(IBlockState iblockstate) {
 		return ((EnumDyeColor) iblockstate.getValue(COLOR)).getMetadata();
 	}
 
-	/**+
-	 * returns a list of blocks with the same ID, but different meta
-	 * (eg: wood returns 4 blocks)
+	/**
+	 * + Get the MapColor for this Block and the given BlockState
+	 */
+	public MapColor getMapColor(IBlockState iblockstate) {
+		return ((EnumDyeColor) iblockstate.getValue(COLOR)).getMapColor();
+	}
+
+	/**
+	 * + Convert the BlockState into the correct metadata value
+	 */
+	public int getMetaFromState(IBlockState iblockstate) {
+		return ((EnumDyeColor) iblockstate.getValue(COLOR)).getMetadata();
+	}
+
+	/**
+	 * + Convert the given metadata into a BlockState for this Block
+	 */
+	public IBlockState getStateFromMeta(int i) {
+		return this.getDefaultState().withProperty(COLOR, EnumDyeColor.byMetadata(i));
+	}
+
+	/**
+	 * + returns a list of blocks with the same ID, but different meta (eg: wood
+	 * returns 4 blocks)
 	 */
 	public void getSubBlocks(Item item, CreativeTabs var2, List<ItemStack> list) {
 		for (int i = 0; i < 16; ++i) {
@@ -139,22 +119,16 @@ public class BlockCarpet extends Block {
 
 	}
 
-	/**+
-	 * Convert the given metadata into a BlockState for this Block
-	 */
-	public IBlockState getStateFromMeta(int i) {
-		return this.getDefaultState().withProperty(COLOR, EnumDyeColor.byMetadata(i));
+	public boolean isFullCube() {
+		return false;
 	}
 
-	/**+
-	 * Convert the BlockState into the correct metadata value
+	/**
+	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
+	 * render
 	 */
-	public int getMetaFromState(IBlockState iblockstate) {
-		return ((EnumDyeColor) iblockstate.getValue(COLOR)).getMetadata();
-	}
-
-	protected BlockState createBlockState() {
-		return new BlockState(this, new IProperty[] { COLOR });
+	public boolean isOpaqueCube() {
+		return false;
 	}
 
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState var3, EntityPlayer entityplayer,
@@ -169,5 +143,33 @@ public class BlockCarpet extends Block {
 			return true;
 		}
 		return super.onBlockActivated(world, blockpos, var3, entityplayer, var5, var6, var7, var8);
+	}
+
+	/**
+	 * + Called when a neighboring block changes.
+	 */
+	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block var4) {
+		this.checkForDrop(world, blockpos, iblockstate);
+	}
+
+	public void setBlockBoundsBasedOnState(IBlockAccess var1, BlockPos var2) {
+		this.setBlockBoundsFromMeta(0);
+	}
+
+	/**
+	 * + Sets the block's bounds for rendering it as an item
+	 */
+	public void setBlockBoundsForItemRender() {
+		this.setBlockBoundsFromMeta(0);
+	}
+
+	protected void setBlockBoundsFromMeta(int meta) {
+		byte b0 = 0;
+		float f = (float) (1 * (1 + b0)) / 16.0F;
+		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, f, 1.0F);
+	}
+
+	public boolean shouldSideBeRendered(IBlockAccess iblockaccess, BlockPos blockpos, EnumFacing enumfacing) {
+		return enumfacing == EnumFacing.UP ? true : super.shouldSideBeRendered(iblockaccess, blockpos, enumfacing);
 	}
 }

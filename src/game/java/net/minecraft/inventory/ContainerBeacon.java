@@ -4,28 +4,48 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class ContainerBeacon extends Container {
+	class BeaconSlot extends Slot {
+		public BeaconSlot(IInventory parIInventory, int parInt1, int parInt2, int parInt3) {
+			super(parIInventory, parInt1, parInt2, parInt3);
+		}
+
+		public int getSlotStackLimit() {
+			return 1;
+		}
+
+		public boolean isItemValid(ItemStack itemstack) {
+			return itemstack == null ? false
+					: itemstack.getItem() == Items.emerald || itemstack.getItem() == Items.diamond
+							|| itemstack.getItem() == Items.gold_ingot || itemstack.getItem() == Items.iron_ingot;
+		}
+	}
+
 	private IInventory tileBeacon;
+
 	private final ContainerBeacon.BeaconSlot beaconSlot;
 
 	public ContainerBeacon(IInventory playerInventory, IInventory tileBeaconIn) {
@@ -46,21 +66,16 @@ public class ContainerBeacon extends Container {
 
 	}
 
-	public void onCraftGuiOpened(ICrafting icrafting) {
-		super.onCraftGuiOpened(icrafting);
-		icrafting.func_175173_a(this, this.tileBeacon);
-	}
-
-	public void updateProgressBar(int i, int j) {
-		this.tileBeacon.setField(i, j);
+	public boolean canInteractWith(EntityPlayer entityplayer) {
+		return this.tileBeacon.isUseableByPlayer(entityplayer);
 	}
 
 	public IInventory func_180611_e() {
 		return this.tileBeacon;
 	}
 
-	/**+
-	 * Called when the container is closed.
+	/**
+	 * + Called when the container is closed.
 	 */
 	public void onContainerClosed(EntityPlayer entityplayer) {
 		super.onContainerClosed(entityplayer);
@@ -73,12 +88,13 @@ public class ContainerBeacon extends Container {
 		}
 	}
 
-	public boolean canInteractWith(EntityPlayer entityplayer) {
-		return this.tileBeacon.isUseableByPlayer(entityplayer);
+	public void onCraftGuiOpened(ICrafting icrafting) {
+		super.onCraftGuiOpened(icrafting);
+		icrafting.func_175173_a(this, this.tileBeacon);
 	}
 
-	/**+
-	 * Take a stack from the specified inventory slot.
+	/**
+	 * + Take a stack from the specified inventory slot.
 	 */
 	public ItemStack transferStackInSlot(EntityPlayer entityplayer, int i) {
 		ItemStack itemstack = null;
@@ -125,19 +141,7 @@ public class ContainerBeacon extends Container {
 		return itemstack;
 	}
 
-	class BeaconSlot extends Slot {
-		public BeaconSlot(IInventory parIInventory, int parInt1, int parInt2, int parInt3) {
-			super(parIInventory, parInt1, parInt2, parInt3);
-		}
-
-		public boolean isItemValid(ItemStack itemstack) {
-			return itemstack == null ? false
-					: itemstack.getItem() == Items.emerald || itemstack.getItem() == Items.diamond
-							|| itemstack.getItem() == Items.gold_ingot || itemstack.getItem() == Items.iron_ingot;
-		}
-
-		public int getSlotStackLimit() {
-			return 1;
-		}
+	public void updateProgressBar(int i, int j) {
+		this.tileBeacon.setField(i, j);
 	}
 }

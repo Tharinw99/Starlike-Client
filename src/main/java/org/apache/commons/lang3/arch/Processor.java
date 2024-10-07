@@ -160,16 +160,6 @@ public class Processor {
 	}
 
 	/**
-	 * Checks if {@link Processor} is type of x86.
-	 *
-	 * @return {@code true}, if {@link Processor} is {@link Type#X86}, else
-	 *         {@code false}.
-	 */
-	public boolean isX86() {
-		return Type.X86 == type;
-	}
-
-	/**
 	 * Checks if {@link Processor} is type of Intel Itanium.
 	 *
 	 * @return {@code true}. if {@link Processor} is {@link Type#IA_64}, else
@@ -187,6 +177,16 @@ public class Processor {
 	 */
 	public boolean isPPC() {
 		return Type.PPC == type;
+	}
+
+	/**
+	 * Checks if {@link Processor} is type of x86.
+	 *
+	 * @return {@code true}, if {@link Processor} is {@link Type#X86}, else
+	 *         {@code false}.
+	 */
+	public boolean isX86() {
+		return Type.X86 == type;
 	}
 
 }

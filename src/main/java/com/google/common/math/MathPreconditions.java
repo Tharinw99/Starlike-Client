@@ -27,23 +27,22 @@ import com.google.common.annotations.GwtCompatible;
  */
 @GwtCompatible
 final class MathPreconditions {
-	static int checkPositive(@Nullable String role, int x) {
-		if (x <= 0) {
-			throw new IllegalArgumentException(role + " (" + x + ") must be > 0");
+	static void checkInRange(boolean condition) {
+		if (!condition) {
+			throw new ArithmeticException("not in range");
+		}
+	}
+
+	static BigInteger checkNonNegative(@Nullable String role, BigInteger x) {
+		if (x.signum() < 0) {
+			throw new IllegalArgumentException(role + " (" + x + ") must be >= 0");
 		}
 		return x;
 	}
 
-	static long checkPositive(@Nullable String role, long x) {
-		if (x <= 0) {
-			throw new IllegalArgumentException(role + " (" + x + ") must be > 0");
-		}
-		return x;
-	}
-
-	static BigInteger checkPositive(@Nullable String role, BigInteger x) {
-		if (x.signum() <= 0) {
-			throw new IllegalArgumentException(role + " (" + x + ") must be > 0");
+	static double checkNonNegative(@Nullable String role, double x) {
+		if (!(x >= 0)) { // not x < 0, to work with NaN.
+			throw new IllegalArgumentException(role + " (" + x + ") must be >= 0");
 		}
 		return x;
 	}
@@ -62,16 +61,29 @@ final class MathPreconditions {
 		return x;
 	}
 
-	static BigInteger checkNonNegative(@Nullable String role, BigInteger x) {
-		if (x.signum() < 0) {
-			throw new IllegalArgumentException(role + " (" + x + ") must be >= 0");
+	static void checkNoOverflow(boolean condition) {
+		if (!condition) {
+			throw new ArithmeticException("overflow");
+		}
+	}
+
+	static BigInteger checkPositive(@Nullable String role, BigInteger x) {
+		if (x.signum() <= 0) {
+			throw new IllegalArgumentException(role + " (" + x + ") must be > 0");
 		}
 		return x;
 	}
 
-	static double checkNonNegative(@Nullable String role, double x) {
-		if (!(x >= 0)) { // not x < 0, to work with NaN.
-			throw new IllegalArgumentException(role + " (" + x + ") must be >= 0");
+	static int checkPositive(@Nullable String role, int x) {
+		if (x <= 0) {
+			throw new IllegalArgumentException(role + " (" + x + ") must be > 0");
+		}
+		return x;
+	}
+
+	static long checkPositive(@Nullable String role, long x) {
+		if (x <= 0) {
+			throw new IllegalArgumentException(role + " (" + x + ") must be > 0");
 		}
 		return x;
 	}
@@ -79,18 +91,6 @@ final class MathPreconditions {
 	static void checkRoundingUnnecessary(boolean condition) {
 		if (!condition) {
 			throw new ArithmeticException("mode was UNNECESSARY, but rounding was necessary");
-		}
-	}
-
-	static void checkInRange(boolean condition) {
-		if (!condition) {
-			throw new ArithmeticException("not in range");
-		}
-	}
-
-	static void checkNoOverflow(boolean condition) {
-		if (!condition) {
-			throw new ArithmeticException("overflow");
 		}
 	}
 

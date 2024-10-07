@@ -41,48 +41,38 @@ import javax.annotation.Nullable;
  * @author Dimitris Andreou
  */
 final class Murmur3_128HashFunction extends AbstractStreamingHashFunction implements Serializable {
-	// TODO(user): when the shortcuts are implemented, update BloomFilterStrategies
-	private final int seed;
-
-	Murmur3_128HashFunction(int seed) {
-		this.seed = seed;
-	}
-
-	@Override
-	public int bits() {
-		return 128;
-	}
-
-	@Override
-	public Hasher newHasher() {
-		return new Murmur3_128Hasher(seed);
-	}
-
-	@Override
-	public String toString() {
-		return "Hashing.murmur3_128(" + seed + ")";
-	}
-
-	@Override
-	public boolean equals(@Nullable Object object) {
-		if (object instanceof Murmur3_128HashFunction) {
-			Murmur3_128HashFunction other = (Murmur3_128HashFunction) object;
-			return seed == other.seed;
-		}
-		return false;
-	}
-
-	@Override
-	public int hashCode() {
-		return getClass().hashCode() ^ seed;
-	}
-
 	private static final class Murmur3_128Hasher extends AbstractStreamingHasher {
 		private static final int CHUNK_SIZE = 16;
 		private static final long C1 = 0x87c37b91114253d5L;
 		private static final long C2 = 0x4cf5ad432745937fL;
+
+		private static long fmix64(long k) {
+			k ^= k >>> 33;
+			k *= 0xff51afd7ed558ccdL;
+			k ^= k >>> 33;
+			k *= 0xc4ceb9fe1a85ec53L;
+			k ^= k >>> 33;
+			return k;
+		}
+
+		private static long mixK1(long k1) {
+			k1 *= C1;
+			k1 = Long.rotateLeft(k1, 31);
+			k1 *= C2;
+			return k1;
+		}
+
+		private static long mixK2(long k2) {
+			k2 *= C2;
+			k2 = Long.rotateLeft(k2, 33);
+			k2 *= C1;
+			return k2;
+		}
+
 		private long h1;
+
 		private long h2;
+
 		private int length;
 
 		Murmur3_128Hasher(int seed) {
@@ -90,14 +80,6 @@ final class Murmur3_128HashFunction extends AbstractStreamingHashFunction implem
 			this.h1 = seed;
 			this.h2 = seed;
 			this.length = 0;
-		}
-
-		@Override
-		protected void process(ByteBuffer bb) {
-			long k1 = bb.getLong();
-			long k2 = bb.getLong();
-			bmix64(k1, k2);
-			length += CHUNK_SIZE;
 		}
 
 		private void bmix64(long k1, long k2) {
@@ -112,6 +94,32 @@ final class Murmur3_128HashFunction extends AbstractStreamingHashFunction implem
 			h2 = Long.rotateLeft(h2, 31);
 			h2 += h1;
 			h2 = h2 * 5 + 0x38495ab5;
+		}
+
+		@Override
+		public HashCode makeHash() {
+			h1 ^= length;
+			h2 ^= length;
+
+			h1 += h2;
+			h2 += h1;
+
+			h1 = fmix64(h1);
+			h2 = fmix64(h2);
+
+			h1 += h2;
+			h2 += h1;
+
+			return HashCode.fromBytesNoCopy(ByteBuffer.wrap(new byte[CHUNK_SIZE]).order(ByteOrder.LITTLE_ENDIAN)
+					.putLong(h1).putLong(h2).array());
+		}
+
+		@Override
+		protected void process(ByteBuffer bb) {
+			long k1 = bb.getLong();
+			long k2 = bb.getLong();
+			bmix64(k1, k2);
+			length += CHUNK_SIZE;
 		}
 
 		@Override
@@ -158,48 +166,43 @@ final class Murmur3_128HashFunction extends AbstractStreamingHashFunction implem
 			h1 ^= mixK1(k1);
 			h2 ^= mixK2(k2);
 		}
-
-		@Override
-		public HashCode makeHash() {
-			h1 ^= length;
-			h2 ^= length;
-
-			h1 += h2;
-			h2 += h1;
-
-			h1 = fmix64(h1);
-			h2 = fmix64(h2);
-
-			h1 += h2;
-			h2 += h1;
-
-			return HashCode.fromBytesNoCopy(ByteBuffer.wrap(new byte[CHUNK_SIZE]).order(ByteOrder.LITTLE_ENDIAN)
-					.putLong(h1).putLong(h2).array());
-		}
-
-		private static long fmix64(long k) {
-			k ^= k >>> 33;
-			k *= 0xff51afd7ed558ccdL;
-			k ^= k >>> 33;
-			k *= 0xc4ceb9fe1a85ec53L;
-			k ^= k >>> 33;
-			return k;
-		}
-
-		private static long mixK1(long k1) {
-			k1 *= C1;
-			k1 = Long.rotateLeft(k1, 31);
-			k1 *= C2;
-			return k1;
-		}
-
-		private static long mixK2(long k2) {
-			k2 *= C2;
-			k2 = Long.rotateLeft(k2, 33);
-			k2 *= C1;
-			return k2;
-		}
 	}
 
 	private static final long serialVersionUID = 0L;
+
+	// TODO(user): when the shortcuts are implemented, update BloomFilterStrategies
+	private final int seed;
+
+	Murmur3_128HashFunction(int seed) {
+		this.seed = seed;
+	}
+
+	@Override
+	public int bits() {
+		return 128;
+	}
+
+	@Override
+	public boolean equals(@Nullable Object object) {
+		if (object instanceof Murmur3_128HashFunction) {
+			Murmur3_128HashFunction other = (Murmur3_128HashFunction) object;
+			return seed == other.seed;
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return getClass().hashCode() ^ seed;
+	}
+
+	@Override
+	public Hasher newHasher() {
+		return new Murmur3_128Hasher(seed);
+	}
+
+	@Override
+	public String toString() {
+		return "Hashing.murmur3_128(" + seed + ")";
+	}
 }

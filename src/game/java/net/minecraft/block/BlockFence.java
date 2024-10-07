@@ -19,41 +19,44 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class BlockFence extends Block {
-	/**+
-	 * Whether this fence connects in the northern direction
+	/**
+	 * + Whether this fence connects in the northern direction
 	 */
 	public static final PropertyBool NORTH = PropertyBool.create("north");
-	/**+
-	 * Whether this fence connects in the eastern direction
+	/**
+	 * + Whether this fence connects in the eastern direction
 	 */
 	public static final PropertyBool EAST = PropertyBool.create("east");
-	/**+
-	 * Whether this fence connects in the southern direction
+	/**
+	 * + Whether this fence connects in the southern direction
 	 */
 	public static final PropertyBool SOUTH = PropertyBool.create("south");
-	/**+
-	 * Whether this fence connects in the western direction
+	/**
+	 * + Whether this fence connects in the western direction
 	 */
 	public static final PropertyBool WEST = PropertyBool.create("west");
 
@@ -69,9 +72,9 @@ public class BlockFence extends Block {
 		this.setCreativeTab(CreativeTabs.tabDecorations);
 	}
 
-	/**+
-	 * Add all collision boxes of this Block to the list that
-	 * intersect with the given mask.
+	/**
+	 * + Add all collision boxes of this Block to the list that intersect with the
+	 * given mask.
 	 */
 	public void addCollisionBoxesToList(World world, BlockPos blockpos, IBlockState iblockstate,
 			AxisAlignedBB axisalignedbb, List<AxisAlignedBB> list, Entity entity) {
@@ -122,6 +125,60 @@ public class BlockFence extends Block {
 		this.setBlockBounds(f, 0.0F, f2, f1, 1.0F, f3);
 	}
 
+	public boolean canConnectTo(IBlockAccess worldIn, BlockPos pos) {
+		Block block = worldIn.getBlockState(pos).getBlock();
+		return block == Blocks.barrier ? false
+				: ((!(block instanceof BlockFence) || block.blockMaterial != this.blockMaterial)
+						&& !(block instanceof BlockFenceGate)
+								? (block.blockMaterial.isOpaque() && block.isFullCube()
+										? block.blockMaterial != Material.gourd
+										: false)
+								: true);
+	}
+
+	protected BlockState createBlockState() {
+		return new BlockState(this, new IProperty[] { NORTH, EAST, WEST, SOUTH });
+	}
+
+	/**
+	 * + Get the actual Block state of this Block at the given position. This
+	 * applies properties not visible in the metadata, such as fence connections.
+	 */
+	public IBlockState getActualState(IBlockState iblockstate, IBlockAccess iblockaccess, BlockPos blockpos) {
+		return iblockstate.withProperty(NORTH, Boolean.valueOf(this.canConnectTo(iblockaccess, blockpos.north())))
+				.withProperty(EAST, Boolean.valueOf(this.canConnectTo(iblockaccess, blockpos.east())))
+				.withProperty(SOUTH, Boolean.valueOf(this.canConnectTo(iblockaccess, blockpos.south())))
+				.withProperty(WEST, Boolean.valueOf(this.canConnectTo(iblockaccess, blockpos.west())));
+	}
+
+	/**
+	 * + Convert the BlockState into the correct metadata value
+	 */
+	public int getMetaFromState(IBlockState var1) {
+		return 0;
+	}
+
+	public boolean isFullCube() {
+		return false;
+	}
+
+	/**
+	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
+	 * render
+	 */
+	public boolean isOpaqueCube() {
+		return false;
+	}
+
+	public boolean isPassable(IBlockAccess var1, BlockPos var2) {
+		return false;
+	}
+
+	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState var3, EntityPlayer entityplayer,
+			EnumFacing var5, float var6, float var7, float var8) {
+		return world.isRemote ? true : ItemLead.attachToFence(entityplayer, world, blockpos);
+	}
+
 	public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
 		boolean flag = this.canConnectTo(iblockaccess, blockpos.north());
 		boolean flag1 = this.canConnectTo(iblockaccess, blockpos.south());
@@ -150,62 +207,7 @@ public class BlockFence extends Block {
 		this.setBlockBounds(f, 0.0F, f2, f1, 1.0F, f3);
 	}
 
-	/**+
-	 * Used to determine ambient occlusion and culling when
-	 * rebuilding chunks for render
-	 */
-	public boolean isOpaqueCube() {
-		return false;
-	}
-
-	public boolean isFullCube() {
-		return false;
-	}
-
-	public boolean isPassable(IBlockAccess var1, BlockPos var2) {
-		return false;
-	}
-
-	public boolean canConnectTo(IBlockAccess worldIn, BlockPos pos) {
-		Block block = worldIn.getBlockState(pos).getBlock();
-		return block == Blocks.barrier ? false
-				: ((!(block instanceof BlockFence) || block.blockMaterial != this.blockMaterial)
-						&& !(block instanceof BlockFenceGate)
-								? (block.blockMaterial.isOpaque() && block.isFullCube()
-										? block.blockMaterial != Material.gourd
-										: false)
-								: true);
-	}
-
 	public boolean shouldSideBeRendered(IBlockAccess var1, BlockPos var2, EnumFacing var3) {
 		return true;
-	}
-
-	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState var3, EntityPlayer entityplayer,
-			EnumFacing var5, float var6, float var7, float var8) {
-		return world.isRemote ? true : ItemLead.attachToFence(entityplayer, world, blockpos);
-	}
-
-	/**+
-	 * Convert the BlockState into the correct metadata value
-	 */
-	public int getMetaFromState(IBlockState var1) {
-		return 0;
-	}
-
-	/**+
-	 * Get the actual Block state of this Block at the given
-	 * position. This applies properties not visible in the
-	 * metadata, such as fence connections.
-	 */
-	public IBlockState getActualState(IBlockState iblockstate, IBlockAccess iblockaccess, BlockPos blockpos) {
-		return iblockstate.withProperty(NORTH, Boolean.valueOf(this.canConnectTo(iblockaccess, blockpos.north())))
-				.withProperty(EAST, Boolean.valueOf(this.canConnectTo(iblockaccess, blockpos.east())))
-				.withProperty(SOUTH, Boolean.valueOf(this.canConnectTo(iblockaccess, blockpos.south())))
-				.withProperty(WEST, Boolean.valueOf(this.canConnectTo(iblockaccess, blockpos.west())));
-	}
-
-	protected BlockState createBlockState() {
-		return new BlockState(this, new IProperty[] { NORTH, EAST, WEST, SOUTH });
 	}
 }

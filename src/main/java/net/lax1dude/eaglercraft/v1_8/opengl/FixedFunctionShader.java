@@ -3,44 +3,20 @@ package net.lax1dude.eaglercraft.v1_8.opengl;
 /**
  * Copyright (c) 2022-2023 lax1dude, ayunami2000. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class FixedFunctionShader {
-
-	public static final int initialSize = 0x8000;
-	public static final int initialCount = 3;
-	public static final int maxCount = 8;
-
-	public class FixedFunctionState {
-
-		public static final int fixedFunctionStatesCount = 12;
-		public static final int fixedFunctionStatesBits = (1 << 12) - 1;
-		public static final int extentionStateBits = fixedFunctionStatesBits ^ 0xFFFFFFFF;
-
-		public static final int STATE_HAS_ATTRIB_TEXTURE = 1;
-		public static final int STATE_HAS_ATTRIB_COLOR = 2;
-		public static final int STATE_HAS_ATTRIB_NORMAL = 4;
-		public static final int STATE_HAS_ATTRIB_LIGHTMAP = 8;
-		public static final int STATE_ENABLE_TEXTURE2D = 16;
-		public static final int STATE_ENABLE_LIGHTMAP = 32;
-		public static final int STATE_ENABLE_ALPHA_TEST = 64;
-		public static final int STATE_ENABLE_MC_LIGHTING = 128;
-		public static final int STATE_ENABLE_END_PORTAL = 256;
-		public static final int STATE_ENABLE_ANISOTROPIC_FIX = 512;
-		public static final int STATE_ENABLE_FOG = 1024;
-		public static final int STATE_ENABLE_BLEND_ADD = 2048;
-
-	}
 
 	public class FixedFunctionConstants {
 
@@ -50,12 +26,12 @@ public class FixedFunctionShader {
 		public static final String PRECISION_INT = "lowp";
 		public static final String PRECISION_FLOAT = "highp";
 		public static final String PRECISION_SAMPLER = "mediump";
-		
+
 		public static final String MACRO_ATTRIB_TEXTURE = "COMPILE_TEXTURE_ATTRIB";
 		public static final String MACRO_ATTRIB_COLOR = "COMPILE_COLOR_ATTRIB";
 		public static final String MACRO_ATTRIB_NORMAL = "COMPILE_NORMAL_ATTRIB";
 		public static final String MACRO_ATTRIB_LIGHTMAP = "COMPILE_LIGHTMAP_ATTRIB";
-		
+
 		public static final String MACRO_ENABLE_TEXTURE2D = "COMPILE_ENABLE_TEXTURE2D";
 		public static final String MACRO_ENABLE_LIGHTMAP = "COMPILE_ENABLE_LIGHTMAP";
 		public static final String MACRO_ENABLE_ALPHA_TEST = "COMPILE_ENABLE_ALPHA_TEST";
@@ -97,9 +73,36 @@ public class FixedFunctionShader {
 
 		public static final String UNIFORM_TEXTURE_UNIT_01_NAME = "u_samplerTexture";
 		public static final String UNIFORM_TEXTURE_UNIT_02_NAME = "u_samplerLightmap";
-		
+
 		public static final String OUTPUT_COLOR = "output4f";
 
 	}
+
+	public class FixedFunctionState {
+
+		public static final int fixedFunctionStatesCount = 12;
+		public static final int fixedFunctionStatesBits = (1 << 12) - 1;
+		public static final int extentionStateBits = fixedFunctionStatesBits ^ 0xFFFFFFFF;
+
+		public static final int STATE_HAS_ATTRIB_TEXTURE = 1;
+		public static final int STATE_HAS_ATTRIB_COLOR = 2;
+		public static final int STATE_HAS_ATTRIB_NORMAL = 4;
+		public static final int STATE_HAS_ATTRIB_LIGHTMAP = 8;
+		public static final int STATE_ENABLE_TEXTURE2D = 16;
+		public static final int STATE_ENABLE_LIGHTMAP = 32;
+		public static final int STATE_ENABLE_ALPHA_TEST = 64;
+		public static final int STATE_ENABLE_MC_LIGHTING = 128;
+		public static final int STATE_ENABLE_END_PORTAL = 256;
+		public static final int STATE_ENABLE_ANISOTROPIC_FIX = 512;
+		public static final int STATE_ENABLE_FOG = 1024;
+		public static final int STATE_ENABLE_BLEND_ADD = 2048;
+
+	}
+
+	public static final int initialSize = 0x8000;
+
+	public static final int initialCount = 3;
+
+	public static final int maxCount = 8;
 
 }

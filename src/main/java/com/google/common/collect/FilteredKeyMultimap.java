@@ -37,74 +37,41 @@ import com.google.common.base.Predicate;
  */
 @GwtCompatible
 class FilteredKeyMultimap<K, V> extends AbstractMultimap<K, V> implements FilteredMultimap<K, V> {
-	final Multimap<K, V> unfiltered;
-	final Predicate<? super K> keyPredicate;
+	static class AddRejectingList<K, V> extends ForwardingList<V> {
+		final K key;
 
-	FilteredKeyMultimap(Multimap<K, V> unfiltered, Predicate<? super K> keyPredicate) {
-		this.unfiltered = checkNotNull(unfiltered);
-		this.keyPredicate = checkNotNull(keyPredicate);
-	}
-
-	@Override
-	public Multimap<K, V> unfiltered() {
-		return unfiltered;
-	}
-
-	@Override
-	public Predicate<? super Entry<K, V>> entryPredicate() {
-		return Maps.keyPredicateOnEntries(keyPredicate);
-	}
-
-	@Override
-	public int size() {
-		int size = 0;
-		for (Collection<V> collection : asMap().values()) {
-			size += collection.size();
+		AddRejectingList(K key) {
+			this.key = key;
 		}
-		return size;
-	}
 
-	@Override
-	public boolean containsKey(@Nullable Object key) {
-		if (unfiltered.containsKey(key)) {
-			@SuppressWarnings("unchecked") // k is equal to a K, if not one itself
-			K k = (K) key;
-			return keyPredicate.apply(k);
+		@Override
+		public void add(int index, V element) {
+			checkPositionIndex(index, 0);
+			throw new IllegalArgumentException("Key does not satisfy predicate: " + key);
 		}
-		return false;
-	}
 
-	@Override
-	public Collection<V> removeAll(Object key) {
-		return containsKey(key) ? unfiltered.removeAll(key) : unmodifiableEmptyCollection();
-	}
-
-	Collection<V> unmodifiableEmptyCollection() {
-		if (unfiltered instanceof SetMultimap) {
-			return ImmutableSet.of();
-		} else {
-			return ImmutableList.of();
+		@Override
+		public boolean add(V v) {
+			add(0, v);
+			return true;
 		}
-	}
 
-	@Override
-	public void clear() {
-		keySet().clear();
-	}
+		@Override
+		public boolean addAll(Collection<? extends V> collection) {
+			addAll(0, collection);
+			return true;
+		}
 
-	@Override
-	Set<K> createKeySet() {
-		return Sets.filter(unfiltered.keySet(), keyPredicate);
-	}
+		@Override
+		public boolean addAll(int index, Collection<? extends V> elements) {
+			checkNotNull(elements);
+			checkPositionIndex(index, 0);
+			throw new IllegalArgumentException("Key does not satisfy predicate: " + key);
+		}
 
-	@Override
-	public Collection<V> get(K key) {
-		if (keyPredicate.apply(key)) {
-			return unfiltered.get(key);
-		} else if (unfiltered instanceof SetMultimap) {
-			return new AddRejectingSet<K, V>(key);
-		} else {
-			return new AddRejectingList<K, V>(key);
+		@Override
+		protected List<V> delegate() {
+			return Collections.emptyList();
 		}
 	}
 
@@ -132,54 +99,6 @@ class FilteredKeyMultimap<K, V> extends AbstractMultimap<K, V> implements Filter
 		}
 	}
 
-	static class AddRejectingList<K, V> extends ForwardingList<V> {
-		final K key;
-
-		AddRejectingList(K key) {
-			this.key = key;
-		}
-
-		@Override
-		public boolean add(V v) {
-			add(0, v);
-			return true;
-		}
-
-		@Override
-		public boolean addAll(Collection<? extends V> collection) {
-			addAll(0, collection);
-			return true;
-		}
-
-		@Override
-		public void add(int index, V element) {
-			checkPositionIndex(index, 0);
-			throw new IllegalArgumentException("Key does not satisfy predicate: " + key);
-		}
-
-		@Override
-		public boolean addAll(int index, Collection<? extends V> elements) {
-			checkNotNull(elements);
-			checkPositionIndex(index, 0);
-			throw new IllegalArgumentException("Key does not satisfy predicate: " + key);
-		}
-
-		@Override
-		protected List<V> delegate() {
-			return Collections.emptyList();
-		}
-	}
-
-	@Override
-	Iterator<Entry<K, V>> entryIterator() {
-		throw new AssertionError("should never be called");
-	}
-
-	@Override
-	Collection<Entry<K, V>> createEntries() {
-		return new Entries();
-	}
-
 	class Entries extends ForwardingCollection<Entry<K, V>> {
 		@Override
 		protected Collection<Entry<K, V>> delegate() {
@@ -201,9 +120,28 @@ class FilteredKeyMultimap<K, V> extends AbstractMultimap<K, V> implements Filter
 		}
 	}
 
+	final Multimap<K, V> unfiltered;
+
+	final Predicate<? super K> keyPredicate;
+
+	FilteredKeyMultimap(Multimap<K, V> unfiltered, Predicate<? super K> keyPredicate) {
+		this.unfiltered = checkNotNull(unfiltered);
+		this.keyPredicate = checkNotNull(keyPredicate);
+	}
+
 	@Override
-	Collection<V> createValues() {
-		return new FilteredMultimapValues<K, V>(this);
+	public void clear() {
+		keySet().clear();
+	}
+
+	@Override
+	public boolean containsKey(@Nullable Object key) {
+		if (unfiltered.containsKey(key)) {
+			@SuppressWarnings("unchecked") // k is equal to a K, if not one itself
+			K k = (K) key;
+			return keyPredicate.apply(k);
+		}
+		return false;
 	}
 
 	@Override
@@ -212,7 +150,70 @@ class FilteredKeyMultimap<K, V> extends AbstractMultimap<K, V> implements Filter
 	}
 
 	@Override
+	Collection<Entry<K, V>> createEntries() {
+		return new Entries();
+	}
+
+	@Override
 	Multiset<K> createKeys() {
 		return Multisets.filter(unfiltered.keys(), keyPredicate);
+	}
+
+	@Override
+	Set<K> createKeySet() {
+		return Sets.filter(unfiltered.keySet(), keyPredicate);
+	}
+
+	@Override
+	Collection<V> createValues() {
+		return new FilteredMultimapValues<K, V>(this);
+	}
+
+	@Override
+	Iterator<Entry<K, V>> entryIterator() {
+		throw new AssertionError("should never be called");
+	}
+
+	@Override
+	public Predicate<? super Entry<K, V>> entryPredicate() {
+		return Maps.keyPredicateOnEntries(keyPredicate);
+	}
+
+	@Override
+	public Collection<V> get(K key) {
+		if (keyPredicate.apply(key)) {
+			return unfiltered.get(key);
+		} else if (unfiltered instanceof SetMultimap) {
+			return new AddRejectingSet<K, V>(key);
+		} else {
+			return new AddRejectingList<K, V>(key);
+		}
+	}
+
+	@Override
+	public Collection<V> removeAll(Object key) {
+		return containsKey(key) ? unfiltered.removeAll(key) : unmodifiableEmptyCollection();
+	}
+
+	@Override
+	public int size() {
+		int size = 0;
+		for (Collection<V> collection : asMap().values()) {
+			size += collection.size();
+		}
+		return size;
+	}
+
+	@Override
+	public Multimap<K, V> unfiltered() {
+		return unfiltered;
+	}
+
+	Collection<V> unmodifiableEmptyCollection() {
+		if (unfiltered instanceof SetMultimap) {
+			return ImmutableSet.of();
+		} else {
+			return ImmutableList.of();
+		}
 	}
 }

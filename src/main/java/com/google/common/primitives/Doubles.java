@@ -54,7 +54,177 @@ import com.google.common.base.Converter;
  */
 @GwtCompatible(emulated = true)
 public final class Doubles {
-	private Doubles() {
+	@GwtCompatible
+	private static class DoubleArrayAsList extends AbstractList<Double> implements RandomAccess, Serializable {
+		private static final long serialVersionUID = 0;
+		final double[] array;
+		final int start;
+
+		final int end;
+
+		DoubleArrayAsList(double[] array) {
+			this(array, 0, array.length);
+		}
+
+		DoubleArrayAsList(double[] array, int start, int end) {
+			this.array = array;
+			this.start = start;
+			this.end = end;
+		}
+
+		@Override
+		public boolean contains(Object target) {
+			// Overridden to prevent a ton of boxing
+			return (target instanceof Double) && Doubles.indexOf(array, (Double) target, start, end) != -1;
+		}
+
+		@Override
+		public boolean equals(Object object) {
+			if (object == this) {
+				return true;
+			}
+			if (object instanceof DoubleArrayAsList) {
+				DoubleArrayAsList that = (DoubleArrayAsList) object;
+				int size = size();
+				if (that.size() != size) {
+					return false;
+				}
+				for (int i = 0; i < size; i++) {
+					if (array[start + i] != that.array[that.start + i]) {
+						return false;
+					}
+				}
+				return true;
+			}
+			return super.equals(object);
+		}
+
+		@Override
+		public Double get(int index) {
+			checkElementIndex(index, size());
+			return array[start + index];
+		}
+
+		@Override
+		public int hashCode() {
+			int result = 1;
+			for (int i = start; i < end; i++) {
+				result = 31 * result + Doubles.hashCode(array[i]);
+			}
+			return result;
+		}
+
+		@Override
+		public int indexOf(Object target) {
+			// Overridden to prevent a ton of boxing
+			if (target instanceof Double) {
+				int i = Doubles.indexOf(array, (Double) target, start, end);
+				if (i >= 0) {
+					return i - start;
+				}
+			}
+			return -1;
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return false;
+		}
+
+		@Override
+		public int lastIndexOf(Object target) {
+			// Overridden to prevent a ton of boxing
+			if (target instanceof Double) {
+				int i = Doubles.lastIndexOf(array, (Double) target, start, end);
+				if (i >= 0) {
+					return i - start;
+				}
+			}
+			return -1;
+		}
+
+		@Override
+		public Double set(int index, Double element) {
+			checkElementIndex(index, size());
+			double oldValue = array[start + index];
+			// checkNotNull for GWT (do not optimize)
+			array[start + index] = checkNotNull(element);
+			return oldValue;
+		}
+
+		@Override
+		public int size() {
+			return end - start;
+		}
+
+		@Override
+		public List<Double> subList(int fromIndex, int toIndex) {
+			int size = size();
+			checkPositionIndexes(fromIndex, toIndex, size);
+			if (fromIndex == toIndex) {
+				return Collections.emptyList();
+			}
+			return new DoubleArrayAsList(array, start + fromIndex, start + toIndex);
+		}
+
+		double[] toDoubleArray() {
+			// Arrays.copyOfRange() is not available under GWT
+			int size = size();
+			double[] result = new double[size];
+			System.arraycopy(array, start, result, 0, size);
+			return result;
+		}
+
+		@Override
+		public String toString() {
+			StringBuilder builder = new StringBuilder(size() * 12);
+			builder.append('[').append(array[start]);
+			for (int i = start + 1; i < end; i++) {
+				builder.append(", ").append(array[i]);
+			}
+			return builder.append(']').toString();
+		}
+	}
+
+	private static final class DoubleConverter extends Converter<String, Double> implements Serializable {
+		static final DoubleConverter INSTANCE = new DoubleConverter();
+
+		private static final long serialVersionUID = 1;
+
+		@Override
+		protected String doBackward(Double value) {
+			return value.toString();
+		}
+
+		@Override
+		protected Double doForward(String value) {
+			return Double.valueOf(value);
+		}
+
+		private Object readResolve() {
+			return INSTANCE;
+		}
+
+		@Override
+		public String toString() {
+			return "Doubles.stringConverter()";
+		}
+	}
+
+	private enum LexicographicalComparator implements Comparator<double[]> {
+		INSTANCE;
+
+		@Override
+		public int compare(double[] left, double[] right) {
+			int minLength = Math.min(left.length, right.length);
+			for (int i = 0; i < minLength; i++) {
+				int result = Doubles.compare(left[i], right[i]);
+				if (result != 0) {
+					return result;
+				}
+			}
+			return left.length - right.length;
+		}
 	}
 
 	/**
@@ -65,17 +235,38 @@ public final class Doubles {
 	public static final int BYTES = Double.SIZE / Byte.SIZE;
 
 	/**
-	 * Returns a hash code for {@code value}; equal to the result of invoking
-	 * {@code ((Double) value).hashCode()}.
-	 *
-	 * @param value a primitive {@code double} value
-	 * @return a hash code for the value
+	 * This is adapted from the regex suggested by {@link Double#valueOf(String)}
+	 * for prevalidating inputs. All valid inputs must pass this regex, but it's
+	 * semantically fine if not all inputs that pass this regex are valid -- only a
+	 * performance hit is incurred, not a semantics bug.
 	 */
-	public static int hashCode(double value) {
-		return ((Double) value).hashCode();
-		// TODO(kevinb): do it this way when we can (GWT problem):
-		// long bits = Double.doubleToLongBits(value);
-		// return (int) (bits ^ (bits >>> 32));
+	@GwtIncompatible("regular expressions")
+	static final Pattern FLOATING_POINT_PATTERN = fpPattern();
+
+	/**
+	 * Returns a fixed-size list backed by the specified array, similar to
+	 * {@link Arrays#asList(Object[])}. The list supports
+	 * {@link List#set(int, Object)}, but any attempt to set a value to {@code null}
+	 * will result in a {@link NullPointerException}.
+	 *
+	 * <p>
+	 * The returned list maintains the values, but not the identities, of
+	 * {@code Double} objects written to or read from it. For example, whether
+	 * {@code list.get(0) == list.get(0)} is true for the returned list is
+	 * unspecified.
+	 *
+	 * <p>
+	 * The returned list may have unexpected behavior if it contains {@code
+	 * NaN}, or if {@code NaN} is used as a parameter to any of its methods.
+	 *
+	 * @param backingArray the array to back the list
+	 * @return a list view of the array
+	 */
+	public static List<Double> asList(double... backingArray) {
+		if (backingArray.length == 0) {
+			return Collections.emptyList();
+		}
+		return new DoubleArrayAsList(backingArray);
 	}
 
 	/**
@@ -100,14 +291,26 @@ public final class Doubles {
 	}
 
 	/**
-	 * Returns {@code true} if {@code value} represents a real number. This is
-	 * equivalent to, but not necessarily implemented as,
-	 * {@code !(Double.isInfinite(value) || Double.isNaN(value))}.
+	 * Returns the values from each provided array combined into a single array. For
+	 * example, {@code concat(new double[] {a, b}, new double[] {}, new double[]
+	 * {c}} returns the array {@code {a, b, c}}.
 	 *
-	 * @since 10.0
+	 * @param arrays zero or more {@code double} arrays
+	 * @return a single array containing all the values from the source arrays, in
+	 *         order
 	 */
-	public static boolean isFinite(double value) {
-		return NEGATIVE_INFINITY < value & value < POSITIVE_INFINITY;
+	public static double[] concat(double[]... arrays) {
+		int length = 0;
+		for (double[] array : arrays) {
+			length += array.length;
+		}
+		double[] result = new double[length];
+		int pos = 0;
+		for (double[] array : arrays) {
+			System.arraycopy(array, 0, result, pos, array.length);
+			pos += array.length;
+		}
+		return result;
 	}
 
 	/**
@@ -127,6 +330,59 @@ public final class Doubles {
 			}
 		}
 		return false;
+	}
+
+	// Arrays.copyOf() requires Java 6
+	private static double[] copyOf(double[] original, int length) {
+		double[] copy = new double[length];
+		System.arraycopy(original, 0, copy, 0, Math.min(original.length, length));
+		return copy;
+	}
+
+	/**
+	 * Returns an array containing the same values as {@code array}, but guaranteed
+	 * to be of a specified minimum length. If {@code array} already has a length of
+	 * at least {@code minLength}, it is returned directly. Otherwise, a new array
+	 * of size {@code minLength + padding} is returned, containing the values of
+	 * {@code array}, and zeroes in the remaining places.
+	 *
+	 * @param array     the source array
+	 * @param minLength the minimum length the returned array must guarantee
+	 * @param padding   an extra amount to "grow" the array by if growth is
+	 *                  necessary
+	 * @throws IllegalArgumentException if {@code minLength} or {@code padding} is
+	 *                                  negative
+	 * @return an array containing the values of {@code array}, with guaranteed
+	 *         minimum length {@code minLength}
+	 */
+	public static double[] ensureCapacity(double[] array, int minLength, int padding) {
+		checkArgument(minLength >= 0, "Invalid minLength: %s", minLength);
+		checkArgument(padding >= 0, "Invalid padding: %s", padding);
+		return (array.length < minLength) ? copyOf(array, minLength + padding) : array;
+	}
+
+	@GwtIncompatible("regular expressions")
+	private static Pattern fpPattern() {
+		String decimal = "(?:\\d++(?:\\.\\d*+)?|\\.\\d++)";
+		String completeDec = decimal + "(?:[eE][+-]?\\d++)?[fFdD]?";
+		String hex = "(?:\\p{XDigit}++(?:\\.\\p{XDigit}*+)?|\\.\\p{XDigit}++)";
+		String completeHex = "0[xX]" + hex + "[pP][+-]?\\d++[fFdD]?";
+		String fpPattern = "[+-]?(?:NaN|Infinity|" + completeDec + "|" + completeHex + ")";
+		return Pattern.compile(fpPattern);
+	}
+
+	/**
+	 * Returns a hash code for {@code value}; equal to the result of invoking
+	 * {@code ((Double) value).hashCode()}.
+	 *
+	 * @param value a primitive {@code double} value
+	 * @return a hash code for the value
+	 */
+	public static int hashCode(double value) {
+		return ((Double) value).hashCode();
+		// TODO(kevinb): do it this way when we can (GWT problem):
+		// long bits = Double.doubleToLongBits(value);
+		// return (int) (bits ^ (bits >>> 32));
 	}
 
 	/**
@@ -188,151 +444,14 @@ public final class Doubles {
 	}
 
 	/**
-	 * Returns the index of the last appearance of the value {@code target} in
-	 * {@code array}. Note that this always returns {@code -1} when {@code target}
-	 * is {@code NaN}.
+	 * Returns {@code true} if {@code value} represents a real number. This is
+	 * equivalent to, but not necessarily implemented as,
+	 * {@code !(Double.isInfinite(value) || Double.isNaN(value))}.
 	 *
-	 * @param array  an array of {@code double} values, possibly empty
-	 * @param target a primitive {@code double} value
-	 * @return the greatest index {@code i} for which {@code array[i] == target}, or
-	 *         {@code -1} if no such index exists.
+	 * @since 10.0
 	 */
-	public static int lastIndexOf(double[] array, double target) {
-		return lastIndexOf(array, target, 0, array.length);
-	}
-
-	// TODO(kevinb): consider making this public
-	private static int lastIndexOf(double[] array, double target, int start, int end) {
-		for (int i = end - 1; i >= start; i--) {
-			if (array[i] == target) {
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	/**
-	 * Returns the least value present in {@code array}, using the same rules of
-	 * comparison as {@link Math#min(double, double)}.
-	 *
-	 * @param array a <i>nonempty</i> array of {@code double} values
-	 * @return the value present in {@code array} that is less than or equal to
-	 *         every other value in the array
-	 * @throws IllegalArgumentException if {@code array} is empty
-	 */
-	public static double min(double... array) {
-		checkArgument(array.length > 0);
-		double min = array[0];
-		for (int i = 1; i < array.length; i++) {
-			min = Math.min(min, array[i]);
-		}
-		return min;
-	}
-
-	/**
-	 * Returns the greatest value present in {@code array}, using the same rules of
-	 * comparison as {@link Math#max(double, double)}.
-	 *
-	 * @param array a <i>nonempty</i> array of {@code double} values
-	 * @return the value present in {@code array} that is greater than or equal to
-	 *         every other value in the array
-	 * @throws IllegalArgumentException if {@code array} is empty
-	 */
-	public static double max(double... array) {
-		checkArgument(array.length > 0);
-		double max = array[0];
-		for (int i = 1; i < array.length; i++) {
-			max = Math.max(max, array[i]);
-		}
-		return max;
-	}
-
-	/**
-	 * Returns the values from each provided array combined into a single array. For
-	 * example, {@code concat(new double[] {a, b}, new double[] {}, new double[]
-	 * {c}} returns the array {@code {a, b, c}}.
-	 *
-	 * @param arrays zero or more {@code double} arrays
-	 * @return a single array containing all the values from the source arrays, in
-	 *         order
-	 */
-	public static double[] concat(double[]... arrays) {
-		int length = 0;
-		for (double[] array : arrays) {
-			length += array.length;
-		}
-		double[] result = new double[length];
-		int pos = 0;
-		for (double[] array : arrays) {
-			System.arraycopy(array, 0, result, pos, array.length);
-			pos += array.length;
-		}
-		return result;
-	}
-
-	private static final class DoubleConverter extends Converter<String, Double> implements Serializable {
-		static final DoubleConverter INSTANCE = new DoubleConverter();
-
-		@Override
-		protected Double doForward(String value) {
-			return Double.valueOf(value);
-		}
-
-		@Override
-		protected String doBackward(Double value) {
-			return value.toString();
-		}
-
-		@Override
-		public String toString() {
-			return "Doubles.stringConverter()";
-		}
-
-		private Object readResolve() {
-			return INSTANCE;
-		}
-
-		private static final long serialVersionUID = 1;
-	}
-
-	/**
-	 * Returns a serializable converter object that converts between strings and
-	 * doubles using {@link Double#valueOf} and {@link Double#toString()}.
-	 *
-	 * @since 16.0
-	 */
-	@Beta
-	public static Converter<String, Double> stringConverter() {
-		return DoubleConverter.INSTANCE;
-	}
-
-	/**
-	 * Returns an array containing the same values as {@code array}, but guaranteed
-	 * to be of a specified minimum length. If {@code array} already has a length of
-	 * at least {@code minLength}, it is returned directly. Otherwise, a new array
-	 * of size {@code minLength + padding} is returned, containing the values of
-	 * {@code array}, and zeroes in the remaining places.
-	 *
-	 * @param array     the source array
-	 * @param minLength the minimum length the returned array must guarantee
-	 * @param padding   an extra amount to "grow" the array by if growth is
-	 *                  necessary
-	 * @throws IllegalArgumentException if {@code minLength} or {@code padding} is
-	 *                                  negative
-	 * @return an array containing the values of {@code array}, with guaranteed
-	 *         minimum length {@code minLength}
-	 */
-	public static double[] ensureCapacity(double[] array, int minLength, int padding) {
-		checkArgument(minLength >= 0, "Invalid minLength: %s", minLength);
-		checkArgument(padding >= 0, "Invalid padding: %s", padding);
-		return (array.length < minLength) ? copyOf(array, minLength + padding) : array;
-	}
-
-	// Arrays.copyOf() requires Java 6
-	private static double[] copyOf(double[] original, int length) {
-		double[] copy = new double[length];
-		System.arraycopy(original, 0, copy, 0, Math.min(original.length, length));
-		return copy;
+	public static boolean isFinite(double value) {
+		return NEGATIVE_INFINITY < value & value < POSITIVE_INFINITY;
 	}
 
 	/**
@@ -366,6 +485,30 @@ public final class Doubles {
 	}
 
 	/**
+	 * Returns the index of the last appearance of the value {@code target} in
+	 * {@code array}. Note that this always returns {@code -1} when {@code target}
+	 * is {@code NaN}.
+	 *
+	 * @param array  an array of {@code double} values, possibly empty
+	 * @param target a primitive {@code double} value
+	 * @return the greatest index {@code i} for which {@code array[i] == target}, or
+	 *         {@code -1} if no such index exists.
+	 */
+	public static int lastIndexOf(double[] array, double target) {
+		return lastIndexOf(array, target, 0, array.length);
+	}
+
+	// TODO(kevinb): consider making this public
+	private static int lastIndexOf(double[] array, double target, int start, int end) {
+		for (int i = end - 1; i >= start; i--) {
+			if (array[i] == target) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	/**
 	 * Returns a comparator that compares two {@code double} arrays
 	 * lexicographically. That is, it compares, using
 	 * {@link #compare(double, double)}), the first pair of values that follow any
@@ -385,20 +528,51 @@ public final class Doubles {
 		return LexicographicalComparator.INSTANCE;
 	}
 
-	private enum LexicographicalComparator implements Comparator<double[]> {
-		INSTANCE;
-
-		@Override
-		public int compare(double[] left, double[] right) {
-			int minLength = Math.min(left.length, right.length);
-			for (int i = 0; i < minLength; i++) {
-				int result = Doubles.compare(left[i], right[i]);
-				if (result != 0) {
-					return result;
-				}
-			}
-			return left.length - right.length;
+	/**
+	 * Returns the greatest value present in {@code array}, using the same rules of
+	 * comparison as {@link Math#max(double, double)}.
+	 *
+	 * @param array a <i>nonempty</i> array of {@code double} values
+	 * @return the value present in {@code array} that is greater than or equal to
+	 *         every other value in the array
+	 * @throws IllegalArgumentException if {@code array} is empty
+	 */
+	public static double max(double... array) {
+		checkArgument(array.length > 0);
+		double max = array[0];
+		for (int i = 1; i < array.length; i++) {
+			max = Math.max(max, array[i]);
 		}
+		return max;
+	}
+
+	/**
+	 * Returns the least value present in {@code array}, using the same rules of
+	 * comparison as {@link Math#min(double, double)}.
+	 *
+	 * @param array a <i>nonempty</i> array of {@code double} values
+	 * @return the value present in {@code array} that is less than or equal to
+	 *         every other value in the array
+	 * @throws IllegalArgumentException if {@code array} is empty
+	 */
+	public static double min(double... array) {
+		checkArgument(array.length > 0);
+		double min = array[0];
+		for (int i = 1; i < array.length; i++) {
+			min = Math.min(min, array[i]);
+		}
+		return min;
+	}
+
+	/**
+	 * Returns a serializable converter object that converts between strings and
+	 * doubles using {@link Double#valueOf} and {@link Double#toString()}.
+	 *
+	 * @since 16.0
+	 */
+	@Beta
+	public static Converter<String, Double> stringConverter() {
+		return DoubleConverter.INSTANCE;
 	}
 
 	/**
@@ -430,183 +604,6 @@ public final class Doubles {
 			array[i] = ((Number) checkNotNull(boxedArray[i])).doubleValue();
 		}
 		return array;
-	}
-
-	/**
-	 * Returns a fixed-size list backed by the specified array, similar to
-	 * {@link Arrays#asList(Object[])}. The list supports
-	 * {@link List#set(int, Object)}, but any attempt to set a value to {@code null}
-	 * will result in a {@link NullPointerException}.
-	 *
-	 * <p>
-	 * The returned list maintains the values, but not the identities, of
-	 * {@code Double} objects written to or read from it. For example, whether
-	 * {@code list.get(0) == list.get(0)} is true for the returned list is
-	 * unspecified.
-	 *
-	 * <p>
-	 * The returned list may have unexpected behavior if it contains {@code
-	 * NaN}, or if {@code NaN} is used as a parameter to any of its methods.
-	 *
-	 * @param backingArray the array to back the list
-	 * @return a list view of the array
-	 */
-	public static List<Double> asList(double... backingArray) {
-		if (backingArray.length == 0) {
-			return Collections.emptyList();
-		}
-		return new DoubleArrayAsList(backingArray);
-	}
-
-	@GwtCompatible
-	private static class DoubleArrayAsList extends AbstractList<Double> implements RandomAccess, Serializable {
-		final double[] array;
-		final int start;
-		final int end;
-
-		DoubleArrayAsList(double[] array) {
-			this(array, 0, array.length);
-		}
-
-		DoubleArrayAsList(double[] array, int start, int end) {
-			this.array = array;
-			this.start = start;
-			this.end = end;
-		}
-
-		@Override
-		public int size() {
-			return end - start;
-		}
-
-		@Override
-		public boolean isEmpty() {
-			return false;
-		}
-
-		@Override
-		public Double get(int index) {
-			checkElementIndex(index, size());
-			return array[start + index];
-		}
-
-		@Override
-		public boolean contains(Object target) {
-			// Overridden to prevent a ton of boxing
-			return (target instanceof Double) && Doubles.indexOf(array, (Double) target, start, end) != -1;
-		}
-
-		@Override
-		public int indexOf(Object target) {
-			// Overridden to prevent a ton of boxing
-			if (target instanceof Double) {
-				int i = Doubles.indexOf(array, (Double) target, start, end);
-				if (i >= 0) {
-					return i - start;
-				}
-			}
-			return -1;
-		}
-
-		@Override
-		public int lastIndexOf(Object target) {
-			// Overridden to prevent a ton of boxing
-			if (target instanceof Double) {
-				int i = Doubles.lastIndexOf(array, (Double) target, start, end);
-				if (i >= 0) {
-					return i - start;
-				}
-			}
-			return -1;
-		}
-
-		@Override
-		public Double set(int index, Double element) {
-			checkElementIndex(index, size());
-			double oldValue = array[start + index];
-			// checkNotNull for GWT (do not optimize)
-			array[start + index] = checkNotNull(element);
-			return oldValue;
-		}
-
-		@Override
-		public List<Double> subList(int fromIndex, int toIndex) {
-			int size = size();
-			checkPositionIndexes(fromIndex, toIndex, size);
-			if (fromIndex == toIndex) {
-				return Collections.emptyList();
-			}
-			return new DoubleArrayAsList(array, start + fromIndex, start + toIndex);
-		}
-
-		@Override
-		public boolean equals(Object object) {
-			if (object == this) {
-				return true;
-			}
-			if (object instanceof DoubleArrayAsList) {
-				DoubleArrayAsList that = (DoubleArrayAsList) object;
-				int size = size();
-				if (that.size() != size) {
-					return false;
-				}
-				for (int i = 0; i < size; i++) {
-					if (array[start + i] != that.array[that.start + i]) {
-						return false;
-					}
-				}
-				return true;
-			}
-			return super.equals(object);
-		}
-
-		@Override
-		public int hashCode() {
-			int result = 1;
-			for (int i = start; i < end; i++) {
-				result = 31 * result + Doubles.hashCode(array[i]);
-			}
-			return result;
-		}
-
-		@Override
-		public String toString() {
-			StringBuilder builder = new StringBuilder(size() * 12);
-			builder.append('[').append(array[start]);
-			for (int i = start + 1; i < end; i++) {
-				builder.append(", ").append(array[i]);
-			}
-			return builder.append(']').toString();
-		}
-
-		double[] toDoubleArray() {
-			// Arrays.copyOfRange() is not available under GWT
-			int size = size();
-			double[] result = new double[size];
-			System.arraycopy(array, start, result, 0, size);
-			return result;
-		}
-
-		private static final long serialVersionUID = 0;
-	}
-
-	/**
-	 * This is adapted from the regex suggested by {@link Double#valueOf(String)}
-	 * for prevalidating inputs. All valid inputs must pass this regex, but it's
-	 * semantically fine if not all inputs that pass this regex are valid -- only a
-	 * performance hit is incurred, not a semantics bug.
-	 */
-	@GwtIncompatible("regular expressions")
-	static final Pattern FLOATING_POINT_PATTERN = fpPattern();
-
-	@GwtIncompatible("regular expressions")
-	private static Pattern fpPattern() {
-		String decimal = "(?:\\d++(?:\\.\\d*+)?|\\.\\d++)";
-		String completeDec = decimal + "(?:[eE][+-]?\\d++)?[fFdD]?";
-		String hex = "(?:\\p{XDigit}++(?:\\.\\p{XDigit}*+)?|\\.\\p{XDigit}++)";
-		String completeHex = "0[xX]" + hex + "[pP][+-]?\\d++[fFdD]?";
-		String fpPattern = "[+-]?(?:NaN|Infinity|" + completeDec + "|" + completeHex + ")";
-		return Pattern.compile(fpPattern);
 	}
 
 	/**
@@ -645,5 +642,8 @@ public final class Doubles {
 			}
 		}
 		return null;
+	}
+
+	private Doubles() {
 	}
 }

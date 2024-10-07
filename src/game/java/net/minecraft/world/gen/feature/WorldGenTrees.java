@@ -16,22 +16,25 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -58,6 +61,28 @@ public class WorldGenTrees extends WorldGenAbstractTree {
 		this.metaWood = parIBlockState;
 		this.metaLeaves = parIBlockState2;
 		this.vinesGrow = parFlag2;
+	}
+
+	private void func_181650_b(World parWorld, BlockPos parBlockPos, PropertyBool parPropertyBool) {
+		this.func_181651_a(parWorld, parBlockPos, parPropertyBool);
+		int i = 4;
+
+		for (parBlockPos = parBlockPos
+				.down(); parWorld.getBlockState(parBlockPos).getBlock().getMaterial() == Material.air && i > 0; --i) {
+			this.func_181651_a(parWorld, parBlockPos, parPropertyBool);
+			parBlockPos = parBlockPos.down();
+		}
+
+	}
+
+	private void func_181651_a(World parWorld, BlockPos parBlockPos, PropertyBool parPropertyBool) {
+		this.setBlockAndNotifyAdequately(parWorld, parBlockPos,
+				Blocks.vine.getDefaultState().withProperty(parPropertyBool, Boolean.valueOf(true)));
+	}
+
+	private void func_181652_a(World parWorld, int parInt1, BlockPos parBlockPos, EnumFacing parEnumFacing) {
+		this.setBlockAndNotifyAdequately(parWorld, parBlockPos, Blocks.cocoa.getDefaultState()
+				.withProperty(BlockCocoa.AGE, Integer.valueOf(parInt1)).withProperty(BlockCocoa.FACING, parEnumFacing));
 	}
 
 	public boolean generate(World world, EaglercraftRandom random, BlockPos blockpos) {
@@ -210,27 +235,5 @@ public class WorldGenTrees extends WorldGenAbstractTree {
 		} else {
 			return false;
 		}
-	}
-
-	private void func_181652_a(World parWorld, int parInt1, BlockPos parBlockPos, EnumFacing parEnumFacing) {
-		this.setBlockAndNotifyAdequately(parWorld, parBlockPos, Blocks.cocoa.getDefaultState()
-				.withProperty(BlockCocoa.AGE, Integer.valueOf(parInt1)).withProperty(BlockCocoa.FACING, parEnumFacing));
-	}
-
-	private void func_181651_a(World parWorld, BlockPos parBlockPos, PropertyBool parPropertyBool) {
-		this.setBlockAndNotifyAdequately(parWorld, parBlockPos,
-				Blocks.vine.getDefaultState().withProperty(parPropertyBool, Boolean.valueOf(true)));
-	}
-
-	private void func_181650_b(World parWorld, BlockPos parBlockPos, PropertyBool parPropertyBool) {
-		this.func_181651_a(parWorld, parBlockPos, parPropertyBool);
-		int i = 4;
-
-		for (parBlockPos = parBlockPos
-				.down(); parWorld.getBlockState(parBlockPos).getBlock().getMaterial() == Material.air && i > 0; --i) {
-			this.func_181651_a(parWorld, parBlockPos, parPropertyBool);
-			parBlockPos = parBlockPos.down();
-		}
-
 	}
 }

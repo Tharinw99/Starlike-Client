@@ -13,54 +13,129 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class ItemModelGenerator {
+	static class Span {
+		private final ItemModelGenerator.SpanFacing spanFacing;
+		private int field_178387_b;
+		private int field_178388_c;
+		private final int field_178386_d;
+
+		public Span(ItemModelGenerator.SpanFacing spanFacingIn, int parInt1, int parInt2) {
+			this.spanFacing = spanFacingIn;
+			this.field_178387_b = parInt1;
+			this.field_178388_c = parInt1;
+			this.field_178386_d = parInt2;
+		}
+
+		public int func_178381_d() {
+			return this.field_178386_d;
+		}
+
+		public void func_178382_a(int parInt1) {
+			if (parInt1 < this.field_178387_b) {
+				this.field_178387_b = parInt1;
+			} else if (parInt1 > this.field_178388_c) {
+				this.field_178388_c = parInt1;
+			}
+
+		}
+
+		public ItemModelGenerator.SpanFacing func_178383_a() {
+			return this.spanFacing;
+		}
+
+		public int func_178384_c() {
+			return this.field_178388_c;
+		}
+
+		public int func_178385_b() {
+			return this.field_178387_b;
+		}
+	}
+
+	static enum SpanFacing {
+		UP(EnumFacing.UP, 0, -1), DOWN(EnumFacing.DOWN, 0, 1), LEFT(EnumFacing.EAST, -1, 0),
+		RIGHT(EnumFacing.WEST, 1, 0);
+
+		private final EnumFacing facing;
+		private final int field_178373_f;
+		private final int field_178374_g;
+
+		private SpanFacing(EnumFacing facing, int parInt2, int parInt3) {
+			this.facing = facing;
+			this.field_178373_f = parInt2;
+			this.field_178374_g = parInt3;
+		}
+
+		private boolean func_178369_d() {
+			return this == DOWN || this == UP;
+		}
+
+		public int func_178371_c() {
+			return this.field_178374_g;
+		}
+
+		public int func_178372_b() {
+			return this.field_178373_f;
+		}
+
+		public EnumFacing getFacing() {
+			return this.facing;
+		}
+	}
+
 	public static final List<String> LAYERS = Lists
 			.newArrayList(new String[] { "layer0", "layer1", "layer2", "layer3", "layer4" });
 
-	public ModelBlock makeItemModel(TextureMap textureMapIn, ModelBlock blockModel) {
-		HashMap hashmap = Maps.newHashMap();
+	private boolean func_178391_a(int[] parArrayOfInt, int parInt1, int parInt2, int parInt3, int parInt4) {
+		return parInt1 >= 0 && parInt2 >= 0 && parInt1 < parInt3 && parInt2 < parInt4
+				? (parArrayOfInt[parInt2 * parInt3 + parInt1] >> 24 & 255) == 0
+				: true;
+	}
+
+	private List<ItemModelGenerator.Span> func_178393_a(EaglerTextureAtlasSprite parTextureAtlasSprite) {
+		int i = parTextureAtlasSprite.getIconWidth();
+		int j = parTextureAtlasSprite.getIconHeight();
 		ArrayList arraylist = Lists.newArrayList();
 
-		for (int i = 0; i < LAYERS.size(); ++i) {
-			String s = (String) LAYERS.get(i);
-			if (!blockModel.isTexturePresent(s)) {
-				break;
+		for (int k = 0; k < parTextureAtlasSprite.getFrameCount(); ++k) {
+			int[] aint = parTextureAtlasSprite.getFrameTextureData(k)[0];
+
+			for (int l = 0; l < j; ++l) {
+				for (int i1 = 0; i1 < i; ++i1) {
+					boolean flag = !this.func_178391_a(aint, i1, l, i, j);
+					this.func_178396_a(ItemModelGenerator.SpanFacing.UP, arraylist, aint, i1, l, i, j, flag);
+					this.func_178396_a(ItemModelGenerator.SpanFacing.DOWN, arraylist, aint, i1, l, i, j, flag);
+					this.func_178396_a(ItemModelGenerator.SpanFacing.LEFT, arraylist, aint, i1, l, i, j, flag);
+					this.func_178396_a(ItemModelGenerator.SpanFacing.RIGHT, arraylist, aint, i1, l, i, j, flag);
+				}
 			}
-
-			String s1 = blockModel.resolveTextureName(s);
-			hashmap.put(s, s1);
-			EaglerTextureAtlasSprite textureatlassprite = textureMapIn
-					.getAtlasSprite((new ResourceLocation(s1)).toString());
-			arraylist.addAll(this.func_178394_a(i, s, textureatlassprite));
 		}
 
-		if (arraylist.isEmpty()) {
-			return null;
-		} else {
-			hashmap.put("particle", blockModel.isTexturePresent("particle") ? blockModel.resolveTextureName("particle")
-					: (String) hashmap.get("layer0"));
-			return new ModelBlock(arraylist, hashmap, false, false, blockModel.func_181682_g());
-		}
+		return arraylist;
 	}
 
 	private List<BlockPart> func_178394_a(int parInt1, String parString1,
@@ -75,6 +150,41 @@ public class ItemModelGenerator {
 				(BlockPartRotation) null, true));
 		arraylist.addAll(this.func_178397_a(parTextureAtlasSprite, parString1, parInt1));
 		return arraylist;
+	}
+
+	private void func_178395_a(List<ItemModelGenerator.Span> parList, ItemModelGenerator.SpanFacing parSpanFacing,
+			int parInt1, int parInt2) {
+		ItemModelGenerator.Span itemmodelgenerator$span = null;
+
+		for (int j = 0, l = parList.size(); j < l; ++j) {
+			ItemModelGenerator.Span itemmodelgenerator$span1 = parList.get(j);
+			if (itemmodelgenerator$span1.func_178383_a() == parSpanFacing) {
+				int i = parSpanFacing.func_178369_d() ? parInt2 : parInt1;
+				if (itemmodelgenerator$span1.func_178381_d() == i) {
+					itemmodelgenerator$span = itemmodelgenerator$span1;
+					break;
+				}
+			}
+		}
+
+		int j = parSpanFacing.func_178369_d() ? parInt2 : parInt1;
+		int k = parSpanFacing.func_178369_d() ? parInt1 : parInt2;
+		if (itemmodelgenerator$span == null) {
+			parList.add(new ItemModelGenerator.Span(parSpanFacing, k, j));
+		} else {
+			itemmodelgenerator$span.func_178382_a(k);
+		}
+
+	}
+
+	private void func_178396_a(ItemModelGenerator.SpanFacing parSpanFacing, List<ItemModelGenerator.Span> parList,
+			int[] parArrayOfInt, int parInt1, int parInt2, int parInt3, int parInt4, boolean parFlag) {
+		boolean flag = this.func_178391_a(parArrayOfInt, parInt1 + parSpanFacing.func_178372_b(),
+				parInt2 + parSpanFacing.func_178371_c(), parInt3, parInt4) && parFlag;
+		if (flag) {
+			this.func_178395_a(parList, parSpanFacing, parInt1, parInt2);
+		}
+
 	}
 
 	private List<BlockPart> func_178397_a(EaglerTextureAtlasSprite parTextureAtlasSprite, String parString1,
@@ -183,136 +293,29 @@ public class ItemModelGenerator {
 		return arraylist;
 	}
 
-	private List<ItemModelGenerator.Span> func_178393_a(EaglerTextureAtlasSprite parTextureAtlasSprite) {
-		int i = parTextureAtlasSprite.getIconWidth();
-		int j = parTextureAtlasSprite.getIconHeight();
+	public ModelBlock makeItemModel(TextureMap textureMapIn, ModelBlock blockModel) {
+		HashMap hashmap = Maps.newHashMap();
 		ArrayList arraylist = Lists.newArrayList();
 
-		for (int k = 0; k < parTextureAtlasSprite.getFrameCount(); ++k) {
-			int[] aint = parTextureAtlasSprite.getFrameTextureData(k)[0];
-
-			for (int l = 0; l < j; ++l) {
-				for (int i1 = 0; i1 < i; ++i1) {
-					boolean flag = !this.func_178391_a(aint, i1, l, i, j);
-					this.func_178396_a(ItemModelGenerator.SpanFacing.UP, arraylist, aint, i1, l, i, j, flag);
-					this.func_178396_a(ItemModelGenerator.SpanFacing.DOWN, arraylist, aint, i1, l, i, j, flag);
-					this.func_178396_a(ItemModelGenerator.SpanFacing.LEFT, arraylist, aint, i1, l, i, j, flag);
-					this.func_178396_a(ItemModelGenerator.SpanFacing.RIGHT, arraylist, aint, i1, l, i, j, flag);
-				}
+		for (int i = 0; i < LAYERS.size(); ++i) {
+			String s = (String) LAYERS.get(i);
+			if (!blockModel.isTexturePresent(s)) {
+				break;
 			}
+
+			String s1 = blockModel.resolveTextureName(s);
+			hashmap.put(s, s1);
+			EaglerTextureAtlasSprite textureatlassprite = textureMapIn
+					.getAtlasSprite((new ResourceLocation(s1)).toString());
+			arraylist.addAll(this.func_178394_a(i, s, textureatlassprite));
 		}
 
-		return arraylist;
-	}
-
-	private void func_178396_a(ItemModelGenerator.SpanFacing parSpanFacing, List<ItemModelGenerator.Span> parList,
-			int[] parArrayOfInt, int parInt1, int parInt2, int parInt3, int parInt4, boolean parFlag) {
-		boolean flag = this.func_178391_a(parArrayOfInt, parInt1 + parSpanFacing.func_178372_b(),
-				parInt2 + parSpanFacing.func_178371_c(), parInt3, parInt4) && parFlag;
-		if (flag) {
-			this.func_178395_a(parList, parSpanFacing, parInt1, parInt2);
-		}
-
-	}
-
-	private void func_178395_a(List<ItemModelGenerator.Span> parList, ItemModelGenerator.SpanFacing parSpanFacing,
-			int parInt1, int parInt2) {
-		ItemModelGenerator.Span itemmodelgenerator$span = null;
-
-		for (int j = 0, l = parList.size(); j < l; ++j) {
-			ItemModelGenerator.Span itemmodelgenerator$span1 = parList.get(j);
-			if (itemmodelgenerator$span1.func_178383_a() == parSpanFacing) {
-				int i = parSpanFacing.func_178369_d() ? parInt2 : parInt1;
-				if (itemmodelgenerator$span1.func_178381_d() == i) {
-					itemmodelgenerator$span = itemmodelgenerator$span1;
-					break;
-				}
-			}
-		}
-
-		int j = parSpanFacing.func_178369_d() ? parInt2 : parInt1;
-		int k = parSpanFacing.func_178369_d() ? parInt1 : parInt2;
-		if (itemmodelgenerator$span == null) {
-			parList.add(new ItemModelGenerator.Span(parSpanFacing, k, j));
+		if (arraylist.isEmpty()) {
+			return null;
 		} else {
-			itemmodelgenerator$span.func_178382_a(k);
-		}
-
-	}
-
-	private boolean func_178391_a(int[] parArrayOfInt, int parInt1, int parInt2, int parInt3, int parInt4) {
-		return parInt1 >= 0 && parInt2 >= 0 && parInt1 < parInt3 && parInt2 < parInt4
-				? (parArrayOfInt[parInt2 * parInt3 + parInt1] >> 24 & 255) == 0
-				: true;
-	}
-
-	static class Span {
-		private final ItemModelGenerator.SpanFacing spanFacing;
-		private int field_178387_b;
-		private int field_178388_c;
-		private final int field_178386_d;
-
-		public Span(ItemModelGenerator.SpanFacing spanFacingIn, int parInt1, int parInt2) {
-			this.spanFacing = spanFacingIn;
-			this.field_178387_b = parInt1;
-			this.field_178388_c = parInt1;
-			this.field_178386_d = parInt2;
-		}
-
-		public void func_178382_a(int parInt1) {
-			if (parInt1 < this.field_178387_b) {
-				this.field_178387_b = parInt1;
-			} else if (parInt1 > this.field_178388_c) {
-				this.field_178388_c = parInt1;
-			}
-
-		}
-
-		public ItemModelGenerator.SpanFacing func_178383_a() {
-			return this.spanFacing;
-		}
-
-		public int func_178385_b() {
-			return this.field_178387_b;
-		}
-
-		public int func_178384_c() {
-			return this.field_178388_c;
-		}
-
-		public int func_178381_d() {
-			return this.field_178386_d;
-		}
-	}
-
-	static enum SpanFacing {
-		UP(EnumFacing.UP, 0, -1), DOWN(EnumFacing.DOWN, 0, 1), LEFT(EnumFacing.EAST, -1, 0),
-		RIGHT(EnumFacing.WEST, 1, 0);
-
-		private final EnumFacing facing;
-		private final int field_178373_f;
-		private final int field_178374_g;
-
-		private SpanFacing(EnumFacing facing, int parInt2, int parInt3) {
-			this.facing = facing;
-			this.field_178373_f = parInt2;
-			this.field_178374_g = parInt3;
-		}
-
-		public EnumFacing getFacing() {
-			return this.facing;
-		}
-
-		public int func_178372_b() {
-			return this.field_178373_f;
-		}
-
-		public int func_178371_c() {
-			return this.field_178374_g;
-		}
-
-		private boolean func_178369_d() {
-			return this == DOWN || this == UP;
+			hashmap.put("particle", blockModel.isTexturePresent("particle") ? blockModel.resolveTextureName("particle")
+					: (String) hashmap.get("layer0"));
+			return new ModelBlock(arraylist, hashmap, false, false, blockModel.func_181682_g());
 		}
 	}
 }

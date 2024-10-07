@@ -41,7 +41,20 @@ import com.google.common.annotations.GwtCompatible;
 // javadoc?
 @GwtCompatible
 public final class SignedBytes {
-	private SignedBytes() {
+	private enum LexicographicalComparator implements Comparator<byte[]> {
+		INSTANCE;
+
+		@Override
+		public int compare(byte[] left, byte[] right) {
+			int minLength = Math.min(left.length, right.length);
+			for (int i = 0; i < minLength; i++) {
+				int result = SignedBytes.compare(left[i], right[i]);
+				if (result != 0) {
+					return result;
+				}
+			}
+			return left.length - right.length;
+		}
 	}
 
 	/**
@@ -70,24 +83,6 @@ public final class SignedBytes {
 	}
 
 	/**
-	 * Returns the {@code byte} nearest in value to {@code value}.
-	 *
-	 * @param value any {@code long} value
-	 * @return the same value cast to {@code byte} if it is in the range of the
-	 *         {@code byte} type, {@link Byte#MAX_VALUE} if it is too large, or
-	 *         {@link Byte#MIN_VALUE} if it is too small
-	 */
-	public static byte saturatedCast(long value) {
-		if (value > Byte.MAX_VALUE) {
-			return Byte.MAX_VALUE;
-		}
-		if (value < Byte.MIN_VALUE) {
-			return Byte.MIN_VALUE;
-		}
-		return (byte) value;
-	}
-
-	/**
 	 * Compares the two specified {@code byte} values. The sign of the value
 	 * returned is the same as that of {@code ((Byte) a).compareTo(b)}.
 	 *
@@ -105,44 +100,6 @@ public final class SignedBytes {
 	// one too, which would leave compare methods only on the Unsigned* classes.
 	public static int compare(byte a, byte b) {
 		return a - b; // safe due to restricted range
-	}
-
-	/**
-	 * Returns the least value present in {@code array}.
-	 *
-	 * @param array a <i>nonempty</i> array of {@code byte} values
-	 * @return the value present in {@code array} that is less than or equal to
-	 *         every other value in the array
-	 * @throws IllegalArgumentException if {@code array} is empty
-	 */
-	public static byte min(byte... array) {
-		checkArgument(array.length > 0);
-		byte min = array[0];
-		for (int i = 1; i < array.length; i++) {
-			if (array[i] < min) {
-				min = array[i];
-			}
-		}
-		return min;
-	}
-
-	/**
-	 * Returns the greatest value present in {@code array}.
-	 *
-	 * @param array a <i>nonempty</i> array of {@code byte} values
-	 * @return the value present in {@code array} that is greater than or equal to
-	 *         every other value in the array
-	 * @throws IllegalArgumentException if {@code array} is empty
-	 */
-	public static byte max(byte... array) {
-		checkArgument(array.length > 0);
-		byte max = array[0];
-		for (int i = 1; i < array.length; i++) {
-			if (array[i] > max) {
-				max = array[i];
-			}
-		}
-		return max;
 	}
 
 	/**
@@ -190,19 +147,62 @@ public final class SignedBytes {
 		return LexicographicalComparator.INSTANCE;
 	}
 
-	private enum LexicographicalComparator implements Comparator<byte[]> {
-		INSTANCE;
-
-		@Override
-		public int compare(byte[] left, byte[] right) {
-			int minLength = Math.min(left.length, right.length);
-			for (int i = 0; i < minLength; i++) {
-				int result = SignedBytes.compare(left[i], right[i]);
-				if (result != 0) {
-					return result;
-				}
+	/**
+	 * Returns the greatest value present in {@code array}.
+	 *
+	 * @param array a <i>nonempty</i> array of {@code byte} values
+	 * @return the value present in {@code array} that is greater than or equal to
+	 *         every other value in the array
+	 * @throws IllegalArgumentException if {@code array} is empty
+	 */
+	public static byte max(byte... array) {
+		checkArgument(array.length > 0);
+		byte max = array[0];
+		for (int i = 1; i < array.length; i++) {
+			if (array[i] > max) {
+				max = array[i];
 			}
-			return left.length - right.length;
 		}
+		return max;
+	}
+
+	/**
+	 * Returns the least value present in {@code array}.
+	 *
+	 * @param array a <i>nonempty</i> array of {@code byte} values
+	 * @return the value present in {@code array} that is less than or equal to
+	 *         every other value in the array
+	 * @throws IllegalArgumentException if {@code array} is empty
+	 */
+	public static byte min(byte... array) {
+		checkArgument(array.length > 0);
+		byte min = array[0];
+		for (int i = 1; i < array.length; i++) {
+			if (array[i] < min) {
+				min = array[i];
+			}
+		}
+		return min;
+	}
+
+	/**
+	 * Returns the {@code byte} nearest in value to {@code value}.
+	 *
+	 * @param value any {@code long} value
+	 * @return the same value cast to {@code byte} if it is in the range of the
+	 *         {@code byte} type, {@link Byte#MAX_VALUE} if it is too large, or
+	 *         {@link Byte#MIN_VALUE} if it is too small
+	 */
+	public static byte saturatedCast(long value) {
+		if (value > Byte.MAX_VALUE) {
+			return Byte.MAX_VALUE;
+		}
+		if (value < Byte.MIN_VALUE) {
+			return Byte.MIN_VALUE;
+		}
+		return (byte) value;
+	}
+
+	private SignedBytes() {
 	}
 }

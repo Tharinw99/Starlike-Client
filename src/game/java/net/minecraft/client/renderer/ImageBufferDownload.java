@@ -2,22 +2,25 @@ package net.minecraft.client.renderer;
 
 import net.lax1dude.eaglercraft.v1_8.opengl.ImageData;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -26,6 +29,22 @@ public class ImageBufferDownload implements IImageBuffer {
 	private int[] imageData;
 	private int imageWidth;
 	private int imageHeight;
+
+	/**
+	 * + Returns true if the given area of the image contains transparent pixels
+	 */
+	private boolean hasTransparency(int parInt1, int parInt2, int parInt3, int parInt4) {
+		for (int i = parInt1; i < parInt3; ++i) {
+			for (int j = parInt2; j < parInt4; ++j) {
+				int k = this.imageData[i + j * this.imageWidth];
+				if ((k >> 24 & 255) < 128) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
 
 	public ImageData parseUserSkin(ImageData bufferedimage) {
 		if (bufferedimage == null) {
@@ -65,15 +84,23 @@ public class ImageBufferDownload implements IImageBuffer {
 		}
 	}
 
-	public void skinAvailable() {
+	/**
+	 * + Makes the given area of the image opaque
+	 */
+	private void setAreaOpaque(int parInt1, int parInt2, int parInt3, int parInt4) {
+		for (int i = parInt1; i < parInt3; ++i) {
+			for (int j = parInt2; j < parInt4; ++j) {
+				this.imageData[i + j * this.imageWidth] |= -16777216;
+			}
+		}
+
 	}
 
-	/**+
-	 * Makes the given area of the image transparent if it was
-	 * previously completely opaque (used to remove the outer layer
-	 * of a skin around the head if it was saved all opaque; this
-	 * would be redundant so it's assumed that the skin maker is
-	 * just using an image editor without an alpha channel)
+	/**
+	 * + Makes the given area of the image transparent if it was previously
+	 * completely opaque (used to remove the outer layer of a skin around the head
+	 * if it was saved all opaque; this would be redundant so it's assumed that the
+	 * skin maker is just using an image editor without an alpha channel)
 	 */
 	private void setAreaTransparent(int parInt1, int parInt2, int parInt3, int parInt4) {
 		if (!this.hasTransparency(parInt1, parInt2, parInt3, parInt4)) {
@@ -86,32 +113,6 @@ public class ImageBufferDownload implements IImageBuffer {
 		}
 	}
 
-	/**+
-	 * Makes the given area of the image opaque
-	 */
-	private void setAreaOpaque(int parInt1, int parInt2, int parInt3, int parInt4) {
-		for (int i = parInt1; i < parInt3; ++i) {
-			for (int j = parInt2; j < parInt4; ++j) {
-				this.imageData[i + j * this.imageWidth] |= -16777216;
-			}
-		}
-
-	}
-
-	/**+
-	 * Returns true if the given area of the image contains
-	 * transparent pixels
-	 */
-	private boolean hasTransparency(int parInt1, int parInt2, int parInt3, int parInt4) {
-		for (int i = parInt1; i < parInt3; ++i) {
-			for (int j = parInt2; j < parInt4; ++j) {
-				int k = this.imageData[i + j * this.imageWidth];
-				if ((k >> 24 & 255) < 128) {
-					return true;
-				}
-			}
-		}
-
-		return false;
+	public void skinAvailable() {
 	}
 }

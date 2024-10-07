@@ -13,57 +13,30 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.UnmodifiableIterator;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class Cartesian {
-	public static <T> Iterable<T[]> cartesianProduct(Class<T> clazz, Iterable<? extends Iterable<? extends T>> sets) {
-		return new Cartesian.Product(clazz, (Iterable[]) toArray(Iterable.class, sets));
-	}
-
-	public static <T> Iterable<List<T>> cartesianProduct(Iterable<? extends Iterable<? extends T>> sets) {
-		/**+
-		 * Convert an Iterable of Arrays (Object[]) to an Iterable of
-		 * Lists
-		 */
-		return arraysAsLists(cartesianProduct(Object.class, sets));
-	}
-
-	private static <T> Iterable<List<T>> arraysAsLists(Iterable<Object[]> arrays) {
-		return Iterables.transform(arrays, new Cartesian.GetList());
-	}
-
-	private static <T> T[] toArray(Class<? super T> clazz, Iterable<? extends T> it) {
-		ArrayList arraylist = Lists.newArrayList();
-
-		for (Object object : it) {
-			arraylist.add(object);
-		}
-
-		return (T[]) ((Object[]) arraylist.toArray(createArray(clazz, arraylist.size())));
-	}
-
-	private static <T> T[] createArray(Class<? super T> parClass1, int parInt1) {
-		return (T[]) ((Object[]) ((Object[]) Array.newInstance(parClass1, parInt1)));
-	}
-
 	static class GetList<T> implements Function<Object[], List<T>> {
 		private GetList() {
 		}
@@ -74,20 +47,6 @@ public class Cartesian {
 	}
 
 	static class Product<T> implements Iterable<T[]> {
-		private final Class<T> clazz;
-		private final Iterable<? extends T>[] iterables;
-
-		private Product(Class<T> clazz, Iterable<? extends T>[] iterables) {
-			this.clazz = clazz;
-			this.iterables = iterables;
-		}
-
-		public Iterator<T[]> iterator() {
-			return (Iterator<T[]>) (this.iterables.length <= 0
-					? Collections.singletonList((T[]) Cartesian.createArray(this.clazz, 0)).iterator()
-					: new Cartesian.Product.ProductIterator(this.clazz, this.iterables));
-		}
-
 		static class ProductIterator<T> extends UnmodifiableIterator<T[]> {
 			private int index;
 			private final Iterable<? extends T>[] iterables;
@@ -163,5 +122,49 @@ public class Cartesian {
 				}
 			}
 		}
+
+		private final Class<T> clazz;
+
+		private final Iterable<? extends T>[] iterables;
+
+		private Product(Class<T> clazz, Iterable<? extends T>[] iterables) {
+			this.clazz = clazz;
+			this.iterables = iterables;
+		}
+
+		public Iterator<T[]> iterator() {
+			return (Iterator<T[]>) (this.iterables.length <= 0
+					? Collections.singletonList((T[]) Cartesian.createArray(this.clazz, 0)).iterator()
+					: new Cartesian.Product.ProductIterator(this.clazz, this.iterables));
+		}
+	}
+
+	private static <T> Iterable<List<T>> arraysAsLists(Iterable<Object[]> arrays) {
+		return Iterables.transform(arrays, new Cartesian.GetList());
+	}
+
+	public static <T> Iterable<T[]> cartesianProduct(Class<T> clazz, Iterable<? extends Iterable<? extends T>> sets) {
+		return new Cartesian.Product(clazz, (Iterable[]) toArray(Iterable.class, sets));
+	}
+
+	public static <T> Iterable<List<T>> cartesianProduct(Iterable<? extends Iterable<? extends T>> sets) {
+		/**
+		 * + Convert an Iterable of Arrays (Object[]) to an Iterable of Lists
+		 */
+		return arraysAsLists(cartesianProduct(Object.class, sets));
+	}
+
+	private static <T> T[] createArray(Class<? super T> parClass1, int parInt1) {
+		return (T[]) ((Object[]) ((Object[]) Array.newInstance(parClass1, parInt1)));
+	}
+
+	private static <T> T[] toArray(Class<? super T> clazz, Iterable<? extends T> it) {
+		ArrayList arraylist = Lists.newArrayList();
+
+		for (Object object : it) {
+			arraylist.add(object);
+		}
+
+		return (T[]) ((Object[]) arraylist.toArray(createArray(clazz, arraylist.size())));
 	}
 }

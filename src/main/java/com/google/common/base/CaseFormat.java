@@ -39,11 +39,6 @@ public enum CaseFormat {
 	 */
 	LOWER_HYPHEN(CharMatcher.is('-'), "-") {
 		@Override
-		String normalizeWord(String word) {
-			return Ascii.toLowerCase(word);
-		}
-
-		@Override
 		String convert(CaseFormat format, String s) {
 			if (format == LOWER_UNDERSCORE) {
 				return s.replace('-', '_');
@@ -53,17 +48,17 @@ public enum CaseFormat {
 			}
 			return super.convert(format, s);
 		}
+
+		@Override
+		String normalizeWord(String word) {
+			return Ascii.toLowerCase(word);
+		}
 	},
 
 	/**
 	 * C++ variable naming convention, e.g., "lower_underscore".
 	 */
 	LOWER_UNDERSCORE(CharMatcher.is('_'), "_") {
-		@Override
-		String normalizeWord(String word) {
-			return Ascii.toLowerCase(word);
-		}
-
 		@Override
 		String convert(CaseFormat format, String s) {
 			if (format == LOWER_HYPHEN) {
@@ -73,6 +68,11 @@ public enum CaseFormat {
 				return Ascii.toUpperCase(s);
 			}
 			return super.convert(format, s);
+		}
+
+		@Override
+		String normalizeWord(String word) {
+			return Ascii.toLowerCase(word);
 		}
 	},
 
@@ -101,11 +101,6 @@ public enum CaseFormat {
 	 */
 	UPPER_UNDERSCORE(CharMatcher.is('_'), "_") {
 		@Override
-		String normalizeWord(String word) {
-			return Ascii.toUpperCase(word);
-		}
-
-		@Override
 		String convert(CaseFormat format, String s) {
 			if (format == LOWER_HYPHEN) {
 				return Ascii.toLowerCase(s.replace('_', '-'));
@@ -115,26 +110,70 @@ public enum CaseFormat {
 			}
 			return super.convert(format, s);
 		}
+
+		@Override
+		String normalizeWord(String word) {
+			return Ascii.toUpperCase(word);
+		}
 	};
 
+	private static final class StringConverter extends Converter<String, String> implements Serializable {
+
+		private static final long serialVersionUID = 0L;
+		private final CaseFormat sourceFormat;
+
+		private final CaseFormat targetFormat;
+
+		StringConverter(CaseFormat sourceFormat, CaseFormat targetFormat) {
+			this.sourceFormat = checkNotNull(sourceFormat);
+			this.targetFormat = checkNotNull(targetFormat);
+		}
+
+		@Override
+		protected String doBackward(String s) {
+			// TODO(kevinb): remove null boilerplate (convert() will do it automatically)
+			return s == null ? null : targetFormat.to(sourceFormat, s);
+		}
+
+		@Override
+		protected String doForward(String s) {
+			// TODO(kevinb): remove null boilerplate (convert() will do it automatically)
+			return s == null ? null : sourceFormat.to(targetFormat, s);
+		}
+
+		@Override
+		public boolean equals(@Nullable Object object) {
+			if (object instanceof StringConverter) {
+				StringConverter that = (StringConverter) object;
+				return sourceFormat.equals(that.sourceFormat) && targetFormat.equals(that.targetFormat);
+			}
+			return false;
+		}
+
+		@Override
+		public int hashCode() {
+			return sourceFormat.hashCode() ^ targetFormat.hashCode();
+		}
+
+		@Override
+		public String toString() {
+			return sourceFormat + ".converterTo(" + targetFormat + ")";
+		}
+	}
+
+	private static String firstCharOnlyToUpper(String word) {
+		return (word.isEmpty()) ? word
+				: new StringBuilder(word.length()).append(Ascii.toUpperCase(word.charAt(0)))
+						.append(Ascii.toLowerCase(word.substring(1))).toString();
+	}
+
 	private final CharMatcher wordBoundary;
+
 	private final String wordSeparator;
 
 	CaseFormat(CharMatcher wordBoundary, String wordSeparator) {
 		this.wordBoundary = wordBoundary;
 		this.wordSeparator = wordSeparator;
-	}
-
-	/**
-	 * Converts the specified {@code String str} from this format to the specified
-	 * {@code format}. A "best effort" approach is taken; if {@code str} does not
-	 * conform to the assumed format, then the behavior of this method is undefined
-	 * but we make a reasonable effort at converting anyway.
-	 */
-	public final String to(CaseFormat format, String str) {
-		checkNotNull(format);
-		checkNotNull(str);
-		return (format == this) ? str : convert(format, str);
 	}
 
 	/**
@@ -170,59 +209,21 @@ public enum CaseFormat {
 		return new StringConverter(this, targetFormat);
 	}
 
-	private static final class StringConverter extends Converter<String, String> implements Serializable {
-
-		private final CaseFormat sourceFormat;
-		private final CaseFormat targetFormat;
-
-		StringConverter(CaseFormat sourceFormat, CaseFormat targetFormat) {
-			this.sourceFormat = checkNotNull(sourceFormat);
-			this.targetFormat = checkNotNull(targetFormat);
-		}
-
-		@Override
-		protected String doForward(String s) {
-			// TODO(kevinb): remove null boilerplate (convert() will do it automatically)
-			return s == null ? null : sourceFormat.to(targetFormat, s);
-		}
-
-		@Override
-		protected String doBackward(String s) {
-			// TODO(kevinb): remove null boilerplate (convert() will do it automatically)
-			return s == null ? null : targetFormat.to(sourceFormat, s);
-		}
-
-		@Override
-		public boolean equals(@Nullable Object object) {
-			if (object instanceof StringConverter) {
-				StringConverter that = (StringConverter) object;
-				return sourceFormat.equals(that.sourceFormat) && targetFormat.equals(that.targetFormat);
-			}
-			return false;
-		}
-
-		@Override
-		public int hashCode() {
-			return sourceFormat.hashCode() ^ targetFormat.hashCode();
-		}
-
-		@Override
-		public String toString() {
-			return sourceFormat + ".converterTo(" + targetFormat + ")";
-		}
-
-		private static final long serialVersionUID = 0L;
-	}
-
-	abstract String normalizeWord(String word);
-
 	private String normalizeFirstWord(String word) {
 		return (this == LOWER_CAMEL) ? Ascii.toLowerCase(word) : normalizeWord(word);
 	}
 
-	private static String firstCharOnlyToUpper(String word) {
-		return (word.isEmpty()) ? word
-				: new StringBuilder(word.length()).append(Ascii.toUpperCase(word.charAt(0)))
-						.append(Ascii.toLowerCase(word.substring(1))).toString();
+	abstract String normalizeWord(String word);
+
+	/**
+	 * Converts the specified {@code String str} from this format to the specified
+	 * {@code format}. A "best effort" approach is taken; if {@code str} does not
+	 * conform to the assumed format, then the behavior of this method is undefined
+	 * but we make a reasonable effort at converting anyway.
+	 */
+	public final String to(CaseFormat format, String str) {
+		checkNotNull(format);
+		checkNotNull(str);
+		return (format == this) ? str : convert(format, str);
 	}
 }

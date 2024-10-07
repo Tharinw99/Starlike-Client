@@ -24,26 +24,28 @@ package net.lax1dude.eaglercraft.v1_8.crypto;
 /**
  * an implementation of the AES (Rijndael), from FIPS-197.
  * <p>
- * For further details see: <a href="https://csrc.nist.gov/encryption/aes/">https://csrc.nist.gov/encryption/aes/</a>.
+ * For further details see: <a href=
+ * "https://csrc.nist.gov/encryption/aes/">https://csrc.nist.gov/encryption/aes/</a>.
  *
- * This implementation is based on optimizations from Dr. Brian Gladman's paper and C code at
- * <a href="https://fp.gladman.plus.com/cryptography_technology/rijndael/">https://fp.gladman.plus.com/cryptography_technology/rijndael/</a>
+ * This implementation is based on optimizations from Dr. Brian Gladman's paper
+ * and C code at <a href=
+ * "https://fp.gladman.plus.com/cryptography_technology/rijndael/">https://fp.gladman.plus.com/cryptography_technology/rijndael/</a>
  *
- * There are three levels of tradeoff of speed vs memory
- * Because java has no preprocessor, they are written as three separate classes from which to choose
+ * There are three levels of tradeoff of speed vs memory Because java has no
+ * preprocessor, they are written as three separate classes from which to choose
  *
- * The fastest uses 8Kbytes of static tables to precompute round calculations, 4 256 word tables for encryption
- * and 4 for decryption.
+ * The fastest uses 8Kbytes of static tables to precompute round calculations, 4
+ * 256 word tables for encryption and 4 for decryption.
  *
- * The middle performance version uses only one 256 word table for each, for a total of 2Kbytes,
- * adding 12 rotate operations per round to compute the values contained in the other tables from
- * the contents of the first
+ * The middle performance version uses only one 256 word table for each, for a
+ * total of 2Kbytes, adding 12 rotate operations per round to compute the values
+ * contained in the other tables from the contents of the first
  *
- * The slowest version uses no static tables at all and computes the values
- * in each round.
+ * The slowest version uses no static tables at all and computes the values in
+ * each round.
  * <p>
- * This file contains the slowest performance version with no static tables
- * for round precomputation, but it has the smallest foot print.
+ * This file contains the slowest performance version with no static tables for
+ * round precomputation, but it has the smallest foot print.
  *
  */
 public class AESLightEngine {
@@ -113,17 +115,15 @@ public class AESLightEngine {
 	private static final int[] rcon = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab,
 			0x4d, 0x9a, 0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91 };
 
-	private static int shift(int r, int shift) {
-		return (r >>> shift) | (r << -shift);
-	}
+	private static final int m1 = 0x80808080;
 
 	/* multiply four bytes in GF(2^8) by 'x' {02} in parallel */
 
-	private static final int m1 = 0x80808080;
 	private static final int m2 = 0x7f7f7f7f;
 	private static final int m3 = 0x0000001b;
 	private static final int m4 = 0xC0C0C0C0;
 	private static final int m5 = 0x3f3f3f3f;
+	private static final int BLOCK_SIZE = 16;
 
 	private static int FFmulX(int x) {
 		return (((x & m2) << 1) ^ (((x & m1) >>> 7) * m3));
@@ -136,21 +136,22 @@ public class AESLightEngine {
 		return t0 ^ (t1 >>> 2) ^ (t1 >>> 5);
 	}
 
-	/* 
-		The following defines provide alternative definitions of FFmulX that might
-		give improved performance if a fast 32-bit multiply is not available.
-
-		private int FFmulX(int x) { int u = x & m1; u |= (u >> 1); return ((x & m2) << 1) ^ ((u >>> 3) | (u >>> 6)); } 
-		private static final int  m4 = 0x1b1b1b1b;
-		private int FFmulX(int x) { int u = x & m1; return ((x & m2) << 1) ^ ((u - (u >>> 7)) & m4); } 
-
+	/*
+	 * The following defines provide alternative definitions of FFmulX that might
+	 * give improved performance if a fast 32-bit multiply is not available.
+	 * 
+	 * private int FFmulX(int x) { int u = x & m1; u |= (u >> 1); return ((x & m2)
+	 * << 1) ^ ((u >>> 3) | (u >>> 6)); } private static final int m4 = 0x1b1b1b1b;
+	 * private int FFmulX(int x) { int u = x & m1; return ((x & m2) << 1) ^ ((u - (u
+	 * >>> 7)) & m4); }
+	 * 
 	 */
 
-	private static int mcol(int x) {
-		int t0, t1;
-		t0 = shift(x, 8);
-		t1 = x ^ t0;
-		return shift(t1, 16) ^ t0 ^ FFmulX(t1);
+	public static void intToLittleEndian(int n, byte[] bs, int off) {
+		bs[off] = (byte) (n);
+		bs[++off] = (byte) (n >>> 8);
+		bs[++off] = (byte) (n >>> 16);
+		bs[++off] = (byte) (n >>> 24);
 	}
 
 	private static int inv_mcol(int x) {
@@ -163,11 +164,6 @@ public class AESLightEngine {
 		return t0;
 	}
 
-	private static int subWord(int x) {
-		return (S[x & 255] & 255 | ((S[(x >> 8) & 255] & 255) << 8) | ((S[(x >> 16) & 255] & 255) << 16)
-				| S[(x >> 24) & 255] << 24);
-	}
-
 	private static int littleEndianToInt(byte[] bs, int off) {
 		int n = bs[off] & 0xff;
 		n |= (bs[++off] & 0xff) << 8;
@@ -176,18 +172,157 @@ public class AESLightEngine {
 		return n;
 	}
 
-	public static void intToLittleEndian(int n, byte[] bs, int off) {
-		bs[off] = (byte) (n);
-		bs[++off] = (byte) (n >>> 8);
-		bs[++off] = (byte) (n >>> 16);
-		bs[++off] = (byte) (n >>> 24);
+	private static int mcol(int x) {
+		int t0, t1;
+		t0 = shift(x, 8);
+		t1 = x ^ t0;
+		return shift(t1, 16) ^ t0 ^ FFmulX(t1);
+	}
+
+	private static int shift(int r, int shift) {
+		return (r >>> shift) | (r << -shift);
+	}
+
+	private static int subWord(int x) {
+		return (S[x & 255] & 255 | ((S[(x >> 8) & 255] & 255) << 8) | ((S[(x >> 16) & 255] & 255) << 16)
+				| S[(x >> 24) & 255] << 24);
+	}
+
+	private int ROUNDS;
+	private int[][] WorkingKey = null;
+	private boolean forEncryption;
+
+	/**
+	 * default constructor - 128 bit block size.
+	 */
+	public AESLightEngine() {
+
+	}
+
+	private int bitsOfSecurity() {
+		if (WorkingKey == null) {
+			return 256;
+		}
+		return (WorkingKey.length - 7) << 5;
+	}
+
+	private void decryptBlock(byte[] in, int inOff, byte[] out, int outOff, int[][] KW) {
+		int C0 = littleEndianToInt(in, inOff + 0);
+		int C1 = littleEndianToInt(in, inOff + 4);
+		int C2 = littleEndianToInt(in, inOff + 8);
+		int C3 = littleEndianToInt(in, inOff + 12);
+
+		int t0 = C0 ^ KW[ROUNDS][0];
+		int t1 = C1 ^ KW[ROUNDS][1];
+		int t2 = C2 ^ KW[ROUNDS][2];
+
+		int r = ROUNDS - 1, r0, r1, r2, r3 = C3 ^ KW[ROUNDS][3];
+		while (r > 1) {
+			r0 = inv_mcol((Si[t0 & 255] & 255) ^ ((Si[(r3 >> 8) & 255] & 255) << 8)
+					^ ((Si[(t2 >> 16) & 255] & 255) << 16) ^ (Si[(t1 >> 24) & 255] << 24)) ^ KW[r][0];
+			r1 = inv_mcol((Si[t1 & 255] & 255) ^ ((Si[(t0 >> 8) & 255] & 255) << 8)
+					^ ((Si[(r3 >> 16) & 255] & 255) << 16) ^ (Si[(t2 >> 24) & 255] << 24)) ^ KW[r][1];
+			r2 = inv_mcol((Si[t2 & 255] & 255) ^ ((Si[(t1 >> 8) & 255] & 255) << 8)
+					^ ((Si[(t0 >> 16) & 255] & 255) << 16) ^ (Si[(r3 >> 24) & 255] << 24)) ^ KW[r][2];
+			r3 = inv_mcol((Si[r3 & 255] & 255) ^ ((Si[(t2 >> 8) & 255] & 255) << 8)
+					^ ((Si[(t1 >> 16) & 255] & 255) << 16) ^ (Si[(t0 >> 24) & 255] << 24)) ^ KW[r--][3];
+			t0 = inv_mcol((Si[r0 & 255] & 255) ^ ((Si[(r3 >> 8) & 255] & 255) << 8)
+					^ ((Si[(r2 >> 16) & 255] & 255) << 16) ^ (Si[(r1 >> 24) & 255] << 24)) ^ KW[r][0];
+			t1 = inv_mcol((Si[r1 & 255] & 255) ^ ((Si[(r0 >> 8) & 255] & 255) << 8)
+					^ ((Si[(r3 >> 16) & 255] & 255) << 16) ^ (Si[(r2 >> 24) & 255] << 24)) ^ KW[r][1];
+			t2 = inv_mcol((Si[r2 & 255] & 255) ^ ((Si[(r1 >> 8) & 255] & 255) << 8)
+					^ ((Si[(r0 >> 16) & 255] & 255) << 16) ^ (Si[(r3 >> 24) & 255] << 24)) ^ KW[r][2];
+			r3 = inv_mcol((Si[r3 & 255] & 255) ^ ((Si[(r2 >> 8) & 255] & 255) << 8)
+					^ ((Si[(r1 >> 16) & 255] & 255) << 16) ^ (Si[(r0 >> 24) & 255] << 24)) ^ KW[r--][3];
+		}
+
+		r0 = inv_mcol((Si[t0 & 255] & 255) ^ ((Si[(r3 >> 8) & 255] & 255) << 8) ^ ((Si[(t2 >> 16) & 255] & 255) << 16)
+				^ (Si[(t1 >> 24) & 255] << 24)) ^ KW[r][0];
+		r1 = inv_mcol((Si[t1 & 255] & 255) ^ ((Si[(t0 >> 8) & 255] & 255) << 8) ^ ((Si[(r3 >> 16) & 255] & 255) << 16)
+				^ (Si[(t2 >> 24) & 255] << 24)) ^ KW[r][1];
+		r2 = inv_mcol((Si[t2 & 255] & 255) ^ ((Si[(t1 >> 8) & 255] & 255) << 8) ^ ((Si[(t0 >> 16) & 255] & 255) << 16)
+				^ (Si[(r3 >> 24) & 255] << 24)) ^ KW[r][2];
+		r3 = inv_mcol((Si[r3 & 255] & 255) ^ ((Si[(t2 >> 8) & 255] & 255) << 8) ^ ((Si[(t1 >> 16) & 255] & 255) << 16)
+				^ (Si[(t0 >> 24) & 255] << 24)) ^ KW[r][3];
+
+		// the final round's table is a simple function of Si
+
+		C0 = (Si[r0 & 255] & 255) ^ ((Si[(r3 >> 8) & 255] & 255) << 8) ^ ((Si[(r2 >> 16) & 255] & 255) << 16)
+				^ (Si[(r1 >> 24) & 255] << 24) ^ KW[0][0];
+		C1 = (Si[r1 & 255] & 255) ^ ((Si[(r0 >> 8) & 255] & 255) << 8) ^ ((Si[(r3 >> 16) & 255] & 255) << 16)
+				^ (Si[(r2 >> 24) & 255] << 24) ^ KW[0][1];
+		C2 = (Si[r2 & 255] & 255) ^ ((Si[(r1 >> 8) & 255] & 255) << 8) ^ ((Si[(r0 >> 16) & 255] & 255) << 16)
+				^ (Si[(r3 >> 24) & 255] << 24) ^ KW[0][2];
+		C3 = (Si[r3 & 255] & 255) ^ ((Si[(r2 >> 8) & 255] & 255) << 8) ^ ((Si[(r1 >> 16) & 255] & 255) << 16)
+				^ (Si[(r0 >> 24) & 255] << 24) ^ KW[0][3];
+
+		intToLittleEndian(C0, out, outOff + 0);
+		intToLittleEndian(C1, out, outOff + 4);
+		intToLittleEndian(C2, out, outOff + 8);
+		intToLittleEndian(C3, out, outOff + 12);
+	}
+
+	private void encryptBlock(byte[] in, int inOff, byte[] out, int outOff, int[][] KW) {
+		int C0 = littleEndianToInt(in, inOff + 0);
+		int C1 = littleEndianToInt(in, inOff + 4);
+		int C2 = littleEndianToInt(in, inOff + 8);
+		int C3 = littleEndianToInt(in, inOff + 12);
+
+		int t0 = C0 ^ KW[0][0];
+		int t1 = C1 ^ KW[0][1];
+		int t2 = C2 ^ KW[0][2];
+
+		int r = 1, r0, r1, r2, r3 = C3 ^ KW[0][3];
+		while (r < ROUNDS - 1) {
+			r0 = mcol((S[t0 & 255] & 255) ^ ((S[(t1 >> 8) & 255] & 255) << 8) ^ ((S[(t2 >> 16) & 255] & 255) << 16)
+					^ (S[(r3 >> 24) & 255] << 24)) ^ KW[r][0];
+			r1 = mcol((S[t1 & 255] & 255) ^ ((S[(t2 >> 8) & 255] & 255) << 8) ^ ((S[(r3 >> 16) & 255] & 255) << 16)
+					^ (S[(t0 >> 24) & 255] << 24)) ^ KW[r][1];
+			r2 = mcol((S[t2 & 255] & 255) ^ ((S[(r3 >> 8) & 255] & 255) << 8) ^ ((S[(t0 >> 16) & 255] & 255) << 16)
+					^ (S[(t1 >> 24) & 255] << 24)) ^ KW[r][2];
+			r3 = mcol((S[r3 & 255] & 255) ^ ((S[(t0 >> 8) & 255] & 255) << 8) ^ ((S[(t1 >> 16) & 255] & 255) << 16)
+					^ (S[(t2 >> 24) & 255] << 24)) ^ KW[r++][3];
+			t0 = mcol((S[r0 & 255] & 255) ^ ((S[(r1 >> 8) & 255] & 255) << 8) ^ ((S[(r2 >> 16) & 255] & 255) << 16)
+					^ (S[(r3 >> 24) & 255] << 24)) ^ KW[r][0];
+			t1 = mcol((S[r1 & 255] & 255) ^ ((S[(r2 >> 8) & 255] & 255) << 8) ^ ((S[(r3 >> 16) & 255] & 255) << 16)
+					^ (S[(r0 >> 24) & 255] << 24)) ^ KW[r][1];
+			t2 = mcol((S[r2 & 255] & 255) ^ ((S[(r3 >> 8) & 255] & 255) << 8) ^ ((S[(r0 >> 16) & 255] & 255) << 16)
+					^ (S[(r1 >> 24) & 255] << 24)) ^ KW[r][2];
+			r3 = mcol((S[r3 & 255] & 255) ^ ((S[(r0 >> 8) & 255] & 255) << 8) ^ ((S[(r1 >> 16) & 255] & 255) << 16)
+					^ (S[(r2 >> 24) & 255] << 24)) ^ KW[r++][3];
+		}
+
+		r0 = mcol((S[t0 & 255] & 255) ^ ((S[(t1 >> 8) & 255] & 255) << 8) ^ ((S[(t2 >> 16) & 255] & 255) << 16)
+				^ (S[(r3 >> 24) & 255] << 24)) ^ KW[r][0];
+		r1 = mcol((S[t1 & 255] & 255) ^ ((S[(t2 >> 8) & 255] & 255) << 8) ^ ((S[(r3 >> 16) & 255] & 255) << 16)
+				^ (S[(t0 >> 24) & 255] << 24)) ^ KW[r][1];
+		r2 = mcol((S[t2 & 255] & 255) ^ ((S[(r3 >> 8) & 255] & 255) << 8) ^ ((S[(t0 >> 16) & 255] & 255) << 16)
+				^ (S[(t1 >> 24) & 255] << 24)) ^ KW[r][2];
+		r3 = mcol((S[r3 & 255] & 255) ^ ((S[(t0 >> 8) & 255] & 255) << 8) ^ ((S[(t1 >> 16) & 255] & 255) << 16)
+				^ (S[(t2 >> 24) & 255] << 24)) ^ KW[r++][3];
+
+		// the final round is a simple function of S
+
+		C0 = (S[r0 & 255] & 255) ^ ((S[(r1 >> 8) & 255] & 255) << 8) ^ ((S[(r2 >> 16) & 255] & 255) << 16)
+				^ (S[(r3 >> 24) & 255] << 24) ^ KW[r][0];
+		C1 = (S[r1 & 255] & 255) ^ ((S[(r2 >> 8) & 255] & 255) << 8) ^ ((S[(r3 >> 16) & 255] & 255) << 16)
+				^ (S[(r0 >> 24) & 255] << 24) ^ KW[r][1];
+		C2 = (S[r2 & 255] & 255) ^ ((S[(r3 >> 8) & 255] & 255) << 8) ^ ((S[(r0 >> 16) & 255] & 255) << 16)
+				^ (S[(r1 >> 24) & 255] << 24) ^ KW[r][2];
+		C3 = (S[r3 & 255] & 255) ^ ((S[(r0 >> 8) & 255] & 255) << 8) ^ ((S[(r1 >> 16) & 255] & 255) << 16)
+				^ (S[(r2 >> 24) & 255] << 24) ^ KW[r][3];
+
+		intToLittleEndian(C0, out, outOff + 0);
+		intToLittleEndian(C1, out, outOff + 4);
+		intToLittleEndian(C2, out, outOff + 8);
+		intToLittleEndian(C3, out, outOff + 12);
 	}
 
 	/**
-	 * Calculate the necessary round keys
-	 * The number of calculations depends on key size and block size
-	 * AES specified a fixed block size of 128 bits and key sizes 128/192/256 bits
-	 * This code is written assuming those are the only possible values
+	 * Calculate the necessary round keys The number of calculations depends on key
+	 * size and block size AES specified a fixed block size of 128 bits and key
+	 * sizes 128/192/256 bits This code is written assuming those are the only
+	 * possible values
 	 */
 	private int[][] generateWorkingKey(byte[] key, boolean forEncryption) {
 		int keyLen = key.length;
@@ -346,39 +481,25 @@ public class AESLightEngine {
 		return W;
 	}
 
-	private int ROUNDS;
-	private int[][] WorkingKey = null;
-	private boolean forEncryption;
-
-	private static final int BLOCK_SIZE = 16;
-
-	/**
-	 * default constructor - 128 bit block size.
-	 */
-	public AESLightEngine() {
-		
-	}
-
-	/**
-	 * initialise an AES cipher.
-	 *
-	 * @param forEncryption whether or not we are for encryption.
-	 * @param params the parameters required to set up the cipher.
-	 * @exception IllegalArgumentException if the params argument is
-	 * inappropriate.
-	 */
-	public void init(boolean forEncryption, byte[] key) {
-		WorkingKey = generateWorkingKey(key, forEncryption);
-		this.forEncryption = forEncryption;
-		return;
-	}
-
 	public String getAlgorithmName() {
 		return "AES";
 	}
 
 	public int getBlockSize() {
 		return BLOCK_SIZE;
+	}
+
+	/**
+	 * initialise an AES cipher.
+	 *
+	 * @param forEncryption whether or not we are for encryption.
+	 * @param params        the parameters required to set up the cipher.
+	 * @exception IllegalArgumentException if the params argument is inappropriate.
+	 */
+	public void init(boolean forEncryption, byte[] key) {
+		WorkingKey = generateWorkingKey(key, forEncryption);
+		this.forEncryption = forEncryption;
+		return;
 	}
 
 	public int processBlock(byte[] in, int inOff, byte[] out, int outOff) {
@@ -404,124 +525,5 @@ public class AESLightEngine {
 	}
 
 	public void reset() {
-	}
-
-	private void encryptBlock(byte[] in, int inOff, byte[] out, int outOff, int[][] KW) {
-		int C0 = littleEndianToInt(in, inOff + 0);
-		int C1 = littleEndianToInt(in, inOff + 4);
-		int C2 = littleEndianToInt(in, inOff + 8);
-		int C3 = littleEndianToInt(in, inOff + 12);
-
-		int t0 = C0 ^ KW[0][0];
-		int t1 = C1 ^ KW[0][1];
-		int t2 = C2 ^ KW[0][2];
-
-		int r = 1, r0, r1, r2, r3 = C3 ^ KW[0][3];
-		while (r < ROUNDS - 1) {
-			r0 = mcol((S[t0 & 255] & 255) ^ ((S[(t1 >> 8) & 255] & 255) << 8) ^ ((S[(t2 >> 16) & 255] & 255) << 16)
-					^ (S[(r3 >> 24) & 255] << 24)) ^ KW[r][0];
-			r1 = mcol((S[t1 & 255] & 255) ^ ((S[(t2 >> 8) & 255] & 255) << 8) ^ ((S[(r3 >> 16) & 255] & 255) << 16)
-					^ (S[(t0 >> 24) & 255] << 24)) ^ KW[r][1];
-			r2 = mcol((S[t2 & 255] & 255) ^ ((S[(r3 >> 8) & 255] & 255) << 8) ^ ((S[(t0 >> 16) & 255] & 255) << 16)
-					^ (S[(t1 >> 24) & 255] << 24)) ^ KW[r][2];
-			r3 = mcol((S[r3 & 255] & 255) ^ ((S[(t0 >> 8) & 255] & 255) << 8) ^ ((S[(t1 >> 16) & 255] & 255) << 16)
-					^ (S[(t2 >> 24) & 255] << 24)) ^ KW[r++][3];
-			t0 = mcol((S[r0 & 255] & 255) ^ ((S[(r1 >> 8) & 255] & 255) << 8) ^ ((S[(r2 >> 16) & 255] & 255) << 16)
-					^ (S[(r3 >> 24) & 255] << 24)) ^ KW[r][0];
-			t1 = mcol((S[r1 & 255] & 255) ^ ((S[(r2 >> 8) & 255] & 255) << 8) ^ ((S[(r3 >> 16) & 255] & 255) << 16)
-					^ (S[(r0 >> 24) & 255] << 24)) ^ KW[r][1];
-			t2 = mcol((S[r2 & 255] & 255) ^ ((S[(r3 >> 8) & 255] & 255) << 8) ^ ((S[(r0 >> 16) & 255] & 255) << 16)
-					^ (S[(r1 >> 24) & 255] << 24)) ^ KW[r][2];
-			r3 = mcol((S[r3 & 255] & 255) ^ ((S[(r0 >> 8) & 255] & 255) << 8) ^ ((S[(r1 >> 16) & 255] & 255) << 16)
-					^ (S[(r2 >> 24) & 255] << 24)) ^ KW[r++][3];
-		}
-
-		r0 = mcol((S[t0 & 255] & 255) ^ ((S[(t1 >> 8) & 255] & 255) << 8) ^ ((S[(t2 >> 16) & 255] & 255) << 16)
-				^ (S[(r3 >> 24) & 255] << 24)) ^ KW[r][0];
-		r1 = mcol((S[t1 & 255] & 255) ^ ((S[(t2 >> 8) & 255] & 255) << 8) ^ ((S[(r3 >> 16) & 255] & 255) << 16)
-				^ (S[(t0 >> 24) & 255] << 24)) ^ KW[r][1];
-		r2 = mcol((S[t2 & 255] & 255) ^ ((S[(r3 >> 8) & 255] & 255) << 8) ^ ((S[(t0 >> 16) & 255] & 255) << 16)
-				^ (S[(t1 >> 24) & 255] << 24)) ^ KW[r][2];
-		r3 = mcol((S[r3 & 255] & 255) ^ ((S[(t0 >> 8) & 255] & 255) << 8) ^ ((S[(t1 >> 16) & 255] & 255) << 16)
-				^ (S[(t2 >> 24) & 255] << 24)) ^ KW[r++][3];
-
-		// the final round is a simple function of S
-
-		C0 = (S[r0 & 255] & 255) ^ ((S[(r1 >> 8) & 255] & 255) << 8) ^ ((S[(r2 >> 16) & 255] & 255) << 16)
-				^ (S[(r3 >> 24) & 255] << 24) ^ KW[r][0];
-		C1 = (S[r1 & 255] & 255) ^ ((S[(r2 >> 8) & 255] & 255) << 8) ^ ((S[(r3 >> 16) & 255] & 255) << 16)
-				^ (S[(r0 >> 24) & 255] << 24) ^ KW[r][1];
-		C2 = (S[r2 & 255] & 255) ^ ((S[(r3 >> 8) & 255] & 255) << 8) ^ ((S[(r0 >> 16) & 255] & 255) << 16)
-				^ (S[(r1 >> 24) & 255] << 24) ^ KW[r][2];
-		C3 = (S[r3 & 255] & 255) ^ ((S[(r0 >> 8) & 255] & 255) << 8) ^ ((S[(r1 >> 16) & 255] & 255) << 16)
-				^ (S[(r2 >> 24) & 255] << 24) ^ KW[r][3];
-
-		intToLittleEndian(C0, out, outOff + 0);
-		intToLittleEndian(C1, out, outOff + 4);
-		intToLittleEndian(C2, out, outOff + 8);
-		intToLittleEndian(C3, out, outOff + 12);
-	}
-
-	private void decryptBlock(byte[] in, int inOff, byte[] out, int outOff, int[][] KW) {
-		int C0 = littleEndianToInt(in, inOff + 0);
-		int C1 = littleEndianToInt(in, inOff + 4);
-		int C2 = littleEndianToInt(in, inOff + 8);
-		int C3 = littleEndianToInt(in, inOff + 12);
-
-		int t0 = C0 ^ KW[ROUNDS][0];
-		int t1 = C1 ^ KW[ROUNDS][1];
-		int t2 = C2 ^ KW[ROUNDS][2];
-
-		int r = ROUNDS - 1, r0, r1, r2, r3 = C3 ^ KW[ROUNDS][3];
-		while (r > 1) {
-			r0 = inv_mcol((Si[t0 & 255] & 255) ^ ((Si[(r3 >> 8) & 255] & 255) << 8)
-					^ ((Si[(t2 >> 16) & 255] & 255) << 16) ^ (Si[(t1 >> 24) & 255] << 24)) ^ KW[r][0];
-			r1 = inv_mcol((Si[t1 & 255] & 255) ^ ((Si[(t0 >> 8) & 255] & 255) << 8)
-					^ ((Si[(r3 >> 16) & 255] & 255) << 16) ^ (Si[(t2 >> 24) & 255] << 24)) ^ KW[r][1];
-			r2 = inv_mcol((Si[t2 & 255] & 255) ^ ((Si[(t1 >> 8) & 255] & 255) << 8)
-					^ ((Si[(t0 >> 16) & 255] & 255) << 16) ^ (Si[(r3 >> 24) & 255] << 24)) ^ KW[r][2];
-			r3 = inv_mcol((Si[r3 & 255] & 255) ^ ((Si[(t2 >> 8) & 255] & 255) << 8)
-					^ ((Si[(t1 >> 16) & 255] & 255) << 16) ^ (Si[(t0 >> 24) & 255] << 24)) ^ KW[r--][3];
-			t0 = inv_mcol((Si[r0 & 255] & 255) ^ ((Si[(r3 >> 8) & 255] & 255) << 8)
-					^ ((Si[(r2 >> 16) & 255] & 255) << 16) ^ (Si[(r1 >> 24) & 255] << 24)) ^ KW[r][0];
-			t1 = inv_mcol((Si[r1 & 255] & 255) ^ ((Si[(r0 >> 8) & 255] & 255) << 8)
-					^ ((Si[(r3 >> 16) & 255] & 255) << 16) ^ (Si[(r2 >> 24) & 255] << 24)) ^ KW[r][1];
-			t2 = inv_mcol((Si[r2 & 255] & 255) ^ ((Si[(r1 >> 8) & 255] & 255) << 8)
-					^ ((Si[(r0 >> 16) & 255] & 255) << 16) ^ (Si[(r3 >> 24) & 255] << 24)) ^ KW[r][2];
-			r3 = inv_mcol((Si[r3 & 255] & 255) ^ ((Si[(r2 >> 8) & 255] & 255) << 8)
-					^ ((Si[(r1 >> 16) & 255] & 255) << 16) ^ (Si[(r0 >> 24) & 255] << 24)) ^ KW[r--][3];
-		}
-
-		r0 = inv_mcol((Si[t0 & 255] & 255) ^ ((Si[(r3 >> 8) & 255] & 255) << 8) ^ ((Si[(t2 >> 16) & 255] & 255) << 16)
-				^ (Si[(t1 >> 24) & 255] << 24)) ^ KW[r][0];
-		r1 = inv_mcol((Si[t1 & 255] & 255) ^ ((Si[(t0 >> 8) & 255] & 255) << 8) ^ ((Si[(r3 >> 16) & 255] & 255) << 16)
-				^ (Si[(t2 >> 24) & 255] << 24)) ^ KW[r][1];
-		r2 = inv_mcol((Si[t2 & 255] & 255) ^ ((Si[(t1 >> 8) & 255] & 255) << 8) ^ ((Si[(t0 >> 16) & 255] & 255) << 16)
-				^ (Si[(r3 >> 24) & 255] << 24)) ^ KW[r][2];
-		r3 = inv_mcol((Si[r3 & 255] & 255) ^ ((Si[(t2 >> 8) & 255] & 255) << 8) ^ ((Si[(t1 >> 16) & 255] & 255) << 16)
-				^ (Si[(t0 >> 24) & 255] << 24)) ^ KW[r][3];
-
-		// the final round's table is a simple function of Si
-
-		C0 = (Si[r0 & 255] & 255) ^ ((Si[(r3 >> 8) & 255] & 255) << 8) ^ ((Si[(r2 >> 16) & 255] & 255) << 16)
-				^ (Si[(r1 >> 24) & 255] << 24) ^ KW[0][0];
-		C1 = (Si[r1 & 255] & 255) ^ ((Si[(r0 >> 8) & 255] & 255) << 8) ^ ((Si[(r3 >> 16) & 255] & 255) << 16)
-				^ (Si[(r2 >> 24) & 255] << 24) ^ KW[0][1];
-		C2 = (Si[r2 & 255] & 255) ^ ((Si[(r1 >> 8) & 255] & 255) << 8) ^ ((Si[(r0 >> 16) & 255] & 255) << 16)
-				^ (Si[(r3 >> 24) & 255] << 24) ^ KW[0][2];
-		C3 = (Si[r3 & 255] & 255) ^ ((Si[(r2 >> 8) & 255] & 255) << 8) ^ ((Si[(r1 >> 16) & 255] & 255) << 16)
-				^ (Si[(r0 >> 24) & 255] << 24) ^ KW[0][3];
-
-		intToLittleEndian(C0, out, outOff + 0);
-		intToLittleEndian(C1, out, outOff + 4);
-		intToLittleEndian(C2, out, outOff + 8);
-		intToLittleEndian(C3, out, outOff + 12);
-	}
-
-	private int bitsOfSecurity() {
-		if (WorkingKey == null) {
-			return 256;
-		}
-		return (WorkingKey.length - 7) << 5;
 	}
 }

@@ -22,8 +22,6 @@ import javax.annotation.meta.When;
 @TypeQualifierNickname
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RegEx {
-	When when() default When.ALWAYS;
-
 	static class Checker implements TypeQualifierValidator<RegEx> {
 
 		public When forConstantValue(RegEx annotation, Object value) {
@@ -40,5 +38,7 @@ public @interface RegEx {
 		}
 
 	}
+
+	When when() default When.ALWAYS;
 
 }

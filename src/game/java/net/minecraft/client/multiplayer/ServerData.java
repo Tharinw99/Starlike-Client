@@ -17,108 +17,52 @@ import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ResourceLocation;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class ServerData {
-	public String serverName;
-	public String serverIP;
-	/**+
-	 * the string indicating number of players on and capacity of
-	 * the server that is shown on the server browser (i.e. "5/20"
-	 * meaning 5 slots used out of 20 slots total)
-	 */
-	public String populationInfo = "";
-	/**+
-	 * (better variable name would be 'hostname') server name as
-	 * displayed in the server browser's second line (grey text)
-	 */
-	public String serverMOTD = "";
-	/**+
-	 * last server ping that showed up in the server browser
-	 */
-	public long pingToServer = -1l;
-	public int version = 47;
-	/**+
-	 * Game version for this server.
-	 */
-	public String gameVersion = "1.8.8";
-	public boolean field_78841_f;
-	public String playerList;
-	private ServerData.ServerResourceMode resourceMode = ServerData.ServerResourceMode.PROMPT;
-	public boolean hideAddress = false;
-	private boolean field_181042_l;
-	public IServerQuery currentQuery = null;
-	public final ResourceLocation iconResourceLocation;
-	public EaglerSkinTexture iconTextureObject = null;
-	public long pingSentTime = -1l;
-	public boolean serverIconDirty = false;
-	public boolean hasPing = false;
-	public boolean serverIconEnabled = false;
-	public boolean isDefault = false;
-	public boolean enableCookies;
+	public static enum ServerResourceMode {
+		ENABLED("enabled"), DISABLED("disabled"), PROMPT("prompt");
 
-	private static final Logger logger = LogManager.getLogger("MOTDQuery");
+		public static final ServerResourceMode[] _VALUES = values();
 
-	private static int serverTextureId = 0;
+		private final IChatComponent motd;
 
-	public ServerData(String parString1, String parString2, boolean parFlag) {
-		this.serverName = parString1;
-		this.serverIP = parString2;
-		this.field_181042_l = parFlag;
-		this.iconResourceLocation = new ResourceLocation("eagler:servers/icons/tex_" + serverTextureId++);
-		this.enableCookies = EagRuntime.getConfiguration().isEnableServerCookies();
-	}
-
-	/**+
-	 * Returns an NBTTagCompound with the server's name, IP and
-	 * maybe acceptTextures.
-	 */
-	public NBTTagCompound getNBTCompound() {
-		NBTTagCompound nbttagcompound = new NBTTagCompound();
-		nbttagcompound.setString("name", this.serverName);
-		nbttagcompound.setString("ip", this.serverIP);
-
-		if (this.resourceMode == ServerData.ServerResourceMode.ENABLED) {
-			nbttagcompound.setBoolean("acceptTextures", true);
-		} else if (this.resourceMode == ServerData.ServerResourceMode.DISABLED) {
-			nbttagcompound.setBoolean("acceptTextures", false);
+		private ServerResourceMode(String parString2) {
+			this.motd = new ChatComponentTranslation("addServer.resourcePack." + parString2, new Object[0]);
 		}
 
-		nbttagcompound.setBoolean("hideAddress", this.hideAddress);
-		nbttagcompound.setBoolean("enableCookies", this.enableCookies);
-
-		return nbttagcompound;
+		public IChatComponent getMotd() {
+			return this.motd;
+		}
 	}
 
-	public ServerData.ServerResourceMode getResourceMode() {
-		return this.resourceMode;
-	}
+	private static final Logger logger = LogManager.getLogger("MOTDQuery");
+	private static int serverTextureId = 0;
 
-	public void setResourceMode(ServerData.ServerResourceMode mode) {
-		this.resourceMode = mode;
-	}
-
-	/**+
-	 * Takes an NBTTagCompound with 'name' and 'ip' keys, returns a
-	 * ServerData instance.
+	/**
+	 * + Takes an NBTTagCompound with 'name' and 'ip' keys, returns a ServerData
+	 * instance.
 	 */
 	public static ServerData getServerDataFromNBTCompound(NBTTagCompound nbtCompound) {
 		ServerData serverdata = new ServerData(nbtCompound.getString("name"), nbtCompound.getString("ip"), false);
@@ -148,8 +92,53 @@ public class ServerData {
 		return serverdata;
 	}
 
-	public boolean func_181041_d() {
-		return this.field_181042_l;
+	public String serverName;
+	public String serverIP;
+	/**
+	 * + the string indicating number of players on and capacity of the server that
+	 * is shown on the server browser (i.e. "5/20" meaning 5 slots used out of 20
+	 * slots total)
+	 */
+	public String populationInfo = "";
+	/**
+	 * + (better variable name would be 'hostname') server name as displayed in the
+	 * server browser's second line (grey text)
+	 */
+	public String serverMOTD = "";
+	/**
+	 * + last server ping that showed up in the server browser
+	 */
+	public long pingToServer = -1l;
+	public int version = 47;
+	/**
+	 * + Game version for this server.
+	 */
+	public String gameVersion = "1.8.8";
+	public boolean field_78841_f;
+	public String playerList;
+	private ServerData.ServerResourceMode resourceMode = ServerData.ServerResourceMode.PROMPT;
+	public boolean hideAddress = false;
+	private boolean field_181042_l;
+	public IServerQuery currentQuery = null;
+	public final ResourceLocation iconResourceLocation;
+	public EaglerSkinTexture iconTextureObject = null;
+	public long pingSentTime = -1l;
+	public boolean serverIconDirty = false;
+
+	public boolean hasPing = false;
+
+	public boolean serverIconEnabled = false;
+
+	public boolean isDefault = false;
+
+	public boolean enableCookies;
+
+	public ServerData(String parString1, String parString2, boolean parFlag) {
+		this.serverName = parString1;
+		this.serverIP = parString2;
+		this.field_181042_l = parFlag;
+		this.iconResourceLocation = new ResourceLocation("eagler:servers/icons/tex_" + serverTextureId++);
+		this.enableCookies = EagRuntime.getConfiguration().isEnableServerCookies();
 	}
 
 	public void copyFrom(ServerData serverDataIn) {
@@ -161,19 +150,59 @@ public class ServerData {
 		this.enableCookies = serverDataIn.enableCookies;
 	}
 
-	public static enum ServerResourceMode {
-		ENABLED("enabled"), DISABLED("disabled"), PROMPT("prompt");
+	public boolean func_181041_d() {
+		return this.field_181042_l;
+	}
 
-		public static final ServerResourceMode[] _VALUES = values();
+	/**
+	 * + Returns an NBTTagCompound with the server's name, IP and maybe
+	 * acceptTextures.
+	 */
+	public NBTTagCompound getNBTCompound() {
+		NBTTagCompound nbttagcompound = new NBTTagCompound();
+		nbttagcompound.setString("name", this.serverName);
+		nbttagcompound.setString("ip", this.serverIP);
 
-		private final IChatComponent motd;
-
-		private ServerResourceMode(String parString2) {
-			this.motd = new ChatComponentTranslation("addServer.resourcePack." + parString2, new Object[0]);
+		if (this.resourceMode == ServerData.ServerResourceMode.ENABLED) {
+			nbttagcompound.setBoolean("acceptTextures", true);
+		} else if (this.resourceMode == ServerData.ServerResourceMode.DISABLED) {
+			nbttagcompound.setBoolean("acceptTextures", false);
 		}
 
-		public IChatComponent getMotd() {
-			return this.motd;
+		nbttagcompound.setBoolean("hideAddress", this.hideAddress);
+		nbttagcompound.setBoolean("enableCookies", this.enableCookies);
+
+		return nbttagcompound;
+	}
+
+	public ServerData.ServerResourceMode getResourceMode() {
+		return this.resourceMode;
+	}
+
+	public void setIconPacket(byte[] pkt) {
+		try {
+			if (!serverIconEnabled) {
+				throw new IOException("Unexpected icon packet on text-only MOTD");
+			}
+			if (pkt.length != 16384) {
+				throw new IOException("MOTD icon packet is the wrong size!");
+			}
+			int[] pixels = new int[4096];
+			for (int i = 0, j; i < 4096; ++i) {
+				j = i << 2;
+				pixels[i] = ((int) pkt[j] & 0xFF) | (((int) pkt[j + 1] & 0xFF) << 8) | (((int) pkt[j + 2] & 0xFF) << 16)
+						| (((int) pkt[j + 3] & 0xFF) << 24);
+			}
+			if (iconTextureObject != null) {
+				iconTextureObject.copyPixelsIn(pixels);
+			} else {
+				iconTextureObject = new EaglerSkinTexture(pixels, 64, 64);
+				Minecraft.getMinecraft().getTextureManager().loadTexture(iconResourceLocation, iconTextureObject);
+			}
+		} catch (Throwable t) {
+			pingToServer = -1l;
+			logger.error("Could not decode MOTD icon from: {}", serverIP);
+			logger.error(t);
 		}
 	}
 
@@ -220,31 +249,8 @@ public class ServerData {
 		}
 	}
 
-	public void setIconPacket(byte[] pkt) {
-		try {
-			if (!serverIconEnabled) {
-				throw new IOException("Unexpected icon packet on text-only MOTD");
-			}
-			if (pkt.length != 16384) {
-				throw new IOException("MOTD icon packet is the wrong size!");
-			}
-			int[] pixels = new int[4096];
-			for (int i = 0, j; i < 4096; ++i) {
-				j = i << 2;
-				pixels[i] = ((int) pkt[j] & 0xFF) | (((int) pkt[j + 1] & 0xFF) << 8) | (((int) pkt[j + 2] & 0xFF) << 16)
-						| (((int) pkt[j + 3] & 0xFF) << 24);
-			}
-			if (iconTextureObject != null) {
-				iconTextureObject.copyPixelsIn(pixels);
-			} else {
-				iconTextureObject = new EaglerSkinTexture(pixels, 64, 64);
-				Minecraft.getMinecraft().getTextureManager().loadTexture(iconResourceLocation, iconTextureObject);
-			}
-		} catch (Throwable t) {
-			pingToServer = -1l;
-			logger.error("Could not decode MOTD icon from: {}", serverIP);
-			logger.error(t);
-		}
+	public void setResourceMode(ServerData.ServerResourceMode mode) {
+		this.resourceMode = mode;
 	}
 
 }

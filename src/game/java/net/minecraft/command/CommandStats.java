@@ -1,9 +1,11 @@
 package net.minecraft.command;
 
-import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import com.google.common.collect.Lists;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.server.MinecraftServer;
@@ -13,51 +15,106 @@ import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class CommandStats extends CommandBase {
 
-	/**+
-	 * Gets the name of the command
+	/**
+	 * + Return a list of options when the user types TAB
+	 */
+	public List<String> addTabCompletionOptions(ICommandSender var1, String[] astring, BlockPos blockpos) {
+		return astring.length == 1 ? getListOfStringsMatchingLastWord(astring, new String[] { "entity", "block" })
+				: (astring.length == 2 && astring[0].equals("entity")
+						? getListOfStringsMatchingLastWord(astring, this.func_175776_d())
+						: (astring.length >= 2 && astring.length <= 4 && astring[0].equals("block")
+								? func_175771_a(astring, 1, blockpos)
+								: ((astring.length != 3 || !astring[0].equals("entity"))
+										&& (astring.length != 5 || !astring[0].equals("block"))
+												? ((astring.length != 4 || !astring[0].equals("entity"))
+														&& (astring.length != 6 || !astring[0].equals("block"))
+																? ((astring.length != 6 || !astring[0].equals("entity"))
+																		&& (astring.length != 8
+																				|| !astring[0].equals("block"))
+																						? null
+																						: getListOfStringsMatchingLastWord(
+																								astring,
+																								this.func_175777_e()))
+																: getListOfStringsMatchingLastWord(astring,
+																		CommandResultStats.Type.getTypeNames()))
+												: getListOfStringsMatchingLastWord(astring,
+														new String[] { "set", "clear" }))));
+	}
+
+	protected String[] func_175776_d() {
+		return MinecraftServer.getServer().getAllUsernames();
+	}
+
+	protected List<String> func_175777_e() {
+		Collection collection = MinecraftServer.getServer().worldServerForDimension(0).getScoreboard()
+				.getScoreObjectives();
+		ArrayList arraylist = Lists.newArrayList();
+
+		for (ScoreObjective scoreobjective : (Collection<ScoreObjective>) collection) {
+			if (!scoreobjective.getCriteria().isReadOnly()) {
+				arraylist.add(scoreobjective.getName());
+			}
+		}
+
+		return arraylist;
+	}
+
+	/**
+	 * + Gets the name of the command
 	 */
 	public String getCommandName() {
 		return "stats";
 	}
 
-	/**+
-	 * Return the required permission level for this command.
-	 */
-	public int getRequiredPermissionLevel() {
-		return 2;
-	}
-
-	/**+
-	 * Gets the usage string for the command.
+	/**
+	 * + Gets the usage string for the command.
 	 */
 	public String getCommandUsage(ICommandSender var1) {
 		return "commands.stats.usage";
 	}
 
-	/**+
-	 * Callback when the command is invoked
+	/**
+	 * + Return the required permission level for this command.
+	 */
+	public int getRequiredPermissionLevel() {
+		return 2;
+	}
+
+	/**
+	 * + Return whether the specified command parameter index is a username
+	 * parameter.
+	 */
+	public boolean isUsernameIndex(String[] astring, int i) {
+		return astring.length > 0 && astring[0].equals("entity") && i == 1;
+	}
+
+	/**
+	 * + Callback when the command is invoked
 	 */
 	public void processCommand(ICommandSender parICommandSender, String[] parArrayOfString) throws CommandException {
 		if (parArrayOfString.length < 1) {
@@ -169,57 +226,5 @@ public class CommandStats extends CommandBase {
 
 			}
 		}
-	}
-
-	/**+
-	 * Return a list of options when the user types TAB
-	 */
-	public List<String> addTabCompletionOptions(ICommandSender var1, String[] astring, BlockPos blockpos) {
-		return astring.length == 1 ? getListOfStringsMatchingLastWord(astring, new String[] { "entity", "block" })
-				: (astring.length == 2 && astring[0].equals("entity")
-						? getListOfStringsMatchingLastWord(astring, this.func_175776_d())
-						: (astring.length >= 2 && astring.length <= 4 && astring[0].equals("block")
-								? func_175771_a(astring, 1, blockpos)
-								: ((astring.length != 3 || !astring[0].equals("entity"))
-										&& (astring.length != 5 || !astring[0].equals("block"))
-												? ((astring.length != 4 || !astring[0].equals("entity"))
-														&& (astring.length != 6 || !astring[0].equals("block"))
-																? ((astring.length != 6 || !astring[0].equals("entity"))
-																		&& (astring.length != 8
-																				|| !astring[0].equals("block"))
-																						? null
-																						: getListOfStringsMatchingLastWord(
-																								astring,
-																								this.func_175777_e()))
-																: getListOfStringsMatchingLastWord(astring,
-																		CommandResultStats.Type.getTypeNames()))
-												: getListOfStringsMatchingLastWord(astring,
-														new String[] { "set", "clear" }))));
-	}
-
-	protected String[] func_175776_d() {
-		return MinecraftServer.getServer().getAllUsernames();
-	}
-
-	protected List<String> func_175777_e() {
-		Collection collection = MinecraftServer.getServer().worldServerForDimension(0).getScoreboard()
-				.getScoreObjectives();
-		ArrayList arraylist = Lists.newArrayList();
-
-		for (ScoreObjective scoreobjective : (Collection<ScoreObjective>) collection) {
-			if (!scoreobjective.getCriteria().isReadOnly()) {
-				arraylist.add(scoreobjective.getName());
-			}
-		}
-
-		return arraylist;
-	}
-
-	/**+
-	 * Return whether the specified command parameter index is a
-	 * username parameter.
-	 */
-	public boolean isUsernameIndex(String[] astring, int i) {
-		return astring.length > 0 && astring[0].equals("entity") && i == 1;
 	}
 }

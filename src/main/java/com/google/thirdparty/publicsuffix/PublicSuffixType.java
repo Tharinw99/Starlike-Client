@@ -29,25 +29,6 @@ enum PublicSuffixType {
 	/** ICANN definition of a top-level domain */
 	ICANN('!', '?');
 
-	/** The character used for an inner node in the trie encoding */
-	private final char innerNodeCode;
-
-	/** The character used for a leaf node in the trie encoding */
-	private final char leafNodeCode;
-
-	private PublicSuffixType(char innerNodeCode, char leafNodeCode) {
-		this.innerNodeCode = innerNodeCode;
-		this.leafNodeCode = leafNodeCode;
-	}
-
-	char getLeafNodeCode() {
-		return leafNodeCode;
-	}
-
-	char getInnerNodeCode() {
-		return innerNodeCode;
-	}
-
 	/** Returns a PublicSuffixType of the right type according to the given code */
 	static PublicSuffixType fromCode(char code) {
 		for (PublicSuffixType value : values()) {
@@ -60,5 +41,24 @@ enum PublicSuffixType {
 
 	static PublicSuffixType fromIsPrivate(boolean isPrivate) {
 		return isPrivate ? PRIVATE : ICANN;
+	}
+
+	/** The character used for an inner node in the trie encoding */
+	private final char innerNodeCode;
+
+	/** The character used for a leaf node in the trie encoding */
+	private final char leafNodeCode;
+
+	private PublicSuffixType(char innerNodeCode, char leafNodeCode) {
+		this.innerNodeCode = innerNodeCode;
+		this.leafNodeCode = leafNodeCode;
+	}
+
+	char getInnerNodeCode() {
+		return innerNodeCode;
+	}
+
+	char getLeafNodeCode() {
+		return leafNodeCode;
 	}
 }

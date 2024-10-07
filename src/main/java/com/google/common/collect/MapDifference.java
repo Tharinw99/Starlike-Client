@@ -31,10 +31,55 @@ import com.google.common.annotations.GwtCompatible;
 @GwtCompatible
 public interface MapDifference<K, V> {
 	/**
+	 * A difference between the mappings from two maps with the same key. The
+	 * {@link #leftValue} and {@link #rightValue} are not equal, and one but not
+	 * both of them may be null.
+	 *
+	 * @since 2.0 (imported from Google Collections Library)
+	 */
+	interface ValueDifference<V> {
+		/**
+		 * Two instances are considered equal if their {@link #leftValue()} values are
+		 * equal and their {@link #rightValue()} values are also equal.
+		 */
+		@Override
+		boolean equals(@Nullable Object other);
+
+		/**
+		 * The hash code equals the value
+		 * {@code Arrays.asList(leftValue(), rightValue()).hashCode()}.
+		 */
+		@Override
+		int hashCode();
+
+		/**
+		 * Returns the value from the left map (possibly null).
+		 */
+		V leftValue();
+
+		/**
+		 * Returns the value from the right map (possibly null).
+		 */
+		V rightValue();
+	}
+
+	/**
 	 * Returns {@code true} if there are no differences between the two maps; that
 	 * is, if the maps are equal.
 	 */
 	boolean areEqual();
+
+	/**
+	 * Returns an unmodifiable map describing keys that appear in both maps, but
+	 * with different values.
+	 */
+	Map<K, ValueDifference<V>> entriesDiffering();
+
+	/**
+	 * Returns an unmodifiable map containing the entries that appear in both maps;
+	 * that is, the intersection of the two maps.
+	 */
+	Map<K, V> entriesInCommon();
 
 	/**
 	 * Returns an unmodifiable map containing the entries from the left map whose
@@ -47,18 +92,6 @@ public interface MapDifference<K, V> {
 	 * keys are not present in the left map.
 	 */
 	Map<K, V> entriesOnlyOnRight();
-
-	/**
-	 * Returns an unmodifiable map containing the entries that appear in both maps;
-	 * that is, the intersection of the two maps.
-	 */
-	Map<K, V> entriesInCommon();
-
-	/**
-	 * Returns an unmodifiable map describing keys that appear in both maps, but
-	 * with different values.
-	 */
-	Map<K, ValueDifference<V>> entriesDiffering();
 
 	/**
 	 * Compares the specified object with this instance for equality. Returns
@@ -76,44 +109,11 @@ public interface MapDifference<K, V> {
 	 * <pre>
 	 *    {@code
 	 *
-	 *   Arrays.asList(entriesOnlyOnLeft(), entriesOnlyOnRight(),
-	 *       entriesInCommon(), entriesDiffering())}
+	 * Arrays.asList(entriesOnlyOnLeft(), entriesOnlyOnRight(), entriesInCommon(), entriesDiffering())
+	 * }
 	 * </pre>
 	 */
 	@Override
 	int hashCode();
-
-	/**
-	 * A difference between the mappings from two maps with the same key. The
-	 * {@link #leftValue} and {@link #rightValue} are not equal, and one but not
-	 * both of them may be null.
-	 *
-	 * @since 2.0 (imported from Google Collections Library)
-	 */
-	interface ValueDifference<V> {
-		/**
-		 * Returns the value from the left map (possibly null).
-		 */
-		V leftValue();
-
-		/**
-		 * Returns the value from the right map (possibly null).
-		 */
-		V rightValue();
-
-		/**
-		 * Two instances are considered equal if their {@link #leftValue()} values are
-		 * equal and their {@link #rightValue()} values are also equal.
-		 */
-		@Override
-		boolean equals(@Nullable Object other);
-
-		/**
-		 * The hash code equals the value
-		 * {@code Arrays.asList(leftValue(), rightValue()).hashCode()}.
-		 */
-		@Override
-		int hashCode();
-	}
 
 }

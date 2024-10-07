@@ -3,12 +3,12 @@ package net.minecraft.world;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -26,22 +26,25 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -60,17 +63,6 @@ public class Explosion {
 	private final Map<EntityPlayer, Vec3> playerKnockbackMap;
 
 	public Explosion(World worldIn, Entity parEntity, double parDouble1, double parDouble2, double parDouble3,
-			float parFloat1, List<BlockPos> parList) {
-		this(worldIn, parEntity, parDouble1, parDouble2, parDouble3, parFloat1, false, true, parList);
-	}
-
-	public Explosion(World worldIn, Entity parEntity, double parDouble1, double parDouble2, double parDouble3,
-			float parFloat1, boolean parFlag, boolean parFlag2, List<BlockPos> parList) {
-		this(worldIn, parEntity, parDouble1, parDouble2, parDouble3, parFloat1, parFlag, parFlag2);
-		this.affectedBlockPositions.addAll(parList);
-	}
-
-	public Explosion(World worldIn, Entity parEntity, double parDouble1, double parDouble2, double parDouble3,
 			float size, boolean parFlag, boolean parFlag2) {
 		this.explosionRNG = new EaglercraftRandom();
 		this.affectedBlockPositions = Lists.newArrayList();
@@ -85,8 +77,19 @@ public class Explosion {
 		this.isSmoking = parFlag2;
 	}
 
-	/**+
-	 * Does the first part of the explosion (destroy blocks)
+	public Explosion(World worldIn, Entity parEntity, double parDouble1, double parDouble2, double parDouble3,
+			float parFloat1, boolean parFlag, boolean parFlag2, List<BlockPos> parList) {
+		this(worldIn, parEntity, parDouble1, parDouble2, parDouble3, parFloat1, parFlag, parFlag2);
+		this.affectedBlockPositions.addAll(parList);
+	}
+
+	public Explosion(World worldIn, Entity parEntity, double parDouble1, double parDouble2, double parDouble3,
+			float parFloat1, List<BlockPos> parList) {
+		this(worldIn, parEntity, parDouble1, parDouble2, parDouble3, parFloat1, false, true, parList);
+	}
+
+	/**
+	 * + Does the first part of the explosion (destroy blocks)
 	 */
 	public void doExplosionA() {
 		HashSet hashset = Sets.newHashSet();
@@ -176,9 +179,8 @@ public class Explosion {
 
 	}
 
-	/**+
-	 * Does the second part of the explosion (sound, particles, drop
-	 * spawn)
+	/**
+	 * + Does the second part of the explosion (sound, particles, drop spawn)
 	 */
 	public void doExplosionB(boolean spawnParticles) {
 		this.worldObj.playSoundEffect(this.explosionX, this.explosionY, this.explosionZ, "random.explode", 4.0F,
@@ -243,13 +245,17 @@ public class Explosion {
 
 	}
 
-	public Map<EntityPlayer, Vec3> getPlayerKnockbackMap() {
-		return this.playerKnockbackMap;
+	public void func_180342_d() {
+		this.affectedBlockPositions.clear();
 	}
 
-	/**+
-	 * Returns either the entity that placed the explosive block,
-	 * the entity that caused the explosion or null.
+	public List<BlockPos> getAffectedBlockPositions() {
+		return this.affectedBlockPositions;
+	}
+
+	/**
+	 * + Returns either the entity that placed the explosive block, the entity that
+	 * caused the explosion or null.
 	 */
 	public EntityLivingBase getExplosivePlacedBy() {
 		return this.exploder == null ? null
@@ -257,11 +263,7 @@ public class Explosion {
 						: (this.exploder instanceof EntityLivingBase ? (EntityLivingBase) this.exploder : null));
 	}
 
-	public void func_180342_d() {
-		this.affectedBlockPositions.clear();
-	}
-
-	public List<BlockPos> getAffectedBlockPositions() {
-		return this.affectedBlockPositions;
+	public Map<EntityPlayer, Vec3> getPlayerKnockbackMap() {
+		return this.playerKnockbackMap;
 	}
 }

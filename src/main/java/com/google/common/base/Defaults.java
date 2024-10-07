@@ -29,9 +29,6 @@ import java.util.Map;
  * @since 1.0
  */
 public final class Defaults {
-	private Defaults() {
-	}
-
 	private static final Map<Class<?>, Object> DEFAULTS;
 
 	static {
@@ -48,10 +45,6 @@ public final class Defaults {
 		DEFAULTS = Collections.unmodifiableMap(map);
 	}
 
-	private static <T> void put(Map<Class<?>, Object> map, Class<T> type, T value) {
-		map.put(type, value);
-	}
-
 	/**
 	 * Returns the default value of {@code type} as defined by JLS --- {@code 0} for
 	 * numbers, {@code
@@ -64,5 +57,12 @@ public final class Defaults {
 		@SuppressWarnings("unchecked") // the put method enforces this key-value relationship
 		T t = (T) DEFAULTS.get(checkNotNull(type));
 		return t;
+	}
+
+	private static <T> void put(Map<Class<?>, Object> map, Class<T> type, T value) {
+		map.put(type, value);
+	}
+
+	private Defaults() {
 	}
 }

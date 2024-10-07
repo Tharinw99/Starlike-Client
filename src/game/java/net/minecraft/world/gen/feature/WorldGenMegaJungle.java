@@ -9,22 +9,25 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -33,6 +36,24 @@ public class WorldGenMegaJungle extends WorldGenHugeTrees {
 	public WorldGenMegaJungle(boolean parFlag, int parInt1, int parInt2, IBlockState parIBlockState,
 			IBlockState parIBlockState2) {
 		super(parFlag, parInt1, parInt2, parIBlockState, parIBlockState2);
+	}
+
+	private void func_175930_c(World worldIn, BlockPos parBlockPos, int parInt1) {
+		byte b0 = 2;
+
+		for (int i = -b0; i <= 0; ++i) {
+			this.func_175925_a(worldIn, parBlockPos.up(i), parInt1 + 1 - i);
+		}
+
+	}
+
+	private void func_181632_a(World parWorld, EaglercraftRandom parRandom, BlockPos parBlockPos,
+			PropertyBool parPropertyBool) {
+		if (parRandom.nextInt(3) > 0 && parWorld.isAirBlock(parBlockPos)) {
+			this.setBlockAndNotifyAdequately(parWorld, parBlockPos,
+					Blocks.vine.getDefaultState().withProperty(parPropertyBool, Boolean.valueOf(true)));
+		}
+
 	}
 
 	public boolean generate(World world, EaglercraftRandom random, BlockPos blockpos) {
@@ -105,23 +126,5 @@ public class WorldGenMegaJungle extends WorldGenHugeTrees {
 
 			return true;
 		}
-	}
-
-	private void func_181632_a(World parWorld, EaglercraftRandom parRandom, BlockPos parBlockPos,
-			PropertyBool parPropertyBool) {
-		if (parRandom.nextInt(3) > 0 && parWorld.isAirBlock(parBlockPos)) {
-			this.setBlockAndNotifyAdequately(parWorld, parBlockPos,
-					Blocks.vine.getDefaultState().withProperty(parPropertyBool, Boolean.valueOf(true)));
-		}
-
-	}
-
-	private void func_175930_c(World worldIn, BlockPos parBlockPos, int parInt1) {
-		byte b0 = 2;
-
-		for (int i = -b0; i <= 0; ++i) {
-			this.func_175925_a(worldIn, parBlockPos.up(i), parInt1 + 1 - i);
-		}
-
 	}
 }

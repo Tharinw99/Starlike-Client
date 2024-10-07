@@ -3,10 +3,10 @@ package net.minecraft.potion;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import net.lax1dude.eaglercraft.v1_8.EaglercraftUUID;
 
 import com.google.common.collect.Maps;
 
+import net.lax1dude.eaglercraft.v1_8.EaglercraftUUID;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -19,29 +19,32 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StringUtils;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class Potion {
-	/**+
-	 * The array of potion types.
+	/**
+	 * + The array of potion types.
 	 */
 	public static final Potion[] potionTypes = new Potion[32];
 	private static final Map<ResourceLocation, Potion> field_180150_I = Maps.newHashMap();
@@ -69,72 +72,72 @@ public class Potion {
 			.setPotionName("potion.jump").setIconIndex(2, 1);
 	public static final Potion confusion = (new Potion(9, new ResourceLocation("nausea"), true, 5578058))
 			.setPotionName("potion.confusion").setIconIndex(3, 1).setEffectiveness(0.25D);
-	/**+
-	 * The regeneration Potion object.
+	/**
+	 * + The regeneration Potion object.
 	 */
 	public static final Potion regeneration = (new Potion(10, new ResourceLocation("regeneration"), false, 13458603))
 			.setPotionName("potion.regeneration").setIconIndex(7, 0).setEffectiveness(0.25D);
 	public static final Potion resistance = (new Potion(11, new ResourceLocation("resistance"), false, 10044730))
 			.setPotionName("potion.resistance").setIconIndex(6, 1);
-	/**+
-	 * The fire resistance Potion object.
+	/**
+	 * + The fire resistance Potion object.
 	 */
 	public static final Potion fireResistance = (new Potion(12, new ResourceLocation("fire_resistance"), false,
 			14981690)).setPotionName("potion.fireResistance").setIconIndex(7, 1);
-	/**+
-	 * The water breathing Potion object.
+	/**
+	 * + The water breathing Potion object.
 	 */
 	public static final Potion waterBreathing = (new Potion(13, new ResourceLocation("water_breathing"), false,
 			3035801)).setPotionName("potion.waterBreathing").setIconIndex(0, 2);
-	/**+
-	 * The invisibility Potion object.
+	/**
+	 * + The invisibility Potion object.
 	 */
 	public static final Potion invisibility = (new Potion(14, new ResourceLocation("invisibility"), false, 8356754))
 			.setPotionName("potion.invisibility").setIconIndex(0, 1);
-	/**+
-	 * The blindness Potion object.
+	/**
+	 * + The blindness Potion object.
 	 */
 	public static final Potion blindness = (new Potion(15, new ResourceLocation("blindness"), true, 2039587))
 			.setPotionName("potion.blindness").setIconIndex(5, 1).setEffectiveness(0.25D);
-	/**+
-	 * The night vision Potion object.
+	/**
+	 * + The night vision Potion object.
 	 */
 	public static final Potion nightVision = (new Potion(16, new ResourceLocation("night_vision"), false, 2039713))
 			.setPotionName("potion.nightVision").setIconIndex(4, 1);
-	/**+
-	 * The hunger Potion object.
+	/**
+	 * + The hunger Potion object.
 	 */
 	public static final Potion hunger = (new Potion(17, new ResourceLocation("hunger"), true, 5797459))
 			.setPotionName("potion.hunger").setIconIndex(1, 1);
-	/**+
-	 * The weakness Potion object.
+	/**
+	 * + The weakness Potion object.
 	 */
 	public static final Potion weakness = (new PotionAttackDamage(18, new ResourceLocation("weakness"), true, 4738376))
 			.setPotionName("potion.weakness").setIconIndex(5, 0).registerPotionAttributeModifier(
 					SharedMonsterAttributes.attackDamage, "22653B89-116E-49DC-9B6B-9971489B5BE5", 2.0D, 0);
-	/**+
-	 * The poison Potion object.
+	/**
+	 * + The poison Potion object.
 	 */
 	public static final Potion poison = (new Potion(19, new ResourceLocation("poison"), true, 5149489))
 			.setPotionName("potion.poison").setIconIndex(6, 0).setEffectiveness(0.25D);
-	/**+
-	 * The wither Potion object.
+	/**
+	 * + The wither Potion object.
 	 */
 	public static final Potion wither = (new Potion(20, new ResourceLocation("wither"), true, 3484199))
 			.setPotionName("potion.wither").setIconIndex(1, 2).setEffectiveness(0.25D);
-	/**+
-	 * The health boost Potion object.
+	/**
+	 * + The health boost Potion object.
 	 */
 	public static final Potion healthBoost = (new PotionHealthBoost(21, new ResourceLocation("health_boost"), false,
 			16284963)).setPotionName("potion.healthBoost").setIconIndex(2, 2).registerPotionAttributeModifier(
 					SharedMonsterAttributes.maxHealth, "5D6F0BA2-1186-46AC-B896-C61C5CEE99CC", 4.0D, 0);
-	/**+
-	 * The absorption Potion object.
+	/**
+	 * + The absorption Potion object.
 	 */
 	public static final Potion absorption = (new PotionAbsorption(22, new ResourceLocation("absorption"), false,
 			2445989)).setPotionName("potion.absorption").setIconIndex(2, 2);
-	/**+
-	 * The saturation Potion object.
+	/**
+	 * + The saturation Potion object.
 	 */
 	public static final Potion saturation = (new PotionHealth(23, new ResourceLocation("saturation"), false, 16262179))
 			.setPotionName("potion.saturation");
@@ -146,20 +149,40 @@ public class Potion {
 	public static final Potion field_180144_E = null;
 	public static final Potion field_180145_F = null;
 	public static final Potion field_180146_G = null;
+
+	public static Set<ResourceLocation> func_181168_c() {
+		return field_180150_I.keySet();
+	}
+
+	public static String getDurationString(PotionEffect effect) {
+		if (effect.getIsPotionDurationMax()) {
+			return "**:**";
+		} else {
+			int i = effect.getDuration();
+			return StringUtils.ticksToElapsedTime(i);
+		}
+	}
+
+	public static Potion getPotionFromResourceLocation(String location) {
+		return (Potion) field_180150_I.get(new ResourceLocation(location));
+	}
+
 	public final int id;
 	private final Map<IAttribute, AttributeModifier> attributeModifierMap = Maps.newHashMap();
 	private final boolean isBadEffect;
 	private final int liquidColor;
-	/**+
-	 * The name of the Potion.
+	/**
+	 * + The name of the Potion.
 	 */
 	private String name = "";
-	/**+
-	 * The index for the icon displayed when the potion effect is
-	 * active.
+
+	/**
+	 * + The index for the icon displayed when the potion effect is active.
 	 */
 	private int statusIconIndex = -1;
+
 	private double effectiveness;
+
 	private boolean usable;
 
 	protected Potion(int potionID, ResourceLocation location, boolean badEffect, int potionColor) {
@@ -176,28 +199,125 @@ public class Potion {
 		this.liquidColor = potionColor;
 	}
 
-	public static Potion getPotionFromResourceLocation(String location) {
-		return (Potion) field_180150_I.get(new ResourceLocation(location));
+	public void affectEntity(Entity entityLivingBaseIn, Entity parEntity2, EntityLivingBase parEntityLivingBase,
+			int parInt1, double parDouble1) {
+		if ((this.id != heal.id || parEntityLivingBase.isEntityUndead())
+				&& (this.id != harm.id || !parEntityLivingBase.isEntityUndead())) {
+			if (this.id == harm.id && !parEntityLivingBase.isEntityUndead()
+					|| this.id == heal.id && parEntityLivingBase.isEntityUndead()) {
+				int j = (int) (parDouble1 * (double) (6 << parInt1) + 0.5D);
+				if (entityLivingBaseIn == null) {
+					parEntityLivingBase.attackEntityFrom(DamageSource.magic, (float) j);
+				} else {
+					parEntityLivingBase.attackEntityFrom(
+							DamageSource.causeIndirectMagicDamage(entityLivingBaseIn, parEntity2), (float) j);
+				}
+			}
+		} else {
+			int i = (int) (parDouble1 * (double) (4 << parInt1) + 0.5D);
+			parEntityLivingBase.heal((float) i);
+		}
+
 	}
 
-	public static Set<ResourceLocation> func_181168_c() {
-		return field_180150_I.keySet();
+	public void applyAttributesModifiersToEntity(EntityLivingBase var1, BaseAttributeMap baseattributemap, int i) {
+		for (Entry entry : this.attributeModifierMap.entrySet()) {
+			IAttributeInstance iattributeinstance = baseattributemap.getAttributeInstance((IAttribute) entry.getKey());
+			if (iattributeinstance != null) {
+				AttributeModifier attributemodifier = (AttributeModifier) entry.getValue();
+				iattributeinstance.removeModifier(attributemodifier);
+				iattributeinstance.applyModifier(new AttributeModifier(attributemodifier.getID(),
+						this.getName() + " " + i, this.getAttributeModifierAmount(i, attributemodifier),
+						attributemodifier.getOperation()));
+			}
+		}
+
 	}
 
-	/**+
-	 * Sets the index for the icon displayed in the player's
-	 * inventory when the status is active.
-	 */
-	protected Potion setIconIndex(int parInt1, int parInt2) {
-		this.statusIconIndex = parInt1 + parInt2 * 8;
-		return this;
+	public double getAttributeModifierAmount(int i, AttributeModifier attributemodifier) {
+		return attributemodifier.getAmount() * (double) (i + 1);
 	}
 
-	/**+
-	 * returns the ID of the potion
+	public Map<IAttribute, AttributeModifier> getAttributeModifierMap() {
+		return this.attributeModifierMap;
+	}
+
+	public double getEffectiveness() {
+		return this.effectiveness;
+	}
+
+	/**
+	 * + returns the ID of the potion
 	 */
 	public int getId() {
 		return this.id;
+	}
+
+	/**
+	 * + Returns the color of the potion liquid.
+	 */
+	public int getLiquidColor() {
+		return this.liquidColor;
+	}
+
+	/**
+	 * + returns the name of the potion
+	 */
+	public String getName() {
+		return this.name;
+	}
+
+	/**
+	 * + Returns the index for the icon to display when the potion is active.
+	 */
+	public int getStatusIconIndex() {
+		return this.statusIconIndex;
+	}
+
+	/**
+	 * + Returns true if the potion has a associated status icon to display in then
+	 * inventory when active.
+	 */
+	public boolean hasStatusIcon() {
+		return this.statusIconIndex >= 0;
+	}
+
+	/**
+	 * + This method returns true if the potion effect is bad - negative - for the
+	 * entity.
+	 */
+	public boolean isBadEffect() {
+		return this.isBadEffect;
+	}
+
+	/**
+	 * + Returns true if the potion has an instant effect instead of a continuous
+	 * one (eg Harming)
+	 */
+	public boolean isInstant() {
+		return false;
+	}
+
+	/**
+	 * + checks if Potion effect is ready to be applied this tick.
+	 */
+	public boolean isReady(int i, int j) {
+		if (this.id == regeneration.id) {
+			int i1 = 50 >> j;
+			return i1 > 0 ? i % i1 == 0 : true;
+		} else if (this.id == poison.id) {
+			int l = 25 >> j;
+			return l > 0 ? i % l == 0 : true;
+		} else if (this.id == wither.id) {
+			int k = 40 >> j;
+			return k > 0 ? i % k == 0 : true;
+		} else {
+			return this.id == hunger.id;
+		}
+	}
+
+	public boolean isUsable() {
+		return this.usable;
 	}
 
 	public void performEffect(EntityLivingBase entityLivingBaseIn, int parInt1) {
@@ -229,123 +349,8 @@ public class Potion {
 
 	}
 
-	public void affectEntity(Entity entityLivingBaseIn, Entity parEntity2, EntityLivingBase parEntityLivingBase,
-			int parInt1, double parDouble1) {
-		if ((this.id != heal.id || parEntityLivingBase.isEntityUndead())
-				&& (this.id != harm.id || !parEntityLivingBase.isEntityUndead())) {
-			if (this.id == harm.id && !parEntityLivingBase.isEntityUndead()
-					|| this.id == heal.id && parEntityLivingBase.isEntityUndead()) {
-				int j = (int) (parDouble1 * (double) (6 << parInt1) + 0.5D);
-				if (entityLivingBaseIn == null) {
-					parEntityLivingBase.attackEntityFrom(DamageSource.magic, (float) j);
-				} else {
-					parEntityLivingBase.attackEntityFrom(
-							DamageSource.causeIndirectMagicDamage(entityLivingBaseIn, parEntity2), (float) j);
-				}
-			}
-		} else {
-			int i = (int) (parDouble1 * (double) (4 << parInt1) + 0.5D);
-			parEntityLivingBase.heal((float) i);
-		}
-
-	}
-
-	/**+
-	 * Returns true if the potion has an instant effect instead of a
-	 * continuous one (eg Harming)
-	 */
-	public boolean isInstant() {
-		return false;
-	}
-
-	/**+
-	 * checks if Potion effect is ready to be applied this tick.
-	 */
-	public boolean isReady(int i, int j) {
-		if (this.id == regeneration.id) {
-			int i1 = 50 >> j;
-			return i1 > 0 ? i % i1 == 0 : true;
-		} else if (this.id == poison.id) {
-			int l = 25 >> j;
-			return l > 0 ? i % l == 0 : true;
-		} else if (this.id == wither.id) {
-			int k = 40 >> j;
-			return k > 0 ? i % k == 0 : true;
-		} else {
-			return this.id == hunger.id;
-		}
-	}
-
-	/**+
-	 * Set the potion name.
-	 */
-	public Potion setPotionName(String nameIn) {
-		this.name = nameIn;
-		return this;
-	}
-
-	/**+
-	 * returns the name of the potion
-	 */
-	public String getName() {
-		return this.name;
-	}
-
-	/**+
-	 * Returns true if the potion has a associated status icon to
-	 * display in then inventory when active.
-	 */
-	public boolean hasStatusIcon() {
-		return this.statusIconIndex >= 0;
-	}
-
-	/**+
-	 * Returns the index for the icon to display when the potion is
-	 * active.
-	 */
-	public int getStatusIconIndex() {
-		return this.statusIconIndex;
-	}
-
-	/**+
-	 * This method returns true if the potion effect is bad -
-	 * negative - for the entity.
-	 */
-	public boolean isBadEffect() {
-		return this.isBadEffect;
-	}
-
-	public static String getDurationString(PotionEffect effect) {
-		if (effect.getIsPotionDurationMax()) {
-			return "**:**";
-		} else {
-			int i = effect.getDuration();
-			return StringUtils.ticksToElapsedTime(i);
-		}
-	}
-
-	protected Potion setEffectiveness(double effectivenessIn) {
-		this.effectiveness = effectivenessIn;
-		return this;
-	}
-
-	public double getEffectiveness() {
-		return this.effectiveness;
-	}
-
-	public boolean isUsable() {
-		return this.usable;
-	}
-
-	/**+
-	 * Returns the color of the potion liquid.
-	 */
-	public int getLiquidColor() {
-		return this.liquidColor;
-	}
-
-	/**+
-	 * Used by potions to register the attribute they modify.
+	/**
+	 * + Used by potions to register the attribute they modify.
 	 */
 	public Potion registerPotionAttributeModifier(IAttribute parIAttribute, String parString1, double parDouble1,
 			int parInt1) {
@@ -353,10 +358,6 @@ public class Potion {
 				this.getName(), parDouble1, parInt1);
 		this.attributeModifierMap.put(parIAttribute, attributemodifier);
 		return this;
-	}
-
-	public Map<IAttribute, AttributeModifier> getAttributeModifierMap() {
-		return this.attributeModifierMap;
 	}
 
 	public void removeAttributesModifiersFromEntity(EntityLivingBase var1, BaseAttributeMap baseattributemap,
@@ -370,21 +371,25 @@ public class Potion {
 
 	}
 
-	public void applyAttributesModifiersToEntity(EntityLivingBase var1, BaseAttributeMap baseattributemap, int i) {
-		for (Entry entry : this.attributeModifierMap.entrySet()) {
-			IAttributeInstance iattributeinstance = baseattributemap.getAttributeInstance((IAttribute) entry.getKey());
-			if (iattributeinstance != null) {
-				AttributeModifier attributemodifier = (AttributeModifier) entry.getValue();
-				iattributeinstance.removeModifier(attributemodifier);
-				iattributeinstance.applyModifier(new AttributeModifier(attributemodifier.getID(),
-						this.getName() + " " + i, this.getAttributeModifierAmount(i, attributemodifier),
-						attributemodifier.getOperation()));
-			}
-		}
-
+	protected Potion setEffectiveness(double effectivenessIn) {
+		this.effectiveness = effectivenessIn;
+		return this;
 	}
 
-	public double getAttributeModifierAmount(int i, AttributeModifier attributemodifier) {
-		return attributemodifier.getAmount() * (double) (i + 1);
+	/**
+	 * + Sets the index for the icon displayed in the player's inventory when the
+	 * status is active.
+	 */
+	protected Potion setIconIndex(int parInt1, int parInt2) {
+		this.statusIconIndex = parInt1 + parInt2 * 8;
+		return this;
+	}
+
+	/**
+	 * + Set the potion name.
+	 */
+	public Potion setPotionName(String nameIn) {
+		this.name = nameIn;
+		return this;
 	}
 }

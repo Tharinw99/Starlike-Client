@@ -34,6 +34,15 @@ final class Count implements Serializable {
 		this.value = value;
 	}
 
+	public int addAndGet(int delta) {
+		return value += delta;
+	}
+
+	@Override
+	public boolean equals(@Nullable Object obj) {
+		return obj instanceof Count && ((Count) obj).value == value;
+	}
+
 	public int get() {
 		return value;
 	}
@@ -42,14 +51,6 @@ final class Count implements Serializable {
 		int result = value;
 		value = result + delta;
 		return result;
-	}
-
-	public int addAndGet(int delta) {
-		return value += delta;
-	}
-
-	public void set(int newValue) {
-		value = newValue;
 	}
 
 	public int getAndSet(int newValue) {
@@ -63,9 +64,8 @@ final class Count implements Serializable {
 		return value;
 	}
 
-	@Override
-	public boolean equals(@Nullable Object obj) {
-		return obj instanceof Count && ((Count) obj).value == value;
+	public void set(int newValue) {
+		value = newValue;
 	}
 
 	@Override

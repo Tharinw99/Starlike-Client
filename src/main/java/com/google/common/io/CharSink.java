@@ -60,18 +60,6 @@ public abstract class CharSink implements OutputSupplier<Writer> {
 	}
 
 	/**
-	 * Opens a new {@link Writer} for writing to this sink. This method should
-	 * return a new, independent writer each time it is called.
-	 *
-	 * <p>
-	 * The caller is responsible for ensuring that the returned writer is closed.
-	 *
-	 * @throws IOException if an I/O error occurs in the process of opening the
-	 *                     writer
-	 */
-	public abstract Writer openStream() throws IOException;
-
-	/**
 	 * This method is a temporary method provided for easing migration from
 	 * suppliers to sources and sinks.
 	 *
@@ -107,6 +95,18 @@ public abstract class CharSink implements OutputSupplier<Writer> {
 	}
 
 	/**
+	 * Opens a new {@link Writer} for writing to this sink. This method should
+	 * return a new, independent writer each time it is called.
+	 *
+	 * <p>
+	 * The caller is responsible for ensuring that the returned writer is closed.
+	 *
+	 * @throws IOException if an I/O error occurs in the process of opening the
+	 *                     writer
+	 */
+	public abstract Writer openStream() throws IOException;
+
+	/**
 	 * Writes the given character sequence to this sink.
 	 *
 	 * @throws IOException if an I/O error in the process of writing to this sink
@@ -119,6 +119,30 @@ public abstract class CharSink implements OutputSupplier<Writer> {
 			Writer out = closer.register(openStream());
 			out.append(charSequence);
 			out.flush(); // https://code.google.com/p/guava-libraries/issues/detail?id=1330
+		} catch (Throwable e) {
+			throw closer.rethrow(e);
+		} finally {
+			closer.close();
+		}
+	}
+
+	/**
+	 * Writes all the text from the given {@link Readable} (such as a
+	 * {@link Reader}) to this sink. Does not close {@code readable} if it is
+	 * {@code Closeable}.
+	 *
+	 * @throws IOException if an I/O error occurs in the process of reading from
+	 *                     {@code readable} or writing to this sink
+	 */
+	public long writeFrom(Readable readable) throws IOException {
+		checkNotNull(readable);
+
+		Closer closer = Closer.create();
+		try {
+			Writer out = closer.register(openStream());
+			long written = CharStreams.copy(readable, out);
+			out.flush(); // https://code.google.com/p/guava-libraries/issues/detail?id=1330
+			return written;
 		} catch (Throwable e) {
 			throw closer.rethrow(e);
 		} finally {
@@ -157,30 +181,6 @@ public abstract class CharSink implements OutputSupplier<Writer> {
 				out.append(line).append(lineSeparator);
 			}
 			out.flush(); // https://code.google.com/p/guava-libraries/issues/detail?id=1330
-		} catch (Throwable e) {
-			throw closer.rethrow(e);
-		} finally {
-			closer.close();
-		}
-	}
-
-	/**
-	 * Writes all the text from the given {@link Readable} (such as a
-	 * {@link Reader}) to this sink. Does not close {@code readable} if it is
-	 * {@code Closeable}.
-	 *
-	 * @throws IOException if an I/O error occurs in the process of reading from
-	 *                     {@code readable} or writing to this sink
-	 */
-	public long writeFrom(Readable readable) throws IOException {
-		checkNotNull(readable);
-
-		Closer closer = Closer.create();
-		try {
-			Writer out = closer.register(openStream());
-			long written = CharStreams.copy(readable, out);
-			out.flush(); // https://code.google.com/p/guava-libraries/issues/detail?id=1330
-			return written;
 		} catch (Throwable e) {
 			throw closer.rethrow(e);
 		} finally {

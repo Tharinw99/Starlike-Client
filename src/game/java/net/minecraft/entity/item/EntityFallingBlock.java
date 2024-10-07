@@ -1,7 +1,9 @@
 package net.minecraft.entity.item;
 
-import com.google.common.collect.Lists;
 import java.util.ArrayList;
+
+import com.google.common.collect.Lists;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAnvil;
 import net.minecraft.block.BlockFalling;
@@ -22,22 +24,25 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -70,10 +75,35 @@ public class EntityFallingBlock extends Entity {
 		this.prevPosZ = z;
 	}
 
-	/**+
-	 * returns if this entity triggers Block.onEntityWalking on the
-	 * blocks they walk on. used for spiders and wolves to prevent
-	 * them from trampling crops
+	public void addEntityCrashInfo(CrashReportCategory crashreportcategory) {
+		super.addEntityCrashInfo(crashreportcategory);
+		if (this.fallTile != null) {
+			Block block = this.fallTile.getBlock();
+			crashreportcategory.addCrashSection("Immitating block ID", Integer.valueOf(Block.getIdFromBlock(block)));
+			crashreportcategory.addCrashSection("Immitating block data",
+					Integer.valueOf(block.getMetaFromState(this.fallTile)));
+		}
+
+	}
+
+	/**
+	 * + Returns true if other Entities should be prevented from moving through this
+	 * Entity.
+	 */
+	public boolean canBeCollidedWith() {
+		return !this.isDead;
+	}
+
+	/**
+	 * + Return whether this entity should be rendered as on fire.
+	 */
+	public boolean canRenderOnFire() {
+		return false;
+	}
+
+	/**
+	 * + returns if this entity triggers Block.onEntityWalking on the blocks they
+	 * walk on. used for spiders and wolves to prevent them from trampling crops
 	 */
 	protected boolean canTriggerWalking() {
 		return false;
@@ -82,16 +112,45 @@ public class EntityFallingBlock extends Entity {
 	protected void entityInit() {
 	}
 
-	/**+
-	 * Returns true if other Entities should be prevented from
-	 * moving through this Entity.
-	 */
-	public boolean canBeCollidedWith() {
-		return !this.isDead;
+	public void fall(float f, float var2) {
+		Block block = this.fallTile.getBlock();
+		if (this.hurtEntities) {
+			int i = MathHelper.ceiling_float_int(f - 1.0F);
+			if (i > 0) {
+				ArrayList<Entity> arraylist = Lists.newArrayList(
+						this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox()));
+				boolean flag = block == Blocks.anvil;
+				DamageSource damagesource = flag ? DamageSource.anvil : DamageSource.fallingBlock;
+
+				for (int j = 0, l = arraylist.size(); j < l; ++j) {
+					arraylist.get(j).attackEntityFrom(damagesource, (float) Math
+							.min(MathHelper.floor_float((float) i * this.fallHurtAmount), this.fallHurtMax));
+				}
+
+				if (flag && (double) this.rand.nextFloat() < 0.05000000074505806D + (double) i * 0.05D) {
+					int j = ((Integer) this.fallTile.getValue(BlockAnvil.DAMAGE)).intValue();
+					++j;
+					if (j > 2) {
+						this.canSetAsBlock = true;
+					} else {
+						this.fallTile = this.fallTile.withProperty(BlockAnvil.DAMAGE, Integer.valueOf(j));
+					}
+				}
+			}
+		}
+
 	}
 
-	/**+
-	 * Called to update the entity's position/logic.
+	public IBlockState getBlock() {
+		return this.fallTile;
+	}
+
+	public World getWorldObj() {
+		return this.worldObj;
+	}
+
+	/**
+	 * + Called to update the entity's position/logic.
 	 */
 	public void onUpdate() {
 		Block block = this.fallTile.getBlock();
@@ -168,58 +227,8 @@ public class EntityFallingBlock extends Entity {
 		}
 	}
 
-	public void fall(float f, float var2) {
-		Block block = this.fallTile.getBlock();
-		if (this.hurtEntities) {
-			int i = MathHelper.ceiling_float_int(f - 1.0F);
-			if (i > 0) {
-				ArrayList<Entity> arraylist = Lists.newArrayList(
-						this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox()));
-				boolean flag = block == Blocks.anvil;
-				DamageSource damagesource = flag ? DamageSource.anvil : DamageSource.fallingBlock;
-
-				for (int j = 0, l = arraylist.size(); j < l; ++j) {
-					arraylist.get(j).attackEntityFrom(damagesource, (float) Math
-							.min(MathHelper.floor_float((float) i * this.fallHurtAmount), this.fallHurtMax));
-				}
-
-				if (flag && (double) this.rand.nextFloat() < 0.05000000074505806D + (double) i * 0.05D) {
-					int j = ((Integer) this.fallTile.getValue(BlockAnvil.DAMAGE)).intValue();
-					++j;
-					if (j > 2) {
-						this.canSetAsBlock = true;
-					} else {
-						this.fallTile = this.fallTile.withProperty(BlockAnvil.DAMAGE, Integer.valueOf(j));
-					}
-				}
-			}
-		}
-
-	}
-
-	/**+
-	 * (abstract) Protected helper method to write subclass entity
-	 * data to NBT.
-	 */
-	protected void writeEntityToNBT(NBTTagCompound nbttagcompound) {
-		Block block = this.fallTile != null ? this.fallTile.getBlock() : Blocks.air;
-		ResourceLocation resourcelocation = (ResourceLocation) Block.blockRegistry.getNameForObject(block);
-		nbttagcompound.setString("Block", resourcelocation == null ? "" : resourcelocation.toString());
-		nbttagcompound.setByte("Data", (byte) block.getMetaFromState(this.fallTile));
-		nbttagcompound.setByte("Time", (byte) this.fallTime);
-		nbttagcompound.setBoolean("DropItem", this.shouldDropItem);
-		nbttagcompound.setBoolean("HurtEntities", this.hurtEntities);
-		nbttagcompound.setFloat("FallHurtAmount", this.fallHurtAmount);
-		nbttagcompound.setInteger("FallHurtMax", this.fallHurtMax);
-		if (this.tileEntityData != null) {
-			nbttagcompound.setTag("TileEntityData", this.tileEntityData);
-		}
-
-	}
-
-	/**+
-	 * (abstract) Protected helper method to read subclass entity
-	 * data from NBT.
+	/**
+	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
 	protected void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		int i = nbttagcompound.getByte("Data") & 255;
@@ -255,33 +264,26 @@ public class EntityFallingBlock extends Entity {
 
 	}
 
-	public World getWorldObj() {
-		return this.worldObj;
-	}
-
 	public void setHurtEntities(boolean parFlag) {
 		this.hurtEntities = parFlag;
 	}
 
-	/**+
-	 * Return whether this entity should be rendered as on fire.
+	/**
+	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
-	public boolean canRenderOnFire() {
-		return false;
-	}
-
-	public void addEntityCrashInfo(CrashReportCategory crashreportcategory) {
-		super.addEntityCrashInfo(crashreportcategory);
-		if (this.fallTile != null) {
-			Block block = this.fallTile.getBlock();
-			crashreportcategory.addCrashSection("Immitating block ID", Integer.valueOf(Block.getIdFromBlock(block)));
-			crashreportcategory.addCrashSection("Immitating block data",
-					Integer.valueOf(block.getMetaFromState(this.fallTile)));
+	protected void writeEntityToNBT(NBTTagCompound nbttagcompound) {
+		Block block = this.fallTile != null ? this.fallTile.getBlock() : Blocks.air;
+		ResourceLocation resourcelocation = (ResourceLocation) Block.blockRegistry.getNameForObject(block);
+		nbttagcompound.setString("Block", resourcelocation == null ? "" : resourcelocation.toString());
+		nbttagcompound.setByte("Data", (byte) block.getMetaFromState(this.fallTile));
+		nbttagcompound.setByte("Time", (byte) this.fallTime);
+		nbttagcompound.setBoolean("DropItem", this.shouldDropItem);
+		nbttagcompound.setBoolean("HurtEntities", this.hurtEntities);
+		nbttagcompound.setFloat("FallHurtAmount", this.fallHurtAmount);
+		nbttagcompound.setInteger("FallHurtMax", this.fallHurtMax);
+		if (this.tileEntityData != null) {
+			nbttagcompound.setTag("TileEntityData", this.tileEntityData);
 		}
 
-	}
-
-	public IBlockState getBlock() {
-		return this.fallTile;
 	}
 }

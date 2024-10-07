@@ -48,112 +48,6 @@ import com.google.common.primitives.Ints;
 @GwtCompatible(emulated = true)
 abstract class AbstractMapBasedMultiset<E> extends AbstractMultiset<E> implements Serializable {
 
-	private transient Map<E, Count> backingMap;
-
-	/*
-	 * Cache the size for efficiency. Using a long lets us avoid the need for
-	 * overflow checking and ensures that size() will function correctly even if the
-	 * multiset had once been larger than Integer.MAX_VALUE.
-	 */
-	private transient long size;
-
-	/** Standard constructor. */
-	protected AbstractMapBasedMultiset(Map<E, Count> backingMap) {
-		this.backingMap = checkNotNull(backingMap);
-		this.size = super.size();
-	}
-
-	/** Used during deserialization only. The backing map must be empty. */
-	void setBackingMap(Map<E, Count> backingMap) {
-		this.backingMap = backingMap;
-	}
-
-	// Required Implementations
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>
-	 * Invoking {@link Multiset.Entry#getCount} on an entry in the returned set
-	 * always returns the current count of that element in the multiset, as opposed
-	 * to the count at the time the entry was retrieved.
-	 */
-	@Override
-	public Set<Multiset.Entry<E>> entrySet() {
-		return super.entrySet();
-	}
-
-	@Override
-	Iterator<Entry<E>> entryIterator() {
-		final Iterator<Map.Entry<E, Count>> backingEntries = backingMap.entrySet().iterator();
-		return new Iterator<Multiset.Entry<E>>() {
-			Map.Entry<E, Count> toRemove;
-
-			@Override
-			public boolean hasNext() {
-				return backingEntries.hasNext();
-			}
-
-			@Override
-			public Multiset.Entry<E> next() {
-				final Map.Entry<E, Count> mapEntry = backingEntries.next();
-				toRemove = mapEntry;
-				return new Multisets.AbstractEntry<E>() {
-					@Override
-					public E getElement() {
-						return mapEntry.getKey();
-					}
-
-					@Override
-					public int getCount() {
-						Count count = mapEntry.getValue();
-						if (count == null || count.get() == 0) {
-							Count frequency = backingMap.get(getElement());
-							if (frequency != null) {
-								return frequency.get();
-							}
-						}
-						return (count == null) ? 0 : count.get();
-					}
-				};
-			}
-
-			@Override
-			public void remove() {
-				checkRemove(toRemove != null);
-				size -= toRemove.getValue().getAndSet(0);
-				backingEntries.remove();
-				toRemove = null;
-			}
-		};
-	}
-
-	@Override
-	public void clear() {
-		for (Count frequency : backingMap.values()) {
-			frequency.set(0);
-		}
-		backingMap.clear();
-		size = 0L;
-	}
-
-	@Override
-	int distinctElements() {
-		return backingMap.size();
-	}
-
-	// Optimizations - Query Operations
-
-	@Override
-	public int size() {
-		return Ints.saturatedCast(size);
-	}
-
-	@Override
-	public Iterator<E> iterator() {
-		return new MapBasedMultisetIterator();
-	}
-
 	/*
 	 * Not subclassing AbstractMultiset$MultisetIterator because next() needs to
 	 * retrieve the Map.Entry<E, Count> entry, which can then be used for a more
@@ -200,13 +94,33 @@ abstract class AbstractMapBasedMultiset<E> extends AbstractMultiset<E> implement
 		}
 	}
 
-	@Override
-	public int count(@Nullable Object element) {
-		Count frequency = Maps.safeGet(backingMap, element);
-		return (frequency == null) ? 0 : frequency.get();
+	@GwtIncompatible("not needed in emulated source.")
+	private static final long serialVersionUID = -2250766705698539974L;
+
+	private static int getAndSet(Count i, int count) {
+		if (i == null) {
+			return 0;
+		}
+
+		return i.getAndSet(count);
 	}
 
-	// Optional Operations - Modification Operations
+	private transient Map<E, Count> backingMap;
+
+	// Required Implementations
+
+	/*
+	 * Cache the size for efficiency. Using a long lets us avoid the need for
+	 * overflow checking and ensures that size() will function correctly even if the
+	 * multiset had once been larger than Integer.MAX_VALUE.
+	 */
+	private transient long size;
+
+	/** Standard constructor. */
+	protected AbstractMapBasedMultiset(Map<E, Count> backingMap) {
+		this.backingMap = checkNotNull(backingMap);
+		this.size = super.size();
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -237,6 +151,100 @@ abstract class AbstractMapBasedMultiset<E> extends AbstractMultiset<E> implement
 	}
 
 	@Override
+	public void clear() {
+		for (Count frequency : backingMap.values()) {
+			frequency.set(0);
+		}
+		backingMap.clear();
+		size = 0L;
+	}
+
+	// Optimizations - Query Operations
+
+	@Override
+	public int count(@Nullable Object element) {
+		Count frequency = Maps.safeGet(backingMap, element);
+		return (frequency == null) ? 0 : frequency.get();
+	}
+
+	@Override
+	int distinctElements() {
+		return backingMap.size();
+	}
+
+	@Override
+	Iterator<Entry<E>> entryIterator() {
+		final Iterator<Map.Entry<E, Count>> backingEntries = backingMap.entrySet().iterator();
+		return new Iterator<Multiset.Entry<E>>() {
+			Map.Entry<E, Count> toRemove;
+
+			@Override
+			public boolean hasNext() {
+				return backingEntries.hasNext();
+			}
+
+			@Override
+			public Multiset.Entry<E> next() {
+				final Map.Entry<E, Count> mapEntry = backingEntries.next();
+				toRemove = mapEntry;
+				return new Multisets.AbstractEntry<E>() {
+					@Override
+					public int getCount() {
+						Count count = mapEntry.getValue();
+						if (count == null || count.get() == 0) {
+							Count frequency = backingMap.get(getElement());
+							if (frequency != null) {
+								return frequency.get();
+							}
+						}
+						return (count == null) ? 0 : count.get();
+					}
+
+					@Override
+					public E getElement() {
+						return mapEntry.getKey();
+					}
+				};
+			}
+
+			@Override
+			public void remove() {
+				checkRemove(toRemove != null);
+				size -= toRemove.getValue().getAndSet(0);
+				backingEntries.remove();
+				toRemove = null;
+			}
+		};
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * Invoking {@link Multiset.Entry#getCount} on an entry in the returned set
+	 * always returns the current count of that element in the multiset, as opposed
+	 * to the count at the time the entry was retrieved.
+	 */
+	@Override
+	public Set<Multiset.Entry<E>> entrySet() {
+		return super.entrySet();
+	}
+
+	// Optional Operations - Modification Operations
+
+	@Override
+	public Iterator<E> iterator() {
+		return new MapBasedMultisetIterator();
+	}
+
+	// Don't allow default serialization.
+	@GwtIncompatible("java.io.ObjectStreamException")
+	@SuppressWarnings("unused") // actually used during deserialization
+	private void readObjectNoData() throws ObjectStreamException {
+		throw new InvalidObjectException("Stream data required");
+	}
+
+	@Override
 	public int remove(@Nullable Object element, int occurrences) {
 		if (occurrences == 0) {
 			return count(element);
@@ -262,6 +270,11 @@ abstract class AbstractMapBasedMultiset<E> extends AbstractMultiset<E> implement
 		return oldCount;
 	}
 
+	/** Used during deserialization only. The backing map must be empty. */
+	void setBackingMap(Map<E, Count> backingMap) {
+		this.backingMap = backingMap;
+	}
+
 	// Roughly a 33% performance improvement over AbstractMultiset.setCount().
 	@Override
 	public int setCount(@Nullable E element, int count) {
@@ -285,21 +298,8 @@ abstract class AbstractMapBasedMultiset<E> extends AbstractMultiset<E> implement
 		return oldCount;
 	}
 
-	private static int getAndSet(Count i, int count) {
-		if (i == null) {
-			return 0;
-		}
-
-		return i.getAndSet(count);
+	@Override
+	public int size() {
+		return Ints.saturatedCast(size);
 	}
-
-	// Don't allow default serialization.
-	@GwtIncompatible("java.io.ObjectStreamException")
-	@SuppressWarnings("unused") // actually used during deserialization
-	private void readObjectNoData() throws ObjectStreamException {
-		throw new InvalidObjectException("Stream data required");
-	}
-
-	@GwtIncompatible("not needed in emulated source.")
-	private static final long serialVersionUID = -2250766705698539974L;
 }

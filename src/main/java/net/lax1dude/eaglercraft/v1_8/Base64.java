@@ -116,29 +116,17 @@ public class Base64 extends BaseNCodec {
 			41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51 // 70-7a p-z
 	};
 
-	public static int lookupCharInt(char c) {
-		return c < 123 ? DECODE_TABLE[c] : -1;
-	}
-
-	public static char lookupIntChar(int i) {
-		return (char)STANDARD_ENCODE_TABLE[i];
-	}
-
 	/**
 	 * Base64 uses 6-bit fields.
 	 */
 	/** Mask used to extract 6 bits, used when encoding */
 	private static final int MASK_6BITS = 0x3f;
+
 	/** Mask used to extract 4 bits, used when decoding final trailing character. */
 	private static final int MASK_4BITS = 0xf;
+
 	/** Mask used to extract 2 bits, used when decoding final trailing character. */
 	private static final int MASK_2BITS = 0x3;
-
-	// The static final fields above are used for the original static byte[] methods
-	// on Base64.
-	// The private member fields below are used with the new streaming approach,
-	// which requires
-	// some state be preserved between calls of encode() and decode().
 
 	/**
 	 * Decodes Base64 data into octets.
@@ -168,6 +156,12 @@ public class Base64 extends BaseNCodec {
 	public static byte[] decodeBase64(final String base64String) {
 		return new Base64().decode(base64String);
 	}
+
+	// The static final fields above are used for the original static byte[] methods
+	// on Base64.
+	// The private member fields below are used with the new streaming approach,
+	// which requires
+	// some state be preserved between calls of encode() and decode().
 
 	// Implementation of integer encoding used for crypto
 	/**
@@ -380,6 +374,14 @@ public class Base64 extends BaseNCodec {
 	 */
 	public static boolean isBase64(final String base64) {
 		return isBase64(base64.getBytes(Charset.forName("UTF-8")));
+	}
+
+	public static int lookupCharInt(char c) {
+		return c < 123 ? DECODE_TABLE[c] : -1;
+	}
+
+	public static char lookupIntChar(int i) {
+		return (char) STANDARD_ENCODE_TABLE[i];
 	}
 
 	/**

@@ -16,37 +16,68 @@ import net.minecraft.client.resources.data.IMetadataSerializer;
 import net.minecraft.client.resources.data.LanguageMetadataSection;
 import net.minecraft.util.StringTranslate;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class LanguageManager implements IResourceManagerReloadListener {
 	private static final Logger logger = LogManager.getLogger();
+	protected static final Locale currentLocale = new Locale();
 	private final IMetadataSerializer theMetadataSerializer;
 	private String currentLanguage;
-	protected static final Locale currentLocale = new Locale();
 	private Map<String, Language> languageMap = Maps.newHashMap();
 
 	public LanguageManager(IMetadataSerializer theMetadataSerializerIn, String currentLanguageIn) {
 		this.theMetadataSerializer = theMetadataSerializerIn;
 		this.currentLanguage = currentLanguageIn;
 		I18n.setLocale(currentLocale);
+	}
+
+	public Language getCurrentLanguage() {
+		return this.languageMap.containsKey(this.currentLanguage)
+				? (Language) this.languageMap.get(this.currentLanguage)
+				: (Language) this.languageMap.get("en_US");
+	}
+
+	public SortedSet<Language> getLanguages() {
+		return Sets.newTreeSet(this.languageMap.values());
+	}
+
+	public boolean isCurrentLanguageBidirectional() {
+		return this.getCurrentLanguage() != null && this.getCurrentLanguage().isBidirectional();
+	}
+
+	public boolean isCurrentLocaleUnicode() {
+		return currentLocale.isUnicode();
+	}
+
+	public void onResourceManagerReload(IResourceManager iresourcemanager) {
+		ArrayList arraylist = Lists.newArrayList(new String[] { "en_US" });
+		if (!"en_US".equals(this.currentLanguage)) {
+			arraylist.add(this.currentLanguage);
+		}
+
+		currentLocale.loadLocaleDataFiles(iresourcemanager, arraylist);
+		StringTranslate.replaceWith(currentLocale.properties);
 	}
 
 	public void parseLanguageMetadata(List<IResourcePack> parList) {
@@ -75,35 +106,7 @@ public class LanguageManager implements IResourceManagerReloadListener {
 
 	}
 
-	public void onResourceManagerReload(IResourceManager iresourcemanager) {
-		ArrayList arraylist = Lists.newArrayList(new String[] { "en_US" });
-		if (!"en_US".equals(this.currentLanguage)) {
-			arraylist.add(this.currentLanguage);
-		}
-
-		currentLocale.loadLocaleDataFiles(iresourcemanager, arraylist);
-		StringTranslate.replaceWith(currentLocale.properties);
-	}
-
-	public boolean isCurrentLocaleUnicode() {
-		return currentLocale.isUnicode();
-	}
-
-	public boolean isCurrentLanguageBidirectional() {
-		return this.getCurrentLanguage() != null && this.getCurrentLanguage().isBidirectional();
-	}
-
 	public void setCurrentLanguage(Language currentLanguageIn) {
 		this.currentLanguage = currentLanguageIn.getLanguageCode();
-	}
-
-	public Language getCurrentLanguage() {
-		return this.languageMap.containsKey(this.currentLanguage)
-				? (Language) this.languageMap.get(this.currentLanguage)
-				: (Language) this.languageMap.get("en_US");
-	}
-
-	public SortedSet<Language> getLanguages() {
-		return Sets.newTreeSet(this.languageMap.values());
 	}
 }

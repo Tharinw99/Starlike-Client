@@ -53,7 +53,177 @@ import com.google.common.base.Converter;
  */
 @GwtCompatible(emulated = true)
 public final class Floats {
-	private Floats() {
+	@GwtCompatible
+	private static class FloatArrayAsList extends AbstractList<Float> implements RandomAccess, Serializable {
+		private static final long serialVersionUID = 0;
+		final float[] array;
+		final int start;
+
+		final int end;
+
+		FloatArrayAsList(float[] array) {
+			this(array, 0, array.length);
+		}
+
+		FloatArrayAsList(float[] array, int start, int end) {
+			this.array = array;
+			this.start = start;
+			this.end = end;
+		}
+
+		@Override
+		public boolean contains(Object target) {
+			// Overridden to prevent a ton of boxing
+			return (target instanceof Float) && Floats.indexOf(array, (Float) target, start, end) != -1;
+		}
+
+		@Override
+		public boolean equals(Object object) {
+			if (object == this) {
+				return true;
+			}
+			if (object instanceof FloatArrayAsList) {
+				FloatArrayAsList that = (FloatArrayAsList) object;
+				int size = size();
+				if (that.size() != size) {
+					return false;
+				}
+				for (int i = 0; i < size; i++) {
+					if (array[start + i] != that.array[that.start + i]) {
+						return false;
+					}
+				}
+				return true;
+			}
+			return super.equals(object);
+		}
+
+		@Override
+		public Float get(int index) {
+			checkElementIndex(index, size());
+			return array[start + index];
+		}
+
+		@Override
+		public int hashCode() {
+			int result = 1;
+			for (int i = start; i < end; i++) {
+				result = 31 * result + Floats.hashCode(array[i]);
+			}
+			return result;
+		}
+
+		@Override
+		public int indexOf(Object target) {
+			// Overridden to prevent a ton of boxing
+			if (target instanceof Float) {
+				int i = Floats.indexOf(array, (Float) target, start, end);
+				if (i >= 0) {
+					return i - start;
+				}
+			}
+			return -1;
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return false;
+		}
+
+		@Override
+		public int lastIndexOf(Object target) {
+			// Overridden to prevent a ton of boxing
+			if (target instanceof Float) {
+				int i = Floats.lastIndexOf(array, (Float) target, start, end);
+				if (i >= 0) {
+					return i - start;
+				}
+			}
+			return -1;
+		}
+
+		@Override
+		public Float set(int index, Float element) {
+			checkElementIndex(index, size());
+			float oldValue = array[start + index];
+			// checkNotNull for GWT (do not optimize)
+			array[start + index] = checkNotNull(element);
+			return oldValue;
+		}
+
+		@Override
+		public int size() {
+			return end - start;
+		}
+
+		@Override
+		public List<Float> subList(int fromIndex, int toIndex) {
+			int size = size();
+			checkPositionIndexes(fromIndex, toIndex, size);
+			if (fromIndex == toIndex) {
+				return Collections.emptyList();
+			}
+			return new FloatArrayAsList(array, start + fromIndex, start + toIndex);
+		}
+
+		float[] toFloatArray() {
+			// Arrays.copyOfRange() is not available under GWT
+			int size = size();
+			float[] result = new float[size];
+			System.arraycopy(array, start, result, 0, size);
+			return result;
+		}
+
+		@Override
+		public String toString() {
+			StringBuilder builder = new StringBuilder(size() * 12);
+			builder.append('[').append(array[start]);
+			for (int i = start + 1; i < end; i++) {
+				builder.append(", ").append(array[i]);
+			}
+			return builder.append(']').toString();
+		}
+	}
+
+	private static final class FloatConverter extends Converter<String, Float> implements Serializable {
+		static final FloatConverter INSTANCE = new FloatConverter();
+
+		private static final long serialVersionUID = 1;
+
+		@Override
+		protected String doBackward(Float value) {
+			return value.toString();
+		}
+
+		@Override
+		protected Float doForward(String value) {
+			return Float.valueOf(value);
+		}
+
+		private Object readResolve() {
+			return INSTANCE;
+		}
+
+		@Override
+		public String toString() {
+			return "Floats.stringConverter()";
+		}
+	}
+
+	private enum LexicographicalComparator implements Comparator<float[]> {
+		INSTANCE;
+
+		@Override
+		public int compare(float[] left, float[] right) {
+			int minLength = Math.min(left.length, right.length);
+			for (int i = 0; i < minLength; i++) {
+				int result = Floats.compare(left[i], right[i]);
+				if (result != 0) {
+					return result;
+				}
+			}
+			return left.length - right.length;
+		}
 	}
 
 	/**
@@ -64,15 +234,29 @@ public final class Floats {
 	public static final int BYTES = Float.SIZE / Byte.SIZE;
 
 	/**
-	 * Returns a hash code for {@code value}; equal to the result of invoking
-	 * {@code ((Float) value).hashCode()}.
+	 * Returns a fixed-size list backed by the specified array, similar to
+	 * {@link Arrays#asList(Object[])}. The list supports
+	 * {@link List#set(int, Object)}, but any attempt to set a value to {@code null}
+	 * will result in a {@link NullPointerException}.
 	 *
-	 * @param value a primitive {@code float} value
-	 * @return a hash code for the value
+	 * <p>
+	 * The returned list maintains the values, but not the identities, of
+	 * {@code Float} objects written to or read from it. For example, whether
+	 * {@code list.get(0) == list.get(0)} is true for the returned list is
+	 * unspecified.
+	 *
+	 * <p>
+	 * The returned list may have unexpected behavior if it contains {@code
+	 * NaN}, or if {@code NaN} is used as a parameter to any of its methods.
+	 *
+	 * @param backingArray the array to back the list
+	 * @return a list view of the array
 	 */
-	public static int hashCode(float value) {
-		// TODO(kevinb): is there a better way, that's still gwt-safe?
-		return ((Float) value).hashCode();
+	public static List<Float> asList(float... backingArray) {
+		if (backingArray.length == 0) {
+			return Collections.emptyList();
+		}
+		return new FloatArrayAsList(backingArray);
 	}
 
 	/**
@@ -95,14 +279,26 @@ public final class Floats {
 	}
 
 	/**
-	 * Returns {@code true} if {@code value} represents a real number. This is
-	 * equivalent to, but not necessarily implemented as,
-	 * {@code !(Float.isInfinite(value) || Float.isNaN(value))}.
+	 * Returns the values from each provided array combined into a single array. For
+	 * example, {@code concat(new float[] {a, b}, new float[] {}, new float[] {c}}
+	 * returns the array {@code {a, b, c}}.
 	 *
-	 * @since 10.0
+	 * @param arrays zero or more {@code float} arrays
+	 * @return a single array containing all the values from the source arrays, in
+	 *         order
 	 */
-	public static boolean isFinite(float value) {
-		return NEGATIVE_INFINITY < value & value < POSITIVE_INFINITY;
+	public static float[] concat(float[]... arrays) {
+		int length = 0;
+		for (float[] array : arrays) {
+			length += array.length;
+		}
+		float[] result = new float[length];
+		int pos = 0;
+		for (float[] array : arrays) {
+			System.arraycopy(array, 0, result, pos, array.length);
+			pos += array.length;
+		}
+		return result;
 	}
 
 	/**
@@ -122,6 +318,47 @@ public final class Floats {
 			}
 		}
 		return false;
+	}
+
+	// Arrays.copyOf() requires Java 6
+	private static float[] copyOf(float[] original, int length) {
+		float[] copy = new float[length];
+		System.arraycopy(original, 0, copy, 0, Math.min(original.length, length));
+		return copy;
+	}
+
+	/**
+	 * Returns an array containing the same values as {@code array}, but guaranteed
+	 * to be of a specified minimum length. If {@code array} already has a length of
+	 * at least {@code minLength}, it is returned directly. Otherwise, a new array
+	 * of size {@code minLength + padding} is returned, containing the values of
+	 * {@code array}, and zeroes in the remaining places.
+	 *
+	 * @param array     the source array
+	 * @param minLength the minimum length the returned array must guarantee
+	 * @param padding   an extra amount to "grow" the array by if growth is
+	 *                  necessary
+	 * @throws IllegalArgumentException if {@code minLength} or {@code padding} is
+	 *                                  negative
+	 * @return an array containing the values of {@code array}, with guaranteed
+	 *         minimum length {@code minLength}
+	 */
+	public static float[] ensureCapacity(float[] array, int minLength, int padding) {
+		checkArgument(minLength >= 0, "Invalid minLength: %s", minLength);
+		checkArgument(padding >= 0, "Invalid padding: %s", padding);
+		return (array.length < minLength) ? copyOf(array, minLength + padding) : array;
+	}
+
+	/**
+	 * Returns a hash code for {@code value}; equal to the result of invoking
+	 * {@code ((Float) value).hashCode()}.
+	 *
+	 * @param value a primitive {@code float} value
+	 * @return a hash code for the value
+	 */
+	public static int hashCode(float value) {
+		// TODO(kevinb): is there a better way, that's still gwt-safe?
+		return ((Float) value).hashCode();
 	}
 
 	/**
@@ -183,151 +420,14 @@ public final class Floats {
 	}
 
 	/**
-	 * Returns the index of the last appearance of the value {@code target} in
-	 * {@code array}. Note that this always returns {@code -1} when {@code target}
-	 * is {@code NaN}.
+	 * Returns {@code true} if {@code value} represents a real number. This is
+	 * equivalent to, but not necessarily implemented as,
+	 * {@code !(Float.isInfinite(value) || Float.isNaN(value))}.
 	 *
-	 * @param array  an array of {@code float} values, possibly empty
-	 * @param target a primitive {@code float} value
-	 * @return the greatest index {@code i} for which {@code array[i] == target}, or
-	 *         {@code -1} if no such index exists.
+	 * @since 10.0
 	 */
-	public static int lastIndexOf(float[] array, float target) {
-		return lastIndexOf(array, target, 0, array.length);
-	}
-
-	// TODO(kevinb): consider making this public
-	private static int lastIndexOf(float[] array, float target, int start, int end) {
-		for (int i = end - 1; i >= start; i--) {
-			if (array[i] == target) {
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	/**
-	 * Returns the least value present in {@code array}, using the same rules of
-	 * comparison as {@link Math#min(float, float)}.
-	 *
-	 * @param array a <i>nonempty</i> array of {@code float} values
-	 * @return the value present in {@code array} that is less than or equal to
-	 *         every other value in the array
-	 * @throws IllegalArgumentException if {@code array} is empty
-	 */
-	public static float min(float... array) {
-		checkArgument(array.length > 0);
-		float min = array[0];
-		for (int i = 1; i < array.length; i++) {
-			min = Math.min(min, array[i]);
-		}
-		return min;
-	}
-
-	/**
-	 * Returns the greatest value present in {@code array}, using the same rules of
-	 * comparison as {@link Math#min(float, float)}.
-	 *
-	 * @param array a <i>nonempty</i> array of {@code float} values
-	 * @return the value present in {@code array} that is greater than or equal to
-	 *         every other value in the array
-	 * @throws IllegalArgumentException if {@code array} is empty
-	 */
-	public static float max(float... array) {
-		checkArgument(array.length > 0);
-		float max = array[0];
-		for (int i = 1; i < array.length; i++) {
-			max = Math.max(max, array[i]);
-		}
-		return max;
-	}
-
-	/**
-	 * Returns the values from each provided array combined into a single array. For
-	 * example, {@code concat(new float[] {a, b}, new float[] {}, new float[] {c}}
-	 * returns the array {@code {a, b, c}}.
-	 *
-	 * @param arrays zero or more {@code float} arrays
-	 * @return a single array containing all the values from the source arrays, in
-	 *         order
-	 */
-	public static float[] concat(float[]... arrays) {
-		int length = 0;
-		for (float[] array : arrays) {
-			length += array.length;
-		}
-		float[] result = new float[length];
-		int pos = 0;
-		for (float[] array : arrays) {
-			System.arraycopy(array, 0, result, pos, array.length);
-			pos += array.length;
-		}
-		return result;
-	}
-
-	private static final class FloatConverter extends Converter<String, Float> implements Serializable {
-		static final FloatConverter INSTANCE = new FloatConverter();
-
-		@Override
-		protected Float doForward(String value) {
-			return Float.valueOf(value);
-		}
-
-		@Override
-		protected String doBackward(Float value) {
-			return value.toString();
-		}
-
-		@Override
-		public String toString() {
-			return "Floats.stringConverter()";
-		}
-
-		private Object readResolve() {
-			return INSTANCE;
-		}
-
-		private static final long serialVersionUID = 1;
-	}
-
-	/**
-	 * Returns a serializable converter object that converts between strings and
-	 * floats using {@link Float#valueOf} and {@link Float#toString()}.
-	 *
-	 * @since 16.0
-	 */
-	@Beta
-	public static Converter<String, Float> stringConverter() {
-		return FloatConverter.INSTANCE;
-	}
-
-	/**
-	 * Returns an array containing the same values as {@code array}, but guaranteed
-	 * to be of a specified minimum length. If {@code array} already has a length of
-	 * at least {@code minLength}, it is returned directly. Otherwise, a new array
-	 * of size {@code minLength + padding} is returned, containing the values of
-	 * {@code array}, and zeroes in the remaining places.
-	 *
-	 * @param array     the source array
-	 * @param minLength the minimum length the returned array must guarantee
-	 * @param padding   an extra amount to "grow" the array by if growth is
-	 *                  necessary
-	 * @throws IllegalArgumentException if {@code minLength} or {@code padding} is
-	 *                                  negative
-	 * @return an array containing the values of {@code array}, with guaranteed
-	 *         minimum length {@code minLength}
-	 */
-	public static float[] ensureCapacity(float[] array, int minLength, int padding) {
-		checkArgument(minLength >= 0, "Invalid minLength: %s", minLength);
-		checkArgument(padding >= 0, "Invalid padding: %s", padding);
-		return (array.length < minLength) ? copyOf(array, minLength + padding) : array;
-	}
-
-	// Arrays.copyOf() requires Java 6
-	private static float[] copyOf(float[] original, int length) {
-		float[] copy = new float[length];
-		System.arraycopy(original, 0, copy, 0, Math.min(original.length, length));
-		return copy;
+	public static boolean isFinite(float value) {
+		return NEGATIVE_INFINITY < value & value < POSITIVE_INFINITY;
 	}
 
 	/**
@@ -361,6 +461,30 @@ public final class Floats {
 	}
 
 	/**
+	 * Returns the index of the last appearance of the value {@code target} in
+	 * {@code array}. Note that this always returns {@code -1} when {@code target}
+	 * is {@code NaN}.
+	 *
+	 * @param array  an array of {@code float} values, possibly empty
+	 * @param target a primitive {@code float} value
+	 * @return the greatest index {@code i} for which {@code array[i] == target}, or
+	 *         {@code -1} if no such index exists.
+	 */
+	public static int lastIndexOf(float[] array, float target) {
+		return lastIndexOf(array, target, 0, array.length);
+	}
+
+	// TODO(kevinb): consider making this public
+	private static int lastIndexOf(float[] array, float target, int start, int end) {
+		for (int i = end - 1; i >= start; i--) {
+			if (array[i] == target) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	/**
 	 * Returns a comparator that compares two {@code float} arrays
 	 * lexicographically. That is, it compares, using
 	 * {@link #compare(float, float)}), the first pair of values that follow any
@@ -381,20 +505,51 @@ public final class Floats {
 		return LexicographicalComparator.INSTANCE;
 	}
 
-	private enum LexicographicalComparator implements Comparator<float[]> {
-		INSTANCE;
-
-		@Override
-		public int compare(float[] left, float[] right) {
-			int minLength = Math.min(left.length, right.length);
-			for (int i = 0; i < minLength; i++) {
-				int result = Floats.compare(left[i], right[i]);
-				if (result != 0) {
-					return result;
-				}
-			}
-			return left.length - right.length;
+	/**
+	 * Returns the greatest value present in {@code array}, using the same rules of
+	 * comparison as {@link Math#min(float, float)}.
+	 *
+	 * @param array a <i>nonempty</i> array of {@code float} values
+	 * @return the value present in {@code array} that is greater than or equal to
+	 *         every other value in the array
+	 * @throws IllegalArgumentException if {@code array} is empty
+	 */
+	public static float max(float... array) {
+		checkArgument(array.length > 0);
+		float max = array[0];
+		for (int i = 1; i < array.length; i++) {
+			max = Math.max(max, array[i]);
 		}
+		return max;
+	}
+
+	/**
+	 * Returns the least value present in {@code array}, using the same rules of
+	 * comparison as {@link Math#min(float, float)}.
+	 *
+	 * @param array a <i>nonempty</i> array of {@code float} values
+	 * @return the value present in {@code array} that is less than or equal to
+	 *         every other value in the array
+	 * @throws IllegalArgumentException if {@code array} is empty
+	 */
+	public static float min(float... array) {
+		checkArgument(array.length > 0);
+		float min = array[0];
+		for (int i = 1; i < array.length; i++) {
+			min = Math.min(min, array[i]);
+		}
+		return min;
+	}
+
+	/**
+	 * Returns a serializable converter object that converts between strings and
+	 * floats using {@link Float#valueOf} and {@link Float#toString()}.
+	 *
+	 * @since 16.0
+	 */
+	@Beta
+	public static Converter<String, Float> stringConverter() {
+		return FloatConverter.INSTANCE;
 	}
 
 	/**
@@ -426,164 +581,6 @@ public final class Floats {
 			array[i] = ((Number) checkNotNull(boxedArray[i])).floatValue();
 		}
 		return array;
-	}
-
-	/**
-	 * Returns a fixed-size list backed by the specified array, similar to
-	 * {@link Arrays#asList(Object[])}. The list supports
-	 * {@link List#set(int, Object)}, but any attempt to set a value to {@code null}
-	 * will result in a {@link NullPointerException}.
-	 *
-	 * <p>
-	 * The returned list maintains the values, but not the identities, of
-	 * {@code Float} objects written to or read from it. For example, whether
-	 * {@code list.get(0) == list.get(0)} is true for the returned list is
-	 * unspecified.
-	 *
-	 * <p>
-	 * The returned list may have unexpected behavior if it contains {@code
-	 * NaN}, or if {@code NaN} is used as a parameter to any of its methods.
-	 *
-	 * @param backingArray the array to back the list
-	 * @return a list view of the array
-	 */
-	public static List<Float> asList(float... backingArray) {
-		if (backingArray.length == 0) {
-			return Collections.emptyList();
-		}
-		return new FloatArrayAsList(backingArray);
-	}
-
-	@GwtCompatible
-	private static class FloatArrayAsList extends AbstractList<Float> implements RandomAccess, Serializable {
-		final float[] array;
-		final int start;
-		final int end;
-
-		FloatArrayAsList(float[] array) {
-			this(array, 0, array.length);
-		}
-
-		FloatArrayAsList(float[] array, int start, int end) {
-			this.array = array;
-			this.start = start;
-			this.end = end;
-		}
-
-		@Override
-		public int size() {
-			return end - start;
-		}
-
-		@Override
-		public boolean isEmpty() {
-			return false;
-		}
-
-		@Override
-		public Float get(int index) {
-			checkElementIndex(index, size());
-			return array[start + index];
-		}
-
-		@Override
-		public boolean contains(Object target) {
-			// Overridden to prevent a ton of boxing
-			return (target instanceof Float) && Floats.indexOf(array, (Float) target, start, end) != -1;
-		}
-
-		@Override
-		public int indexOf(Object target) {
-			// Overridden to prevent a ton of boxing
-			if (target instanceof Float) {
-				int i = Floats.indexOf(array, (Float) target, start, end);
-				if (i >= 0) {
-					return i - start;
-				}
-			}
-			return -1;
-		}
-
-		@Override
-		public int lastIndexOf(Object target) {
-			// Overridden to prevent a ton of boxing
-			if (target instanceof Float) {
-				int i = Floats.lastIndexOf(array, (Float) target, start, end);
-				if (i >= 0) {
-					return i - start;
-				}
-			}
-			return -1;
-		}
-
-		@Override
-		public Float set(int index, Float element) {
-			checkElementIndex(index, size());
-			float oldValue = array[start + index];
-			// checkNotNull for GWT (do not optimize)
-			array[start + index] = checkNotNull(element);
-			return oldValue;
-		}
-
-		@Override
-		public List<Float> subList(int fromIndex, int toIndex) {
-			int size = size();
-			checkPositionIndexes(fromIndex, toIndex, size);
-			if (fromIndex == toIndex) {
-				return Collections.emptyList();
-			}
-			return new FloatArrayAsList(array, start + fromIndex, start + toIndex);
-		}
-
-		@Override
-		public boolean equals(Object object) {
-			if (object == this) {
-				return true;
-			}
-			if (object instanceof FloatArrayAsList) {
-				FloatArrayAsList that = (FloatArrayAsList) object;
-				int size = size();
-				if (that.size() != size) {
-					return false;
-				}
-				for (int i = 0; i < size; i++) {
-					if (array[start + i] != that.array[that.start + i]) {
-						return false;
-					}
-				}
-				return true;
-			}
-			return super.equals(object);
-		}
-
-		@Override
-		public int hashCode() {
-			int result = 1;
-			for (int i = start; i < end; i++) {
-				result = 31 * result + Floats.hashCode(array[i]);
-			}
-			return result;
-		}
-
-		@Override
-		public String toString() {
-			StringBuilder builder = new StringBuilder(size() * 12);
-			builder.append('[').append(array[start]);
-			for (int i = start + 1; i < end; i++) {
-				builder.append(", ").append(array[i]);
-			}
-			return builder.append(']').toString();
-		}
-
-		float[] toFloatArray() {
-			// Arrays.copyOfRange() is not available under GWT
-			int size = size();
-			float[] result = new float[size];
-			System.arraycopy(array, start, result, 0, size);
-			return result;
-		}
-
-		private static final long serialVersionUID = 0;
 	}
 
 	/**
@@ -622,5 +619,8 @@ public final class Floats {
 			}
 		}
 		return null;
+	}
+
+	private Floats() {
 	}
 }

@@ -1,11 +1,13 @@
 package net.minecraft.network;
 
+import java.util.Collection;
+import java.util.Map;
+
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
 
-import java.util.Collection;
-import java.util.Map;
+import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
 import net.minecraft.network.handshake.client.C00Handshake;
 import net.minecraft.network.login.client.C00PacketLoginStart;
 import net.minecraft.network.login.client.C01PacketEncryptionResponse;
@@ -107,24 +109,26 @@ import net.minecraft.network.play.server.S46PacketSetCompressionLevel;
 import net.minecraft.network.play.server.S47PacketPlayerListHeaderFooter;
 import net.minecraft.network.play.server.S48PacketResourcePackSend;
 import net.minecraft.network.play.server.S49PacketUpdateEntityNBT;
-import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -255,54 +259,6 @@ public enum EnumConnectionState {
 	private static final EnumConnectionState[] STATES_BY_ID = new EnumConnectionState[field_181137_f - field_181136_e
 			+ 1];
 	private static final Map<Class<? extends Packet>, EnumConnectionState> STATES_BY_CLASS = Maps.newHashMap();
-	private final int id;
-	private final Map<EnumPacketDirection, BiMap<Integer, Class<? extends Packet>>> directionMaps;
-
-	private EnumConnectionState(int protocolId) {
-		this.directionMaps = Maps.newEnumMap(EnumPacketDirection.class);
-		this.id = protocolId;
-	}
-
-	protected EnumConnectionState registerPacket(EnumPacketDirection direction, Class<? extends Packet> packetClass) {
-		Object object = (BiMap) this.directionMaps.get(direction);
-		if (object == null) {
-			object = HashBiMap.create();
-			this.directionMaps.put(direction, (BiMap<Integer, Class<? extends Packet>>) object);
-		}
-
-		if (((BiMap) object).containsValue(packetClass)) {
-			String s = direction + " packet " + packetClass + " is already known to ID "
-					+ ((BiMap) object).inverse().get(packetClass);
-			LogManager.getLogger().fatal(s);
-			throw new IllegalArgumentException(s);
-		} else {
-			((BiMap) object).put(Integer.valueOf(((BiMap) object).size()), packetClass);
-			return this;
-		}
-	}
-
-	public Integer getPacketId(EnumPacketDirection direction, Packet packetIn) {
-		return (Integer) ((BiMap) this.directionMaps.get(direction)).inverse().get(packetIn.getClass());
-	}
-
-	public Packet getPacket(EnumPacketDirection direction, int packetId)
-			throws IllegalAccessException, InstantiationException {
-		Class oclass = (Class) ((BiMap) this.directionMaps.get(direction)).get(Integer.valueOf(packetId));
-		return oclass == null ? null : (Packet) oclass.newInstance();
-	}
-
-	public int getId() {
-		return this.id;
-	}
-
-	public static EnumConnectionState getById(int stateId) {
-		return stateId >= field_181136_e && stateId <= field_181137_f ? STATES_BY_ID[stateId - field_181136_e] : null;
-	}
-
-	public static EnumConnectionState getFromPacket(Packet packetIn) {
-		return (EnumConnectionState) STATES_BY_CLASS.get(packetIn.getClass());
-	}
-
 	static {
 		EnumConnectionState[] states = values();
 		for (int j = 0; j < states.length; ++j) {
@@ -333,5 +289,54 @@ public enum EnumConnectionState {
 			}
 		}
 
+	}
+
+	public static EnumConnectionState getById(int stateId) {
+		return stateId >= field_181136_e && stateId <= field_181137_f ? STATES_BY_ID[stateId - field_181136_e] : null;
+	}
+
+	public static EnumConnectionState getFromPacket(Packet packetIn) {
+		return (EnumConnectionState) STATES_BY_CLASS.get(packetIn.getClass());
+	}
+
+	private final int id;
+
+	private final Map<EnumPacketDirection, BiMap<Integer, Class<? extends Packet>>> directionMaps;
+
+	private EnumConnectionState(int protocolId) {
+		this.directionMaps = Maps.newEnumMap(EnumPacketDirection.class);
+		this.id = protocolId;
+	}
+
+	public int getId() {
+		return this.id;
+	}
+
+	public Packet getPacket(EnumPacketDirection direction, int packetId)
+			throws IllegalAccessException, InstantiationException {
+		Class oclass = (Class) ((BiMap) this.directionMaps.get(direction)).get(Integer.valueOf(packetId));
+		return oclass == null ? null : (Packet) oclass.newInstance();
+	}
+
+	public Integer getPacketId(EnumPacketDirection direction, Packet packetIn) {
+		return (Integer) ((BiMap) this.directionMaps.get(direction)).inverse().get(packetIn.getClass());
+	}
+
+	protected EnumConnectionState registerPacket(EnumPacketDirection direction, Class<? extends Packet> packetClass) {
+		Object object = (BiMap) this.directionMaps.get(direction);
+		if (object == null) {
+			object = HashBiMap.create();
+			this.directionMaps.put(direction, (BiMap<Integer, Class<? extends Packet>>) object);
+		}
+
+		if (((BiMap) object).containsValue(packetClass)) {
+			String s = direction + " packet " + packetClass + " is already known to ID "
+					+ ((BiMap) object).inverse().get(packetClass);
+			LogManager.getLogger().fatal(s);
+			throw new IllegalArgumentException(s);
+		} else {
+			((BiMap) object).put(Integer.valueOf(((BiMap) object).size()), packetClass);
+			return this;
+		}
 	}
 }

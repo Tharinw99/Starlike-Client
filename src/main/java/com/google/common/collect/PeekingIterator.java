@@ -35,6 +35,16 @@ import com.google.common.annotations.GwtCompatible;
 @GwtCompatible
 public interface PeekingIterator<E> extends Iterator<E> {
 	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * The objects returned by consecutive calls to {@link #peek()} then
+	 * {@link #next()} are guaranteed to be equal to each other.
+	 */
+	@Override
+	E next();
+
+	/**
 	 * Returns the next element in the iteration, without advancing the iteration.
 	 *
 	 * <p>
@@ -46,16 +56,6 @@ public interface PeekingIterator<E> extends Iterator<E> {
 	 *                                according to {@link #hasNext()}
 	 */
 	E peek();
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>
-	 * The objects returned by consecutive calls to {@link #peek()} then
-	 * {@link #next()} are guaranteed to be equal to each other.
-	 */
-	@Override
-	E next();
 
 	/**
 	 * {@inheritDoc}

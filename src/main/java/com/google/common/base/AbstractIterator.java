@@ -29,16 +29,16 @@ import com.google.common.annotations.GwtCompatible;
  */
 @GwtCompatible
 abstract class AbstractIterator<T> implements Iterator<T> {
-	private State state = State.NOT_READY;
-
-	protected AbstractIterator() {
-	}
-
 	private enum State {
 		READY, NOT_READY, DONE, FAILED,
 	}
 
+	private State state = State.NOT_READY;
+
 	private T next;
+
+	protected AbstractIterator() {
+	}
 
 	protected abstract T computeNext();
 
@@ -60,16 +60,6 @@ abstract class AbstractIterator<T> implements Iterator<T> {
 		return tryToComputeNext();
 	}
 
-	private boolean tryToComputeNext() {
-		state = State.FAILED; // temporary pessimism
-		next = computeNext();
-		if (state != State.DONE) {
-			state = State.READY;
-			return true;
-		}
-		return false;
-	}
-
 	@Override
 	public final T next() {
 		if (!hasNext()) {
@@ -84,5 +74,15 @@ abstract class AbstractIterator<T> implements Iterator<T> {
 	@Override
 	public final void remove() {
 		throw new UnsupportedOperationException();
+	}
+
+	private boolean tryToComputeNext() {
+		state = State.FAILED; // temporary pessimism
+		next = computeNext();
+		if (state != State.DONE) {
+			state = State.READY;
+			return true;
+		}
+		return false;
 	}
 }

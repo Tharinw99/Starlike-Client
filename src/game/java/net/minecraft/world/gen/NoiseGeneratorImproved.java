@@ -2,31 +2,30 @@ package net.minecraft.world.gen;
 
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class NoiseGeneratorImproved extends NoiseGenerator {
-	private int[] permutations;
-	public double xCoord;
-	public double yCoord;
-	public double zCoord;
 	private static final double[] field_152381_e = new double[] { 1.0D, -1.0D, 1.0D, -1.0D, 1.0D, -1.0D, 1.0D, -1.0D,
 			0.0D, 0.0D, 0.0D, 0.0D, 1.0D, 0.0D, -1.0D, 0.0D };
 	private static final double[] field_152382_f = new double[] { 1.0D, 1.0D, -1.0D, -1.0D, 0.0D, 0.0D, 0.0D, 0.0D,
@@ -37,6 +36,10 @@ public class NoiseGeneratorImproved extends NoiseGenerator {
 			0.0D, 0.0D, 0.0D, 0.0D, 1.0D, 0.0D, -1.0D, 0.0D };
 	private static final double[] field_152385_i = new double[] { 0.0D, 0.0D, 0.0D, 0.0D, 1.0D, 1.0D, -1.0D, -1.0D,
 			1.0D, 1.0D, -1.0D, -1.0D, 0.0D, 1.0D, 0.0D, -1.0D };
+	private int[] permutations;
+	public double xCoord;
+	public double yCoord;
+	public double zCoord;
 
 	public NoiseGeneratorImproved() {
 		this(new EaglercraftRandom());
@@ -62,10 +65,6 @@ public class NoiseGeneratorImproved extends NoiseGenerator {
 
 	}
 
-	public final double lerp(double parDouble1, double parDouble2, double parDouble3) {
-		return parDouble2 + parDouble1 * (parDouble3 - parDouble2);
-	}
-
 	public final double func_76309_a(int parInt1, double parDouble1, double parDouble2) {
 		int i = parInt1 & 15;
 		return field_152384_h[i] * parDouble1 + field_152385_i[i] * parDouble2;
@@ -76,10 +75,14 @@ public class NoiseGeneratorImproved extends NoiseGenerator {
 		return field_152381_e[i] * parDouble1 + field_152382_f[i] * parDouble2 + field_152383_g[i] * parDouble3;
 	}
 
-	/**+
-	 * pars: noiseArray , xOffset , yOffset , zOffset , xSize ,
-	 * ySize , zSize , xScale, yScale , zScale , noiseScale.
-	 * noiseArray should be xSize*ySize*zSize in size
+	public final double lerp(double parDouble1, double parDouble2, double parDouble3) {
+		return parDouble2 + parDouble1 * (parDouble3 - parDouble2);
+	}
+
+	/**
+	 * + pars: noiseArray , xOffset , yOffset , zOffset , xSize , ySize , zSize ,
+	 * xScale, yScale , zScale , noiseScale. noiseArray should be xSize*ySize*zSize
+	 * in size
 	 */
 	public void populateNoiseArray(double[] parArrayOfDouble, double parDouble1, double parDouble2, double parDouble3,
 			int parInt1, int parInt2, int parInt3, double parDouble4, double parDouble5, double parDouble6,

@@ -40,8 +40,8 @@ import net.lax1dude.eaglercraft.v1_8.HString;
  *
  * @since 3.0
  * @!deprecated as of 3.6, use commons-text <a href=
- *             "https://commons.apache.org/proper/commons-text/javadocs/api-release/org/apache/commons/text/FormattableUtils.html">
- *             FormattableUtils</a> instead
+ *              "https://commons.apache.org/proper/commons-text/javadocs/api-release/org/apache/commons/text/FormattableUtils.html">
+ *              FormattableUtils</a> instead
  */
 //@Deprecated
 public class FormattableUtils {
@@ -50,32 +50,6 @@ public class FormattableUtils {
 	 * A format that simply outputs the value as a string.
 	 */
 	private static final String SIMPLEST_FORMAT = "%s";
-
-	/**
-	 * <p>
-	 * {@code FormattableUtils} instances should NOT be constructed in standard
-	 * programming. Instead, the methods of the class should be invoked statically.
-	 * </p>
-	 *
-	 * <p>
-	 * This constructor is public to permit tools that require a JavaBean instance
-	 * to operate.
-	 * </p>
-	 */
-	public FormattableUtils() {
-	}
-
-	// -----------------------------------------------------------------------
-	/**
-	 * Gets the default formatted representation of the specified
-	 * {@code Formattable}.
-	 *
-	 * @param formattable the instance to convert to a string, not null
-	 * @return the resulting string, not null
-	 */
-	public static String toString(final Formattable formattable) {
-		return HString.format(SIMPLEST_FORMAT, formattable);
-	}
 
 	/**
 	 * Handles the common {@code Formattable} operations of truncate-pad-append,
@@ -112,24 +86,6 @@ public class FormattableUtils {
 	}
 
 	/**
-	 * Handles the common {@link Formattable} operations of truncate-pad-append,
-	 * padding width underflow with spaces.
-	 *
-	 * @param seq       the string to handle, not null
-	 * @param formatter the destination formatter, not null
-	 * @param flags     the flags for formatting, see {@code Formattable}
-	 * @param width     the width of the output, see {@code Formattable}
-	 * @param precision the precision of the output, see {@code Formattable}
-	 * @param ellipsis  the ellipsis to use when precision dictates truncation, null
-	 *                  or empty causes a hard truncation
-	 * @return the {@code formatter} instance, not null
-	 */
-	public static Formatter append(final CharSequence seq, final Formatter formatter, final int flags, final int width,
-			final int precision, final CharSequence ellipsis) {
-		return append(seq, formatter, flags, width, precision, ' ', ellipsis);
-	}
-
-	/**
 	 * Handles the common {@link Formattable} operations of truncate-pad-append.
 	 *
 	 * @param seq       the string to handle, not null
@@ -157,6 +113,50 @@ public class FormattableUtils {
 		}
 		formatter.format(buf.toString());
 		return formatter;
+	}
+
+	/**
+	 * Handles the common {@link Formattable} operations of truncate-pad-append,
+	 * padding width underflow with spaces.
+	 *
+	 * @param seq       the string to handle, not null
+	 * @param formatter the destination formatter, not null
+	 * @param flags     the flags for formatting, see {@code Formattable}
+	 * @param width     the width of the output, see {@code Formattable}
+	 * @param precision the precision of the output, see {@code Formattable}
+	 * @param ellipsis  the ellipsis to use when precision dictates truncation, null
+	 *                  or empty causes a hard truncation
+	 * @return the {@code formatter} instance, not null
+	 */
+	public static Formatter append(final CharSequence seq, final Formatter formatter, final int flags, final int width,
+			final int precision, final CharSequence ellipsis) {
+		return append(seq, formatter, flags, width, precision, ' ', ellipsis);
+	}
+
+	// -----------------------------------------------------------------------
+	/**
+	 * Gets the default formatted representation of the specified
+	 * {@code Formattable}.
+	 *
+	 * @param formattable the instance to convert to a string, not null
+	 * @return the resulting string, not null
+	 */
+	public static String toString(final Formattable formattable) {
+		return HString.format(SIMPLEST_FORMAT, formattable);
+	}
+
+	/**
+	 * <p>
+	 * {@code FormattableUtils} instances should NOT be constructed in standard
+	 * programming. Instead, the methods of the class should be invoked statically.
+	 * </p>
+	 *
+	 * <p>
+	 * This constructor is public to permit tools that require a JavaBean instance
+	 * to operate.
+	 * </p>
+	 */
+	public FormattableUtils() {
 	}
 
 }

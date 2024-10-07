@@ -32,6 +32,8 @@ import com.google.common.annotations.GwtCompatible;
 final class Absent<T> extends Optional<T> {
 	static final Absent<Object> INSTANCE = new Absent<Object>();
 
+	private static final long serialVersionUID = 0;
+
 	@SuppressWarnings("unchecked") // implementation is "fully variant"
 	static <T> Optional<T> withType() {
 		return (Optional<T>) INSTANCE;
@@ -41,8 +43,13 @@ final class Absent<T> extends Optional<T> {
 	}
 
 	@Override
-	public boolean isPresent() {
-		return false;
+	public Set<T> asSet() {
+		return Collections.emptySet();
+	}
+
+	@Override
+	public boolean equals(@Nullable Object object) {
+		return object == this;
 	}
 
 	@Override
@@ -51,8 +58,13 @@ final class Absent<T> extends Optional<T> {
 	}
 
 	@Override
-	public T or(T defaultValue) {
-		return checkNotNull(defaultValue, "use Optional.orNull() instead of Optional.or(null)");
+	public int hashCode() {
+		return 0x598df91c;
+	}
+
+	@Override
+	public boolean isPresent() {
+		return false;
 	}
 
 	@SuppressWarnings("unchecked") // safe covariant cast
@@ -67,30 +79,18 @@ final class Absent<T> extends Optional<T> {
 	}
 
 	@Override
+	public T or(T defaultValue) {
+		return checkNotNull(defaultValue, "use Optional.orNull() instead of Optional.or(null)");
+	}
+
+	@Override
 	@Nullable
 	public T orNull() {
 		return null;
 	}
 
-	@Override
-	public Set<T> asSet() {
-		return Collections.emptySet();
-	}
-
-	@Override
-	public <V> Optional<V> transform(Function<? super T, V> function) {
-		checkNotNull(function);
-		return Optional.absent();
-	}
-
-	@Override
-	public boolean equals(@Nullable Object object) {
-		return object == this;
-	}
-
-	@Override
-	public int hashCode() {
-		return 0x598df91c;
+	private Object readResolve() {
+		return INSTANCE;
 	}
 
 	@Override
@@ -98,9 +98,9 @@ final class Absent<T> extends Optional<T> {
 		return "Optional.absent()";
 	}
 
-	private Object readResolve() {
-		return INSTANCE;
+	@Override
+	public <V> Optional<V> transform(Function<? super T, V> function) {
+		checkNotNull(function);
+		return Optional.absent();
 	}
-
-	private static final long serialVersionUID = 0;
 }

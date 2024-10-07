@@ -11,22 +11,25 @@ import net.minecraft.item.ItemSword;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.stats.AchievementList;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -43,17 +46,9 @@ public class SlotCrafting extends Slot {
 		this.craftMatrix = craftingInventory;
 	}
 
-	/**+
-	 * Check if the stack is a valid item for this slot. Always true
-	 * beside for the armor slots.
-	 */
-	public boolean isItemValid(ItemStack var1) {
-		return false;
-	}
-
-	/**+
-	 * Decrease the size of the stack in slot (first int arg) by the
-	 * amount of the second int arg. Returns the new stack.
+	/**
+	 * + Decrease the size of the stack in slot (first int arg) by the amount of the
+	 * second int arg. Returns the new stack.
 	 */
 	public ItemStack decrStackSize(int i) {
 		if (this.getHasStack()) {
@@ -63,20 +58,18 @@ public class SlotCrafting extends Slot {
 		return super.decrStackSize(i);
 	}
 
-	/**+
-	 * the itemStack passed in is the output - ie, iron ingots, and
-	 * pickaxes, not ore and wood. Typically increases an internal
-	 * count then calls onCrafting(item).
+	/**
+	 * + Check if the stack is a valid item for this slot. Always true beside for
+	 * the armor slots.
 	 */
-	protected void onCrafting(ItemStack itemstack, int i) {
-		this.amountCrafted += i;
-		this.onCrafting(itemstack);
+	public boolean isItemValid(ItemStack var1) {
+		return false;
 	}
 
-	/**+
-	 * the itemStack passed in is the output - ie, iron ingots, and
-	 * pickaxes, not ore and wood. Typically increases an internal
-	 * count then calls onCrafting(item).
+	/**
+	 * + the itemStack passed in is the output - ie, iron ingots, and pickaxes, not
+	 * ore and wood. Typically increases an internal count then calls
+	 * onCrafting(item).
 	 */
 	protected void onCrafting(ItemStack itemstack) {
 		if (this.amountCrafted > 0) {
@@ -129,6 +122,16 @@ public class SlotCrafting extends Slot {
 			this.thePlayer.triggerAchievement(AchievementList.overpowered);
 		}
 
+	}
+
+	/**
+	 * + the itemStack passed in is the output - ie, iron ingots, and pickaxes, not
+	 * ore and wood. Typically increases an internal count then calls
+	 * onCrafting(item).
+	 */
+	protected void onCrafting(ItemStack itemstack, int i) {
+		this.amountCrafted += i;
+		this.onCrafting(itemstack);
 	}
 
 	public void onPickupFromSlot(EntityPlayer entityplayer, ItemStack itemstack) {

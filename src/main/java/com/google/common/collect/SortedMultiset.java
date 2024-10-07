@@ -58,28 +58,10 @@ public interface SortedMultiset<E> extends SortedMultisetBridge<E>, SortedIterab
 	Comparator<? super E> comparator();
 
 	/**
-	 * Returns the entry of the first element in this multiset, or {@code null} if
-	 * this multiset is empty.
+	 * Returns a descending view of this multiset. Modifications made to either map
+	 * will be reflected in the other.
 	 */
-	Entry<E> firstEntry();
-
-	/**
-	 * Returns the entry of the last element in this multiset, or {@code null} if
-	 * this multiset is empty.
-	 */
-	Entry<E> lastEntry();
-
-	/**
-	 * Returns and removes the entry associated with the lowest element in this
-	 * multiset, or returns {@code null} if this multiset is empty.
-	 */
-	Entry<E> pollFirstEntry();
-
-	/**
-	 * Returns and removes the entry associated with the greatest element in this
-	 * multiset, or returns {@code null} if this multiset is empty.
-	 */
-	Entry<E> pollLastEntry();
+	SortedMultiset<E> descendingMultiset();
 
 	/**
 	 * Returns a {@link NavigableSet} view of the distinct elements in this
@@ -101,20 +83,10 @@ public interface SortedMultiset<E> extends SortedMultisetBridge<E>, SortedIterab
 	Set<Entry<E>> entrySet();
 
 	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>
-	 * The iterator returns the elements in ascending order according to this
-	 * multiset's comparator.
+	 * Returns the entry of the first element in this multiset, or {@code null} if
+	 * this multiset is empty.
 	 */
-	@Override
-	Iterator<E> iterator();
-
-	/**
-	 * Returns a descending view of this multiset. Modifications made to either map
-	 * will be reflected in the other.
-	 */
-	SortedMultiset<E> descendingMultiset();
+	Entry<E> firstEntry();
 
 	/**
 	 * Returns a view of this multiset restricted to the elements less than
@@ -128,6 +100,34 @@ public interface SortedMultiset<E> extends SortedMultisetBridge<E>, SortedIterab
 	 * attempts to add elements outside its range.
 	 */
 	SortedMultiset<E> headMultiset(E upperBound, BoundType boundType);
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * The iterator returns the elements in ascending order according to this
+	 * multiset's comparator.
+	 */
+	@Override
+	Iterator<E> iterator();
+
+	/**
+	 * Returns the entry of the last element in this multiset, or {@code null} if
+	 * this multiset is empty.
+	 */
+	Entry<E> lastEntry();
+
+	/**
+	 * Returns and removes the entry associated with the lowest element in this
+	 * multiset, or returns {@code null} if this multiset is empty.
+	 */
+	Entry<E> pollFirstEntry();
+
+	/**
+	 * Returns and removes the entry associated with the greatest element in this
+	 * multiset, or returns {@code null} if this multiset is empty.
+	 */
+	Entry<E> pollLastEntry();
 
 	/**
 	 * Returns a view of this multiset restricted to the range between

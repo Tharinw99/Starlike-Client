@@ -67,6 +67,11 @@ public abstract class ForwardingMapEntry<K, V> extends ForwardingObject implemen
 	protected abstract Map.Entry<K, V> delegate();
 
 	@Override
+	public boolean equals(@Nullable Object object) {
+		return delegate().equals(object);
+	}
+
+	@Override
 	public K getKey() {
 		return delegate().getKey();
 	}
@@ -77,18 +82,13 @@ public abstract class ForwardingMapEntry<K, V> extends ForwardingObject implemen
 	}
 
 	@Override
-	public V setValue(V value) {
-		return delegate().setValue(value);
-	}
-
-	@Override
-	public boolean equals(@Nullable Object object) {
-		return delegate().equals(object);
-	}
-
-	@Override
 	public int hashCode() {
 		return delegate().hashCode();
+	}
+
+	@Override
+	public V setValue(V value) {
+		return delegate().setValue(value);
 	}
 
 	/**

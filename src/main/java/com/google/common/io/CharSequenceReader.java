@@ -50,26 +50,25 @@ final class CharSequenceReader extends Reader {
 		}
 	}
 
+	@Override
+	public synchronized void close() throws IOException {
+		seq = null;
+	}
+
 	private boolean hasRemaining() {
 		return remaining() > 0;
 	}
 
-	private int remaining() {
-		return seq.length() - pos;
+	@Override
+	public synchronized void mark(int readAheadLimit) throws IOException {
+		checkArgument(readAheadLimit >= 0, "readAheadLimit (%s) may not be negative", readAheadLimit);
+		checkOpen();
+		mark = pos;
 	}
 
 	@Override
-	public synchronized int read(CharBuffer target) throws IOException {
-		checkNotNull(target);
-		checkOpen();
-		if (!hasRemaining()) {
-			return -1;
-		}
-		int charsToRead = Math.min(target.remaining(), remaining());
-		for (int i = 0; i < charsToRead; i++) {
-			target.put(seq.charAt(pos++));
-		}
-		return charsToRead;
+	public boolean markSupported() {
+		return true;
 	}
 
 	@Override
@@ -93,12 +92,17 @@ final class CharSequenceReader extends Reader {
 	}
 
 	@Override
-	public synchronized long skip(long n) throws IOException {
-		checkArgument(n >= 0, "n (%s) may not be negative", n);
+	public synchronized int read(CharBuffer target) throws IOException {
+		checkNotNull(target);
 		checkOpen();
-		int charsToSkip = (int) Math.min(remaining(), n); // safe because remaining is an int
-		pos += charsToSkip;
-		return charsToSkip;
+		if (!hasRemaining()) {
+			return -1;
+		}
+		int charsToRead = Math.min(target.remaining(), remaining());
+		for (int i = 0; i < charsToRead; i++) {
+			target.put(seq.charAt(pos++));
+		}
+		return charsToRead;
 	}
 
 	@Override
@@ -107,16 +111,8 @@ final class CharSequenceReader extends Reader {
 		return true;
 	}
 
-	@Override
-	public boolean markSupported() {
-		return true;
-	}
-
-	@Override
-	public synchronized void mark(int readAheadLimit) throws IOException {
-		checkArgument(readAheadLimit >= 0, "readAheadLimit (%s) may not be negative", readAheadLimit);
-		checkOpen();
-		mark = pos;
+	private int remaining() {
+		return seq.length() - pos;
 	}
 
 	@Override
@@ -126,7 +122,11 @@ final class CharSequenceReader extends Reader {
 	}
 
 	@Override
-	public synchronized void close() throws IOException {
-		seq = null;
+	public synchronized long skip(long n) throws IOException {
+		checkArgument(n >= 0, "n (%s) may not be negative", n);
+		checkOpen();
+		int charsToSkip = (int) Math.min(remaining(), n); // safe because remaining is an int
+		pos += charsToSkip;
+		return charsToSkip;
 	}
 }

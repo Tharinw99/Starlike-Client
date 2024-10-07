@@ -36,35 +36,44 @@ import com.google.common.annotations.GwtIncompatible;
  */
 @GwtCompatible(emulated = true)
 final class GwtWorkarounds {
-	private GwtWorkarounds() {
+	/**
+	 * A GWT-compatible substitute for an {@code InputStream}.
+	 */
+	interface ByteInput {
+		void close() throws IOException;
+
+		int read() throws IOException;
+	}
+
+	/**
+	 * A GWT-compatible substitute for an {@code OutputStream}.
+	 */
+	interface ByteOutput {
+		void close() throws IOException;
+
+		void flush() throws IOException;
+
+		void write(byte b) throws IOException;
 	}
 
 	/**
 	 * A GWT-compatible substitute for a {@code Reader}.
 	 */
 	interface CharInput {
-		int read() throws IOException;
-
 		void close() throws IOException;
+
+		int read() throws IOException;
 	}
 
 	/**
-	 * Views a {@code Reader} as a {@code CharInput}.
+	 * A GWT-compatible substitute for a {@code Writer}.
 	 */
-	@GwtIncompatible("Reader")
-	static CharInput asCharInput(final Reader reader) {
-		checkNotNull(reader);
-		return new CharInput() {
-			@Override
-			public int read() throws IOException {
-				return reader.read();
-			}
+	interface CharOutput {
+		void close() throws IOException;
 
-			@Override
-			public void close() throws IOException {
-				reader.close();
-			}
-		};
+		void flush() throws IOException;
+
+		void write(char c) throws IOException;
 	}
 
 	/**
@@ -76,6 +85,11 @@ final class GwtWorkarounds {
 			int index = 0;
 
 			@Override
+			public void close() {
+				index = chars.length();
+			}
+
+			@Override
 			public int read() {
 				if (index < chars.length()) {
 					return chars.charAt(index++);
@@ -83,21 +97,50 @@ final class GwtWorkarounds {
 					return -1;
 				}
 			}
+		};
+	}
+
+	/**
+	 * Views a {@code Reader} as a {@code CharInput}.
+	 */
+	@GwtIncompatible("Reader")
+	static CharInput asCharInput(final Reader reader) {
+		checkNotNull(reader);
+		return new CharInput() {
+			@Override
+			public void close() throws IOException {
+				reader.close();
+			}
 
 			@Override
-			public void close() {
-				index = chars.length();
+			public int read() throws IOException {
+				return reader.read();
 			}
 		};
 	}
 
 	/**
-	 * A GWT-compatible substitute for an {@code InputStream}.
+	 * Views a {@code Writer} as a {@code CharOutput}.
 	 */
-	interface ByteInput {
-		int read() throws IOException;
+	@GwtIncompatible("Writer")
+	static CharOutput asCharOutput(final Writer writer) {
+		checkNotNull(writer);
+		return new CharOutput() {
+			@Override
+			public void close() throws IOException {
+				writer.close();
+			}
 
-		void close() throws IOException;
+			@Override
+			public void flush() throws IOException {
+				writer.flush();
+			}
+
+			@Override
+			public void write(char c) throws IOException {
+				writer.append(c);
+			}
+		};
 	}
 
 	/**
@@ -107,6 +150,11 @@ final class GwtWorkarounds {
 	static InputStream asInputStream(final ByteInput input) {
 		checkNotNull(input);
 		return new InputStream() {
+			@Override
+			public void close() throws IOException {
+				input.close();
+			}
+
 			@Override
 			public int read() throws IOException {
 				return input.read();
@@ -133,23 +181,7 @@ final class GwtWorkarounds {
 				}
 				return len;
 			}
-
-			@Override
-			public void close() throws IOException {
-				input.close();
-			}
 		};
-	}
-
-	/**
-	 * A GWT-compatible substitute for an {@code OutputStream}.
-	 */
-	interface ByteOutput {
-		void write(byte b) throws IOException;
-
-		void flush() throws IOException;
-
-		void close() throws IOException;
 	}
 
 	/**
@@ -160,8 +192,8 @@ final class GwtWorkarounds {
 		checkNotNull(output);
 		return new OutputStream() {
 			@Override
-			public void write(int b) throws IOException {
-				output.write((byte) b);
+			public void close() throws IOException {
+				output.close();
 			}
 
 			@Override
@@ -170,43 +202,8 @@ final class GwtWorkarounds {
 			}
 
 			@Override
-			public void close() throws IOException {
-				output.close();
-			}
-		};
-	}
-
-	/**
-	 * A GWT-compatible substitute for a {@code Writer}.
-	 */
-	interface CharOutput {
-		void write(char c) throws IOException;
-
-		void flush() throws IOException;
-
-		void close() throws IOException;
-	}
-
-	/**
-	 * Views a {@code Writer} as a {@code CharOutput}.
-	 */
-	@GwtIncompatible("Writer")
-	static CharOutput asCharOutput(final Writer writer) {
-		checkNotNull(writer);
-		return new CharOutput() {
-			@Override
-			public void write(char c) throws IOException {
-				writer.append(c);
-			}
-
-			@Override
-			public void flush() throws IOException {
-				writer.flush();
-			}
-
-			@Override
-			public void close() throws IOException {
-				writer.close();
+			public void write(int b) throws IOException {
+				output.write((byte) b);
 			}
 		};
 	}
@@ -220,8 +217,7 @@ final class GwtWorkarounds {
 		return new CharOutput() {
 
 			@Override
-			public void write(char c) {
-				builder.append(c);
+			public void close() {
 			}
 
 			@Override
@@ -229,13 +225,17 @@ final class GwtWorkarounds {
 			}
 
 			@Override
-			public void close() {
-			}
-
-			@Override
 			public String toString() {
 				return builder.toString();
 			}
+
+			@Override
+			public void write(char c) {
+				builder.append(c);
+			}
 		};
+	}
+
+	private GwtWorkarounds() {
 	}
 }

@@ -67,28 +67,6 @@ public abstract class ArrayBasedUnicodeEscaper extends UnicodeEscaper {
 	/**
 	 * Creates a new ArrayBasedUnicodeEscaper instance with the given replacement
 	 * map and specified safe range. If {@code safeMax < safeMin} then no code
-	 * points are considered safe.
-	 *
-	 * <p>
-	 * If a code point has no mapped replacement then it is checked against the safe
-	 * range. If it lies outside that, then {@link #escapeUnsafe} is called,
-	 * otherwise no escaping is performed.
-	 *
-	 * @param replacementMap    a map of characters to their escaped representations
-	 * @param safeMin           the lowest character value in the safe range
-	 * @param safeMax           the highest character value in the safe range
-	 * @param unsafeReplacement the default replacement for unsafe characters or
-	 *                          null if no default replacement is required
-	 */
-	protected ArrayBasedUnicodeEscaper(Map<Character, String> replacementMap, int safeMin, int safeMax,
-			@Nullable String unsafeReplacement) {
-
-		this(ArrayBasedEscaperMap.create(replacementMap), safeMin, safeMax, unsafeReplacement);
-	}
-
-	/**
-	 * Creates a new ArrayBasedUnicodeEscaper instance with the given replacement
-	 * map and specified safe range. If {@code safeMax < safeMin} then no code
 	 * points are considered safe. This initializer is useful when explicit
 	 * instances of ArrayBasedEscaperMap are used to allow the sharing of large
 	 * replacement mappings.
@@ -145,34 +123,26 @@ public abstract class ArrayBasedUnicodeEscaper extends UnicodeEscaper {
 		}
 	}
 
-	/*
-	 * This is overridden to improve performance. Rough benchmarking shows that this
-	 * almost doubles the speed when processing strings that do not require any
-	 * escaping.
+	/**
+	 * Creates a new ArrayBasedUnicodeEscaper instance with the given replacement
+	 * map and specified safe range. If {@code safeMax < safeMin} then no code
+	 * points are considered safe.
+	 *
+	 * <p>
+	 * If a code point has no mapped replacement then it is checked against the safe
+	 * range. If it lies outside that, then {@link #escapeUnsafe} is called,
+	 * otherwise no escaping is performed.
+	 *
+	 * @param replacementMap    a map of characters to their escaped representations
+	 * @param safeMin           the lowest character value in the safe range
+	 * @param safeMax           the highest character value in the safe range
+	 * @param unsafeReplacement the default replacement for unsafe characters or
+	 *                          null if no default replacement is required
 	 */
-	@Override
-	public final String escape(String s) {
-		checkNotNull(s); // GWT specific check (do not optimize)
-		for (int i = 0; i < s.length(); i++) {
-			char c = s.charAt(i);
-			if ((c < replacementsLength && replacements[c] != null) || c > safeMaxChar || c < safeMinChar) {
-				return escapeSlow(s, i);
-			}
-		}
-		return s;
-	}
+	protected ArrayBasedUnicodeEscaper(Map<Character, String> replacementMap, int safeMin, int safeMax,
+			@Nullable String unsafeReplacement) {
 
-	/* Overridden for performance. */
-	@Override
-	protected final int nextEscapeIndex(CharSequence csq, int index, int end) {
-		while (index < end) {
-			char c = csq.charAt(index);
-			if ((c < replacementsLength && replacements[c] != null) || c > safeMaxChar || c < safeMinChar) {
-				break;
-			}
-			index++;
-		}
-		return index;
+		this(ArrayBasedEscaperMap.create(replacementMap), safeMin, safeMax, unsafeReplacement);
 	}
 
 	/**
@@ -194,6 +164,23 @@ public abstract class ArrayBasedUnicodeEscaper extends UnicodeEscaper {
 		return escapeUnsafe(cp);
 	}
 
+	/*
+	 * This is overridden to improve performance. Rough benchmarking shows that this
+	 * almost doubles the speed when processing strings that do not require any
+	 * escaping.
+	 */
+	@Override
+	public final String escape(String s) {
+		checkNotNull(s); // GWT specific check (do not optimize)
+		for (int i = 0; i < s.length(); i++) {
+			char c = s.charAt(i);
+			if ((c < replacementsLength && replacements[c] != null) || c > safeMaxChar || c < safeMinChar) {
+				return escapeSlow(s, i);
+			}
+		}
+		return s;
+	}
+
 	/**
 	 * Escapes a code point that has no direct explicit value in the replacement
 	 * array and lies outside the stated safe range. Subclasses should override this
@@ -209,4 +196,17 @@ public abstract class ArrayBasedUnicodeEscaper extends UnicodeEscaper {
 	 *         required
 	 */
 	protected abstract char[] escapeUnsafe(int cp);
+
+	/* Overridden for performance. */
+	@Override
+	protected final int nextEscapeIndex(CharSequence csq, int index, int end) {
+		while (index < end) {
+			char c = csq.charAt(index);
+			if ((c < replacementsLength && replacements[c] != null) || c > safeMaxChar || c < safeMinChar) {
+				break;
+			}
+			index++;
+		}
+		return index;
+	}
 }

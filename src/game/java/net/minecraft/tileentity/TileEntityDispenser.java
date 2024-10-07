@@ -1,7 +1,6 @@
 package net.minecraft.tileentity;
 
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -11,22 +10,25 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -36,23 +38,38 @@ public class TileEntityDispenser extends TileEntityLockable implements IInventor
 	private ItemStack[] stacks = new ItemStack[9];
 	protected String customName;
 
-	/**+
-	 * Returns the number of slots in the inventory.
+	/**
+	 * + Add the given ItemStack to this Dispenser. Return the Slot the Item was
+	 * placed in or -1 if no free slot is available.
 	 */
-	public int getSizeInventory() {
-		return 9;
+	public int addItemStack(ItemStack stack) {
+		for (int i = 0; i < this.stacks.length; ++i) {
+			if (this.stacks[i] == null || this.stacks[i].getItem() == null) {
+				this.setInventorySlotContents(i, stack);
+				return i;
+			}
+		}
+
+		return -1;
 	}
 
-	/**+
-	 * Returns the stack in the given slot.
-	 */
-	public ItemStack getStackInSlot(int i) {
-		return this.stacks[i];
+	public void clear() {
+		for (int i = 0; i < this.stacks.length; ++i) {
+			this.stacks[i] = null;
+		}
+
 	}
 
-	/**+
-	 * Removes up to a specified number of items from an inventory
-	 * slot and returns them in a new stack.
+	public void closeInventory(EntityPlayer var1) {
+	}
+
+	public Container createContainer(InventoryPlayer inventoryplayer, EntityPlayer var2) {
+		return new ContainerDispenser(inventoryplayer, this);
+	}
+
+	/**
+	 * + Removes up to a specified number of items from an inventory slot and
+	 * returns them in a new stack.
 	 */
 	public ItemStack decrStackSize(int i, int j) {
 		if (this.stacks[i] != null) {
@@ -75,19 +92,6 @@ public class TileEntityDispenser extends TileEntityLockable implements IInventor
 		}
 	}
 
-	/**+
-	 * Removes a stack from the given slot and returns it.
-	 */
-	public ItemStack removeStackFromSlot(int i) {
-		if (this.stacks[i] != null) {
-			ItemStack itemstack = this.stacks[i];
-			this.stacks[i] = null;
-			return itemstack;
-		} else {
-			return null;
-		}
-	}
-
 	public int getDispenseSlot() {
 		int i = -1;
 		int j = 1;
@@ -101,51 +105,74 @@ public class TileEntityDispenser extends TileEntityLockable implements IInventor
 		return i;
 	}
 
-	/**+
-	 * Sets the given item stack to the specified slot in the
-	 * inventory (can be crafting or armor sections).
-	 */
-	public void setInventorySlotContents(int i, ItemStack itemstack) {
-		this.stacks[i] = itemstack;
-		if (itemstack != null && itemstack.stackSize > this.getInventoryStackLimit()) {
-			itemstack.stackSize = this.getInventoryStackLimit();
-		}
-
-		this.markDirty();
+	public int getField(int var1) {
+		return 0;
 	}
 
-	/**+
-	 * Add the given ItemStack to this Dispenser. Return the Slot
-	 * the Item was placed in or -1 if no free slot is available.
-	 */
-	public int addItemStack(ItemStack stack) {
-		for (int i = 0; i < this.stacks.length; ++i) {
-			if (this.stacks[i] == null || this.stacks[i].getItem() == null) {
-				this.setInventorySlotContents(i, stack);
-				return i;
-			}
-		}
-
-		return -1;
+	public int getFieldCount() {
+		return 0;
 	}
 
-	/**+
-	 * Gets the name of this command sender (usually username, but
-	 * possibly "Rcon")
+	public String getGuiID() {
+		return "minecraft:dispenser";
+	}
+
+	/**
+	 * + Returns the maximum stack size for a inventory slot. Seems to always be 64,
+	 * possibly will be extended.
+	 */
+	public int getInventoryStackLimit() {
+		return 64;
+	}
+
+	/**
+	 * + Gets the name of this command sender (usually username, but possibly
+	 * "Rcon")
 	 */
 	public String getName() {
 		return this.hasCustomName() ? this.customName : "container.dispenser";
 	}
 
-	public void setCustomName(String customName) {
-		this.customName = customName;
+	/**
+	 * + Returns the number of slots in the inventory.
+	 */
+	public int getSizeInventory() {
+		return 9;
 	}
 
-	/**+
-	 * Returns true if this thing is named
+	/**
+	 * + Returns the stack in the given slot.
+	 */
+	public ItemStack getStackInSlot(int i) {
+		return this.stacks[i];
+	}
+
+	/**
+	 * + Returns true if this thing is named
 	 */
 	public boolean hasCustomName() {
 		return this.customName != null;
+	}
+
+	/**
+	 * + Returns true if automation is allowed to insert the given stack (ignoring
+	 * stack size) into the given slot.
+	 */
+	public boolean isItemValidForSlot(int var1, ItemStack var2) {
+		return true;
+	}
+
+	/**
+	 * + Do not make give this method the name canInteractWith because it clashes
+	 * with Container
+	 */
+	public boolean isUseableByPlayer(EntityPlayer entityplayer) {
+		return this.worldObj.getTileEntity(this.pos) != this ? false
+				: entityplayer.getDistanceSq((double) this.pos.getX() + 0.5D, (double) this.pos.getY() + 0.5D,
+						(double) this.pos.getZ() + 0.5D) <= 64.0D;
+	}
+
+	public void openInventory(EntityPlayer var1) {
 	}
 
 	public void readFromNBT(NBTTagCompound nbttagcompound) {
@@ -167,6 +194,39 @@ public class TileEntityDispenser extends TileEntityLockable implements IInventor
 
 	}
 
+	/**
+	 * + Removes a stack from the given slot and returns it.
+	 */
+	public ItemStack removeStackFromSlot(int i) {
+		if (this.stacks[i] != null) {
+			ItemStack itemstack = this.stacks[i];
+			this.stacks[i] = null;
+			return itemstack;
+		} else {
+			return null;
+		}
+	}
+
+	public void setCustomName(String customName) {
+		this.customName = customName;
+	}
+
+	public void setField(int var1, int var2) {
+	}
+
+	/**
+	 * + Sets the given item stack to the specified slot in the inventory (can be
+	 * crafting or armor sections).
+	 */
+	public void setInventorySlotContents(int i, ItemStack itemstack) {
+		this.stacks[i] = itemstack;
+		if (itemstack != null && itemstack.stackSize > this.getInventoryStackLimit()) {
+			itemstack.stackSize = this.getInventoryStackLimit();
+		}
+
+		this.markDirty();
+	}
+
 	public void writeToNBT(NBTTagCompound nbttagcompound) {
 		super.writeToNBT(nbttagcompound);
 		NBTTagList nbttaglist = new NBTTagList();
@@ -183,64 +243,6 @@ public class TileEntityDispenser extends TileEntityLockable implements IInventor
 		nbttagcompound.setTag("Items", nbttaglist);
 		if (this.hasCustomName()) {
 			nbttagcompound.setString("CustomName", this.customName);
-		}
-
-	}
-
-	/**+
-	 * Returns the maximum stack size for a inventory slot. Seems to
-	 * always be 64, possibly will be extended.
-	 */
-	public int getInventoryStackLimit() {
-		return 64;
-	}
-
-	/**+
-	 * Do not make give this method the name canInteractWith because
-	 * it clashes with Container
-	 */
-	public boolean isUseableByPlayer(EntityPlayer entityplayer) {
-		return this.worldObj.getTileEntity(this.pos) != this ? false
-				: entityplayer.getDistanceSq((double) this.pos.getX() + 0.5D, (double) this.pos.getY() + 0.5D,
-						(double) this.pos.getZ() + 0.5D) <= 64.0D;
-	}
-
-	public void openInventory(EntityPlayer var1) {
-	}
-
-	public void closeInventory(EntityPlayer var1) {
-	}
-
-	/**+
-	 * Returns true if automation is allowed to insert the given
-	 * stack (ignoring stack size) into the given slot.
-	 */
-	public boolean isItemValidForSlot(int var1, ItemStack var2) {
-		return true;
-	}
-
-	public String getGuiID() {
-		return "minecraft:dispenser";
-	}
-
-	public Container createContainer(InventoryPlayer inventoryplayer, EntityPlayer var2) {
-		return new ContainerDispenser(inventoryplayer, this);
-	}
-
-	public int getField(int var1) {
-		return 0;
-	}
-
-	public void setField(int var1, int var2) {
-	}
-
-	public int getFieldCount() {
-		return 0;
-	}
-
-	public void clear() {
-		for (int i = 0; i < this.stacks.length; ++i) {
-			this.stacks[i] = null;
 		}
 
 	}

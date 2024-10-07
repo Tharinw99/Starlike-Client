@@ -44,6 +44,16 @@ public final class CountingOutputStream extends FilterOutputStream {
 		super(out);
 	}
 
+	// Overriding close() because FilterOutputStream's close() method pre-JDK8 has
+	// bad behavior:
+	// it silently ignores any exception thrown by flush(). Instead, just close the
+	// delegate stream.
+	// It should flush itself if necessary.
+	@Override
+	public void close() throws IOException {
+		out.close();
+	}
+
 	/** Returns the number of bytes written. */
 	public long getCount() {
 		return count;
@@ -59,15 +69,5 @@ public final class CountingOutputStream extends FilterOutputStream {
 	public void write(int b) throws IOException {
 		out.write(b);
 		count++;
-	}
-
-	// Overriding close() because FilterOutputStream's close() method pre-JDK8 has
-	// bad behavior:
-	// it silently ignores any exception thrown by flush(). Instead, just close the
-	// delegate stream.
-	// It should flush itself if necessary.
-	@Override
-	public void close() throws IOException {
-		out.close();
 	}
 }

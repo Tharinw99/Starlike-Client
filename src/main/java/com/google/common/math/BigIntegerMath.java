@@ -51,65 +51,6 @@ import com.google.common.annotations.VisibleForTesting;
  */
 @GwtCompatible(emulated = true)
 public final class BigIntegerMath {
-	/**
-	 * Returns {@code true} if {@code x} represents a power of two.
-	 */
-	public static boolean isPowerOfTwo(BigInteger x) {
-		checkNotNull(x);
-		return x.signum() > 0 && x.getLowestSetBit() == x.bitLength() - 1;
-	}
-
-	/**
-	 * Returns the base-2 logarithm of {@code x}, rounded according to the specified
-	 * rounding mode.
-	 *
-	 * @throws IllegalArgumentException if {@code x <= 0}
-	 * @throws ArithmeticException      if {@code mode} is
-	 *                                  {@link RoundingMode#UNNECESSARY} and
-	 *                                  {@code x} is not a power of two
-	 */
-	@SuppressWarnings("fallthrough")
-	// TODO(kevinb): remove after this warning is disabled globally
-	public static int log2(BigInteger x, RoundingMode mode) {
-		checkPositive("x", checkNotNull(x));
-		int logFloor = x.bitLength() - 1;
-		switch (mode) {
-		case UNNECESSARY:
-			checkRoundingUnnecessary(isPowerOfTwo(x)); // fall through
-		case DOWN:
-		case FLOOR:
-			return logFloor;
-
-		case UP:
-		case CEILING:
-			return isPowerOfTwo(x) ? logFloor : logFloor + 1;
-
-		case HALF_DOWN:
-		case HALF_UP:
-		case HALF_EVEN:
-			if (logFloor < SQRT2_PRECOMPUTE_THRESHOLD) {
-				BigInteger halfPower = SQRT2_PRECOMPUTED_BITS.shiftRight(SQRT2_PRECOMPUTE_THRESHOLD - logFloor);
-				if (x.compareTo(halfPower) <= 0) {
-					return logFloor;
-				} else {
-					return logFloor + 1;
-				}
-			}
-			/*
-			 * Since sqrt(2) is irrational, log2(x) - logFloor cannot be exactly 0.5
-			 *
-			 * To determine which side of logFloor.5 the logarithm is, we compare x^2 to
-			 * 2^(2 * logFloor + 1).
-			 */
-			BigInteger x2 = x.pow(2);
-			int logX2Floor = x2.bitLength() - 1;
-			return (logX2Floor < 2 * logFloor + 1) ? logFloor : logFloor + 1;
-
-		default:
-			throw new AssertionError();
-		}
-	}
-
 	/*
 	 * The maximum number of bits in a square root for which we'll precompute an
 	 * explicit half power of two. This can be any value, but higher values incur
@@ -122,182 +63,62 @@ public final class BigIntegerMath {
 	static final BigInteger SQRT2_PRECOMPUTED_BITS = new BigInteger(
 			"16a09e667f3bcc908b2fb1366ea957d3e3adec17512775099da2f590b0667322a", 16);
 
-	/**
-	 * Returns the base-10 logarithm of {@code x}, rounded according to the
-	 * specified rounding mode.
-	 *
-	 * @throws IllegalArgumentException if {@code x <= 0}
-	 * @throws ArithmeticException      if {@code mode} is
-	 *                                  {@link RoundingMode#UNNECESSARY} and
-	 *                                  {@code x} is not a power of ten
-	 */
-	@GwtIncompatible("TODO")
-	@SuppressWarnings("fallthrough")
-	public static int log10(BigInteger x, RoundingMode mode) {
-		checkPositive("x", x);
-		if (fitsInLong(x)) {
-			return LongMath.log10(x.longValue(), mode);
-		}
-
-		int approxLog10 = (int) (log2(x, FLOOR) * LN_2 / LN_10);
-		BigInteger approxPow = BigInteger.TEN.pow(approxLog10);
-		int approxCmp = approxPow.compareTo(x);
-
-		/*
-		 * We adjust approxLog10 and approxPow until they're equal to floor(log10(x))
-		 * and 10^floor(log10(x)).
-		 */
-
-		if (approxCmp > 0) {
-			/*
-			 * The code is written so that even completely incorrect approximations will
-			 * still yield the correct answer eventually, but in practice this branch should
-			 * almost never be entered, and even then the loop should not run more than
-			 * once.
-			 */
-			do {
-				approxLog10--;
-				approxPow = approxPow.divide(BigInteger.TEN);
-				approxCmp = approxPow.compareTo(x);
-			} while (approxCmp > 0);
-		} else {
-			BigInteger nextPow = BigInteger.TEN.multiply(approxPow);
-			int nextCmp = nextPow.compareTo(x);
-			while (nextCmp <= 0) {
-				approxLog10++;
-				approxPow = nextPow;
-				approxCmp = nextCmp;
-				nextPow = BigInteger.TEN.multiply(approxPow);
-				nextCmp = nextPow.compareTo(x);
-			}
-		}
-
-		int floorLog = approxLog10;
-		BigInteger floorPow = approxPow;
-		int floorCmp = approxCmp;
-
-		switch (mode) {
-		case UNNECESSARY:
-			checkRoundingUnnecessary(floorCmp == 0);
-			// fall through
-		case FLOOR:
-		case DOWN:
-			return floorLog;
-
-		case CEILING:
-		case UP:
-			return floorPow.equals(x) ? floorLog : floorLog + 1;
-
-		case HALF_DOWN:
-		case HALF_UP:
-		case HALF_EVEN:
-			// Since sqrt(10) is irrational, log10(x) - floorLog can never be exactly 0.5
-			BigInteger x2 = x.pow(2);
-			BigInteger halfPowerSquared = floorPow.pow(2).multiply(BigInteger.TEN);
-			return (x2.compareTo(halfPowerSquared) <= 0) ? floorLog : floorLog + 1;
-		default:
-			throw new AssertionError();
-		}
-	}
-
 	private static final double LN_10 = Math.log(10);
+
 	private static final double LN_2 = Math.log(2);
 
 	/**
-	 * Returns the square root of {@code x}, rounded with the specified rounding
-	 * mode.
+	 * Returns {@code n} choose {@code k}, also known as the binomial coefficient of
+	 * {@code n} and {@code k}, that is, {@code n! / (k! (n - k)!)}.
 	 *
-	 * @throws IllegalArgumentException if {@code x < 0}
-	 * @throws ArithmeticException      if {@code mode} is
-	 *                                  {@link RoundingMode#UNNECESSARY} and
-	 *                                  {@code sqrt(x)} is not an integer
+	 * <p>
+	 * <b>Warning</b>: the result can take as much as <i>O(k log n)</i> space.
+	 *
+	 * @throws IllegalArgumentException if {@code n < 0}, {@code k < 0}, or
+	 *                                  {@code k > n}
 	 */
-	@GwtIncompatible("TODO")
-	@SuppressWarnings("fallthrough")
-	public static BigInteger sqrt(BigInteger x, RoundingMode mode) {
-		checkNonNegative("x", x);
-		if (fitsInLong(x)) {
-			return BigInteger.valueOf(LongMath.sqrt(x.longValue(), mode));
+	public static BigInteger binomial(int n, int k) {
+		checkNonNegative("n", n);
+		checkNonNegative("k", k);
+		checkArgument(k <= n, "k (%s) > n (%s)", k, n);
+		if (k > (n >> 1)) {
+			k = n - k;
 		}
-		BigInteger sqrtFloor = sqrtFloor(x);
-		switch (mode) {
-		case UNNECESSARY:
-			checkRoundingUnnecessary(sqrtFloor.pow(2).equals(x)); // fall through
-		case FLOOR:
-		case DOWN:
-			return sqrtFloor;
-		case CEILING:
-		case UP:
-			int sqrtFloorInt = sqrtFloor.intValue();
-			boolean sqrtFloorIsExact = (sqrtFloorInt * sqrtFloorInt == x.intValue()) // fast check mod 2^32
-					&& sqrtFloor.pow(2).equals(x); // slow exact check
-			return sqrtFloorIsExact ? sqrtFloor : sqrtFloor.add(BigInteger.ONE);
-		case HALF_DOWN:
-		case HALF_UP:
-		case HALF_EVEN:
-			BigInteger halfSquare = sqrtFloor.pow(2).add(sqrtFloor);
-			/*
-			 * We wish to test whether or not x <= (sqrtFloor + 0.5)^2 = halfSquare + 0.25.
-			 * Since both x and halfSquare are integers, this is equivalent to testing
-			 * whether or not x <= halfSquare.
-			 */
-			return (halfSquare.compareTo(x) >= 0) ? sqrtFloor : sqrtFloor.add(BigInteger.ONE);
-		default:
-			throw new AssertionError();
+		if (k < LongMath.biggestBinomials.length && n <= LongMath.biggestBinomials[k]) {
+			return BigInteger.valueOf(LongMath.binomial(n, k));
 		}
-	}
 
-	@GwtIncompatible("TODO")
-	private static BigInteger sqrtFloor(BigInteger x) {
-		/*
-		 * Adapted from Hacker's Delight, Figure 11-1.
-		 *
-		 * Using DoubleUtils.bigToDouble, getting a double approximation of x is
-		 * extremely fast, and then we can get a double approximation of the square
-		 * root. Then, we iteratively improve this guess with an application of Newton's
-		 * method, which sets guess := (guess + (x / guess)) / 2. This iteration has the
-		 * following two properties:
-		 *
-		 * a) every iteration (except potentially the first) has guess >=
-		 * floor(sqrt(x)). This is because guess' is the arithmetic mean of guess and x
-		 * / guess, sqrt(x) is the geometric mean, and the arithmetic mean is always
-		 * higher than the geometric mean.
-		 *
-		 * b) this iteration converges to floor(sqrt(x)). In fact, the number of correct
-		 * digits doubles with each iteration, so this algorithm takes O(log(digits))
-		 * iterations.
-		 *
-		 * We start out with a double-precision approximation, which may be higher or
-		 * lower than the true value. Therefore, we perform at least one Newton
-		 * iteration to get a guess that's definitely >= floor(sqrt(x)), and then
-		 * continue the iteration until we reach a fixed point.
-		 */
-		BigInteger sqrt0;
-		int log2 = log2(x, FLOOR);
-		if (log2 < Double.MAX_EXPONENT) {
-			sqrt0 = sqrtApproxWithDoubles(x);
-		} else {
-			int shift = (log2 - DoubleUtils.SIGNIFICAND_BITS) & ~1; // even!
-			/*
-			 * We have that x / 2^shift < 2^54. Our initial approximation to sqrtFloor(x)
-			 * will be 2^(shift/2) * sqrtApproxWithDoubles(x / 2^shift).
-			 */
-			sqrt0 = sqrtApproxWithDoubles(x.shiftRight(shift)).shiftLeft(shift >> 1);
-		}
-		BigInteger sqrt1 = sqrt0.add(x.divide(sqrt0)).shiftRight(1);
-		if (sqrt0.equals(sqrt1)) {
-			return sqrt0;
-		}
-		do {
-			sqrt0 = sqrt1;
-			sqrt1 = sqrt0.add(x.divide(sqrt0)).shiftRight(1);
-		} while (sqrt1.compareTo(sqrt0) < 0);
-		return sqrt0;
-	}
+		BigInteger accum = BigInteger.ONE;
 
-	@GwtIncompatible("TODO")
-	private static BigInteger sqrtApproxWithDoubles(BigInteger x) {
-		return DoubleMath.roundToBigInteger(Math.sqrt(DoubleUtils.bigToDouble(x)), HALF_EVEN);
+		long numeratorAccum = n;
+		long denominatorAccum = 1;
+
+		int bits = LongMath.log2(n, RoundingMode.CEILING);
+
+		int numeratorBits = bits;
+
+		for (int i = 1; i < k; i++) {
+			int p = n - i;
+			int q = i + 1;
+
+			// log2(p) >= bits - 1, because p >= n/2
+
+			if (numeratorBits + bits >= Long.SIZE - 1) {
+				// The numerator is as big as it can get without risking overflow.
+				// Multiply numeratorAccum / denominatorAccum into accum.
+				accum = accum.multiply(BigInteger.valueOf(numeratorAccum)).divide(BigInteger.valueOf(denominatorAccum));
+				numeratorAccum = p;
+				denominatorAccum = q;
+				numeratorBits = bits;
+			} else {
+				// We can definitely multiply into the long accumulators without overflowing
+				// them.
+				numeratorAccum *= p;
+				denominatorAccum *= q;
+				numeratorBits += bits;
+			}
+		}
+		return accum.multiply(BigInteger.valueOf(numeratorAccum)).divide(BigInteger.valueOf(denominatorAccum));
 	}
 
 	/**
@@ -384,6 +205,20 @@ public final class BigIntegerMath {
 		return listProduct(bignums).shiftLeft(shift);
 	}
 
+	// Returns true if BigInteger.valueOf(x.longValue()).equals(x).
+	@GwtIncompatible("TODO")
+	static boolean fitsInLong(BigInteger x) {
+		return x.bitLength() <= Long.SIZE - 1;
+	}
+
+	/**
+	 * Returns {@code true} if {@code x} represents a power of two.
+	 */
+	public static boolean isPowerOfTwo(BigInteger x) {
+		checkNotNull(x);
+		return x.signum() > 0 && x.getLowestSetBit() == x.bitLength() - 1;
+	}
+
 	static BigInteger listProduct(List<BigInteger> nums) {
 		return listProduct(nums, 0, nums.size());
 	}
@@ -406,63 +241,229 @@ public final class BigIntegerMath {
 	}
 
 	/**
-	 * Returns {@code n} choose {@code k}, also known as the binomial coefficient of
-	 * {@code n} and {@code k}, that is, {@code n! / (k! (n - k)!)}.
+	 * Returns the base-10 logarithm of {@code x}, rounded according to the
+	 * specified rounding mode.
 	 *
-	 * <p>
-	 * <b>Warning</b>: the result can take as much as <i>O(k log n)</i> space.
-	 *
-	 * @throws IllegalArgumentException if {@code n < 0}, {@code k < 0}, or
-	 *                                  {@code k > n}
+	 * @throws IllegalArgumentException if {@code x <= 0}
+	 * @throws ArithmeticException      if {@code mode} is
+	 *                                  {@link RoundingMode#UNNECESSARY} and
+	 *                                  {@code x} is not a power of ten
 	 */
-	public static BigInteger binomial(int n, int k) {
-		checkNonNegative("n", n);
-		checkNonNegative("k", k);
-		checkArgument(k <= n, "k (%s) > n (%s)", k, n);
-		if (k > (n >> 1)) {
-			k = n - k;
-		}
-		if (k < LongMath.biggestBinomials.length && n <= LongMath.biggestBinomials[k]) {
-			return BigInteger.valueOf(LongMath.binomial(n, k));
+	@GwtIncompatible("TODO")
+	@SuppressWarnings("fallthrough")
+	public static int log10(BigInteger x, RoundingMode mode) {
+		checkPositive("x", x);
+		if (fitsInLong(x)) {
+			return LongMath.log10(x.longValue(), mode);
 		}
 
-		BigInteger accum = BigInteger.ONE;
+		int approxLog10 = (int) (log2(x, FLOOR) * LN_2 / LN_10);
+		BigInteger approxPow = BigInteger.TEN.pow(approxLog10);
+		int approxCmp = approxPow.compareTo(x);
 
-		long numeratorAccum = n;
-		long denominatorAccum = 1;
+		/*
+		 * We adjust approxLog10 and approxPow until they're equal to floor(log10(x))
+		 * and 10^floor(log10(x)).
+		 */
 
-		int bits = LongMath.log2(n, RoundingMode.CEILING);
-
-		int numeratorBits = bits;
-
-		for (int i = 1; i < k; i++) {
-			int p = n - i;
-			int q = i + 1;
-
-			// log2(p) >= bits - 1, because p >= n/2
-
-			if (numeratorBits + bits >= Long.SIZE - 1) {
-				// The numerator is as big as it can get without risking overflow.
-				// Multiply numeratorAccum / denominatorAccum into accum.
-				accum = accum.multiply(BigInteger.valueOf(numeratorAccum)).divide(BigInteger.valueOf(denominatorAccum));
-				numeratorAccum = p;
-				denominatorAccum = q;
-				numeratorBits = bits;
-			} else {
-				// We can definitely multiply into the long accumulators without overflowing
-				// them.
-				numeratorAccum *= p;
-				denominatorAccum *= q;
-				numeratorBits += bits;
+		if (approxCmp > 0) {
+			/*
+			 * The code is written so that even completely incorrect approximations will
+			 * still yield the correct answer eventually, but in practice this branch should
+			 * almost never be entered, and even then the loop should not run more than
+			 * once.
+			 */
+			do {
+				approxLog10--;
+				approxPow = approxPow.divide(BigInteger.TEN);
+				approxCmp = approxPow.compareTo(x);
+			} while (approxCmp > 0);
+		} else {
+			BigInteger nextPow = BigInteger.TEN.multiply(approxPow);
+			int nextCmp = nextPow.compareTo(x);
+			while (nextCmp <= 0) {
+				approxLog10++;
+				approxPow = nextPow;
+				approxCmp = nextCmp;
+				nextPow = BigInteger.TEN.multiply(approxPow);
+				nextCmp = nextPow.compareTo(x);
 			}
 		}
-		return accum.multiply(BigInteger.valueOf(numeratorAccum)).divide(BigInteger.valueOf(denominatorAccum));
+
+		int floorLog = approxLog10;
+		BigInteger floorPow = approxPow;
+		int floorCmp = approxCmp;
+
+		switch (mode) {
+		case UNNECESSARY:
+			checkRoundingUnnecessary(floorCmp == 0);
+			// fall through
+		case FLOOR:
+		case DOWN:
+			return floorLog;
+
+		case CEILING:
+		case UP:
+			return floorPow.equals(x) ? floorLog : floorLog + 1;
+
+		case HALF_DOWN:
+		case HALF_UP:
+		case HALF_EVEN:
+			// Since sqrt(10) is irrational, log10(x) - floorLog can never be exactly 0.5
+			BigInteger x2 = x.pow(2);
+			BigInteger halfPowerSquared = floorPow.pow(2).multiply(BigInteger.TEN);
+			return (x2.compareTo(halfPowerSquared) <= 0) ? floorLog : floorLog + 1;
+		default:
+			throw new AssertionError();
+		}
 	}
 
-	// Returns true if BigInteger.valueOf(x.longValue()).equals(x).
+	/**
+	 * Returns the base-2 logarithm of {@code x}, rounded according to the specified
+	 * rounding mode.
+	 *
+	 * @throws IllegalArgumentException if {@code x <= 0}
+	 * @throws ArithmeticException      if {@code mode} is
+	 *                                  {@link RoundingMode#UNNECESSARY} and
+	 *                                  {@code x} is not a power of two
+	 */
+	@SuppressWarnings("fallthrough")
+	// TODO(kevinb): remove after this warning is disabled globally
+	public static int log2(BigInteger x, RoundingMode mode) {
+		checkPositive("x", checkNotNull(x));
+		int logFloor = x.bitLength() - 1;
+		switch (mode) {
+		case UNNECESSARY:
+			checkRoundingUnnecessary(isPowerOfTwo(x)); // fall through
+		case DOWN:
+		case FLOOR:
+			return logFloor;
+
+		case UP:
+		case CEILING:
+			return isPowerOfTwo(x) ? logFloor : logFloor + 1;
+
+		case HALF_DOWN:
+		case HALF_UP:
+		case HALF_EVEN:
+			if (logFloor < SQRT2_PRECOMPUTE_THRESHOLD) {
+				BigInteger halfPower = SQRT2_PRECOMPUTED_BITS.shiftRight(SQRT2_PRECOMPUTE_THRESHOLD - logFloor);
+				if (x.compareTo(halfPower) <= 0) {
+					return logFloor;
+				} else {
+					return logFloor + 1;
+				}
+			}
+			/*
+			 * Since sqrt(2) is irrational, log2(x) - logFloor cannot be exactly 0.5
+			 *
+			 * To determine which side of logFloor.5 the logarithm is, we compare x^2 to
+			 * 2^(2 * logFloor + 1).
+			 */
+			BigInteger x2 = x.pow(2);
+			int logX2Floor = x2.bitLength() - 1;
+			return (logX2Floor < 2 * logFloor + 1) ? logFloor : logFloor + 1;
+
+		default:
+			throw new AssertionError();
+		}
+	}
+
+	/**
+	 * Returns the square root of {@code x}, rounded with the specified rounding
+	 * mode.
+	 *
+	 * @throws IllegalArgumentException if {@code x < 0}
+	 * @throws ArithmeticException      if {@code mode} is
+	 *                                  {@link RoundingMode#UNNECESSARY} and
+	 *                                  {@code sqrt(x)} is not an integer
+	 */
 	@GwtIncompatible("TODO")
-	static boolean fitsInLong(BigInteger x) {
-		return x.bitLength() <= Long.SIZE - 1;
+	@SuppressWarnings("fallthrough")
+	public static BigInteger sqrt(BigInteger x, RoundingMode mode) {
+		checkNonNegative("x", x);
+		if (fitsInLong(x)) {
+			return BigInteger.valueOf(LongMath.sqrt(x.longValue(), mode));
+		}
+		BigInteger sqrtFloor = sqrtFloor(x);
+		switch (mode) {
+		case UNNECESSARY:
+			checkRoundingUnnecessary(sqrtFloor.pow(2).equals(x)); // fall through
+		case FLOOR:
+		case DOWN:
+			return sqrtFloor;
+		case CEILING:
+		case UP:
+			int sqrtFloorInt = sqrtFloor.intValue();
+			boolean sqrtFloorIsExact = (sqrtFloorInt * sqrtFloorInt == x.intValue()) // fast check mod 2^32
+					&& sqrtFloor.pow(2).equals(x); // slow exact check
+			return sqrtFloorIsExact ? sqrtFloor : sqrtFloor.add(BigInteger.ONE);
+		case HALF_DOWN:
+		case HALF_UP:
+		case HALF_EVEN:
+			BigInteger halfSquare = sqrtFloor.pow(2).add(sqrtFloor);
+			/*
+			 * We wish to test whether or not x <= (sqrtFloor + 0.5)^2 = halfSquare + 0.25.
+			 * Since both x and halfSquare are integers, this is equivalent to testing
+			 * whether or not x <= halfSquare.
+			 */
+			return (halfSquare.compareTo(x) >= 0) ? sqrtFloor : sqrtFloor.add(BigInteger.ONE);
+		default:
+			throw new AssertionError();
+		}
+	}
+
+	@GwtIncompatible("TODO")
+	private static BigInteger sqrtApproxWithDoubles(BigInteger x) {
+		return DoubleMath.roundToBigInteger(Math.sqrt(DoubleUtils.bigToDouble(x)), HALF_EVEN);
+	}
+
+	@GwtIncompatible("TODO")
+	private static BigInteger sqrtFloor(BigInteger x) {
+		/*
+		 * Adapted from Hacker's Delight, Figure 11-1.
+		 *
+		 * Using DoubleUtils.bigToDouble, getting a double approximation of x is
+		 * extremely fast, and then we can get a double approximation of the square
+		 * root. Then, we iteratively improve this guess with an application of Newton's
+		 * method, which sets guess := (guess + (x / guess)) / 2. This iteration has the
+		 * following two properties:
+		 *
+		 * a) every iteration (except potentially the first) has guess >=
+		 * floor(sqrt(x)). This is because guess' is the arithmetic mean of guess and x
+		 * / guess, sqrt(x) is the geometric mean, and the arithmetic mean is always
+		 * higher than the geometric mean.
+		 *
+		 * b) this iteration converges to floor(sqrt(x)). In fact, the number of correct
+		 * digits doubles with each iteration, so this algorithm takes O(log(digits))
+		 * iterations.
+		 *
+		 * We start out with a double-precision approximation, which may be higher or
+		 * lower than the true value. Therefore, we perform at least one Newton
+		 * iteration to get a guess that's definitely >= floor(sqrt(x)), and then
+		 * continue the iteration until we reach a fixed point.
+		 */
+		BigInteger sqrt0;
+		int log2 = log2(x, FLOOR);
+		if (log2 < Double.MAX_EXPONENT) {
+			sqrt0 = sqrtApproxWithDoubles(x);
+		} else {
+			int shift = (log2 - DoubleUtils.SIGNIFICAND_BITS) & ~1; // even!
+			/*
+			 * We have that x / 2^shift < 2^54. Our initial approximation to sqrtFloor(x)
+			 * will be 2^(shift/2) * sqrtApproxWithDoubles(x / 2^shift).
+			 */
+			sqrt0 = sqrtApproxWithDoubles(x.shiftRight(shift)).shiftLeft(shift >> 1);
+		}
+		BigInteger sqrt1 = sqrt0.add(x.divide(sqrt0)).shiftRight(1);
+		if (sqrt0.equals(sqrt1)) {
+			return sqrt0;
+		}
+		do {
+			sqrt0 = sqrt1;
+			sqrt1 = sqrt0.add(x.divide(sqrt0)).shiftRight(1);
+		} while (sqrt1.compareTo(sqrt0) < 0);
+		return sqrt0;
 	}
 
 	private BigIntegerMath() {

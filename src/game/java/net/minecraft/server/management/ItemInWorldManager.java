@@ -20,22 +20,25 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldSettings;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -57,31 +60,90 @@ public class ItemInWorldManager {
 		this.theWorld = worldIn;
 	}
 
-	public void setGameType(WorldSettings.GameType type) {
-		this.gameType = type;
-		type.configurePlayerCapabilities(this.thisPlayerMP.capabilities);
-		this.thisPlayerMP.sendPlayerAbilities();
-		this.thisPlayerMP.mcServer.getConfigurationManager().sendPacketToAllPlayers(new S38PacketPlayerListItem(
-				S38PacketPlayerListItem.Action.UPDATE_GAME_MODE, new EntityPlayerMP[] { this.thisPlayerMP }));
+	/**
+	 * + Activate the clicked on block, otherwise use the held item.
+	 */
+	public boolean activateBlockOrUseItem(EntityPlayer entityplayer, World world, ItemStack itemstack,
+			BlockPos blockpos, EnumFacing enumfacing, float f, float f1, float f2) {
+		if (this.gameType == WorldSettings.GameType.SPECTATOR) {
+			TileEntity tileentity = world.getTileEntity(blockpos);
+			if (tileentity instanceof ILockableContainer) {
+				Block block = world.getBlockState(blockpos).getBlock();
+				ILockableContainer ilockablecontainer = (ILockableContainer) tileentity;
+				if (ilockablecontainer instanceof TileEntityChest && block instanceof BlockChest) {
+					ilockablecontainer = ((BlockChest) block).getLockableContainer(world, blockpos);
+				}
+
+				if (ilockablecontainer != null) {
+					entityplayer.displayGUIChest(ilockablecontainer);
+					return true;
+				}
+			} else if (tileentity instanceof IInventory) {
+				entityplayer.displayGUIChest((IInventory) tileentity);
+				return true;
+			}
+
+			return false;
+		} else {
+			if (!entityplayer.isSneaking() || entityplayer.getHeldItem() == null) {
+				IBlockState iblockstate = world.getBlockState(blockpos);
+				if (iblockstate.getBlock().onBlockActivated(world, blockpos, iblockstate, entityplayer, enumfacing, f,
+						f1, f2)) {
+					return true;
+				}
+			}
+
+			if (itemstack == null) {
+				return false;
+			} else if (this.isCreative()) {
+				int j = itemstack.getMetadata();
+				int i = itemstack.stackSize;
+				boolean flag = itemstack.onItemUse(entityplayer, world, blockpos, enumfacing, f, f1, f2);
+				itemstack.setItemDamage(j);
+				itemstack.stackSize = i;
+				return flag;
+			} else {
+				return itemstack.onItemUse(entityplayer, world, blockpos, enumfacing, f, f1, f2);
+			}
+		}
+	}
+
+	public void blockRemoving(BlockPos blockpos) {
+		if (blockpos.equals(this.field_180240_f)) {
+			int i = this.curblockDamage - this.initialDamage;
+			Block block = this.theWorld.getBlockState(blockpos).getBlock();
+			if (block.getMaterial() != Material.air) {
+				float f = block.getPlayerRelativeBlockHardness(this.thisPlayerMP, this.thisPlayerMP.worldObj, blockpos)
+						* (float) (i + 1);
+				if (f >= 0.7F) {
+					this.isDestroyingBlock = false;
+					this.theWorld.sendBlockBreakProgress(this.thisPlayerMP.getEntityId(), blockpos, -1);
+					this.tryHarvestBlock(blockpos);
+				} else if (!this.receivedFinishDiggingPacket) {
+					this.isDestroyingBlock = false;
+					this.receivedFinishDiggingPacket = true;
+					this.field_180241_i = blockpos;
+					this.initialBlockDamage = this.initialDamage;
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * + Stops the block breaking process
+	 */
+	public void cancelDestroyingBlock() {
+		this.isDestroyingBlock = false;
+		this.theWorld.sendBlockBreakProgress(this.thisPlayerMP.getEntityId(), this.field_180240_f, -1);
 	}
 
 	public WorldSettings.GameType getGameType() {
 		return this.gameType;
 	}
 
-	public boolean survivalOrAdventure() {
-		return this.gameType.isSurvivalOrAdventure();
-	}
-
-	/**+
-	 * Get if we are in creative game mode.
-	 */
-	public boolean isCreative() {
-		return this.gameType.isCreative();
-	}
-
-	/**+
-	 * if the gameType is currently NOT_SET then change it to par1
+	/**
+	 * + if the gameType is currently NOT_SET then change it to par1
 	 */
 	public void initializeGameType(WorldSettings.GameType type) {
 		if (this.gameType == WorldSettings.GameType.NOT_SET) {
@@ -91,51 +153,16 @@ public class ItemInWorldManager {
 		this.setGameType(this.gameType);
 	}
 
-	public void updateBlockRemoving() {
-		++this.curblockDamage;
-		if (this.receivedFinishDiggingPacket) {
-			int i = this.curblockDamage - this.initialBlockDamage;
-			Block block = this.theWorld.getBlockState(this.field_180241_i).getBlock();
-			if (block.getMaterial() == Material.air) {
-				this.receivedFinishDiggingPacket = false;
-			} else {
-				float f = block.getPlayerRelativeBlockHardness(this.thisPlayerMP, this.thisPlayerMP.worldObj,
-						this.field_180241_i) * (float) (i + 1);
-				int j = (int) (f * 10.0F);
-				if (j != this.durabilityRemainingOnBlock) {
-					this.theWorld.sendBlockBreakProgress(this.thisPlayerMP.getEntityId(), this.field_180241_i, j);
-					this.durabilityRemainingOnBlock = j;
-				}
-
-				if (f >= 1.0F) {
-					this.receivedFinishDiggingPacket = false;
-					this.tryHarvestBlock(this.field_180241_i);
-				}
-			}
-		} else if (this.isDestroyingBlock) {
-			Block block1 = this.theWorld.getBlockState(this.field_180240_f).getBlock();
-			if (block1.getMaterial() == Material.air) {
-				this.theWorld.sendBlockBreakProgress(this.thisPlayerMP.getEntityId(), this.field_180240_f, -1);
-				this.durabilityRemainingOnBlock = -1;
-				this.isDestroyingBlock = false;
-			} else {
-				int k = this.curblockDamage - this.initialDamage;
-				float f1 = block1.getPlayerRelativeBlockHardness(this.thisPlayerMP, this.thisPlayerMP.worldObj,
-						this.field_180241_i) * (float) (k + 1);
-				int l = (int) (f1 * 10.0F);
-				if (l != this.durabilityRemainingOnBlock) {
-					this.theWorld.sendBlockBreakProgress(this.thisPlayerMP.getEntityId(), this.field_180240_f, l);
-					this.durabilityRemainingOnBlock = l;
-				}
-			}
-		}
-
+	/**
+	 * + Get if we are in creative game mode.
+	 */
+	public boolean isCreative() {
+		return this.gameType.isCreative();
 	}
 
-	/**+
-	 * If not creative, it calls sendBlockBreakProgress until the
-	 * block is broken first. tryHarvestBlock can also be the result
-	 * of this call.
+	/**
+	 * + If not creative, it calls sendBlockBreakProgress until the block is broken
+	 * first. tryHarvestBlock can also be the result of this call.
 	 */
 	public void onBlockClicked(BlockPos blockpos, EnumFacing enumfacing) {
 		if (this.isCreative()) {
@@ -183,38 +210,8 @@ public class ItemInWorldManager {
 		}
 	}
 
-	public void blockRemoving(BlockPos blockpos) {
-		if (blockpos.equals(this.field_180240_f)) {
-			int i = this.curblockDamage - this.initialDamage;
-			Block block = this.theWorld.getBlockState(blockpos).getBlock();
-			if (block.getMaterial() != Material.air) {
-				float f = block.getPlayerRelativeBlockHardness(this.thisPlayerMP, this.thisPlayerMP.worldObj, blockpos)
-						* (float) (i + 1);
-				if (f >= 0.7F) {
-					this.isDestroyingBlock = false;
-					this.theWorld.sendBlockBreakProgress(this.thisPlayerMP.getEntityId(), blockpos, -1);
-					this.tryHarvestBlock(blockpos);
-				} else if (!this.receivedFinishDiggingPacket) {
-					this.isDestroyingBlock = false;
-					this.receivedFinishDiggingPacket = true;
-					this.field_180241_i = blockpos;
-					this.initialBlockDamage = this.initialDamage;
-				}
-			}
-		}
-
-	}
-
-	/**+
-	 * Stops the block breaking process
-	 */
-	public void cancelDestroyingBlock() {
-		this.isDestroyingBlock = false;
-		this.theWorld.sendBlockBreakProgress(this.thisPlayerMP.getEntityId(), this.field_180240_f, -1);
-	}
-
-	/**+
-	 * Removes a block and triggers the appropriate events
+	/**
+	 * + Removes a block and triggers the appropriate events
 	 */
 	private boolean removeBlock(BlockPos pos) {
 		IBlockState iblockstate = this.theWorld.getBlockState(pos);
@@ -227,8 +224,27 @@ public class ItemInWorldManager {
 		return flag;
 	}
 
-	/**+
-	 * Attempts to harvest a block
+	public void setGameType(WorldSettings.GameType type) {
+		this.gameType = type;
+		type.configurePlayerCapabilities(this.thisPlayerMP.capabilities);
+		this.thisPlayerMP.sendPlayerAbilities();
+		this.thisPlayerMP.mcServer.getConfigurationManager().sendPacketToAllPlayers(new S38PacketPlayerListItem(
+				S38PacketPlayerListItem.Action.UPDATE_GAME_MODE, new EntityPlayerMP[] { this.thisPlayerMP }));
+	}
+
+	/**
+	 * + Sets the world instance.
+	 */
+	public void setWorld(WorldServer serverWorld) {
+		this.theWorld = serverWorld;
+	}
+
+	public boolean survivalOrAdventure() {
+		return this.gameType.isSurvivalOrAdventure();
+	}
+
+	/**
+	 * + Attempts to harvest a block
 	 */
 	public boolean tryHarvestBlock(BlockPos blockpos) {
 		if (this.gameType.isCreative() && this.thisPlayerMP.getHeldItem() != null
@@ -278,9 +294,9 @@ public class ItemInWorldManager {
 		}
 	}
 
-	/**+
-	 * Attempts to right-click use an item by the given EntityPlayer
-	 * in the given World
+	/**
+	 * + Attempts to right-click use an item by the given EntityPlayer in the given
+	 * World
 	 */
 	public boolean tryUseItem(EntityPlayer entityplayer, World world, ItemStack itemstack) {
 		if (this.gameType == WorldSettings.GameType.SPECTATOR) {
@@ -314,58 +330,44 @@ public class ItemInWorldManager {
 		}
 	}
 
-	/**+
-	 * Activate the clicked on block, otherwise use the held item.
-	 */
-	public boolean activateBlockOrUseItem(EntityPlayer entityplayer, World world, ItemStack itemstack,
-			BlockPos blockpos, EnumFacing enumfacing, float f, float f1, float f2) {
-		if (this.gameType == WorldSettings.GameType.SPECTATOR) {
-			TileEntity tileentity = world.getTileEntity(blockpos);
-			if (tileentity instanceof ILockableContainer) {
-				Block block = world.getBlockState(blockpos).getBlock();
-				ILockableContainer ilockablecontainer = (ILockableContainer) tileentity;
-				if (ilockablecontainer instanceof TileEntityChest && block instanceof BlockChest) {
-					ilockablecontainer = ((BlockChest) block).getLockableContainer(world, blockpos);
-				}
-
-				if (ilockablecontainer != null) {
-					entityplayer.displayGUIChest(ilockablecontainer);
-					return true;
-				}
-			} else if (tileentity instanceof IInventory) {
-				entityplayer.displayGUIChest((IInventory) tileentity);
-				return true;
-			}
-
-			return false;
-		} else {
-			if (!entityplayer.isSneaking() || entityplayer.getHeldItem() == null) {
-				IBlockState iblockstate = world.getBlockState(blockpos);
-				if (iblockstate.getBlock().onBlockActivated(world, blockpos, iblockstate, entityplayer, enumfacing, f,
-						f1, f2)) {
-					return true;
-				}
-			}
-
-			if (itemstack == null) {
-				return false;
-			} else if (this.isCreative()) {
-				int j = itemstack.getMetadata();
-				int i = itemstack.stackSize;
-				boolean flag = itemstack.onItemUse(entityplayer, world, blockpos, enumfacing, f, f1, f2);
-				itemstack.setItemDamage(j);
-				itemstack.stackSize = i;
-				return flag;
+	public void updateBlockRemoving() {
+		++this.curblockDamage;
+		if (this.receivedFinishDiggingPacket) {
+			int i = this.curblockDamage - this.initialBlockDamage;
+			Block block = this.theWorld.getBlockState(this.field_180241_i).getBlock();
+			if (block.getMaterial() == Material.air) {
+				this.receivedFinishDiggingPacket = false;
 			} else {
-				return itemstack.onItemUse(entityplayer, world, blockpos, enumfacing, f, f1, f2);
+				float f = block.getPlayerRelativeBlockHardness(this.thisPlayerMP, this.thisPlayerMP.worldObj,
+						this.field_180241_i) * (float) (i + 1);
+				int j = (int) (f * 10.0F);
+				if (j != this.durabilityRemainingOnBlock) {
+					this.theWorld.sendBlockBreakProgress(this.thisPlayerMP.getEntityId(), this.field_180241_i, j);
+					this.durabilityRemainingOnBlock = j;
+				}
+
+				if (f >= 1.0F) {
+					this.receivedFinishDiggingPacket = false;
+					this.tryHarvestBlock(this.field_180241_i);
+				}
+			}
+		} else if (this.isDestroyingBlock) {
+			Block block1 = this.theWorld.getBlockState(this.field_180240_f).getBlock();
+			if (block1.getMaterial() == Material.air) {
+				this.theWorld.sendBlockBreakProgress(this.thisPlayerMP.getEntityId(), this.field_180240_f, -1);
+				this.durabilityRemainingOnBlock = -1;
+				this.isDestroyingBlock = false;
+			} else {
+				int k = this.curblockDamage - this.initialDamage;
+				float f1 = block1.getPlayerRelativeBlockHardness(this.thisPlayerMP, this.thisPlayerMP.worldObj,
+						this.field_180241_i) * (float) (k + 1);
+				int l = (int) (f1 * 10.0F);
+				if (l != this.durabilityRemainingOnBlock) {
+					this.theWorld.sendBlockBreakProgress(this.thisPlayerMP.getEntityId(), this.field_180240_f, l);
+					this.durabilityRemainingOnBlock = l;
+				}
 			}
 		}
-	}
 
-	/**+
-	 * Sets the world instance.
-	 */
-	public void setWorld(WorldServer serverWorld) {
-		this.theWorld = serverWorld;
 	}
 }

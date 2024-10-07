@@ -1,7 +1,6 @@
 package net.minecraft.block;
 
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
-
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyDirection;
@@ -22,22 +21,25 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -52,61 +54,66 @@ public class BlockEnderChest extends BlockContainer {
 		this.setBlockBounds(0.0625F, 0.0F, 0.0625F, 0.9375F, 0.875F, 0.9375F);
 	}
 
-	/**+
-	 * Used to determine ambient occlusion and culling when
-	 * rebuilding chunks for render
+	protected boolean canSilkHarvest() {
+		return true;
+	}
+
+	protected BlockState createBlockState() {
+		return new BlockState(this, new IProperty[] { FACING });
+	}
+
+	/**
+	 * + Returns a new instance of a block's tile entity class. Called on placing
+	 * the block.
 	 */
-	public boolean isOpaqueCube() {
-		return false;
+	public TileEntity createNewTileEntity(World var1, int var2) {
+		return new TileEntityEnderChest();
+	}
+
+	/**
+	 * + Get the Item that this Block should drop when harvested.
+	 */
+	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
+		return Item.getItemFromBlock(Blocks.obsidian);
+	}
+
+	/**
+	 * + Convert the BlockState into the correct metadata value
+	 */
+	public int getMetaFromState(IBlockState iblockstate) {
+		return ((EnumFacing) iblockstate.getValue(FACING)).getIndex();
+	}
+
+	/**
+	 * + The type of render function called. 3 for standard block models, 2 for
+	 * TESR's, 1 for liquids, -1 is no render
+	 */
+	public int getRenderType() {
+		return 2;
+	}
+
+	/**
+	 * + Convert the given metadata into a BlockState for this Block
+	 */
+	public IBlockState getStateFromMeta(int i) {
+		EnumFacing enumfacing = EnumFacing.getFront(i);
+		if (enumfacing.getAxis() == EnumFacing.Axis.Y) {
+			enumfacing = EnumFacing.NORTH;
+		}
+
+		return this.getDefaultState().withProperty(FACING, enumfacing);
 	}
 
 	public boolean isFullCube() {
 		return false;
 	}
 
-	/**+
-	 * The type of render function called. 3 for standard block
-	 * models, 2 for TESR's, 1 for liquids, -1 is no render
+	/**
+	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
+	 * render
 	 */
-	public int getRenderType() {
-		return 2;
-	}
-
-	/**+
-	 * Get the Item that this Block should drop when harvested.
-	 */
-	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
-		return Item.getItemFromBlock(Blocks.obsidian);
-	}
-
-	/**+
-	 * Returns the quantity of items to drop on block destruction.
-	 */
-	public int quantityDropped(EaglercraftRandom var1) {
-		return 8;
-	}
-
-	protected boolean canSilkHarvest() {
-		return true;
-	}
-
-	/**+
-	 * Called by ItemBlocks just before a block is actually set in
-	 * the world, to allow for adjustments to the IBlockstate
-	 */
-	public IBlockState onBlockPlaced(World var1, BlockPos var2, EnumFacing var3, float var4, float var5, float var6,
-			int var7, EntityLivingBase entitylivingbase) {
-		return this.getDefaultState().withProperty(FACING, entitylivingbase.getHorizontalFacing().getOpposite());
-	}
-
-	/**+
-	 * Called by ItemBlocks after a block is set in the world, to
-	 * allow post-place logic
-	 */
-	public void onBlockPlacedBy(World world, BlockPos blockpos, IBlockState iblockstate,
-			EntityLivingBase entitylivingbase, ItemStack var5) {
-		world.setBlockState(blockpos,
-				iblockstate.withProperty(FACING, entitylivingbase.getHorizontalFacing().getOpposite()), 2);
+	public boolean isOpaqueCube() {
+		return false;
 	}
 
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState var3, EntityPlayer entityplayer,
@@ -129,12 +136,30 @@ public class BlockEnderChest extends BlockContainer {
 		}
 	}
 
-	/**+
-	 * Returns a new instance of a block's tile entity class. Called
-	 * on placing the block.
+	/**
+	 * + Called by ItemBlocks just before a block is actually set in the world, to
+	 * allow for adjustments to the IBlockstate
 	 */
-	public TileEntity createNewTileEntity(World var1, int var2) {
-		return new TileEntityEnderChest();
+	public IBlockState onBlockPlaced(World var1, BlockPos var2, EnumFacing var3, float var4, float var5, float var6,
+			int var7, EntityLivingBase entitylivingbase) {
+		return this.getDefaultState().withProperty(FACING, entitylivingbase.getHorizontalFacing().getOpposite());
+	}
+
+	/**
+	 * + Called by ItemBlocks after a block is set in the world, to allow post-place
+	 * logic
+	 */
+	public void onBlockPlacedBy(World world, BlockPos blockpos, IBlockState iblockstate,
+			EntityLivingBase entitylivingbase, ItemStack var5) {
+		world.setBlockState(blockpos,
+				iblockstate.withProperty(FACING, entitylivingbase.getHorizontalFacing().getOpposite()), 2);
+	}
+
+	/**
+	 * + Returns the quantity of items to drop on block destruction.
+	 */
+	public int quantityDropped(EaglercraftRandom var1) {
+		return 8;
 	}
 
 	public void randomDisplayTick(World world, BlockPos blockpos, IBlockState var3, EaglercraftRandom random) {
@@ -150,28 +175,5 @@ public class BlockEnderChest extends BlockContainer {
 			world.spawnParticle(EnumParticleTypes.PORTAL, d0, d1, d2, d3, d4, d5, new int[0]);
 		}
 
-	}
-
-	/**+
-	 * Convert the given metadata into a BlockState for this Block
-	 */
-	public IBlockState getStateFromMeta(int i) {
-		EnumFacing enumfacing = EnumFacing.getFront(i);
-		if (enumfacing.getAxis() == EnumFacing.Axis.Y) {
-			enumfacing = EnumFacing.NORTH;
-		}
-
-		return this.getDefaultState().withProperty(FACING, enumfacing);
-	}
-
-	/**+
-	 * Convert the BlockState into the correct metadata value
-	 */
-	public int getMetaFromState(IBlockState iblockstate) {
-		return ((EnumFacing) iblockstate.getValue(FACING)).getIndex();
-	}
-
-	protected BlockState createBlockState() {
-		return new BlockState(this, new IProperty[] { FACING });
 	}
 }

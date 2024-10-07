@@ -28,22 +28,25 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.EnumDifficulty;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -63,103 +66,9 @@ public class GuiOptions extends GuiScreen implements GuiYesNoCallback {
 		this.game_settings_1 = parGameSettings;
 	}
 
-	/**+
-	 * Adds the buttons (and other controls) to the screen in
-	 * question. Called when the GUI is displayed and when the
-	 * window resizes, the buttonList is cleared beforehand.
-	 */
-	public void initGui() {
-		int i = 0;
-		this.field_146442_a = I18n.format("options.title", new Object[0]);
-
-		for (int j = 0; j < field_146440_f.length; ++j) {
-			GameSettings.Options gamesettings$options = field_146440_f[j];
-			if (gamesettings$options.getEnumFloat()) {
-				this.buttonList.add(new GuiOptionSlider(gamesettings$options.returnEnumOrdinal(),
-						this.width / 2 - 155 + i % 2 * 160, this.height / 6 - 12 + 24 * (i >> 1),
-						gamesettings$options));
-			} else {
-				GuiOptionButton guioptionbutton = new GuiOptionButton(gamesettings$options.returnEnumOrdinal(),
-						this.width / 2 - 155 + i % 2 * 160, this.height / 6 - 12 + 24 * (i >> 1), gamesettings$options,
-						this.game_settings_1.getKeyBinding(gamesettings$options));
-				this.buttonList.add(guioptionbutton);
-			}
-
-			++i;
-		}
-
-		if (this.mc.theWorld != null) {
-			EnumDifficulty enumdifficulty = this.mc.theWorld.getDifficulty();
-			this.field_175357_i = new GuiButton(108, this.width / 2 - 155 + i % 2 * 160,
-					this.height / 6 - 12 + 24 * (i >> 1), 150, 20, this.func_175355_a(enumdifficulty));
-			this.buttonList.add(this.field_175357_i);
-			if (this.mc.isSingleplayer() && !this.mc.theWorld.getWorldInfo().isHardcoreModeEnabled()) {
-				this.field_175357_i.setWidth(this.field_175357_i.getButtonWidth() - 20);
-				this.field_175356_r = new GuiLockIconButton(109,
-						this.field_175357_i.xPosition + this.field_175357_i.getButtonWidth(),
-						this.field_175357_i.yPosition);
-				this.buttonList.add(this.field_175356_r);
-				this.field_175356_r.func_175229_b(this.mc.theWorld.getWorldInfo().isDifficultyLocked());
-				this.field_175356_r.enabled = !this.field_175356_r.func_175230_c();
-				this.field_175357_i.enabled = !this.field_175356_r.func_175230_c();
-			} else {
-				this.field_175357_i.enabled = false;
-			}
-		}
-
-		this.buttonList.add(new GuiButton(110, this.width / 2 - 155, this.height / 6 + 48 - 6, 150, 20,
-				I18n.format("options.skinCustomisation", new Object[0])));
-		this.buttonList.add(new GuiButton(8675309, this.width / 2 + 5, this.height / 6 + 48 - 6, 150, 20,
-				I18n.format("shaders.gui.optionsButton")));
-		this.buttonList.add(new GuiButton(106, this.width / 2 - 155, this.height / 6 + 72 - 6, 150, 20,
-				I18n.format("options.sounds", new Object[0])));
-		boolean support = ScreenRecordingController.isSupported();
-		this.buttonList.add(broadcastSettings = new GuiButton(107, this.width / 2 + 5, this.height / 6 + 72 - 6, 150,
-				20, I18n.format(support ? "options.screenRecording.button" : "options.screenRecording.unsupported")));
-		broadcastSettings.enabled = support;
-		this.buttonList.add(new GuiButton(101, this.width / 2 - 155, this.height / 6 + 96 - 6, 150, 20,
-				I18n.format("options.video", new Object[0])));
-		this.buttonList.add(new GuiButton(100, this.width / 2 + 5, this.height / 6 + 96 - 6, 150, 20,
-				I18n.format("options.controls", new Object[0])));
-		this.buttonList.add(new GuiButton(102, this.width / 2 - 155, this.height / 6 + 120 - 6, 150, 20,
-				I18n.format("options.language", new Object[0])));
-		this.buttonList.add(new GuiButton(103, this.width / 2 + 5, this.height / 6 + 120 - 6, 150, 20,
-				I18n.format("options.chat.title", new Object[0])));
-		GuiButton btn;
-		this.buttonList.add(btn = new GuiButton(105, this.width / 2 - 155, this.height / 6 + 144 - 6, 150, 20,
-				I18n.format("options.resourcepack", new Object[0])));
-		btn.enabled = EaglerFolderResourcePack.isSupported();
-		this.buttonList.add(btn = new GuiButton(104, this.width / 2 + 5, this.height / 6 + 144 - 6, 150, 20,
-				I18n.format("options.debugConsoleButton", new Object[0])));
-		btn.enabled = EagRuntime.getPlatformType() != EnumPlatformType.DESKTOP;
-		this.buttonList.add(new GuiButton(200, this.width / 2 - 100, this.height / 6 + 168,
-				I18n.format("gui.done", new Object[0])));
-	}
-
-	public String func_175355_a(EnumDifficulty parEnumDifficulty) {
-		ChatComponentText chatcomponenttext = new ChatComponentText("");
-		chatcomponenttext.appendSibling(new ChatComponentTranslation("options.difficulty", new Object[0]));
-		chatcomponenttext.appendText(": ");
-		chatcomponenttext.appendSibling(
-				new ChatComponentTranslation(parEnumDifficulty.getDifficultyResourceKey(), new Object[0]));
-		return chatcomponenttext.getUnformattedText();
-	}
-
-	public void confirmClicked(boolean flag, int i) {
-		this.mc.displayGuiScreen(this);
-		if (i == 109 && flag && this.mc.theWorld != null) {
-			this.mc.theWorld.getWorldInfo().setDifficultyLocked(true);
-			SingleplayerServerController.setDifficulty(-1);
-			this.field_175356_r.func_175229_b(true);
-			this.field_175356_r.enabled = false;
-			this.field_175357_i.enabled = false;
-		}
-
-	}
-
-	/**+
-	 * Called by the controls from the buttonList when activated.
-	 * (Mouse pressed for buttons)
+	/**
+	 * + Called by the controls from the buttonList when activated. (Mouse pressed
+	 * for buttons)
 	 */
 	protected void actionPerformed(GuiButton parGuiButton) {
 		if (parGuiButton.enabled) {
@@ -186,7 +95,7 @@ public class GuiOptions extends GuiScreen implements GuiYesNoCallback {
 								(new ChatComponentTranslation("difficulty.lock.question",
 										new Object[] { new ChatComponentTranslation(this.mc.theWorld.getWorldInfo()
 												.getDifficulty().getDifficultyResourceKey(), new Object[0]) }))
-														.getFormattedText(),
+										.getFormattedText(),
 								109));
 			}
 
@@ -255,9 +164,21 @@ public class GuiOptions extends GuiScreen implements GuiYesNoCallback {
 		}
 	}
 
-	/**+
-	 * Draws the screen and all the components in it. Args : mouseX,
-	 * mouseY, renderPartialTicks
+	public void confirmClicked(boolean flag, int i) {
+		this.mc.displayGuiScreen(this);
+		if (i == 109 && flag && this.mc.theWorld != null) {
+			this.mc.theWorld.getWorldInfo().setDifficultyLocked(true);
+			SingleplayerServerController.setDifficulty(-1);
+			this.field_175356_r.func_175229_b(true);
+			this.field_175356_r.enabled = false;
+			this.field_175357_i.enabled = false;
+		}
+
+	}
+
+	/**
+	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
+	 * renderPartialTicks
 	 */
 	public void drawScreen(int i, int j, float f) {
 		this.drawDefaultBackground();
@@ -306,6 +227,88 @@ public class GuiOptions extends GuiScreen implements GuiYesNoCallback {
 		}
 
 		super.drawScreen(i, j, f);
+	}
+
+	public String func_175355_a(EnumDifficulty parEnumDifficulty) {
+		ChatComponentText chatcomponenttext = new ChatComponentText("");
+		chatcomponenttext.appendSibling(new ChatComponentTranslation("options.difficulty", new Object[0]));
+		chatcomponenttext.appendText(": ");
+		chatcomponenttext.appendSibling(
+				new ChatComponentTranslation(parEnumDifficulty.getDifficultyResourceKey(), new Object[0]));
+		return chatcomponenttext.getUnformattedText();
+	}
+
+	/**
+	 * + Adds the buttons (and other controls) to the screen in question. Called
+	 * when the GUI is displayed and when the window resizes, the buttonList is
+	 * cleared beforehand.
+	 */
+	public void initGui() {
+		int i = 0;
+		this.field_146442_a = I18n.format("options.title", new Object[0]);
+
+		for (int j = 0; j < field_146440_f.length; ++j) {
+			GameSettings.Options gamesettings$options = field_146440_f[j];
+			if (gamesettings$options.getEnumFloat()) {
+				this.buttonList.add(new GuiOptionSlider(gamesettings$options.returnEnumOrdinal(),
+						this.width / 2 - 155 + i % 2 * 160, this.height / 6 - 12 + 24 * (i >> 1),
+						gamesettings$options));
+			} else {
+				GuiOptionButton guioptionbutton = new GuiOptionButton(gamesettings$options.returnEnumOrdinal(),
+						this.width / 2 - 155 + i % 2 * 160, this.height / 6 - 12 + 24 * (i >> 1), gamesettings$options,
+						this.game_settings_1.getKeyBinding(gamesettings$options));
+				this.buttonList.add(guioptionbutton);
+			}
+
+			++i;
+		}
+
+		if (this.mc.theWorld != null) {
+			EnumDifficulty enumdifficulty = this.mc.theWorld.getDifficulty();
+			this.field_175357_i = new GuiButton(108, this.width / 2 - 155 + i % 2 * 160,
+					this.height / 6 - 12 + 24 * (i >> 1), 150, 20, this.func_175355_a(enumdifficulty));
+			this.buttonList.add(this.field_175357_i);
+			if (this.mc.isSingleplayer() && !this.mc.theWorld.getWorldInfo().isHardcoreModeEnabled()) {
+				this.field_175357_i.setWidth(this.field_175357_i.getButtonWidth() - 20);
+				this.field_175356_r = new GuiLockIconButton(109,
+						this.field_175357_i.xPosition + this.field_175357_i.getButtonWidth(),
+						this.field_175357_i.yPosition);
+				this.buttonList.add(this.field_175356_r);
+				this.field_175356_r.func_175229_b(this.mc.theWorld.getWorldInfo().isDifficultyLocked());
+				this.field_175356_r.enabled = !this.field_175356_r.func_175230_c();
+				this.field_175357_i.enabled = !this.field_175356_r.func_175230_c();
+			} else {
+				this.field_175357_i.enabled = false;
+			}
+		}
+
+		this.buttonList.add(new GuiButton(110, this.width / 2 - 155, this.height / 6 + 48 - 6, 150, 20,
+				I18n.format("options.skinCustomisation", new Object[0])));
+		this.buttonList.add(new GuiButton(8675309, this.width / 2 + 5, this.height / 6 + 48 - 6, 150, 20,
+				I18n.format("shaders.gui.optionsButton")));
+		this.buttonList.add(new GuiButton(106, this.width / 2 - 155, this.height / 6 + 72 - 6, 150, 20,
+				I18n.format("options.sounds", new Object[0])));
+		boolean support = ScreenRecordingController.isSupported();
+		this.buttonList.add(broadcastSettings = new GuiButton(107, this.width / 2 + 5, this.height / 6 + 72 - 6, 150,
+				20, I18n.format(support ? "options.screenRecording.button" : "options.screenRecording.unsupported")));
+		broadcastSettings.enabled = support;
+		this.buttonList.add(new GuiButton(101, this.width / 2 - 155, this.height / 6 + 96 - 6, 150, 20,
+				I18n.format("options.video", new Object[0])));
+		this.buttonList.add(new GuiButton(100, this.width / 2 + 5, this.height / 6 + 96 - 6, 150, 20,
+				I18n.format("options.controls", new Object[0])));
+		this.buttonList.add(new GuiButton(102, this.width / 2 - 155, this.height / 6 + 120 - 6, 150, 20,
+				I18n.format("options.language", new Object[0])));
+		this.buttonList.add(new GuiButton(103, this.width / 2 + 5, this.height / 6 + 120 - 6, 150, 20,
+				I18n.format("options.chat.title", new Object[0])));
+		GuiButton btn;
+		this.buttonList.add(btn = new GuiButton(105, this.width / 2 - 155, this.height / 6 + 144 - 6, 150, 20,
+				I18n.format("options.resourcepack", new Object[0])));
+		btn.enabled = EaglerFolderResourcePack.isSupported();
+		this.buttonList.add(btn = new GuiButton(104, this.width / 2 + 5, this.height / 6 + 144 - 6, 150, 20,
+				I18n.format("options.debugConsoleButton", new Object[0])));
+		btn.enabled = EagRuntime.getPlatformType() != EnumPlatformType.DESKTOP;
+		this.buttonList.add(new GuiButton(200, this.width / 2 - 100, this.height / 6 + 168,
+				I18n.format("gui.done", new Object[0])));
 	}
 
 	@Override

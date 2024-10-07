@@ -27,22 +27,25 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -64,71 +67,9 @@ public class GuiIngameMenu extends GuiScreen {
 		}
 	}
 
-	/**+
-	 * Adds the buttons (and other controls) to the screen in
-	 * question. Called when the GUI is displayed and when the
-	 * window resizes, the buttonList is cleared beforehand.
-	 */
-	public void initGui() {
-		this.buttonList.clear();
-		this.updateCheckerOverlay.setResolution(mc, width, height);
-		byte b0 = -16;
-		boolean flag = true;
-		this.buttonList.add(new GuiButtonWithStupidIcons(1, this.width / 2 - 100, this.height / 4 + 120 + b0,
-				I18n.format("menu.returnToMenu", new Object[0]), PauseMenuCustomizeState.icon_disconnect_L,
-				PauseMenuCustomizeState.icon_disconnect_L_aspect, PauseMenuCustomizeState.icon_disconnect_R,
-				PauseMenuCustomizeState.icon_disconnect_R_aspect));
-		if (!this.mc.isIntegratedServerRunning()) {
-			((GuiButton) this.buttonList.get(0)).displayString = I18n.format("menu.disconnect", new Object[0]);
-			if (this.mc.thePlayer != null && this.mc.thePlayer.sendQueue.getEaglerMessageProtocol().ver >= 4) {
-				this.buttonList.add(notifBellButton = new GuiButtonNotifBell(11, width - 22, height - 22));
-				notifBellButton.setUnread(mc.thePlayer.sendQueue.getNotifManager().getUnread());
-			}
-		}
-
-		this.buttonList.add(new GuiButtonWithStupidIcons(4, this.width / 2 - 100, this.height / 4 + 24 + b0,
-				I18n.format("menu.returnToGame", new Object[0]), PauseMenuCustomizeState.icon_backToGame_L,
-				PauseMenuCustomizeState.icon_backToGame_L_aspect, PauseMenuCustomizeState.icon_backToGame_R,
-				PauseMenuCustomizeState.icon_backToGame_R_aspect));
-		this.buttonList.add(new GuiButtonWithStupidIcons(0, this.width / 2 - 100, this.height / 4 + 96 + b0, 98, 20,
-				I18n.format("menu.options", new Object[0]), PauseMenuCustomizeState.icon_options_L,
-				PauseMenuCustomizeState.icon_options_L_aspect, PauseMenuCustomizeState.icon_options_R,
-				PauseMenuCustomizeState.icon_options_R_aspect));
-		this.buttonList
-				.add(lanButton = new GuiButtonWithStupidIcons(7, this.width / 2 + 2, this.height / 4 + 96 + b0, 98, 20,
-						I18n.format(LANServerController.isLANOpen() ? "menu.closeLan" : "menu.openToLan",
-								new Object[0]),
-						PauseMenuCustomizeState.icon_discord_L, PauseMenuCustomizeState.icon_discord_L_aspect,
-						PauseMenuCustomizeState.icon_discord_R, PauseMenuCustomizeState.icon_discord_R_aspect));
-		this.buttonList.add(new GuiButtonWithStupidIcons(5, this.width / 2 - 100, this.height / 4 + 48 + b0, 98, 20,
-				I18n.format("gui.achievements", new Object[0]), PauseMenuCustomizeState.icon_achievements_L,
-				PauseMenuCustomizeState.icon_achievements_L_aspect, PauseMenuCustomizeState.icon_achievements_R,
-				PauseMenuCustomizeState.icon_achievements_R_aspect));
-		this.buttonList.add(new GuiButtonWithStupidIcons(6, this.width / 2 + 2, this.height / 4 + 48 + b0, 98, 20,
-				I18n.format("gui.stats", new Object[0]), PauseMenuCustomizeState.icon_statistics_L,
-				PauseMenuCustomizeState.icon_statistics_L_aspect, PauseMenuCustomizeState.icon_statistics_R,
-				PauseMenuCustomizeState.icon_statistics_R_aspect));
-		lanButton.enabled = SingleplayerServerController.isWorldRunning();
-		if (PauseMenuCustomizeState.discordButtonMode != PauseMenuCustomizeState.DISCORD_MODE_NONE) {
-			lanButton.enabled = true;
-			lanButton.id = 8;
-			lanButton.displayString = "" + PauseMenuCustomizeState.discordButtonText;
-		}
-		if (PauseMenuCustomizeState.serverInfoMode != PauseMenuCustomizeState.DISCORD_MODE_NONE) {
-			this.buttonList.add(new GuiButtonWithStupidIcons(9, this.width / 2 - 100, this.height / 4 + 72 + b0,
-					PauseMenuCustomizeState.serverInfoButtonText, PauseMenuCustomizeState.icon_serverInfo_L,
-					PauseMenuCustomizeState.icon_serverInfo_L_aspect, PauseMenuCustomizeState.icon_serverInfo_R,
-					PauseMenuCustomizeState.icon_serverInfo_R_aspect));
-		}
-		if (!hasSentAutoSave) {
-			hasSentAutoSave = true;
-			SingleplayerServerController.autoSave();
-		}
-	}
-
-	/**+
-	 * Called by the controls from the buttonList when activated.
-	 * (Mouse pressed for buttons)
+	/**
+	 * + Called by the controls from the buttonList when activated. (Mouse pressed
+	 * for buttons)
 	 */
 	protected void actionPerformed(GuiButton parGuiButton) {
 		switch (parGuiButton.id) {
@@ -217,26 +158,20 @@ public class GuiIngameMenu extends GuiScreen {
 
 	}
 
-	/**+
-	 * Called from the main game loop to update the screen.
-	 */
-	public void updateScreen() {
-		super.updateScreen();
-		if (EagRuntime.getConfiguration().isAllowVoiceClient()
-				&& (!mc.isSingleplayer() || LANServerController.isHostingLAN())) {
-			voiceMenu.updateScreen();
+	public void confirmClicked(boolean par1, int par2) {
+		mc.displayGuiScreen(this);
+		LANServerController.closeLANNoKick();
+		if (par1) {
+			LANServerController.cleanupLAN();
+			SingleplayerServerController.configureLAN(this.mc.theWorld.getWorldInfo().getGameType(), false);
 		}
-		if (Mouse.isActuallyGrabbed()) {
-			Mouse.setGrabbed(false);
-		}
-		if (notifBellButton != null && mc.thePlayer != null) {
-			notifBellButton.setUnread(mc.thePlayer.sendQueue.getNotifManager().getUnread());
-		}
+		this.mc.ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(I18n.format("lanServer.closed")));
+		this.lanButton.displayString = I18n.format("menu.openToLan");
 	}
 
-	/**+
-	 * Draws the screen and all the components in it. Args : mouseX,
-	 * mouseY, renderPartialTicks
+	/**
+	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
+	 * renderPartialTicks
 	 */
 	public void drawScreen(int i, int j, float f) {
 		this.drawDefaultBackground();
@@ -318,6 +253,72 @@ public class GuiIngameMenu extends GuiScreen {
 		}
 	}
 
+	/**
+	 * + Adds the buttons (and other controls) to the screen in question. Called
+	 * when the GUI is displayed and when the window resizes, the buttonList is
+	 * cleared beforehand.
+	 */
+	public void initGui() {
+		this.buttonList.clear();
+		this.updateCheckerOverlay.setResolution(mc, width, height);
+		byte b0 = -16;
+		boolean flag = true;
+		this.buttonList.add(new GuiButtonWithStupidIcons(1, this.width / 2 - 100, this.height / 4 + 120 + b0,
+				I18n.format("menu.returnToMenu", new Object[0]), PauseMenuCustomizeState.icon_disconnect_L,
+				PauseMenuCustomizeState.icon_disconnect_L_aspect, PauseMenuCustomizeState.icon_disconnect_R,
+				PauseMenuCustomizeState.icon_disconnect_R_aspect));
+		if (!this.mc.isIntegratedServerRunning()) {
+			((GuiButton) this.buttonList.get(0)).displayString = I18n.format("menu.disconnect", new Object[0]);
+			if (this.mc.thePlayer != null && this.mc.thePlayer.sendQueue.getEaglerMessageProtocol().ver >= 4) {
+				this.buttonList.add(notifBellButton = new GuiButtonNotifBell(11, width - 22, height - 22));
+				notifBellButton.setUnread(mc.thePlayer.sendQueue.getNotifManager().getUnread());
+			}
+		}
+
+		this.buttonList.add(new GuiButtonWithStupidIcons(4, this.width / 2 - 100, this.height / 4 + 24 + b0,
+				I18n.format("menu.returnToGame", new Object[0]), PauseMenuCustomizeState.icon_backToGame_L,
+				PauseMenuCustomizeState.icon_backToGame_L_aspect, PauseMenuCustomizeState.icon_backToGame_R,
+				PauseMenuCustomizeState.icon_backToGame_R_aspect));
+		this.buttonList.add(new GuiButtonWithStupidIcons(0, this.width / 2 - 100, this.height / 4 + 96 + b0, 98, 20,
+				I18n.format("menu.options", new Object[0]), PauseMenuCustomizeState.icon_options_L,
+				PauseMenuCustomizeState.icon_options_L_aspect, PauseMenuCustomizeState.icon_options_R,
+				PauseMenuCustomizeState.icon_options_R_aspect));
+		this.buttonList
+				.add(lanButton = new GuiButtonWithStupidIcons(7, this.width / 2 + 2, this.height / 4 + 96 + b0, 98, 20,
+						I18n.format(LANServerController.isLANOpen() ? "menu.closeLan" : "menu.openToLan",
+								new Object[0]),
+						PauseMenuCustomizeState.icon_discord_L, PauseMenuCustomizeState.icon_discord_L_aspect,
+						PauseMenuCustomizeState.icon_discord_R, PauseMenuCustomizeState.icon_discord_R_aspect));
+		this.buttonList.add(new GuiButtonWithStupidIcons(5, this.width / 2 - 100, this.height / 4 + 48 + b0, 98, 20,
+				I18n.format("gui.achievements", new Object[0]), PauseMenuCustomizeState.icon_achievements_L,
+				PauseMenuCustomizeState.icon_achievements_L_aspect, PauseMenuCustomizeState.icon_achievements_R,
+				PauseMenuCustomizeState.icon_achievements_R_aspect));
+		this.buttonList.add(new GuiButtonWithStupidIcons(6, this.width / 2 + 2, this.height / 4 + 48 + b0, 98, 20,
+				I18n.format("gui.stats", new Object[0]), PauseMenuCustomizeState.icon_statistics_L,
+				PauseMenuCustomizeState.icon_statistics_L_aspect, PauseMenuCustomizeState.icon_statistics_R,
+				PauseMenuCustomizeState.icon_statistics_R_aspect));
+		lanButton.enabled = SingleplayerServerController.isWorldRunning();
+		if (PauseMenuCustomizeState.discordButtonMode != PauseMenuCustomizeState.DISCORD_MODE_NONE) {
+			lanButton.enabled = true;
+			lanButton.id = 8;
+			lanButton.displayString = "" + PauseMenuCustomizeState.discordButtonText;
+		}
+		if (PauseMenuCustomizeState.serverInfoMode != PauseMenuCustomizeState.DISCORD_MODE_NONE) {
+			this.buttonList.add(new GuiButtonWithStupidIcons(9, this.width / 2 - 100, this.height / 4 + 72 + b0,
+					PauseMenuCustomizeState.serverInfoButtonText, PauseMenuCustomizeState.icon_serverInfo_L,
+					PauseMenuCustomizeState.icon_serverInfo_L_aspect, PauseMenuCustomizeState.icon_serverInfo_R,
+					PauseMenuCustomizeState.icon_serverInfo_R_aspect));
+		}
+		if (!hasSentAutoSave) {
+			hasSentAutoSave = true;
+			SingleplayerServerController.autoSave();
+		}
+	}
+
+	protected boolean isPartOfPauseMenu() {
+		return true;
+	}
+
 	protected void keyTyped(char par1, int par2) {
 		try {
 			if (EagRuntime.getConfiguration().isAllowVoiceClient()
@@ -327,17 +328,6 @@ public class GuiIngameMenu extends GuiScreen {
 			super.keyTyped(par1, par2);
 		} catch (GuiVoiceMenu.AbortedException ex) {
 		}
-	}
-
-	public void confirmClicked(boolean par1, int par2) {
-		mc.displayGuiScreen(this);
-		LANServerController.closeLANNoKick();
-		if (par1) {
-			LANServerController.cleanupLAN();
-			SingleplayerServerController.configureLAN(this.mc.theWorld.getWorldInfo().getGameType(), false);
-		}
-		this.mc.ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(I18n.format("lanServer.closed")));
-		this.lanButton.displayString = I18n.format("menu.openToLan");
 	}
 
 	protected void mouseClicked(int par1, int par2, int par3) {
@@ -379,13 +369,6 @@ public class GuiIngameMenu extends GuiScreen {
 		super.mouseClicked(par1, par2, par3);
 	}
 
-	public void setWorldAndResolution(Minecraft par1Minecraft, int par2, int par3) {
-		super.setWorldAndResolution(par1Minecraft, par2, par3);
-		if (EagRuntime.getConfiguration().isAllowVoiceClient()) {
-			voiceMenu.setResolution(par1Minecraft, par2, par3);
-		}
-	}
-
 	protected void mouseReleased(int par1, int par2, int par3) {
 		try {
 			if (EagRuntime.getConfiguration().isAllowVoiceClient()
@@ -397,7 +380,27 @@ public class GuiIngameMenu extends GuiScreen {
 		}
 	}
 
-	protected boolean isPartOfPauseMenu() {
-		return true;
+	public void setWorldAndResolution(Minecraft par1Minecraft, int par2, int par3) {
+		super.setWorldAndResolution(par1Minecraft, par2, par3);
+		if (EagRuntime.getConfiguration().isAllowVoiceClient()) {
+			voiceMenu.setResolution(par1Minecraft, par2, par3);
+		}
+	}
+
+	/**
+	 * + Called from the main game loop to update the screen.
+	 */
+	public void updateScreen() {
+		super.updateScreen();
+		if (EagRuntime.getConfiguration().isAllowVoiceClient()
+				&& (!mc.isSingleplayer() || LANServerController.isHostingLAN())) {
+			voiceMenu.updateScreen();
+		}
+		if (Mouse.isActuallyGrabbed()) {
+			Mouse.setGrabbed(false);
+		}
+		if (notifBellButton != null && mc.thePlayer != null) {
+			notifBellButton.setUnread(mc.thePlayer.sendQueue.getNotifManager().getUnread());
+		}
 	}
 }

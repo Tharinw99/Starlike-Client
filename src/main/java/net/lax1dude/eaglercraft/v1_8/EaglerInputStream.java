@@ -9,24 +9,67 @@ import java.util.Arrays;
 /**
  * Copyright (c) 2022-2024 lax1dude. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class EaglerInputStream extends InputStream {
 
+	public static byte[] inputStreamToBytes(InputStream is) throws IOException {
+		try {
+			if (is instanceof EaglerInputStream) {
+				return ((EaglerInputStream) is).getAsArray();
+			} else if (is instanceof ByteArrayInputStream) {
+				byte[] ret = new byte[is.available()];
+				is.read(ret);
+				return ret;
+			} else {
+				EaglerOutputStream os = new EaglerOutputStream(1024);
+				byte[] buf = new byte[1024];
+				int i;
+				while ((i = is.read(buf)) != -1) {
+					os.write(buf, 0, i);
+				}
+				return os.toByteArray();
+			}
+		} finally {
+			is.close();
+		}
+	}
+
+	public static byte[] inputStreamToBytesQuiet(InputStream is) {
+		if (is == null) {
+			return null;
+		}
+		try {
+			return inputStreamToBytes(is);
+		} catch (IOException ex) {
+			return null;
+		}
+	}
+
 	protected byte buf[];
 	protected int pos;
+
 	protected int mark = 0;
+
 	protected int count;
+
+	public EaglerInputStream(byte buf[], int offset, int length) {
+		this.buf = buf;
+		this.pos = offset;
+		this.count = Math.min(offset + length, buf.length);
+		this.mark = offset;
+	}
 
 	public EaglerInputStream(byte[] buf) {
 		this.buf = buf;
@@ -34,11 +77,45 @@ public class EaglerInputStream extends InputStream {
 		this.count = buf.length;
 	}
 
-	public EaglerInputStream(byte buf[], int offset, int length) {
-		this.buf = buf;
-		this.pos = offset;
-		this.count = Math.min(offset + length, buf.length);
-		this.mark = offset;
+	public int available() {
+		return count - pos;
+	}
+
+	public boolean canUseArrayDirectly() {
+		return pos == 0 && count == buf.length;
+	}
+
+	public void close() throws IOException {
+	}
+
+	public byte[] getAsArray() {
+		if (pos == 0 && count == buf.length) {
+			return buf;
+		} else {
+			byte[] ret = new byte[count];
+			System.arraycopy(buf, pos, ret, 0, count);
+			return ret;
+		}
+	}
+
+	public int getCount() {
+		return count;
+	}
+
+	public int getMark() {
+		return mark;
+	}
+
+	public int getPosition() {
+		return pos;
+	}
+
+	public void mark(int readAheadLimit) {
+		mark = pos;
+	}
+
+	public boolean markSupported() {
+		return true;
 	}
 
 	public int read() {
@@ -73,22 +150,8 @@ public class EaglerInputStream extends InputStream {
 		return n == -1 ? 0 : n;
 	}
 
-	public long transferTo(OutputStream out) throws IOException {
-		int len = count - pos;
-		out.write(buf, pos, len);
-		pos = count;
-		return len;
-	}
-
-	public static byte[] inputStreamToBytesQuiet(InputStream is) {
-		if (is == null) {
-			return null;
-		}
-		try {
-			return inputStreamToBytes(is);
-		} catch (IOException ex) {
-			return null;
-		}
+	public void reset() {
+		pos = mark;
 	}
 
 	public long skip(long n) {
@@ -101,71 +164,11 @@ public class EaglerInputStream extends InputStream {
 		return k;
 	}
 
-	public int available() {
-		return count - pos;
-	}
-
-	public boolean markSupported() {
-		return true;
-	}
-
-	public void mark(int readAheadLimit) {
-		mark = pos;
-	}
-
-	public void reset() {
-		pos = mark;
-	}
-
-	public void close() throws IOException {
-	}
-
-	public static byte[] inputStreamToBytes(InputStream is) throws IOException {
-		try {
-			if (is instanceof EaglerInputStream) {
-				return ((EaglerInputStream) is).getAsArray();
-			} else if (is instanceof ByteArrayInputStream) {
-				byte[] ret = new byte[is.available()];
-				is.read(ret);
-				return ret;
-			} else {
-				EaglerOutputStream os = new EaglerOutputStream(1024);
-				byte[] buf = new byte[1024];
-				int i;
-				while ((i = is.read(buf)) != -1) {
-					os.write(buf, 0, i);
-				}
-				return os.toByteArray();
-			}
-		}finally {
-			is.close();
-		}
-	}
-
-	public byte[] getAsArray() {
-		if (pos == 0 && count == buf.length) {
-			return buf;
-		} else {
-			byte[] ret = new byte[count];
-			System.arraycopy(buf, pos, ret, 0, count);
-			return ret;
-		}
-	}
-
-	public boolean canUseArrayDirectly() {
-		return pos == 0 && count == buf.length;
-	}
-
-	public int getPosition() {
-		return pos;
-	}
-
-	public int getMark() {
-		return mark;
-	}
-
-	public int getCount() {
-		return count;
+	public long transferTo(OutputStream out) throws IOException {
+		int len = count - pos;
+		out.write(buf, pos, len);
+		pos = count;
+		return len;
 	}
 
 }

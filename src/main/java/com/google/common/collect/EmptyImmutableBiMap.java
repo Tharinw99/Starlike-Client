@@ -34,28 +34,8 @@ final class EmptyImmutableBiMap extends ImmutableBiMap<Object, Object> {
 	}
 
 	@Override
-	public ImmutableBiMap<Object, Object> inverse() {
-		return this;
-	}
-
-	@Override
-	public int size() {
-		return 0;
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return true;
-	}
-
-	@Override
-	public Object get(@Nullable Object key) {
-		return null;
-	}
-
-	@Override
-	public ImmutableSet<Entry<Object, Object>> entrySet() {
-		return ImmutableSet.of();
+	public ImmutableSetMultimap<Object, Object> asMultimap() {
+		return ImmutableSetMultimap.of();
 	}
 
 	@Override
@@ -64,13 +44,23 @@ final class EmptyImmutableBiMap extends ImmutableBiMap<Object, Object> {
 	}
 
 	@Override
-	public ImmutableSetMultimap<Object, Object> asMultimap() {
-		return ImmutableSetMultimap.of();
+	public ImmutableSet<Entry<Object, Object>> entrySet() {
+		return ImmutableSet.of();
 	}
 
 	@Override
-	public ImmutableSet<Object> keySet() {
-		return ImmutableSet.of();
+	public Object get(@Nullable Object key) {
+		return null;
+	}
+
+	@Override
+	public ImmutableBiMap<Object, Object> inverse() {
+		return this;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return true;
 	}
 
 	@Override
@@ -78,7 +68,17 @@ final class EmptyImmutableBiMap extends ImmutableBiMap<Object, Object> {
 		return false;
 	}
 
+	@Override
+	public ImmutableSet<Object> keySet() {
+		return ImmutableSet.of();
+	}
+
 	Object readResolve() {
 		return INSTANCE; // preserve singleton property
+	}
+
+	@Override
+	public int size() {
+		return 0;
 	}
 }

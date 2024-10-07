@@ -18,22 +18,25 @@ import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.ChatAllowedCharacters;
 import net.minecraft.util.ChatComponentText;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -48,41 +51,9 @@ public class GuiEditSign extends GuiScreenVisualViewport {
 		this.tileSign = teSign;
 	}
 
-	/**+
-	 * Adds the buttons (and other controls) to the screen in
-	 * question. Called when the GUI is displayed and when the
-	 * window resizes, the buttonList is cleared beforehand.
-	 */
-	public void initGui() {
-		this.buttonList.clear();
-		Keyboard.enableRepeatEvents(true);
-		this.buttonList.add(this.doneBtn = new GuiButton(0, this.width / 2 - 100, this.height / 4 + 120,
-				I18n.format("gui.done", new Object[0])));
-		this.tileSign.setEditable(false);
-	}
-
-	/**+
-	 * Called when the screen is unloaded. Used to disable keyboard
-	 * repeat events
-	 */
-	public void onGuiClosed() {
-		Keyboard.enableRepeatEvents(false);
-		NetHandlerPlayClient nethandlerplayclient = this.mc.getNetHandler();
-		if (nethandlerplayclient != null) {
-			nethandlerplayclient
-					.addToSendQueue(new C12PacketUpdateSign(this.tileSign.getPos(), this.tileSign.signText));
-		}
-
-		this.tileSign.setEditable(true);
-	}
-
-	public void updateScreen0() {
-		++this.updateCounter;
-	}
-
-	/**+
-	 * Called by the controls from the buttonList when activated.
-	 * (Mouse pressed for buttons)
+	/**
+	 * + Called by the controls from the buttonList when activated. (Mouse pressed
+	 * for buttons)
 	 */
 	protected void actionPerformed(GuiButton parGuiButton) {
 		if (parGuiButton.enabled) {
@@ -94,36 +65,8 @@ public class GuiEditSign extends GuiScreenVisualViewport {
 		}
 	}
 
-	/**+
-	 * Fired when a key is typed (except F11 which toggles full
-	 * screen). This is the equivalent of
-	 * KeyListener.keyTyped(KeyEvent e). Args : character (character
-	 * on the key), keyCode (lwjgl Keyboard key code)
-	 */
-	protected void keyTyped(char parChar1, int parInt1) {
-		if (parInt1 == 200) {
-			this.editLine = this.editLine - 1 & 3;
-		}
-
-		if (parInt1 == 208 || parInt1 == 28 || parInt1 == 156) {
-			this.editLine = this.editLine + 1 & 3;
-		}
-
-		String s = this.tileSign.signText[this.editLine].getUnformattedText();
-		if (parInt1 == 14 && s.length() > 0) {
-			s = s.substring(0, s.length() - 1);
-		}
-
-		if (ChatAllowedCharacters.isAllowedCharacter(parChar1)
-				&& this.fontRendererObj.getStringWidth(s + parChar1) <= 90) {
-			s = s + parChar1;
-		}
-
-		this.tileSign.signText[this.editLine] = new ChatComponentText(s);
-		if (parInt1 == 1) {
-			this.actionPerformed(this.doneBtn);
-		}
-
+	public boolean blockPTTKey() {
+		return true;
 	}
 
 	public void drawScreen0(int i, int j, float f) {
@@ -179,8 +122,66 @@ public class GuiEditSign extends GuiScreenVisualViewport {
 		super.drawScreen0(i, j, f);
 	}
 
-	public boolean blockPTTKey() {
-		return true;
+	/**
+	 * + Adds the buttons (and other controls) to the screen in question. Called
+	 * when the GUI is displayed and when the window resizes, the buttonList is
+	 * cleared beforehand.
+	 */
+	public void initGui() {
+		this.buttonList.clear();
+		Keyboard.enableRepeatEvents(true);
+		this.buttonList.add(this.doneBtn = new GuiButton(0, this.width / 2 - 100, this.height / 4 + 120,
+				I18n.format("gui.done", new Object[0])));
+		this.tileSign.setEditable(false);
+	}
+
+	/**
+	 * + Fired when a key is typed (except F11 which toggles full screen). This is
+	 * the equivalent of KeyListener.keyTyped(KeyEvent e). Args : character
+	 * (character on the key), keyCode (lwjgl Keyboard key code)
+	 */
+	protected void keyTyped(char parChar1, int parInt1) {
+		if (parInt1 == 200) {
+			this.editLine = this.editLine - 1 & 3;
+		}
+
+		if (parInt1 == 208 || parInt1 == 28 || parInt1 == 156) {
+			this.editLine = this.editLine + 1 & 3;
+		}
+
+		String s = this.tileSign.signText[this.editLine].getUnformattedText();
+		if (parInt1 == 14 && s.length() > 0) {
+			s = s.substring(0, s.length() - 1);
+		}
+
+		if (ChatAllowedCharacters.isAllowedCharacter(parChar1)
+				&& this.fontRendererObj.getStringWidth(s + parChar1) <= 90) {
+			s = s + parChar1;
+		}
+
+		this.tileSign.signText[this.editLine] = new ChatComponentText(s);
+		if (parInt1 == 1) {
+			this.actionPerformed(this.doneBtn);
+		}
+
+	}
+
+	/**
+	 * + Called when the screen is unloaded. Used to disable keyboard repeat events
+	 */
+	public void onGuiClosed() {
+		Keyboard.enableRepeatEvents(false);
+		NetHandlerPlayClient nethandlerplayclient = this.mc.getNetHandler();
+		if (nethandlerplayclient != null) {
+			nethandlerplayclient
+					.addToSendQueue(new C12PacketUpdateSign(this.tileSign.getPos(), this.tileSign.signText));
+		}
+
+		this.tileSign.setEditable(true);
+	}
+
+	public void updateScreen0() {
+		++this.updateCounter;
 	}
 
 }

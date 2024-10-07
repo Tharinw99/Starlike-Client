@@ -1,10 +1,18 @@
 package net.minecraft.client.renderer.tileentity;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_EYE_LINEAR;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_EYE_PLANE;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_MODELVIEW;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_OBJECT_LINEAR;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_OBJECT_PLANE;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ONE;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ONE_MINUS_SRC_ALPHA;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_SRC_ALPHA;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ZERO;
 
-import net.lax1dude.eaglercraft.v1_8.internal.buffer.FloatBuffer;
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
-
+import net.lax1dude.eaglercraft.v1_8.internal.buffer.FloatBuffer;
 import net.lax1dude.eaglercraft.v1_8.opengl.GlStateManager;
 import net.lax1dude.eaglercraft.v1_8.opengl.WorldRenderer;
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.DeferredStateManager;
@@ -17,22 +25,25 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.tileentity.TileEntityEndPortal;
 import net.minecraft.util.ResourceLocation;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -42,6 +53,13 @@ public class TileEntityEndPortalRenderer extends TileEntitySpecialRenderer<TileE
 	private static final ResourceLocation END_PORTAL_TEXTURE = new ResourceLocation("textures/entity/end_portal.png");
 	private static final EaglercraftRandom field_147527_e = new EaglercraftRandom(31100L);
 	FloatBuffer field_147528_b = GLAllocation.createDirectFloatBuffer(16);
+
+	private FloatBuffer func_147525_a(float parFloat1, float parFloat2, float parFloat3, float parFloat4) {
+		this.field_147528_b.clear();
+		this.field_147528_b.put(parFloat1).put(parFloat2).put(parFloat3).put(parFloat4);
+		this.field_147528_b.flip();
+		return this.field_147528_b;
+	}
 
 	public void renderTileEntityAt(TileEntityEndPortal var1, double d0, double d1, double d2, float var8, int var9) {
 		if (DeferredStateManager.isInDeferredPass()) {
@@ -119,10 +137,14 @@ public class TileEntityEndPortalRenderer extends TileEntitySpecialRenderer<TileE
 			GlStateManager.texGen(GlStateManager.TexGen.T, GL_OBJECT_LINEAR);
 			GlStateManager.texGen(GlStateManager.TexGen.R, GL_OBJECT_LINEAR);
 			GlStateManager.texGen(GlStateManager.TexGen.Q, GL_EYE_LINEAR);
-			GlStateManager.func_179105_a(GlStateManager.TexGen.S, GL_OBJECT_PLANE, this.func_147525_a(1.0F, 0.0F, 0.0F, 0.0F));
-			GlStateManager.func_179105_a(GlStateManager.TexGen.T, GL_OBJECT_PLANE, this.func_147525_a(0.0F, 0.0F, 1.0F, 0.0F));
-			GlStateManager.func_179105_a(GlStateManager.TexGen.R, GL_OBJECT_PLANE, this.func_147525_a(0.0F, 0.0F, 0.0F, 1.0F));
-			GlStateManager.func_179105_a(GlStateManager.TexGen.Q, GL_EYE_PLANE, this.func_147525_a(0.0F, 1.0F, 0.0F, 0.0F));
+			GlStateManager.func_179105_a(GlStateManager.TexGen.S, GL_OBJECT_PLANE,
+					this.func_147525_a(1.0F, 0.0F, 0.0F, 0.0F));
+			GlStateManager.func_179105_a(GlStateManager.TexGen.T, GL_OBJECT_PLANE,
+					this.func_147525_a(0.0F, 0.0F, 1.0F, 0.0F));
+			GlStateManager.func_179105_a(GlStateManager.TexGen.R, GL_OBJECT_PLANE,
+					this.func_147525_a(0.0F, 0.0F, 0.0F, 1.0F));
+			GlStateManager.func_179105_a(GlStateManager.TexGen.Q, GL_EYE_PLANE,
+					this.func_147525_a(0.0F, 1.0F, 0.0F, 0.0F));
 			GlStateManager.enableTexGen();
 			GlStateManager.popMatrix();
 			GlStateManager.matrixMode(GL_TEXTURE);
@@ -159,12 +181,5 @@ public class TileEntityEndPortalRenderer extends TileEntitySpecialRenderer<TileE
 
 		GlStateManager.disableTexGen();
 		GlStateManager.enableLighting();
-	}
-
-	private FloatBuffer func_147525_a(float parFloat1, float parFloat2, float parFloat3, float parFloat4) {
-		this.field_147528_b.clear();
-		this.field_147528_b.put(parFloat1).put(parFloat2).put(parFloat3).put(parFloat4);
-		this.field_147528_b.flip();
-		return this.field_147528_b;
 	}
 }

@@ -52,12 +52,6 @@ public final class UnsignedLong extends Number implements Comparable<UnsignedLon
 	public static final UnsignedLong ONE = new UnsignedLong(1);
 	public static final UnsignedLong MAX_VALUE = new UnsignedLong(-1L);
 
-	private final long value;
-
-	private UnsignedLong(long value) {
-		this.value = value;
-	}
-
 	/**
 	 * Returns an {@code UnsignedLong} corresponding to a given bit representation.
 	 * The argument is interpreted as an unsigned 64-bit value. Specifically, the
@@ -80,18 +74,6 @@ public final class UnsignedLong extends Number implements Comparable<UnsignedLon
 	}
 
 	/**
-	 * Returns an {@code UnsignedLong} representing the same value as the specified
-	 * {@code long}.
-	 *
-	 * @throws IllegalArgumentException if {@code value} is negative
-	 * @since 14.0
-	 */
-	public static UnsignedLong valueOf(long value) {
-		checkArgument(value >= 0, "value (%s) is outside the range for an unsigned long value", value);
-		return fromLongBits(value);
-	}
-
-	/**
 	 * Returns a {@code UnsignedLong} representing the same value as the specified
 	 * {@code BigInteger}. This is the inverse operation of
 	 * {@link #bigIntegerValue()}.
@@ -104,6 +86,18 @@ public final class UnsignedLong extends Number implements Comparable<UnsignedLon
 		checkArgument(value.signum() >= 0 && value.bitLength() <= Long.SIZE,
 				"value (%s) is outside the range for an unsigned long value", value);
 		return fromLongBits(value.longValue());
+	}
+
+	/**
+	 * Returns an {@code UnsignedLong} representing the same value as the specified
+	 * {@code long}.
+	 *
+	 * @throws IllegalArgumentException if {@code value} is negative
+	 * @since 14.0
+	 */
+	public static UnsignedLong valueOf(long value) {
+		checkArgument(value >= 0, "value (%s) is outside the range for an unsigned long value", value);
+		return fromLongBits(value);
 	}
 
 	/**
@@ -131,35 +125,27 @@ public final class UnsignedLong extends Number implements Comparable<UnsignedLon
 		return fromLongBits(UnsignedLongs.parseUnsignedLong(string, radix));
 	}
 
-	/**
-	 * Returns the result of adding this and {@code val}. If the result would have
-	 * more than 64 bits, returns the low 64 bits of the result.
-	 *
-	 * @since 14.0
-	 */
-	public UnsignedLong plus(UnsignedLong val) {
-		return fromLongBits(this.value + checkNotNull(val).value);
+	private final long value;
+
+	private UnsignedLong(long value) {
+		this.value = value;
 	}
 
 	/**
-	 * Returns the result of subtracting this and {@code val}. If the result would
-	 * have more than 64 bits, returns the low 64 bits of the result.
-	 *
-	 * @since 14.0
+	 * Returns the value of this {@code UnsignedLong} as a {@link BigInteger}.
 	 */
-	public UnsignedLong minus(UnsignedLong val) {
-		return fromLongBits(this.value - checkNotNull(val).value);
+	public BigInteger bigIntegerValue() {
+		BigInteger bigInt = BigInteger.valueOf(value & UNSIGNED_MASK);
+		if (value < 0) {
+			bigInt = bigInt.setBit(Long.SIZE - 1);
+		}
+		return bigInt;
 	}
 
-	/**
-	 * Returns the result of multiplying this and {@code val}. If the result would
-	 * have more than 64 bits, returns the low 64 bits of the result.
-	 *
-	 * @since 14.0
-	 */
-	@CheckReturnValue
-	public UnsignedLong times(UnsignedLong val) {
-		return fromLongBits(value * checkNotNull(val).value);
+	@Override
+	public int compareTo(UnsignedLong o) {
+		checkNotNull(o);
+		return UnsignedLongs.compare(value, o.value);
 	}
 
 	/**
@@ -173,13 +159,47 @@ public final class UnsignedLong extends Number implements Comparable<UnsignedLon
 	}
 
 	/**
-	 * Returns this modulo {@code val}.
-	 *
-	 * @since 14.0
+	 * Returns the value of this {@code UnsignedLong} as a {@code double}, analogous
+	 * to a widening primitive conversion from {@code long} to {@code double}, and
+	 * correctly rounded.
 	 */
-	@CheckReturnValue
-	public UnsignedLong mod(UnsignedLong val) {
-		return fromLongBits(UnsignedLongs.remainder(value, checkNotNull(val).value));
+	@Override
+	public double doubleValue() {
+		@SuppressWarnings("cast")
+		double dValue = (double) (value & UNSIGNED_MASK);
+		if (value < 0) {
+			dValue += 0x1.0p63;
+		}
+		return dValue;
+	}
+
+	@Override
+	public boolean equals(@Nullable Object obj) {
+		if (obj instanceof UnsignedLong) {
+			UnsignedLong other = (UnsignedLong) obj;
+			return value == other.value;
+		}
+		return false;
+	}
+
+	/**
+	 * Returns the value of this {@code UnsignedLong} as a {@code float}, analogous
+	 * to a widening primitive conversion from {@code long} to {@code float}, and
+	 * correctly rounded.
+	 */
+	@Override
+	public float floatValue() {
+		@SuppressWarnings("cast")
+		float fValue = (float) (value & UNSIGNED_MASK);
+		if (value < 0) {
+			fValue += 0x1.0p63f;
+		}
+		return fValue;
+	}
+
+	@Override
+	public int hashCode() {
+		return Longs.hashCode(value);
 	}
 
 	/**
@@ -204,64 +224,44 @@ public final class UnsignedLong extends Number implements Comparable<UnsignedLon
 	}
 
 	/**
-	 * Returns the value of this {@code UnsignedLong} as a {@code float}, analogous
-	 * to a widening primitive conversion from {@code long} to {@code float}, and
-	 * correctly rounded.
+	 * Returns the result of subtracting this and {@code val}. If the result would
+	 * have more than 64 bits, returns the low 64 bits of the result.
+	 *
+	 * @since 14.0
 	 */
-	@Override
-	public float floatValue() {
-		@SuppressWarnings("cast")
-		float fValue = (float) (value & UNSIGNED_MASK);
-		if (value < 0) {
-			fValue += 0x1.0p63f;
-		}
-		return fValue;
+	public UnsignedLong minus(UnsignedLong val) {
+		return fromLongBits(this.value - checkNotNull(val).value);
 	}
 
 	/**
-	 * Returns the value of this {@code UnsignedLong} as a {@code double}, analogous
-	 * to a widening primitive conversion from {@code long} to {@code double}, and
-	 * correctly rounded.
+	 * Returns this modulo {@code val}.
+	 *
+	 * @since 14.0
 	 */
-	@Override
-	public double doubleValue() {
-		@SuppressWarnings("cast")
-		double dValue = (double) (value & UNSIGNED_MASK);
-		if (value < 0) {
-			dValue += 0x1.0p63;
-		}
-		return dValue;
+	@CheckReturnValue
+	public UnsignedLong mod(UnsignedLong val) {
+		return fromLongBits(UnsignedLongs.remainder(value, checkNotNull(val).value));
 	}
 
 	/**
-	 * Returns the value of this {@code UnsignedLong} as a {@link BigInteger}.
+	 * Returns the result of adding this and {@code val}. If the result would have
+	 * more than 64 bits, returns the low 64 bits of the result.
+	 *
+	 * @since 14.0
 	 */
-	public BigInteger bigIntegerValue() {
-		BigInteger bigInt = BigInteger.valueOf(value & UNSIGNED_MASK);
-		if (value < 0) {
-			bigInt = bigInt.setBit(Long.SIZE - 1);
-		}
-		return bigInt;
+	public UnsignedLong plus(UnsignedLong val) {
+		return fromLongBits(this.value + checkNotNull(val).value);
 	}
 
-	@Override
-	public int compareTo(UnsignedLong o) {
-		checkNotNull(o);
-		return UnsignedLongs.compare(value, o.value);
-	}
-
-	@Override
-	public int hashCode() {
-		return Longs.hashCode(value);
-	}
-
-	@Override
-	public boolean equals(@Nullable Object obj) {
-		if (obj instanceof UnsignedLong) {
-			UnsignedLong other = (UnsignedLong) obj;
-			return value == other.value;
-		}
-		return false;
+	/**
+	 * Returns the result of multiplying this and {@code val}. If the result would
+	 * have more than 64 bits, returns the low 64 bits of the result.
+	 *
+	 * @since 14.0
+	 */
+	@CheckReturnValue
+	public UnsignedLong times(UnsignedLong val) {
+		return fromLongBits(value * checkNotNull(val).value);
 	}
 
 	/**

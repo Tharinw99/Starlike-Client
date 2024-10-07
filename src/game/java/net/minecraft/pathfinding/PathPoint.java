@@ -2,27 +2,35 @@ package net.minecraft.pathfinding;
 
 import net.minecraft.util.MathHelper;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class PathPoint {
+	public static int makeHash(int x, int y, int z) {
+		return y & 255 | (x & 32767) << 8 | (z & 32767) << 24 | (x < 0 ? Integer.MIN_VALUE : 0)
+				| (z < 0 ? '\u8000' : 0);
+	}
+
 	public final int xCoord;
 	public final int yCoord;
 	public final int zCoord;
@@ -32,6 +40,7 @@ public class PathPoint {
 	float distanceToNext;
 	float distanceToTarget;
 	PathPoint previous;
+
 	public boolean visited;
 
 	public PathPoint(int x, int y, int z) {
@@ -41,13 +50,8 @@ public class PathPoint {
 		this.hash = makeHash(x, y, z);
 	}
 
-	public static int makeHash(int x, int y, int z) {
-		return y & 255 | (x & 32767) << 8 | (z & 32767) << 24 | (x < 0 ? Integer.MIN_VALUE : 0)
-				| (z < 0 ? '\u8000' : 0);
-	}
-
-	/**+
-	 * Returns the linear distance to another path point
+	/**
+	 * + Returns the linear distance to another path point
 	 */
 	public float distanceTo(PathPoint pathpointIn) {
 		float f = (float) (pathpointIn.xCoord - this.xCoord);
@@ -56,8 +60,8 @@ public class PathPoint {
 		return MathHelper.sqrt_float(f * f + f1 * f1 + f2 * f2);
 	}
 
-	/**+
-	 * Returns the squared distance to another path point
+	/**
+	 * + Returns the squared distance to another path point
 	 */
 	public float distanceToSquared(PathPoint pathpointIn) {
 		float f = (float) (pathpointIn.xCoord - this.xCoord);
@@ -80,9 +84,8 @@ public class PathPoint {
 		return this.hash;
 	}
 
-	/**+
-	 * Returns true if this point has already been assigned to a
-	 * path
+	/**
+	 * + Returns true if this point has already been assigned to a path
 	 */
 	public boolean isAssigned() {
 		return this.index >= 0;

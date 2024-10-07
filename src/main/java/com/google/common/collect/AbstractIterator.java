@@ -44,19 +44,20 @@ import com.google.common.annotations.GwtCompatible;
  * <pre>
  *    {@code
  *
- *   public static Iterator<String> skipNulls(final Iterator<String> in) {
- *     return new AbstractIterator<String>() {
- *       protected String computeNext() {
- *         while (in.hasNext()) {
- *           String s = in.next();
- *           if (s != null) {
- *             return s;
- *           }
- *         }
- *         return endOfData();
- *       }
- *     };
- *   }}
+ * public static Iterator<String> skipNulls(final Iterator<String> in) {
+ * 	return new AbstractIterator<String>() {
+ * 		protected String computeNext() {
+ * 			while (in.hasNext()) {
+ * 				String s = in.next();
+ * 				if (s != null) {
+ * 					return s;
+ * 				}
+ * 			}
+ * 			return endOfData();
+ * 		}
+ * 	};
+ * }
+ * }
  * </pre>
  *
  * <p>
@@ -69,12 +70,6 @@ import com.google.common.annotations.GwtCompatible;
 // com.google.common.base.AbstractIterator
 @GwtCompatible
 public abstract class AbstractIterator<T> extends UnmodifiableIterator<T> {
-	private State state = State.NOT_READY;
-
-	/** Constructor for use by subclasses. */
-	protected AbstractIterator() {
-	}
-
 	private enum State {
 		/** We have computed the next element and haven't returned it yet. */
 		READY,
@@ -89,7 +84,13 @@ public abstract class AbstractIterator<T> extends UnmodifiableIterator<T> {
 		FAILED,
 	}
 
+	private State state = State.NOT_READY;
+
 	private T next;
+
+	/** Constructor for use by subclasses. */
+	protected AbstractIterator() {
+	}
 
 	/**
 	 * Returns the next element. <b>Note:</b> the implementation must call
@@ -151,16 +152,6 @@ public abstract class AbstractIterator<T> extends UnmodifiableIterator<T> {
 		return tryToComputeNext();
 	}
 
-	private boolean tryToComputeNext() {
-		state = State.FAILED; // temporary pessimism
-		next = computeNext();
-		if (state != State.DONE) {
-			state = State.READY;
-			return true;
-		}
-		return false;
-	}
-
 	@Override
 	public final T next() {
 		if (!hasNext()) {
@@ -185,5 +176,15 @@ public abstract class AbstractIterator<T> extends UnmodifiableIterator<T> {
 			throw new NoSuchElementException();
 		}
 		return next;
+	}
+
+	private boolean tryToComputeNext() {
+		state = State.FAILED; // temporary pessimism
+		next = computeNext();
+		if (state != State.DONE) {
+			state = State.READY;
+			return true;
+		}
+		return false;
 	}
 }

@@ -1,6 +1,7 @@
 package net.minecraft.client.gui.spectator.categories;
 
 import java.util.List;
+
 import com.google.common.collect.Lists;
 
 import net.lax1dude.eaglercraft.v1_8.opengl.GlStateManager;
@@ -19,69 +20,30 @@ import net.minecraft.util.IChatComponent;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class TeleportToTeam implements ISpectatorMenuView, ISpectatorMenuObject {
-	private final List<ISpectatorMenuObject> field_178672_a = Lists.newArrayList();
-
-	public TeleportToTeam() {
-		Minecraft minecraft = Minecraft.getMinecraft();
-
-		for (ScorePlayerTeam scoreplayerteam : minecraft.theWorld.getScoreboard().getTeams()) {
-			this.field_178672_a.add(new TeleportToTeam.TeamSelectionObject(scoreplayerteam));
-		}
-
-	}
-
-	public List<ISpectatorMenuObject> func_178669_a() {
-		return this.field_178672_a;
-	}
-
-	public IChatComponent func_178670_b() {
-		return new ChatComponentText("Select a team to teleport to");
-	}
-
-	public void func_178661_a(SpectatorMenu spectatormenu) {
-		spectatormenu.func_178647_a(this);
-	}
-
-	public IChatComponent getSpectatorName() {
-		return new ChatComponentText("Teleport to team member");
-	}
-
-	public void func_178663_a(float var1, int var2) {
-		Minecraft.getMinecraft().getTextureManager().bindTexture(GuiSpectator.field_175269_a);
-		Gui.drawModalRectWithCustomSizedTexture(0, 0, 16.0F, 0.0F, 16, 16, 256.0F, 256.0F);
-	}
-
-	public boolean func_178662_A_() {
-		for (int i = 0, l = this.field_178672_a.size(); i < l; ++i) {
-			if (this.field_178672_a.get(i).func_178662_A_()) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	class TeamSelectionObject implements ISpectatorMenuObject {
 		private final ScorePlayerTeam field_178676_b;
 		private final ResourceLocation field_178677_c;
@@ -118,8 +80,8 @@ public class TeleportToTeam implements ISpectatorMenuView, ISpectatorMenuObject 
 			spectatormenu.func_178647_a(new TeleportToPlayer(this.field_178675_d));
 		}
 
-		public IChatComponent getSpectatorName() {
-			return new ChatComponentText(this.field_178676_b.getTeamName());
+		public boolean func_178662_A_() {
+			return !this.field_178675_d.isEmpty();
 		}
 
 		public void func_178663_a(float f, int i) {
@@ -142,8 +104,50 @@ public class TeleportToTeam implements ISpectatorMenuView, ISpectatorMenuObject 
 			Gui.drawScaledCustomSizeModalRect(2, 2, 40.0F, 8.0F, 8, 8, 12, 12, 64.0F, 64.0F);
 		}
 
-		public boolean func_178662_A_() {
-			return !this.field_178675_d.isEmpty();
+		public IChatComponent getSpectatorName() {
+			return new ChatComponentText(this.field_178676_b.getTeamName());
 		}
+	}
+
+	private final List<ISpectatorMenuObject> field_178672_a = Lists.newArrayList();
+
+	public TeleportToTeam() {
+		Minecraft minecraft = Minecraft.getMinecraft();
+
+		for (ScorePlayerTeam scoreplayerteam : minecraft.theWorld.getScoreboard().getTeams()) {
+			this.field_178672_a.add(new TeleportToTeam.TeamSelectionObject(scoreplayerteam));
+		}
+
+	}
+
+	public void func_178661_a(SpectatorMenu spectatormenu) {
+		spectatormenu.func_178647_a(this);
+	}
+
+	public boolean func_178662_A_() {
+		for (int i = 0, l = this.field_178672_a.size(); i < l; ++i) {
+			if (this.field_178672_a.get(i).func_178662_A_()) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public void func_178663_a(float var1, int var2) {
+		Minecraft.getMinecraft().getTextureManager().bindTexture(GuiSpectator.field_175269_a);
+		Gui.drawModalRectWithCustomSizedTexture(0, 0, 16.0F, 0.0F, 16, 16, 256.0F, 256.0F);
+	}
+
+	public List<ISpectatorMenuObject> func_178669_a() {
+		return this.field_178672_a;
+	}
+
+	public IChatComponent func_178670_b() {
+		return new ChatComponentText("Select a team to teleport to");
+	}
+
+	public IChatComponent getSpectatorName() {
+		return new ChatComponentText("Teleport to team member");
 	}
 }

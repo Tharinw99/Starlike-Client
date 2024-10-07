@@ -51,9 +51,46 @@ import com.google.common.annotations.GwtCompatible;
 @Beta
 @GwtCompatible
 public abstract class CharEscaper extends Escaper {
+	/**
+	 * The multiplier for padding to use when growing the escape buffer.
+	 */
+	private static final int DEST_PAD_MULTIPLIER = 2;
+
+	/**
+	 * Helper method to grow the character buffer as needed, this only happens once
+	 * in a while so it's ok if it's in a method call. If the index passed in is 0
+	 * then no copying will be done.
+	 */
+	private static char[] growBuffer(char[] dest, int index, int size) {
+		char[] copy = new char[size];
+		if (index > 0) {
+			System.arraycopy(dest, 0, copy, 0, index);
+		}
+		return copy;
+	}
+
 	/** Constructor for use by subclasses. */
 	protected CharEscaper() {
 	}
+
+	/**
+	 * Returns the escaped form of the given character, or {@code null} if this
+	 * character does not need to be escaped. If an empty array is returned, this
+	 * effectively strips the input character from the resulting text.
+	 *
+	 * <p>
+	 * If the character does not need to be escaped, this method should return
+	 * {@code null}, rather than a one-character array containing the character
+	 * itself. This enables the escaping algorithm to perform more efficiently.
+	 *
+	 * <p>
+	 * An escaper is expected to be able to deal with any {@code char} value, so
+	 * this method should not throw any exceptions.
+	 *
+	 * @param c the character to escape if necessary
+	 * @return the replacement characters, or {@code null} if no escaping was needed
+	 */
+	protected abstract char[] escape(char c);
 
 	/**
 	 * Returns the escaped form of a given literal string.
@@ -147,41 +184,4 @@ public abstract class CharEscaper extends Escaper {
 		}
 		return new String(dest, 0, destIndex);
 	}
-
-	/**
-	 * Returns the escaped form of the given character, or {@code null} if this
-	 * character does not need to be escaped. If an empty array is returned, this
-	 * effectively strips the input character from the resulting text.
-	 *
-	 * <p>
-	 * If the character does not need to be escaped, this method should return
-	 * {@code null}, rather than a one-character array containing the character
-	 * itself. This enables the escaping algorithm to perform more efficiently.
-	 *
-	 * <p>
-	 * An escaper is expected to be able to deal with any {@code char} value, so
-	 * this method should not throw any exceptions.
-	 *
-	 * @param c the character to escape if necessary
-	 * @return the replacement characters, or {@code null} if no escaping was needed
-	 */
-	protected abstract char[] escape(char c);
-
-	/**
-	 * Helper method to grow the character buffer as needed, this only happens once
-	 * in a while so it's ok if it's in a method call. If the index passed in is 0
-	 * then no copying will be done.
-	 */
-	private static char[] growBuffer(char[] dest, int index, int size) {
-		char[] copy = new char[size];
-		if (index > 0) {
-			System.arraycopy(dest, 0, copy, 0, index);
-		}
-		return copy;
-	}
-
-	/**
-	 * The multiplier for padding to use when growing the escape buffer.
-	 */
-	private static final int DEST_PAD_MULTIPLIER = 2;
 }

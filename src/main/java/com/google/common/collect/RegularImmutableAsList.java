@@ -40,6 +40,12 @@ class RegularImmutableAsList<E> extends ImmutableAsList<E> {
 		this(delegate, ImmutableList.<E>asImmutableList(array));
 	}
 
+	@GwtIncompatible("not present in emulated superclass")
+	@Override
+	int copyIntoArray(Object[] dst, int offset) {
+		return delegateList.copyIntoArray(dst, offset);
+	}
+
 	@Override
 	ImmutableCollection<E> delegateCollection() {
 		return delegate;
@@ -49,20 +55,14 @@ class RegularImmutableAsList<E> extends ImmutableAsList<E> {
 		return delegateList;
 	}
 
+	@Override
+	public E get(int index) {
+		return delegateList.get(index);
+	}
+
 	@SuppressWarnings("unchecked") // safe covariant cast!
 	@Override
 	public UnmodifiableListIterator<E> listIterator(int index) {
 		return (UnmodifiableListIterator<E>) delegateList.listIterator(index);
-	}
-
-	@GwtIncompatible("not present in emulated superclass")
-	@Override
-	int copyIntoArray(Object[] dst, int offset) {
-		return delegateList.copyIntoArray(dst, offset);
-	}
-
-	@Override
-	public E get(int index) {
-		return delegateList.get(index);
 	}
 }

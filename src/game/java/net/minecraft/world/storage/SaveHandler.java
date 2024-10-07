@@ -4,6 +4,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import net.lax1dude.eaglercraft.v1_8.internal.vfs2.VFile2;
+import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
+import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
+import net.lax1dude.eaglercraft.v1_8.sp.server.WorldsDB;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
@@ -11,27 +15,26 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.MinecraftException;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.chunk.storage.IChunkLoader;
-import net.lax1dude.eaglercraft.v1_8.internal.vfs2.VFile2;
-import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
-import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
-import net.lax1dude.eaglercraft.v1_8.sp.server.WorldsDB;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -41,9 +44,9 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData {
 	private final VFile2 worldDirectory;
 	private final VFile2 playersDirectory;
 	private final VFile2 mapDataDir;
-	/**+
-	 * The time in milliseconds when this field was initialized.
-	 * Stored in the session lock file.
+	/**
+	 * + The time in milliseconds when this field was initialized. Stored in the
+	 * session lock file.
 	 */
 	private final long initializationTime = MinecraftServer.getCurrentTimeMillis();
 	private final String saveDirectoryName;
@@ -56,30 +59,68 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData {
 
 	}
 
-	/**+
-	 * Gets the File object corresponding to the base directory of
-	 * this world.
-	 */
-	public VFile2 getWorldDirectory() {
-		return this.worldDirectory;
-	}
-
-	/**+
-	 * Checks the session lock to prevent save collisions
+	/**
+	 * + Checks the session lock to prevent save collisions
 	 */
 	public void checkSessionLock() throws MinecraftException {
 	}
 
-	/**+
-	 * initializes and returns the chunk loader for the specified
-	 * world provider
+	/**
+	 * + Called to flush all changes to disk, waiting for them to complete.
+	 */
+	public void flush() {
+	}
+
+	/**
+	 * + Returns an array of usernames for which player.dat exists for.
+	 */
+	public String[] getAvailablePlayerDat() {
+		List<String> astring = this.playersDirectory.listFilenames(false);
+
+		for (int i = 0, l = astring.size(); i < l; ++i) {
+			String str = astring.get(i);
+			if (str.endsWith(".dat")) {
+				astring.set(i, str.substring(0, str.length() - 4));
+			}
+		}
+
+		return astring.toArray(new String[astring.size()]);
+	}
+
+	/**
+	 * + initializes and returns the chunk loader for the specified world provider
 	 */
 	public IChunkLoader getChunkLoader(WorldProvider var1) {
 		throw new RuntimeException("eagler");
 	}
 
-	/**+
-	 * Loads and returns the world info
+	/**
+	 * + Gets the file location of the given map
+	 */
+	public VFile2 getMapFileFromName(String mapName) {
+		return WorldsDB.newVFile(this.mapDataDir, mapName + ".dat");
+	}
+
+	public IPlayerFileData getPlayerNBTManager() {
+		return this;
+	}
+
+	/**
+	 * + Gets the File object corresponding to the base directory of this world.
+	 */
+	public VFile2 getWorldDirectory() {
+		return this.worldDirectory;
+	}
+
+	/**
+	 * + Returns the name of the directory where world information is saved.
+	 */
+	public String getWorldDirectoryName() {
+		return this.saveDirectoryName;
+	}
+
+	/**
+	 * + Loads and returns the world info
 	 */
 	public WorldInfo loadWorldInfo() {
 		VFile2 file1 = WorldsDB.newVFile(this.worldDirectory, "level.dat");
@@ -109,44 +150,33 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData {
 		return null;
 	}
 
-	/**+
-	 * Saves the given World Info with the given NBTTagCompound as
-	 * the Player.
+	/**
+	 * + Reads the player data from disk into the specified PlayerEntityMP.
 	 */
-	public void saveWorldInfoWithPlayer(WorldInfo worldinfo, NBTTagCompound nbttagcompound) {
-		NBTTagCompound nbttagcompound1 = worldinfo.cloneNBTCompound(nbttagcompound);
-		NBTTagCompound nbttagcompound2 = new NBTTagCompound();
-		nbttagcompound2.setTag("Data", nbttagcompound1);
+	public NBTTagCompound readPlayerData(EntityPlayer player) {
+		NBTTagCompound nbttagcompound = null;
 
 		try {
-			VFile2 file1 = WorldsDB.newVFile(this.worldDirectory, "level.dat_new");
-			VFile2 file2 = WorldsDB.newVFile(this.worldDirectory, "level.dat_old");
-			VFile2 file3 = WorldsDB.newVFile(this.worldDirectory, "level.dat");
-			try (OutputStream os = file1.getOutputStream()) {
-				CompressedStreamTools.writeCompressed(nbttagcompound2, os);
-			}
-			if (file2.exists()) {
-				file2.delete();
-			}
-
-			file3.renameTo(file2);
-			if (file3.exists()) {
-				file3.delete();
-			}
-
-			file1.renameTo(file3);
+			VFile2 file1 = WorldsDB.newVFile(this.playersDirectory, player.getName().toLowerCase() + ".dat");
 			if (file1.exists()) {
-				file1.delete();
+				try (InputStream is = file1.getInputStream()) {
+					nbttagcompound = CompressedStreamTools.readCompressed(is);
+				}
 			}
-		} catch (Exception exception) {
-			logger.error("Failed to write level.dat!");
-			logger.error(exception);
+		} catch (Exception var4) {
+			logger.error("Failed to load player data for {}", player.getName());
+			logger.error(var4);
 		}
 
+		if (nbttagcompound != null) {
+			player.readFromNBT(nbttagcompound);
+		}
+
+		return nbttagcompound;
 	}
 
-	/**+
-	 * used to update level.dat from old format to MCRegion format
+	/**
+	 * + used to update level.dat from old format to MCRegion format
 	 */
 	public void saveWorldInfo(WorldInfo worldInformation) {
 		NBTTagCompound nbttagcompound = worldInformation.getNBTTagCompound();
@@ -180,9 +210,43 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData {
 
 	}
 
-	/**+
-	 * Writes the player data to disk from the specified
-	 * PlayerEntityMP.
+	/**
+	 * + Saves the given World Info with the given NBTTagCompound as the Player.
+	 */
+	public void saveWorldInfoWithPlayer(WorldInfo worldinfo, NBTTagCompound nbttagcompound) {
+		NBTTagCompound nbttagcompound1 = worldinfo.cloneNBTCompound(nbttagcompound);
+		NBTTagCompound nbttagcompound2 = new NBTTagCompound();
+		nbttagcompound2.setTag("Data", nbttagcompound1);
+
+		try {
+			VFile2 file1 = WorldsDB.newVFile(this.worldDirectory, "level.dat_new");
+			VFile2 file2 = WorldsDB.newVFile(this.worldDirectory, "level.dat_old");
+			VFile2 file3 = WorldsDB.newVFile(this.worldDirectory, "level.dat");
+			try (OutputStream os = file1.getOutputStream()) {
+				CompressedStreamTools.writeCompressed(nbttagcompound2, os);
+			}
+			if (file2.exists()) {
+				file2.delete();
+			}
+
+			file3.renameTo(file2);
+			if (file3.exists()) {
+				file3.delete();
+			}
+
+			file1.renameTo(file3);
+			if (file1.exists()) {
+				file1.delete();
+			}
+		} catch (Exception exception) {
+			logger.error("Failed to write level.dat!");
+			logger.error(exception);
+		}
+
+	}
+
+	/**
+	 * + Writes the player data to disk from the specified PlayerEntityMP.
 	 */
 	public void writePlayerData(EntityPlayer player) {
 		try {
@@ -204,74 +268,5 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData {
 			logger.error(var5);
 		}
 
-	}
-
-	/**+
-	 * Reads the player data from disk into the specified
-	 * PlayerEntityMP.
-	 */
-	public NBTTagCompound readPlayerData(EntityPlayer player) {
-		NBTTagCompound nbttagcompound = null;
-
-		try {
-			VFile2 file1 = WorldsDB.newVFile(this.playersDirectory, player.getName().toLowerCase() + ".dat");
-			if (file1.exists()) {
-				try (InputStream is = file1.getInputStream()) {
-					nbttagcompound = CompressedStreamTools.readCompressed(is);
-				}
-			}
-		} catch (Exception var4) {
-			logger.error("Failed to load player data for {}", player.getName());
-			logger.error(var4);
-		}
-
-		if (nbttagcompound != null) {
-			player.readFromNBT(nbttagcompound);
-		}
-
-		return nbttagcompound;
-	}
-
-	public IPlayerFileData getPlayerNBTManager() {
-		return this;
-	}
-
-	/**+
-	 * Returns an array of usernames for which player.dat exists
-	 * for.
-	 */
-	public String[] getAvailablePlayerDat() {
-		List<String> astring = this.playersDirectory.listFilenames(false);
-
-		for (int i = 0, l = astring.size(); i < l; ++i) {
-			String str = astring.get(i);
-			if (str.endsWith(".dat")) {
-				astring.set(i, str.substring(0, str.length() - 4));
-			}
-		}
-
-		return astring.toArray(new String[astring.size()]);
-	}
-
-	/**+
-	 * Called to flush all changes to disk, waiting for them to
-	 * complete.
-	 */
-	public void flush() {
-	}
-
-	/**+
-	 * Gets the file location of the given map
-	 */
-	public VFile2 getMapFileFromName(String mapName) {
-		return WorldsDB.newVFile(this.mapDataDir, mapName + ".dat");
-	}
-
-	/**+
-	 * Returns the name of the directory where world information is
-	 * saved.
-	 */
-	public String getWorldDirectoryName() {
-		return this.saveDirectoryName;
 	}
 }

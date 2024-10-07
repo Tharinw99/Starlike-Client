@@ -26,41 +26,8 @@ abstract class AbstractRangeSet<C extends Comparable> implements RangeSet<C> {
 	}
 
 	@Override
-	public boolean contains(C value) {
-		return rangeContaining(value) != null;
-	}
-
-	@Override
-	public abstract Range<C> rangeContaining(C value);
-
-	@Override
-	public boolean isEmpty() {
-		return asRanges().isEmpty();
-	}
-
-	@Override
 	public void add(Range<C> range) {
 		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void remove(Range<C> range) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void clear() {
-		remove(Range.<C>all());
-	}
-
-	@Override
-	public boolean enclosesAll(RangeSet<C> other) {
-		for (Range<C> range : other.asRanges()) {
-			if (!encloses(range)) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 	@Override
@@ -71,14 +38,27 @@ abstract class AbstractRangeSet<C extends Comparable> implements RangeSet<C> {
 	}
 
 	@Override
-	public void removeAll(RangeSet<C> other) {
-		for (Range<C> range : other.asRanges()) {
-			remove(range);
-		}
+	public void clear() {
+		remove(Range.<C>all());
+	}
+
+	@Override
+	public boolean contains(C value) {
+		return rangeContaining(value) != null;
 	}
 
 	@Override
 	public abstract boolean encloses(Range<C> otherRange);
+
+	@Override
+	public boolean enclosesAll(RangeSet<C> other) {
+		for (Range<C> range : other.asRanges()) {
+			if (!encloses(range)) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 	@Override
 	public boolean equals(@Nullable Object obj) {
@@ -94,6 +74,26 @@ abstract class AbstractRangeSet<C extends Comparable> implements RangeSet<C> {
 	@Override
 	public final int hashCode() {
 		return asRanges().hashCode();
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return asRanges().isEmpty();
+	}
+
+	@Override
+	public abstract Range<C> rangeContaining(C value);
+
+	@Override
+	public void remove(Range<C> range) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void removeAll(RangeSet<C> other) {
+		for (Range<C> range : other.asRanges()) {
+			remove(range);
+		}
 	}
 
 	@Override

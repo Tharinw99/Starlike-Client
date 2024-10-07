@@ -1,6 +1,7 @@
 package net.minecraft.entity.passive;
 
 import com.google.common.base.Predicate;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
@@ -38,22 +39,25 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -93,6 +97,10 @@ public class EntityWolf extends EntityTameable {
 		this.setTamed(false);
 	}
 
+	public boolean allowLeashing() {
+		return !this.isAngry() && super.allowLeashing();
+	}
+
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.30000001192092896D);
@@ -106,21 +114,66 @@ public class EntityWolf extends EntityTameable {
 		this.getEntityAttribute(SharedMonsterAttributes.attackDamage).setBaseValue(2.0D);
 	}
 
-	/**+
-	 * Sets the active target the Task system uses for tracking
-	 */
-	public void setAttackTarget(EntityLivingBase entitylivingbase) {
-		super.setAttackTarget(entitylivingbase);
-		if (entitylivingbase == null) {
-			this.setAngry(false);
-		} else if (!this.isTamed()) {
-			this.setAngry(true);
+	public boolean attackEntityAsMob(Entity entity) {
+		boolean flag = entity.attackEntityFrom(DamageSource.causeMobDamage(this),
+				(float) ((int) this.getEntityAttribute(SharedMonsterAttributes.attackDamage).getAttributeValue()));
+		if (flag) {
+			this.applyEnchantments(this, entity);
 		}
 
+		return flag;
 	}
 
-	protected void updateAITasks() {
-		this.dataWatcher.updateObject(18, Float.valueOf(this.getHealth()));
+	/**
+	 * + Called when the entity is attacked.
+	 */
+	public boolean attackEntityFrom(DamageSource damagesource, float f) {
+		if (this.isEntityInvulnerable(damagesource)) {
+			return false;
+		} else {
+			Entity entity = damagesource.getEntity();
+			this.aiSit.setSitting(false);
+			if (entity != null && !(entity instanceof EntityPlayer) && !(entity instanceof EntityArrow)) {
+				f = (f + 1.0F) / 2.0F;
+			}
+
+			return super.attackEntityFrom(damagesource, f);
+		}
+	}
+
+	/**
+	 * + Determines if an entity can be despawned, used on idle far away entities
+	 */
+	protected boolean canDespawn() {
+		return !this.isTamed() && this.ticksExisted > 2400;
+	}
+
+	/**
+	 * + Returns true if the mob is currently able to mate with the specified mob.
+	 */
+	public boolean canMateWith(EntityAnimal entityanimal) {
+		if (entityanimal == this) {
+			return false;
+		} else if (!this.isTamed()) {
+			return false;
+		} else if (!(entityanimal instanceof EntityWolf)) {
+			return false;
+		} else {
+			EntityWolf entitywolf = (EntityWolf) entityanimal;
+			return !entitywolf.isTamed() ? false
+					: (entitywolf.isSitting() ? false : this.isInLove() && entitywolf.isInLove());
+		}
+	}
+
+	public EntityWolf createChild(EntityAgeable var1) {
+		EntityWolf entitywolf = new EntityWolf(this.worldObj);
+		String s = this.getOwnerId();
+		if (s != null && s.trim().length() > 0) {
+			entitywolf.setOwnerId(s);
+			entitywolf.setTamed(true);
+		}
+
+		return entitywolf;
 	}
 
 	protected void entityInit() {
@@ -130,35 +183,39 @@ public class EntityWolf extends EntityTameable {
 		this.dataWatcher.addObject(20, Byte.valueOf((byte) EnumDyeColor.RED.getMetadata()));
 	}
 
-	protected void playStepSound(BlockPos var1, Block var2) {
-		this.playSound("mob.wolf.step", 0.15F, 1.0F);
+	public EnumDyeColor getCollarColor() {
+		return EnumDyeColor.byDyeDamage(this.dataWatcher.getWatchableObjectByte(20) & 15);
 	}
 
-	/**+
-	 * (abstract) Protected helper method to write subclass entity
-	 * data to NBT.
+	/**
+	 * + Returns the sound this mob makes on death.
 	 */
-	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
-		super.writeEntityToNBT(nbttagcompound);
-		nbttagcompound.setBoolean("Angry", this.isAngry());
-		nbttagcompound.setByte("CollarColor", (byte) this.getCollarColor().getDyeDamage());
+	protected String getDeathSound() {
+		return "mob.wolf.death";
 	}
 
-	/**+
-	 * (abstract) Protected helper method to read subclass entity
-	 * data from NBT.
+	protected Item getDropItem() {
+		return Item.getItemById(-1);
+	}
+
+	public float getEyeHeight() {
+		return this.height * 0.8F;
+	}
+
+	/**
+	 * + Returns the sound this mob makes when it is hurt.
 	 */
-	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
-		super.readEntityFromNBT(nbttagcompound);
-		this.setAngry(nbttagcompound.getBoolean("Angry"));
-		if (nbttagcompound.hasKey("CollarColor", 99)) {
-			this.setCollarColor(EnumDyeColor.byDyeDamage(nbttagcompound.getByte("CollarColor")));
-		}
-
+	protected String getHurtSound() {
+		return "mob.wolf.hurt";
 	}
 
-	/**+
-	 * Returns the sound this mob makes while it's alive.
+	public float getInterestedAngle(float parFloat1) {
+		return (this.headRotationCourseOld + (this.headRotationCourse - this.headRotationCourseOld) * parFloat1) * 0.15F
+				* 3.1415927F;
+	}
+
+	/**
+	 * + Returns the sound this mob makes while it's alive.
 	 */
 	protected String getLivingSound() {
 		return this.isAngry() ? "mob.wolf.growl"
@@ -168,109 +225,15 @@ public class EntityWolf extends EntityTameable {
 						: "mob.wolf.bark");
 	}
 
-	/**+
-	 * Returns the sound this mob makes when it is hurt.
+	/**
+	 * + Will return how many at most can spawn in a chunk at once.
 	 */
-	protected String getHurtSound() {
-		return "mob.wolf.hurt";
+	public int getMaxSpawnedInChunk() {
+		return 8;
 	}
 
-	/**+
-	 * Returns the sound this mob makes on death.
-	 */
-	protected String getDeathSound() {
-		return "mob.wolf.death";
-	}
-
-	/**+
-	 * Returns the volume for the sounds this mob makes.
-	 */
-	protected float getSoundVolume() {
-		return 0.4F;
-	}
-
-	protected Item getDropItem() {
-		return Item.getItemById(-1);
-	}
-
-	/**+
-	 * Called frequently so the entity can update its state every
-	 * tick as required. For example, zombies and skeletons use this
-	 * to react to sunlight and start to burn.
-	 */
-	public void onLivingUpdate() {
-		super.onLivingUpdate();
-		if (!this.worldObj.isRemote && this.isWet && !this.isShaking && !this.hasPath() && this.onGround) {
-			this.isShaking = true;
-			this.timeWolfIsShaking = 0.0F;
-			this.prevTimeWolfIsShaking = 0.0F;
-			this.worldObj.setEntityState(this, (byte) 8);
-		}
-
-		if (!this.worldObj.isRemote && this.getAttackTarget() == null && this.isAngry()) {
-			this.setAngry(false);
-		}
-
-	}
-
-	/**+
-	 * Called to update the entity's position/logic.
-	 */
-	public void onUpdate() {
-		super.onUpdate();
-		this.headRotationCourseOld = this.headRotationCourse;
-		if (this.isBegging()) {
-			this.headRotationCourse += (1.0F - this.headRotationCourse) * 0.4F;
-		} else {
-			this.headRotationCourse += (0.0F - this.headRotationCourse) * 0.4F;
-		}
-
-		if (this.isWet()) {
-			this.isWet = true;
-			this.isShaking = false;
-			this.timeWolfIsShaking = 0.0F;
-			this.prevTimeWolfIsShaking = 0.0F;
-		} else if ((this.isWet || this.isShaking) && this.isShaking) {
-			if (this.timeWolfIsShaking == 0.0F) {
-				this.playSound("mob.wolf.shake", this.getSoundVolume(),
-						(this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
-			}
-
-			this.prevTimeWolfIsShaking = this.timeWolfIsShaking;
-			this.timeWolfIsShaking += 0.05F;
-			if (this.prevTimeWolfIsShaking >= 2.0F) {
-				this.isWet = false;
-				this.isShaking = false;
-				this.prevTimeWolfIsShaking = 0.0F;
-				this.timeWolfIsShaking = 0.0F;
-			}
-
-			if (this.timeWolfIsShaking > 0.4F) {
-				float f = (float) this.getEntityBoundingBox().minY;
-				int i = (int) (MathHelper.sin((this.timeWolfIsShaking - 0.4F) * 3.1415927F) * 7.0F);
-
-				for (int j = 0; j < i; ++j) {
-					float f1 = (this.rand.nextFloat() * 2.0F - 1.0F) * this.width * 0.5F;
-					float f2 = (this.rand.nextFloat() * 2.0F - 1.0F) * this.width * 0.5F;
-					this.worldObj.spawnParticle(EnumParticleTypes.WATER_SPLASH, this.posX + (double) f1,
-							(double) (f + 0.8F), this.posZ + (double) f2, this.motionX, this.motionY, this.motionZ,
-							new int[0]);
-				}
-			}
-		}
-
-	}
-
-	/**+
-	 * True if the wolf is wet
-	 */
-	public boolean isWolfWet() {
-		return this.isWet;
-	}
-
-	/**+
-	 * Used when calculating the amount of shading to apply while
-	 * the wolf is wet.
+	/**
+	 * + Used when calculating the amount of shading to apply while the wolf is wet.
 	 */
 	public float getShadingWhileWet(float parFloat1) {
 		return 0.75F + (this.prevTimeWolfIsShaking + (this.timeWolfIsShaking - this.prevTimeWolfIsShaking) * parFloat1)
@@ -289,65 +252,42 @@ public class EntityWolf extends EntityTameable {
 		return MathHelper.sin(f * 3.1415927F) * MathHelper.sin(f * 3.1415927F * 11.0F) * 0.15F * 3.1415927F;
 	}
 
-	public float getInterestedAngle(float parFloat1) {
-		return (this.headRotationCourseOld + (this.headRotationCourse - this.headRotationCourseOld) * parFloat1) * 0.15F
-				* 3.1415927F;
+	/**
+	 * + Returns the volume for the sounds this mob makes.
+	 */
+	protected float getSoundVolume() {
+		return 0.4F;
 	}
 
-	public float getEyeHeight() {
-		return this.height * 0.8F;
+	public float getTailRotation() {
+		return this.isAngry() ? 1.5393804F
+				: (this.isTamed()
+						? (0.55F - (20.0F - this.dataWatcher.getWatchableObjectFloat(18)) * 0.02F) * 3.1415927F
+						: 0.62831855F);
 	}
 
-	/**+
-	 * The speed it takes to move the entityliving's rotationPitch
-	 * through the faceEntity method. This is only currently use in
-	 * wolves.
+	/**
+	 * + The speed it takes to move the entityliving's rotationPitch through the
+	 * faceEntity method. This is only currently use in wolves.
 	 */
 	public int getVerticalFaceSpeed() {
 		return this.isSitting() ? 20 : super.getVerticalFaceSpeed();
 	}
 
-	/**+
-	 * Called when the entity is attacked.
-	 */
-	public boolean attackEntityFrom(DamageSource damagesource, float f) {
-		if (this.isEntityInvulnerable(damagesource)) {
-			return false;
+	public void handleStatusUpdate(byte b0) {
+		if (b0 == 8) {
+			this.isShaking = true;
+			this.timeWolfIsShaking = 0.0F;
+			this.prevTimeWolfIsShaking = 0.0F;
 		} else {
-			Entity entity = damagesource.getEntity();
-			this.aiSit.setSitting(false);
-			if (entity != null && !(entity instanceof EntityPlayer) && !(entity instanceof EntityArrow)) {
-				f = (f + 1.0F) / 2.0F;
-			}
-
-			return super.attackEntityFrom(damagesource, f);
-		}
-	}
-
-	public boolean attackEntityAsMob(Entity entity) {
-		boolean flag = entity.attackEntityFrom(DamageSource.causeMobDamage(this),
-				(float) ((int) this.getEntityAttribute(SharedMonsterAttributes.attackDamage).getAttributeValue()));
-		if (flag) {
-			this.applyEnchantments(this, entity);
+			super.handleStatusUpdate(b0);
 		}
 
-		return flag;
 	}
 
-	public void setTamed(boolean flag) {
-		super.setTamed(flag);
-		if (flag) {
-			this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(20.0D);
-		} else {
-			this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(8.0D);
-		}
-
-		this.getEntityAttribute(SharedMonsterAttributes.attackDamage).setBaseValue(4.0D);
-	}
-
-	/**+
-	 * Called when a player interacts with a mob. e.g. gets milk
-	 * from a cow, gets into the saddle on a pig.
+	/**
+	 * + Called when a player interacts with a mob. e.g. gets milk from a cow, gets
+	 * into the saddle on a pig.
 	 */
 	public boolean interact(EntityPlayer entityplayer) {
 		ItemStack itemstack = entityplayer.inventory.getCurrentItem();
@@ -419,28 +359,20 @@ public class EntityWolf extends EntityTameable {
 		return super.interact(entityplayer);
 	}
 
-	public void handleStatusUpdate(byte b0) {
-		if (b0 == 8) {
-			this.isShaking = true;
-			this.timeWolfIsShaking = 0.0F;
-			this.prevTimeWolfIsShaking = 0.0F;
-		} else {
-			super.handleStatusUpdate(b0);
-		}
-
+	/**
+	 * + Determines whether this wolf is angry or not.
+	 */
+	public boolean isAngry() {
+		return (this.dataWatcher.getWatchableObjectByte(16) & 2) != 0;
 	}
 
-	public float getTailRotation() {
-		return this.isAngry() ? 1.5393804F
-				: (this.isTamed()
-						? (0.55F - (20.0F - this.dataWatcher.getWatchableObjectFloat(18)) * 0.02F) * 3.1415927F
-						: 0.62831855F);
+	public boolean isBegging() {
+		return this.dataWatcher.getWatchableObjectByte(19) == 1;
 	}
 
-	/**+
-	 * Checks if the parameter is an item which this animal can be
-	 * fed to breed it (wheat, carrots or seeds depending on the
-	 * animal type)
+	/**
+	 * + Checks if the parameter is an item which this animal can be fed to breed it
+	 * (wheat, carrots or seeds depending on the animal type)
 	 */
 	public boolean isBreedingItem(ItemStack itemstack) {
 		return itemstack == null ? false
@@ -448,22 +380,99 @@ public class EntityWolf extends EntityTameable {
 						: ((ItemFood) itemstack.getItem()).isWolfsFavoriteMeat());
 	}
 
-	/**+
-	 * Will return how many at most can spawn in a chunk at once.
+	/**
+	 * + True if the wolf is wet
 	 */
-	public int getMaxSpawnedInChunk() {
-		return 8;
+	public boolean isWolfWet() {
+		return this.isWet;
 	}
 
-	/**+
-	 * Determines whether this wolf is angry or not.
+	/**
+	 * + Called frequently so the entity can update its state every tick as
+	 * required. For example, zombies and skeletons use this to react to sunlight
+	 * and start to burn.
 	 */
-	public boolean isAngry() {
-		return (this.dataWatcher.getWatchableObjectByte(16) & 2) != 0;
+	public void onLivingUpdate() {
+		super.onLivingUpdate();
+		if (!this.worldObj.isRemote && this.isWet && !this.isShaking && !this.hasPath() && this.onGround) {
+			this.isShaking = true;
+			this.timeWolfIsShaking = 0.0F;
+			this.prevTimeWolfIsShaking = 0.0F;
+			this.worldObj.setEntityState(this, (byte) 8);
+		}
+
+		if (!this.worldObj.isRemote && this.getAttackTarget() == null && this.isAngry()) {
+			this.setAngry(false);
+		}
+
 	}
 
-	/**+
-	 * Sets whether this wolf is angry or not.
+	/**
+	 * + Called to update the entity's position/logic.
+	 */
+	public void onUpdate() {
+		super.onUpdate();
+		this.headRotationCourseOld = this.headRotationCourse;
+		if (this.isBegging()) {
+			this.headRotationCourse += (1.0F - this.headRotationCourse) * 0.4F;
+		} else {
+			this.headRotationCourse += (0.0F - this.headRotationCourse) * 0.4F;
+		}
+
+		if (this.isWet()) {
+			this.isWet = true;
+			this.isShaking = false;
+			this.timeWolfIsShaking = 0.0F;
+			this.prevTimeWolfIsShaking = 0.0F;
+		} else if ((this.isWet || this.isShaking) && this.isShaking) {
+			if (this.timeWolfIsShaking == 0.0F) {
+				this.playSound("mob.wolf.shake", this.getSoundVolume(),
+						(this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
+			}
+
+			this.prevTimeWolfIsShaking = this.timeWolfIsShaking;
+			this.timeWolfIsShaking += 0.05F;
+			if (this.prevTimeWolfIsShaking >= 2.0F) {
+				this.isWet = false;
+				this.isShaking = false;
+				this.prevTimeWolfIsShaking = 0.0F;
+				this.timeWolfIsShaking = 0.0F;
+			}
+
+			if (this.timeWolfIsShaking > 0.4F) {
+				float f = (float) this.getEntityBoundingBox().minY;
+				int i = (int) (MathHelper.sin((this.timeWolfIsShaking - 0.4F) * 3.1415927F) * 7.0F);
+
+				for (int j = 0; j < i; ++j) {
+					float f1 = (this.rand.nextFloat() * 2.0F - 1.0F) * this.width * 0.5F;
+					float f2 = (this.rand.nextFloat() * 2.0F - 1.0F) * this.width * 0.5F;
+					this.worldObj.spawnParticle(EnumParticleTypes.WATER_SPLASH, this.posX + (double) f1,
+							(double) (f + 0.8F), this.posZ + (double) f2, this.motionX, this.motionY, this.motionZ,
+							new int[0]);
+				}
+			}
+		}
+
+	}
+
+	protected void playStepSound(BlockPos var1, Block var2) {
+		this.playSound("mob.wolf.step", 0.15F, 1.0F);
+	}
+
+	/**
+	 * + (abstract) Protected helper method to read subclass entity data from NBT.
+	 */
+	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
+		super.readEntityFromNBT(nbttagcompound);
+		this.setAngry(nbttagcompound.getBoolean("Angry"));
+		if (nbttagcompound.hasKey("CollarColor", 99)) {
+			this.setCollarColor(EnumDyeColor.byDyeDamage(nbttagcompound.getByte("CollarColor")));
+		}
+
+	}
+
+	/**
+	 * + Sets whether this wolf is angry or not.
 	 */
 	public void setAngry(boolean angry) {
 		byte b0 = this.dataWatcher.getWatchableObjectByte(16);
@@ -475,23 +484,17 @@ public class EntityWolf extends EntityTameable {
 
 	}
 
-	public EnumDyeColor getCollarColor() {
-		return EnumDyeColor.byDyeDamage(this.dataWatcher.getWatchableObjectByte(20) & 15);
-	}
-
-	public void setCollarColor(EnumDyeColor collarcolor) {
-		this.dataWatcher.updateObject(20, Byte.valueOf((byte) (collarcolor.getDyeDamage() & 15)));
-	}
-
-	public EntityWolf createChild(EntityAgeable var1) {
-		EntityWolf entitywolf = new EntityWolf(this.worldObj);
-		String s = this.getOwnerId();
-		if (s != null && s.trim().length() > 0) {
-			entitywolf.setOwnerId(s);
-			entitywolf.setTamed(true);
+	/**
+	 * + Sets the active target the Task system uses for tracking
+	 */
+	public void setAttackTarget(EntityLivingBase entitylivingbase) {
+		super.setAttackTarget(entitylivingbase);
+		if (entitylivingbase == null) {
+			this.setAngry(false);
+		} else if (!this.isTamed()) {
+			this.setAngry(true);
 		}
 
-		return entitywolf;
 	}
 
 	public void setBegging(boolean beg) {
@@ -503,34 +506,19 @@ public class EntityWolf extends EntityTameable {
 
 	}
 
-	/**+
-	 * Returns true if the mob is currently able to mate with the
-	 * specified mob.
-	 */
-	public boolean canMateWith(EntityAnimal entityanimal) {
-		if (entityanimal == this) {
-			return false;
-		} else if (!this.isTamed()) {
-			return false;
-		} else if (!(entityanimal instanceof EntityWolf)) {
-			return false;
+	public void setCollarColor(EnumDyeColor collarcolor) {
+		this.dataWatcher.updateObject(20, Byte.valueOf((byte) (collarcolor.getDyeDamage() & 15)));
+	}
+
+	public void setTamed(boolean flag) {
+		super.setTamed(flag);
+		if (flag) {
+			this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(20.0D);
 		} else {
-			EntityWolf entitywolf = (EntityWolf) entityanimal;
-			return !entitywolf.isTamed() ? false
-					: (entitywolf.isSitting() ? false : this.isInLove() && entitywolf.isInLove());
+			this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(8.0D);
 		}
-	}
 
-	public boolean isBegging() {
-		return this.dataWatcher.getWatchableObjectByte(19) == 1;
-	}
-
-	/**+
-	 * Determines if an entity can be despawned, used on idle far
-	 * away entities
-	 */
-	protected boolean canDespawn() {
-		return !this.isTamed() && this.ticksExisted > 2400;
+		this.getEntityAttribute(SharedMonsterAttributes.attackDamage).setBaseValue(4.0D);
 	}
 
 	public boolean shouldAttackEntity(EntityLivingBase entitylivingbase, EntityLivingBase entitylivingbase1) {
@@ -550,7 +538,16 @@ public class EntityWolf extends EntityTameable {
 		}
 	}
 
-	public boolean allowLeashing() {
-		return !this.isAngry() && super.allowLeashing();
+	protected void updateAITasks() {
+		this.dataWatcher.updateObject(18, Float.valueOf(this.getHealth()));
+	}
+
+	/**
+	 * + (abstract) Protected helper method to write subclass entity data to NBT.
+	 */
+	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
+		super.writeEntityToNBT(nbttagcompound);
+		nbttagcompound.setBoolean("Angry", this.isAngry());
+		nbttagcompound.setByte("CollarColor", (byte) this.getCollarColor().getDyeDamage());
 	}
 }

@@ -1,5 +1,49 @@
 package net.lax1dude.eaglercraft.v1_8.opengl;
 
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglAttachShader;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglBindFramebuffer;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglBindRenderbuffer;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglCompileShader;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglCreateFramebuffer;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglCreateProgram;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglCreateRenderbuffer;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglCreateShader;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDeleteFramebuffer;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDeleteProgram;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDeleteRenderbuffer;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDeleteShader;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDetachShader;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglFramebufferRenderbuffer;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglFramebufferTexture2D;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetProgramInfoLog;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetProgrami;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetShaderInfoLog;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetShaderi;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetUniformLocation;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglLinkProgram;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglRenderbufferStorage;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglShaderSource;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglTexParameteri;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniform1i;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniform2f;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_CLAMP_TO_EDGE;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_COLOR_BUFFER_BIT;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_COMPILE_STATUS;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_DEPTH_BUFFER_BIT;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_FRAGMENT_SHADER;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_LINK_STATUS;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_NEAREST;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_RGBA;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_RGBA8;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE_2D;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE_MAG_FILTER;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE_MIN_FILTER;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE_WRAP_S;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE_WRAP_T;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TRUE;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_UNSIGNED_BYTE;
+
+import net.lax1dude.eaglercraft.v1_8.EagRuntime;
 import net.lax1dude.eaglercraft.v1_8.internal.IFramebufferGL;
 import net.lax1dude.eaglercraft.v1_8.internal.IProgramGL;
 import net.lax1dude.eaglercraft.v1_8.internal.IRenderbufferGL;
@@ -9,22 +53,18 @@ import net.lax1dude.eaglercraft.v1_8.internal.buffer.ByteBuffer;
 import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
 import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
-import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL.*;
-
-import net.lax1dude.eaglercraft.v1_8.EagRuntime;
-
 /**
  * Copyright (c) 2022-2023 lax1dude. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -53,6 +93,60 @@ public class EffectPipelineFXAA {
 	private static int currentWidth = -1;
 	private static int currentHeight = -1;
 
+	public static void begin(int width, int height) {
+		if (currentWidth != width || currentHeight != height) {
+			currentWidth = width;
+			currentHeight = height;
+
+			GlStateManager.bindTexture(framebufferColor);
+			EaglercraftGPU.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+					(ByteBuffer) null);
+
+			_wglBindRenderbuffer(_GL_RENDERBUFFER, framebufferDepth);
+			_wglRenderbufferStorage(_GL_RENDERBUFFER,
+					EaglercraftGPU.checkOpenGLESVersion() == 200 ? _GL_DEPTH_COMPONENT16 : _GL_DEPTH_COMPONENT32F,
+					width, height);
+		}
+
+		_wglBindFramebuffer(_GL_FRAMEBUFFER, framebuffer);
+
+		GlStateManager.clearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		GlStateManager.clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	}
+
+	public static void destroy() {
+		if (shaderProgram != null) {
+			_wglDeleteProgram(shaderProgram);
+			shaderProgram = null;
+		}
+		u_screenSize2f = null;
+		if (framebuffer != null) {
+			_wglDeleteFramebuffer(framebuffer);
+			framebuffer = null;
+		}
+		if (framebufferColor != -1) {
+			GlStateManager.deleteTexture(framebufferColor);
+			framebufferColor = -1;
+		}
+		if (framebufferDepth != null) {
+			_wglDeleteRenderbuffer(framebufferDepth);
+			framebufferDepth = null;
+		}
+	}
+
+	public static void end() {
+		_wglBindFramebuffer(_GL_FRAMEBUFFER, null);
+
+		EaglercraftGPU.bindGLShaderProgram(shaderProgram);
+
+		GlStateManager.bindTexture(framebufferColor);
+
+		_wglUniform2f(u_screenSize2f, 1.0f / currentWidth, 1.0f / currentHeight);
+
+		DrawUtils.drawStandardQuad2D();
+	}
+
 	static void initialize() {
 		String fragmentSource = EagRuntime.getRequiredResourceString(fragmentShaderPath);
 
@@ -61,12 +155,12 @@ public class EffectPipelineFXAA {
 		_wglShaderSource(frag, GLSLHeader.getFragmentHeaderCompat(fragmentSource, fragmentShaderPrecision));
 		_wglCompileShader(frag);
 
-		if(_wglGetShaderi(frag, GL_COMPILE_STATUS) != GL_TRUE) {
+		if (_wglGetShaderi(frag, GL_COMPILE_STATUS) != GL_TRUE) {
 			logger.error("Failed to compile GL_FRAGMENT_SHADER \"" + fragmentShaderPath + "\" for EffectPipelineFXAA!");
 			String log = _wglGetShaderInfoLog(frag);
-			if(log != null) {
+			if (log != null) {
 				String[] lines = log.split("(\\r\\n|\\r|\\n)");
-				for(int i = 0; i < lines.length; ++i) {
+				for (int i = 0; i < lines.length; ++i) {
 					logger.error("[FRAG] {}", lines[i]);
 				}
 			}
@@ -78,7 +172,7 @@ public class EffectPipelineFXAA {
 		_wglAttachShader(shaderProgram, DrawUtils.vshLocal);
 		_wglAttachShader(shaderProgram, frag);
 
-		if(EaglercraftGPU.checkOpenGLESVersion() == 200) {
+		if (EaglercraftGPU.checkOpenGLESVersion() == 200) {
 			VSHInputLayoutParser.applyLayout(shaderProgram, DrawUtils.vshLocalLayout);
 		}
 
@@ -89,12 +183,12 @@ public class EffectPipelineFXAA {
 
 		_wglDeleteShader(frag);
 
-		if(_wglGetProgrami(shaderProgram, GL_LINK_STATUS) != GL_TRUE) {
+		if (_wglGetProgrami(shaderProgram, GL_LINK_STATUS) != GL_TRUE) {
 			logger.error("Failed to link shader program for EffectPipelineFXAA!");
 			String log = _wglGetProgramInfoLog(shaderProgram);
-			if(log != null) {
+			if (log != null) {
 				String[] lines = log.split("(\\r\\n|\\r|\\n)");
-				for(int i = 0; i < lines.length; ++i) {
+				for (int i = 0; i < lines.length; ++i) {
 					logger.error("[LINK] {}", lines[i]);
 				}
 			}
@@ -120,61 +214,11 @@ public class EffectPipelineFXAA {
 		_wglBindRenderbuffer(_GL_RENDERBUFFER, framebufferDepth);
 
 		_wglBindFramebuffer(_GL_FRAMEBUFFER, framebuffer);
-		_wglFramebufferTexture2D(_GL_FRAMEBUFFER, _GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, EaglercraftGPU.getNativeTexture(framebufferColor), 0);
+		_wglFramebufferTexture2D(_GL_FRAMEBUFFER, _GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+				EaglercraftGPU.getNativeTexture(framebufferColor), 0);
 		_wglFramebufferRenderbuffer(_GL_FRAMEBUFFER, _GL_DEPTH_ATTACHMENT, _GL_RENDERBUFFER, framebufferDepth);
 
 		_wglBindFramebuffer(_GL_FRAMEBUFFER, null);
-	}
-
-	public static void begin(int width, int height) {
-		if(currentWidth != width || currentHeight != height) {
-			currentWidth = width;
-			currentHeight = height;
-
-			GlStateManager.bindTexture(framebufferColor);
-			EaglercraftGPU.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (ByteBuffer)null);
-
-			_wglBindRenderbuffer(_GL_RENDERBUFFER, framebufferDepth);
-			_wglRenderbufferStorage(_GL_RENDERBUFFER, EaglercraftGPU.checkOpenGLESVersion() == 200 ? _GL_DEPTH_COMPONENT16 : _GL_DEPTH_COMPONENT32F, width, height);
-		}
-
-		_wglBindFramebuffer(_GL_FRAMEBUFFER, framebuffer);
-
-		GlStateManager.clearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		GlStateManager.clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	}
-
-	public static void end() {
-		_wglBindFramebuffer(_GL_FRAMEBUFFER, null);
-
-		EaglercraftGPU.bindGLShaderProgram(shaderProgram);
-
-		GlStateManager.bindTexture(framebufferColor);
-
-		_wglUniform2f(u_screenSize2f, 1.0f / currentWidth, 1.0f / currentHeight);
-
-		DrawUtils.drawStandardQuad2D();
-	}
-
-	public static void destroy() {
-		if(shaderProgram != null) {
-			_wglDeleteProgram(shaderProgram);
-			shaderProgram = null;
-		}
-		u_screenSize2f = null;
-		if(framebuffer != null) {
-			_wglDeleteFramebuffer(framebuffer);
-			framebuffer = null;
-		}
-		if(framebufferColor != -1) {
-			GlStateManager.deleteTexture(framebufferColor);
-			framebufferColor = -2;
-		}
-		if(framebufferDepth != null) {
-			_wglDeleteRenderbuffer(framebufferDepth);
-			framebufferDepth = null;
-		}
 	}
 
 }

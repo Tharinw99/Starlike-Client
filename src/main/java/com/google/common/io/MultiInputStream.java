@@ -46,17 +46,6 @@ final class MultiInputStream extends InputStream {
 		advance();
 	}
 
-	@Override
-	public void close() throws IOException {
-		if (in != null) {
-			try {
-				in.close();
-			} finally {
-				in = null;
-			}
-		}
-	}
-
 	/**
 	 * Closes the current input stream and opens the next one, if any.
 	 */
@@ -73,6 +62,17 @@ final class MultiInputStream extends InputStream {
 			return 0;
 		}
 		return in.available();
+	}
+
+	@Override
+	public void close() throws IOException {
+		if (in != null) {
+			try {
+				in.close();
+			} finally {
+				in = null;
+			}
+		}
 	}
 
 	@Override

@@ -41,45 +41,14 @@ final class SingletonImmutableList<E> extends ImmutableList<E> {
 	}
 
 	@Override
-	public E get(int index) {
-		Preconditions.checkElementIndex(index, 1);
-		return element;
-	}
-
-	@Override
-	public int indexOf(@Nullable Object object) {
-		return element.equals(object) ? 0 : -1;
-	}
-
-	@Override
-	public UnmodifiableIterator<E> iterator() {
-		return Iterators.singletonIterator(element);
-	}
-
-	@Override
-	public int lastIndexOf(@Nullable Object object) {
-		return indexOf(object);
-	}
-
-	@Override
-	public int size() {
-		return 1;
-	}
-
-	@Override
-	public ImmutableList<E> subList(int fromIndex, int toIndex) {
-		Preconditions.checkPositionIndexes(fromIndex, toIndex, 1);
-		return (fromIndex == toIndex) ? ImmutableList.<E>of() : this;
-	}
-
-	@Override
-	public ImmutableList<E> reverse() {
-		return this;
-	}
-
-	@Override
 	public boolean contains(@Nullable Object object) {
 		return element.equals(object);
+	}
+
+	@Override
+	int copyIntoArray(Object[] dst, int offset) {
+		dst[offset] = element;
+		return offset + 1;
 	}
 
 	@Override
@@ -95,6 +64,12 @@ final class SingletonImmutableList<E> extends ImmutableList<E> {
 	}
 
 	@Override
+	public E get(int index) {
+		Preconditions.checkElementIndex(index, 1);
+		return element;
+	}
+
+	@Override
 	public int hashCode() {
 		// not caching hash code since it could change if the element is mutable
 		// in a way that modifies its hash code.
@@ -102,10 +77,8 @@ final class SingletonImmutableList<E> extends ImmutableList<E> {
 	}
 
 	@Override
-	public String toString() {
-		String elementToString = element.toString();
-		return new StringBuilder(elementToString.length() + 2).append('[').append(elementToString).append(']')
-				.toString();
+	public int indexOf(@Nullable Object object) {
+		return element.equals(object) ? 0 : -1;
 	}
 
 	@Override
@@ -119,8 +92,35 @@ final class SingletonImmutableList<E> extends ImmutableList<E> {
 	}
 
 	@Override
-	int copyIntoArray(Object[] dst, int offset) {
-		dst[offset] = element;
-		return offset + 1;
+	public UnmodifiableIterator<E> iterator() {
+		return Iterators.singletonIterator(element);
+	}
+
+	@Override
+	public int lastIndexOf(@Nullable Object object) {
+		return indexOf(object);
+	}
+
+	@Override
+	public ImmutableList<E> reverse() {
+		return this;
+	}
+
+	@Override
+	public int size() {
+		return 1;
+	}
+
+	@Override
+	public ImmutableList<E> subList(int fromIndex, int toIndex) {
+		Preconditions.checkPositionIndexes(fromIndex, toIndex, 1);
+		return (fromIndex == toIndex) ? ImmutableList.<E>of() : this;
+	}
+
+	@Override
+	public String toString() {
+		String elementToString = element.toString();
+		return new StringBuilder(elementToString.length() + 2).append('[').append(elementToString).append(']')
+				.toString();
 	}
 }

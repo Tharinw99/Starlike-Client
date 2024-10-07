@@ -59,6 +59,8 @@ import com.google.common.base.Supplier;
 @GwtCompatible(serializable = true)
 public class HashBasedTable<R, C, V> extends StandardTable<R, C, V> {
 	private static class Factory<C, V> implements Supplier<Map<C, V>>, Serializable {
+		private static final long serialVersionUID = 0;
+
 		final int expectedSize;
 
 		Factory(int expectedSize) {
@@ -69,9 +71,9 @@ public class HashBasedTable<R, C, V> extends StandardTable<R, C, V> {
 		public Map<C, V> get() {
 			return Maps.newHashMapWithExpectedSize(expectedSize);
 		}
-
-		private static final long serialVersionUID = 0;
 	}
+
+	private static final long serialVersionUID = 0;
 
 	/**
 	 * Creates an empty {@code HashBasedTable}.
@@ -109,11 +111,11 @@ public class HashBasedTable<R, C, V> extends StandardTable<R, C, V> {
 		return result;
 	}
 
+	// Overriding so NullPointerTester test passes.
+
 	HashBasedTable(Map<R, Map<C, V>> backingMap, Factory<C, V> factory) {
 		super(backingMap, factory);
 	}
-
-	// Overriding so NullPointerTester test passes.
 
 	@Override
 	public boolean contains(@Nullable Object rowKey, @Nullable Object columnKey) {
@@ -136,19 +138,17 @@ public class HashBasedTable<R, C, V> extends StandardTable<R, C, V> {
 	}
 
 	@Override
-	public V get(@Nullable Object rowKey, @Nullable Object columnKey) {
-		return super.get(rowKey, columnKey);
+	public boolean equals(@Nullable Object obj) {
+		return super.equals(obj);
 	}
 
 	@Override
-	public boolean equals(@Nullable Object obj) {
-		return super.equals(obj);
+	public V get(@Nullable Object rowKey, @Nullable Object columnKey) {
+		return super.get(rowKey, columnKey);
 	}
 
 	@Override
 	public V remove(@Nullable Object rowKey, @Nullable Object columnKey) {
 		return super.remove(rowKey, columnKey);
 	}
-
-	private static final long serialVersionUID = 0;
 }

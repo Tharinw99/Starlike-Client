@@ -1,8 +1,10 @@
 package net.minecraft.command;
 
-import com.google.common.collect.Maps;
 import java.util.List;
 import java.util.Map;
+
+import com.google.common.collect.Maps;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,22 +19,25 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -41,29 +46,103 @@ public class CommandReplaceItem extends CommandBase {
 
 	private static final Map<String, Integer> SHORTCUTS = Maps.newHashMap();
 
-	/**+
-	 * Gets the name of the command
+	static {
+		for (int i = 0; i < 54; ++i) {
+			SHORTCUTS.put("slot.container." + i, Integer.valueOf(i));
+		}
+
+		for (int j = 0; j < 9; ++j) {
+			SHORTCUTS.put("slot.hotbar." + j, Integer.valueOf(j));
+		}
+
+		for (int k = 0; k < 27; ++k) {
+			SHORTCUTS.put("slot.inventory." + k, Integer.valueOf(9 + k));
+		}
+
+		for (int l = 0; l < 27; ++l) {
+			SHORTCUTS.put("slot.enderchest." + l, Integer.valueOf(200 + l));
+		}
+
+		for (int i1 = 0; i1 < 8; ++i1) {
+			SHORTCUTS.put("slot.villager." + i1, Integer.valueOf(300 + i1));
+		}
+
+		for (int j1 = 0; j1 < 15; ++j1) {
+			SHORTCUTS.put("slot.horse." + j1, Integer.valueOf(500 + j1));
+		}
+
+		SHORTCUTS.put("slot.weapon", Integer.valueOf(99));
+		SHORTCUTS.put("slot.armor.head", Integer.valueOf(103));
+		SHORTCUTS.put("slot.armor.chest", Integer.valueOf(102));
+		SHORTCUTS.put("slot.armor.legs", Integer.valueOf(101));
+		SHORTCUTS.put("slot.armor.feet", Integer.valueOf(100));
+		SHORTCUTS.put("slot.horse.saddle", Integer.valueOf(400));
+		SHORTCUTS.put("slot.horse.armor", Integer.valueOf(401));
+		SHORTCUTS.put("slot.horse.chest", Integer.valueOf(499));
+	}
+
+	/**
+	 * + Return a list of options when the user types TAB
+	 */
+	public List<String> addTabCompletionOptions(ICommandSender var1, String[] astring, BlockPos blockpos) {
+		return astring.length == 1 ? getListOfStringsMatchingLastWord(astring, new String[] { "entity", "block" })
+				: (astring.length == 2 && astring[0].equals("entity")
+						? getListOfStringsMatchingLastWord(astring, this.getUsernames())
+						: (astring.length >= 2 && astring.length <= 4 && astring[0].equals("block")
+								? func_175771_a(astring, 1, blockpos)
+								: ((astring.length != 3 || !astring[0].equals("entity"))
+										&& (astring.length != 5 || !astring[0].equals("block"))
+												? ((astring.length != 4 || !astring[0].equals("entity"))
+														&& (astring.length != 6 || !astring[0].equals("block"))
+																? null
+																: getListOfStringsMatchingLastWord(astring,
+																		Item.itemRegistry.getKeys()))
+												: getListOfStringsMatchingLastWord(astring, SHORTCUTS.keySet()))));
+	}
+
+	/**
+	 * + Gets the name of the command
 	 */
 	public String getCommandName() {
 		return "replaceitem";
 	}
 
-	/**+
-	 * Return the required permission level for this command.
-	 */
-	public int getRequiredPermissionLevel() {
-		return 2;
-	}
-
-	/**+
-	 * Gets the usage string for the command.
+	/**
+	 * + Gets the usage string for the command.
 	 */
 	public String getCommandUsage(ICommandSender var1) {
 		return "commands.replaceitem.usage";
 	}
 
-	/**+
-	 * Callback when the command is invoked
+	/**
+	 * + Return the required permission level for this command.
+	 */
+	public int getRequiredPermissionLevel() {
+		return 2;
+	}
+
+	private int getSlotForShortcut(String shortcut) throws CommandException {
+		if (!SHORTCUTS.containsKey(shortcut)) {
+			throw new CommandException("commands.generic.parameter.invalid", new Object[] { shortcut });
+		} else {
+			return ((Integer) SHORTCUTS.get(shortcut)).intValue();
+		}
+	}
+
+	protected String[] getUsernames() {
+		return MinecraftServer.getServer().getAllUsernames();
+	}
+
+	/**
+	 * + Return whether the specified command parameter index is a username
+	 * parameter.
+	 */
+	public boolean isUsernameIndex(String[] astring, int i) {
+		return astring.length > 0 && astring[0].equals("entity") && i == 1;
+	}
+
+	/**
+	 * + Callback when the command is invoked
 	 */
 	public void processCommand(ICommandSender parICommandSender, String[] parArrayOfString) throws CommandException {
 		if (parArrayOfString.length < 1) {
@@ -163,79 +242,5 @@ public class CommandReplaceItem extends CommandBase {
 			notifyOperators(parICommandSender, this, "commands.replaceitem.success", new Object[] { Integer.valueOf(j),
 					Integer.valueOf(k), itemstack == null ? "Air" : itemstack.getChatComponent() });
 		}
-	}
-
-	private int getSlotForShortcut(String shortcut) throws CommandException {
-		if (!SHORTCUTS.containsKey(shortcut)) {
-			throw new CommandException("commands.generic.parameter.invalid", new Object[] { shortcut });
-		} else {
-			return ((Integer) SHORTCUTS.get(shortcut)).intValue();
-		}
-	}
-
-	/**+
-	 * Return a list of options when the user types TAB
-	 */
-	public List<String> addTabCompletionOptions(ICommandSender var1, String[] astring, BlockPos blockpos) {
-		return astring.length == 1 ? getListOfStringsMatchingLastWord(astring, new String[] { "entity", "block" })
-				: (astring.length == 2 && astring[0].equals("entity")
-						? getListOfStringsMatchingLastWord(astring, this.getUsernames())
-						: (astring.length >= 2 && astring.length <= 4 && astring[0].equals("block")
-								? func_175771_a(astring, 1, blockpos)
-								: ((astring.length != 3 || !astring[0].equals("entity"))
-										&& (astring.length != 5 || !astring[0].equals("block"))
-												? ((astring.length != 4 || !astring[0].equals("entity"))
-														&& (astring.length != 6 || !astring[0].equals("block"))
-																? null
-																: getListOfStringsMatchingLastWord(astring,
-																		Item.itemRegistry.getKeys()))
-												: getListOfStringsMatchingLastWord(astring, SHORTCUTS.keySet()))));
-	}
-
-	protected String[] getUsernames() {
-		return MinecraftServer.getServer().getAllUsernames();
-	}
-
-	/**+
-	 * Return whether the specified command parameter index is a
-	 * username parameter.
-	 */
-	public boolean isUsernameIndex(String[] astring, int i) {
-		return astring.length > 0 && astring[0].equals("entity") && i == 1;
-	}
-
-	static {
-		for (int i = 0; i < 54; ++i) {
-			SHORTCUTS.put("slot.container." + i, Integer.valueOf(i));
-		}
-
-		for (int j = 0; j < 9; ++j) {
-			SHORTCUTS.put("slot.hotbar." + j, Integer.valueOf(j));
-		}
-
-		for (int k = 0; k < 27; ++k) {
-			SHORTCUTS.put("slot.inventory." + k, Integer.valueOf(9 + k));
-		}
-
-		for (int l = 0; l < 27; ++l) {
-			SHORTCUTS.put("slot.enderchest." + l, Integer.valueOf(200 + l));
-		}
-
-		for (int i1 = 0; i1 < 8; ++i1) {
-			SHORTCUTS.put("slot.villager." + i1, Integer.valueOf(300 + i1));
-		}
-
-		for (int j1 = 0; j1 < 15; ++j1) {
-			SHORTCUTS.put("slot.horse." + j1, Integer.valueOf(500 + j1));
-		}
-
-		SHORTCUTS.put("slot.weapon", Integer.valueOf(99));
-		SHORTCUTS.put("slot.armor.head", Integer.valueOf(103));
-		SHORTCUTS.put("slot.armor.chest", Integer.valueOf(102));
-		SHORTCUTS.put("slot.armor.legs", Integer.valueOf(101));
-		SHORTCUTS.put("slot.armor.feet", Integer.valueOf(100));
-		SHORTCUTS.put("slot.horse.saddle", Integer.valueOf(400));
-		SHORTCUTS.put("slot.horse.armor", Integer.valueOf(401));
-		SHORTCUTS.put("slot.horse.chest", Integer.valueOf(499));
 	}
 }

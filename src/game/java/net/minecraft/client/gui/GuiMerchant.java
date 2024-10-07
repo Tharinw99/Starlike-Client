@@ -1,10 +1,10 @@
 package net.minecraft.client.gui;
 
-import net.lax1dude.eaglercraft.v1_8.netty.Unpooled;
 import net.lax1dude.eaglercraft.v1_8.Mouse;
 import net.lax1dude.eaglercraft.v1_8.internal.EnumCursorType;
 import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
 import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
+import net.lax1dude.eaglercraft.v1_8.netty.Unpooled;
 import net.lax1dude.eaglercraft.v1_8.opengl.GlStateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -22,30 +22,67 @@ import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class GuiMerchant extends GuiContainer {
+	static class MerchantButton extends GuiButton {
+		private final boolean field_146157_o;
+
+		public MerchantButton(int buttonID, int x, int y, boolean parFlag) {
+			super(buttonID, x, y, 12, 19, "");
+			this.field_146157_o = parFlag;
+		}
+
+		public void drawButton(Minecraft minecraft, int i, int j) {
+			if (this.visible) {
+				minecraft.getTextureManager().bindTexture(GuiMerchant.MERCHANT_GUI_TEXTURE);
+				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+				boolean flag = i >= this.xPosition && j >= this.yPosition && i < this.xPosition + this.width
+						&& j < this.yPosition + this.height;
+				if (flag && this.enabled) {
+					Mouse.showCursor(EnumCursorType.HAND);
+				}
+				int k = 0;
+				int l = 176;
+				if (!this.enabled) {
+					l += this.width * 2;
+				} else if (flag) {
+					l += this.width;
+				}
+
+				if (!this.field_146157_o) {
+					k += this.height;
+				}
+
+				this.drawTexturedModalRect(this.xPosition, this.yPosition, l, k, this.width, this.height);
+			}
+		}
+	}
+
 	private static final Logger logger = LogManager.getLogger();
-	/**+
-	 * The GUI texture for the villager merchant GUI.
+	/**
+	 * + The GUI texture for the villager merchant GUI.
 	 */
 	private static final ResourceLocation MERCHANT_GUI_TEXTURE = new ResourceLocation(
 			"textures/gui/container/villager.png");
@@ -53,6 +90,7 @@ public class GuiMerchant extends GuiContainer {
 	private GuiMerchant.MerchantButton nextButton;
 	private GuiMerchant.MerchantButton previousButton;
 	private int selectedMerchantRecipe;
+
 	private IChatComponent chatComponent;
 
 	public GuiMerchant(InventoryPlayer parInventoryPlayer, IMerchant parIMerchant, World worldIn) {
@@ -61,48 +99,9 @@ public class GuiMerchant extends GuiContainer {
 		this.chatComponent = parIMerchant.getDisplayName();
 	}
 
-	/**+
-	 * Adds the buttons (and other controls) to the screen in
-	 * question. Called when the GUI is displayed and when the
-	 * window resizes, the buttonList is cleared beforehand.
-	 */
-	public void initGui() {
-		super.initGui();
-		int i = (this.width - this.xSize) / 2;
-		int j = (this.height - this.ySize) / 2;
-		this.buttonList.add(this.nextButton = new GuiMerchant.MerchantButton(1, i + 120 + 27, j + 24 - 1, true));
-		this.buttonList.add(this.previousButton = new GuiMerchant.MerchantButton(2, i + 36 - 19, j + 24 - 1, false));
-		this.nextButton.enabled = false;
-		this.previousButton.enabled = false;
-	}
-
-	/**+
-	 * Draw the foreground layer for the GuiContainer (everything in
-	 * front of the items). Args : mouseX, mouseY
-	 */
-	protected void drawGuiContainerForegroundLayer(int var1, int var2) {
-		String s = this.chatComponent.getUnformattedText();
-		this.fontRendererObj.drawString(s, this.xSize / 2 - this.fontRendererObj.getStringWidth(s) / 2, 6, 4210752);
-		this.fontRendererObj.drawString(I18n.format("container.inventory", new Object[0]), 8, this.ySize - 96 + 2,
-				4210752);
-	}
-
-	/**+
-	 * Called from the main game loop to update the screen.
-	 */
-	public void updateScreen() {
-		super.updateScreen();
-		MerchantRecipeList merchantrecipelist = this.merchant.getRecipes(this.mc.thePlayer);
-		if (merchantrecipelist != null) {
-			this.nextButton.enabled = this.selectedMerchantRecipe < merchantrecipelist.size() - 1;
-			this.previousButton.enabled = this.selectedMerchantRecipe > 0;
-		}
-
-	}
-
-	/**+
-	 * Called by the controls from the buttonList when activated.
-	 * (Mouse pressed for buttons)
+	/**
+	 * + Called by the controls from the buttonList when activated. (Mouse pressed
+	 * for buttons)
 	 */
 	protected void actionPerformed(GuiButton parGuiButton) {
 		boolean flag = false;
@@ -132,8 +131,8 @@ public class GuiMerchant extends GuiContainer {
 
 	}
 
-	/**+
-	 * Args : renderPartialTicks, mouseX, mouseY
+	/**
+	 * + Args : renderPartialTicks, mouseX, mouseY
 	 */
 	protected void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
@@ -160,9 +159,20 @@ public class GuiMerchant extends GuiContainer {
 
 	}
 
-	/**+
-	 * Draws the screen and all the components in it. Args : mouseX,
-	 * mouseY, renderPartialTicks
+	/**
+	 * + Draw the foreground layer for the GuiContainer (everything in front of the
+	 * items). Args : mouseX, mouseY
+	 */
+	protected void drawGuiContainerForegroundLayer(int var1, int var2) {
+		String s = this.chatComponent.getUnformattedText();
+		this.fontRendererObj.drawString(s, this.xSize / 2 - this.fontRendererObj.getStringWidth(s) / 2, 6, 4210752);
+		this.fontRendererObj.drawString(I18n.format("container.inventory", new Object[0]), 8, this.ySize - 96 + 2,
+				4210752);
+	}
+
+	/**
+	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
+	 * renderPartialTicks
 	 */
 	public void drawScreen(int i, int j, float f) {
 		super.drawScreen(i, j, f);
@@ -216,37 +226,31 @@ public class GuiMerchant extends GuiContainer {
 		return this.merchant;
 	}
 
-	static class MerchantButton extends GuiButton {
-		private final boolean field_146157_o;
+	/**
+	 * + Adds the buttons (and other controls) to the screen in question. Called
+	 * when the GUI is displayed and when the window resizes, the buttonList is
+	 * cleared beforehand.
+	 */
+	public void initGui() {
+		super.initGui();
+		int i = (this.width - this.xSize) / 2;
+		int j = (this.height - this.ySize) / 2;
+		this.buttonList.add(this.nextButton = new GuiMerchant.MerchantButton(1, i + 120 + 27, j + 24 - 1, true));
+		this.buttonList.add(this.previousButton = new GuiMerchant.MerchantButton(2, i + 36 - 19, j + 24 - 1, false));
+		this.nextButton.enabled = false;
+		this.previousButton.enabled = false;
+	}
 
-		public MerchantButton(int buttonID, int x, int y, boolean parFlag) {
-			super(buttonID, x, y, 12, 19, "");
-			this.field_146157_o = parFlag;
+	/**
+	 * + Called from the main game loop to update the screen.
+	 */
+	public void updateScreen() {
+		super.updateScreen();
+		MerchantRecipeList merchantrecipelist = this.merchant.getRecipes(this.mc.thePlayer);
+		if (merchantrecipelist != null) {
+			this.nextButton.enabled = this.selectedMerchantRecipe < merchantrecipelist.size() - 1;
+			this.previousButton.enabled = this.selectedMerchantRecipe > 0;
 		}
 
-		public void drawButton(Minecraft minecraft, int i, int j) {
-			if (this.visible) {
-				minecraft.getTextureManager().bindTexture(GuiMerchant.MERCHANT_GUI_TEXTURE);
-				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-				boolean flag = i >= this.xPosition && j >= this.yPosition && i < this.xPosition + this.width
-						&& j < this.yPosition + this.height;
-				if (flag && this.enabled) {
-					Mouse.showCursor(EnumCursorType.HAND);
-				}
-				int k = 0;
-				int l = 176;
-				if (!this.enabled) {
-					l += this.width * 2;
-				} else if (flag) {
-					l += this.width;
-				}
-
-				if (!this.field_146157_o) {
-					k += this.height;
-				}
-
-				this.drawTexturedModalRect(this.xPosition, this.yPosition, l, k, this.width, this.height);
-			}
-		}
 	}
 }

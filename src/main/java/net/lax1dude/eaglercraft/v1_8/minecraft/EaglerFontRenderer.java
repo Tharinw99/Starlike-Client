@@ -14,34 +14,64 @@ import net.minecraft.util.ResourceLocation;
 /**
  * Copyright (c) 2022 lax1dude. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class EaglerFontRenderer extends FontRenderer {
 
-	private final int[] temporaryCodepointArray = new int[6553];
-
 	public static FontRenderer createSupportedFontRenderer(GameSettings gameSettingsIn, ResourceLocation location,
 			TextureManager textureManagerIn, boolean unicode) {
-		if(EaglercraftGPU.checkInstancingCapable()) {
+		if (EaglercraftGPU.checkInstancingCapable()) {
 			return new EaglerFontRenderer(gameSettingsIn, location, textureManagerIn, unicode);
-		}else {
+		} else {
 			return new FontRenderer(gameSettingsIn, location, textureManagerIn, unicode);
 		}
 	}
 
+	private final int[] temporaryCodepointArray = new int[6553];
+
 	public EaglerFontRenderer(GameSettings gameSettingsIn, ResourceLocation location, TextureManager textureManagerIn,
 			boolean unicode) {
 		super(gameSettingsIn, location, textureManagerIn, unicode);
+	}
+
+	private float appendCharToBuffer(int parInt1, int color, boolean boldStyle, boolean italicStyle) {
+		if (parInt1 == 32) {
+			return 4.0f;
+		} else {
+			int i = parInt1 % 16;
+			int j = parInt1 / 16;
+			float w = this.charWidth[parInt1];
+			if (boldStyle) {
+				InstancedFontRenderer.appendBoldQuad((int) this.posX, (int) this.posY, i, j, color, italicStyle);
+				++w;
+			} else {
+				InstancedFontRenderer.appendQuad((int) this.posX, (int) this.posY, i, j, color, italicStyle);
+			}
+			return w;
+		}
+	}
+
+	private boolean decodeASCIICodepointsAndValidate(String str) {
+		for (int i = 0, l = str.length(); i < l; ++i) {
+			int j = FontMappingHelper.lookupChar(str.charAt(i), true);
+			if (j != -1) {
+				temporaryCodepointArray[i] = j;
+			} else {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public int drawString(String text, float x, float y, int color, boolean dropShadow) {
@@ -49,7 +79,7 @@ public class EaglerFontRenderer extends FontRenderer {
 			this.posX = x + (dropShadow ? 1 : 0);
 			this.posY = y;
 		} else {
-			if(this.unicodeFlag || !decodeASCIICodepointsAndValidate(text)) {
+			if (this.unicodeFlag || !decodeASCIICodepointsAndValidate(text)) {
 				return super.drawString(text, x, y, color, dropShadow);
 			}
 			this.resetStyles();
@@ -69,10 +99,11 @@ public class EaglerFontRenderer extends FontRenderer {
 	}
 
 	protected void renderStringAtPos(String parString1, boolean parFlag) {
-		if(parString1 == null) return;
-		if(this.unicodeFlag || !decodeASCIICodepointsAndValidate(parString1)) {
+		if (parString1 == null)
+			return;
+		if (this.unicodeFlag || !decodeASCIICodepointsAndValidate(parString1)) {
 			super.renderStringAtPos(parString1, parFlag);
-		}else {
+		} else {
 			renderStringAtPos0(parString1, false);
 		}
 	}
@@ -80,13 +111,13 @@ public class EaglerFontRenderer extends FontRenderer {
 	private void renderStringAtPos0(String parString1, boolean parFlag) {
 		renderEngine.bindTexture(locationFontTexture);
 		InstancedFontRenderer.begin();
-		
+
 		Tessellator tessellator = Tessellator.getInstance();
 		WorldRenderer worldrenderer = tessellator.getWorldRenderer();
 		worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR);
-		
+
 		boolean hasStrike = false;
-		
+
 		for (int i = 0; i < parString1.length(); ++i) {
 			char c0 = parString1.charAt(i);
 			if (c0 == 167 && i + 1 < parString1.length()) {
@@ -125,8 +156,9 @@ public class EaglerFontRenderer extends FontRenderer {
 				++i;
 			} else {
 				int j = temporaryCodepointArray[i];
-				if(j > 255) continue;
-				
+				if (j > 255)
+					continue;
+
 				if (this.randomStyle && j != -1) {
 					int k = this.getCharWidth(c0);
 					char[] chars = FontRenderer.codepointLookup;
@@ -163,8 +195,8 @@ public class EaglerFontRenderer extends FontRenderer {
 				if (this.underlineStyle) {
 					hasStrike = true;
 					int l = this.underlineStyle ? -1 : 0;
-					worldrenderer.pos((double) (this.posX + (float) l),
-							(double) (this.posY + (float) this.FONT_HEIGHT), 0.0D).endVertex();
+					worldrenderer.pos((double) (this.posX + (float) l), (double) (this.posY + (float) this.FONT_HEIGHT),
+							0.0D).endVertex();
 					worldrenderer.pos((double) (this.posX + f), (double) (this.posY + (float) this.FONT_HEIGHT), 0.0D)
 							.endVertex();
 					worldrenderer
@@ -178,15 +210,15 @@ public class EaglerFontRenderer extends FontRenderer {
 				this.posX += (float) ((int) f);
 			}
 		}
-		
+
 		float texScale = 0.0625f;
-		
-		if(!hasStrike) {
+
+		if (!hasStrike) {
 			worldrenderer.finishDrawing();
 		}
-		
-		if(parFlag) {
-			if(hasStrike) {
+
+		if (parFlag) {
+			if (hasStrike) {
 				GlStateManager.color(0.25f, 0.25f, 0.25f, 1.0f);
 				GlStateManager.translate(1.0f, 1.0f, 0.0f);
 				tessellator.draw();
@@ -194,49 +226,20 @@ public class EaglerFontRenderer extends FontRenderer {
 				GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 				InstancedFontRenderer.render(8, 8, texScale, texScale, true);
 				EaglercraftGPU.renderAgain();
-			}else {
+			} else {
 				GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 				InstancedFontRenderer.render(8, 8, texScale, texScale, true);
 			}
-		}else {
+		} else {
 			GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
-			if(hasStrike) {
+			if (hasStrike) {
 				tessellator.draw();
 			}
 			InstancedFontRenderer.render(8, 8, texScale, texScale, false);
 		}
-		
-		if(parFlag) {
+
+		if (parFlag) {
 			this.posX += 1.0f;
 		}
-	}
-
-	private float appendCharToBuffer(int parInt1, int color, boolean boldStyle, boolean italicStyle) {
-		if (parInt1 == 32) {
-			return 4.0f;
-		}else {
-			int i = parInt1 % 16;
-			int j = parInt1 / 16;
-			float w = this.charWidth[parInt1];
-			if(boldStyle) {
-				InstancedFontRenderer.appendBoldQuad((int)this.posX, (int)this.posY, i, j, color, italicStyle);
-				++w;
-			}else {
-				InstancedFontRenderer.appendQuad((int)this.posX, (int)this.posY, i, j, color, italicStyle);
-			}
-			return w;
-		}
-	}
-
-	private boolean decodeASCIICodepointsAndValidate(String str) {
-		for(int i = 0, l = str.length(); i < l; ++i) {
-			int j = FontMappingHelper.lookupChar(str.charAt(i), true);
-			if(j != -1) {
-				temporaryCodepointArray[i] = j;
-			}else {
-				return false;
-			}
-		}
-		return true;
 	}
 }

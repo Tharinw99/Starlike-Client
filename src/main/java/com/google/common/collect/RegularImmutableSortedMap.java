@@ -29,7 +29,38 @@ import com.google.common.annotations.GwtCompatible;
 @GwtCompatible(emulated = true)
 @SuppressWarnings("serial") // uses writeReplace, not default serialization
 final class RegularImmutableSortedMap<K, V> extends ImmutableSortedMap<K, V> {
+	private class EntrySet extends ImmutableMapEntrySet<K, V> {
+		@Override
+		ImmutableList<Entry<K, V>> createAsList() {
+			return new ImmutableAsList<Entry<K, V>>() {
+				// avoid additional indirection
+				private final ImmutableList<K> keyList = keySet().asList();
+
+				@Override
+				ImmutableCollection<Entry<K, V>> delegateCollection() {
+					return EntrySet.this;
+				}
+
+				@Override
+				public Entry<K, V> get(int index) {
+					return Maps.immutableEntry(keyList.get(index), valueList.get(index));
+				}
+			};
+		}
+
+		@Override
+		public UnmodifiableIterator<Entry<K, V>> iterator() {
+			return asList().iterator();
+		}
+
+		@Override
+		ImmutableMap<K, V> map() {
+			return RegularImmutableSortedMap.this;
+		}
+	}
+
 	private final transient RegularImmutableSortedSet<K> keySet;
+
 	private final transient ImmutableList<V> valueList;
 
 	RegularImmutableSortedMap(RegularImmutableSortedSet<K> keySet, ImmutableList<V> valueList) {
@@ -45,48 +76,14 @@ final class RegularImmutableSortedMap<K, V> extends ImmutableSortedMap<K, V> {
 	}
 
 	@Override
+	ImmutableSortedMap<K, V> createDescendingMap() {
+		return new RegularImmutableSortedMap<K, V>((RegularImmutableSortedSet<K>) keySet.descendingSet(),
+				valueList.reverse(), this);
+	}
+
+	@Override
 	ImmutableSet<Entry<K, V>> createEntrySet() {
 		return new EntrySet();
-	}
-
-	private class EntrySet extends ImmutableMapEntrySet<K, V> {
-		@Override
-		public UnmodifiableIterator<Entry<K, V>> iterator() {
-			return asList().iterator();
-		}
-
-		@Override
-		ImmutableList<Entry<K, V>> createAsList() {
-			return new ImmutableAsList<Entry<K, V>>() {
-				// avoid additional indirection
-				private final ImmutableList<K> keyList = keySet().asList();
-
-				@Override
-				public Entry<K, V> get(int index) {
-					return Maps.immutableEntry(keyList.get(index), valueList.get(index));
-				}
-
-				@Override
-				ImmutableCollection<Entry<K, V>> delegateCollection() {
-					return EntrySet.this;
-				}
-			};
-		}
-
-		@Override
-		ImmutableMap<K, V> map() {
-			return RegularImmutableSortedMap.this;
-		}
-	}
-
-	@Override
-	public ImmutableSortedSet<K> keySet() {
-		return keySet;
-	}
-
-	@Override
-	public ImmutableCollection<V> values() {
-		return valueList;
 	}
 
 	@Override
@@ -111,14 +108,18 @@ final class RegularImmutableSortedMap<K, V> extends ImmutableSortedMap<K, V> {
 	}
 
 	@Override
+	public ImmutableSortedSet<K> keySet() {
+		return keySet;
+	}
+
+	@Override
 	public ImmutableSortedMap<K, V> tailMap(K fromKey, boolean inclusive) {
 		return getSubMap(keySet.tailIndex(checkNotNull(fromKey), inclusive), size());
 	}
 
 	@Override
-	ImmutableSortedMap<K, V> createDescendingMap() {
-		return new RegularImmutableSortedMap<K, V>((RegularImmutableSortedSet<K>) keySet.descendingSet(),
-				valueList.reverse(), this);
+	public ImmutableCollection<V> values() {
+		return valueList;
 	}
 
 }

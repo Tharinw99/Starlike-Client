@@ -1,12 +1,14 @@
 package net.minecraft.client.renderer.entity;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_GREATER;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ONE_MINUS_SRC_ALPHA;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_SRC_ALPHA;
 
-import net.lax1dude.eaglercraft.v1_8.internal.buffer.FloatBuffer;
 import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import net.lax1dude.eaglercraft.v1_8.internal.buffer.FloatBuffer;
 import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
 import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 import net.lax1dude.eaglercraft.v1_8.opengl.EaglercraftGPU;
@@ -37,22 +39,25 @@ import net.minecraft.scoreboard.Team;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -60,9 +65,19 @@ import net.minecraft.util.MathHelper;
 public abstract class RendererLivingEntity<T extends EntityLivingBase> extends Render<T> {
 	private static final Logger logger = LogManager.getLogger();
 	private static final DynamicTexture field_177096_e = new DynamicTexture(16, 16);
+	static {
+		int[] aint = field_177096_e.getTextureData();
+
+		for (int i = 0; i < 256; ++i) {
+			aint[i] = -1;
+		}
+
+		field_177096_e.updateDynamicTexture();
+	}
 	protected ModelBase mainModel;
 	protected FloatBuffer brightnessBuffer = GLAllocation.createDirectFloatBuffer(4);
 	protected List<LayerRenderer<T>> layerRenderers = Lists.newArrayList();
+
 	protected boolean renderOutlines = false;
 
 	public RendererLivingEntity(RenderManager renderManagerIn, ModelBase modelBaseIn, float shadowSizeIn) {
@@ -75,45 +90,39 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
 		return this.layerRenderers.add((LayerRenderer<T>) layer);
 	}
 
-	protected <V extends EntityLivingBase, U extends LayerRenderer<V>> boolean removeLayer(U layer) {
-		return this.layerRenderers.remove(layer);
-	}
-
-	public ModelBase getMainModel() {
-		return this.mainModel;
-	}
-
-	/**+
-	 * Returns a rotation angle that is inbetween two other rotation
-	 * angles. par1 and par2 are the angles between which to
-	 * interpolate, par3 is probably a float between 0.0 and 1.0
-	 * that tells us where "between" the two angles we are. Example:
-	 * par1 = 30, par2 = 50, par3 = 0.5, then return = 40
-	 */
-	protected float interpolateRotation(float par1, float par2, float par3) {
-		float f;
-		for (f = par2 - par1; f < -180.0F; f += 360.0F) {
-			;
+	protected boolean canRenderName(T entitylivingbase) {
+		EntityPlayerSP entityplayersp = Minecraft.getMinecraft().thePlayer;
+		if (entitylivingbase instanceof EntityPlayer && entitylivingbase != entityplayersp) {
+			Team team = entitylivingbase.getTeam();
+			Team team1 = entityplayersp.getTeam();
+			if (team != null) {
+				Team.EnumVisible team$enumvisible = team.getNameTagVisibility();
+				switch (team$enumvisible) {
+				case ALWAYS:
+					return true;
+				case NEVER:
+					return false;
+				case HIDE_FOR_OTHER_TEAMS:
+					return team1 == null || team.isSameTeam(team1);
+				case HIDE_FOR_OWN_TEAM:
+					return team1 == null || !team.isSameTeam(team1);
+				default:
+					return true;
+				}
+			}
 		}
 
-		while (f >= 180.0F) {
-			f -= 360.0F;
-		}
-
-		return par1 + par3 * f;
+		return Minecraft.isGuiEnabled() && entitylivingbase != this.renderManager.livingPlayer
+				&& !entitylivingbase.isInvisibleToPlayer(entityplayersp) && entitylivingbase.riddenByEntity == null;
 	}
 
-	public void transformHeldFull3DItemLayer() {
-	}
-
-	/**+
-	 * Actually renders the given argument. This is a synthetic
-	 * bridge method, always casting down its argument and then
-	 * handing it off to a worker function which does the actual
-	 * work. In all probabilty, the class Render is generic
-	 * (Render<T extends Entity>) and this method has signature
-	 * public void func_76986_a(T entity, double d, double d1,
-	 * double d2, float f, float f1). But JAD is pre 1.5 so doe
+	/**
+	 * + Actually renders the given argument. This is a synthetic bridge method,
+	 * always casting down its argument and then handing it off to a worker function
+	 * which does the actual work. In all probabilty, the class Render is generic
+	 * (Render<T extends Entity>) and this method has signature public void
+	 * func_76986_a(T entity, double d, double d1, double d2, float f, float f1).
+	 * But JAD is pre 1.5 so doe
 	 */
 	public void doRender(T entitylivingbase, double d0, double d1, double d2, float f, float f1) {
 		GlStateManager.pushMatrix();
@@ -207,42 +216,90 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
 		}
 	}
 
-	protected boolean setScoreTeamColor(T entityLivingBaseIn) {
-		int i = 16777215;
-		if (entityLivingBaseIn instanceof EntityPlayer) {
-			ScorePlayerTeam scoreplayerteam = (ScorePlayerTeam) entityLivingBaseIn.getTeam();
-			if (scoreplayerteam != null) {
-				String s = FontRenderer.getFormatFromString(scoreplayerteam.getColorPrefix());
-				if (s.length() >= 2) {
-					i = this.getFontRendererFromRenderManager().getColorCode(s.charAt(1));
-				}
+	/**
+	 * + Returns an ARGB int color back. Args: entityLiving, lightBrightness,
+	 * partialTickTime
+	 */
+	protected int getColorMultiplier(T var1, float var2, float var3) {
+		return 0;
+	}
+
+	protected float getDeathMaxRotation(T var1) {
+		return 90.0F;
+	}
+
+	public ModelBase getMainModel() {
+		return this.mainModel;
+	}
+
+	/**
+	 * + Returns where in the swing animation the living entity is (from 0 to 1).
+	 * Args : entity, partialTickTime
+	 */
+	protected float getSwingProgress(T livingBase, float partialTickTime) {
+		return livingBase.getSwingProgress(partialTickTime);
+	}
+
+	/**
+	 * + Defines what float the third param in setRotationAngles of ModelBase is
+	 */
+	protected float handleRotationFloat(T entitylivingbase, float f) {
+		return (float) entitylivingbase.ticksExisted + f;
+	}
+
+	/**
+	 * + Returns a rotation angle that is inbetween two other rotation angles. par1
+	 * and par2 are the angles between which to interpolate, par3 is probably a
+	 * float between 0.0 and 1.0 that tells us where "between" the two angles we
+	 * are. Example: par1 = 30, par2 = 50, par3 = 0.5, then return = 40
+	 */
+	protected float interpolateRotation(float par1, float par2, float par3) {
+		float f;
+		for (f = par2 - par1; f < -180.0F; f += 360.0F) {
+			;
+		}
+
+		while (f >= 180.0F) {
+			f -= 360.0F;
+		}
+
+		return par1 + par3 * f;
+	}
+
+	/**
+	 * + Allows the render to do any OpenGL state modifications necessary before the
+	 * model is rendered. Args: entityLiving, partialTickTime
+	 */
+	protected void preRenderCallback(T var1, float var2) {
+	}
+
+	protected <V extends EntityLivingBase, U extends LayerRenderer<V>> boolean removeLayer(U layer) {
+		return this.layerRenderers.remove(layer);
+	}
+
+	protected void renderLayers(T entitylivingbaseIn, float partialTicks, float parFloat2, float parFloat3,
+			float parFloat4, float parFloat5, float parFloat6, float parFloat7) {
+		for (int i = 0, l = this.layerRenderers.size(); i < l; ++i) {
+			LayerRenderer layerrenderer = this.layerRenderers.get(i);
+			boolean flag = this.setBrightness(entitylivingbaseIn, parFloat3, layerrenderer.shouldCombineTextures());
+			layerrenderer.doRenderLayer(entitylivingbaseIn, partialTicks, parFloat2, parFloat3, parFloat4, parFloat5,
+					parFloat6, parFloat7);
+			if (flag) {
+				this.unsetBrightness();
 			}
 		}
 
-		float f1 = (float) (i >> 16 & 255) / 255.0F;
-		float f2 = (float) (i >> 8 & 255) / 255.0F;
-		float f = (float) (i & 255) / 255.0F;
-		GlStateManager.disableLighting();
-		GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
-		GlStateManager.color(f1, f2, f, 1.0F);
-		GlStateManager.disableTexture2D();
-		GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
-		GlStateManager.disableTexture2D();
-		GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
-		return true;
 	}
 
-	protected void unsetScoreTeamColor() {
-		GlStateManager.enableLighting();
-		GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
-		GlStateManager.enableTexture2D();
-		GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
-		GlStateManager.enableTexture2D();
-		GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
+	/**
+	 * + Sets a simple glTranslate on a LivingEntity.
+	 */
+	public void renderLivingAt(T entityLivingBaseIn, double x, double y, double z) {
+		GlStateManager.translate((float) x, (float) y, (float) z);
 	}
 
-	/**+
-	 * Renders the model in RenderLiving
+	/**
+	 * + Renders the model in RenderLiving
 	 */
 	protected void renderModel(T entitylivingbase, float f, float f1, float f2, float f3, float f4, float f5) { // f8,
 																												// f7,
@@ -336,114 +393,6 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
 
 	}
 
-	protected boolean setDoRenderBrightness(T entityLivingBaseIn, float partialTicks) {
-		return this.setBrightness(entityLivingBaseIn, partialTicks, true);
-	}
-
-	public boolean setBrightness(T entitylivingbaseIn, float partialTicks, boolean combineTextures) {
-		float f = entitylivingbaseIn.getBrightness(partialTicks);
-		int i = this.getColorMultiplier(entitylivingbaseIn, f, partialTicks);
-		boolean flag = (i >> 24 & 255) > 0;
-		boolean flag1 = entitylivingbaseIn.hurtTime > 0 || entitylivingbaseIn.deathTime > 0;
-		if (!flag && !flag1) {
-			return false;
-		} else if (!flag && !combineTextures) {
-			return false;
-		} else {
-			GlStateManager.enableShaderBlendAdd();
-			float f1 = 1.0F - (float) (i >>> 24 & 255) / 255.0F;
-			float f2 = (float) (i >>> 16 & 255) / 255.0F;
-			float f3 = (float) (i >>> 8 & 255) / 255.0F;
-			float f4 = (float) (i & 255) / 255.0F;
-			GlStateManager.setShaderBlendSrc(f1, f1, f1, 1.0F);
-			GlStateManager.setShaderBlendAdd(f2 * f1 + 0.4F, f3 * f1, f4 * f1, 0.0f);
-			return true;
-		}
-	}
-
-	public void unsetBrightness() {
-		GlStateManager.disableShaderBlendAdd();
-	}
-
-	/**+
-	 * Sets a simple glTranslate on a LivingEntity.
-	 */
-	public void renderLivingAt(T entityLivingBaseIn, double x, double y, double z) {
-		GlStateManager.translate((float) x, (float) y, (float) z);
-	}
-
-	protected void rotateCorpse(T entitylivingbase, float var2, float f, float f1) {
-		GlStateManager.rotate(180.0F - f, 0.0F, 1.0F, 0.0F);
-		if (entitylivingbase.deathTime > 0) {
-			float f2 = ((float) entitylivingbase.deathTime + f1 - 1.0F) / 20.0F * 1.6F;
-			f2 = MathHelper.sqrt_float(f2);
-			if (f2 > 1.0F) {
-				f2 = 1.0F;
-			}
-
-			GlStateManager.rotate(f2 * this.getDeathMaxRotation(entitylivingbase), 0.0F, 0.0F, 1.0F);
-		} else {
-			String s = EnumChatFormatting.getTextWithoutFormattingCodes(entitylivingbase.getName());
-			if (s != null && (s.equals("Dinnerbone") || s.equals("Grumm"))
-					&& (!(entitylivingbase instanceof EntityPlayer)
-							|| ((EntityPlayer) entitylivingbase).isWearing(EnumPlayerModelParts.CAPE))) {
-				GlStateManager.translate(0.0F, entitylivingbase.height + 0.1F, 0.0F);
-				GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);
-			}
-		}
-
-	}
-
-	/**+
-	 * Returns where in the swing animation the living entity is
-	 * (from 0 to 1). Args : entity, partialTickTime
-	 */
-	protected float getSwingProgress(T livingBase, float partialTickTime) {
-		return livingBase.getSwingProgress(partialTickTime);
-	}
-
-	/**+
-	 * Defines what float the third param in setRotationAngles of
-	 * ModelBase is
-	 */
-	protected float handleRotationFloat(T entitylivingbase, float f) {
-		return (float) entitylivingbase.ticksExisted + f;
-	}
-
-	protected void renderLayers(T entitylivingbaseIn, float partialTicks, float parFloat2, float parFloat3,
-			float parFloat4, float parFloat5, float parFloat6, float parFloat7) {
-		for (int i = 0, l = this.layerRenderers.size(); i < l; ++i) {
-			LayerRenderer layerrenderer = this.layerRenderers.get(i);
-			boolean flag = this.setBrightness(entitylivingbaseIn, parFloat3, layerrenderer.shouldCombineTextures());
-			layerrenderer.doRenderLayer(entitylivingbaseIn, partialTicks, parFloat2, parFloat3, parFloat4, parFloat5,
-					parFloat6, parFloat7);
-			if (flag) {
-				this.unsetBrightness();
-			}
-		}
-
-	}
-
-	protected float getDeathMaxRotation(T var1) {
-		return 90.0F;
-	}
-
-	/**+
-	 * Returns an ARGB int color back. Args: entityLiving,
-	 * lightBrightness, partialTickTime
-	 */
-	protected int getColorMultiplier(T var1, float var2, float var3) {
-		return 0;
-	}
-
-	/**+
-	 * Allows the render to do any OpenGL state modifications
-	 * necessary before the model is rendered. Args: entityLiving,
-	 * partialTickTime
-	 */
-	protected void preRenderCallback(T var1, float var2) {
-	}
-
 	public void renderName(T entitylivingbase, double d0, double d1, double d2) {
 		if (this.canRenderName(entitylivingbase)) {
 			double d3 = entitylivingbase.getDistanceSqToEntity(this.renderManager.livingPlayer);
@@ -497,43 +446,95 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
 		}
 	}
 
-	protected boolean canRenderName(T entitylivingbase) {
-		EntityPlayerSP entityplayersp = Minecraft.getMinecraft().thePlayer;
-		if (entitylivingbase instanceof EntityPlayer && entitylivingbase != entityplayersp) {
-			Team team = entitylivingbase.getTeam();
-			Team team1 = entityplayersp.getTeam();
-			if (team != null) {
-				Team.EnumVisible team$enumvisible = team.getNameTagVisibility();
-				switch (team$enumvisible) {
-				case ALWAYS:
-					return true;
-				case NEVER:
-					return false;
-				case HIDE_FOR_OTHER_TEAMS:
-					return team1 == null || team.isSameTeam(team1);
-				case HIDE_FOR_OWN_TEAM:
-					return team1 == null || !team.isSameTeam(team1);
-				default:
-					return true;
-				}
+	protected void rotateCorpse(T entitylivingbase, float var2, float f, float f1) {
+		GlStateManager.rotate(180.0F - f, 0.0F, 1.0F, 0.0F);
+		if (entitylivingbase.deathTime > 0) {
+			float f2 = ((float) entitylivingbase.deathTime + f1 - 1.0F) / 20.0F * 1.6F;
+			f2 = MathHelper.sqrt_float(f2);
+			if (f2 > 1.0F) {
+				f2 = 1.0F;
+			}
+
+			GlStateManager.rotate(f2 * this.getDeathMaxRotation(entitylivingbase), 0.0F, 0.0F, 1.0F);
+		} else {
+			String s = EnumChatFormatting.getTextWithoutFormattingCodes(entitylivingbase.getName());
+			if (s != null && (s.equals("Dinnerbone") || s.equals("Grumm"))
+					&& (!(entitylivingbase instanceof EntityPlayer)
+							|| ((EntityPlayer) entitylivingbase).isWearing(EnumPlayerModelParts.CAPE))) {
+				GlStateManager.translate(0.0F, entitylivingbase.height + 0.1F, 0.0F);
+				GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);
 			}
 		}
 
-		return Minecraft.isGuiEnabled() && entitylivingbase != this.renderManager.livingPlayer
-				&& !entitylivingbase.isInvisibleToPlayer(entityplayersp) && entitylivingbase.riddenByEntity == null;
+	}
+
+	public boolean setBrightness(T entitylivingbaseIn, float partialTicks, boolean combineTextures) {
+		float f = entitylivingbaseIn.getBrightness(partialTicks);
+		int i = this.getColorMultiplier(entitylivingbaseIn, f, partialTicks);
+		boolean flag = (i >> 24 & 255) > 0;
+		boolean flag1 = entitylivingbaseIn.hurtTime > 0 || entitylivingbaseIn.deathTime > 0;
+		if (!flag && !flag1) {
+			return false;
+		} else if (!flag && !combineTextures) {
+			return false;
+		} else {
+			GlStateManager.enableShaderBlendAdd();
+			float f1 = 1.0F - (float) (i >>> 24 & 255) / 255.0F;
+			float f2 = (float) (i >>> 16 & 255) / 255.0F;
+			float f3 = (float) (i >>> 8 & 255) / 255.0F;
+			float f4 = (float) (i & 255) / 255.0F;
+			GlStateManager.setShaderBlendSrc(f1, f1, f1, 1.0F);
+			GlStateManager.setShaderBlendAdd(f2 * f1 + 0.4F, f3 * f1, f4 * f1, 0.0f);
+			return true;
+		}
+	}
+
+	protected boolean setDoRenderBrightness(T entityLivingBaseIn, float partialTicks) {
+		return this.setBrightness(entityLivingBaseIn, partialTicks, true);
 	}
 
 	public void setRenderOutlines(boolean renderOutlinesIn) {
 		this.renderOutlines = renderOutlinesIn;
 	}
 
-	static {
-		int[] aint = field_177096_e.getTextureData();
-
-		for (int i = 0; i < 256; ++i) {
-			aint[i] = -1;
+	protected boolean setScoreTeamColor(T entityLivingBaseIn) {
+		int i = 16777215;
+		if (entityLivingBaseIn instanceof EntityPlayer) {
+			ScorePlayerTeam scoreplayerteam = (ScorePlayerTeam) entityLivingBaseIn.getTeam();
+			if (scoreplayerteam != null) {
+				String s = FontRenderer.getFormatFromString(scoreplayerteam.getColorPrefix());
+				if (s.length() >= 2) {
+					i = this.getFontRendererFromRenderManager().getColorCode(s.charAt(1));
+				}
+			}
 		}
 
-		field_177096_e.updateDynamicTexture();
+		float f1 = (float) (i >> 16 & 255) / 255.0F;
+		float f2 = (float) (i >> 8 & 255) / 255.0F;
+		float f = (float) (i & 255) / 255.0F;
+		GlStateManager.disableLighting();
+		GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
+		GlStateManager.color(f1, f2, f, 1.0F);
+		GlStateManager.disableTexture2D();
+		GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
+		GlStateManager.disableTexture2D();
+		GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
+		return true;
+	}
+
+	public void transformHeldFull3DItemLayer() {
+	}
+
+	public void unsetBrightness() {
+		GlStateManager.disableShaderBlendAdd();
+	}
+
+	protected void unsetScoreTeamColor() {
+		GlStateManager.enableLighting();
+		GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
+		GlStateManager.enableTexture2D();
+		GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
+		GlStateManager.enableTexture2D();
+		GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
 	}
 }

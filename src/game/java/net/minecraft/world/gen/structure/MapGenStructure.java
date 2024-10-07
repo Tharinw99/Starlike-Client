@@ -1,14 +1,14 @@
 package net.minecraft.world.gen.structure;
 
-import com.google.common.collect.Maps;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+
+import com.google.common.collect.Maps;
+
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import net.lax1dude.eaglercraft.v1_8.HString;
-
-import java.util.concurrent.Callable;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.nbt.NBTBase;
@@ -20,22 +20,25 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.MapGenBase;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -43,8 +46,6 @@ import net.minecraft.world.gen.MapGenBase;
 public abstract class MapGenStructure extends MapGenBase {
 	private MapGenStructureData structureData;
 	protected Map<Long, StructureStart> structureMap = Maps.newHashMap();
-
-	public abstract String getStructureName();
 
 	public MapGenStructure() {
 		super();
@@ -54,70 +55,60 @@ public abstract class MapGenStructure extends MapGenBase {
 		super(scramble);
 	}
 
-	/**+
-	 * Recursively called by generate()
-	 */
-	protected final void recursiveGenerate(World world, final int i, final int j, int var4, int var5,
-			ChunkPrimer var6) {
-		this.func_143027_a(world);
-		if (!this.structureMap.containsKey(Long.valueOf(ChunkCoordIntPair.chunkXZ2Int(i, j)))) {
-			this.rand.nextInt();
+	protected abstract boolean canSpawnStructureAtCoords(int var1, int var2);
 
-			try {
-				if (this.canSpawnStructureAtCoords(i, j)) {
-					StructureStart structurestart = this.getStructureStart(i, j);
-					this.structureMap.put(Long.valueOf(ChunkCoordIntPair.chunkXZ2Int(i, j)), structurestart);
-					this.func_143026_a(i, j, structurestart);
-				}
-
-			} catch (Throwable throwable) {
-				CrashReport crashreport = CrashReport.makeCrashReport(throwable,
-						"Exception preparing structure feature");
-				CrashReportCategory crashreportcategory = crashreport.makeCategory("Feature being prepared");
-				crashreportcategory.addCrashSectionCallable("Is feature chunk", new Callable<String>() {
-					public String call() throws Exception {
-						return MapGenStructure.this.canSpawnStructureAtCoords(i, j) ? "True" : "False";
-					}
-				});
-				crashreportcategory.addCrashSection("Chunk location",
-						HString.format("%d,%d", new Object[] { Integer.valueOf(i), Integer.valueOf(j) }));
-				crashreportcategory.addCrashSectionCallable("Chunk pos hash", new Callable<String>() {
-					public String call() throws Exception {
-						return String.valueOf(ChunkCoordIntPair.chunkXZ2Int(i, j));
-					}
-				});
-				crashreportcategory.addCrashSectionCallable("Structure type", new Callable<String>() {
-					public String call() throws Exception {
-						return MapGenStructure.this.getClass().getCanonicalName();
-					}
-				});
-				throw new ReportedException(crashreport);
-			}
-		}
+	private void func_143026_a(int start, int parInt2, StructureStart parStructureStart) {
+		this.structureData.writeInstance(parStructureStart.writeStructureComponentsToNBT(start, parInt2), start,
+				parInt2);
+		this.structureData.markDirty();
 	}
 
-	public boolean generateStructure(World worldIn, EaglercraftRandom randomIn, ChunkCoordIntPair chunkCoord) {
-		this.func_143027_a(worldIn);
-		int i = (chunkCoord.chunkXPos << 4) + 8;
-		int j = (chunkCoord.chunkZPos << 4) + 8;
-		boolean flag = false;
+	private void func_143027_a(World worldIn) {
+		if (this.structureData == null) {
+			this.structureData = (MapGenStructureData) worldIn.loadItemData(MapGenStructureData.class,
+					this.getStructureName());
+			if (this.structureData == null) {
+				this.structureData = new MapGenStructureData(this.getStructureName());
+				worldIn.setItemData(this.getStructureName(), this.structureData);
+			} else {
+				NBTTagCompound nbttagcompound = this.structureData.getTagCompound();
 
-		for (StructureStart structurestart : this.structureMap.values()) {
-			if (structurestart.isSizeableStructure() && structurestart.func_175788_a(chunkCoord)
-					&& structurestart.getBoundingBox().intersectsWith(i, j, i + 15, j + 15)) {
-				structurestart.generateStructure(worldIn, randomIn, new StructureBoundingBox(i, j, i + 15, j + 15));
-				structurestart.func_175787_b(chunkCoord);
-				flag = true;
-				this.func_143026_a(structurestart.getChunkPosX(), structurestart.getChunkPosZ(), structurestart);
+				for (String s : nbttagcompound.getKeySet()) {
+					NBTBase nbtbase = nbttagcompound.getTag(s);
+					if (nbtbase.getId() == 10) {
+						NBTTagCompound nbttagcompound1 = (NBTTagCompound) nbtbase;
+						if (nbttagcompound1.hasKey("ChunkX") && nbttagcompound1.hasKey("ChunkZ")) {
+							int i = nbttagcompound1.getInteger("ChunkX");
+							int j = nbttagcompound1.getInteger("ChunkZ");
+							StructureStart structurestart = MapGenStructureIO.getStructureStart(nbttagcompound1,
+									worldIn);
+							if (structurestart != null) {
+								this.structureMap.put(Long.valueOf(ChunkCoordIntPair.chunkXZ2Int(i, j)),
+										structurestart);
+							}
+						}
+					}
+				}
 			}
 		}
 
-		return flag;
 	}
 
 	public boolean func_175795_b(BlockPos pos) {
 		this.func_143027_a(this.worldObj);
 		return this.func_175797_c(pos) != null;
+	}
+
+	public boolean func_175796_a(World worldIn, BlockPos pos) {
+		this.func_143027_a(worldIn);
+
+		for (StructureStart structurestart : this.structureMap.values()) {
+			if (structurestart.isSizeableStructure() && structurestart.getBoundingBox().isVecInside(pos)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	protected StructureStart func_175797_c(BlockPos pos) {
@@ -143,16 +134,23 @@ public abstract class MapGenStructure extends MapGenBase {
 		return null;
 	}
 
-	public boolean func_175796_a(World worldIn, BlockPos pos) {
+	public boolean generateStructure(World worldIn, EaglercraftRandom randomIn, ChunkCoordIntPair chunkCoord) {
 		this.func_143027_a(worldIn);
+		int i = (chunkCoord.chunkXPos << 4) + 8;
+		int j = (chunkCoord.chunkZPos << 4) + 8;
+		boolean flag = false;
 
 		for (StructureStart structurestart : this.structureMap.values()) {
-			if (structurestart.isSizeableStructure() && structurestart.getBoundingBox().isVecInside(pos)) {
-				return true;
+			if (structurestart.isSizeableStructure() && structurestart.func_175788_a(chunkCoord)
+					&& structurestart.getBoundingBox().intersectsWith(i, j, i + 15, j + 15)) {
+				structurestart.generateStructure(worldIn, randomIn, new StructureBoundingBox(i, j, i + 15, j + 15));
+				structurestart.func_175787_b(chunkCoord);
+				flag = true;
+				this.func_143026_a(structurestart.getChunkPosX(), structurestart.getChunkPosZ(), structurestart);
 			}
 		}
 
-		return false;
+		return flag;
 	}
 
 	public BlockPos getClosestStrongholdPos(World worldIn, BlockPos pos) {
@@ -203,53 +201,57 @@ public abstract class MapGenStructure extends MapGenBase {
 		}
 	}
 
-	/**+
-	 * Returns a list of other locations at which the structure
-	 * generation has been run, or null if not relevant to this
-	 * structure generator.
+	/**
+	 * + Returns a list of other locations at which the structure generation has
+	 * been run, or null if not relevant to this structure generator.
 	 */
 	protected List<BlockPos> getCoordList() {
 		return null;
 	}
 
-	private void func_143027_a(World worldIn) {
-		if (this.structureData == null) {
-			this.structureData = (MapGenStructureData) worldIn.loadItemData(MapGenStructureData.class,
-					this.getStructureName());
-			if (this.structureData == null) {
-				this.structureData = new MapGenStructureData(this.getStructureName());
-				worldIn.setItemData(this.getStructureName(), this.structureData);
-			} else {
-				NBTTagCompound nbttagcompound = this.structureData.getTagCompound();
-
-				for (String s : nbttagcompound.getKeySet()) {
-					NBTBase nbtbase = nbttagcompound.getTag(s);
-					if (nbtbase.getId() == 10) {
-						NBTTagCompound nbttagcompound1 = (NBTTagCompound) nbtbase;
-						if (nbttagcompound1.hasKey("ChunkX") && nbttagcompound1.hasKey("ChunkZ")) {
-							int i = nbttagcompound1.getInteger("ChunkX");
-							int j = nbttagcompound1.getInteger("ChunkZ");
-							StructureStart structurestart = MapGenStructureIO.getStructureStart(nbttagcompound1,
-									worldIn);
-							if (structurestart != null) {
-								this.structureMap.put(Long.valueOf(ChunkCoordIntPair.chunkXZ2Int(i, j)),
-										structurestart);
-							}
-						}
-					}
-				}
-			}
-		}
-
-	}
-
-	private void func_143026_a(int start, int parInt2, StructureStart parStructureStart) {
-		this.structureData.writeInstance(parStructureStart.writeStructureComponentsToNBT(start, parInt2), start,
-				parInt2);
-		this.structureData.markDirty();
-	}
-
-	protected abstract boolean canSpawnStructureAtCoords(int var1, int var2);
+	public abstract String getStructureName();
 
 	protected abstract StructureStart getStructureStart(int var1, int var2);
+
+	/**
+	 * + Recursively called by generate()
+	 */
+	protected final void recursiveGenerate(World world, final int i, final int j, int var4, int var5,
+			ChunkPrimer var6) {
+		this.func_143027_a(world);
+		if (!this.structureMap.containsKey(Long.valueOf(ChunkCoordIntPair.chunkXZ2Int(i, j)))) {
+			this.rand.nextInt();
+
+			try {
+				if (this.canSpawnStructureAtCoords(i, j)) {
+					StructureStart structurestart = this.getStructureStart(i, j);
+					this.structureMap.put(Long.valueOf(ChunkCoordIntPair.chunkXZ2Int(i, j)), structurestart);
+					this.func_143026_a(i, j, structurestart);
+				}
+
+			} catch (Throwable throwable) {
+				CrashReport crashreport = CrashReport.makeCrashReport(throwable,
+						"Exception preparing structure feature");
+				CrashReportCategory crashreportcategory = crashreport.makeCategory("Feature being prepared");
+				crashreportcategory.addCrashSectionCallable("Is feature chunk", new Callable<String>() {
+					public String call() throws Exception {
+						return MapGenStructure.this.canSpawnStructureAtCoords(i, j) ? "True" : "False";
+					}
+				});
+				crashreportcategory.addCrashSection("Chunk location",
+						HString.format("%d,%d", new Object[] { Integer.valueOf(i), Integer.valueOf(j) }));
+				crashreportcategory.addCrashSectionCallable("Chunk pos hash", new Callable<String>() {
+					public String call() throws Exception {
+						return String.valueOf(ChunkCoordIntPair.chunkXZ2Int(i, j));
+					}
+				});
+				crashreportcategory.addCrashSectionCallable("Structure type", new Callable<String>() {
+					public String call() throws Exception {
+						return MapGenStructure.this.getClass().getCanonicalName();
+					}
+				});
+				throw new ReportedException(crashreport);
+			}
+		}
+	}
 }

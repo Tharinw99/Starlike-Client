@@ -13,22 +13,25 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -42,6 +45,51 @@ public class WorldGenCanopyTree extends WorldGenAbstractTree {
 
 	public WorldGenCanopyTree(boolean parFlag) {
 		super(parFlag);
+	}
+
+	private void func_150526_a(World worldIn, int parInt1, int parInt2, int parInt3) {
+		BlockPos blockpos = new BlockPos(parInt1, parInt2, parInt3);
+		Block block = worldIn.getBlockState(blockpos).getBlock();
+		if (block.getMaterial() == Material.air) {
+			this.setBlockAndNotifyAdequately(worldIn, blockpos, field_181641_b);
+		}
+
+	}
+
+	private boolean func_181638_a(World parWorld, BlockPos parBlockPos, int parInt1) {
+		int i = parBlockPos.getX();
+		int j = parBlockPos.getY();
+		int k = parBlockPos.getZ();
+		BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+
+		for (int l = 0; l <= parInt1 + 1; ++l) {
+			byte b0 = 1;
+			if (l == 0) {
+				b0 = 0;
+			}
+
+			if (l >= parInt1 - 1) {
+				b0 = 2;
+			}
+
+			for (int i1 = -b0; i1 <= b0; ++i1) {
+				for (int j1 = -b0; j1 <= b0; ++j1) {
+					if (!this.func_150523_a(parWorld
+							.getBlockState(blockpos$mutableblockpos.func_181079_c(i + i1, j + l, k + j1)).getBlock())) {
+						return false;
+					}
+				}
+			}
+		}
+
+		return true;
+	}
+
+	private void func_181639_b(World parWorld, BlockPos parBlockPos) {
+		if (this.func_150523_a(parWorld.getBlockState(parBlockPos).getBlock())) {
+			this.setBlockAndNotifyAdequately(parWorld, parBlockPos, field_181640_a);
+		}
+
 	}
 
 	public boolean generate(World world, EaglercraftRandom random, BlockPos blockpos) {
@@ -150,50 +198,5 @@ public class WorldGenCanopyTree extends WorldGenAbstractTree {
 		} else {
 			return false;
 		}
-	}
-
-	private boolean func_181638_a(World parWorld, BlockPos parBlockPos, int parInt1) {
-		int i = parBlockPos.getX();
-		int j = parBlockPos.getY();
-		int k = parBlockPos.getZ();
-		BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
-
-		for (int l = 0; l <= parInt1 + 1; ++l) {
-			byte b0 = 1;
-			if (l == 0) {
-				b0 = 0;
-			}
-
-			if (l >= parInt1 - 1) {
-				b0 = 2;
-			}
-
-			for (int i1 = -b0; i1 <= b0; ++i1) {
-				for (int j1 = -b0; j1 <= b0; ++j1) {
-					if (!this.func_150523_a(parWorld
-							.getBlockState(blockpos$mutableblockpos.func_181079_c(i + i1, j + l, k + j1)).getBlock())) {
-						return false;
-					}
-				}
-			}
-		}
-
-		return true;
-	}
-
-	private void func_181639_b(World parWorld, BlockPos parBlockPos) {
-		if (this.func_150523_a(parWorld.getBlockState(parBlockPos).getBlock())) {
-			this.setBlockAndNotifyAdequately(parWorld, parBlockPos, field_181640_a);
-		}
-
-	}
-
-	private void func_150526_a(World worldIn, int parInt1, int parInt2, int parInt3) {
-		BlockPos blockpos = new BlockPos(parInt1, parInt2, parInt3);
-		Block block = worldIn.getBlockState(blockpos).getBlock();
-		if (block.getMaterial() == Material.air) {
-			this.setBlockAndNotifyAdequately(worldIn, blockpos, field_181641_b);
-		}
-
 	}
 }

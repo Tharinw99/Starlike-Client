@@ -51,52 +51,6 @@ import com.google.common.collect.Table.Cell;
  */
 @GwtCompatible
 public final class Tables {
-	private Tables() {
-	}
-
-	/**
-	 * Returns an immutable cell with the specified row key, column key, and value.
-	 *
-	 * <p>
-	 * The returned cell is serializable.
-	 *
-	 * @param rowKey    the row key to be associated with the returned cell
-	 * @param columnKey the column key to be associated with the returned cell
-	 * @param value     the value to be associated with the returned cell
-	 */
-	public static <R, C, V> Cell<R, C, V> immutableCell(@Nullable R rowKey, @Nullable C columnKey, @Nullable V value) {
-		return new ImmutableCell<R, C, V>(rowKey, columnKey, value);
-	}
-
-	static final class ImmutableCell<R, C, V> extends AbstractCell<R, C, V> implements Serializable {
-		private final R rowKey;
-		private final C columnKey;
-		private final V value;
-
-		ImmutableCell(@Nullable R rowKey, @Nullable C columnKey, @Nullable V value) {
-			this.rowKey = rowKey;
-			this.columnKey = columnKey;
-			this.value = value;
-		}
-
-		@Override
-		public R getRowKey() {
-			return rowKey;
-		}
-
-		@Override
-		public C getColumnKey() {
-			return columnKey;
-		}
-
-		@Override
-		public V getValue() {
-			return value;
-		}
-
-		private static final long serialVersionUID = 0;
-	}
-
 	abstract static class AbstractCell<R, C, V> implements Cell<R, C, V> {
 		// needed for serialization
 		AbstractCell() {
@@ -127,31 +81,162 @@ public final class Tables {
 		}
 	}
 
-	/**
-	 * Creates a transposed view of a given table that flips its row and column
-	 * keys. In other words, calling {@code get(columnKey, rowKey)} on the generated
-	 * table always returns the same value as calling {@code
-	 * get(rowKey, columnKey)} on the original table. Updating the original table
-	 * changes the contents of the transposed table and vice versa.
-	 *
-	 * <p>
-	 * The returned table supports update operations as long as the input table
-	 * supports the analogous operation with swapped rows and columns. For example,
-	 * in a {@link HashBasedTable} instance, {@code
-	 * rowKeySet().iterator()} supports {@code remove()} but {@code
-	 * columnKeySet().iterator()} doesn't. With a transposed {@link HashBasedTable},
-	 * it's the other way around.
-	 */
-	public static <R, C, V> Table<C, R, V> transpose(Table<R, C, V> table) {
-		return (table instanceof TransposeTable) ? ((TransposeTable<R, C, V>) table).original
-				: new TransposeTable<C, R, V>(table);
+	static final class ImmutableCell<R, C, V> extends AbstractCell<R, C, V> implements Serializable {
+		private static final long serialVersionUID = 0;
+		private final R rowKey;
+		private final C columnKey;
+
+		private final V value;
+
+		ImmutableCell(@Nullable R rowKey, @Nullable C columnKey, @Nullable V value) {
+			this.rowKey = rowKey;
+			this.columnKey = columnKey;
+			this.value = value;
+		}
+
+		@Override
+		public C getColumnKey() {
+			return columnKey;
+		}
+
+		@Override
+		public R getRowKey() {
+			return rowKey;
+		}
+
+		@Override
+		public V getValue() {
+			return value;
+		}
+	}
+
+	private static class TransformedTable<R, C, V1, V2> extends AbstractTable<R, C, V2> {
+		final Table<R, C, V1> fromTable;
+		final Function<? super V1, V2> function;
+
+		TransformedTable(Table<R, C, V1> fromTable, Function<? super V1, V2> function) {
+			this.fromTable = checkNotNull(fromTable);
+			this.function = checkNotNull(function);
+		}
+
+		Function<Cell<R, C, V1>, Cell<R, C, V2>> cellFunction() {
+			return new Function<Cell<R, C, V1>, Cell<R, C, V2>>() {
+				@Override
+				public Cell<R, C, V2> apply(Cell<R, C, V1> cell) {
+					return immutableCell(cell.getRowKey(), cell.getColumnKey(), function.apply(cell.getValue()));
+				}
+			};
+		}
+
+		@Override
+		Iterator<Cell<R, C, V2>> cellIterator() {
+			return Iterators.transform(fromTable.cellSet().iterator(), cellFunction());
+		}
+
+		@Override
+		public void clear() {
+			fromTable.clear();
+		}
+
+		@Override
+		public Map<R, V2> column(C columnKey) {
+			return Maps.transformValues(fromTable.column(columnKey), function);
+		}
+
+		@Override
+		public Set<C> columnKeySet() {
+			return fromTable.columnKeySet();
+		}
+
+		@Override
+		public Map<C, Map<R, V2>> columnMap() {
+			Function<Map<R, V1>, Map<R, V2>> columnFunction = new Function<Map<R, V1>, Map<R, V2>>() {
+				@Override
+				public Map<R, V2> apply(Map<R, V1> column) {
+					return Maps.transformValues(column, function);
+				}
+			};
+			return Maps.transformValues(fromTable.columnMap(), columnFunction);
+		}
+
+		@Override
+		public boolean contains(Object rowKey, Object columnKey) {
+			return fromTable.contains(rowKey, columnKey);
+		}
+
+		@Override
+		Collection<V2> createValues() {
+			return Collections2.transform(fromTable.values(), function);
+		}
+
+		@Override
+		public V2 get(Object rowKey, Object columnKey) {
+			// The function is passed a null input only when the table contains a null
+			// value.
+			return contains(rowKey, columnKey) ? function.apply(fromTable.get(rowKey, columnKey)) : null;
+		}
+
+		@Override
+		public V2 put(R rowKey, C columnKey, V2 value) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void putAll(Table<? extends R, ? extends C, ? extends V2> table) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public V2 remove(Object rowKey, Object columnKey) {
+			return contains(rowKey, columnKey) ? function.apply(fromTable.remove(rowKey, columnKey)) : null;
+		}
+
+		@Override
+		public Map<C, V2> row(R rowKey) {
+			return Maps.transformValues(fromTable.row(rowKey), function);
+		}
+
+		@Override
+		public Set<R> rowKeySet() {
+			return fromTable.rowKeySet();
+		}
+
+		@Override
+		public Map<R, Map<C, V2>> rowMap() {
+			Function<Map<C, V1>, Map<C, V2>> rowFunction = new Function<Map<C, V1>, Map<C, V2>>() {
+				@Override
+				public Map<C, V2> apply(Map<C, V1> row) {
+					return Maps.transformValues(row, function);
+				}
+			};
+			return Maps.transformValues(fromTable.rowMap(), rowFunction);
+		}
+
+		@Override
+		public int size() {
+			return fromTable.size();
+		}
 	}
 
 	private static class TransposeTable<C, R, V> extends AbstractTable<C, R, V> {
+		// Will cast TRANSPOSE_CELL to a type that always succeeds
+		private static final Function<Cell<?, ?, ?>, Cell<?, ?, ?>> TRANSPOSE_CELL = new Function<Cell<?, ?, ?>, Cell<?, ?, ?>>() {
+			@Override
+			public Cell<?, ?, ?> apply(Cell<?, ?, ?> cell) {
+				return immutableCell(cell.getColumnKey(), cell.getRowKey(), cell.getValue());
+			}
+		};
+
 		final Table<R, C, V> original;
 
 		TransposeTable(Table<R, C, V> original) {
 			this.original = checkNotNull(original);
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		Iterator<Cell<C, R, V>> cellIterator() {
+			return Iterators.transform(original.cellSet().iterator(), (Function) TRANSPOSE_CELL);
 		}
 
 		@Override
@@ -238,20 +323,142 @@ public final class Tables {
 		public Collection<V> values() {
 			return original.values();
 		}
+	}
 
-		// Will cast TRANSPOSE_CELL to a type that always succeeds
-		private static final Function<Cell<?, ?, ?>, Cell<?, ?, ?>> TRANSPOSE_CELL = new Function<Cell<?, ?, ?>, Cell<?, ?, ?>>() {
-			@Override
-			public Cell<?, ?, ?> apply(Cell<?, ?, ?> cell) {
-				return immutableCell(cell.getColumnKey(), cell.getRowKey(), cell.getValue());
-			}
-		};
+	static final class UnmodifiableRowSortedMap<R, C, V> extends UnmodifiableTable<R, C, V>
+			implements RowSortedTable<R, C, V> {
 
-		@SuppressWarnings("unchecked")
-		@Override
-		Iterator<Cell<C, R, V>> cellIterator() {
-			return Iterators.transform(original.cellSet().iterator(), (Function) TRANSPOSE_CELL);
+		private static final long serialVersionUID = 0;
+
+		public UnmodifiableRowSortedMap(RowSortedTable<R, ? extends C, ? extends V> delegate) {
+			super(delegate);
 		}
+
+		@Override
+		protected RowSortedTable<R, C, V> delegate() {
+			return (RowSortedTable<R, C, V>) super.delegate();
+		}
+
+		@Override
+		public SortedSet<R> rowKeySet() {
+			return Collections.unmodifiableSortedSet(delegate().rowKeySet());
+		}
+
+		@Override
+		public SortedMap<R, Map<C, V>> rowMap() {
+			Function<Map<C, V>, Map<C, V>> wrapper = unmodifiableWrapper();
+			return Collections.unmodifiableSortedMap(Maps.transformValues(delegate().rowMap(), wrapper));
+		}
+	}
+
+	private static class UnmodifiableTable<R, C, V> extends ForwardingTable<R, C, V> implements Serializable {
+		private static final long serialVersionUID = 0;
+
+		final Table<? extends R, ? extends C, ? extends V> delegate;
+
+		UnmodifiableTable(Table<? extends R, ? extends C, ? extends V> delegate) {
+			this.delegate = checkNotNull(delegate);
+		}
+
+		@Override
+		public Set<Cell<R, C, V>> cellSet() {
+			return Collections.unmodifiableSet(super.cellSet());
+		}
+
+		@Override
+		public void clear() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Map<R, V> column(@Nullable C columnKey) {
+			return Collections.unmodifiableMap(super.column(columnKey));
+		}
+
+		@Override
+		public Set<C> columnKeySet() {
+			return Collections.unmodifiableSet(super.columnKeySet());
+		}
+
+		@Override
+		public Map<C, Map<R, V>> columnMap() {
+			Function<Map<R, V>, Map<R, V>> wrapper = unmodifiableWrapper();
+			return Collections.unmodifiableMap(Maps.transformValues(super.columnMap(), wrapper));
+		}
+
+		@SuppressWarnings("unchecked") // safe, covariant cast
+		@Override
+		protected Table<R, C, V> delegate() {
+			return (Table<R, C, V>) delegate;
+		}
+
+		@Override
+		public V put(@Nullable R rowKey, @Nullable C columnKey, @Nullable V value) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void putAll(Table<? extends R, ? extends C, ? extends V> table) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public V remove(@Nullable Object rowKey, @Nullable Object columnKey) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Map<C, V> row(@Nullable R rowKey) {
+			return Collections.unmodifiableMap(super.row(rowKey));
+		}
+
+		@Override
+		public Set<R> rowKeySet() {
+			return Collections.unmodifiableSet(super.rowKeySet());
+		}
+
+		@Override
+		public Map<R, Map<C, V>> rowMap() {
+			Function<Map<C, V>, Map<C, V>> wrapper = unmodifiableWrapper();
+			return Collections.unmodifiableMap(Maps.transformValues(super.rowMap(), wrapper));
+		}
+
+		@Override
+		public Collection<V> values() {
+			return Collections.unmodifiableCollection(super.values());
+		}
+	}
+
+	private static final Function<? extends Map<?, ?>, ? extends Map<?, ?>> UNMODIFIABLE_WRAPPER = new Function<Map<Object, Object>, Map<Object, Object>>() {
+		@Override
+		public Map<Object, Object> apply(Map<Object, Object> input) {
+			return Collections.unmodifiableMap(input);
+		}
+	};
+
+	static boolean equalsImpl(Table<?, ?, ?> table, @Nullable Object obj) {
+		if (obj == table) {
+			return true;
+		} else if (obj instanceof Table) {
+			Table<?, ?, ?> that = (Table<?, ?, ?>) obj;
+			return table.cellSet().equals(that.cellSet());
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Returns an immutable cell with the specified row key, column key, and value.
+	 *
+	 * <p>
+	 * The returned cell is serializable.
+	 *
+	 * @param rowKey    the row key to be associated with the returned cell
+	 * @param columnKey the column key to be associated with the returned cell
+	 * @param value     the value to be associated with the returned cell
+	 */
+	public static <R, C, V> Cell<R, C, V> immutableCell(@Nullable R rowKey, @Nullable C columnKey, @Nullable V value) {
+		return new ImmutableCell<R, C, V>(rowKey, columnKey, value);
 	}
 
 	/**
@@ -345,213 +552,24 @@ public final class Tables {
 		return new TransformedTable<R, C, V1, V2>(fromTable, function);
 	}
 
-	private static class TransformedTable<R, C, V1, V2> extends AbstractTable<R, C, V2> {
-		final Table<R, C, V1> fromTable;
-		final Function<? super V1, V2> function;
-
-		TransformedTable(Table<R, C, V1> fromTable, Function<? super V1, V2> function) {
-			this.fromTable = checkNotNull(fromTable);
-			this.function = checkNotNull(function);
-		}
-
-		@Override
-		public boolean contains(Object rowKey, Object columnKey) {
-			return fromTable.contains(rowKey, columnKey);
-		}
-
-		@Override
-		public V2 get(Object rowKey, Object columnKey) {
-			// The function is passed a null input only when the table contains a null
-			// value.
-			return contains(rowKey, columnKey) ? function.apply(fromTable.get(rowKey, columnKey)) : null;
-		}
-
-		@Override
-		public int size() {
-			return fromTable.size();
-		}
-
-		@Override
-		public void clear() {
-			fromTable.clear();
-		}
-
-		@Override
-		public V2 put(R rowKey, C columnKey, V2 value) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public void putAll(Table<? extends R, ? extends C, ? extends V2> table) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public V2 remove(Object rowKey, Object columnKey) {
-			return contains(rowKey, columnKey) ? function.apply(fromTable.remove(rowKey, columnKey)) : null;
-		}
-
-		@Override
-		public Map<C, V2> row(R rowKey) {
-			return Maps.transformValues(fromTable.row(rowKey), function);
-		}
-
-		@Override
-		public Map<R, V2> column(C columnKey) {
-			return Maps.transformValues(fromTable.column(columnKey), function);
-		}
-
-		Function<Cell<R, C, V1>, Cell<R, C, V2>> cellFunction() {
-			return new Function<Cell<R, C, V1>, Cell<R, C, V2>>() {
-				@Override
-				public Cell<R, C, V2> apply(Cell<R, C, V1> cell) {
-					return immutableCell(cell.getRowKey(), cell.getColumnKey(), function.apply(cell.getValue()));
-				}
-			};
-		}
-
-		@Override
-		Iterator<Cell<R, C, V2>> cellIterator() {
-			return Iterators.transform(fromTable.cellSet().iterator(), cellFunction());
-		}
-
-		@Override
-		public Set<R> rowKeySet() {
-			return fromTable.rowKeySet();
-		}
-
-		@Override
-		public Set<C> columnKeySet() {
-			return fromTable.columnKeySet();
-		}
-
-		@Override
-		Collection<V2> createValues() {
-			return Collections2.transform(fromTable.values(), function);
-		}
-
-		@Override
-		public Map<R, Map<C, V2>> rowMap() {
-			Function<Map<C, V1>, Map<C, V2>> rowFunction = new Function<Map<C, V1>, Map<C, V2>>() {
-				@Override
-				public Map<C, V2> apply(Map<C, V1> row) {
-					return Maps.transformValues(row, function);
-				}
-			};
-			return Maps.transformValues(fromTable.rowMap(), rowFunction);
-		}
-
-		@Override
-		public Map<C, Map<R, V2>> columnMap() {
-			Function<Map<R, V1>, Map<R, V2>> columnFunction = new Function<Map<R, V1>, Map<R, V2>>() {
-				@Override
-				public Map<R, V2> apply(Map<R, V1> column) {
-					return Maps.transformValues(column, function);
-				}
-			};
-			return Maps.transformValues(fromTable.columnMap(), columnFunction);
-		}
-	}
-
 	/**
-	 * Returns an unmodifiable view of the specified table. This method allows
-	 * modules to provide users with "read-only" access to internal tables. Query
-	 * operations on the returned table "read through" to the specified table, and
-	 * attempts to modify the returned table, whether direct or via its collection
-	 * views, result in an {@code UnsupportedOperationException}.
-	 * 
-	 * <p>
-	 * The returned table will be serializable if the specified table is
-	 * serializable.
+	 * Creates a transposed view of a given table that flips its row and column
+	 * keys. In other words, calling {@code get(columnKey, rowKey)} on the generated
+	 * table always returns the same value as calling {@code
+	 * get(rowKey, columnKey)} on the original table. Updating the original table
+	 * changes the contents of the transposed table and vice versa.
 	 *
 	 * <p>
-	 * Consider using an {@link ImmutableTable}, which is guaranteed never to
-	 * change.
-	 * 
-	 * @param table the table for which an unmodifiable view is to be returned
-	 * @return an unmodifiable view of the specified table
-	 * @since 11.0
+	 * The returned table supports update operations as long as the input table
+	 * supports the analogous operation with swapped rows and columns. For example,
+	 * in a {@link HashBasedTable} instance, {@code
+	 * rowKeySet().iterator()} supports {@code remove()} but {@code
+	 * columnKeySet().iterator()} doesn't. With a transposed {@link HashBasedTable},
+	 * it's the other way around.
 	 */
-	public static <R, C, V> Table<R, C, V> unmodifiableTable(Table<? extends R, ? extends C, ? extends V> table) {
-		return new UnmodifiableTable<R, C, V>(table);
-	}
-
-	private static class UnmodifiableTable<R, C, V> extends ForwardingTable<R, C, V> implements Serializable {
-		final Table<? extends R, ? extends C, ? extends V> delegate;
-
-		UnmodifiableTable(Table<? extends R, ? extends C, ? extends V> delegate) {
-			this.delegate = checkNotNull(delegate);
-		}
-
-		@SuppressWarnings("unchecked") // safe, covariant cast
-		@Override
-		protected Table<R, C, V> delegate() {
-			return (Table<R, C, V>) delegate;
-		}
-
-		@Override
-		public Set<Cell<R, C, V>> cellSet() {
-			return Collections.unmodifiableSet(super.cellSet());
-		}
-
-		@Override
-		public void clear() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public Map<R, V> column(@Nullable C columnKey) {
-			return Collections.unmodifiableMap(super.column(columnKey));
-		}
-
-		@Override
-		public Set<C> columnKeySet() {
-			return Collections.unmodifiableSet(super.columnKeySet());
-		}
-
-		@Override
-		public Map<C, Map<R, V>> columnMap() {
-			Function<Map<R, V>, Map<R, V>> wrapper = unmodifiableWrapper();
-			return Collections.unmodifiableMap(Maps.transformValues(super.columnMap(), wrapper));
-		}
-
-		@Override
-		public V put(@Nullable R rowKey, @Nullable C columnKey, @Nullable V value) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public void putAll(Table<? extends R, ? extends C, ? extends V> table) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public V remove(@Nullable Object rowKey, @Nullable Object columnKey) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public Map<C, V> row(@Nullable R rowKey) {
-			return Collections.unmodifiableMap(super.row(rowKey));
-		}
-
-		@Override
-		public Set<R> rowKeySet() {
-			return Collections.unmodifiableSet(super.rowKeySet());
-		}
-
-		@Override
-		public Map<R, Map<C, V>> rowMap() {
-			Function<Map<C, V>, Map<C, V>> wrapper = unmodifiableWrapper();
-			return Collections.unmodifiableMap(Maps.transformValues(super.rowMap(), wrapper));
-		}
-
-		@Override
-		public Collection<V> values() {
-			return Collections.unmodifiableCollection(super.values());
-		}
-
-		private static final long serialVersionUID = 0;
+	public static <R, C, V> Table<C, R, V> transpose(Table<R, C, V> table) {
+		return (table instanceof TransposeTable) ? ((TransposeTable<R, C, V>) table).original
+				: new TransposeTable<C, R, V>(table);
 	}
 
 	/**
@@ -582,30 +600,27 @@ public final class Tables {
 		return new UnmodifiableRowSortedMap<R, C, V>(table);
 	}
 
-	static final class UnmodifiableRowSortedMap<R, C, V> extends UnmodifiableTable<R, C, V>
-			implements RowSortedTable<R, C, V> {
-
-		public UnmodifiableRowSortedMap(RowSortedTable<R, ? extends C, ? extends V> delegate) {
-			super(delegate);
-		}
-
-		@Override
-		protected RowSortedTable<R, C, V> delegate() {
-			return (RowSortedTable<R, C, V>) super.delegate();
-		}
-
-		@Override
-		public SortedMap<R, Map<C, V>> rowMap() {
-			Function<Map<C, V>, Map<C, V>> wrapper = unmodifiableWrapper();
-			return Collections.unmodifiableSortedMap(Maps.transformValues(delegate().rowMap(), wrapper));
-		}
-
-		@Override
-		public SortedSet<R> rowKeySet() {
-			return Collections.unmodifiableSortedSet(delegate().rowKeySet());
-		}
-
-		private static final long serialVersionUID = 0;
+	/**
+	 * Returns an unmodifiable view of the specified table. This method allows
+	 * modules to provide users with "read-only" access to internal tables. Query
+	 * operations on the returned table "read through" to the specified table, and
+	 * attempts to modify the returned table, whether direct or via its collection
+	 * views, result in an {@code UnsupportedOperationException}.
+	 * 
+	 * <p>
+	 * The returned table will be serializable if the specified table is
+	 * serializable.
+	 *
+	 * <p>
+	 * Consider using an {@link ImmutableTable}, which is guaranteed never to
+	 * change.
+	 * 
+	 * @param table the table for which an unmodifiable view is to be returned
+	 * @return an unmodifiable view of the specified table
+	 * @since 11.0
+	 */
+	public static <R, C, V> Table<R, C, V> unmodifiableTable(Table<? extends R, ? extends C, ? extends V> table) {
+		return new UnmodifiableTable<R, C, V>(table);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -613,21 +628,6 @@ public final class Tables {
 		return (Function) UNMODIFIABLE_WRAPPER;
 	}
 
-	private static final Function<? extends Map<?, ?>, ? extends Map<?, ?>> UNMODIFIABLE_WRAPPER = new Function<Map<Object, Object>, Map<Object, Object>>() {
-		@Override
-		public Map<Object, Object> apply(Map<Object, Object> input) {
-			return Collections.unmodifiableMap(input);
-		}
-	};
-
-	static boolean equalsImpl(Table<?, ?, ?> table, @Nullable Object obj) {
-		if (obj == table) {
-			return true;
-		} else if (obj instanceof Table) {
-			Table<?, ?, ?> that = (Table<?, ?, ?>) obj;
-			return table.cellSet().equals(that.cellSet());
-		} else {
-			return false;
-		}
+	private Tables() {
 	}
 }

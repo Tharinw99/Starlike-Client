@@ -1,8 +1,8 @@
 package net.minecraft.block;
 
 import java.util.List;
-import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 
+import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -34,42 +34,80 @@ import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class Block {
-	/**+
-	 * ResourceLocation for the Air block
+	public static enum EnumOffsetType {
+		NONE, XZ, XYZ;
+	}
+
+	public static class SoundType {
+		public final String soundName;
+		public final float volume;
+		public final float frequency;
+
+		public SoundType(String name, float volume, float frequency) {
+			this.soundName = name;
+			this.volume = volume;
+			this.frequency = frequency;
+		}
+
+		public String getBreakSound() {
+			return "dig." + this.soundName;
+		}
+
+		public float getFrequency() {
+			return this.frequency;
+		}
+
+		public String getPlaceSound() {
+			return this.getBreakSound();
+		}
+
+		public String getStepSound() {
+			return "step." + this.soundName;
+		}
+
+		public float getVolume() {
+			return this.volume;
+		}
+	}
+
+	/**
+	 * + ResourceLocation for the Air block
 	 */
 	private static final ResourceLocation AIR_ID = new ResourceLocation("air");
 	public static final RegistryNamespacedDefaultedByKey<ResourceLocation, Block> blockRegistry = new RegistryNamespacedDefaultedByKey(
 			AIR_ID);
 	public static final ObjectIntIdentityMap<IBlockState> BLOCK_STATE_IDS = new ObjectIntIdentityMap();
-	private CreativeTabs displayOnCreativeTab;
 	public static final Block.SoundType soundTypeStone = new Block.SoundType("stone", 1.0F, 1.0F);
-	/**+
-	 * the wood sound type
+	/**
+	 * + the wood sound type
 	 */
 	public static final Block.SoundType soundTypeWood = new Block.SoundType("wood", 1.0F, 1.0F);
-	/**+
-	 * the gravel sound type
+	/**
+	 * + the gravel sound type
 	 */
 	public static final Block.SoundType soundTypeGravel = new Block.SoundType("gravel", 1.0F, 1.0F);
 	public static final Block.SoundType soundTypeGrass = new Block.SoundType("grass", 1.0F, 1.0F);
@@ -114,55 +152,51 @@ public class Block {
 			return "mob.slime.small";
 		}
 	};
-	protected boolean fullBlock;
-	protected int lightOpacity;
-	protected boolean translucent;
-	protected int lightValue;
-	protected boolean useNeighborBrightness;
-	protected float blockHardness;
-	protected float blockResistance;
-	protected boolean enableStats;
-	protected boolean needsRandomTick;
-	protected boolean isBlockContainer;
-	protected double minX;
-	protected double minY;
-	protected double minZ;
-	protected double maxX;
-	protected double maxY;
-	protected double maxZ;
-	public Block.SoundType stepSound;
-	public float blockParticleGravity;
-	protected final Material blockMaterial;
-	protected final MapColor field_181083_K;
-	public float slipperiness;
-	protected final BlockState blockState;
-	private IBlockState defaultBlockState;
-	private String unlocalizedName;
 
-	public static int getIdFromBlock(Block blockIn) {
-		return blockRegistry.getIDForObject(blockIn);
-	}
+	public static void bootstrapStates() {
+		BlockBed.bootstrapStates();
+		BlockDirt.bootstrapStates();
+		BlockDoor.bootstrapStates();
+		BlockDoublePlant.bootstrapStates();
+		BlockFlowerPot.bootstrapStates();
+		BlockHugeMushroom.bootstrapStates();
+		BlockLever.bootstrapStates();
+		BlockLog.bootstrapStates();
+		BlockMosaic.bootstrapStates();
+		BlockNewLeaf.bootstrapStates();
+		BlockNewLog.bootstrapStates();
+		BlockOldLeaf.bootstrapStates();
+		BlockOldLog.bootstrapStates();
+		BlockPistonExtension.bootstrapStates();
+		BlockPistonMoving.bootstrapStates();
+		BlockPlanks.bootstrapStates();
+		BlockPrismarine.bootstrapStates();
+		BlockQuartz.bootstrapStates();
+		BlockRail.bootstrapStates();
+		BlockRailDetector.bootstrapStates();
+		BlockRailPowered.bootstrapStates();
+		BlockRedSandstone.bootstrapStates();
+		BlockRedstoneComparator.bootstrapStates();
+		BlockRedstoneWire.bootstrapStates();
+		BlockSand.bootstrapStates();
+		BlockSandStone.bootstrapStates();
+		BlockSapling.bootstrapStates();
+		BlockSilverfish.bootstrapStates();
+		BlockSlab.bootstrapStates();
+		BlockStairs.bootstrapStates();
+		BlockStone.bootstrapStates();
+		BlockStoneBrick.bootstrapStates();
+		BlockStoneSlab.bootstrapStates();
+		BlockStoneSlabNew.bootstrapStates();
+		BlockTallGrass.bootstrapStates();
+		BlockTrapDoor.bootstrapStates();
+		BlockWall.bootstrapStates();
+		BlockWoodSlab.bootstrapStates();
 
-	/**+
-	 * Get a unique ID for the given BlockState, containing both
-	 * BlockID and metadata
-	 */
-	public static int getStateId(IBlockState state) {
-		Block block = state.getBlock();
-		return getIdFromBlock(block) + (block.getMetaFromState(state) << 12);
 	}
 
 	public static Block getBlockById(int id) {
 		return (Block) blockRegistry.getObjectById(id);
-	}
-
-	/**+
-	 * Get a BlockState by it's ID (see getStateId)
-	 */
-	public static IBlockState getStateById(int id) {
-		int i = id & 4095;
-		int j = id >> 12 & 15;
-		return getBlockById(i).getStateFromMeta(j);
 	}
 
 	public static Block getBlockFromItem(Item itemIn) {
@@ -182,925 +216,38 @@ public class Block {
 		}
 	}
 
-	public boolean isFullBlock() {
-		return this.fullBlock;
+	public static int getIdFromBlock(Block blockIn) {
+		return blockRegistry.getIDForObject(blockIn);
 	}
 
-	public int getLightOpacity() {
-		return this.lightOpacity;
-	}
-
-	/**+
-	 * Used in the renderer to apply ambient occlusion
-	 */
-	public boolean isTranslucent() {
-		return this.translucent;
-	}
-
-	public int getLightValue() {
-		return this.lightValue;
-	}
-
-	/**+
-	 * Should block use the brightest neighbor light value as its
-	 * own
-	 */
-	public boolean getUseNeighborBrightness() {
-		return this.useNeighborBrightness;
-	}
-
-	/**+
-	 * Get a material of block
-	 */
-	public Material getMaterial() {
-		return this.blockMaterial;
-	}
-
-	/**+
-	 * Get the MapColor for this Block and the given BlockState
-	 */
-	public MapColor getMapColor(IBlockState state) {
-		return this.field_181083_K;
-	}
-
-	/**+
-	 * Convert the given metadata into a BlockState for this Block
-	 */
-	public IBlockState getStateFromMeta(int var1) {
-		return this.getDefaultState();
-	}
-
-	/**+
-	 * Convert the BlockState into the correct metadata value
-	 */
-	public int getMetaFromState(IBlockState iblockstate) {
-		if (iblockstate != null && !iblockstate.getPropertyNames().isEmpty()) {
-			throw new IllegalArgumentException("Don\'t know how to convert " + iblockstate + " back into data...");
-		} else {
-			return 0;
-		}
-	}
-
-	/**+
-	 * Get the actual Block state of this Block at the given
-	 * position. This applies properties not visible in the
-	 * metadata, such as fence connections.
-	 */
-	public IBlockState getActualState(IBlockState iblockstate, IBlockAccess var2, BlockPos var3) {
-		return iblockstate;
-	}
-
-	public Block(Material parMaterial, MapColor parMapColor) {
-		this.enableStats = true;
-		this.stepSound = soundTypeStone;
-		this.blockParticleGravity = 1.0F;
-		this.slipperiness = 0.6F;
-		this.blockMaterial = parMaterial;
-		this.field_181083_K = parMapColor;
-		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
-		this.fullBlock = this.isOpaqueCube();
-		this.lightOpacity = this.isOpaqueCube() ? 255 : 0;
-		this.translucent = !parMaterial.blocksLight();
-		this.blockState = this.createBlockState();
-		this.setDefaultState(this.blockState.getBaseState());
-	}
-
-	protected Block(Material materialIn) {
-		this(materialIn, materialIn.getMaterialMapColor());
-	}
-
-	/**+
-	 * Sets the footstep sound for the block. Returns the object for
-	 * convenience in constructing.
-	 */
-	protected Block setStepSound(Block.SoundType sound) {
-		this.stepSound = sound;
-		return this;
-	}
-
-	/**+
-	 * Sets how much light is blocked going through this block.
-	 * Returns the object for convenience in constructing.
-	 */
-	protected Block setLightOpacity(int opacity) {
-		this.lightOpacity = opacity;
-		return this;
-	}
-
-	/**+
-	 * Sets the light value that the block emits. Returns resulting
-	 * block instance for constructing convenience. Args: level
-	 */
-	protected Block setLightLevel(float value) {
-		this.lightValue = (int) (15.0F * value);
-		return this;
-	}
-
-	/**+
-	 * Sets the the blocks resistance to explosions. Returns the
-	 * object for convenience in constructing.
-	 */
-	protected Block setResistance(float resistance) {
-		this.blockResistance = resistance * 3.0F;
-		return this;
-	}
-
-	/**+
-	 * Indicate if a material is a normal solid opaque cube
-	 */
-	public boolean isBlockNormalCube() {
-		return this.blockMaterial.blocksMovement() && this.isFullCube();
-	}
-
-	/**+
-	 * Used for nearly all game logic (non-rendering) purposes. Use
-	 * Forge-provided isNormalCube(IBlockAccess, BlockPos) instead.
-	 */
-	public boolean isNormalCube() {
-		return this.blockMaterial.isOpaque() && this.isFullCube() && !this.canProvidePower();
-	}
-
-	public boolean isVisuallyOpaque() {
-		return this.blockMaterial.blocksMovement() && this.isFullCube();
-	}
-
-	public boolean isFullCube() {
-		return true;
-	}
-
-	public boolean isPassable(IBlockAccess var1, BlockPos var2) {
-		return !this.blockMaterial.blocksMovement();
-	}
-
-	/**+
-	 * The type of render function called. 3 for standard block
-	 * models, 2 for TESR's, 1 for liquids, -1 is no render
-	 */
-	public int getRenderType() {
-		return 3;
-	}
-
-	/**+
-	 * Whether this Block can be replaced directly by other blocks
-	 * (true for e.g. tall grass)
-	 */
-	public boolean isReplaceable(World var1, BlockPos var2) {
-		return false;
-	}
-
-	/**+
-	 * Sets how many hits it takes to break a block.
-	 */
-	protected Block setHardness(float hardness) {
-		this.blockHardness = hardness;
-		if (this.blockResistance < hardness * 5.0F) {
-			this.blockResistance = hardness * 5.0F;
-		}
-
-		return this;
-	}
-
-	protected Block setBlockUnbreakable() {
-		this.setHardness(-1.0F);
-		return this;
-	}
-
-	public float getBlockHardness(World worldIn, BlockPos pos) {
-		return this.blockHardness;
-	}
-
-	/**+
-	 * Sets whether this block type will receive random update ticks
-	 */
-	protected Block setTickRandomly(boolean shouldTick) {
-		this.needsRandomTick = shouldTick;
-		return this;
-	}
-
-	/**+
-	 * Returns whether or not this block is of a type that needs
-	 * random ticking. Called for ref-counting purposes by
-	 * ExtendedBlockStorage in order to broadly cull a chunk from
-	 * the random chunk update list for efficiency's sake.
-	 */
-	public boolean getTickRandomly() {
-		return this.needsRandomTick;
-	}
-
-	public boolean hasTileEntity() {
-		return this.isBlockContainer;
-	}
-
-	protected final void setBlockBounds(float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
-		this.minX = (double) minX;
-		this.minY = (double) minY;
-		this.minZ = (double) minZ;
-		this.maxX = (double) maxX;
-		this.maxY = (double) maxY;
-		this.maxZ = (double) maxZ;
-	}
-
-	public int getMixedBrightnessForBlock(IBlockAccess worldIn, BlockPos pos) {
-		Block block = worldIn.getBlockState(pos).getBlock();
-		int i = worldIn.getCombinedLight(pos, block.getLightValue());
-		if (i == 0 && block instanceof BlockSlab) {
-			pos = pos.down();
-			block = worldIn.getBlockState(pos).getBlock();
-			return worldIn.getCombinedLight(pos, block.getLightValue());
-		} else {
-			return i;
-		}
-	}
-
-	public boolean shouldSideBeRendered(IBlockAccess iblockaccess, BlockPos blockpos, EnumFacing enumfacing) {
-		return enumfacing == EnumFacing.DOWN && this.minY > 0.0D ? true
-				: (enumfacing == EnumFacing.UP && this.maxY < 1.0D ? true
-						: (enumfacing == EnumFacing.NORTH && this.minZ > 0.0D ? true
-								: (enumfacing == EnumFacing.SOUTH && this.maxZ < 1.0D ? true
-										: (enumfacing == EnumFacing.WEST && this.minX > 0.0D ? true
-												: (enumfacing == EnumFacing.EAST && this.maxX < 1.0D ? true
-														: !iblockaccess.getBlockState(blockpos).getBlock()
-																.isOpaqueCube())))));
-	}
-
-	/**+
-	 * Whether this Block is solid on the given Side
-	 */
-	public boolean isBlockSolid(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
-		return worldIn.getBlockState(pos).getBlock().getMaterial().isSolid();
-	}
-
-	public AxisAlignedBB getSelectedBoundingBox(World var1, BlockPos blockpos) {
-		return new AxisAlignedBB((double) blockpos.getX() + this.minX, (double) blockpos.getY() + this.minY,
-				(double) blockpos.getZ() + this.minZ, (double) blockpos.getX() + this.maxX,
-				(double) blockpos.getY() + this.maxY, (double) blockpos.getZ() + this.maxZ);
-	}
-
-	/**+
-	 * Add all collision boxes of this Block to the list that
-	 * intersect with the given mask.
-	 */
-	public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask,
-			List<AxisAlignedBB> list, Entity collidingEntity) {
-		AxisAlignedBB axisalignedbb = this.getCollisionBoundingBox(worldIn, pos, state);
-		if (axisalignedbb != null && mask.intersectsWith(axisalignedbb)) {
-			list.add(axisalignedbb);
-		}
-
-	}
-
-	public AxisAlignedBB getCollisionBoundingBox(World var1, BlockPos blockpos, IBlockState var3) {
-		return new AxisAlignedBB((double) blockpos.getX() + this.minX, (double) blockpos.getY() + this.minY,
-				(double) blockpos.getZ() + this.minZ, (double) blockpos.getX() + this.maxX,
-				(double) blockpos.getY() + this.maxY, (double) blockpos.getZ() + this.maxZ);
-	}
-
-	/**+
-	 * Used to determine ambient occlusion and culling when
-	 * rebuilding chunks for render
-	 */
-	public boolean isOpaqueCube() {
-		return true;
-	}
-
-	public boolean canCollideCheck(IBlockState var1, boolean var2) {
-		return this.isCollidable();
-	}
-
-	/**+
-	 * Returns if this block is collidable (only used by Fire).
-	 * Args: x, y, z
-	 */
-	public boolean isCollidable() {
-		return true;
-	}
-
-	/**+
-	 * Called randomly when setTickRandomly is set to true (used by
-	 * e.g. crops to grow, etc.)
-	 */
-	public void randomTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom random) {
-		this.updateTick(world, blockpos, iblockstate, random);
-	}
-
-	public void updateTick(World var1, BlockPos var2, IBlockState var3, EaglercraftRandom var4) {
-	}
-
-	public void randomDisplayTick(World worldIn, BlockPos pos, IBlockState state, EaglercraftRandom rand) {
-	}
-
-	/**+
-	 * Called when a player destroys this Block
-	 */
-	public void onBlockDestroyedByPlayer(World worldIn, BlockPos pos, IBlockState state) {
-	}
-
-	/**+
-	 * Called when a neighboring block changes.
-	 */
-	public void onNeighborBlockChange(World var1, BlockPos var2, IBlockState var3, Block var4) {
-	}
-
-	/**+
-	 * How many world ticks before ticking
-	 */
-	public int tickRate(World var1) {
-		return 10;
-	}
-
-	public void onBlockAdded(World var1, BlockPos var2, IBlockState var3) {
-	}
-
-	public void breakBlock(World var1, BlockPos var2, IBlockState var3) {
-	}
-
-	/**+
-	 * Returns the quantity of items to drop on block destruction.
-	 */
-	public int quantityDropped(EaglercraftRandom random) {
-		return 1;
-	}
-
-	/**+
-	 * Get the Item that this Block should drop when harvested.
-	 */
-	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
-		return Item.getItemFromBlock(this);
-	}
-
-	/**+
-	 * Get the hardness of this Block relative to the ability of the
-	 * given player
-	 */
-	public float getPlayerRelativeBlockHardness(EntityPlayer playerIn, World worldIn, BlockPos pos) {
-		float f = this.getBlockHardness(worldIn, pos);
-		return f < 0.0F ? 0.0F
-				: (!playerIn.canHarvestBlock(this) ? playerIn.getToolDigEfficiency(this) / f / 100.0F
-						: playerIn.getToolDigEfficiency(this) / f / 30.0F);
-	}
-
-	/**+
-	 * Spawn this Block's drops into the World as EntityItems
-	 */
-	public final void dropBlockAsItem(World worldIn, BlockPos pos, IBlockState state, int forture) {
-		this.dropBlockAsItemWithChance(worldIn, pos, state, 1.0F, forture);
-	}
-
-	/**+
-	 * Spawns this Block's drops into the World as EntityItems.
-	 */
-	public void dropBlockAsItemWithChance(World world, BlockPos blockpos, IBlockState iblockstate, float f, int i) {
-		if (!world.isRemote) {
-			int j = this.quantityDroppedWithBonus(i, world.rand);
-
-			for (int k = 0; k < j; ++k) {
-				if (world.rand.nextFloat() <= f) {
-					Item item = this.getItemDropped(iblockstate, world.rand, i);
-					if (item != null) {
-						spawnAsEntity(world, blockpos, new ItemStack(item, 1, this.damageDropped(iblockstate)));
-					}
-				}
-			}
-		}
-	}
-
-	/**+
-	 * Spawns the given ItemStack as an EntityItem into the World at
-	 * the given position
-	 */
-	public static void spawnAsEntity(World worldIn, BlockPos pos, ItemStack stack) {
-		if (!worldIn.isRemote && worldIn.getGameRules().getBoolean("doTileDrops")) {
-			float f = 0.5F;
-			double d0 = (double) (worldIn.rand.nextFloat() * f) + (double) (1.0F - f) * 0.5D;
-			double d1 = (double) (worldIn.rand.nextFloat() * f) + (double) (1.0F - f) * 0.5D;
-			double d2 = (double) (worldIn.rand.nextFloat() * f) + (double) (1.0F - f) * 0.5D;
-			EntityItem entityitem = new EntityItem(worldIn, (double) pos.getX() + d0, (double) pos.getY() + d1,
-					(double) pos.getZ() + d2, stack);
-			entityitem.setDefaultPickupDelay();
-			worldIn.spawnEntityInWorld(entityitem);
-		}
-	}
-
-	/**+
-	 * Spawns the given amount of experience into the World as XP
-	 * orb entities
-	 */
-	protected void dropXpOnBlockBreak(World worldIn, BlockPos pos, int amount) {
-		if (!worldIn.isRemote) {
-			while (amount > 0) {
-				int i = EntityXPOrb.getXPSplit(amount);
-				amount -= i;
-				worldIn.spawnEntityInWorld(new EntityXPOrb(worldIn, (double) pos.getX() + 0.5D,
-						(double) pos.getY() + 0.5D, (double) pos.getZ() + 0.5D, i));
-			}
-		}
-	}
-
-	/**+
-	 * Gets the metadata of the item this Block can drop. This
-	 * method is called when the block gets destroyed. It returns
-	 * the metadata of the dropped item based on the old metadata of
-	 * the block.
-	 */
-	public int damageDropped(IBlockState var1) {
-		return 0;
-	}
-
-	/**+
-	 * Returns how much this block can resist explosions from the
-	 * passed in entity.
-	 */
-	public float getExplosionResistance(Entity exploder) {
-		return this.blockResistance / 5.0F;
-	}
-
-	/**+
-	 * Ray traces through the blocks collision from start vector to
-	 * end vector returning a ray trace hit.
-	 */
-	public MovingObjectPosition collisionRayTrace(World world, BlockPos blockpos, Vec3 vec3, Vec3 vec31) {
-		this.setBlockBoundsBasedOnState(world, blockpos);
-		vec3 = vec3.addVector((double) (-blockpos.getX()), (double) (-blockpos.getY()), (double) (-blockpos.getZ()));
-		vec31 = vec31.addVector((double) (-blockpos.getX()), (double) (-blockpos.getY()), (double) (-blockpos.getZ()));
-		Vec3 vec32 = vec3.getIntermediateWithXValue(vec31, this.minX);
-		Vec3 vec33 = vec3.getIntermediateWithXValue(vec31, this.maxX);
-		Vec3 vec34 = vec3.getIntermediateWithYValue(vec31, this.minY);
-		Vec3 vec35 = vec3.getIntermediateWithYValue(vec31, this.maxY);
-		Vec3 vec36 = vec3.getIntermediateWithZValue(vec31, this.minZ);
-		Vec3 vec37 = vec3.getIntermediateWithZValue(vec31, this.maxZ);
-		if (!this.isVecInsideYZBounds(vec32)) {
-			vec32 = null;
-		}
-
-		if (!this.isVecInsideYZBounds(vec33)) {
-			vec33 = null;
-		}
-
-		if (!this.isVecInsideXZBounds(vec34)) {
-			vec34 = null;
-		}
-
-		if (!this.isVecInsideXZBounds(vec35)) {
-			vec35 = null;
-		}
-
-		if (!this.isVecInsideXYBounds(vec36)) {
-			vec36 = null;
-		}
-
-		if (!this.isVecInsideXYBounds(vec37)) {
-			vec37 = null;
-		}
-
-		Vec3 vec38 = null;
-		if (vec32 != null && (vec38 == null || vec3.squareDistanceTo(vec32) < vec3.squareDistanceTo(vec38))) {
-			vec38 = vec32;
-		}
-
-		if (vec33 != null && (vec38 == null || vec3.squareDistanceTo(vec33) < vec3.squareDistanceTo(vec38))) {
-			vec38 = vec33;
-		}
-
-		if (vec34 != null && (vec38 == null || vec3.squareDistanceTo(vec34) < vec3.squareDistanceTo(vec38))) {
-			vec38 = vec34;
-		}
-
-		if (vec35 != null && (vec38 == null || vec3.squareDistanceTo(vec35) < vec3.squareDistanceTo(vec38))) {
-			vec38 = vec35;
-		}
-
-		if (vec36 != null && (vec38 == null || vec3.squareDistanceTo(vec36) < vec3.squareDistanceTo(vec38))) {
-			vec38 = vec36;
-		}
-
-		if (vec37 != null && (vec38 == null || vec3.squareDistanceTo(vec37) < vec3.squareDistanceTo(vec38))) {
-			vec38 = vec37;
-		}
-
-		if (vec38 == null) {
-			return null;
-		} else {
-			EnumFacing enumfacing = null;
-			if (vec38 == vec32) {
-				enumfacing = EnumFacing.WEST;
-			}
-
-			if (vec38 == vec33) {
-				enumfacing = EnumFacing.EAST;
-			}
-
-			if (vec38 == vec34) {
-				enumfacing = EnumFacing.DOWN;
-			}
-
-			if (vec38 == vec35) {
-				enumfacing = EnumFacing.UP;
-			}
-
-			if (vec38 == vec36) {
-				enumfacing = EnumFacing.NORTH;
-			}
-
-			if (vec38 == vec37) {
-				enumfacing = EnumFacing.SOUTH;
-			}
-
-			return new MovingObjectPosition(
-					vec38.addVector((double) blockpos.getX(), (double) blockpos.getY(), (double) blockpos.getZ()),
-					enumfacing, blockpos);
-		}
-	}
-
-	/**+
-	 * Checks if a vector is within the Y and Z bounds of the block.
-	 */
-	private boolean isVecInsideYZBounds(Vec3 point) {
-		return point == null ? false
-				: point.yCoord >= this.minY && point.yCoord <= this.maxY && point.zCoord >= this.minZ
-						&& point.zCoord <= this.maxZ;
-	}
-
-	/**+
-	 * Checks if a vector is within the X and Z bounds of the block.
-	 */
-	private boolean isVecInsideXZBounds(Vec3 point) {
-		return point == null ? false
-				: point.xCoord >= this.minX && point.xCoord <= this.maxX && point.zCoord >= this.minZ
-						&& point.zCoord <= this.maxZ;
-	}
-
-	/**+
-	 * Checks if a vector is within the X and Y bounds of the block.
-	 */
-	private boolean isVecInsideXYBounds(Vec3 point) {
-		return point == null ? false
-				: point.xCoord >= this.minX && point.xCoord <= this.maxX && point.yCoord >= this.minY
-						&& point.yCoord <= this.maxY;
-	}
-
-	/**+
-	 * Called when this Block is destroyed by an Explosion
-	 */
-	public void onBlockDestroyedByExplosion(World worldIn, BlockPos pos, Explosion explosionIn) {
-	}
-
-	public EnumWorldBlockLayer getBlockLayer() {
-		return EnumWorldBlockLayer.SOLID;
-	}
-
-	public boolean canReplace(World worldIn, BlockPos pos, EnumFacing side, ItemStack stack) {
-		return this.canPlaceBlockOnSide(worldIn, pos, side);
-	}
-
-	/**+
-	 * Check whether this Block can be placed on the given side
-	 */
-	public boolean canPlaceBlockOnSide(World worldIn, BlockPos pos, EnumFacing side) {
-		return this.canPlaceBlockAt(worldIn, pos);
-	}
-
-	public boolean canPlaceBlockAt(World world, BlockPos blockpos) {
-		return world.getBlockState(blockpos).getBlock().blockMaterial.isReplaceable();
-	}
-
-	public boolean onBlockActivated(World var1, BlockPos var2, IBlockState var3, EntityPlayer var4, EnumFacing var5,
-			float var6, float var7, float var8) {
-		return false;
-	}
-
-	/**+
-	 * Called When an Entity Collided with the Block
-	 */
-	public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, Entity entityIn) {
-	}
-
-	/**+
-	 * Called by ItemBlocks just before a block is actually set in
-	 * the world, to allow for adjustments to the IBlockstate
-	 */
-	public IBlockState onBlockPlaced(World var1, BlockPos var2, EnumFacing var3, float var4, float var5, float var6,
-			int i, EntityLivingBase var8) {
-		return this.getStateFromMeta(i);
-	}
-
-	public void onBlockClicked(World worldIn, BlockPos pos, EntityPlayer playerIn) {
-	}
-
-	public Vec3 modifyAcceleration(World worldIn, BlockPos pos, Entity entityIn, Vec3 motion) {
-		return motion;
-	}
-
-	public void setBlockBoundsBasedOnState(IBlockAccess var1, BlockPos var2) {
-	}
-
-	/**+
-	 * returns the block bounderies minX value
-	 */
-	public final double getBlockBoundsMinX() {
-		return this.minX;
-	}
-
-	/**+
-	 * returns the block bounderies maxX value
-	 */
-	public final double getBlockBoundsMaxX() {
-		return this.maxX;
-	}
-
-	/**+
-	 * returns the block bounderies minY value
-	 */
-	public final double getBlockBoundsMinY() {
-		return this.minY;
-	}
-
-	/**+
-	 * returns the block bounderies maxY value
-	 */
-	public final double getBlockBoundsMaxY() {
-		return this.maxY;
-	}
-
-	/**+
-	 * returns the block bounderies minZ value
-	 */
-	public final double getBlockBoundsMinZ() {
-		return this.minZ;
-	}
-
-	/**+
-	 * returns the block bounderies maxZ value
-	 */
-	public final double getBlockBoundsMaxZ() {
-		return this.maxZ;
-	}
-
-	public int getBlockColor() {
-		return 16777215;
-	}
-
-	public int getRenderColor(IBlockState state) {
-		return 16777215;
-	}
-
-	public int colorMultiplier(IBlockAccess worldIn, BlockPos pos, int renderPass) {
-		return 16777215;
-	}
-
-	public final int colorMultiplier(IBlockAccess worldIn, BlockPos pos) {
-		return this.colorMultiplier(worldIn, pos, 0);
-	}
-
-	public int getWeakPower(IBlockAccess var1, BlockPos var2, IBlockState var3, EnumFacing var4) {
-		return 0;
-	}
-
-	/**+
-	 * Can this block provide power. Only wire currently seems to
-	 * have this change based on its state.
-	 */
-	public boolean canProvidePower() {
-		return false;
-	}
-
-	/**+
-	 * Called When an Entity Collided with the Block
-	 */
-	public void onEntityCollidedWithBlock(World var1, BlockPos var2, IBlockState var3, Entity var4) {
-	}
-
-	public int getStrongPower(IBlockAccess var1, BlockPos var2, IBlockState var3, EnumFacing var4) {
-		return 0;
-	}
-
-	/**+
-	 * Sets the block's bounds for rendering it as an item
-	 */
-	public void setBlockBoundsForItemRender() {
-	}
-
-	public void harvestBlock(World world, EntityPlayer entityplayer, BlockPos blockpos, IBlockState iblockstate,
-			TileEntity var5) {
-		entityplayer.triggerAchievement(StatList.mineBlockStatArray[getIdFromBlock(this)]);
-		entityplayer.addExhaustion(0.025F);
-		if (this.canSilkHarvest() && EnchantmentHelper.getSilkTouchModifier(entityplayer)) {
-			ItemStack itemstack = this.createStackedBlock(iblockstate);
-			if (itemstack != null) {
-				spawnAsEntity(world, blockpos, itemstack);
-			}
-		} else {
-			int i = EnchantmentHelper.getFortuneModifier(entityplayer);
-			this.dropBlockAsItem(world, blockpos, iblockstate, i);
-		}
-
-	}
-
-	protected boolean canSilkHarvest() {
-		return this.isFullCube() && !this.isBlockContainer;
-	}
-
-	protected ItemStack createStackedBlock(IBlockState state) {
-		int i = 0;
-		Item item = Item.getItemFromBlock(this);
-		if (item != null && item.getHasSubtypes()) {
-			i = this.getMetaFromState(state);
-		}
-
-		return new ItemStack(item, 1, i);
-	}
-
-	/**+
-	 * Get the quantity dropped based on the given fortune level
-	 */
-	public int quantityDroppedWithBonus(int fortune, EaglercraftRandom random) {
-		return this.quantityDropped(random);
-	}
-
-	/**+
-	 * Called by ItemBlocks after a block is set in the world, to
-	 * allow post-place logic
-	 */
-	public void onBlockPlacedBy(World var1, BlockPos var2, IBlockState var3, EntityLivingBase var4, ItemStack var5) {
-	}
-
-	public boolean func_181623_g() {
-		return !this.blockMaterial.isSolid() && !this.blockMaterial.isLiquid();
-	}
-
-	public Block setUnlocalizedName(String name) {
-		this.unlocalizedName = name;
-		return this;
-	}
-
-	/**+
-	 * Gets the localized name of this block. Used for the
-	 * statistics page.
-	 */
-	public String getLocalizedName() {
-		return StatCollector.translateToLocal(this.getUnlocalizedName() + ".name");
-	}
-
-	/**+
-	 * Returns the unlocalized name of the block with "tile."
-	 * appended to the front.
-	 */
-	public String getUnlocalizedName() {
-		return "tile." + this.unlocalizedName;
-	}
-
-	/**+
-	 * Called on both Client and Server when World#addBlockEvent is
-	 * called
-	 */
-	public boolean onBlockEventReceived(World var1, BlockPos var2, IBlockState var3, int var4, int var5) {
-		return false;
-	}
-
-	/**+
-	 * Return the state of blocks statistics flags - if the block is
-	 * counted for mined and placed.
-	 */
-	public boolean getEnableStats() {
-		return this.enableStats;
-	}
-
-	protected Block disableStats() {
-		this.enableStats = false;
-		return this;
-	}
-
-	public int getMobilityFlag() {
-		return this.blockMaterial.getMaterialMobility();
-	}
-
-	/**+
-	 * Returns the default ambient occlusion value based on block
-	 * opacity
-	 */
-	public float getAmbientOcclusionLightValue() {
-		return this.isBlockNormalCube() ? 0.2F : 1.0F;
-	}
-
-	/**+
-	 * Block's chance to react to a living entity falling on it.
-	 */
-	public void onFallenUpon(World worldIn, BlockPos pos, Entity entityIn, float fallDistance) {
-		entityIn.fall(fallDistance, 1.0F);
-	}
-
-	/**+
-	 * Called when an Entity lands on this Block. This method *must*
-	 * update motionY because the entity will not do that on its own
-	 */
-	public void onLanded(World worldIn, Entity entityIn) {
-		entityIn.motionY = 0.0D;
-	}
-
-	public Item getItem(World var1, BlockPos var2) {
-		return Item.getItemFromBlock(this);
-	}
-
-	public int getDamageValue(World worldIn, BlockPos pos) {
-		return this.damageDropped(worldIn.getBlockState(pos));
-	}
-
-	/**+
-	 * returns a list of blocks with the same ID, but different meta
-	 * (eg: wood returns 4 blocks)
-	 */
-	public void getSubBlocks(Item item, CreativeTabs var2, List<ItemStack> list) {
-		list.add(new ItemStack(item, 1, 0));
-	}
-
-	/**+
-	 * Returns the CreativeTab to display the given block on.
-	 */
-	public CreativeTabs getCreativeTabToDisplayOn() {
-		return this.displayOnCreativeTab;
-	}
-
-	public Block setCreativeTab(CreativeTabs tab) {
-		this.displayOnCreativeTab = tab;
-		return this;
-	}
-
-	public void onBlockHarvested(World var1, BlockPos var2, IBlockState var3, EntityPlayer var4) {
-	}
-
-	/**+
-	 * Called similar to random ticks, but only when it is raining.
-	 */
-	public void fillWithRain(World worldIn, BlockPos pos) {
-	}
-
-	/**+
-	 * Returns true only if block is flowerPot
+	/**
+	 * + Get a BlockState by it's ID (see getStateId)
 	 */
-	public boolean isFlowerPot() {
-		return false;
-	}
-
-	public boolean requiresUpdates() {
-		return true;
+	public static IBlockState getStateById(int id) {
+		int i = id & 4095;
+		int j = id >> 12 & 15;
+		return getBlockById(i).getStateFromMeta(j);
 	}
 
-	/**+
-	 * Return whether this block can drop from an explosion.
+	/**
+	 * + Get a unique ID for the given BlockState, containing both BlockID and
+	 * metadata
 	 */
-	public boolean canDropFromExplosion(Explosion explosionIn) {
-		return true;
-	}
-
-	public boolean isAssociatedBlock(Block other) {
-		return this == other;
+	public static int getStateId(IBlockState state) {
+		Block block = state.getBlock();
+		return getIdFromBlock(block) + (block.getMetaFromState(state) << 12);
 	}
 
 	public static boolean isEqualTo(Block blockIn, Block other) {
 		return blockIn != null && other != null ? (blockIn == other ? true : blockIn.isAssociatedBlock(other)) : false;
 	}
 
-	public boolean hasComparatorInputOverride() {
-		return false;
+	private static void registerBlock(int id, ResourceLocation textualID, Block block_) {
+		blockRegistry.register(id, textualID, block_);
 	}
 
-	public int getComparatorInputOverride(World worldIn, BlockPos pos) {
-		return 0;
-	}
-
-	/**+
-	 * Possibly modify the given BlockState before rendering it on
-	 * an Entity (Minecarts, Endermen, ...)
-	 */
-	public IBlockState getStateForEntityRender(IBlockState iblockstate) {
-		return iblockstate;
-	}
-
-	protected BlockState createBlockState() {
-		return new BlockState(this, new IProperty[0]);
-	}
-
-	public BlockState getBlockState() {
-		return this.blockState;
-	}
-
-	protected final void setDefaultState(IBlockState state) {
-		this.defaultBlockState = state;
-	}
-
-	public final IBlockState getDefaultState() {
-		return this.defaultBlockState;
-	}
-
-	/**+
-	 * Get the OffsetType for this Block. Determines if the model is
-	 * rendered slightly offset.
-	 */
-	public Block.EnumOffsetType getOffsetType() {
-		return Block.EnumOffsetType.NONE;
-	}
-
-	public String toString() {
-		return "Block{" + blockRegistry.getNameForObject(this) + "}";
+	private static void registerBlock(int id, String textualID, Block block_) {
+		registerBlock(id, new ResourceLocation(textualID), block_);
 	}
 
 	public static void registerBlocks() {
@@ -1195,8 +342,6 @@ public class Block {
 				(new Block(Material.iron, MapColor.ironColor)).setHardness(5.0F).setResistance(10.0F)
 						.setStepSound(soundTypeMetal).setUnlocalizedName("blockIron")
 						.setCreativeTab(CreativeTabs.tabBlock));
-		
-						
 		registerBlock(43, (String) "double_stone_slab", (new BlockDoubleStoneSlab()).setHardness(2.0F)
 				.setResistance(10.0F).setStepSound(soundTypePiston).setUnlocalizedName("stoneSlab"));
 		registerBlock(44, (String) "stone_slab", (new BlockHalfStoneSlab()).setHardness(2.0F).setResistance(10.0F)
@@ -1342,7 +487,7 @@ public class Block {
 				(new BlockStairs(block5.getDefaultState())).setUnlocalizedName("stairsBrick"));
 		registerBlock(109, (String) "stone_brick_stairs", (new BlockStairs(
 				block8.getDefaultState().withProperty(BlockStoneBrick.VARIANT, BlockStoneBrick.EnumType.DEFAULT)))
-						.setUnlocalizedName("stairsStoneBrickSmooth"));
+				.setUnlocalizedName("stairsStoneBrickSmooth"));
 		registerBlock(110, (String) "mycelium",
 				(new BlockMycelium()).setHardness(0.6F).setStepSound(soundTypeGrass).setUnlocalizedName("mycel"));
 		registerBlock(111, (String) "waterlily",
@@ -1387,7 +532,7 @@ public class Block {
 		registerBlock(128, (String) "sandstone_stairs",
 				(new BlockStairs(
 						block2.getDefaultState().withProperty(BlockSandStone.TYPE, BlockSandStone.EnumType.SMOOTH)))
-								.setUnlocalizedName("stairsSandStone"));
+						.setUnlocalizedName("stairsSandStone"));
 		registerBlock(129, (String) "emerald_ore", (new BlockOre()).setHardness(3.0F).setResistance(5.0F)
 				.setStepSound(soundTypePiston).setUnlocalizedName("oreEmerald"));
 		registerBlock(130, (String) "ender_chest", (new BlockEnderChest()).setHardness(22.5F).setResistance(1000.0F)
@@ -1401,15 +546,15 @@ public class Block {
 		registerBlock(134, (String) "spruce_stairs",
 				(new BlockStairs(
 						block1.getDefaultState().withProperty(BlockPlanks.VARIANT, BlockPlanks.EnumType.SPRUCE)))
-								.setUnlocalizedName("stairsWoodSpruce"));
+						.setUnlocalizedName("stairsWoodSpruce"));
 		registerBlock(135, (String) "birch_stairs",
 				(new BlockStairs(
 						block1.getDefaultState().withProperty(BlockPlanks.VARIANT, BlockPlanks.EnumType.BIRCH)))
-								.setUnlocalizedName("stairsWoodBirch"));
+						.setUnlocalizedName("stairsWoodBirch"));
 		registerBlock(136, (String) "jungle_stairs",
 				(new BlockStairs(
 						block1.getDefaultState().withProperty(BlockPlanks.VARIANT, BlockPlanks.EnumType.JUNGLE)))
-								.setUnlocalizedName("stairsWoodJungle"));
+						.setUnlocalizedName("stairsWoodJungle"));
 		registerBlock(137, (String) "command_block", (new BlockCommandBlock()).setBlockUnbreakable()
 				.setResistance(6000000.0F).setUnlocalizedName("commandBlock"));
 		registerBlock(138, (String) "beacon", (new BlockBeacon()).setUnlocalizedName("beacon").setLightLevel(1.0F));
@@ -1451,7 +596,7 @@ public class Block {
 		registerBlock(156, (String) "quartz_stairs",
 				(new BlockStairs(
 						block11.getDefaultState().withProperty(BlockQuartz.VARIANT, BlockQuartz.EnumType.DEFAULT)))
-								.setUnlocalizedName("stairsQuartz"));
+						.setUnlocalizedName("stairsQuartz"));
 		registerBlock(157, (String) "activator_rail", (new BlockRailPowered()).setHardness(0.7F)
 				.setStepSound(soundTypeMetal).setUnlocalizedName("activatorRail"));
 		registerBlock(158, (String) "dropper",
@@ -1465,11 +610,11 @@ public class Block {
 		registerBlock(163, (String) "acacia_stairs",
 				(new BlockStairs(
 						block1.getDefaultState().withProperty(BlockPlanks.VARIANT, BlockPlanks.EnumType.ACACIA)))
-								.setUnlocalizedName("stairsWoodAcacia"));
+						.setUnlocalizedName("stairsWoodAcacia"));
 		registerBlock(164, (String) "dark_oak_stairs",
 				(new BlockStairs(
 						block1.getDefaultState().withProperty(BlockPlanks.VARIANT, BlockPlanks.EnumType.DARK_OAK)))
-								.setUnlocalizedName("stairsWoodDarkOak"));
+						.setUnlocalizedName("stairsWoodDarkOak"));
 		registerBlock(165, (String) "slime", (new BlockSlime()).setUnlocalizedName("slime").setStepSound(SLIME_SOUND));
 		registerBlock(166, (String) "barrier", (new BlockBarrier()).setUnlocalizedName("barrier"));
 		registerBlock(167, (String) "iron_trapdoor", (new BlockTrapDoor(Material.iron)).setHardness(5.0F)
@@ -1501,7 +646,7 @@ public class Block {
 		registerBlock(179, (String) "red_sandstone", block12);
 		registerBlock(180, (String) "red_sandstone_stairs", (new BlockStairs(
 				block12.getDefaultState().withProperty(BlockRedSandstone.TYPE, BlockRedSandstone.EnumType.SMOOTH)))
-						.setUnlocalizedName("stairsRedSandStone"));
+				.setUnlocalizedName("stairsRedSandStone"));
 		registerBlock(181, (String) "double_stone_slab2", (new BlockDoubleStoneSlabNew()).setHardness(2.0F)
 				.setResistance(10.0F).setStepSound(soundTypePiston).setUnlocalizedName("stoneSlab2"));
 		registerBlock(182, (String) "stone_slab2", (new BlockHalfStoneSlabNew()).setHardness(2.0F).setResistance(10.0F)
@@ -1546,33 +691,47 @@ public class Block {
 				.setStepSound(soundTypeWood).setUnlocalizedName("doorAcacia").disableStats());
 		registerBlock(197, (String) "dark_oak_door", (new BlockDoor(Material.wood)).setHardness(3.0F)
 				.setStepSound(soundTypeWood).setUnlocalizedName("doorDarkOak").disableStats());
-		registerBlock(198, (String) "starlike:iron_grate",
-				(new Block(Material.iron, MapColor.ironColor))
-						.setHardness(5.0F)
-						.setResistance(10.0F)
-						.setStepSound(soundTypeMetal)
-						.setUnlocalizedName("iron_grate")
-						.setCreativeTab(CreativeTabs.tabBlock));
-		registerBlock(199, (String) "starlike:platinum_ore",
-				(new BlockOre())
-						.setHardness(50.0F)
-						.setResistance(2000.0F)
-						.setStepSound(soundTypePiston)
-						.setUnlocalizedName("platinum_ore"));
-		registerBlock(200, (String) "starlike:platinum_block",
-				(new Block(Material.iron, MapColor.ironColor))
-						.setHardness(5.0F)
-						.setResistance(10.0F)
-						.setStepSound(soundTypeMetal)
-						.setUnlocalizedName("platinum_block")
-						.setCreativeTab(CreativeTabs.tabBlock));
-		registerBlock(201, (String) "starlike:uranium_ore",
-				(new BlockOre())
-						.setHardness(50.0F)
-						.setResistance(2000.0F)
-						.setStepSound(soundTypePiston)
-						.setUnlocalizedName("uranium_ore"));
 
+		registerBlock(512, (String) "starlike:deepstone",
+				(new BlockDeepstone()).setHardness(3.0F).setResistance(10.0F).setStepSound(soundTypePiston)
+						.setUnlocalizedName("deepstone").setCreativeTab(CreativeTabs.tabStarlike));
+		registerBlock(513, (String) "starlike:cobbled_deepstone",
+				(new Block(Material.rock)).setHardness(3.5F).setResistance(10.0F).setStepSound(soundTypePiston)
+						.setUnlocalizedName("cobbled_deepstone").setCreativeTab(CreativeTabs.tabStarlike));
+		registerBlock(514, (String) "starlike:steel_block",
+				(new Block(Material.iron, MapColor.ironColor)).setHardness(5.0F).setResistance(10.0F)
+						.setStepSound(soundTypeMetal).setUnlocalizedName("steel_block")
+						.setCreativeTab(CreativeTabs.tabStarlike));
+		registerBlock(515, (String) "starlike:steel_grate",
+				(new BlockSteelGrate()).setHardness(5.0F).setResistance(10.0F)
+						.setStepSound(soundTypeMetal).setUnlocalizedName("steel_grate")
+						.setCreativeTab(CreativeTabs.tabStarlike));
+		registerBlock(516, (String) "starlike:platinum_ore",
+				(new BlockOre()).setHardness(50.0F).setResistance(250.0F).setStepSound(soundTypePiston)
+						.setUnlocalizedName("platinum_ore").setCreativeTab(CreativeTabs.tabStarlike));
+		registerBlock(517, (String) "starlike:platinum_block",
+				(new Block(Material.iron, MapColor.ironColor)).setHardness(15.0F).setResistance(30.0F)
+						.setStepSound(soundTypeMetal).setUnlocalizedName("platinum_block")
+						.setCreativeTab(CreativeTabs.tabStarlike));
+		registerBlock(518, (String) "starlike:titanium_ore",
+				(new BlockOre()).setHardness(100.0F).setResistance(500.0F).setStepSound(soundTypePiston)
+						.setUnlocalizedName("titanium_ore").setCreativeTab(CreativeTabs.tabStarlike));
+		registerBlock(519, (String) "starlike:titanium_block",
+				(new Block(Material.iron, MapColor.ironColor)).setHardness(25.0F).setResistance(50.0F)
+						.setStepSound(soundTypeMetal).setUnlocalizedName("titanium_block")
+						.setCreativeTab(CreativeTabs.tabStarlike));
+		registerBlock(520, (String) "starlike:uranium_ore",
+				(new BlockOre()).setHardness(5.0F).setResistance(10.0F).setStepSound(soundTypePiston)
+						.setUnlocalizedName("uranium_ore").setCreativeTab(CreativeTabs.tabStarlike));
+		registerBlock(521, (String) "starlike:uranium_block",
+				(new Block(Material.iron, MapColor.greenColor)).setHardness(40.0F).setResistance(200.0F)
+						.setStepSound(soundTypeMetal).setUnlocalizedName("uranium_block")
+						.setCreativeTab(CreativeTabs.tabStarlike));
+		registerBlock(522, (String) "starlike:mosaic", (new BlockMosaic()).setHardness(2.0F).setResistance(5.0F)
+				.setStepSound(soundTypeWood).setUnlocalizedName("mosaic").setCreativeTab(CreativeTabs.tabStarlike));
+		registerBlock(523, (String) "starlike:fabricator",
+				(new BlockFabricator()).setHardness(5.0F).setResistance(10.0F).setStepSound(soundTypePiston)
+						.setUnlocalizedName("fabricator").setCreativeTab(CreativeTabs.tabStarlike));
 		blockRegistry.validateKey();
 
 		for (Block block13 : blockRegistry) {
@@ -1602,91 +761,957 @@ public class Block {
 
 	}
 
-	public static void bootstrapStates() {
-		BlockBed.bootstrapStates();
-		BlockDirt.bootstrapStates();
-		BlockDoor.bootstrapStates();
-		BlockDoublePlant.bootstrapStates();
-		BlockFlowerPot.bootstrapStates();
-		BlockHugeMushroom.bootstrapStates();
-		BlockLever.bootstrapStates();
-		BlockLog.bootstrapStates();
-		BlockNewLeaf.bootstrapStates();
-		BlockNewLog.bootstrapStates();
-		BlockOldLeaf.bootstrapStates();
-		BlockOldLog.bootstrapStates();
-		BlockPistonExtension.bootstrapStates();
-		BlockPistonMoving.bootstrapStates();
-		BlockPlanks.bootstrapStates();
-		BlockPrismarine.bootstrapStates();
-		BlockQuartz.bootstrapStates();
-		BlockRail.bootstrapStates();
-		BlockRailDetector.bootstrapStates();
-		BlockRailPowered.bootstrapStates();
-		BlockRedSandstone.bootstrapStates();
-		BlockRedstoneComparator.bootstrapStates();
-		BlockRedstoneWire.bootstrapStates();
-		BlockSand.bootstrapStates();
-		BlockSandStone.bootstrapStates();
-		BlockSapling.bootstrapStates();
-		BlockSilverfish.bootstrapStates();
-		BlockSlab.bootstrapStates();
-		BlockStairs.bootstrapStates();
-		BlockStone.bootstrapStates();
-		BlockStoneBrick.bootstrapStates();
-		BlockStoneSlab.bootstrapStates();
-		BlockStoneSlabNew.bootstrapStates();
-		BlockTallGrass.bootstrapStates();
-		BlockTrapDoor.bootstrapStates();
-		BlockWall.bootstrapStates();
-		BlockWoodSlab.bootstrapStates();
+	/**
+	 * + Spawns the given ItemStack as an EntityItem into the World at the given
+	 * position
+	 */
+	public static void spawnAsEntity(World worldIn, BlockPos pos, ItemStack stack) {
+		if (!worldIn.isRemote && worldIn.getGameRules().getBoolean("doTileDrops")) {
+			float f = 0.5F;
+			double d0 = (double) (worldIn.rand.nextFloat() * f) + (double) (1.0F - f) * 0.5D;
+			double d1 = (double) (worldIn.rand.nextFloat() * f) + (double) (1.0F - f) * 0.5D;
+			double d2 = (double) (worldIn.rand.nextFloat() * f) + (double) (1.0F - f) * 0.5D;
+			EntityItem entityitem = new EntityItem(worldIn, (double) pos.getX() + d0, (double) pos.getY() + d1,
+					(double) pos.getZ() + d2, stack);
+			entityitem.setDefaultPickupDelay();
+			worldIn.spawnEntityInWorld(entityitem);
+		}
 	}
 
-	private static void registerBlock(int id, ResourceLocation textualID, Block block_) {
-		blockRegistry.register(id, textualID, block_);
+	private CreativeTabs displayOnCreativeTab;
+	protected boolean fullBlock;
+	protected int lightOpacity;
+	protected boolean translucent;
+	protected int lightValue;
+	protected boolean useNeighborBrightness;
+	protected float blockHardness;
+	protected float blockResistance;
+
+	protected boolean enableStats;
+
+	protected boolean needsRandomTick;
+
+	protected boolean isBlockContainer;
+
+	protected double minX;
+
+	protected double minY;
+
+	protected double minZ;
+
+	protected double maxX;
+
+	protected double maxY;
+
+	protected double maxZ;
+
+	public Block.SoundType stepSound;
+
+	public float blockParticleGravity;
+
+	protected final Material blockMaterial;
+
+	protected final MapColor field_181083_K;
+
+	public float slipperiness;
+
+	protected final BlockState blockState;
+
+	private IBlockState defaultBlockState;
+
+	public String unlocalizedName;
+
+	protected Block(Material materialIn) {
+		this(materialIn, materialIn.getMaterialMapColor());
 	}
 
-	private static void registerBlock(int id, String textualID, Block block_) {
-		registerBlock(id, new ResourceLocation(textualID), block_);
+	public Block(Material parMaterial, MapColor parMapColor) {
+		this.enableStats = true;
+		this.stepSound = soundTypeStone;
+		this.blockParticleGravity = 1.0F;
+		this.slipperiness = 0.6F;
+		this.blockMaterial = parMaterial;
+		this.field_181083_K = parMapColor;
+		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
+		this.fullBlock = this.isOpaqueCube();
+		this.lightOpacity = this.isOpaqueCube() ? 255 : 0;
+		this.translucent = !parMaterial.blocksLight();
+		this.blockState = this.createBlockState();
+		this.setDefaultState(this.blockState.getBaseState());
 	}
 
-	public static enum EnumOffsetType {
-		NONE, XZ, XYZ;
+	/**
+	 * + Add all collision boxes of this Block to the list that intersect with the
+	 * given mask.
+	 */
+	public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask,
+			List<AxisAlignedBB> list, Entity collidingEntity) {
+		AxisAlignedBB axisalignedbb = this.getCollisionBoundingBox(worldIn, pos, state);
+		if (axisalignedbb != null && mask.intersectsWith(axisalignedbb)) {
+			list.add(axisalignedbb);
+		}
+
 	}
 
-	public static class SoundType {
-		public final String soundName;
-		public final float volume;
-		public final float frequency;
+	public void breakBlock(World var1, BlockPos var2, IBlockState var3) {
+	}
 
-		public SoundType(String name, float volume, float frequency) {
-			this.soundName = name;
-			this.volume = volume;
-			this.frequency = frequency;
+	public boolean canCollideCheck(IBlockState var1, boolean var2) {
+		return this.isCollidable();
+	}
+
+	/**
+	 * + Return whether this block can drop from an explosion.
+	 */
+	public boolean canDropFromExplosion(Explosion explosionIn) {
+		return true;
+	}
+
+	public boolean canPlaceBlockAt(World world, BlockPos blockpos) {
+		return world.getBlockState(blockpos).getBlock().blockMaterial.isReplaceable();
+	}
+
+	/**
+	 * + Check whether this Block can be placed on the given side
+	 */
+	public boolean canPlaceBlockOnSide(World worldIn, BlockPos pos, EnumFacing side) {
+		return this.canPlaceBlockAt(worldIn, pos);
+	}
+
+	/**
+	 * + Can this block provide power. Only wire currently seems to have this change
+	 * based on its state.
+	 */
+	public boolean canProvidePower() {
+		return false;
+	}
+
+	public boolean canReplace(World worldIn, BlockPos pos, EnumFacing side, ItemStack stack) {
+		return this.canPlaceBlockOnSide(worldIn, pos, side);
+	}
+
+	protected boolean canSilkHarvest() {
+		return this.isFullCube() && !this.isBlockContainer;
+	}
+
+	/**
+	 * + Ray traces through the blocks collision from start vector to end vector
+	 * returning a ray trace hit.
+	 */
+	public MovingObjectPosition collisionRayTrace(World world, BlockPos blockpos, Vec3 vec3, Vec3 vec31) {
+		this.setBlockBoundsBasedOnState(world, blockpos);
+		vec3 = vec3.addVector((double) (-blockpos.getX()), (double) (-blockpos.getY()), (double) (-blockpos.getZ()));
+		vec31 = vec31.addVector((double) (-blockpos.getX()), (double) (-blockpos.getY()), (double) (-blockpos.getZ()));
+		Vec3 vec32 = vec3.getIntermediateWithXValue(vec31, this.minX);
+		Vec3 vec33 = vec3.getIntermediateWithXValue(vec31, this.maxX);
+		Vec3 vec34 = vec3.getIntermediateWithYValue(vec31, this.minY);
+		Vec3 vec35 = vec3.getIntermediateWithYValue(vec31, this.maxY);
+		Vec3 vec36 = vec3.getIntermediateWithZValue(vec31, this.minZ);
+		Vec3 vec37 = vec3.getIntermediateWithZValue(vec31, this.maxZ);
+		if (!this.isVecInsideYZBounds(vec32)) {
+			vec32 = null;
 		}
 
-		public float getVolume() {
-			return this.volume;
+		if (!this.isVecInsideYZBounds(vec33)) {
+			vec33 = null;
 		}
 
-		public float getFrequency() {
-			return this.frequency;
+		if (!this.isVecInsideXZBounds(vec34)) {
+			vec34 = null;
 		}
 
-		public String getBreakSound() {
-			return "dig." + this.soundName;
+		if (!this.isVecInsideXZBounds(vec35)) {
+			vec35 = null;
 		}
 
-		public String getStepSound() {
-			return "step." + this.soundName;
+		if (!this.isVecInsideXYBounds(vec36)) {
+			vec36 = null;
 		}
 
-		public String getPlaceSound() {
-			return this.getBreakSound();
+		if (!this.isVecInsideXYBounds(vec37)) {
+			vec37 = null;
+		}
+
+		Vec3 vec38 = null;
+		if (vec32 != null && (vec38 == null || vec3.squareDistanceTo(vec32) < vec3.squareDistanceTo(vec38))) {
+			vec38 = vec32;
+		}
+
+		if (vec33 != null && (vec38 == null || vec3.squareDistanceTo(vec33) < vec3.squareDistanceTo(vec38))) {
+			vec38 = vec33;
+		}
+
+		if (vec34 != null && (vec38 == null || vec3.squareDistanceTo(vec34) < vec3.squareDistanceTo(vec38))) {
+			vec38 = vec34;
+		}
+
+		if (vec35 != null && (vec38 == null || vec3.squareDistanceTo(vec35) < vec3.squareDistanceTo(vec38))) {
+			vec38 = vec35;
+		}
+
+		if (vec36 != null && (vec38 == null || vec3.squareDistanceTo(vec36) < vec3.squareDistanceTo(vec38))) {
+			vec38 = vec36;
+		}
+
+		if (vec37 != null && (vec38 == null || vec3.squareDistanceTo(vec37) < vec3.squareDistanceTo(vec38))) {
+			vec38 = vec37;
+		}
+
+		if (vec38 == null) {
+			return null;
+		} else {
+			EnumFacing enumfacing = null;
+			if (vec38 == vec32) {
+				enumfacing = EnumFacing.WEST;
+			}
+
+			if (vec38 == vec33) {
+				enumfacing = EnumFacing.EAST;
+			}
+
+			if (vec38 == vec34) {
+				enumfacing = EnumFacing.DOWN;
+			}
+
+			if (vec38 == vec35) {
+				enumfacing = EnumFacing.UP;
+			}
+
+			if (vec38 == vec36) {
+				enumfacing = EnumFacing.NORTH;
+			}
+
+			if (vec38 == vec37) {
+				enumfacing = EnumFacing.SOUTH;
+			}
+
+			return new MovingObjectPosition(
+					vec38.addVector((double) blockpos.getX(), (double) blockpos.getY(), (double) blockpos.getZ()),
+					enumfacing, blockpos);
+		}
+	}
+
+	public final int colorMultiplier(IBlockAccess worldIn, BlockPos pos) {
+		return this.colorMultiplier(worldIn, pos, 0);
+	}
+
+	public int colorMultiplier(IBlockAccess worldIn, BlockPos pos, int renderPass) {
+		return 16777215;
+	}
+
+	protected BlockState createBlockState() {
+		return new BlockState(this, new IProperty[0]);
+	}
+
+	protected ItemStack createStackedBlock(IBlockState state) {
+		int i = 0;
+		Item item = Item.getItemFromBlock(this);
+		if (item != null && item.getHasSubtypes()) {
+			i = this.getMetaFromState(state);
+		}
+
+		return new ItemStack(item, 1, i);
+	}
+
+	/**
+	 * + Gets the metadata of the item this Block can drop. This method is called
+	 * when the block gets destroyed. It returns the metadata of the dropped item
+	 * based on the old metadata of the block.
+	 */
+	public int damageDropped(IBlockState var1) {
+		return 0;
+	}
+
+	protected Block disableStats() {
+		this.enableStats = false;
+		return this;
+	}
+
+	/**
+	 * + Spawn this Block's drops into the World as EntityItems
+	 */
+	public final void dropBlockAsItem(World worldIn, BlockPos pos, IBlockState state, int forture) {
+		this.dropBlockAsItemWithChance(worldIn, pos, state, 1.0F, forture);
+	}
+
+	/**
+	 * + Spawns this Block's drops into the World as EntityItems.
+	 */
+	public void dropBlockAsItemWithChance(World world, BlockPos blockpos, IBlockState iblockstate, float f, int i) {
+		if (!world.isRemote) {
+			int j = this.quantityDroppedWithBonus(i, world.rand);
+
+			for (int k = 0; k < j; ++k) {
+				if (world.rand.nextFloat() <= f) {
+					Item item = this.getItemDropped(iblockstate, world.rand, i);
+					if (item != null) {
+						spawnAsEntity(world, blockpos, new ItemStack(item, 1, this.damageDropped(iblockstate)));
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * + Spawns the given amount of experience into the World as XP orb entities
+	 */
+	protected void dropXpOnBlockBreak(World worldIn, BlockPos pos, int amount) {
+		if (!worldIn.isRemote) {
+			while (amount > 0) {
+				int i = EntityXPOrb.getXPSplit(amount);
+				amount -= i;
+				worldIn.spawnEntityInWorld(new EntityXPOrb(worldIn, (double) pos.getX() + 0.5D,
+						(double) pos.getY() + 0.5D, (double) pos.getZ() + 0.5D, i));
+			}
 		}
 	}
 
 	public boolean eaglerShadersShouldRenderGlassHighlights() {
 		return false;
+	}
+
+	/**
+	 * + Called similar to random ticks, but only when it is raining.
+	 */
+	public void fillWithRain(World worldIn, BlockPos pos) {
+	}
+
+	public boolean func_181623_g() {
+		return !this.blockMaterial.isSolid() && !this.blockMaterial.isLiquid();
+	}
+
+	/**
+	 * + Get the actual Block state of this Block at the given position. This
+	 * applies properties not visible in the metadata, such as fence connections.
+	 */
+	public IBlockState getActualState(IBlockState iblockstate, IBlockAccess var2, BlockPos var3) {
+		return iblockstate;
+	}
+
+	/**
+	 * + Returns the default ambient occlusion value based on block opacity
+	 */
+	public float getAmbientOcclusionLightValue() {
+		return this.isBlockNormalCube() ? 0.2F : 1.0F;
+	}
+
+	/**
+	 * + returns the block bounderies maxX value
+	 */
+	public final double getBlockBoundsMaxX() {
+		return this.maxX;
+	}
+
+	/**
+	 * + returns the block bounderies maxY value
+	 */
+	public final double getBlockBoundsMaxY() {
+		return this.maxY;
+	}
+
+	/**
+	 * + returns the block bounderies maxZ value
+	 */
+	public final double getBlockBoundsMaxZ() {
+		return this.maxZ;
+	}
+
+	/**
+	 * + returns the block bounderies minX value
+	 */
+	public final double getBlockBoundsMinX() {
+		return this.minX;
+	}
+
+	/**
+	 * + returns the block bounderies minY value
+	 */
+	public final double getBlockBoundsMinY() {
+		return this.minY;
+	}
+
+	/**
+	 * + returns the block bounderies minZ value
+	 */
+	public final double getBlockBoundsMinZ() {
+		return this.minZ;
+	}
+
+	public int getBlockColor() {
+		return 16777215;
+	}
+
+	public float getBlockHardness(World worldIn, BlockPos pos) {
+		return this.blockHardness;
+	}
+
+	public EnumWorldBlockLayer getBlockLayer() {
+		return EnumWorldBlockLayer.SOLID;
+	}
+
+	public BlockState getBlockState() {
+		return this.blockState;
+	}
+
+	public AxisAlignedBB getCollisionBoundingBox(World var1, BlockPos blockpos, IBlockState var3) {
+		return new AxisAlignedBB((double) blockpos.getX() + this.minX, (double) blockpos.getY() + this.minY,
+				(double) blockpos.getZ() + this.minZ, (double) blockpos.getX() + this.maxX,
+				(double) blockpos.getY() + this.maxY, (double) blockpos.getZ() + this.maxZ);
+	}
+
+	public int getComparatorInputOverride(World worldIn, BlockPos pos) {
+		return 0;
+	}
+
+	/**
+	 * + Returns the CreativeTab to display the given block on.
+	 */
+	public CreativeTabs getCreativeTabToDisplayOn() {
+		return this.displayOnCreativeTab;
+	}
+
+	public int getDamageValue(World worldIn, BlockPos pos) {
+		return this.damageDropped(worldIn.getBlockState(pos));
+	}
+
+	public final IBlockState getDefaultState() {
+		return this.defaultBlockState;
+	}
+
+	/**
+	 * + Return the state of blocks statistics flags - if the block is counted for
+	 * mined and placed.
+	 */
+	public boolean getEnableStats() {
+		return this.enableStats;
+	}
+
+	/**
+	 * + Returns how much this block can resist explosions from the passed in
+	 * entity.
+	 */
+	public float getExplosionResistance(Entity exploder) {
+		return this.blockResistance / 5.0F;
+	}
+
+	public Item getItem(World var1, BlockPos var2) {
+		return Item.getItemFromBlock(this);
+	}
+
+	/**
+	 * + Get the Item that this Block should drop when harvested.
+	 */
+	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
+		return Item.getItemFromBlock(this);
+	}
+
+	public int getLightOpacity() {
+		return this.lightOpacity;
+	}
+
+	public int getLightValue() {
+		return this.lightValue;
+	}
+
+	/**
+	 * + Gets the localized name of this block. Used for the statistics page.
+	 */
+	public String getLocalizedName() {
+		return StatCollector.translateToLocal(this.getUnlocalizedName() + ".name");
+	}
+
+	/**
+	 * + Get the MapColor for this Block and the given BlockState
+	 */
+	public MapColor getMapColor(IBlockState state) {
+		return this.field_181083_K;
+	}
+
+	/**
+	 * + Get a material of block
+	 */
+	public Material getMaterial() {
+		return this.blockMaterial;
+	}
+
+	/**
+	 * + Convert the BlockState into the correct metadata value
+	 */
+	public int getMetaFromState(IBlockState iblockstate) {
+		if (iblockstate != null && !iblockstate.getPropertyNames().isEmpty()) {
+			throw new IllegalArgumentException("Don\'t know how to convert " + iblockstate + " back into data...");
+		} else {
+			return 0;
+		}
+	}
+
+	public int getMixedBrightnessForBlock(IBlockAccess worldIn, BlockPos pos) {
+		Block block = worldIn.getBlockState(pos).getBlock();
+		int i = worldIn.getCombinedLight(pos, block.getLightValue());
+		if (i == 0 && block instanceof BlockSlab) {
+			pos = pos.down();
+			block = worldIn.getBlockState(pos).getBlock();
+			return worldIn.getCombinedLight(pos, block.getLightValue());
+		} else {
+			return i;
+		}
+	}
+
+	public int getMobilityFlag() {
+		return this.blockMaterial.getMaterialMobility();
+	}
+
+	/**
+	 * + Get the OffsetType for this Block. Determines if the model is rendered
+	 * slightly offset.
+	 */
+	public Block.EnumOffsetType getOffsetType() {
+		return Block.EnumOffsetType.NONE;
+	}
+
+	/**
+	 * + Get the hardness of this Block relative to the ability of the given player
+	 */
+	public float getPlayerRelativeBlockHardness(EntityPlayer playerIn, World worldIn, BlockPos pos) {
+		float f = this.getBlockHardness(worldIn, pos);
+		return f < 0.0F ? 0.0F
+				: (!playerIn.canHarvestBlock(this) ? playerIn.getToolDigEfficiency(this) / f / 100.0F
+						: playerIn.getToolDigEfficiency(this) / f / 30.0F);
+	}
+
+	public int getRenderColor(IBlockState state) {
+		return 16777215;
+	}
+
+	/**
+	 * + The type of render function called. 3 for standard block models, 2 for
+	 * TESR's, 1 for liquids, -1 is no render
+	 */
+	public int getRenderType() {
+		return 3;
+	}
+
+	public AxisAlignedBB getSelectedBoundingBox(World var1, BlockPos blockpos) {
+		return new AxisAlignedBB((double) blockpos.getX() + this.minX, (double) blockpos.getY() + this.minY,
+				(double) blockpos.getZ() + this.minZ, (double) blockpos.getX() + this.maxX,
+				(double) blockpos.getY() + this.maxY, (double) blockpos.getZ() + this.maxZ);
+	}
+
+	/**
+	 * + Possibly modify the given BlockState before rendering it on an Entity
+	 * (Minecarts, Endermen, ...)
+	 */
+	public IBlockState getStateForEntityRender(IBlockState iblockstate) {
+		return iblockstate;
+	}
+
+	/**
+	 * + Convert the given metadata into a BlockState for this Block
+	 */
+	public IBlockState getStateFromMeta(int var1) {
+		return this.getDefaultState();
+	}
+
+	public int getStrongPower(IBlockAccess var1, BlockPos var2, IBlockState var3, EnumFacing var4) {
+		return 0;
+	}
+
+	/**
+	 * + returns a list of blocks with the same ID, but different meta (eg: wood
+	 * returns 4 blocks)
+	 */
+	public void getSubBlocks(Item item, CreativeTabs var2, List<ItemStack> list) {
+		list.add(new ItemStack(item, 1, 0));
+	}
+
+	/**
+	 * + Returns whether or not this block is of a type that needs random ticking.
+	 * Called for ref-counting purposes by ExtendedBlockStorage in order to broadly
+	 * cull a chunk from the random chunk update list for efficiency's sake.
+	 */
+	public boolean getTickRandomly() {
+		return this.needsRandomTick;
+	}
+
+	/**
+	 * + Returns the unlocalized name of the block with "tile." appended to the
+	 * front.
+	 */
+	public String getUnlocalizedName() {
+		return "tile." + this.unlocalizedName;
+	}
+
+	/**
+	 * + Should block use the brightest neighbor light value as its own
+	 */
+	public boolean getUseNeighborBrightness() {
+		return this.useNeighborBrightness;
+	}
+
+	public int getWeakPower(IBlockAccess var1, BlockPos var2, IBlockState var3, EnumFacing var4) {
+		return 0;
+	}
+
+	public void harvestBlock(World world, EntityPlayer entityplayer, BlockPos blockpos, IBlockState iblockstate,
+			TileEntity var5) {
+		entityplayer.triggerAchievement(StatList.mineBlockStatArray[getIdFromBlock(this)]);
+		entityplayer.addExhaustion(0.025F);
+		if (this.canSilkHarvest() && EnchantmentHelper.getSilkTouchModifier(entityplayer)) {
+			ItemStack itemstack = this.createStackedBlock(iblockstate);
+			if (itemstack != null) {
+				spawnAsEntity(world, blockpos, itemstack);
+			}
+		} else {
+			int i = EnchantmentHelper.getFortuneModifier(entityplayer);
+			this.dropBlockAsItem(world, blockpos, iblockstate, i);
+		}
+
+	}
+
+	public boolean hasComparatorInputOverride() {
+		return false;
+	}
+
+	public boolean hasTileEntity() {
+		return this.isBlockContainer;
+	}
+
+	public boolean isAssociatedBlock(Block other) {
+		return this == other;
+	}
+
+	/**
+	 * + Indicate if a material is a normal solid opaque cube
+	 */
+	public boolean isBlockNormalCube() {
+		return this.blockMaterial.blocksMovement() && this.isFullCube();
+	}
+
+	/**
+	 * + Whether this Block is solid on the given Side
+	 */
+	public boolean isBlockSolid(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+		return worldIn.getBlockState(pos).getBlock().getMaterial().isSolid();
+	}
+
+	/**
+	 * + Returns if this block is collidable (only used by Fire). Args: x, y, z
+	 */
+	public boolean isCollidable() {
+		return true;
+	}
+
+	/**
+	 * + Returns true only if block is flowerPot
+	 */
+	public boolean isFlowerPot() {
+		return false;
+	}
+
+	public boolean isFullBlock() {
+		return this.fullBlock;
+	}
+
+	public boolean isFullCube() {
+		return true;
+	}
+
+	/**
+	 * + Used for nearly all game logic (non-rendering) purposes. Use Forge-provided
+	 * isNormalCube(IBlockAccess, BlockPos) instead.
+	 */
+	public boolean isNormalCube() {
+		return this.blockMaterial.isOpaque() && this.isFullCube() && !this.canProvidePower();
+	}
+
+	/**
+	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
+	 * render
+	 */
+	public boolean isOpaqueCube() {
+		return true;
+	}
+
+	public boolean isPassable(IBlockAccess var1, BlockPos var2) {
+		return !this.blockMaterial.blocksMovement();
+	}
+
+	/**
+	 * + Whether this Block can be replaced directly by other blocks (true for e.g.
+	 * tall grass)
+	 */
+	public boolean isReplaceable(World var1, BlockPos var2) {
+		return false;
+	}
+
+	/**
+	 * + Used in the renderer to apply ambient occlusion
+	 */
+	public boolean isTranslucent() {
+		return this.translucent;
+	}
+
+	/**
+	 * + Checks if a vector is within the X and Y bounds of the block.
+	 */
+	private boolean isVecInsideXYBounds(Vec3 point) {
+		return point == null ? false
+				: point.xCoord >= this.minX && point.xCoord <= this.maxX && point.yCoord >= this.minY
+						&& point.yCoord <= this.maxY;
+	}
+
+	/**
+	 * + Checks if a vector is within the X and Z bounds of the block.
+	 */
+	private boolean isVecInsideXZBounds(Vec3 point) {
+		return point == null ? false
+				: point.xCoord >= this.minX && point.xCoord <= this.maxX && point.zCoord >= this.minZ
+						&& point.zCoord <= this.maxZ;
+	}
+
+	/**
+	 * + Checks if a vector is within the Y and Z bounds of the block.
+	 */
+	private boolean isVecInsideYZBounds(Vec3 point) {
+		return point == null ? false
+				: point.yCoord >= this.minY && point.yCoord <= this.maxY && point.zCoord >= this.minZ
+						&& point.zCoord <= this.maxZ;
+	}
+
+	public boolean isVisuallyOpaque() {
+		return this.blockMaterial.blocksMovement() && this.isFullCube();
+	}
+
+	public Vec3 modifyAcceleration(World worldIn, BlockPos pos, Entity entityIn, Vec3 motion) {
+		return motion;
+	}
+
+	public boolean onBlockActivated(World var1, BlockPos var2, IBlockState var3, EntityPlayer var4, EnumFacing var5,
+			float var6, float var7, float var8) {
+		return false;
+	}
+
+	public void onBlockAdded(World var1, BlockPos var2, IBlockState var3) {
+	}
+
+	public void onBlockClicked(World worldIn, BlockPos pos, EntityPlayer playerIn) {
+	}
+
+	/**
+	 * + Called when this Block is destroyed by an Explosion
+	 */
+	public void onBlockDestroyedByExplosion(World worldIn, BlockPos pos, Explosion explosionIn) {
+	}
+
+	/**
+	 * + Called when a player destroys this Block
+	 */
+	public void onBlockDestroyedByPlayer(World worldIn, BlockPos pos, IBlockState state) {
+	}
+
+	/**
+	 * + Called on both Client and Server when World#addBlockEvent is called
+	 */
+	public boolean onBlockEventReceived(World var1, BlockPos var2, IBlockState var3, int var4, int var5) {
+		return false;
+	}
+
+	public void onBlockHarvested(World var1, BlockPos var2, IBlockState var3, EntityPlayer var4) {
+	}
+
+	/**
+	 * + Called by ItemBlocks just before a block is actually set in the world, to
+	 * allow for adjustments to the IBlockstate
+	 */
+	public IBlockState onBlockPlaced(World var1, BlockPos var2, EnumFacing var3, float var4, float var5, float var6,
+			int i, EntityLivingBase var8) {
+		return this.getStateFromMeta(i);
+	}
+
+	/**
+	 * + Called by ItemBlocks after a block is set in the world, to allow post-place
+	 * logic
+	 */
+	public void onBlockPlacedBy(World var1, BlockPos var2, IBlockState var3, EntityLivingBase var4, ItemStack var5) {
+	}
+
+	/**
+	 * + Called When an Entity Collided with the Block
+	 */
+	public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, Entity entityIn) {
+	}
+
+	/**
+	 * + Called When an Entity Collided with the Block
+	 */
+	public void onEntityCollidedWithBlock(World var1, BlockPos var2, IBlockState var3, Entity var4) {
+	}
+
+	/**
+	 * + Block's chance to react to a living entity falling on it.
+	 */
+	public void onFallenUpon(World worldIn, BlockPos pos, Entity entityIn, float fallDistance) {
+		entityIn.fall(fallDistance, 1.0F);
+	}
+
+	/**
+	 * + Called when an Entity lands on this Block. This method *must* update
+	 * motionY because the entity will not do that on its own
+	 */
+	public void onLanded(World worldIn, Entity entityIn) {
+		entityIn.motionY = 0.0D;
+	}
+
+	/**
+	 * + Called when a neighboring block changes.
+	 */
+	public void onNeighborBlockChange(World var1, BlockPos var2, IBlockState var3, Block var4) {
+	}
+
+	/**
+	 * + Returns the quantity of items to drop on block destruction.
+	 */
+	public int quantityDropped(EaglercraftRandom random) {
+		return 1;
+	}
+
+	/**
+	 * + Get the quantity dropped based on the given fortune level
+	 */
+	public int quantityDroppedWithBonus(int fortune, EaglercraftRandom random) {
+		return this.quantityDropped(random);
+	}
+
+	public void randomDisplayTick(World worldIn, BlockPos pos, IBlockState state, EaglercraftRandom rand) {
+	}
+
+	/**
+	 * + Called randomly when setTickRandomly is set to true (used by e.g. crops to
+	 * grow, etc.)
+	 */
+	public void randomTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom random) {
+		this.updateTick(world, blockpos, iblockstate, random);
+	}
+
+	public boolean requiresUpdates() {
+		return true;
+	}
+
+	protected final void setBlockBounds(float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
+		this.minX = (double) minX;
+		this.minY = (double) minY;
+		this.minZ = (double) minZ;
+		this.maxX = (double) maxX;
+		this.maxY = (double) maxY;
+		this.maxZ = (double) maxZ;
+	}
+
+	public void setBlockBoundsBasedOnState(IBlockAccess var1, BlockPos var2) {
+	}
+
+	/**
+	 * + Sets the block's bounds for rendering it as an item
+	 */
+	public void setBlockBoundsForItemRender() {
+	}
+
+	protected Block setBlockUnbreakable() {
+		this.setHardness(-1.0F);
+		return this;
+	}
+
+	public Block setCreativeTab(CreativeTabs tab) {
+		this.displayOnCreativeTab = tab;
+		return this;
+	}
+
+	protected final void setDefaultState(IBlockState state) {
+		this.defaultBlockState = state;
+	}
+
+	/**
+	 * + Sets how many hits it takes to break a block.
+	 */
+	protected Block setHardness(float hardness) {
+		this.blockHardness = hardness;
+		if (this.blockResistance < hardness * 5.0F) {
+			this.blockResistance = hardness * 5.0F;
+		}
+
+		return this;
+	}
+
+	/**
+	 * + Sets the light value that the block emits. Returns resulting block instance
+	 * for constructing convenience. Args: level
+	 */
+	protected Block setLightLevel(float value) {
+		this.lightValue = (int) (15.0F * value);
+		return this;
+	}
+
+	/**
+	 * + Sets how much light is blocked going through this block. Returns the object
+	 * for convenience in constructing.
+	 */
+	protected Block setLightOpacity(int opacity) {
+		this.lightOpacity = opacity;
+		return this;
+	}
+
+	/**
+	 * + Sets the the blocks resistance to explosions. Returns the object for
+	 * convenience in constructing.
+	 */
+	protected Block setResistance(float resistance) {
+		this.blockResistance = resistance * 3.0F;
+		return this;
+	}
+
+	/**
+	 * + Sets the footstep sound for the block. Returns the object for convenience
+	 * in constructing.
+	 */
+	protected Block setStepSound(Block.SoundType sound) {
+		this.stepSound = sound;
+		return this;
+	}
+
+	/**
+	 * + Sets whether this block type will receive random update ticks
+	 */
+	protected Block setTickRandomly(boolean shouldTick) {
+		this.needsRandomTick = shouldTick;
+		return this;
+	}
+
+	public Block setUnlocalizedName(String name) {
+		this.unlocalizedName = name;
+		return this;
+	}
+
+	public boolean shouldSideBeRendered(IBlockAccess iblockaccess, BlockPos blockpos, EnumFacing enumfacing) {
+		return enumfacing == EnumFacing.DOWN && this.minY > 0.0D ? true
+				: (enumfacing == EnumFacing.UP && this.maxY < 1.0D ? true
+						: (enumfacing == EnumFacing.NORTH && this.minZ > 0.0D ? true
+								: (enumfacing == EnumFacing.SOUTH && this.maxZ < 1.0D ? true
+										: (enumfacing == EnumFacing.WEST && this.minX > 0.0D ? true
+												: (enumfacing == EnumFacing.EAST && this.maxX < 1.0D ? true
+														: !iblockaccess.getBlockState(blockpos).getBlock()
+																.isOpaqueCube())))));
+	}
+
+	/**
+	 * + How many world ticks before ticking
+	 */
+	public int tickRate(World var1) {
+		return 10;
+	}
+
+	public String toString() {
+		return "Block{" + blockRegistry.getNameForObject(this) + "}";
+	}
+
+	public void updateTick(World var1, BlockPos var2, IBlockState var3, EaglercraftRandom var4) {
 	}
 }

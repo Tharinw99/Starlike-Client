@@ -37,6 +37,19 @@ import com.google.common.primitives.Primitives;
 public final class MutableClassToInstanceMap<B> extends ConstrainedMap<Class<? extends B>, B>
 		implements ClassToInstanceMap<B> {
 
+	private static final MapConstraint<Class<?>, Object> VALUE_CAN_BE_CAST_TO_KEY = new MapConstraint<Class<?>, Object>() {
+		@Override
+		public void checkKeyValue(Class<?> key, Object value) {
+			cast(key, value);
+		}
+	};
+
+	private static final long serialVersionUID = 0;
+
+	private static <B, T extends B> T cast(Class<T> type, B value) {
+		return Primitives.wrap(type).cast(value);
+	}
+
 	/**
 	 * Returns a new {@code MutableClassToInstanceMap} instance backed by a
 	 * {@link HashMap} using the default initial capacity and load factor.
@@ -58,26 +71,13 @@ public final class MutableClassToInstanceMap<B> extends ConstrainedMap<Class<? e
 		super(delegate, VALUE_CAN_BE_CAST_TO_KEY);
 	}
 
-	private static final MapConstraint<Class<?>, Object> VALUE_CAN_BE_CAST_TO_KEY = new MapConstraint<Class<?>, Object>() {
-		@Override
-		public void checkKeyValue(Class<?> key, Object value) {
-			cast(key, value);
-		}
-	};
-
-	@Override
-	public <T extends B> T putInstance(Class<T> type, T value) {
-		return cast(type, put(type, value));
-	}
-
 	@Override
 	public <T extends B> T getInstance(Class<T> type) {
 		return cast(type, get(type));
 	}
 
-	private static <B, T extends B> T cast(Class<T> type, B value) {
-		return Primitives.wrap(type).cast(value);
+	@Override
+	public <T extends B> T putInstance(Class<T> type, T value) {
+		return cast(type, put(type, value));
 	}
-
-	private static final long serialVersionUID = 0;
 }

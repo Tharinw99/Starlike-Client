@@ -1,8 +1,9 @@
 package net.lax1dude.eaglercraft.v1_8.internal.paulscode.lwjgl3;
 
-import java.nio.IntBuffer;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.LinkedList;
+
 import javax.sound.sampled.AudioFormat;
 
 // From the lwjgl library, http://www.lwjgl.org
@@ -11,9 +12,9 @@ import org.lwjgl.openal.AL10;
 
 import paulscode.sound.Channel;
 import paulscode.sound.FilenameURL;
-import paulscode.sound.Source;
 import paulscode.sound.SoundBuffer;
 import paulscode.sound.SoundSystemConfig;
+import paulscode.sound.Source;
 
 /**
  * The SourceLWJGLOpenAL class provides an interface to the lwjgl binding of
@@ -102,6 +103,32 @@ public class SourceLWJGLOpenAL extends Source {
 	private FloatBuffer sourceVelocity;
 
 	/**
+	 * Constructor: Creates a new streaming source that will be directly fed with
+	 * raw audio data.
+	 * 
+	 * @param listenerPosition FloatBuffer containing the listener's 3D coordinates.
+	 * @param audioFormat      Format that the data will be in.
+	 * @param priority         Setting this to true will prevent other sounds from
+	 *                         overriding this one.
+	 * @param sourcename       A unique identifier for this source. Two sources may
+	 *                         not use the same sourcename.
+	 * @param x                X position for this source.
+	 * @param y                Y position for this source.
+	 * @param z                Z position for this source.
+	 * @param attModel         Attenuation model to use.
+	 * @param distOrRoll       Either the fading distance or rolloff factor,
+	 *                         depending on the value of 'att'.
+	 */
+	public SourceLWJGLOpenAL(FloatBuffer listenerPosition, AudioFormat audioFormat, boolean priority, String sourcename,
+			float x, float y, float z, int attModel, float distOrRoll) {
+		super(audioFormat, priority, sourcename, x, y, z, attModel, distOrRoll);
+		this.listenerPosition = listenerPosition;
+		libraryType = LibraryLWJGLOpenAL.class;
+		pitch = 1.0f;
+		resetALInformation();
+	}
+
+	/**
 	 * Constructor: Creates a new source using the specified parameters.
 	 * 
 	 * @param listenerPosition FloatBuffer containing the listener's 3D coordinates.
@@ -162,38 +189,39 @@ public class SourceLWJGLOpenAL extends Source {
 	}
 
 	/**
-	 * Constructor: Creates a new streaming source that will be directly fed with
-	 * raw audio data.
-	 * 
-	 * @param listenerPosition FloatBuffer containing the listener's 3D coordinates.
-	 * @param audioFormat      Format that the data will be in.
-	 * @param priority         Setting this to true will prevent other sounds from
-	 *                         overriding this one.
-	 * @param sourcename       A unique identifier for this source. Two sources may
-	 *                         not use the same sourcename.
-	 * @param x                X position for this source.
-	 * @param y                Y position for this source.
-	 * @param z                Z position for this source.
-	 * @param attModel         Attenuation model to use.
-	 * @param distOrRoll       Either the fading distance or rolloff factor,
-	 *                         depending on the value of 'att'.
+	 * Calculates this source's distance from the listener.
 	 */
-	public SourceLWJGLOpenAL(FloatBuffer listenerPosition, AudioFormat audioFormat, boolean priority, String sourcename,
-			float x, float y, float z, int attModel, float distOrRoll) {
-		super(audioFormat, priority, sourcename, x, y, z, attModel, distOrRoll);
-		this.listenerPosition = listenerPosition;
-		libraryType = LibraryLWJGLOpenAL.class;
-		pitch = 1.0f;
-		resetALInformation();
+	private void calculateDistance() {
+		if (listenerPosition != null) {
+			// Calculate the source's distance from the listener:
+			double dX = position.x - listenerPosition.get(0);
+			double dY = position.y - listenerPosition.get(1);
+			double dZ = position.z - listenerPosition.get(2);
+			distanceFromListener = (float) Math.sqrt(dX * dX + dY * dY + dZ * dZ);
+		}
 	}
 
 	/**
-	 * Shuts the source down and removes references to all instantiated objects.
+	 * If using linear attenuation, calculates the gain for this source based on its
+	 * distance from the listener.
 	 */
-	@Override
-	public void cleanup() {
-
-		super.cleanup();
+	private void calculateGain() {
+		// If using linear attenuation, calculate the source's gain:
+		if (attModel == SoundSystemConfig.ATTENUATION_LINEAR) {
+			if (distanceFromListener <= 0) {
+				gain = 1.0f;
+			} else if (distanceFromListener >= distOrRoll) {
+				gain = 0.0f;
+			} else {
+				gain = 1.0f - (distanceFromListener / distOrRoll);
+			}
+			if (gain > 1.0f)
+				gain = 1.0f;
+			if (gain < 0.0f)
+				gain = 0.0f;
+		} else {
+			gain = 1.0f;
+		}
 	}
 
 	/**
@@ -231,6 +259,56 @@ public class SourceLWJGLOpenAL extends Source {
 		this.myBuffer = myBuffer;
 		pitch = 1.0f;
 		resetALInformation();
+	}
+
+	/**
+	 * Checks for OpenAL errors, and prints a message if there is an error.
+	 * 
+	 * @return True if there was an error, False if not.
+	 */
+	private boolean checkALError() {
+		switch (AL10.alGetError()) {
+		case AL10.AL_NO_ERROR:
+			return false;
+		case AL10.AL_INVALID_NAME:
+			errorMessage("Invalid name parameter.");
+			return true;
+		case AL10.AL_INVALID_ENUM:
+			errorMessage("Invalid parameter.");
+			return true;
+		case AL10.AL_INVALID_VALUE:
+			errorMessage("Invalid enumerated parameter value.");
+			return true;
+		case AL10.AL_INVALID_OPERATION:
+			errorMessage("Illegal call.");
+			return true;
+		case AL10.AL_OUT_OF_MEMORY:
+			errorMessage("Unable to allocate memory.");
+			return true;
+		default:
+			errorMessage("An unrecognized error occurred.");
+			return true;
+		}
+	}
+
+	/**
+	 * Checks the source's pitch.
+	 */
+	private void checkPitch() {
+		if (channel != null && channel.attachedSource == this && LibraryLWJGLOpenAL.alPitchSupported()
+				&& channelOpenAL != null && channelOpenAL.ALSource != null) {
+			AL10.alSourcef(channelOpenAL.ALSource.get(0), AL10.AL_PITCH, pitch);
+			checkALError();
+		}
+	}
+
+	/**
+	 * Shuts the source down and removes references to all instantiated objects.
+	 */
+	@Override
+	public void cleanup() {
+
+		super.cleanup();
 	}
 
 	/**
@@ -308,163 +386,6 @@ public class SourceLWJGLOpenAL extends Source {
 	}
 
 	/**
-	 * Moves the source to the specified position.
-	 * 
-	 * @param x X coordinate to move to.
-	 * @param y Y coordinate to move to.
-	 * @param z Z coordinate to move to.
-	 */
-	@Override
-	public void setPosition(float x, float y, float z) {
-		super.setPosition(x, y, z);
-
-		// Make sure OpenAL information has been created
-		if (sourcePosition == null)
-			resetALInformation();
-		else
-			positionChanged();
-
-		// put the new position information into the buffer:
-		sourcePosition.put(0, x);
-		sourcePosition.put(1, y);
-		sourcePosition.put(2, z);
-
-		// make sure we are assigned to a channel:
-		if (channel != null && channel.attachedSource == this && channelOpenAL != null
-				&& channelOpenAL.ALSource != null) {
-			// move the source:
-			AL10.alSourcefv(channelOpenAL.ALSource.get(0), AL10.AL_POSITION, sourcePosition);
-			checkALError();
-		}
-	}
-
-	/**
-	 * Recalculates the distance from the listner and the gain.
-	 */
-	@Override
-	public void positionChanged() {
-		calculateDistance();
-		calculateGain();
-
-		if (channel != null && channel.attachedSource == this && channelOpenAL != null
-				&& channelOpenAL.ALSource != null) {
-			AL10.alSourcef(channelOpenAL.ALSource.get(0), AL10.AL_GAIN,
-					(gain * sourceVolume * (float) Math.abs(fadeOutGain) * fadeInGain));
-			checkALError();
-		}
-		checkPitch();
-	}
-
-	/**
-	 * Checks the source's pitch.
-	 */
-	private void checkPitch() {
-		if (channel != null && channel.attachedSource == this && LibraryLWJGLOpenAL.alPitchSupported()
-				&& channelOpenAL != null && channelOpenAL.ALSource != null) {
-			AL10.alSourcef(channelOpenAL.ALSource.get(0), AL10.AL_PITCH, pitch);
-			checkALError();
-		}
-	}
-
-	/**
-	 * Sets whether this source should loop or only play once.
-	 * 
-	 * @param lp True or false.
-	 */
-	@Override
-	public void setLooping(boolean lp) {
-		super.setLooping(lp);
-
-		// make sure we are assigned to a channel:
-		if (channel != null && channel.attachedSource == this && channelOpenAL != null
-				&& channelOpenAL.ALSource != null) {
-			if (lp)
-				AL10.alSourcei(channelOpenAL.ALSource.get(0), AL10.AL_LOOPING, AL10.AL_TRUE);
-			else
-				AL10.alSourcei(channelOpenAL.ALSource.get(0), AL10.AL_LOOPING, AL10.AL_FALSE);
-			checkALError();
-		}
-	}
-
-	/**
-	 * Sets this source's attenuation model.
-	 * 
-	 * @param model Attenuation model to use.
-	 */
-	@Override
-	public void setAttenuation(int model) {
-		super.setAttenuation(model);
-		// make sure we are assigned to a channel:
-		if (channel != null && channel.attachedSource == this && channelOpenAL != null
-				&& channelOpenAL.ALSource != null) {
-			// attenuation changed, so update the rolloff factor accordingly
-			if (model == SoundSystemConfig.ATTENUATION_ROLLOFF)
-				AL10.alSourcef(channelOpenAL.ALSource.get(0), AL10.AL_ROLLOFF_FACTOR, distOrRoll);
-			else
-				AL10.alSourcef(channelOpenAL.ALSource.get(0), AL10.AL_ROLLOFF_FACTOR, 0.0f);
-			checkALError();
-			if (model == SoundSystemConfig.ATTENUATION_NONE)
-				AL10.alSourcei(channelOpenAL.ALSource.get(0), AL10.AL_SOURCE_RELATIVE, 1);
-			else
-				AL10.alSourcei(channelOpenAL.ALSource.get(0), AL10.AL_SOURCE_RELATIVE, 0);
-			checkALError();
-		}
-	}
-
-	/**
-	 * Sets this source's fade distance or rolloff factor, depending on the
-	 * attenuation model.
-	 * 
-	 * @param dr New value for fade distance or rolloff factor.
-	 */
-	@Override
-	public void setDistOrRoll(float dr) {
-		super.setDistOrRoll(dr);
-		// make sure we are assigned to a channel:
-		if (channel != null && channel.attachedSource == this && channelOpenAL != null
-				&& channelOpenAL.ALSource != null) {
-			// if we are using rolloff attenuation, then dr is a rolloff factor:
-			if (attModel == SoundSystemConfig.ATTENUATION_ROLLOFF)
-				AL10.alSourcef(channelOpenAL.ALSource.get(0), AL10.AL_ROLLOFF_FACTOR, dr);
-			else
-				AL10.alSourcef(channelOpenAL.ALSource.get(0), AL10.AL_ROLLOFF_FACTOR, 0.0f);
-			checkALError();
-		}
-	}
-
-	/**
-	 * Sets this source's velocity, for use in Doppler effect.
-	 * 
-	 * @param x Velocity along world x-axis.
-	 * @param y Velocity along world y-axis.
-	 * @param z Velocity along world z-axis.
-	 */
-	@Override
-	public void setVelocity(float x, float y, float z) {
-		super.setVelocity(x, y, z);
-
-		sourceVelocity = BufferUtils.createFloatBuffer(3).put(new float[] { x, y, z });
-		sourceVelocity.flip();
-		// make sure we are assigned to a channel:
-		if (channel != null && channel.attachedSource == this && channelOpenAL != null
-				&& channelOpenAL.ALSource != null) {
-			AL10.alSourcefv(channelOpenAL.ALSource.get(0), AL10.AL_VELOCITY, sourceVelocity);
-			checkALError();
-		}
-	}
-
-	/**
-	 * Manually sets this source's pitch.
-	 * 
-	 * @param value A float value ( 0.5f - 2.0f ).
-	 */
-	@Override
-	public void setPitch(float value) {
-		super.setPitch(value);
-		checkPitch();
-	}
-
-	/**
 	 * Plays the source on the specified channel.
 	 * 
 	 * @param c Channel to play on.
@@ -516,7 +437,7 @@ public class SourceLWJGLOpenAL extends Source {
 				else
 					AL10.alSourcef(channelOpenAL.ALSource.get(0), AL10.AL_ROLLOFF_FACTOR, 0.0f);
 				checkALError();
-				
+
 				if (attModel == SoundSystemConfig.ATTENUATION_NONE)
 					AL10.alSourcei(channelOpenAL.ALSource.get(0), AL10.AL_SOURCE_RELATIVE, 1);
 				else
@@ -593,6 +514,23 @@ public class SourceLWJGLOpenAL extends Source {
 	}
 
 	/**
+	 * Recalculates the distance from the listner and the gain.
+	 */
+	@Override
+	public void positionChanged() {
+		calculateDistance();
+		calculateGain();
+
+		if (channel != null && channel.attachedSource == this && channelOpenAL != null
+				&& channelOpenAL.ALSource != null) {
+			AL10.alSourcef(channelOpenAL.ALSource.get(0), AL10.AL_GAIN,
+					(gain * sourceVolume * (float) Math.abs(fadeOutGain) * fadeInGain));
+			checkALError();
+		}
+		checkPitch();
+	}
+
+	/**
 	 * Queues up the initial stream-buffers for the stream.
 	 * 
 	 * @return False if the end of the stream was reached.
@@ -636,68 +574,131 @@ public class SourceLWJGLOpenAL extends Source {
 	}
 
 	/**
-	 * Calculates this source's distance from the listener.
-	 */
-	private void calculateDistance() {
-		if (listenerPosition != null) {
-			// Calculate the source's distance from the listener:
-			double dX = position.x - listenerPosition.get(0);
-			double dY = position.y - listenerPosition.get(1);
-			double dZ = position.z - listenerPosition.get(2);
-			distanceFromListener = (float) Math.sqrt(dX * dX + dY * dY + dZ * dZ);
-		}
-	}
-
-	/**
-	 * If using linear attenuation, calculates the gain for this source based on its
-	 * distance from the listener.
-	 */
-	private void calculateGain() {
-		// If using linear attenuation, calculate the source's gain:
-		if (attModel == SoundSystemConfig.ATTENUATION_LINEAR) {
-			if (distanceFromListener <= 0) {
-				gain = 1.0f;
-			} else if (distanceFromListener >= distOrRoll) {
-				gain = 0.0f;
-			} else {
-				gain = 1.0f - (distanceFromListener / distOrRoll);
-			}
-			if (gain > 1.0f)
-				gain = 1.0f;
-			if (gain < 0.0f)
-				gain = 0.0f;
-		} else {
-			gain = 1.0f;
-		}
-	}
-
-	/**
-	 * Checks for OpenAL errors, and prints a message if there is an error.
+	 * Sets this source's attenuation model.
 	 * 
-	 * @return True if there was an error, False if not.
+	 * @param model Attenuation model to use.
 	 */
-	private boolean checkALError() {
-		switch (AL10.alGetError()) {
-		case AL10.AL_NO_ERROR:
-			return false;
-		case AL10.AL_INVALID_NAME:
-			errorMessage("Invalid name parameter.");
-			return true;
-		case AL10.AL_INVALID_ENUM:
-			errorMessage("Invalid parameter.");
-			return true;
-		case AL10.AL_INVALID_VALUE:
-			errorMessage("Invalid enumerated parameter value.");
-			return true;
-		case AL10.AL_INVALID_OPERATION:
-			errorMessage("Illegal call.");
-			return true;
-		case AL10.AL_OUT_OF_MEMORY:
-			errorMessage("Unable to allocate memory.");
-			return true;
-		default:
-			errorMessage("An unrecognized error occurred.");
-			return true;
+	@Override
+	public void setAttenuation(int model) {
+		super.setAttenuation(model);
+		// make sure we are assigned to a channel:
+		if (channel != null && channel.attachedSource == this && channelOpenAL != null
+				&& channelOpenAL.ALSource != null) {
+			// attenuation changed, so update the rolloff factor accordingly
+			if (model == SoundSystemConfig.ATTENUATION_ROLLOFF)
+				AL10.alSourcef(channelOpenAL.ALSource.get(0), AL10.AL_ROLLOFF_FACTOR, distOrRoll);
+			else
+				AL10.alSourcef(channelOpenAL.ALSource.get(0), AL10.AL_ROLLOFF_FACTOR, 0.0f);
+			checkALError();
+			if (model == SoundSystemConfig.ATTENUATION_NONE)
+				AL10.alSourcei(channelOpenAL.ALSource.get(0), AL10.AL_SOURCE_RELATIVE, 1);
+			else
+				AL10.alSourcei(channelOpenAL.ALSource.get(0), AL10.AL_SOURCE_RELATIVE, 0);
+			checkALError();
+		}
+	}
+
+	/**
+	 * Sets this source's fade distance or rolloff factor, depending on the
+	 * attenuation model.
+	 * 
+	 * @param dr New value for fade distance or rolloff factor.
+	 */
+	@Override
+	public void setDistOrRoll(float dr) {
+		super.setDistOrRoll(dr);
+		// make sure we are assigned to a channel:
+		if (channel != null && channel.attachedSource == this && channelOpenAL != null
+				&& channelOpenAL.ALSource != null) {
+			// if we are using rolloff attenuation, then dr is a rolloff factor:
+			if (attModel == SoundSystemConfig.ATTENUATION_ROLLOFF)
+				AL10.alSourcef(channelOpenAL.ALSource.get(0), AL10.AL_ROLLOFF_FACTOR, dr);
+			else
+				AL10.alSourcef(channelOpenAL.ALSource.get(0), AL10.AL_ROLLOFF_FACTOR, 0.0f);
+			checkALError();
+		}
+	}
+
+	/**
+	 * Sets whether this source should loop or only play once.
+	 * 
+	 * @param lp True or false.
+	 */
+	@Override
+	public void setLooping(boolean lp) {
+		super.setLooping(lp);
+
+		// make sure we are assigned to a channel:
+		if (channel != null && channel.attachedSource == this && channelOpenAL != null
+				&& channelOpenAL.ALSource != null) {
+			if (lp)
+				AL10.alSourcei(channelOpenAL.ALSource.get(0), AL10.AL_LOOPING, AL10.AL_TRUE);
+			else
+				AL10.alSourcei(channelOpenAL.ALSource.get(0), AL10.AL_LOOPING, AL10.AL_FALSE);
+			checkALError();
+		}
+	}
+
+	/**
+	 * Manually sets this source's pitch.
+	 * 
+	 * @param value A float value ( 0.5f - 2.0f ).
+	 */
+	@Override
+	public void setPitch(float value) {
+		super.setPitch(value);
+		checkPitch();
+	}
+
+	/**
+	 * Moves the source to the specified position.
+	 * 
+	 * @param x X coordinate to move to.
+	 * @param y Y coordinate to move to.
+	 * @param z Z coordinate to move to.
+	 */
+	@Override
+	public void setPosition(float x, float y, float z) {
+		super.setPosition(x, y, z);
+
+		// Make sure OpenAL information has been created
+		if (sourcePosition == null)
+			resetALInformation();
+		else
+			positionChanged();
+
+		// put the new position information into the buffer:
+		sourcePosition.put(0, x);
+		sourcePosition.put(1, y);
+		sourcePosition.put(2, z);
+
+		// make sure we are assigned to a channel:
+		if (channel != null && channel.attachedSource == this && channelOpenAL != null
+				&& channelOpenAL.ALSource != null) {
+			// move the source:
+			AL10.alSourcefv(channelOpenAL.ALSource.get(0), AL10.AL_POSITION, sourcePosition);
+			checkALError();
+		}
+	}
+
+	/**
+	 * Sets this source's velocity, for use in Doppler effect.
+	 * 
+	 * @param x Velocity along world x-axis.
+	 * @param y Velocity along world y-axis.
+	 * @param z Velocity along world z-axis.
+	 */
+	@Override
+	public void setVelocity(float x, float y, float z) {
+		super.setVelocity(x, y, z);
+
+		sourceVelocity = BufferUtils.createFloatBuffer(3).put(new float[] { x, y, z });
+		sourceVelocity.flip();
+		// make sure we are assigned to a channel:
+		if (channel != null && channel.attachedSource == this && channelOpenAL != null
+				&& channelOpenAL.ALSource != null) {
+			AL10.alSourcefv(channelOpenAL.ALSource.get(0), AL10.AL_VELOCITY, sourceVelocity);
+			checkALError();
 		}
 	}
 }

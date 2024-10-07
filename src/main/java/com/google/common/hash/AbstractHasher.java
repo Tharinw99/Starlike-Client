@@ -41,15 +41,15 @@ abstract class AbstractHasher implements Hasher {
 	}
 
 	@Override
+	public Hasher putString(CharSequence charSequence, Charset charset) {
+		return putBytes(charSequence.toString().getBytes(charset));
+	}
+
+	@Override
 	public Hasher putUnencodedChars(CharSequence charSequence) {
 		for (int i = 0, len = charSequence.length(); i < len; i++) {
 			putChar(charSequence.charAt(i));
 		}
 		return this;
-	}
-
-	@Override
-	public Hasher putString(CharSequence charSequence, Charset charset) {
-		return putBytes(charSequence.toString().getBytes(charset));
 	}
 }

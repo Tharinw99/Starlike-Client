@@ -48,16 +48,26 @@ import com.google.common.annotations.GwtCompatible;
 @Beta
 @GwtCompatible(emulated = true)
 public abstract class ForwardingSortedMultiset<E> extends ForwardingMultiset<E> implements SortedMultiset<E> {
-	/** Constructor for use by subclasses. */
-	protected ForwardingSortedMultiset() {
-	}
+	/**
+	 * A skeleton implementation of a descending multiset view. Normally,
+	 * {@link #descendingMultiset()} will not reflect any changes you make to the
+	 * behavior of methods such as {@link #add(Object)} or {@link #pollFirstEntry}.
+	 * This skeleton implementation correctly delegates each of its operations to
+	 * the appropriate methods of this {@code
+	 * ForwardingSortedMultiset}.
+	 *
+	 * In many cases, you may wish to override {@link #descendingMultiset()} to
+	 * return an instance of a subclass of {@code StandardDescendingMultiset}.
+	 */
+	protected abstract class StandardDescendingMultiset extends DescendingMultiset<E> {
+		/** Constructor for use by subclasses. */
+		public StandardDescendingMultiset() {
+		}
 
-	@Override
-	protected abstract SortedMultiset<E> delegate();
-
-	@Override
-	public NavigableSet<E> elementSet() {
-		return (NavigableSet<E>) super.elementSet();
+		@Override
+		SortedMultiset<E> forwardMultiset() {
+			return ForwardingSortedMultiset.this;
+		}
 	}
 
 	/**
@@ -81,41 +91,51 @@ public abstract class ForwardingSortedMultiset<E> extends ForwardingMultiset<E> 
 		}
 	}
 
+	/** Constructor for use by subclasses. */
+	protected ForwardingSortedMultiset() {
+	}
+
 	@Override
 	public Comparator<? super E> comparator() {
 		return delegate().comparator();
 	}
 
 	@Override
+	protected abstract SortedMultiset<E> delegate();
+
+	@Override
 	public SortedMultiset<E> descendingMultiset() {
 		return delegate().descendingMultiset();
 	}
 
-	/**
-	 * A skeleton implementation of a descending multiset view. Normally,
-	 * {@link #descendingMultiset()} will not reflect any changes you make to the
-	 * behavior of methods such as {@link #add(Object)} or {@link #pollFirstEntry}.
-	 * This skeleton implementation correctly delegates each of its operations to
-	 * the appropriate methods of this {@code
-	 * ForwardingSortedMultiset}.
-	 *
-	 * In many cases, you may wish to override {@link #descendingMultiset()} to
-	 * return an instance of a subclass of {@code StandardDescendingMultiset}.
-	 */
-	protected abstract class StandardDescendingMultiset extends DescendingMultiset<E> {
-		/** Constructor for use by subclasses. */
-		public StandardDescendingMultiset() {
-		}
-
-		@Override
-		SortedMultiset<E> forwardMultiset() {
-			return ForwardingSortedMultiset.this;
-		}
+	@Override
+	public NavigableSet<E> elementSet() {
+		return (NavigableSet<E>) super.elementSet();
 	}
 
 	@Override
 	public Entry<E> firstEntry() {
 		return delegate().firstEntry();
+	}
+
+	@Override
+	public SortedMultiset<E> headMultiset(E upperBound, BoundType boundType) {
+		return delegate().headMultiset(upperBound, boundType);
+	}
+
+	@Override
+	public Entry<E> lastEntry() {
+		return delegate().lastEntry();
+	}
+
+	@Override
+	public Entry<E> pollFirstEntry() {
+		return delegate().pollFirstEntry();
+	}
+
+	@Override
+	public Entry<E> pollLastEntry() {
+		return delegate().pollLastEntry();
 	}
 
 	/**
@@ -134,11 +154,6 @@ public abstract class ForwardingSortedMultiset<E> extends ForwardingMultiset<E> 
 		return Multisets.immutableEntry(entry.getElement(), entry.getCount());
 	}
 
-	@Override
-	public Entry<E> lastEntry() {
-		return delegate().lastEntry();
-	}
-
 	/**
 	 * A sensible definition of {@link #lastEntry()} in terms of {@code
 	 * descendingMultiset().entrySet().iterator()}.
@@ -153,11 +168,6 @@ public abstract class ForwardingSortedMultiset<E> extends ForwardingMultiset<E> 
 		}
 		Entry<E> entry = entryIterator.next();
 		return Multisets.immutableEntry(entry.getElement(), entry.getCount());
-	}
-
-	@Override
-	public Entry<E> pollFirstEntry() {
-		return delegate().pollFirstEntry();
 	}
 
 	/**
@@ -178,11 +188,6 @@ public abstract class ForwardingSortedMultiset<E> extends ForwardingMultiset<E> 
 		return entry;
 	}
 
-	@Override
-	public Entry<E> pollLastEntry() {
-		return delegate().pollLastEntry();
-	}
-
 	/**
 	 * A sensible definition of {@link #pollLastEntry()} in terms of {@code
 	 * descendingMultiset().entrySet().iterator()}.
@@ -201,17 +206,6 @@ public abstract class ForwardingSortedMultiset<E> extends ForwardingMultiset<E> 
 		return entry;
 	}
 
-	@Override
-	public SortedMultiset<E> headMultiset(E upperBound, BoundType boundType) {
-		return delegate().headMultiset(upperBound, boundType);
-	}
-
-	@Override
-	public SortedMultiset<E> subMultiset(E lowerBound, BoundType lowerBoundType, E upperBound,
-			BoundType upperBoundType) {
-		return delegate().subMultiset(lowerBound, lowerBoundType, upperBound, upperBoundType);
-	}
-
 	/**
 	 * A sensible definition of
 	 * {@link #subMultiset(Object, BoundType, Object, BoundType)} in terms of
@@ -225,6 +219,12 @@ public abstract class ForwardingSortedMultiset<E> extends ForwardingMultiset<E> 
 	protected SortedMultiset<E> standardSubMultiset(E lowerBound, BoundType lowerBoundType, E upperBound,
 			BoundType upperBoundType) {
 		return tailMultiset(lowerBound, lowerBoundType).headMultiset(upperBound, upperBoundType);
+	}
+
+	@Override
+	public SortedMultiset<E> subMultiset(E lowerBound, BoundType lowerBoundType, E upperBound,
+			BoundType upperBoundType) {
+		return delegate().subMultiset(lowerBound, lowerBoundType, upperBound, upperBoundType);
 	}
 
 	@Override

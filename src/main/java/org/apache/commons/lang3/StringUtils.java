@@ -31,9 +31,9 @@ import java.util.StringJoiner;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
-import net.lax1dude.eaglercraft.v1_8.HString;
-
 import org.apache.commons.lang3.function.ToBooleanBiFunction;
+
+import net.lax1dude.eaglercraft.v1_8.HString;
 
 /**
  * <p>

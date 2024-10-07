@@ -43,9 +43,6 @@ public abstract class ForwardingDeque<E> extends ForwardingQueue<E> implements D
 	}
 
 	@Override
-	protected abstract Deque<E> delegate();
-
-	@Override
 	public void addFirst(E e) {
 		delegate().addFirst(e);
 	}
@@ -54,6 +51,9 @@ public abstract class ForwardingDeque<E> extends ForwardingQueue<E> implements D
 	public void addLast(E e) {
 		delegate().addLast(e);
 	}
+
+	@Override
+	protected abstract Deque<E> delegate();
 
 	@Override
 	public Iterator<E> descendingIterator() {
@@ -116,13 +116,13 @@ public abstract class ForwardingDeque<E> extends ForwardingQueue<E> implements D
 	}
 
 	@Override
-	public E removeLast() {
-		return delegate().removeLast();
+	public boolean removeFirstOccurrence(Object o) {
+		return delegate().removeFirstOccurrence(o);
 	}
 
 	@Override
-	public boolean removeFirstOccurrence(Object o) {
-		return delegate().removeFirstOccurrence(o);
+	public E removeLast() {
+		return delegate().removeLast();
 	}
 
 	@Override

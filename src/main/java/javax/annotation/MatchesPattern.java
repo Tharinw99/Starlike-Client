@@ -20,11 +20,6 @@ import javax.annotation.meta.When;
 @TypeQualifier(applicableTo = String.class)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MatchesPattern {
-	@RegEx
-	String value();
-
-	int flags() default 0;
-
 	static class Checker implements TypeQualifierValidator<MatchesPattern> {
 		public When forConstantValue(MatchesPattern annotation, Object value) {
 			Pattern p = Pattern.compile(annotation.value(), annotation.flags());
@@ -34,4 +29,9 @@ public @interface MatchesPattern {
 		}
 
 	}
+
+	int flags() default 0;
+
+	@RegEx
+	String value();
 }

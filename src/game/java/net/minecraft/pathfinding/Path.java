@@ -1,34 +1,37 @@
 package net.minecraft.pathfinding;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class Path {
-	/**+
-	 * Contains the points in this path
+	/**
+	 * + Contains the points in this path
 	 */
 	private PathPoint[] pathPoints = new PathPoint[1024];
 	private int count;
 
-	/**+
-	 * Adds a point to the path
+	/**
+	 * + Adds a point to the path
 	 */
 	public PathPoint addPoint(PathPoint point) {
 		if (point.index >= 0) {
@@ -47,15 +50,29 @@ public class Path {
 		}
 	}
 
-	/**+
-	 * Clears the path
+	/**
+	 * + Changes the provided point's distance to target
+	 */
+	public void changeDistance(PathPoint parPathPoint, float parFloat1) {
+		float f = parPathPoint.distanceToTarget;
+		parPathPoint.distanceToTarget = parFloat1;
+		if (parFloat1 < f) {
+			this.sortBack(parPathPoint.index);
+		} else {
+			this.sortForward(parPathPoint.index);
+		}
+
+	}
+
+	/**
+	 * + Clears the path
 	 */
 	public void clearPath() {
 		this.count = 0;
 	}
 
-	/**+
-	 * Returns and removes the first point in the path
+	/**
+	 * + Returns and removes the first point in the path
 	 */
 	public PathPoint dequeue() {
 		PathPoint pathpoint = this.pathPoints[0];
@@ -69,22 +86,15 @@ public class Path {
 		return pathpoint;
 	}
 
-	/**+
-	 * Changes the provided point's distance to target
+	/**
+	 * + Returns true if this path contains no points
 	 */
-	public void changeDistance(PathPoint parPathPoint, float parFloat1) {
-		float f = parPathPoint.distanceToTarget;
-		parPathPoint.distanceToTarget = parFloat1;
-		if (parFloat1 < f) {
-			this.sortBack(parPathPoint.index);
-		} else {
-			this.sortForward(parPathPoint.index);
-		}
-
+	public boolean isPathEmpty() {
+		return this.count == 0;
 	}
 
-	/**+
-	 * Sorts a point to the left
+	/**
+	 * + Sorts a point to the left
 	 */
 	private void sortBack(int parInt1) {
 		PathPoint pathpoint = this.pathPoints[parInt1];
@@ -105,8 +115,8 @@ public class Path {
 		pathpoint.index = parInt1;
 	}
 
-	/**+
-	 * Sorts a point to the right
+	/**
+	 * + Sorts a point to the right
 	 */
 	private void sortForward(int parInt1) {
 		PathPoint pathpoint = this.pathPoints[parInt1];
@@ -152,12 +162,5 @@ public class Path {
 
 		this.pathPoints[parInt1] = pathpoint;
 		pathpoint.index = parInt1;
-	}
-
-	/**+
-	 * Returns true if this path contains no points
-	 */
-	public boolean isPathEmpty() {
-		return this.count == 0;
 	}
 }

@@ -1,6 +1,6 @@
 package net.lax1dude.eaglercraft.v1_8.opengl.ext.dynamiclights;
 
-import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL.*;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniformMatrix4fv;
 
 import net.lax1dude.eaglercraft.v1_8.internal.IProgramGL;
 import net.lax1dude.eaglercraft.v1_8.internal.buffer.FloatBuffer;
@@ -13,21 +13,20 @@ import net.minecraft.client.renderer.GLAllocation;
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class DynamicLightsPipelineCompiler implements IExtPipelineCompiler {
-
-	static FloatBuffer matrixCopyBuffer = null;
 
 	private static class PipelineInstance {
 
@@ -43,26 +42,11 @@ public class DynamicLightsPipelineCompiler implements IExtPipelineCompiler {
 
 	}
 
-	@Override
-	public String[] getShaderSource(int stateCoreBits, int stateExtBits, Object[] userPointer) {
-		if(matrixCopyBuffer == null) {
-			matrixCopyBuffer = GLAllocation.createDirectFloatBuffer(16);
-		}
-		userPointer[0] = new PipelineInstance(stateCoreBits, stateExtBits);
-		return new String[] {
-			ShaderSource.getSourceFor(ShaderSource.core_dynamiclights_vsh),
-			ShaderSource.getSourceFor(ShaderSource.core_dynamiclights_fsh)
-		};
-	}
+	static FloatBuffer matrixCopyBuffer = null;
 
 	@Override
-	public int getExtensionStatesCount() {
-		return 0;
-	}
+	public void destroyPipeline(IProgramGL shaderProgram, int stateCoreBits, int stateExtBits, Object[] userPointer) {
 
-	@Override
-	public int getCurrentExtensionStateBits(int stateCoreBits) {
-		return 0;
 	}
 
 	@Override
@@ -71,20 +55,40 @@ public class DynamicLightsPipelineCompiler implements IExtPipelineCompiler {
 	}
 
 	@Override
+	public int getCurrentExtensionStateBits(int stateCoreBits) {
+		return 0;
+	}
+
+	@Override
+	public int getExtensionStatesCount() {
+		return 0;
+	}
+
+	@Override
+	public String[] getShaderSource(int stateCoreBits, int stateExtBits, Object[] userPointer) {
+		if (matrixCopyBuffer == null) {
+			matrixCopyBuffer = GLAllocation.createDirectFloatBuffer(16);
+		}
+		userPointer[0] = new PipelineInstance(stateCoreBits, stateExtBits);
+		return new String[] { ShaderSource.getSourceFor(ShaderSource.core_dynamiclights_vsh),
+				ShaderSource.getSourceFor(ShaderSource.core_dynamiclights_fsh) };
+	}
+
+	@Override
 	public void initializeNewShader(IProgramGL compiledProg, int stateCoreBits, int stateExtBits,
 			Object[] userPointer) {
 		DynamicLightsExtPipelineShader newShader = new DynamicLightsExtPipelineShader(compiledProg, stateCoreBits);
-		((PipelineInstance)userPointer[0]).shader = newShader;
+		((PipelineInstance) userPointer[0]).shader = newShader;
 		newShader.loadUniforms();
 	}
 
 	@Override
 	public void updatePipeline(IProgramGL compiledProg, int stateCoreBits, int stateExtBits, Object[] userPointer) {
-		if((stateCoreBits & FixedFunctionState.STATE_ENABLE_LIGHTMAP) != 0) {
-			DynamicLightsExtPipelineShader.Uniforms uniforms = ((PipelineInstance)userPointer[0]).shader.uniforms;
-			if(uniforms.u_inverseViewMatrix4f != null) {
+		if ((stateCoreBits & FixedFunctionState.STATE_ENABLE_LIGHTMAP) != 0) {
+			DynamicLightsExtPipelineShader.Uniforms uniforms = ((PipelineInstance) userPointer[0]).shader.uniforms;
+			if (uniforms.u_inverseViewMatrix4f != null) {
 				int serial = DynamicLightsStateManager.inverseViewMatrixSerial;
-				if(uniforms.inverseViewMatrixSerial != serial) {
+				if (uniforms.inverseViewMatrixSerial != serial) {
 					uniforms.inverseViewMatrixSerial = serial;
 					FloatBuffer buf = matrixCopyBuffer;
 					buf.clear();
@@ -94,11 +98,6 @@ public class DynamicLightsPipelineCompiler implements IExtPipelineCompiler {
 				}
 			}
 		}
-	}
-
-	@Override
-	public void destroyPipeline(IProgramGL shaderProgram, int stateCoreBits, int stateExtBits, Object[] userPointer) {
-		
 	}
 
 }

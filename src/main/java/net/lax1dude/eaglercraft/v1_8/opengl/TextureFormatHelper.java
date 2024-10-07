@@ -1,19 +1,31 @@
 package net.lax1dude.eaglercraft.v1_8.opengl;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
-import static net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.ExtGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_FLOAT;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_LUMINANCE;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_RED;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_RGB;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_RGB8;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_RGBA;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_RGBA8;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_UNSIGNED_BYTE;
+import static net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.ExtGLEnums._GL_HALF_FLOAT;
+import static net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.ExtGLEnums._GL_R8;
+import static net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.ExtGLEnums._GL_RG;
+import static net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.ExtGLEnums._GL_RG8;
+import static net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.ExtGLEnums._GL_RGB16F;
 
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -21,7 +33,7 @@ import static net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.ExtGLEnums.*;
 public class TextureFormatHelper {
 
 	public static int getFormatFromInternal(int internalFormat) {
-		switch(internalFormat) {
+		switch (internalFormat) {
 		case _GL_R8:
 		case 0x822D: // GL_R16F
 		case 0x822E: // GL_R32F
@@ -44,7 +56,7 @@ public class TextureFormatHelper {
 	}
 
 	public static int getTypeFromInternal(int internalFormat) {
-		switch(internalFormat) {
+		switch (internalFormat) {
 		case _GL_R8:
 		case _GL_RG8:
 		case GL_RGB8:
@@ -66,7 +78,7 @@ public class TextureFormatHelper {
 	}
 
 	public static int trivializeInternalFormatToGLES20(int internalFormat) {
-		switch(internalFormat) {
+		switch (internalFormat) {
 		case _GL_R8:
 			return GL_LUMINANCE;
 		case GL_RGB8:

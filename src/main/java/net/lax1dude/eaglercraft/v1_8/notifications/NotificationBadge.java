@@ -11,20 +11,21 @@ import net.minecraft.util.IChatComponent;
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class NotificationBadge {
-	
+
 	public final ServerNotificationManager mgr;
 	public final EaglercraftUUID badgeUUID;
 	public final IChatComponent bodyComponent;
@@ -53,7 +54,7 @@ public class NotificationBadge {
 	protected long hideAtMillis = -1l;
 	protected boolean unreadFlag = true;
 	protected boolean unreadFlagRender = true;
-	
+
 	protected NotificationBadge(ServerNotificationManager mgr, EaglercraftUUID badgeUUID, IChatComponent bodyComponent,
 			IChatComponent titleComponent, IChatComponent sourceComponent, long clientTimestamp, long serverTimestamp,
 			boolean silent, EnumBadgePriority priority, NotificationIcon mainIcon, NotificationIcon titleIcon,
@@ -77,29 +78,41 @@ public class NotificationBadge {
 		this.titleTxtColor = titleTxtColor;
 		this.sourceTxtColor = sourceTxtColor;
 	}
-	
-	protected void incrIconRefcounts() {
-		if(mainIcon != null) {
-			mainIcon.retain();
-		}
-		if(titleIcon != null) {
-			titleIcon.retain();
-		}
-	}
-	
+
 	protected void decrIconRefcounts() {
 		deleteGLTexture();
-		if(mainIcon != null) {
+		if (mainIcon != null) {
 			mainIcon.release();
 		}
-		if(titleIcon != null) {
+		if (titleIcon != null) {
 			titleIcon.release();
 		}
 	}
 
-	protected CachedNotifBadgeTexture getGLTexture(ServerNotificationRenderer renderer, int scaleFactor, boolean showXButton) {
+	protected void deleteGLTexture() {
+		if (currentCacheGLTexture != null) {
+			GlStateManager.deleteTexture(currentCacheGLTexture.glTexture);
+			currentCacheGLTexture = null;
+		}
+	}
+
+	public IChatComponent getBodyProfanityFilter() {
+		if (Minecraft.getMinecraft().isEnableProfanityFilter()) {
+			if (bodyComponentProfanityFilter == null && bodyComponent != null) {
+				bodyComponentProfanityFilter = ProfanityFilter.getInstance()
+						.profanityFilterChatComponent(bodyComponent);
+			}
+			return bodyComponentProfanityFilter;
+		} else {
+			return bodyComponent;
+		}
+	}
+
+	protected CachedNotifBadgeTexture getGLTexture(ServerNotificationRenderer renderer, int scaleFactor,
+			boolean showXButton) {
 		boolean profanityFilter = Minecraft.getMinecraft().isEnableProfanityFilter();
-		if(currentCacheGLTexture == null || currentCacheScaleFac != scaleFactor || currentCacheXButton != showXButton || currentCacheProfanityFilter != profanityFilter) {
+		if (currentCacheGLTexture == null || currentCacheScaleFac != scaleFactor || currentCacheXButton != showXButton
+				|| currentCacheProfanityFilter != profanityFilter) {
 			deleteGLTexture();
 			currentCacheGLTexture = renderer.renderBadge(this, scaleFactor, showXButton);
 			currentCacheScaleFac = scaleFactor;
@@ -109,63 +122,56 @@ public class NotificationBadge {
 		return currentCacheGLTexture;
 	}
 
-	protected void deleteGLTexture() {
-		if(currentCacheGLTexture != null) {
-			GlStateManager.deleteTexture(currentCacheGLTexture.glTexture);
-			currentCacheGLTexture = null;
+	public IChatComponent getSourceProfanityFilter() {
+		if (Minecraft.getMinecraft().isEnableProfanityFilter()) {
+			if (sourceComponentProfanityFilter == null && sourceComponent != null) {
+				sourceComponentProfanityFilter = ProfanityFilter.getInstance()
+						.profanityFilterChatComponent(sourceComponent);
+			}
+			return sourceComponentProfanityFilter;
+		} else {
+			return sourceComponent;
+		}
+	}
+
+	public IChatComponent getTitleProfanityFilter() {
+		if (Minecraft.getMinecraft().isEnableProfanityFilter()) {
+			if (titleComponentProfanityFilter == null && titleComponent != null) {
+				titleComponentProfanityFilter = ProfanityFilter.getInstance()
+						.profanityFilterChatComponent(titleComponent);
+			}
+			return titleComponentProfanityFilter;
+		} else {
+			return titleComponent;
 		}
 	}
 
 	public void hideNotif() {
-		if(hideAtMillis == -1l) {
+		if (hideAtMillis == -1l) {
 			markRead();
 			unreadFlagRender = false;
 			hideAtMillis = EagRuntime.steadyTimeMillis();
 		}
 	}
 
-	public void removeNotif() {
-		mgr.removeNotifFromActiveList(badgeUUID);
+	protected void incrIconRefcounts() {
+		if (mainIcon != null) {
+			mainIcon.retain();
+		}
+		if (titleIcon != null) {
+			titleIcon.retain();
+		}
 	}
 
 	public void markRead() {
-		if(unreadFlag) {
+		if (unreadFlag) {
 			unreadFlag = false;
 			--mgr.unreadCounter;
 		}
 	}
 
-	public IChatComponent getBodyProfanityFilter() {
-		if(Minecraft.getMinecraft().isEnableProfanityFilter()) {
-			if(bodyComponentProfanityFilter == null && bodyComponent != null) {
-				bodyComponentProfanityFilter = ProfanityFilter.getInstance().profanityFilterChatComponent(bodyComponent);
-			}
-			return bodyComponentProfanityFilter;
-		}else {
-			return bodyComponent;
-		}
-	}
-
-	public IChatComponent getTitleProfanityFilter() {
-		if(Minecraft.getMinecraft().isEnableProfanityFilter()) {
-			if(titleComponentProfanityFilter == null && titleComponent != null) {
-				titleComponentProfanityFilter = ProfanityFilter.getInstance().profanityFilterChatComponent(titleComponent);
-			}
-			return titleComponentProfanityFilter;
-		}else {
-			return titleComponent;
-		}
-	}
-
-	public IChatComponent getSourceProfanityFilter() {
-		if(Minecraft.getMinecraft().isEnableProfanityFilter()) {
-			if(sourceComponentProfanityFilter == null && sourceComponent != null) {
-				sourceComponentProfanityFilter = ProfanityFilter.getInstance().profanityFilterChatComponent(sourceComponent);
-			}
-			return sourceComponentProfanityFilter;
-		}else {
-			return sourceComponent;
-		}
+	public void removeNotif() {
+		mgr.removeNotifFromActiveList(badgeUUID);
 	}
 
 }

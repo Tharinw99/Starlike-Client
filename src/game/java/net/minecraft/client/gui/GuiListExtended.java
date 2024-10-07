@@ -2,43 +2,42 @@ package net.minecraft.client.gui;
 
 import net.minecraft.client.Minecraft;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public abstract class GuiListExtended extends GuiSlot {
+	public interface IGuiListEntry {
+		void drawEntry(int var1, int var2, int var3, int var4, int var5, int var6, int var7, boolean var8);
+
+		boolean mousePressed(int var1, int var2, int var3, int var4, int var5, int var6);
+
+		void mouseReleased(int var1, int var2, int var3, int var4, int var5, int var6);
+
+		void setSelected(int var1, int var2, int var3);
+	}
+
 	public GuiListExtended(Minecraft mcIn, int widthIn, int heightIn, int topIn, int bottomIn, int slotHeightIn) {
 		super(mcIn, widthIn, heightIn, topIn, bottomIn, slotHeightIn);
-	}
-
-	/**+
-	 * The element in the slot that was clicked, boolean for whether
-	 * it was double clicked or not
-	 */
-	protected void elementClicked(int slotIndex, boolean isDoubleClick, int mouseX, int mouseY) {
-	}
-
-	/**+
-	 * Returns true if the element passed in is currently selected
-	 */
-	protected boolean isSelected(int slotIndex) {
-		return false;
 	}
 
 	protected void drawBackground() {
@@ -49,8 +48,24 @@ public abstract class GuiListExtended extends GuiSlot {
 				parInt6, this.getSlotIndexFromScreenCoords(parInt5, parInt6) == entryID);
 	}
 
+	/**
+	 * + The element in the slot that was clicked, boolean for whether it was double
+	 * clicked or not
+	 */
+	protected void elementClicked(int slotIndex, boolean isDoubleClick, int mouseX, int mouseY) {
+	}
+
 	protected void func_178040_a(int parInt1, int parInt2, int parInt3) {
 		this.getListEntry(parInt1).setSelected(parInt1, parInt2, parInt3);
+	}
+
+	public abstract GuiListExtended.IGuiListEntry getListEntry(int var1);
+
+	/**
+	 * + Returns true if the element passed in is currently selected
+	 */
+	protected boolean isSelected(int slotIndex) {
+		return false;
 	}
 
 	public boolean mouseClicked(int mouseX, int mouseY, int mouseEvent) {
@@ -82,17 +97,5 @@ public abstract class GuiListExtended extends GuiSlot {
 
 		this.setEnabled(true);
 		return false;
-	}
-
-	public abstract GuiListExtended.IGuiListEntry getListEntry(int var1);
-
-	public interface IGuiListEntry {
-		void setSelected(int var1, int var2, int var3);
-
-		void drawEntry(int var1, int var2, int var3, int var4, int var5, int var6, int var7, boolean var8);
-
-		boolean mousePressed(int var1, int var2, int var3, int var4, int var5, int var6);
-
-		void mouseReleased(int var1, int var2, int var3, int var4, int var5, int var6);
 	}
 }

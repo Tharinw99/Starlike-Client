@@ -53,11 +53,70 @@ public final class LittleEndianDataInputStream extends FilterInputStream impleme
 	}
 
 	/**
-	 * This method will throw an {@link UnsupportedOperationException}.
+	 * Reads a byte from the input stream checking that the end of file (EOF) has
+	 * not been encountered.
+	 * 
+	 * @return byte read from input
+	 * @throws IOException  if an error is encountered while reading
+	 * @throws EOFException if the end of file (EOF) is encountered.
+	 */
+	private byte readAndCheckByte() throws IOException, EOFException {
+		int b1 = in.read();
+
+		if (-1 == b1) {
+			throw new EOFException();
+		}
+
+		return (byte) b1;
+	}
+
+	@Override
+	public boolean readBoolean() throws IOException {
+		return readUnsignedByte() != 0;
+	}
+
+	@Override
+	public byte readByte() throws IOException {
+		return (byte) readUnsignedByte();
+	}
+
+	/**
+	 * Reads a char as specified by {@link DataInputStream#readChar()}, except using
+	 * little-endian byte order.
+	 *
+	 * @return the next two bytes of the input stream, interpreted as a {@code char}
+	 *         in little-endian byte order
+	 * @throws IOException if an I/O error occurs
 	 */
 	@Override
-	public String readLine() {
-		throw new UnsupportedOperationException("readLine is not supported");
+	public char readChar() throws IOException {
+		return (char) readUnsignedShort();
+	}
+
+	/**
+	 * Reads a {@code double} as specified by {@link DataInputStream#readDouble()},
+	 * except using little-endian byte order.
+	 *
+	 * @return the next eight bytes of the input stream, interpreted as a
+	 *         {@code double} in little-endian byte order
+	 * @throws IOException if an I/O error occurs
+	 */
+	@Override
+	public double readDouble() throws IOException {
+		return Double.longBitsToDouble(readLong());
+	}
+
+	/**
+	 * Reads a {@code float} as specified by {@link DataInputStream#readFloat()},
+	 * except using little-endian byte order.
+	 *
+	 * @return the next four bytes of the input stream, interpreted as a
+	 *         {@code float} in little-endian byte order
+	 * @throws IOException if an I/O error occurs
+	 */
+	@Override
+	public float readFloat() throws IOException {
+		return Float.intBitsToFloat(readInt());
 	}
 
 	@Override
@@ -70,9 +129,65 @@ public final class LittleEndianDataInputStream extends FilterInputStream impleme
 		ByteStreams.readFully(this, b, off, len);
 	}
 
+	/**
+	 * Reads an integer as specified by {@link DataInputStream#readInt()}, except
+	 * using little-endian byte order.
+	 *
+	 * @return the next four bytes of the input stream, interpreted as an
+	 *         {@code int} in little-endian byte order
+	 * @throws IOException if an I/O error occurs
+	 */
 	@Override
-	public int skipBytes(int n) throws IOException {
-		return (int) in.skip(n);
+	public int readInt() throws IOException {
+		byte b1 = readAndCheckByte();
+		byte b2 = readAndCheckByte();
+		byte b3 = readAndCheckByte();
+		byte b4 = readAndCheckByte();
+
+		return Ints.fromBytes(b4, b3, b2, b1);
+	}
+
+	/**
+	 * This method will throw an {@link UnsupportedOperationException}.
+	 */
+	@Override
+	public String readLine() {
+		throw new UnsupportedOperationException("readLine is not supported");
+	}
+
+	/**
+	 * Reads a {@code long} as specified by {@link DataInputStream#readLong()},
+	 * except using little-endian byte order.
+	 *
+	 * @return the next eight bytes of the input stream, interpreted as a
+	 *         {@code long} in little-endian byte order
+	 * @throws IOException if an I/O error occurs
+	 */
+	@Override
+	public long readLong() throws IOException {
+		byte b1 = readAndCheckByte();
+		byte b2 = readAndCheckByte();
+		byte b3 = readAndCheckByte();
+		byte b4 = readAndCheckByte();
+		byte b5 = readAndCheckByte();
+		byte b6 = readAndCheckByte();
+		byte b7 = readAndCheckByte();
+		byte b8 = readAndCheckByte();
+
+		return Longs.fromBytes(b8, b7, b6, b5, b4, b3, b2, b1);
+	}
+
+	/**
+	 * Reads a {@code short} as specified by {@link DataInputStream#readShort()},
+	 * except using little-endian byte order.
+	 *
+	 * @return the next two bytes of the input stream, interpreted as a
+	 *         {@code short} in little-endian byte order.
+	 * @throws IOException if an I/O error occurs.
+	 */
+	@Override
+	public short readShort() throws IOException {
+		return (short) readUnsignedShort();
 	}
 
 	@Override
@@ -102,129 +217,14 @@ public final class LittleEndianDataInputStream extends FilterInputStream impleme
 		return Ints.fromBytes((byte) 0, (byte) 0, b2, b1);
 	}
 
-	/**
-	 * Reads an integer as specified by {@link DataInputStream#readInt()}, except
-	 * using little-endian byte order.
-	 *
-	 * @return the next four bytes of the input stream, interpreted as an
-	 *         {@code int} in little-endian byte order
-	 * @throws IOException if an I/O error occurs
-	 */
-	@Override
-	public int readInt() throws IOException {
-		byte b1 = readAndCheckByte();
-		byte b2 = readAndCheckByte();
-		byte b3 = readAndCheckByte();
-		byte b4 = readAndCheckByte();
-
-		return Ints.fromBytes(b4, b3, b2, b1);
-	}
-
-	/**
-	 * Reads a {@code long} as specified by {@link DataInputStream#readLong()},
-	 * except using little-endian byte order.
-	 *
-	 * @return the next eight bytes of the input stream, interpreted as a
-	 *         {@code long} in little-endian byte order
-	 * @throws IOException if an I/O error occurs
-	 */
-	@Override
-	public long readLong() throws IOException {
-		byte b1 = readAndCheckByte();
-		byte b2 = readAndCheckByte();
-		byte b3 = readAndCheckByte();
-		byte b4 = readAndCheckByte();
-		byte b5 = readAndCheckByte();
-		byte b6 = readAndCheckByte();
-		byte b7 = readAndCheckByte();
-		byte b8 = readAndCheckByte();
-
-		return Longs.fromBytes(b8, b7, b6, b5, b4, b3, b2, b1);
-	}
-
-	/**
-	 * Reads a {@code float} as specified by {@link DataInputStream#readFloat()},
-	 * except using little-endian byte order.
-	 *
-	 * @return the next four bytes of the input stream, interpreted as a
-	 *         {@code float} in little-endian byte order
-	 * @throws IOException if an I/O error occurs
-	 */
-	@Override
-	public float readFloat() throws IOException {
-		return Float.intBitsToFloat(readInt());
-	}
-
-	/**
-	 * Reads a {@code double} as specified by {@link DataInputStream#readDouble()},
-	 * except using little-endian byte order.
-	 *
-	 * @return the next eight bytes of the input stream, interpreted as a
-	 *         {@code double} in little-endian byte order
-	 * @throws IOException if an I/O error occurs
-	 */
-	@Override
-	public double readDouble() throws IOException {
-		return Double.longBitsToDouble(readLong());
-	}
-
 	@Override
 	public String readUTF() throws IOException {
 		return new DataInputStream(in).readUTF();
 	}
 
-	/**
-	 * Reads a {@code short} as specified by {@link DataInputStream#readShort()},
-	 * except using little-endian byte order.
-	 *
-	 * @return the next two bytes of the input stream, interpreted as a
-	 *         {@code short} in little-endian byte order.
-	 * @throws IOException if an I/O error occurs.
-	 */
 	@Override
-	public short readShort() throws IOException {
-		return (short) readUnsignedShort();
-	}
-
-	/**
-	 * Reads a char as specified by {@link DataInputStream#readChar()}, except using
-	 * little-endian byte order.
-	 *
-	 * @return the next two bytes of the input stream, interpreted as a {@code char}
-	 *         in little-endian byte order
-	 * @throws IOException if an I/O error occurs
-	 */
-	@Override
-	public char readChar() throws IOException {
-		return (char) readUnsignedShort();
-	}
-
-	@Override
-	public byte readByte() throws IOException {
-		return (byte) readUnsignedByte();
-	}
-
-	@Override
-	public boolean readBoolean() throws IOException {
-		return readUnsignedByte() != 0;
-	}
-
-	/**
-	 * Reads a byte from the input stream checking that the end of file (EOF) has
-	 * not been encountered.
-	 * 
-	 * @return byte read from input
-	 * @throws IOException  if an error is encountered while reading
-	 * @throws EOFException if the end of file (EOF) is encountered.
-	 */
-	private byte readAndCheckByte() throws IOException, EOFException {
-		int b1 = in.read();
-
-		if (-1 == b1) {
-			throw new EOFException();
-		}
-
-		return (byte) b1;
+	public int skipBytes(int n) throws IOException {
+		return (int) in.skip(n);
 	}
 
 }

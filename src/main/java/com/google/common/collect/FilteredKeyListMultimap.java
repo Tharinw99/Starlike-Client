@@ -35,11 +35,6 @@ final class FilteredKeyListMultimap<K, V> extends FilteredKeyMultimap<K, V> impl
 	}
 
 	@Override
-	public ListMultimap<K, V> unfiltered() {
-		return (ListMultimap<K, V>) super.unfiltered();
-	}
-
-	@Override
 	public List<V> get(K key) {
 		return (List<V>) super.get(key);
 	}
@@ -52,5 +47,10 @@ final class FilteredKeyListMultimap<K, V> extends FilteredKeyMultimap<K, V> impl
 	@Override
 	public List<V> replaceValues(K key, Iterable<? extends V> values) {
 		return (List<V>) super.replaceValues(key, values);
+	}
+
+	@Override
+	public ListMultimap<K, V> unfiltered() {
+		return (ListMultimap<K, V>) super.unfiltered();
 	}
 }

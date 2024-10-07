@@ -34,6 +34,23 @@ import com.google.common.annotations.GwtCompatible;
 @GwtCompatible(serializable = true, emulated = true)
 @SuppressWarnings("serial") // we're overriding default serialization
 final class ImmutableEnumMap<K extends Enum<K>, V> extends ImmutableMap<K, V> {
+	/*
+	 * This class is used to serialize ImmutableEnumSet instances.
+	 */
+	private static class EnumSerializedForm<K extends Enum<K>, V> implements Serializable {
+		private static final long serialVersionUID = 0;
+
+		final EnumMap<K, V> delegate;
+
+		EnumSerializedForm(EnumMap<K, V> delegate) {
+			this.delegate = delegate;
+		}
+
+		Object readResolve() {
+			return new ImmutableEnumMap<K, V>(delegate);
+		}
+	}
+
 	static <K extends Enum<K>, V> ImmutableMap<K, V> asImmutable(EnumMap<K, V> map) {
 		switch (map.size()) {
 		case 0:
@@ -55,54 +72,13 @@ final class ImmutableEnumMap<K extends Enum<K>, V> extends ImmutableMap<K, V> {
 	}
 
 	@Override
-	ImmutableSet<K> createKeySet() {
-		return new ImmutableSet<K>() {
-
-			@Override
-			public boolean contains(Object object) {
-				return delegate.containsKey(object);
-			}
-
-			@Override
-			public int size() {
-				return ImmutableEnumMap.this.size();
-			}
-
-			@Override
-			public UnmodifiableIterator<K> iterator() {
-				return Iterators.unmodifiableIterator(delegate.keySet().iterator());
-			}
-
-			@Override
-			boolean isPartialView() {
-				return true;
-			}
-		};
-	}
-
-	@Override
-	public int size() {
-		return delegate.size();
-	}
-
-	@Override
 	public boolean containsKey(@Nullable Object key) {
 		return delegate.containsKey(key);
 	}
 
 	@Override
-	public V get(Object key) {
-		return delegate.get(key);
-	}
-
-	@Override
 	ImmutableSet<Entry<K, V>> createEntrySet() {
 		return new ImmutableMapEntrySet<K, V>() {
-
-			@Override
-			ImmutableMap<K, V> map() {
-				return ImmutableEnumMap.this;
-			}
 
 			@Override
 			public UnmodifiableIterator<Entry<K, V>> iterator() {
@@ -121,7 +97,43 @@ final class ImmutableEnumMap<K extends Enum<K>, V> extends ImmutableMap<K, V> {
 					}
 				};
 			}
+
+			@Override
+			ImmutableMap<K, V> map() {
+				return ImmutableEnumMap.this;
+			}
 		};
+	}
+
+	@Override
+	ImmutableSet<K> createKeySet() {
+		return new ImmutableSet<K>() {
+
+			@Override
+			public boolean contains(Object object) {
+				return delegate.containsKey(object);
+			}
+
+			@Override
+			boolean isPartialView() {
+				return true;
+			}
+
+			@Override
+			public UnmodifiableIterator<K> iterator() {
+				return Iterators.unmodifiableIterator(delegate.keySet().iterator());
+			}
+
+			@Override
+			public int size() {
+				return ImmutableEnumMap.this.size();
+			}
+		};
+	}
+
+	@Override
+	public V get(Object key) {
+		return delegate.get(key);
 	}
 
 	@Override
@@ -129,26 +141,14 @@ final class ImmutableEnumMap<K extends Enum<K>, V> extends ImmutableMap<K, V> {
 		return false;
 	}
 
+	@Override
+	public int size() {
+		return delegate.size();
+	}
+
 	// All callers of the constructor are restricted to <K extends Enum<K>>.
 	@Override
 	Object writeReplace() {
 		return new EnumSerializedForm<K, V>(delegate);
-	}
-
-	/*
-	 * This class is used to serialize ImmutableEnumSet instances.
-	 */
-	private static class EnumSerializedForm<K extends Enum<K>, V> implements Serializable {
-		final EnumMap<K, V> delegate;
-
-		EnumSerializedForm(EnumMap<K, V> delegate) {
-			this.delegate = delegate;
-		}
-
-		Object readResolve() {
-			return new ImmutableEnumMap<K, V>(delegate);
-		}
-
-		private static final long serialVersionUID = 0;
 	}
 }

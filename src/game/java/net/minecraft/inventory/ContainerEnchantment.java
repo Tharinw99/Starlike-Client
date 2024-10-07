@@ -1,6 +1,7 @@
 package net.minecraft.inventory;
 
 import java.util.List;
+
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -14,22 +15,25 @@ import net.minecraft.stats.StatList;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -65,12 +69,12 @@ public class ContainerEnchantment extends Container {
 		this.position = pos;
 		this.xpSeed = playerInv.player.getXPSeed();
 		this.addSlotToContainer(new Slot(this.tableInventory, 0, 15, 47) {
-			public boolean isItemValid(ItemStack var1) {
-				return true;
-			}
-
 			public int getSlotStackLimit() {
 				return 1;
+			}
+
+			public boolean isItemValid(ItemStack var1) {
+				return true;
 			}
 		});
 		this.addSlotToContainer(new Slot(this.tableInventory, 1, 35, 47) {
@@ -92,20 +96,14 @@ public class ContainerEnchantment extends Container {
 
 	}
 
-	public void onCraftGuiOpened(ICrafting icrafting) {
-		super.onCraftGuiOpened(icrafting);
-		icrafting.sendProgressBarUpdate(this, 0, this.enchantLevels[0]);
-		icrafting.sendProgressBarUpdate(this, 1, this.enchantLevels[1]);
-		icrafting.sendProgressBarUpdate(this, 2, this.enchantLevels[2]);
-		icrafting.sendProgressBarUpdate(this, 3, this.xpSeed & -16);
-		icrafting.sendProgressBarUpdate(this, 4, this.field_178151_h[0]);
-		icrafting.sendProgressBarUpdate(this, 5, this.field_178151_h[1]);
-		icrafting.sendProgressBarUpdate(this, 6, this.field_178151_h[2]);
+	public boolean canInteractWith(EntityPlayer entityplayer) {
+		return this.worldPointer.getBlockState(this.position).getBlock() != Blocks.enchanting_table ? false
+				: entityplayer.getDistanceSq((double) this.position.getX() + 0.5D, (double) this.position.getY() + 0.5D,
+						(double) this.position.getZ() + 0.5D) <= 64.0D;
 	}
 
-	/**+
-	 * Looks for changes made in the container, sends them to every
-	 * listener.
+	/**
+	 * + Looks for changes made in the container, sends them to every listener.
 	 */
 	public void detectAndSendChanges() {
 		super.detectAndSendChanges();
@@ -123,21 +121,101 @@ public class ContainerEnchantment extends Container {
 
 	}
 
-	public void updateProgressBar(int i, int j) {
-		if (i >= 0 && i <= 2) {
-			this.enchantLevels[i] = j;
-		} else if (i == 3) {
-			this.xpSeed = j;
-		} else if (i >= 4 && i <= 6) {
-			this.field_178151_h[i - 4] = j;
-		} else {
-			super.updateProgressBar(i, j);
-		}
+	/**
+	 * + Handles the given Button-click on the server, currently only used by
+	 * enchanting. Name is for legacy.
+	 */
+	public boolean enchantItem(EntityPlayer entityplayer, int i) {
+		ItemStack itemstack = this.tableInventory.getStackInSlot(0);
+		ItemStack itemstack1 = this.tableInventory.getStackInSlot(1);
+		int j = i + 1;
+		if ((itemstack1 == null || itemstack1.stackSize < j) && !entityplayer.capabilities.isCreativeMode) {
+			return false;
+		} else if (this.enchantLevels[i] > 0 && itemstack != null
+				&& (entityplayer.experienceLevel >= j && entityplayer.experienceLevel >= this.enchantLevels[i]
+						|| entityplayer.capabilities.isCreativeMode)) {
+			if (!this.worldPointer.isRemote) {
+				List list = this.func_178148_a(itemstack, i, this.enchantLevels[i]);
+				boolean flag = itemstack.getItem() == Items.book;
+				if (list != null) {
+					entityplayer.removeExperienceLevel(j);
+					if (flag) {
+						itemstack.setItem(Items.enchanted_book);
+					}
 
+					for (int k = 0; k < list.size(); ++k) {
+						EnchantmentData enchantmentdata = (EnchantmentData) list.get(k);
+						if (flag) {
+							Items.enchanted_book.addEnchantment(itemstack, enchantmentdata);
+						} else {
+							itemstack.addEnchantment(enchantmentdata.enchantmentobj, enchantmentdata.enchantmentLevel);
+						}
+					}
+
+					if (!entityplayer.capabilities.isCreativeMode) {
+						itemstack1.stackSize -= j;
+						if (itemstack1.stackSize <= 0) {
+							this.tableInventory.setInventorySlotContents(1, (ItemStack) null);
+						}
+					}
+
+					entityplayer.triggerAchievement(StatList.field_181739_W);
+					this.tableInventory.markDirty();
+					this.xpSeed = entityplayer.getXPSeed();
+					this.onCraftMatrixChanged(this.tableInventory);
+				}
+			}
+
+			return true;
+		} else {
+			return false;
+		}
 	}
 
-	/**+
-	 * Callback for when the crafting matrix is changed.
+	private List<EnchantmentData> func_178148_a(ItemStack stack, int parInt1, int parInt2) {
+		this.rand.setSeed((long) (this.xpSeed + parInt1));
+		List list = EnchantmentHelper.buildEnchantmentList(this.rand, stack, parInt2);
+		if (stack.getItem() == Items.book && list != null && list.size() > 1) {
+			list.remove(this.rand.nextInt(list.size()));
+		}
+
+		return list;
+	}
+
+	public int getLapisAmount() {
+		ItemStack itemstack = this.tableInventory.getStackInSlot(1);
+		return itemstack == null ? 0 : itemstack.stackSize;
+	}
+
+	/**
+	 * + Called when the container is closed.
+	 */
+	public void onContainerClosed(EntityPlayer entityplayer) {
+		super.onContainerClosed(entityplayer);
+		if (!this.worldPointer.isRemote) {
+			for (int i = 0; i < this.tableInventory.getSizeInventory(); ++i) {
+				ItemStack itemstack = this.tableInventory.removeStackFromSlot(i);
+				if (itemstack != null) {
+					entityplayer.dropPlayerItemWithRandomChoice(itemstack, false);
+				}
+			}
+
+		}
+	}
+
+	public void onCraftGuiOpened(ICrafting icrafting) {
+		super.onCraftGuiOpened(icrafting);
+		icrafting.sendProgressBarUpdate(this, 0, this.enchantLevels[0]);
+		icrafting.sendProgressBarUpdate(this, 1, this.enchantLevels[1]);
+		icrafting.sendProgressBarUpdate(this, 2, this.enchantLevels[2]);
+		icrafting.sendProgressBarUpdate(this, 3, this.xpSeed & -16);
+		icrafting.sendProgressBarUpdate(this, 4, this.field_178151_h[0]);
+		icrafting.sendProgressBarUpdate(this, 5, this.field_178151_h[1]);
+		icrafting.sendProgressBarUpdate(this, 6, this.field_178151_h[2]);
+	}
+
+	/**
+	 * + Callback for when the crafting matrix is changed.
 	 */
 	public void onCraftMatrixChanged(IInventory iinventory) {
 		if (iinventory == this.tableInventory) {
@@ -220,96 +298,8 @@ public class ContainerEnchantment extends Container {
 
 	}
 
-	/**+
-	 * Handles the given Button-click on the server, currently only
-	 * used by enchanting. Name is for legacy.
-	 */
-	public boolean enchantItem(EntityPlayer entityplayer, int i) {
-		ItemStack itemstack = this.tableInventory.getStackInSlot(0);
-		ItemStack itemstack1 = this.tableInventory.getStackInSlot(1);
-		int j = i + 1;
-		if ((itemstack1 == null || itemstack1.stackSize < j) && !entityplayer.capabilities.isCreativeMode) {
-			return false;
-		} else if (this.enchantLevels[i] > 0 && itemstack != null
-				&& (entityplayer.experienceLevel >= j && entityplayer.experienceLevel >= this.enchantLevels[i]
-						|| entityplayer.capabilities.isCreativeMode)) {
-			if (!this.worldPointer.isRemote) {
-				List list = this.func_178148_a(itemstack, i, this.enchantLevels[i]);
-				boolean flag = itemstack.getItem() == Items.book;
-				if (list != null) {
-					entityplayer.removeExperienceLevel(j);
-					if (flag) {
-						itemstack.setItem(Items.enchanted_book);
-					}
-
-					for (int k = 0; k < list.size(); ++k) {
-						EnchantmentData enchantmentdata = (EnchantmentData) list.get(k);
-						if (flag) {
-							Items.enchanted_book.addEnchantment(itemstack, enchantmentdata);
-						} else {
-							itemstack.addEnchantment(enchantmentdata.enchantmentobj, enchantmentdata.enchantmentLevel);
-						}
-					}
-
-					if (!entityplayer.capabilities.isCreativeMode) {
-						itemstack1.stackSize -= j;
-						if (itemstack1.stackSize <= 0) {
-							this.tableInventory.setInventorySlotContents(1, (ItemStack) null);
-						}
-					}
-
-					entityplayer.triggerAchievement(StatList.field_181739_W);
-					this.tableInventory.markDirty();
-					this.xpSeed = entityplayer.getXPSeed();
-					this.onCraftMatrixChanged(this.tableInventory);
-				}
-			}
-
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	private List<EnchantmentData> func_178148_a(ItemStack stack, int parInt1, int parInt2) {
-		this.rand.setSeed((long) (this.xpSeed + parInt1));
-		List list = EnchantmentHelper.buildEnchantmentList(this.rand, stack, parInt2);
-		if (stack.getItem() == Items.book && list != null && list.size() > 1) {
-			list.remove(this.rand.nextInt(list.size()));
-		}
-
-		return list;
-	}
-
-	public int getLapisAmount() {
-		ItemStack itemstack = this.tableInventory.getStackInSlot(1);
-		return itemstack == null ? 0 : itemstack.stackSize;
-	}
-
-	/**+
-	 * Called when the container is closed.
-	 */
-	public void onContainerClosed(EntityPlayer entityplayer) {
-		super.onContainerClosed(entityplayer);
-		if (!this.worldPointer.isRemote) {
-			for (int i = 0; i < this.tableInventory.getSizeInventory(); ++i) {
-				ItemStack itemstack = this.tableInventory.removeStackFromSlot(i);
-				if (itemstack != null) {
-					entityplayer.dropPlayerItemWithRandomChoice(itemstack, false);
-				}
-			}
-
-		}
-	}
-
-	public boolean canInteractWith(EntityPlayer entityplayer) {
-		return this.worldPointer.getBlockState(this.position).getBlock() != Blocks.enchanting_table ? false
-				: entityplayer.getDistanceSq((double) this.position.getX() + 0.5D, (double) this.position.getY() + 0.5D,
-						(double) this.position.getZ() + 0.5D) <= 64.0D;
-	}
-
-	/**+
-	 * Take a stack from the specified inventory slot.
+	/**
+	 * + Take a stack from the specified inventory slot.
 	 */
 	public ItemStack transferStackInSlot(EntityPlayer entityplayer, int i) {
 		ItemStack itemstack = null;
@@ -360,5 +350,18 @@ public class ContainerEnchantment extends Container {
 		}
 
 		return itemstack;
+	}
+
+	public void updateProgressBar(int i, int j) {
+		if (i >= 0 && i <= 2) {
+			this.enchantLevels[i] = j;
+		} else if (i == 3) {
+			this.xpSeed = j;
+		} else if (i >= 4 && i <= 6) {
+			this.field_178151_h[i - 4] = j;
+		} else {
+			super.updateProgressBar(i, j);
+		}
+
 	}
 }

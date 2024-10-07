@@ -1,7 +1,6 @@
 package net.minecraft.block;
 
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
-
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockState;
@@ -15,69 +14,31 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class BlockCrops extends BlockBush implements IGrowable {
 	public static final PropertyInteger AGE = PropertyInteger.create("age", 0, 7);
-
-	protected BlockCrops() {
-		this.setDefaultState(this.blockState.getBaseState().withProperty(AGE, Integer.valueOf(0)));
-		this.setTickRandomly(true);
-		float f = 0.5F;
-		this.setBlockBounds(0.5F - f, 0.0F, 0.5F - f, 0.5F + f, 0.25F, 0.5F + f);
-		this.setCreativeTab((CreativeTabs) null);
-		this.setHardness(0.0F);
-		this.setStepSound(soundTypeGrass);
-		this.disableStats();
-	}
-
-	/**+
-	 * is the block grass, dirt or farmland
-	 */
-	protected boolean canPlaceBlockOn(Block block) {
-		return block == Blocks.farmland;
-	}
-
-	public void updateTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom random) {
-		super.updateTick(world, blockpos, iblockstate, random);
-		if (world.getLightFromNeighbors(blockpos.up()) >= 9) {
-			int i = ((Integer) iblockstate.getValue(AGE)).intValue();
-			if (i < 7) {
-				float f = getGrowthChance(this, world, blockpos);
-				if (random.nextInt((int) (25.0F / f) + 1) == 0) {
-					world.setBlockState(blockpos, iblockstate.withProperty(AGE, Integer.valueOf(i + 1)), 2);
-				}
-			}
-		}
-
-	}
-
-	public void grow(World worldIn, BlockPos pos, IBlockState state) {
-		int i = ((Integer) state.getValue(AGE)).intValue() + MathHelper.getRandomIntegerInRange(worldIn.rand, 2, 5);
-		if (i > 7) {
-			i = 7;
-		}
-
-		worldIn.setBlockState(pos, state.withProperty(AGE, Integer.valueOf(i)), 2);
-	}
 
 	protected static float getGrowthChance(Block blockIn, World worldIn, BlockPos pos) {
 		float f = 1.0F;
@@ -125,21 +86,46 @@ public class BlockCrops extends BlockBush implements IGrowable {
 		return f;
 	}
 
+	protected BlockCrops() {
+		this.setDefaultState(this.blockState.getBaseState().withProperty(AGE, Integer.valueOf(0)));
+		this.setTickRandomly(true);
+		float f = 0.5F;
+		this.setBlockBounds(0.5F - f, 0.0F, 0.5F - f, 0.5F + f, 0.25F, 0.5F + f);
+		this.setCreativeTab((CreativeTabs) null);
+		this.setHardness(0.0F);
+		this.setStepSound(soundTypeGrass);
+		this.disableStats();
+	}
+
 	public boolean canBlockStay(World world, BlockPos blockpos, IBlockState var3) {
 		return (world.getLight(blockpos) >= 8 || world.canSeeSky(blockpos))
 				&& this.canPlaceBlockOn(world.getBlockState(blockpos.down()).getBlock());
 	}
 
-	protected Item getSeed() {
-		return Items.wheat_seeds;
+	/**
+	 * + Whether this IGrowable can grow
+	 */
+	public boolean canGrow(World var1, BlockPos var2, IBlockState iblockstate, boolean var4) {
+		return ((Integer) iblockstate.getValue(AGE)).intValue() < 7;
 	}
 
-	protected Item getCrop() {
-		return Items.wheat;
+	/**
+	 * + is the block grass, dirt or farmland
+	 */
+	protected boolean canPlaceBlockOn(Block block) {
+		return block == Blocks.farmland;
 	}
 
-	/**+
-	 * Spawns this Block's drops into the World as EntityItems.
+	public boolean canUseBonemeal(World var1, EaglercraftRandom var2, BlockPos var3, IBlockState var4) {
+		return true;
+	}
+
+	protected BlockState createBlockState() {
+		return new BlockState(this, new IProperty[] { AGE });
+	}
+
+	/**
+	 * + Spawns this Block's drops into the World as EntityItems.
 	 */
 	public void dropBlockAsItemWithChance(World world, BlockPos blockpos, IBlockState iblockstate, float f, int i) {
 		super.dropBlockAsItemWithChance(world, blockpos, iblockstate, f, 0);
@@ -157,47 +143,63 @@ public class BlockCrops extends BlockBush implements IGrowable {
 		}
 	}
 
-	/**+
-	 * Get the Item that this Block should drop when harvested.
-	 */
-	public Item getItemDropped(IBlockState iblockstate, EaglercraftRandom var2, int var3) {
-		return ((Integer) iblockstate.getValue(AGE)).intValue() == 7 ? this.getCrop() : this.getSeed();
+	protected Item getCrop() {
+		return Items.wheat;
 	}
 
 	public Item getItem(World var1, BlockPos var2) {
 		return this.getSeed();
 	}
 
-	/**+
-	 * Whether this IGrowable can grow
+	/**
+	 * + Get the Item that this Block should drop when harvested.
 	 */
-	public boolean canGrow(World var1, BlockPos var2, IBlockState iblockstate, boolean var4) {
-		return ((Integer) iblockstate.getValue(AGE)).intValue() < 7;
+	public Item getItemDropped(IBlockState iblockstate, EaglercraftRandom var2, int var3) {
+		return ((Integer) iblockstate.getValue(AGE)).intValue() == 7 ? this.getCrop() : this.getSeed();
 	}
 
-	public boolean canUseBonemeal(World var1, EaglercraftRandom var2, BlockPos var3, IBlockState var4) {
-		return true;
+	/**
+	 * + Convert the BlockState into the correct metadata value
+	 */
+	public int getMetaFromState(IBlockState iblockstate) {
+		return ((Integer) iblockstate.getValue(AGE)).intValue();
+	}
+
+	protected Item getSeed() {
+		return Items.wheat_seeds;
+	}
+
+	/**
+	 * + Convert the given metadata into a BlockState for this Block
+	 */
+	public IBlockState getStateFromMeta(int i) {
+		return this.getDefaultState().withProperty(AGE, Integer.valueOf(i));
+	}
+
+	public void grow(World worldIn, BlockPos pos, IBlockState state) {
+		int i = ((Integer) state.getValue(AGE)).intValue() + MathHelper.getRandomIntegerInRange(worldIn.rand, 2, 5);
+		if (i > 7) {
+			i = 7;
+		}
+
+		worldIn.setBlockState(pos, state.withProperty(AGE, Integer.valueOf(i)), 2);
 	}
 
 	public void grow(World world, EaglercraftRandom var2, BlockPos blockpos, IBlockState iblockstate) {
 		this.grow(world, blockpos, iblockstate);
 	}
 
-	/**+
-	 * Convert the given metadata into a BlockState for this Block
-	 */
-	public IBlockState getStateFromMeta(int i) {
-		return this.getDefaultState().withProperty(AGE, Integer.valueOf(i));
-	}
+	public void updateTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom random) {
+		super.updateTick(world, blockpos, iblockstate, random);
+		if (world.getLightFromNeighbors(blockpos.up()) >= 9) {
+			int i = ((Integer) iblockstate.getValue(AGE)).intValue();
+			if (i < 7) {
+				float f = getGrowthChance(this, world, blockpos);
+				if (random.nextInt((int) (25.0F / f) + 1) == 0) {
+					world.setBlockState(blockpos, iblockstate.withProperty(AGE, Integer.valueOf(i + 1)), 2);
+				}
+			}
+		}
 
-	/**+
-	 * Convert the BlockState into the correct metadata value
-	 */
-	public int getMetaFromState(IBlockState iblockstate) {
-		return ((Integer) iblockstate.getValue(AGE)).intValue();
-	}
-
-	protected BlockState createBlockState() {
-		return new BlockState(this, new IProperty[] { AGE });
 	}
 }

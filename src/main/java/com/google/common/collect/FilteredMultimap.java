@@ -28,7 +28,7 @@ import com.google.common.base.Predicate;
  */
 @GwtCompatible
 interface FilteredMultimap<K, V> extends Multimap<K, V> {
-	Multimap<K, V> unfiltered();
-
 	Predicate<? super Entry<K, V>> entryPredicate();
+
+	Multimap<K, V> unfiltered();
 }

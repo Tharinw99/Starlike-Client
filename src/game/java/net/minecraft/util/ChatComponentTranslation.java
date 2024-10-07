@@ -12,33 +12,36 @@ import com.google.common.collect.Lists;
 
 import net.lax1dude.eaglercraft.v1_8.HString;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class ChatComponentTranslation extends ChatComponentStyle {
+	public static final Pattern stringVariablePattern = Pattern.compile("%(?:(\\d+)\\$)?([A-Za-z%]|$)");
 	private final String key;
 	private final Object[] formatArgs;
 	private final Object syncLock = new Object();
 	private long lastTranslationUpdateTimeInMilliseconds = -1L;
 	List<IChatComponent> children = Lists.newArrayList();
-	public static final Pattern stringVariablePattern = Pattern.compile("%(?:(\\d+)\\$)?([A-Za-z%]|$)");
 
 	public ChatComponentTranslation(String translationKey, Object... args) {
 		this.key = translationKey;
@@ -53,9 +56,35 @@ public class ChatComponentTranslation extends ChatComponentStyle {
 
 	}
 
-	/**+
-	 * ensures that our children are initialized from the most
-	 * recent string translation mapping.
+	/**
+	 * + Creates a copy of this component. Almost a deep copy, except the style is
+	 * shallow-copied.
+	 */
+	public ChatComponentTranslation createCopy() {
+		Object[] aobject = new Object[this.formatArgs.length];
+
+		for (int i = 0; i < this.formatArgs.length; ++i) {
+			if (this.formatArgs[i] instanceof IChatComponent) {
+				aobject[i] = ((IChatComponent) this.formatArgs[i]).createCopy();
+			} else {
+				aobject[i] = this.formatArgs[i];
+			}
+		}
+
+		ChatComponentTranslation chatcomponenttranslation = new ChatComponentTranslation(this.key, aobject);
+		chatcomponenttranslation.setChatStyle(this.getChatStyle().createShallowCopy());
+
+		List<IChatComponent> lst = this.getSiblings();
+		for (int i = 0, l = lst.size(); i < l; ++i) {
+			chatcomponenttranslation.appendSibling(lst.get(i).createCopy());
+		}
+
+		return chatcomponenttranslation;
+	}
+
+	/**
+	 * + ensures that our children are initialized from the most recent string
+	 * translation mapping.
 	 */
 	synchronized void ensureInitialized() {
 		synchronized (this.syncLock) {
@@ -82,9 +111,68 @@ public class ChatComponentTranslation extends ChatComponentStyle {
 
 	}
 
-	/**+
-	 * initializes our children from a format string, using the
-	 * format args to fill in the placeholder variables.
+	public boolean equals(Object object) {
+		if (this == object) {
+			return true;
+		} else if (!(object instanceof ChatComponentTranslation)) {
+			return false;
+		} else {
+			ChatComponentTranslation chatcomponenttranslation = (ChatComponentTranslation) object;
+			return Arrays.equals(this.formatArgs, chatcomponenttranslation.formatArgs)
+					&& this.key.equals(chatcomponenttranslation.key) && super.equals(object);
+		}
+	}
+
+	public Object[] getFormatArgs() {
+		return this.formatArgs;
+	}
+
+	private IChatComponent getFormatArgumentAsComponent(int index) {
+		if (index >= this.formatArgs.length) {
+			throw new ChatComponentTranslationFormatException(this, index);
+		} else {
+			Object object = this.formatArgs[index];
+			Object object1;
+			if (object instanceof IChatComponent) {
+				object1 = (IChatComponent) object;
+			} else {
+				object1 = new ChatComponentText(object == null ? "null" : object.toString());
+				((IChatComponent) object1).getChatStyle().setParentStyle(this.getChatStyle());
+			}
+
+			return (IChatComponent) object1;
+		}
+	}
+
+	public String getKey() {
+		return this.key;
+	}
+
+	/**
+	 * + Gets the text of this component, without any special formatting codes
+	 * added, for chat. TODO: why is this two different methods?
+	 */
+	public String getUnformattedTextForChat() {
+		this.ensureInitialized();
+		StringBuilder stringbuilder = new StringBuilder();
+
+		for (int i = 0, l = this.children.size(); i < l; ++i) {
+			stringbuilder.append(this.children.get(i).getUnformattedTextForChat());
+		}
+
+		return stringbuilder.toString();
+	}
+
+	public int hashCode() {
+		int i = super.hashCode();
+		i = 31 * i + this.key.hashCode();
+		i = 31 * i + Arrays.hashCode(this.formatArgs);
+		return i;
+	}
+
+	/**
+	 * + initializes our children from a format string, using the format args to
+	 * fill in the placeholder variables.
 	 */
 	protected void initializeFromFormat(String format) {
 		boolean flag = false;
@@ -135,21 +223,9 @@ public class ChatComponentTranslation extends ChatComponentStyle {
 		}
 	}
 
-	private IChatComponent getFormatArgumentAsComponent(int index) {
-		if (index >= this.formatArgs.length) {
-			throw new ChatComponentTranslationFormatException(this, index);
-		} else {
-			Object object = this.formatArgs[index];
-			Object object1;
-			if (object instanceof IChatComponent) {
-				object1 = (IChatComponent) object;
-			} else {
-				object1 = new ChatComponentText(object == null ? "null" : object.toString());
-				((IChatComponent) object1).getChatStyle().setParentStyle(this.getChatStyle());
-			}
-
-			return (IChatComponent) object1;
-		}
+	public Iterator<IChatComponent> iterator() {
+		this.ensureInitialized();
+		return Iterators.concat(createDeepCopyIterator(this.children), createDeepCopyIterator(this.siblings));
 	}
 
 	public IChatComponent setChatStyle(ChatStyle chatstyle) {
@@ -171,82 +247,8 @@ public class ChatComponentTranslation extends ChatComponentStyle {
 		return this;
 	}
 
-	public Iterator<IChatComponent> iterator() {
-		this.ensureInitialized();
-		return Iterators.concat(createDeepCopyIterator(this.children), createDeepCopyIterator(this.siblings));
-	}
-
-	/**+
-	 * Gets the text of this component, without any special
-	 * formatting codes added, for chat. TODO: why is this two
-	 * different methods?
-	 */
-	public String getUnformattedTextForChat() {
-		this.ensureInitialized();
-		StringBuilder stringbuilder = new StringBuilder();
-
-		for (int i = 0, l = this.children.size(); i < l; ++i) {
-			stringbuilder.append(this.children.get(i).getUnformattedTextForChat());
-		}
-
-		return stringbuilder.toString();
-	}
-
-	/**+
-	 * Creates a copy of this component. Almost a deep copy, except
-	 * the style is shallow-copied.
-	 */
-	public ChatComponentTranslation createCopy() {
-		Object[] aobject = new Object[this.formatArgs.length];
-
-		for (int i = 0; i < this.formatArgs.length; ++i) {
-			if (this.formatArgs[i] instanceof IChatComponent) {
-				aobject[i] = ((IChatComponent) this.formatArgs[i]).createCopy();
-			} else {
-				aobject[i] = this.formatArgs[i];
-			}
-		}
-
-		ChatComponentTranslation chatcomponenttranslation = new ChatComponentTranslation(this.key, aobject);
-		chatcomponenttranslation.setChatStyle(this.getChatStyle().createShallowCopy());
-
-		List<IChatComponent> lst = this.getSiblings();
-		for (int i = 0, l = lst.size(); i < l; ++i) {
-			chatcomponenttranslation.appendSibling(lst.get(i).createCopy());
-		}
-
-		return chatcomponenttranslation;
-	}
-
-	public boolean equals(Object object) {
-		if (this == object) {
-			return true;
-		} else if (!(object instanceof ChatComponentTranslation)) {
-			return false;
-		} else {
-			ChatComponentTranslation chatcomponenttranslation = (ChatComponentTranslation) object;
-			return Arrays.equals(this.formatArgs, chatcomponenttranslation.formatArgs)
-					&& this.key.equals(chatcomponenttranslation.key) && super.equals(object);
-		}
-	}
-
-	public int hashCode() {
-		int i = super.hashCode();
-		i = 31 * i + this.key.hashCode();
-		i = 31 * i + Arrays.hashCode(this.formatArgs);
-		return i;
-	}
-
 	public String toString() {
 		return "TranslatableComponent{key=\'" + this.key + '\'' + ", args=" + Arrays.toString(this.formatArgs)
 				+ ", siblings=" + this.siblings + ", style=" + this.getChatStyle() + '}';
-	}
-
-	public String getKey() {
-		return this.key;
-	}
-
-	public Object[] getFormatArgs() {
-		return this.formatArgs;
 	}
 }

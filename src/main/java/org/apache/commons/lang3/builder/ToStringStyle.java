@@ -74,6 +74,573 @@ import org.apache.commons.lang3.StringUtils;
 public abstract class ToStringStyle implements Serializable {
 
 	/**
+	 * <p>
+	 * Default {@code ToStringStyle}.
+	 * </p>
+	 *
+	 * <p>
+	 * This is an inner class rather than using {@code StandardToStringStyle} to
+	 * ensure its immutability.
+	 * </p>
+	 */
+	private static final class DefaultToStringStyle extends ToStringStyle {
+
+		/**
+		 * Required for serialization support.
+		 *
+		 * @see java.io.Serializable
+		 */
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * <p>
+		 * Constructor.
+		 * </p>
+		 *
+		 * <p>
+		 * Use the static constant rather than instantiating.
+		 * </p>
+		 */
+		DefaultToStringStyle() {
+		}
+
+		/**
+		 * <p>
+		 * Ensure {@code Singleton} after serialization.
+		 * </p>
+		 *
+		 * @return the singleton
+		 */
+		private Object readResolve() {
+			return DEFAULT_STYLE;
+		}
+
+	}
+
+	/**
+	 * <p>
+	 * {@code ToStringStyle} that outputs with JSON format.
+	 * </p>
+	 *
+	 * <p>
+	 * This is an inner class rather than using {@code StandardToStringStyle} to
+	 * ensure its immutability.
+	 * </p>
+	 *
+	 * @since 3.4
+	 * @see <a href="http://json.org">json.org</a>
+	 */
+	private static final class JsonToStringStyle extends ToStringStyle {
+
+		private static final long serialVersionUID = 1L;
+
+		private static final String FIELD_NAME_QUOTE = "\"";
+
+		/**
+		 * <p>
+		 * Constructor.
+		 * </p>
+		 *
+		 * <p>
+		 * Use the static constant rather than instantiating.
+		 * </p>
+		 */
+		JsonToStringStyle() {
+			this.setUseClassName(false);
+			this.setUseIdentityHashCode(false);
+
+			this.setContentStart("{");
+			this.setContentEnd("}");
+
+			this.setArrayStart("[");
+			this.setArrayEnd("]");
+
+			this.setFieldSeparator(",");
+			this.setFieldNameValueSeparator(":");
+
+			this.setNullText("null");
+
+			this.setSummaryObjectStartText("\"<");
+			this.setSummaryObjectEndText(">\"");
+
+			this.setSizeStartText("\"<size=");
+			this.setSizeEndText(">\"");
+		}
+
+		@Override
+		public void append(final StringBuffer buffer, final String fieldName, final boolean[] array,
+				final Boolean fullDetail) {
+
+			if (fieldName == null) {
+				throw new UnsupportedOperationException("Field names are mandatory when using JsonToStringStyle");
+			}
+			if (!isFullDetail(fullDetail)) {
+				throw new UnsupportedOperationException("FullDetail must be true when using JsonToStringStyle");
+			}
+
+			super.append(buffer, fieldName, array, fullDetail);
+		}
+
+		@Override
+		public void append(final StringBuffer buffer, final String fieldName, final byte[] array,
+				final Boolean fullDetail) {
+
+			if (fieldName == null) {
+				throw new UnsupportedOperationException("Field names are mandatory when using JsonToStringStyle");
+			}
+			if (!isFullDetail(fullDetail)) {
+				throw new UnsupportedOperationException("FullDetail must be true when using JsonToStringStyle");
+			}
+
+			super.append(buffer, fieldName, array, fullDetail);
+		}
+
+		@Override
+		public void append(final StringBuffer buffer, final String fieldName, final char[] array,
+				final Boolean fullDetail) {
+
+			if (fieldName == null) {
+				throw new UnsupportedOperationException("Field names are mandatory when using JsonToStringStyle");
+			}
+			if (!isFullDetail(fullDetail)) {
+				throw new UnsupportedOperationException("FullDetail must be true when using JsonToStringStyle");
+			}
+
+			super.append(buffer, fieldName, array, fullDetail);
+		}
+
+		@Override
+		public void append(final StringBuffer buffer, final String fieldName, final double[] array,
+				final Boolean fullDetail) {
+
+			if (fieldName == null) {
+				throw new UnsupportedOperationException("Field names are mandatory when using JsonToStringStyle");
+			}
+			if (!isFullDetail(fullDetail)) {
+				throw new UnsupportedOperationException("FullDetail must be true when using JsonToStringStyle");
+			}
+
+			super.append(buffer, fieldName, array, fullDetail);
+		}
+
+		@Override
+		public void append(final StringBuffer buffer, final String fieldName, final float[] array,
+				final Boolean fullDetail) {
+
+			if (fieldName == null) {
+				throw new UnsupportedOperationException("Field names are mandatory when using JsonToStringStyle");
+			}
+			if (!isFullDetail(fullDetail)) {
+				throw new UnsupportedOperationException("FullDetail must be true when using JsonToStringStyle");
+			}
+
+			super.append(buffer, fieldName, array, fullDetail);
+		}
+
+		@Override
+		public void append(final StringBuffer buffer, final String fieldName, final int[] array,
+				final Boolean fullDetail) {
+
+			if (fieldName == null) {
+				throw new UnsupportedOperationException("Field names are mandatory when using JsonToStringStyle");
+			}
+			if (!isFullDetail(fullDetail)) {
+				throw new UnsupportedOperationException("FullDetail must be true when using JsonToStringStyle");
+			}
+
+			super.append(buffer, fieldName, array, fullDetail);
+		}
+
+		@Override
+		public void append(final StringBuffer buffer, final String fieldName, final long[] array,
+				final Boolean fullDetail) {
+
+			if (fieldName == null) {
+				throw new UnsupportedOperationException("Field names are mandatory when using JsonToStringStyle");
+			}
+			if (!isFullDetail(fullDetail)) {
+				throw new UnsupportedOperationException("FullDetail must be true when using JsonToStringStyle");
+			}
+
+			super.append(buffer, fieldName, array, fullDetail);
+		}
+
+		@Override
+		public void append(final StringBuffer buffer, final String fieldName, final Object value,
+				final Boolean fullDetail) {
+
+			if (fieldName == null) {
+				throw new UnsupportedOperationException("Field names are mandatory when using JsonToStringStyle");
+			}
+			if (!isFullDetail(fullDetail)) {
+				throw new UnsupportedOperationException("FullDetail must be true when using JsonToStringStyle");
+			}
+
+			super.append(buffer, fieldName, value, fullDetail);
+		}
+
+		@Override
+		public void append(final StringBuffer buffer, final String fieldName, final Object[] array,
+				final Boolean fullDetail) {
+
+			if (fieldName == null) {
+				throw new UnsupportedOperationException("Field names are mandatory when using JsonToStringStyle");
+			}
+			if (!isFullDetail(fullDetail)) {
+				throw new UnsupportedOperationException("FullDetail must be true when using JsonToStringStyle");
+			}
+
+			super.append(buffer, fieldName, array, fullDetail);
+		}
+
+		@Override
+		public void append(final StringBuffer buffer, final String fieldName, final short[] array,
+				final Boolean fullDetail) {
+
+			if (fieldName == null) {
+				throw new UnsupportedOperationException("Field names are mandatory when using JsonToStringStyle");
+			}
+			if (!isFullDetail(fullDetail)) {
+				throw new UnsupportedOperationException("FullDetail must be true when using JsonToStringStyle");
+			}
+
+			super.append(buffer, fieldName, array, fullDetail);
+		}
+
+		@Override
+		protected void appendDetail(final StringBuffer buffer, final String fieldName, final char value) {
+			appendValueAsString(buffer, String.valueOf(value));
+		}
+
+		@Override
+		protected void appendDetail(final StringBuffer buffer, final String fieldName, final Collection<?> coll) {
+			if (coll != null && !coll.isEmpty()) {
+				buffer.append(getArrayStart());
+				int i = 0;
+				for (final Object item : coll) {
+					appendDetail(buffer, fieldName, i++, item);
+				}
+				buffer.append(getArrayEnd());
+				return;
+			}
+
+			buffer.append(coll);
+		}
+
+		@Override
+		protected void appendDetail(final StringBuffer buffer, final String fieldName, final Map<?, ?> map) {
+			if (map != null && !map.isEmpty()) {
+				buffer.append(getContentStart());
+
+				boolean firstItem = true;
+				for (final Entry<?, ?> entry : map.entrySet()) {
+					final String keyStr = Objects.toString(entry.getKey(), null);
+					if (keyStr != null) {
+						if (firstItem) {
+							firstItem = false;
+						} else {
+							appendFieldEnd(buffer, keyStr);
+						}
+						appendFieldStart(buffer, keyStr);
+						final Object value = entry.getValue();
+						if (value == null) {
+							appendNullText(buffer, keyStr);
+						} else {
+							appendInternal(buffer, keyStr, value, true);
+						}
+					}
+				}
+
+				buffer.append(getContentEnd());
+				return;
+			}
+
+			buffer.append(map);
+		}
+
+		@Override
+		protected void appendDetail(final StringBuffer buffer, final String fieldName, final Object value) {
+
+			if (value == null) {
+				appendNullText(buffer, fieldName);
+				return;
+			}
+
+			if (value instanceof String || value instanceof Character) {
+				appendValueAsString(buffer, value.toString());
+				return;
+			}
+
+			if (value instanceof Number || value instanceof Boolean) {
+				buffer.append(value);
+				return;
+			}
+
+			final String valueAsString = value.toString();
+			if (isJsonObject(valueAsString) || isJsonArray(valueAsString)) {
+				buffer.append(value);
+				return;
+			}
+
+			appendDetail(buffer, fieldName, valueAsString);
+		}
+
+		@Override
+		protected void appendFieldStart(final StringBuffer buffer, final String fieldName) {
+			throw new UnsupportedOperationException("Not supported in TeaVM");
+			/*
+			 * if (fieldName == null) { throw new UnsupportedOperationException(
+			 * "Field names are mandatory when using JsonToStringStyle"); }
+			 * 
+			 * super.appendFieldStart(buffer, FIELD_NAME_QUOTE +
+			 * StringEscapeUtils.escapeJson(fieldName) + FIELD_NAME_QUOTE);
+			 */
+		}
+
+		/**
+		 * Appends the given String enclosed in double-quotes to the given StringBuffer.
+		 *
+		 * @param buffer the StringBuffer to append the value to.
+		 * @param value  the value to append.
+		 */
+		private void appendValueAsString(final StringBuffer buffer, final String value) {
+			// buffer.append('"').append(StringEscapeUtils.escapeJson(value)).append('"');
+			throw new UnsupportedOperationException("Not supported in TeaVM");
+		}
+
+		private boolean isJsonArray(final String valueAsString) {
+			return valueAsString.startsWith(getArrayStart()) && valueAsString.endsWith(getArrayEnd());
+		}
+
+		private boolean isJsonObject(final String valueAsString) {
+			return valueAsString.startsWith(getContentStart()) && valueAsString.endsWith(getContentEnd());
+		}
+
+		/**
+		 * <p>
+		 * Ensure {@code Singleton} after serialization.
+		 * </p>
+		 *
+		 * @return the singleton
+		 */
+		private Object readResolve() {
+			return JSON_STYLE;
+		}
+
+	}
+
+	/**
+	 * <p>
+	 * {@code ToStringStyle} that outputs on multiple lines.
+	 * </p>
+	 *
+	 * <p>
+	 * This is an inner class rather than using {@code StandardToStringStyle} to
+	 * ensure its immutability.
+	 * </p>
+	 */
+	private static final class MultiLineToStringStyle extends ToStringStyle {
+
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * <p>
+		 * Constructor.
+		 * </p>
+		 *
+		 * <p>
+		 * Use the static constant rather than instantiating.
+		 * </p>
+		 */
+		MultiLineToStringStyle() {
+			this.setContentStart("[");
+			this.setFieldSeparator(System.lineSeparator() + "  ");
+			this.setFieldSeparatorAtStart(true);
+			this.setContentEnd(System.lineSeparator() + "]");
+		}
+
+		/**
+		 * <p>
+		 * Ensure {@code Singleton} after serialization.
+		 * </p>
+		 *
+		 * @return the singleton
+		 */
+		private Object readResolve() {
+			return MULTI_LINE_STYLE;
+		}
+
+	}
+
+	/**
+	 * <p>
+	 * {@code ToStringStyle} that does not print out the classname and identity hash
+	 * code but prints content start and field names.
+	 * </p>
+	 *
+	 * <p>
+	 * This is an inner class rather than using {@code StandardToStringStyle} to
+	 * ensure its immutability.
+	 * </p>
+	 */
+	private static final class NoClassNameToStringStyle extends ToStringStyle {
+
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * <p>
+		 * Constructor.
+		 * </p>
+		 *
+		 * <p>
+		 * Use the static constant rather than instantiating.
+		 * </p>
+		 */
+		NoClassNameToStringStyle() {
+			this.setUseClassName(false);
+			this.setUseIdentityHashCode(false);
+		}
+
+		/**
+		 * <p>
+		 * Ensure {@code Singleton} after serialization.
+		 * </p>
+		 *
+		 * @return the singleton
+		 */
+		private Object readResolve() {
+			return NO_CLASS_NAME_STYLE;
+		}
+
+	}
+
+	/**
+	 * <p>
+	 * {@code ToStringStyle} that does not print out the field names.
+	 * </p>
+	 *
+	 * <p>
+	 * This is an inner class rather than using {@code StandardToStringStyle} to
+	 * ensure its immutability.
+	 */
+	private static final class NoFieldNameToStringStyle extends ToStringStyle {
+
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * <p>
+		 * Constructor.
+		 * </p>
+		 *
+		 * <p>
+		 * Use the static constant rather than instantiating.
+		 * </p>
+		 */
+		NoFieldNameToStringStyle() {
+			this.setUseFieldNames(false);
+		}
+
+		/**
+		 * <p>
+		 * Ensure {@code Singleton} after serialization.
+		 * </p>
+		 *
+		 * @return the singleton
+		 */
+		private Object readResolve() {
+			return NO_FIELD_NAMES_STYLE;
+		}
+
+	}
+
+	/**
+	 * <p>
+	 * {@code ToStringStyle} that prints out the short class name and no identity
+	 * hashcode.
+	 * </p>
+	 *
+	 * <p>
+	 * This is an inner class rather than using {@code StandardToStringStyle} to
+	 * ensure its immutability.
+	 * </p>
+	 */
+	private static final class ShortPrefixToStringStyle extends ToStringStyle {
+
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * <p>
+		 * Constructor.
+		 * </p>
+		 *
+		 * <p>
+		 * Use the static constant rather than instantiating.
+		 * </p>
+		 */
+		ShortPrefixToStringStyle() {
+			this.setUseShortClassName(true);
+			this.setUseIdentityHashCode(false);
+		}
+
+		/**
+		 * <p>
+		 * Ensure <code>Singleton</ode> after serialization.
+		 * </p>
+		 * 
+		 * @return the singleton
+		 */
+		private Object readResolve() {
+			return SHORT_PREFIX_STYLE;
+		}
+
+	}
+
+	/**
+	 * <p>
+	 * {@code ToStringStyle} that does not print out the classname, identity
+	 * hashcode, content start or field name.
+	 * </p>
+	 *
+	 * <p>
+	 * This is an inner class rather than using {@code StandardToStringStyle} to
+	 * ensure its immutability.
+	 * </p>
+	 */
+	private static final class SimpleToStringStyle extends ToStringStyle {
+
+		private static final long serialVersionUID = 1L;
+
+		/**
+		 * <p>
+		 * Constructor.
+		 * </p>
+		 *
+		 * <p>
+		 * Use the static constant rather than instantiating.
+		 * </p>
+		 */
+		SimpleToStringStyle() {
+			this.setUseClassName(false);
+			this.setUseIdentityHashCode(false);
+			this.setUseFieldNames(false);
+			this.setContentStart(StringUtils.EMPTY);
+			this.setContentEnd(StringUtils.EMPTY);
+		}
+
+		/**
+		 * <p>
+		 * Ensure <code>Singleton</ode> after serialization.
+		 * </p>
+		 * 
+		 * @return the singleton
+		 */
+		private Object readResolve() {
+			return SIMPLE_STYLE;
+		}
+
+	}
+
+	/**
 	 * Serialization version ID.
 	 */
 	private static final long serialVersionUID = -2587890625525655916L;
@@ -314,10 +881,14 @@ public abstract class ToStringStyle implements Serializable {
 	 */
 	private boolean arrayContentDetail = true;
 
+	// ----------------------------------------------------------------------------
+
 	/**
 	 * The array end {@code '}'}.
 	 */
 	private String arrayEnd = "}";
+
+	// ----------------------------------------------------------------------------
 
 	/**
 	 * The value to use when fullDetail is {@code null}, the default value is
@@ -345,12 +916,12 @@ public abstract class ToStringStyle implements Serializable {
 	 */
 	private String summaryObjectStartText = "<";
 
+	// ----------------------------------------------------------------------------
+
 	/**
 	 * The summary object text start {@code '&gt;'}.
 	 */
 	private String summaryObjectEndText = ">";
-
-	// ----------------------------------------------------------------------------
 
 	/**
 	 * <p>
@@ -360,110 +931,315 @@ public abstract class ToStringStyle implements Serializable {
 	protected ToStringStyle() {
 	}
 
+	/**
+	 * <p>
+	 * Append to the {@code toString} a {@code boolean} value.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name
+	 * @param value     the value to add to the {@code toString}
+	 */
+	public void append(final StringBuffer buffer, final String fieldName, final boolean value) {
+		appendFieldStart(buffer, fieldName);
+		appendDetail(buffer, fieldName, value);
+		appendFieldEnd(buffer, fieldName);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} a {@code boolean} array.
+	 * </p>
+	 *
+	 * @param buffer     the {@code StringBuffer} to populate
+	 * @param fieldName  the field name
+	 * @param array      the array to add to the toString
+	 * @param fullDetail {@code true} for detail, {@code false} for summary info,
+	 *                   {@code null} for style decides
+	 */
+	public void append(final StringBuffer buffer, final String fieldName, final boolean[] array,
+			final Boolean fullDetail) {
+		appendFieldStart(buffer, fieldName);
+
+		if (array == null) {
+			appendNullText(buffer, fieldName);
+
+		} else if (isFullDetail(fullDetail)) {
+			appendDetail(buffer, fieldName, array);
+
+		} else {
+			appendSummary(buffer, fieldName, array);
+		}
+
+		appendFieldEnd(buffer, fieldName);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} a {@code byte} value.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name
+	 * @param value     the value to add to the {@code toString}
+	 */
+	public void append(final StringBuffer buffer, final String fieldName, final byte value) {
+		appendFieldStart(buffer, fieldName);
+		appendDetail(buffer, fieldName, value);
+		appendFieldEnd(buffer, fieldName);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} a {@code byte} array.
+	 * </p>
+	 *
+	 * @param buffer     the {@code StringBuffer} to populate
+	 * @param fieldName  the field name
+	 * @param array      the array to add to the {@code toString}
+	 * @param fullDetail {@code true} for detail, {@code false} for summary info,
+	 *                   {@code null} for style decides
+	 */
+	public void append(final StringBuffer buffer, final String fieldName, final byte[] array,
+			final Boolean fullDetail) {
+		appendFieldStart(buffer, fieldName);
+
+		if (array == null) {
+			appendNullText(buffer, fieldName);
+
+		} else if (isFullDetail(fullDetail)) {
+			appendDetail(buffer, fieldName, array);
+
+		} else {
+			appendSummary(buffer, fieldName, array);
+		}
+
+		appendFieldEnd(buffer, fieldName);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} a {@code char} value.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name
+	 * @param value     the value to add to the {@code toString}
+	 */
+	public void append(final StringBuffer buffer, final String fieldName, final char value) {
+		appendFieldStart(buffer, fieldName);
+		appendDetail(buffer, fieldName, value);
+		appendFieldEnd(buffer, fieldName);
+	}
+
 	// ----------------------------------------------------------------------------
 
 	/**
 	 * <p>
-	 * Append to the {@code toString} the superclass toString.
-	 * </p>
-	 * <p>
-	 * NOTE: It assumes that the toString has been created from the same
-	 * ToStringStyle.
+	 * Append to the {@code toString} a {@code char} array.
 	 * </p>
 	 *
-	 * <p>
-	 * A {@code null} {@code superToString} is ignored.
-	 * </p>
-	 *
-	 * @param buffer        the {@code StringBuffer} to populate
-	 * @param superToString the {@code super.toString()}
-	 * @since 2.0
+	 * @param buffer     the {@code StringBuffer} to populate
+	 * @param fieldName  the field name
+	 * @param array      the array to add to the {@code toString}
+	 * @param fullDetail {@code true} for detail, {@code false} for summary info,
+	 *                   {@code null} for style decides
 	 */
-	public void appendSuper(final StringBuffer buffer, final String superToString) {
-		appendToString(buffer, superToString);
+	public void append(final StringBuffer buffer, final String fieldName, final char[] array,
+			final Boolean fullDetail) {
+		appendFieldStart(buffer, fieldName);
+
+		if (array == null) {
+			appendNullText(buffer, fieldName);
+
+		} else if (isFullDetail(fullDetail)) {
+			appendDetail(buffer, fieldName, array);
+
+		} else {
+			appendSummary(buffer, fieldName, array);
+		}
+
+		appendFieldEnd(buffer, fieldName);
 	}
 
 	/**
 	 * <p>
-	 * Append to the {@code toString} another toString.
-	 * </p>
-	 * <p>
-	 * NOTE: It assumes that the toString has been created from the same
-	 * ToStringStyle.
+	 * Append to the {@code toString} a {@code double} value.
 	 * </p>
 	 *
-	 * <p>
-	 * A {@code null} {@code toString} is ignored.
-	 * </p>
-	 *
-	 * @param buffer   the {@code StringBuffer} to populate
-	 * @param toString the additional {@code toString}
-	 * @since 2.0
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name
+	 * @param value     the value to add to the {@code toString}
 	 */
-	public void appendToString(final StringBuffer buffer, final String toString) {
-		if (toString != null) {
-			final int pos1 = toString.indexOf(contentStart) + contentStart.length();
-			final int pos2 = toString.lastIndexOf(contentEnd);
-			if (pos1 != pos2 && pos1 >= 0 && pos2 >= 0) {
-				if (fieldSeparatorAtStart) {
-					removeLastFieldSeparator(buffer);
-				}
-				buffer.append(toString, pos1, pos2);
-				appendFieldSeparator(buffer);
-			}
-		}
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} the start of data indicator.
-	 * </p>
-	 *
-	 * @param buffer the {@code StringBuffer} to populate
-	 * @param object the {@code Object} to build a {@code toString} for
-	 */
-	public void appendStart(final StringBuffer buffer, final Object object) {
-		if (object != null) {
-			appendClassName(buffer, object);
-			appendIdentityHashCode(buffer, object);
-			appendContentStart(buffer);
-			if (fieldSeparatorAtStart) {
-				appendFieldSeparator(buffer);
-			}
-		}
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} the end of data indicator.
-	 * </p>
-	 *
-	 * @param buffer the {@code StringBuffer} to populate
-	 * @param object the {@code Object} to build a {@code toString} for.
-	 */
-	public void appendEnd(final StringBuffer buffer, final Object object) {
-		if (!this.fieldSeparatorAtEnd) {
-			removeLastFieldSeparator(buffer);
-		}
-		appendContentEnd(buffer);
-		unregister(object);
-	}
-
-	/**
-	 * <p>
-	 * Remove the last field separator from the buffer.
-	 * </p>
-	 *
-	 * @param buffer the {@code StringBuffer} to populate
-	 * @since 2.0
-	 */
-	protected void removeLastFieldSeparator(final StringBuffer buffer) {
-		if (StringUtils.endsWith(buffer, fieldSeparator)) {
-			buffer.setLength(buffer.length() - fieldSeparator.length());
-		}
+	public void append(final StringBuffer buffer, final String fieldName, final double value) {
+		appendFieldStart(buffer, fieldName);
+		appendDetail(buffer, fieldName, value);
+		appendFieldEnd(buffer, fieldName);
 	}
 
 	// ----------------------------------------------------------------------------
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} a {@code double} array.
+	 * </p>
+	 *
+	 * @param buffer     the {@code StringBuffer} to populate
+	 * @param fieldName  the field name
+	 * @param array      the array to add to the toString
+	 * @param fullDetail {@code true} for detail, {@code false} for summary info,
+	 *                   {@code null} for style decides
+	 */
+	public void append(final StringBuffer buffer, final String fieldName, final double[] array,
+			final Boolean fullDetail) {
+		appendFieldStart(buffer, fieldName);
+
+		if (array == null) {
+			appendNullText(buffer, fieldName);
+
+		} else if (isFullDetail(fullDetail)) {
+			appendDetail(buffer, fieldName, array);
+
+		} else {
+			appendSummary(buffer, fieldName, array);
+		}
+
+		appendFieldEnd(buffer, fieldName);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} a {@code float} value.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name
+	 * @param value     the value to add to the {@code toString}
+	 */
+	public void append(final StringBuffer buffer, final String fieldName, final float value) {
+		appendFieldStart(buffer, fieldName);
+		appendDetail(buffer, fieldName, value);
+		appendFieldEnd(buffer, fieldName);
+	}
+
+	// ----------------------------------------------------------------------------
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} a {@code float} array.
+	 * </p>
+	 *
+	 * @param buffer     the {@code StringBuffer} to populate
+	 * @param fieldName  the field name
+	 * @param array      the array to add to the toString
+	 * @param fullDetail {@code true} for detail, {@code false} for summary info,
+	 *                   {@code null} for style decides
+	 */
+	public void append(final StringBuffer buffer, final String fieldName, final float[] array,
+			final Boolean fullDetail) {
+		appendFieldStart(buffer, fieldName);
+
+		if (array == null) {
+			appendNullText(buffer, fieldName);
+
+		} else if (isFullDetail(fullDetail)) {
+			appendDetail(buffer, fieldName, array);
+
+		} else {
+			appendSummary(buffer, fieldName, array);
+		}
+
+		appendFieldEnd(buffer, fieldName);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} an {@code int} value.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name
+	 * @param value     the value to add to the {@code toString}
+	 */
+	public void append(final StringBuffer buffer, final String fieldName, final int value) {
+		appendFieldStart(buffer, fieldName);
+		appendDetail(buffer, fieldName, value);
+		appendFieldEnd(buffer, fieldName);
+	}
+
+	// ----------------------------------------------------------------------------
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} an {@code int} array.
+	 * </p>
+	 *
+	 * @param buffer     the {@code StringBuffer} to populate
+	 * @param fieldName  the field name
+	 * @param array      the array to add to the {@code toString}
+	 * @param fullDetail {@code true} for detail, {@code false} for summary info,
+	 *                   {@code null} for style decides
+	 */
+	public void append(final StringBuffer buffer, final String fieldName, final int[] array, final Boolean fullDetail) {
+		appendFieldStart(buffer, fieldName);
+
+		if (array == null) {
+			appendNullText(buffer, fieldName);
+
+		} else if (isFullDetail(fullDetail)) {
+			appendDetail(buffer, fieldName, array);
+
+		} else {
+			appendSummary(buffer, fieldName, array);
+		}
+
+		appendFieldEnd(buffer, fieldName);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} a {@code long} value.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name
+	 * @param value     the value to add to the {@code toString}
+	 */
+	public void append(final StringBuffer buffer, final String fieldName, final long value) {
+		appendFieldStart(buffer, fieldName);
+		appendDetail(buffer, fieldName, value);
+		appendFieldEnd(buffer, fieldName);
+	}
+
+	// ----------------------------------------------------------------------------
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} a {@code long} array.
+	 * </p>
+	 *
+	 * @param buffer     the {@code StringBuffer} to populate
+	 * @param fieldName  the field name
+	 * @param array      the array to add to the {@code toString}
+	 * @param fullDetail {@code true} for detail, {@code false} for summary info,
+	 *                   {@code null} for style decides
+	 */
+	public void append(final StringBuffer buffer, final String fieldName, final long[] array,
+			final Boolean fullDetail) {
+		appendFieldStart(buffer, fieldName);
+
+		if (array == null) {
+			appendNullText(buffer, fieldName);
+
+		} else if (isFullDetail(fullDetail)) {
+			appendDetail(buffer, fieldName, array);
+
+		} else {
+			appendSummary(buffer, fieldName, array);
+		}
+
+		appendFieldEnd(buffer, fieldName);
+	}
 
 	/**
 	 * <p>
@@ -489,6 +1265,575 @@ public abstract class ToStringStyle implements Serializable {
 		}
 
 		appendFieldEnd(buffer, fieldName);
+	}
+
+	// ----------------------------------------------------------------------------
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} an {@code Object} array.
+	 * </p>
+	 *
+	 * @param buffer     the {@code StringBuffer} to populate
+	 * @param fieldName  the field name
+	 * @param array      the array to add to the toString
+	 * @param fullDetail {@code true} for detail, {@code false} for summary info,
+	 *                   {@code null} for style decides
+	 */
+	public void append(final StringBuffer buffer, final String fieldName, final Object[] array,
+			final Boolean fullDetail) {
+		appendFieldStart(buffer, fieldName);
+
+		if (array == null) {
+			appendNullText(buffer, fieldName);
+
+		} else if (isFullDetail(fullDetail)) {
+			appendDetail(buffer, fieldName, array);
+
+		} else {
+			appendSummary(buffer, fieldName, array);
+		}
+
+		appendFieldEnd(buffer, fieldName);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} a {@code short} value.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name
+	 * @param value     the value to add to the {@code toString}
+	 */
+	public void append(final StringBuffer buffer, final String fieldName, final short value) {
+		appendFieldStart(buffer, fieldName);
+		appendDetail(buffer, fieldName, value);
+		appendFieldEnd(buffer, fieldName);
+	}
+
+	// ----------------------------------------------------------------------------
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} a {@code short} array.
+	 * </p>
+	 *
+	 * @param buffer     the {@code StringBuffer} to populate
+	 * @param fieldName  the field name
+	 * @param array      the array to add to the {@code toString}
+	 * @param fullDetail {@code true} for detail, {@code false} for summary info,
+	 *                   {@code null} for style decides
+	 */
+	public void append(final StringBuffer buffer, final String fieldName, final short[] array,
+			final Boolean fullDetail) {
+		appendFieldStart(buffer, fieldName);
+
+		if (array == null) {
+			appendNullText(buffer, fieldName);
+
+		} else if (isFullDetail(fullDetail)) {
+			appendDetail(buffer, fieldName, array);
+
+		} else {
+			appendSummary(buffer, fieldName, array);
+		}
+
+		appendFieldEnd(buffer, fieldName);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} the class name.
+	 * </p>
+	 *
+	 * @param buffer the {@code StringBuffer} to populate
+	 * @param object the {@code Object} whose name to output
+	 */
+	protected void appendClassName(final StringBuffer buffer, final Object object) {
+		if (useClassName && object != null) {
+			register(object);
+			if (useShortClassName) {
+				buffer.append(getShortClassName(object.getClass()));
+			} else {
+				buffer.append(object.getClass().getName());
+			}
+		}
+	}
+
+	// ----------------------------------------------------------------------------
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} the content end.
+	 * </p>
+	 *
+	 * @param buffer the {@code StringBuffer} to populate
+	 */
+	protected void appendContentEnd(final StringBuffer buffer) {
+		buffer.append(contentEnd);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} the content start.
+	 * </p>
+	 *
+	 * @param buffer the {@code StringBuffer} to populate
+	 */
+	protected void appendContentStart(final StringBuffer buffer) {
+		buffer.append(contentStart);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} an {@code Object} value that has been detected
+	 * to participate in a cycle. This implementation will print the standard string
+	 * value of the value.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param value     the value to add to the {@code toString}, not {@code null}
+	 *
+	 * @since 2.2
+	 */
+	protected void appendCyclicObject(final StringBuffer buffer, final String fieldName, final Object value) {
+		ObjectUtils.identityToString(buffer, value);
+	}
+
+	// ----------------------------------------------------------------------------
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} a {@code boolean} value.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param value     the value to add to the {@code toString}
+	 */
+	protected void appendDetail(final StringBuffer buffer, final String fieldName, final boolean value) {
+		buffer.append(value);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} the detail of a {@code boolean} array.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param array     the array to add to the {@code toString}, not {@code null}
+	 */
+	protected void appendDetail(final StringBuffer buffer, final String fieldName, final boolean[] array) {
+		buffer.append(arrayStart);
+		for (int i = 0; i < array.length; i++) {
+			if (i > 0) {
+				buffer.append(arraySeparator);
+			}
+			appendDetail(buffer, fieldName, array[i]);
+		}
+		buffer.append(arrayEnd);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} a {@code byte} value.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param value     the value to add to the {@code toString}
+	 */
+	protected void appendDetail(final StringBuffer buffer, final String fieldName, final byte value) {
+		buffer.append(value);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} the detail of a {@code byte} array.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param array     the array to add to the {@code toString}, not {@code null}
+	 */
+	protected void appendDetail(final StringBuffer buffer, final String fieldName, final byte[] array) {
+		buffer.append(arrayStart);
+		for (int i = 0; i < array.length; i++) {
+			if (i > 0) {
+				buffer.append(arraySeparator);
+			}
+			appendDetail(buffer, fieldName, array[i]);
+		}
+		buffer.append(arrayEnd);
+	}
+
+	// ----------------------------------------------------------------------------
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} a {@code char} value.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param value     the value to add to the {@code toString}
+	 */
+	protected void appendDetail(final StringBuffer buffer, final String fieldName, final char value) {
+		buffer.append(value);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} the detail of a {@code char} array.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param array     the array to add to the {@code toString}, not {@code null}
+	 */
+	protected void appendDetail(final StringBuffer buffer, final String fieldName, final char[] array) {
+		buffer.append(arrayStart);
+		for (int i = 0; i < array.length; i++) {
+			if (i > 0) {
+				buffer.append(arraySeparator);
+			}
+			appendDetail(buffer, fieldName, array[i]);
+		}
+		buffer.append(arrayEnd);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} a {@code Collection}.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param coll      the {@code Collection} to add to the {@code toString}, not
+	 *                  {@code null}
+	 */
+	protected void appendDetail(final StringBuffer buffer, final String fieldName, final Collection<?> coll) {
+		buffer.append(coll);
+	}
+
+	// ----------------------------------------------------------------------------
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} a {@code double} value.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param value     the value to add to the {@code toString}
+	 */
+	protected void appendDetail(final StringBuffer buffer, final String fieldName, final double value) {
+		buffer.append(value);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} the detail of a {@code double} array.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param array     the array to add to the {@code toString}, not {@code null}
+	 */
+	protected void appendDetail(final StringBuffer buffer, final String fieldName, final double[] array) {
+		buffer.append(arrayStart);
+		for (int i = 0; i < array.length; i++) {
+			if (i > 0) {
+				buffer.append(arraySeparator);
+			}
+			appendDetail(buffer, fieldName, array[i]);
+		}
+		buffer.append(arrayEnd);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} a {@code float} value.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param value     the value to add to the {@code toString}
+	 */
+	protected void appendDetail(final StringBuffer buffer, final String fieldName, final float value) {
+		buffer.append(value);
+	}
+
+	// ----------------------------------------------------------------------------
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} the detail of a {@code float} array.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param array     the array to add to the {@code toString}, not {@code null}
+	 */
+	protected void appendDetail(final StringBuffer buffer, final String fieldName, final float[] array) {
+		buffer.append(arrayStart);
+		for (int i = 0; i < array.length; i++) {
+			if (i > 0) {
+				buffer.append(arraySeparator);
+			}
+			appendDetail(buffer, fieldName, array[i]);
+		}
+		buffer.append(arrayEnd);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} an {@code int} value.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param value     the value to add to the {@code toString}
+	 */
+	protected void appendDetail(final StringBuffer buffer, final String fieldName, final int value) {
+		buffer.append(value);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} the detail of an {@code Object} array item.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param i         the array item index to add
+	 * @param item      the array item to add
+	 * @since 3.11
+	 */
+	protected void appendDetail(final StringBuffer buffer, final String fieldName, final int i, final Object item) {
+		if (i > 0) {
+			buffer.append(arraySeparator);
+		}
+		if (item == null) {
+			appendNullText(buffer, fieldName);
+		} else {
+			appendInternal(buffer, fieldName, item, arrayContentDetail);
+		}
+	}
+
+	// ----------------------------------------------------------------------------
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} the detail of an {@code int} array.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param array     the array to add to the {@code toString}, not {@code null}
+	 */
+	protected void appendDetail(final StringBuffer buffer, final String fieldName, final int[] array) {
+		buffer.append(arrayStart);
+		for (int i = 0; i < array.length; i++) {
+			if (i > 0) {
+				buffer.append(arraySeparator);
+			}
+			appendDetail(buffer, fieldName, array[i]);
+		}
+		buffer.append(arrayEnd);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} a {@code long} value.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param value     the value to add to the {@code toString}
+	 */
+	protected void appendDetail(final StringBuffer buffer, final String fieldName, final long value) {
+		buffer.append(value);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} the detail of a {@code long} array.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param array     the array to add to the {@code toString}, not {@code null}
+	 */
+	protected void appendDetail(final StringBuffer buffer, final String fieldName, final long[] array) {
+		buffer.append(arrayStart);
+		for (int i = 0; i < array.length; i++) {
+			if (i > 0) {
+				buffer.append(arraySeparator);
+			}
+			appendDetail(buffer, fieldName, array[i]);
+		}
+		buffer.append(arrayEnd);
+	}
+
+	// ----------------------------------------------------------------------------
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} a {@code Map}.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param map       the {@code Map} to add to the {@code toString}, not
+	 *                  {@code null}
+	 */
+	protected void appendDetail(final StringBuffer buffer, final String fieldName, final Map<?, ?> map) {
+		buffer.append(map);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} an {@code Object} value, printing the full
+	 * detail of the {@code Object}.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param value     the value to add to the {@code toString}, not {@code null}
+	 */
+	protected void appendDetail(final StringBuffer buffer, final String fieldName, final Object value) {
+		buffer.append(value);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} the detail of an {@code Object} array.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param array     the array to add to the {@code toString}, not {@code null}
+	 */
+	protected void appendDetail(final StringBuffer buffer, final String fieldName, final Object[] array) {
+		buffer.append(arrayStart);
+		for (int i = 0; i < array.length; i++) {
+			final Object item = array[i];
+			appendDetail(buffer, fieldName, i, item);
+		}
+		buffer.append(arrayEnd);
+	}
+
+	// ----------------------------------------------------------------------------
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} a {@code short} value.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param value     the value to add to the {@code toString}
+	 */
+	protected void appendDetail(final StringBuffer buffer, final String fieldName, final short value) {
+		buffer.append(value);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} the detail of a {@code short} array.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param array     the array to add to the {@code toString}, not {@code null}
+	 */
+	protected void appendDetail(final StringBuffer buffer, final String fieldName, final short[] array) {
+		buffer.append(arrayStart);
+		for (int i = 0; i < array.length; i++) {
+			if (i > 0) {
+				buffer.append(arraySeparator);
+			}
+			appendDetail(buffer, fieldName, array[i]);
+		}
+		buffer.append(arrayEnd);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} the end of data indicator.
+	 * </p>
+	 *
+	 * @param buffer the {@code StringBuffer} to populate
+	 * @param object the {@code Object} to build a {@code toString} for.
+	 */
+	public void appendEnd(final StringBuffer buffer, final Object object) {
+		if (!this.fieldSeparatorAtEnd) {
+			removeLastFieldSeparator(buffer);
+		}
+		appendContentEnd(buffer);
+		unregister(object);
+	}
+
+	// ----------------------------------------------------------------------------
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} the field end.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 */
+	protected void appendFieldEnd(final StringBuffer buffer, final String fieldName) {
+		appendFieldSeparator(buffer);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} the field separator.
+	 * </p>
+	 *
+	 * @param buffer the {@code StringBuffer} to populate
+	 */
+	protected void appendFieldSeparator(final StringBuffer buffer) {
+		buffer.append(fieldSeparator);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} the field start.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name
+	 */
+	protected void appendFieldStart(final StringBuffer buffer, final String fieldName) {
+		if (useFieldNames && fieldName != null) {
+			buffer.append(fieldName);
+			buffer.append(fieldNameValueSeparator);
+		}
+	}
+
+	// ----------------------------------------------------------------------------
+
+	/**
+	 * <p>
+	 * Append the {@link System#identityHashCode(java.lang.Object)}.
+	 * </p>
+	 *
+	 * @param buffer the {@code StringBuffer} to populate
+	 * @param object the {@code Object} whose id to output
+	 */
+	protected void appendIdentityHashCode(final StringBuffer buffer, final Object object) {
+		if (this.isUseIdentityHashCode() && object != null) {
+			register(object);
+			buffer.append('@');
+			buffer.append(Integer.toHexString(System.identityHashCode(object)));
+		}
 	}
 
 	/**
@@ -617,61 +1962,130 @@ public abstract class ToStringStyle implements Serializable {
 
 	/**
 	 * <p>
-	 * Append to the {@code toString} an {@code Object} value that has been detected
-	 * to participate in a cycle. This implementation will print the standard string
-	 * value of the value.
+	 * Append to the {@code toString} an indicator for {@code null}.
+	 * </p>
+	 *
+	 * <p>
+	 * The default indicator is {@code '&lt;null&gt;'}.
 	 * </p>
 	 *
 	 * @param buffer    the {@code StringBuffer} to populate
 	 * @param fieldName the field name, typically not used as already appended
-	 * @param value     the value to add to the {@code toString}, not {@code null}
-	 *
-	 * @since 2.2
 	 */
-	protected void appendCyclicObject(final StringBuffer buffer, final String fieldName, final Object value) {
-		ObjectUtils.identityToString(buffer, value);
+	protected void appendNullText(final StringBuffer buffer, final String fieldName) {
+		buffer.append(nullText);
+	}
+
+	// ----------------------------------------------------------------------------
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} the start of data indicator.
+	 * </p>
+	 *
+	 * @param buffer the {@code StringBuffer} to populate
+	 * @param object the {@code Object} to build a {@code toString} for
+	 */
+	public void appendStart(final StringBuffer buffer, final Object object) {
+		if (object != null) {
+			appendClassName(buffer, object);
+			appendIdentityHashCode(buffer, object);
+			appendContentStart(buffer);
+			if (fieldSeparatorAtStart) {
+				appendFieldSeparator(buffer);
+			}
+		}
 	}
 
 	/**
 	 * <p>
-	 * Append to the {@code toString} an {@code Object} value, printing the full
-	 * detail of the {@code Object}.
+	 * Append to the {@code toString} a summary of a {@code boolean} array.
 	 * </p>
 	 *
 	 * @param buffer    the {@code StringBuffer} to populate
 	 * @param fieldName the field name, typically not used as already appended
-	 * @param value     the value to add to the {@code toString}, not {@code null}
+	 * @param array     the array to add to the {@code toString}, not {@code null}
 	 */
-	protected void appendDetail(final StringBuffer buffer, final String fieldName, final Object value) {
-		buffer.append(value);
+	protected void appendSummary(final StringBuffer buffer, final String fieldName, final boolean[] array) {
+		appendSummarySize(buffer, fieldName, array.length);
 	}
 
 	/**
 	 * <p>
-	 * Append to the {@code toString} a {@code Collection}.
+	 * Append to the {@code toString} a summary of a {@code byte} array.
 	 * </p>
 	 *
 	 * @param buffer    the {@code StringBuffer} to populate
 	 * @param fieldName the field name, typically not used as already appended
-	 * @param coll      the {@code Collection} to add to the {@code toString}, not
-	 *                  {@code null}
+	 * @param array     the array to add to the {@code toString}, not {@code null}
 	 */
-	protected void appendDetail(final StringBuffer buffer, final String fieldName, final Collection<?> coll) {
-		buffer.append(coll);
+	protected void appendSummary(final StringBuffer buffer, final String fieldName, final byte[] array) {
+		appendSummarySize(buffer, fieldName, array.length);
 	}
 
 	/**
 	 * <p>
-	 * Append to the {@code toString} a {@code Map}.
+	 * Append to the {@code toString} a summary of a {@code char} array.
 	 * </p>
 	 *
 	 * @param buffer    the {@code StringBuffer} to populate
 	 * @param fieldName the field name, typically not used as already appended
-	 * @param map       the {@code Map} to add to the {@code toString}, not
-	 *                  {@code null}
+	 * @param array     the array to add to the {@code toString}, not {@code null}
 	 */
-	protected void appendDetail(final StringBuffer buffer, final String fieldName, final Map<?, ?> map) {
-		buffer.append(map);
+	protected void appendSummary(final StringBuffer buffer, final String fieldName, final char[] array) {
+		appendSummarySize(buffer, fieldName, array.length);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} a summary of a {@code double} array.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param array     the array to add to the {@code toString}, not {@code null}
+	 */
+	protected void appendSummary(final StringBuffer buffer, final String fieldName, final double[] array) {
+		appendSummarySize(buffer, fieldName, array.length);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} a summary of a {@code float} array.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param array     the array to add to the {@code toString}, not {@code null}
+	 */
+	protected void appendSummary(final StringBuffer buffer, final String fieldName, final float[] array) {
+		appendSummarySize(buffer, fieldName, array.length);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} a summary of an {@code int} array.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param array     the array to add to the {@code toString}, not {@code null}
+	 */
+	protected void appendSummary(final StringBuffer buffer, final String fieldName, final int[] array) {
+		appendSummarySize(buffer, fieldName, array.length);
+	}
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} a summary of a {@code long} array.
+	 * </p>
+	 *
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param array     the array to add to the {@code toString}, not {@code null}
+	 */
+	protected void appendSummary(final StringBuffer buffer, final String fieldName, final long[] array) {
+		appendSummarySize(buffer, fieldName, array.length);
 	}
 
 	/**
@@ -690,336 +2104,6 @@ public abstract class ToStringStyle implements Serializable {
 		buffer.append(summaryObjectEndText);
 	}
 
-	// ----------------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a {@code long} value.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name
-	 * @param value     the value to add to the {@code toString}
-	 */
-	public void append(final StringBuffer buffer, final String fieldName, final long value) {
-		appendFieldStart(buffer, fieldName);
-		appendDetail(buffer, fieldName, value);
-		appendFieldEnd(buffer, fieldName);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a {@code long} value.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 * @param value     the value to add to the {@code toString}
-	 */
-	protected void appendDetail(final StringBuffer buffer, final String fieldName, final long value) {
-		buffer.append(value);
-	}
-
-	// ----------------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} an {@code int} value.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name
-	 * @param value     the value to add to the {@code toString}
-	 */
-	public void append(final StringBuffer buffer, final String fieldName, final int value) {
-		appendFieldStart(buffer, fieldName);
-		appendDetail(buffer, fieldName, value);
-		appendFieldEnd(buffer, fieldName);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} an {@code int} value.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 * @param value     the value to add to the {@code toString}
-	 */
-	protected void appendDetail(final StringBuffer buffer, final String fieldName, final int value) {
-		buffer.append(value);
-	}
-
-	// ----------------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a {@code short} value.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name
-	 * @param value     the value to add to the {@code toString}
-	 */
-	public void append(final StringBuffer buffer, final String fieldName, final short value) {
-		appendFieldStart(buffer, fieldName);
-		appendDetail(buffer, fieldName, value);
-		appendFieldEnd(buffer, fieldName);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a {@code short} value.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 * @param value     the value to add to the {@code toString}
-	 */
-	protected void appendDetail(final StringBuffer buffer, final String fieldName, final short value) {
-		buffer.append(value);
-	}
-
-	// ----------------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a {@code byte} value.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name
-	 * @param value     the value to add to the {@code toString}
-	 */
-	public void append(final StringBuffer buffer, final String fieldName, final byte value) {
-		appendFieldStart(buffer, fieldName);
-		appendDetail(buffer, fieldName, value);
-		appendFieldEnd(buffer, fieldName);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a {@code byte} value.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 * @param value     the value to add to the {@code toString}
-	 */
-	protected void appendDetail(final StringBuffer buffer, final String fieldName, final byte value) {
-		buffer.append(value);
-	}
-
-	// ----------------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a {@code char} value.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name
-	 * @param value     the value to add to the {@code toString}
-	 */
-	public void append(final StringBuffer buffer, final String fieldName, final char value) {
-		appendFieldStart(buffer, fieldName);
-		appendDetail(buffer, fieldName, value);
-		appendFieldEnd(buffer, fieldName);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a {@code char} value.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 * @param value     the value to add to the {@code toString}
-	 */
-	protected void appendDetail(final StringBuffer buffer, final String fieldName, final char value) {
-		buffer.append(value);
-	}
-
-	// ----------------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a {@code double} value.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name
-	 * @param value     the value to add to the {@code toString}
-	 */
-	public void append(final StringBuffer buffer, final String fieldName, final double value) {
-		appendFieldStart(buffer, fieldName);
-		appendDetail(buffer, fieldName, value);
-		appendFieldEnd(buffer, fieldName);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a {@code double} value.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 * @param value     the value to add to the {@code toString}
-	 */
-	protected void appendDetail(final StringBuffer buffer, final String fieldName, final double value) {
-		buffer.append(value);
-	}
-
-	// ----------------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a {@code float} value.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name
-	 * @param value     the value to add to the {@code toString}
-	 */
-	public void append(final StringBuffer buffer, final String fieldName, final float value) {
-		appendFieldStart(buffer, fieldName);
-		appendDetail(buffer, fieldName, value);
-		appendFieldEnd(buffer, fieldName);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a {@code float} value.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 * @param value     the value to add to the {@code toString}
-	 */
-	protected void appendDetail(final StringBuffer buffer, final String fieldName, final float value) {
-		buffer.append(value);
-	}
-
-	// ----------------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a {@code boolean} value.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name
-	 * @param value     the value to add to the {@code toString}
-	 */
-	public void append(final StringBuffer buffer, final String fieldName, final boolean value) {
-		appendFieldStart(buffer, fieldName);
-		appendDetail(buffer, fieldName, value);
-		appendFieldEnd(buffer, fieldName);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a {@code boolean} value.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 * @param value     the value to add to the {@code toString}
-	 */
-	protected void appendDetail(final StringBuffer buffer, final String fieldName, final boolean value) {
-		buffer.append(value);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} an {@code Object} array.
-	 * </p>
-	 *
-	 * @param buffer     the {@code StringBuffer} to populate
-	 * @param fieldName  the field name
-	 * @param array      the array to add to the toString
-	 * @param fullDetail {@code true} for detail, {@code false} for summary info,
-	 *                   {@code null} for style decides
-	 */
-	public void append(final StringBuffer buffer, final String fieldName, final Object[] array,
-			final Boolean fullDetail) {
-		appendFieldStart(buffer, fieldName);
-
-		if (array == null) {
-			appendNullText(buffer, fieldName);
-
-		} else if (isFullDetail(fullDetail)) {
-			appendDetail(buffer, fieldName, array);
-
-		} else {
-			appendSummary(buffer, fieldName, array);
-		}
-
-		appendFieldEnd(buffer, fieldName);
-	}
-
-	// ----------------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} the detail of an {@code Object} array.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 * @param array     the array to add to the {@code toString}, not {@code null}
-	 */
-	protected void appendDetail(final StringBuffer buffer, final String fieldName, final Object[] array) {
-		buffer.append(arrayStart);
-		for (int i = 0; i < array.length; i++) {
-			final Object item = array[i];
-			appendDetail(buffer, fieldName, i, item);
-		}
-		buffer.append(arrayEnd);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} the detail of an {@code Object} array item.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 * @param i         the array item index to add
-	 * @param item      the array item to add
-	 * @since 3.11
-	 */
-	protected void appendDetail(final StringBuffer buffer, final String fieldName, final int i, final Object item) {
-		if (i > 0) {
-			buffer.append(arraySeparator);
-		}
-		if (item == null) {
-			appendNullText(buffer, fieldName);
-		} else {
-			appendInternal(buffer, fieldName, item, arrayContentDetail);
-		}
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} the detail of an array type.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 * @param array     the array to add to the {@code toString}, not {@code null}
-	 * @since 2.0
-	 */
-	protected void reflectionAppendArrayDetail(final StringBuffer buffer, final String fieldName, final Object array) {
-		buffer.append(arrayStart);
-		final int length = Array.getLength(array);
-		for (int i = 0; i < length; i++) {
-			final Object item = Array.get(array, i);
-			appendDetail(buffer, fieldName, i, item);
-		}
-		buffer.append(arrayEnd);
-	}
-
 	/**
 	 * <p>
 	 * Append to the {@code toString} a summary of an {@code Object} array.
@@ -1031,181 +2115,6 @@ public abstract class ToStringStyle implements Serializable {
 	 */
 	protected void appendSummary(final StringBuffer buffer, final String fieldName, final Object[] array) {
 		appendSummarySize(buffer, fieldName, array.length);
-	}
-
-	// ----------------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a {@code long} array.
-	 * </p>
-	 *
-	 * @param buffer     the {@code StringBuffer} to populate
-	 * @param fieldName  the field name
-	 * @param array      the array to add to the {@code toString}
-	 * @param fullDetail {@code true} for detail, {@code false} for summary info,
-	 *                   {@code null} for style decides
-	 */
-	public void append(final StringBuffer buffer, final String fieldName, final long[] array,
-			final Boolean fullDetail) {
-		appendFieldStart(buffer, fieldName);
-
-		if (array == null) {
-			appendNullText(buffer, fieldName);
-
-		} else if (isFullDetail(fullDetail)) {
-			appendDetail(buffer, fieldName, array);
-
-		} else {
-			appendSummary(buffer, fieldName, array);
-		}
-
-		appendFieldEnd(buffer, fieldName);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} the detail of a {@code long} array.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 * @param array     the array to add to the {@code toString}, not {@code null}
-	 */
-	protected void appendDetail(final StringBuffer buffer, final String fieldName, final long[] array) {
-		buffer.append(arrayStart);
-		for (int i = 0; i < array.length; i++) {
-			if (i > 0) {
-				buffer.append(arraySeparator);
-			}
-			appendDetail(buffer, fieldName, array[i]);
-		}
-		buffer.append(arrayEnd);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a summary of a {@code long} array.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 * @param array     the array to add to the {@code toString}, not {@code null}
-	 */
-	protected void appendSummary(final StringBuffer buffer, final String fieldName, final long[] array) {
-		appendSummarySize(buffer, fieldName, array.length);
-	}
-
-	// ----------------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} an {@code int} array.
-	 * </p>
-	 *
-	 * @param buffer     the {@code StringBuffer} to populate
-	 * @param fieldName  the field name
-	 * @param array      the array to add to the {@code toString}
-	 * @param fullDetail {@code true} for detail, {@code false} for summary info,
-	 *                   {@code null} for style decides
-	 */
-	public void append(final StringBuffer buffer, final String fieldName, final int[] array, final Boolean fullDetail) {
-		appendFieldStart(buffer, fieldName);
-
-		if (array == null) {
-			appendNullText(buffer, fieldName);
-
-		} else if (isFullDetail(fullDetail)) {
-			appendDetail(buffer, fieldName, array);
-
-		} else {
-			appendSummary(buffer, fieldName, array);
-		}
-
-		appendFieldEnd(buffer, fieldName);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} the detail of an {@code int} array.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 * @param array     the array to add to the {@code toString}, not {@code null}
-	 */
-	protected void appendDetail(final StringBuffer buffer, final String fieldName, final int[] array) {
-		buffer.append(arrayStart);
-		for (int i = 0; i < array.length; i++) {
-			if (i > 0) {
-				buffer.append(arraySeparator);
-			}
-			appendDetail(buffer, fieldName, array[i]);
-		}
-		buffer.append(arrayEnd);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a summary of an {@code int} array.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 * @param array     the array to add to the {@code toString}, not {@code null}
-	 */
-	protected void appendSummary(final StringBuffer buffer, final String fieldName, final int[] array) {
-		appendSummarySize(buffer, fieldName, array.length);
-	}
-
-	// ----------------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a {@code short} array.
-	 * </p>
-	 *
-	 * @param buffer     the {@code StringBuffer} to populate
-	 * @param fieldName  the field name
-	 * @param array      the array to add to the {@code toString}
-	 * @param fullDetail {@code true} for detail, {@code false} for summary info,
-	 *                   {@code null} for style decides
-	 */
-	public void append(final StringBuffer buffer, final String fieldName, final short[] array,
-			final Boolean fullDetail) {
-		appendFieldStart(buffer, fieldName);
-
-		if (array == null) {
-			appendNullText(buffer, fieldName);
-
-		} else if (isFullDetail(fullDetail)) {
-			appendDetail(buffer, fieldName, array);
-
-		} else {
-			appendSummary(buffer, fieldName, array);
-		}
-
-		appendFieldEnd(buffer, fieldName);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} the detail of a {@code short} array.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 * @param array     the array to add to the {@code toString}, not {@code null}
-	 */
-	protected void appendDetail(final StringBuffer buffer, final String fieldName, final short[] array) {
-		buffer.append(arrayStart);
-		for (int i = 0; i < array.length; i++) {
-			if (i > 0) {
-				buffer.append(arraySeparator);
-			}
-			appendDetail(buffer, fieldName, array[i]);
-		}
-		buffer.append(arrayEnd);
 	}
 
 	/**
@@ -1221,433 +2130,10 @@ public abstract class ToStringStyle implements Serializable {
 		appendSummarySize(buffer, fieldName, array.length);
 	}
 
-	// ----------------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a {@code byte} array.
-	 * </p>
-	 *
-	 * @param buffer     the {@code StringBuffer} to populate
-	 * @param fieldName  the field name
-	 * @param array      the array to add to the {@code toString}
-	 * @param fullDetail {@code true} for detail, {@code false} for summary info,
-	 *                   {@code null} for style decides
-	 */
-	public void append(final StringBuffer buffer, final String fieldName, final byte[] array,
-			final Boolean fullDetail) {
-		appendFieldStart(buffer, fieldName);
-
-		if (array == null) {
-			appendNullText(buffer, fieldName);
-
-		} else if (isFullDetail(fullDetail)) {
-			appendDetail(buffer, fieldName, array);
-
-		} else {
-			appendSummary(buffer, fieldName, array);
-		}
-
-		appendFieldEnd(buffer, fieldName);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} the detail of a {@code byte} array.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 * @param array     the array to add to the {@code toString}, not {@code null}
-	 */
-	protected void appendDetail(final StringBuffer buffer, final String fieldName, final byte[] array) {
-		buffer.append(arrayStart);
-		for (int i = 0; i < array.length; i++) {
-			if (i > 0) {
-				buffer.append(arraySeparator);
-			}
-			appendDetail(buffer, fieldName, array[i]);
-		}
-		buffer.append(arrayEnd);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a summary of a {@code byte} array.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 * @param array     the array to add to the {@code toString}, not {@code null}
-	 */
-	protected void appendSummary(final StringBuffer buffer, final String fieldName, final byte[] array) {
-		appendSummarySize(buffer, fieldName, array.length);
-	}
-
-	// ----------------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a {@code char} array.
-	 * </p>
-	 *
-	 * @param buffer     the {@code StringBuffer} to populate
-	 * @param fieldName  the field name
-	 * @param array      the array to add to the {@code toString}
-	 * @param fullDetail {@code true} for detail, {@code false} for summary info,
-	 *                   {@code null} for style decides
-	 */
-	public void append(final StringBuffer buffer, final String fieldName, final char[] array,
-			final Boolean fullDetail) {
-		appendFieldStart(buffer, fieldName);
-
-		if (array == null) {
-			appendNullText(buffer, fieldName);
-
-		} else if (isFullDetail(fullDetail)) {
-			appendDetail(buffer, fieldName, array);
-
-		} else {
-			appendSummary(buffer, fieldName, array);
-		}
-
-		appendFieldEnd(buffer, fieldName);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} the detail of a {@code char} array.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 * @param array     the array to add to the {@code toString}, not {@code null}
-	 */
-	protected void appendDetail(final StringBuffer buffer, final String fieldName, final char[] array) {
-		buffer.append(arrayStart);
-		for (int i = 0; i < array.length; i++) {
-			if (i > 0) {
-				buffer.append(arraySeparator);
-			}
-			appendDetail(buffer, fieldName, array[i]);
-		}
-		buffer.append(arrayEnd);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a summary of a {@code char} array.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 * @param array     the array to add to the {@code toString}, not {@code null}
-	 */
-	protected void appendSummary(final StringBuffer buffer, final String fieldName, final char[] array) {
-		appendSummarySize(buffer, fieldName, array.length);
-	}
-
-	// ----------------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a {@code double} array.
-	 * </p>
-	 *
-	 * @param buffer     the {@code StringBuffer} to populate
-	 * @param fieldName  the field name
-	 * @param array      the array to add to the toString
-	 * @param fullDetail {@code true} for detail, {@code false} for summary info,
-	 *                   {@code null} for style decides
-	 */
-	public void append(final StringBuffer buffer, final String fieldName, final double[] array,
-			final Boolean fullDetail) {
-		appendFieldStart(buffer, fieldName);
-
-		if (array == null) {
-			appendNullText(buffer, fieldName);
-
-		} else if (isFullDetail(fullDetail)) {
-			appendDetail(buffer, fieldName, array);
-
-		} else {
-			appendSummary(buffer, fieldName, array);
-		}
-
-		appendFieldEnd(buffer, fieldName);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} the detail of a {@code double} array.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 * @param array     the array to add to the {@code toString}, not {@code null}
-	 */
-	protected void appendDetail(final StringBuffer buffer, final String fieldName, final double[] array) {
-		buffer.append(arrayStart);
-		for (int i = 0; i < array.length; i++) {
-			if (i > 0) {
-				buffer.append(arraySeparator);
-			}
-			appendDetail(buffer, fieldName, array[i]);
-		}
-		buffer.append(arrayEnd);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a summary of a {@code double} array.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 * @param array     the array to add to the {@code toString}, not {@code null}
-	 */
-	protected void appendSummary(final StringBuffer buffer, final String fieldName, final double[] array) {
-		appendSummarySize(buffer, fieldName, array.length);
-	}
-
-	// ----------------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a {@code float} array.
-	 * </p>
-	 *
-	 * @param buffer     the {@code StringBuffer} to populate
-	 * @param fieldName  the field name
-	 * @param array      the array to add to the toString
-	 * @param fullDetail {@code true} for detail, {@code false} for summary info,
-	 *                   {@code null} for style decides
-	 */
-	public void append(final StringBuffer buffer, final String fieldName, final float[] array,
-			final Boolean fullDetail) {
-		appendFieldStart(buffer, fieldName);
-
-		if (array == null) {
-			appendNullText(buffer, fieldName);
-
-		} else if (isFullDetail(fullDetail)) {
-			appendDetail(buffer, fieldName, array);
-
-		} else {
-			appendSummary(buffer, fieldName, array);
-		}
-
-		appendFieldEnd(buffer, fieldName);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} the detail of a {@code float} array.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 * @param array     the array to add to the {@code toString}, not {@code null}
-	 */
-	protected void appendDetail(final StringBuffer buffer, final String fieldName, final float[] array) {
-		buffer.append(arrayStart);
-		for (int i = 0; i < array.length; i++) {
-			if (i > 0) {
-				buffer.append(arraySeparator);
-			}
-			appendDetail(buffer, fieldName, array[i]);
-		}
-		buffer.append(arrayEnd);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a summary of a {@code float} array.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 * @param array     the array to add to the {@code toString}, not {@code null}
-	 */
-	protected void appendSummary(final StringBuffer buffer, final String fieldName, final float[] array) {
-		appendSummarySize(buffer, fieldName, array.length);
-	}
-
-	// ----------------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a {@code boolean} array.
-	 * </p>
-	 *
-	 * @param buffer     the {@code StringBuffer} to populate
-	 * @param fieldName  the field name
-	 * @param array      the array to add to the toString
-	 * @param fullDetail {@code true} for detail, {@code false} for summary info,
-	 *                   {@code null} for style decides
-	 */
-	public void append(final StringBuffer buffer, final String fieldName, final boolean[] array,
-			final Boolean fullDetail) {
-		appendFieldStart(buffer, fieldName);
-
-		if (array == null) {
-			appendNullText(buffer, fieldName);
-
-		} else if (isFullDetail(fullDetail)) {
-			appendDetail(buffer, fieldName, array);
-
-		} else {
-			appendSummary(buffer, fieldName, array);
-		}
-
-		appendFieldEnd(buffer, fieldName);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} the detail of a {@code boolean} array.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 * @param array     the array to add to the {@code toString}, not {@code null}
-	 */
-	protected void appendDetail(final StringBuffer buffer, final String fieldName, final boolean[] array) {
-		buffer.append(arrayStart);
-		for (int i = 0; i < array.length; i++) {
-			if (i > 0) {
-				buffer.append(arraySeparator);
-			}
-			appendDetail(buffer, fieldName, array[i]);
-		}
-		buffer.append(arrayEnd);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} a summary of a {@code boolean} array.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 * @param array     the array to add to the {@code toString}, not {@code null}
-	 */
-	protected void appendSummary(final StringBuffer buffer, final String fieldName, final boolean[] array) {
-		appendSummarySize(buffer, fieldName, array.length);
-	}
-
-	// ----------------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} the class name.
-	 * </p>
-	 *
-	 * @param buffer the {@code StringBuffer} to populate
-	 * @param object the {@code Object} whose name to output
-	 */
-	protected void appendClassName(final StringBuffer buffer, final Object object) {
-		if (useClassName && object != null) {
-			register(object);
-			if (useShortClassName) {
-				buffer.append(getShortClassName(object.getClass()));
-			} else {
-				buffer.append(object.getClass().getName());
-			}
-		}
-	}
-
-	/**
-	 * <p>
-	 * Append the {@link System#identityHashCode(java.lang.Object)}.
-	 * </p>
-	 *
-	 * @param buffer the {@code StringBuffer} to populate
-	 * @param object the {@code Object} whose id to output
-	 */
-	protected void appendIdentityHashCode(final StringBuffer buffer, final Object object) {
-		if (this.isUseIdentityHashCode() && object != null) {
-			register(object);
-			buffer.append('@');
-			buffer.append(Integer.toHexString(System.identityHashCode(object)));
-		}
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} the content start.
-	 * </p>
-	 *
-	 * @param buffer the {@code StringBuffer} to populate
-	 */
-	protected void appendContentStart(final StringBuffer buffer) {
-		buffer.append(contentStart);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} the content end.
-	 * </p>
-	 *
-	 * @param buffer the {@code StringBuffer} to populate
-	 */
-	protected void appendContentEnd(final StringBuffer buffer) {
-		buffer.append(contentEnd);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} an indicator for {@code null}.
-	 * </p>
-	 *
-	 * <p>
-	 * The default indicator is {@code '&lt;null&gt;'}.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 */
-	protected void appendNullText(final StringBuffer buffer, final String fieldName) {
-		buffer.append(nullText);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} the field separator.
-	 * </p>
-	 *
-	 * @param buffer the {@code StringBuffer} to populate
-	 */
-	protected void appendFieldSeparator(final StringBuffer buffer) {
-		buffer.append(fieldSeparator);
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} the field start.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name
-	 */
-	protected void appendFieldStart(final StringBuffer buffer, final String fieldName) {
-		if (useFieldNames && fieldName != null) {
-			buffer.append(fieldName);
-			buffer.append(fieldNameValueSeparator);
-		}
-	}
-
-	/**
-	 * <p>
-	 * Append to the {@code toString} the field end.
-	 * </p>
-	 *
-	 * @param buffer    the {@code StringBuffer} to populate
-	 * @param fieldName the field name, typically not used as already appended
-	 */
-	protected void appendFieldEnd(final StringBuffer buffer, final String fieldName) {
-		appendFieldSeparator(buffer);
-	}
+	// Setters and getters for the customizable parts of the style
+	// These methods are not expected to be overridden, except to make public
+	// (They are not public so that immutable subclasses can be written)
+	// ---------------------------------------------------------------------
 
 	/**
 	 * <p>
@@ -1679,6 +2165,291 @@ public abstract class ToStringStyle implements Serializable {
 
 	/**
 	 * <p>
+	 * Append to the {@code toString} the superclass toString.
+	 * </p>
+	 * <p>
+	 * NOTE: It assumes that the toString has been created from the same
+	 * ToStringStyle.
+	 * </p>
+	 *
+	 * <p>
+	 * A {@code null} {@code superToString} is ignored.
+	 * </p>
+	 *
+	 * @param buffer        the {@code StringBuffer} to populate
+	 * @param superToString the {@code super.toString()}
+	 * @since 2.0
+	 */
+	public void appendSuper(final StringBuffer buffer, final String superToString) {
+		appendToString(buffer, superToString);
+	}
+
+	// ---------------------------------------------------------------------
+
+	/**
+	 * <p>
+	 * Append to the {@code toString} another toString.
+	 * </p>
+	 * <p>
+	 * NOTE: It assumes that the toString has been created from the same
+	 * ToStringStyle.
+	 * </p>
+	 *
+	 * <p>
+	 * A {@code null} {@code toString} is ignored.
+	 * </p>
+	 *
+	 * @param buffer   the {@code StringBuffer} to populate
+	 * @param toString the additional {@code toString}
+	 * @since 2.0
+	 */
+	public void appendToString(final StringBuffer buffer, final String toString) {
+		if (toString != null) {
+			final int pos1 = toString.indexOf(contentStart) + contentStart.length();
+			final int pos2 = toString.lastIndexOf(contentEnd);
+			if (pos1 != pos2 && pos1 >= 0 && pos2 >= 0) {
+				if (fieldSeparatorAtStart) {
+					removeLastFieldSeparator(buffer);
+				}
+				buffer.append(toString, pos1, pos2);
+				appendFieldSeparator(buffer);
+			}
+		}
+	}
+
+	/**
+	 * <p>
+	 * Gets the array end text.
+	 * </p>
+	 *
+	 * @return the current array end text
+	 */
+	protected String getArrayEnd() {
+		return arrayEnd;
+	}
+
+	// ---------------------------------------------------------------------
+
+	/**
+	 * <p>
+	 * Gets the array separator text.
+	 * </p>
+	 *
+	 * @return the current array separator text
+	 */
+	protected String getArraySeparator() {
+		return arraySeparator;
+	}
+
+	/**
+	 * <p>
+	 * Gets the array start text.
+	 * </p>
+	 *
+	 * @return the current array start text
+	 */
+	protected String getArrayStart() {
+		return arrayStart;
+	}
+
+	// ---------------------------------------------------------------------
+
+	/**
+	 * <p>
+	 * Gets the content end text.
+	 * </p>
+	 *
+	 * @return the current content end text
+	 */
+	protected String getContentEnd() {
+		return contentEnd;
+	}
+
+	/**
+	 * <p>
+	 * Gets the content start text.
+	 * </p>
+	 *
+	 * @return the current content start text
+	 */
+	protected String getContentStart() {
+		return contentStart;
+	}
+
+	// ---------------------------------------------------------------------
+
+	/**
+	 * <p>
+	 * Gets the field name value separator text.
+	 * </p>
+	 *
+	 * @return the current field name value separator text
+	 */
+	protected String getFieldNameValueSeparator() {
+		return fieldNameValueSeparator;
+	}
+
+	/**
+	 * <p>
+	 * Gets the field separator text.
+	 * </p>
+	 *
+	 * @return the current field separator text
+	 */
+	protected String getFieldSeparator() {
+		return fieldSeparator;
+	}
+
+	// ---------------------------------------------------------------------
+
+	/**
+	 * <p>
+	 * Gets the text to output when {@code null} found.
+	 * </p>
+	 *
+	 * @return the current text to output when null found
+	 */
+	protected String getNullText() {
+		return nullText;
+	}
+
+	/**
+	 * <p>
+	 * Gets the short class name for a class.
+	 * </p>
+	 *
+	 * <p>
+	 * The short class name is the classname excluding the package name.
+	 * </p>
+	 *
+	 * @param cls the {@code Class} to get the short name of
+	 * @return the short name
+	 */
+	protected String getShortClassName(final Class<?> cls) {
+		return cls.getSimpleName();
+	}
+
+	// ---------------------------------------------------------------------
+
+	/**
+	 * <p>
+	 * Gets the end text to output when a {@code Collection}, {@code Map} or array
+	 * size is output.
+	 * </p>
+	 *
+	 * <p>
+	 * This is output after the size value.
+	 * </p>
+	 *
+	 * @return the current end of size text
+	 */
+	protected String getSizeEndText() {
+		return sizeEndText;
+	}
+
+	/**
+	 * <p>
+	 * Gets the start text to output when a {@code Collection}, {@code Map} or array
+	 * size is output.
+	 * </p>
+	 *
+	 * <p>
+	 * This is output before the size value.
+	 * </p>
+	 *
+	 * @return the current start of size text
+	 */
+	protected String getSizeStartText() {
+		return sizeStartText;
+	}
+
+	// ---------------------------------------------------------------------
+
+	/**
+	 * <p>
+	 * Gets the end text to output when an {@code Object} is output in summary mode.
+	 * </p>
+	 *
+	 * <p>
+	 * This is output after the size value.
+	 * </p>
+	 *
+	 * @return the current end of summary text
+	 */
+	protected String getSummaryObjectEndText() {
+		return summaryObjectEndText;
+	}
+
+	/**
+	 * <p>
+	 * Gets the start text to output when an {@code Object} is output in summary
+	 * mode.
+	 * </p>
+	 *
+	 * <p>
+	 * This is output before the size value.
+	 * </p>
+	 *
+	 * @return the current start of summary text
+	 */
+	protected String getSummaryObjectStartText() {
+		return summaryObjectStartText;
+	}
+
+	// ---------------------------------------------------------------------
+
+	/**
+	 * <p>
+	 * Gets whether to output array content detail.
+	 * </p>
+	 *
+	 * @return the current array content detail setting
+	 */
+	protected boolean isArrayContentDetail() {
+		return arrayContentDetail;
+	}
+
+	/**
+	 * <p>
+	 * Gets whether to use full detail when the caller doesn't specify.
+	 * </p>
+	 *
+	 * @return the current defaultFullDetail flag
+	 */
+	protected boolean isDefaultFullDetail() {
+		return defaultFullDetail;
+	}
+
+	// ---------------------------------------------------------------------
+
+	/**
+	 * <p>
+	 * Gets whether the field separator should be added at the end of each buffer.
+	 * </p>
+	 *
+	 * @return fieldSeparatorAtEnd flag
+	 * @since 2.0
+	 */
+	protected boolean isFieldSeparatorAtEnd() {
+		return fieldSeparatorAtEnd;
+	}
+
+	/**
+	 * <p>
+	 * Gets whether the field separator should be added at the start of each buffer.
+	 * </p>
+	 *
+	 * @return the fieldSeparatorAtStart flag
+	 * @since 2.0
+	 */
+	protected boolean isFieldSeparatorAtStart() {
+		return fieldSeparatorAtStart;
+	}
+
+	// ---------------------------------------------------------------------
+
+	/**
+	 * <p>
 	 * Is this field to be output in full detail.
 	 * </p>
 	 *
@@ -1702,27 +2473,6 @@ public abstract class ToStringStyle implements Serializable {
 
 	/**
 	 * <p>
-	 * Gets the short class name for a class.
-	 * </p>
-	 *
-	 * <p>
-	 * The short class name is the classname excluding the package name.
-	 * </p>
-	 *
-	 * @param cls the {@code Class} to get the short name of
-	 * @return the short name
-	 */
-	protected String getShortClassName(final Class<?> cls) {
-		return cls.getSimpleName();
-	}
-
-	// Setters and getters for the customizable parts of the style
-	// These methods are not expected to be overridden, except to make public
-	// (They are not public so that immutable subclasses can be written)
-	// ---------------------------------------------------------------------
-
-	/**
-	 * <p>
 	 * Gets whether to use the class name.
 	 * </p>
 	 *
@@ -1732,15 +2482,28 @@ public abstract class ToStringStyle implements Serializable {
 		return useClassName;
 	}
 
+	// ---------------------------------------------------------------------
+
 	/**
 	 * <p>
-	 * Sets whether to use the class name.
+	 * Gets whether to use the field names passed in.
 	 * </p>
 	 *
-	 * @param useClassName the new useClassName flag
+	 * @return the current useFieldNames flag
 	 */
-	protected void setUseClassName(final boolean useClassName) {
-		this.useClassName = useClassName;
+	protected boolean isUseFieldNames() {
+		return useFieldNames;
+	}
+
+	/**
+	 * <p>
+	 * Gets whether to use the identity hash code.
+	 * </p>
+	 *
+	 * @return the current useIdentityHashCode flag
+	 */
+	protected boolean isUseIdentityHashCode() {
+		return useIdentityHashCode;
 	}
 
 	// ---------------------------------------------------------------------
@@ -1759,99 +2522,38 @@ public abstract class ToStringStyle implements Serializable {
 
 	/**
 	 * <p>
-	 * Sets whether to output short or long class names.
+	 * Append to the {@code toString} the detail of an array type.
 	 * </p>
 	 *
-	 * @param useShortClassName the new useShortClassName flag
+	 * @param buffer    the {@code StringBuffer} to populate
+	 * @param fieldName the field name, typically not used as already appended
+	 * @param array     the array to add to the {@code toString}, not {@code null}
 	 * @since 2.0
 	 */
-	protected void setUseShortClassName(final boolean useShortClassName) {
-		this.useShortClassName = useShortClassName;
+	protected void reflectionAppendArrayDetail(final StringBuffer buffer, final String fieldName, final Object array) {
+		buffer.append(arrayStart);
+		final int length = Array.getLength(array);
+		for (int i = 0; i < length; i++) {
+			final Object item = Array.get(array, i);
+			appendDetail(buffer, fieldName, i, item);
+		}
+		buffer.append(arrayEnd);
 	}
 
 	// ---------------------------------------------------------------------
 
 	/**
 	 * <p>
-	 * Gets whether to use the identity hash code.
+	 * Remove the last field separator from the buffer.
 	 * </p>
 	 *
-	 * @return the current useIdentityHashCode flag
+	 * @param buffer the {@code StringBuffer} to populate
+	 * @since 2.0
 	 */
-	protected boolean isUseIdentityHashCode() {
-		return useIdentityHashCode;
-	}
-
-	/**
-	 * <p>
-	 * Sets whether to use the identity hash code.
-	 * </p>
-	 *
-	 * @param useIdentityHashCode the new useIdentityHashCode flag
-	 */
-	protected void setUseIdentityHashCode(final boolean useIdentityHashCode) {
-		this.useIdentityHashCode = useIdentityHashCode;
-	}
-
-	// ---------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Gets whether to use the field names passed in.
-	 * </p>
-	 *
-	 * @return the current useFieldNames flag
-	 */
-	protected boolean isUseFieldNames() {
-		return useFieldNames;
-	}
-
-	/**
-	 * <p>
-	 * Sets whether to use the field names passed in.
-	 * </p>
-	 *
-	 * @param useFieldNames the new useFieldNames flag
-	 */
-	protected void setUseFieldNames(final boolean useFieldNames) {
-		this.useFieldNames = useFieldNames;
-	}
-
-	// ---------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Gets whether to use full detail when the caller doesn't specify.
-	 * </p>
-	 *
-	 * @return the current defaultFullDetail flag
-	 */
-	protected boolean isDefaultFullDetail() {
-		return defaultFullDetail;
-	}
-
-	/**
-	 * <p>
-	 * Sets whether to use full detail when the caller doesn't specify.
-	 * </p>
-	 *
-	 * @param defaultFullDetail the new defaultFullDetail flag
-	 */
-	protected void setDefaultFullDetail(final boolean defaultFullDetail) {
-		this.defaultFullDetail = defaultFullDetail;
-	}
-
-	// ---------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Gets whether to output array content detail.
-	 * </p>
-	 *
-	 * @return the current array content detail setting
-	 */
-	protected boolean isArrayContentDetail() {
-		return arrayContentDetail;
+	protected void removeLastFieldSeparator(final StringBuffer buffer) {
+		if (StringUtils.endsWith(buffer, fieldSeparator)) {
+			buffer.setLength(buffer.length() - fieldSeparator.length());
+		}
 	}
 
 	/**
@@ -1869,48 +2571,6 @@ public abstract class ToStringStyle implements Serializable {
 
 	/**
 	 * <p>
-	 * Gets the array start text.
-	 * </p>
-	 *
-	 * @return the current array start text
-	 */
-	protected String getArrayStart() {
-		return arrayStart;
-	}
-
-	/**
-	 * <p>
-	 * Sets the array start text.
-	 * </p>
-	 *
-	 * <p>
-	 * {@code null} is accepted, but will be converted to an empty String.
-	 * </p>
-	 *
-	 * @param arrayStart the new array start text
-	 */
-	protected void setArrayStart(String arrayStart) {
-		if (arrayStart == null) {
-			arrayStart = StringUtils.EMPTY;
-		}
-		this.arrayStart = arrayStart;
-	}
-
-	// ---------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Gets the array end text.
-	 * </p>
-	 *
-	 * @return the current array end text
-	 */
-	protected String getArrayEnd() {
-		return arrayEnd;
-	}
-
-	/**
-	 * <p>
 	 * Sets the array end text.
 	 * </p>
 	 *
@@ -1925,19 +2585,6 @@ public abstract class ToStringStyle implements Serializable {
 			arrayEnd = StringUtils.EMPTY;
 		}
 		this.arrayEnd = arrayEnd;
-	}
-
-	// ---------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Gets the array separator text.
-	 * </p>
-	 *
-	 * @return the current array separator text
-	 */
-	protected String getArraySeparator() {
-		return arraySeparator;
 	}
 
 	/**
@@ -1962,44 +2609,20 @@ public abstract class ToStringStyle implements Serializable {
 
 	/**
 	 * <p>
-	 * Gets the content start text.
-	 * </p>
-	 *
-	 * @return the current content start text
-	 */
-	protected String getContentStart() {
-		return contentStart;
-	}
-
-	/**
-	 * <p>
-	 * Sets the content start text.
+	 * Sets the array start text.
 	 * </p>
 	 *
 	 * <p>
 	 * {@code null} is accepted, but will be converted to an empty String.
 	 * </p>
 	 *
-	 * @param contentStart the new content start text
+	 * @param arrayStart the new array start text
 	 */
-	protected void setContentStart(String contentStart) {
-		if (contentStart == null) {
-			contentStart = StringUtils.EMPTY;
+	protected void setArrayStart(String arrayStart) {
+		if (arrayStart == null) {
+			arrayStart = StringUtils.EMPTY;
 		}
-		this.contentStart = contentStart;
-	}
-
-	// ---------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Gets the content end text.
-	 * </p>
-	 *
-	 * @return the current content end text
-	 */
-	protected String getContentEnd() {
-		return contentEnd;
+		this.arrayStart = arrayStart;
 	}
 
 	/**
@@ -2024,14 +2647,34 @@ public abstract class ToStringStyle implements Serializable {
 
 	/**
 	 * <p>
-	 * Gets the field name value separator text.
+	 * Sets the content start text.
 	 * </p>
 	 *
-	 * @return the current field name value separator text
+	 * <p>
+	 * {@code null} is accepted, but will be converted to an empty String.
+	 * </p>
+	 *
+	 * @param contentStart the new content start text
 	 */
-	protected String getFieldNameValueSeparator() {
-		return fieldNameValueSeparator;
+	protected void setContentStart(String contentStart) {
+		if (contentStart == null) {
+			contentStart = StringUtils.EMPTY;
+		}
+		this.contentStart = contentStart;
 	}
+
+	/**
+	 * <p>
+	 * Sets whether to use full detail when the caller doesn't specify.
+	 * </p>
+	 *
+	 * @param defaultFullDetail the new defaultFullDetail flag
+	 */
+	protected void setDefaultFullDetail(final boolean defaultFullDetail) {
+		this.defaultFullDetail = defaultFullDetail;
+	}
+
+	// ---------------------------------------------------------------------
 
 	/**
 	 * <p>
@@ -2049,19 +2692,6 @@ public abstract class ToStringStyle implements Serializable {
 			fieldNameValueSeparator = StringUtils.EMPTY;
 		}
 		this.fieldNameValueSeparator = fieldNameValueSeparator;
-	}
-
-	// ---------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Gets the field separator text.
-	 * </p>
-	 *
-	 * @return the current field separator text
-	 */
-	protected String getFieldSeparator() {
-		return fieldSeparator;
 	}
 
 	/**
@@ -2086,14 +2716,14 @@ public abstract class ToStringStyle implements Serializable {
 
 	/**
 	 * <p>
-	 * Gets whether the field separator should be added at the start of each buffer.
+	 * Sets whether the field separator should be added at the end of each buffer.
 	 * </p>
 	 *
-	 * @return the fieldSeparatorAtStart flag
+	 * @param fieldSeparatorAtEnd the fieldSeparatorAtEnd flag
 	 * @since 2.0
 	 */
-	protected boolean isFieldSeparatorAtStart() {
-		return fieldSeparatorAtStart;
+	protected void setFieldSeparatorAtEnd(final boolean fieldSeparatorAtEnd) {
+		this.fieldSeparatorAtEnd = fieldSeparatorAtEnd;
 	}
 
 	/**
@@ -2112,43 +2742,6 @@ public abstract class ToStringStyle implements Serializable {
 
 	/**
 	 * <p>
-	 * Gets whether the field separator should be added at the end of each buffer.
-	 * </p>
-	 *
-	 * @return fieldSeparatorAtEnd flag
-	 * @since 2.0
-	 */
-	protected boolean isFieldSeparatorAtEnd() {
-		return fieldSeparatorAtEnd;
-	}
-
-	/**
-	 * <p>
-	 * Sets whether the field separator should be added at the end of each buffer.
-	 * </p>
-	 *
-	 * @param fieldSeparatorAtEnd the fieldSeparatorAtEnd flag
-	 * @since 2.0
-	 */
-	protected void setFieldSeparatorAtEnd(final boolean fieldSeparatorAtEnd) {
-		this.fieldSeparatorAtEnd = fieldSeparatorAtEnd;
-	}
-
-	// ---------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Gets the text to output when {@code null} found.
-	 * </p>
-	 *
-	 * @return the current text to output when null found
-	 */
-	protected String getNullText() {
-		return nullText;
-	}
-
-	/**
-	 * <p>
 	 * Sets the text to output when {@code null} found.
 	 * </p>
 	 *
@@ -2163,65 +2756,6 @@ public abstract class ToStringStyle implements Serializable {
 			nullText = StringUtils.EMPTY;
 		}
 		this.nullText = nullText;
-	}
-
-	// ---------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Gets the start text to output when a {@code Collection}, {@code Map} or array
-	 * size is output.
-	 * </p>
-	 *
-	 * <p>
-	 * This is output before the size value.
-	 * </p>
-	 *
-	 * @return the current start of size text
-	 */
-	protected String getSizeStartText() {
-		return sizeStartText;
-	}
-
-	/**
-	 * <p>
-	 * Sets the start text to output when a {@code Collection}, {@code Map} or array
-	 * size is output.
-	 * </p>
-	 *
-	 * <p>
-	 * This is output before the size value.
-	 * </p>
-	 *
-	 * <p>
-	 * {@code null} is accepted, but will be converted to an empty String.
-	 * </p>
-	 *
-	 * @param sizeStartText the new start of size text
-	 */
-	protected void setSizeStartText(String sizeStartText) {
-		if (sizeStartText == null) {
-			sizeStartText = StringUtils.EMPTY;
-		}
-		this.sizeStartText = sizeStartText;
-	}
-
-	// ---------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Gets the end text to output when a {@code Collection}, {@code Map} or array
-	 * size is output.
-	 * </p>
-	 *
-	 * <p>
-	 * This is output after the size value.
-	 * </p>
-	 *
-	 * @return the current end of size text
-	 */
-	protected String getSizeEndText() {
-		return sizeEndText;
 	}
 
 	/**
@@ -2247,28 +2781,12 @@ public abstract class ToStringStyle implements Serializable {
 		this.sizeEndText = sizeEndText;
 	}
 
-	// ---------------------------------------------------------------------
+	// ----------------------------------------------------------------------------
 
 	/**
 	 * <p>
-	 * Gets the start text to output when an {@code Object} is output in summary
-	 * mode.
-	 * </p>
-	 *
-	 * <p>
-	 * This is output before the size value.
-	 * </p>
-	 *
-	 * @return the current start of summary text
-	 */
-	protected String getSummaryObjectStartText() {
-		return summaryObjectStartText;
-	}
-
-	/**
-	 * <p>
-	 * Sets the start text to output when an {@code Object} is output in summary
-	 * mode.
+	 * Sets the start text to output when a {@code Collection}, {@code Map} or array
+	 * size is output.
 	 * </p>
 	 *
 	 * <p>
@@ -2279,31 +2797,16 @@ public abstract class ToStringStyle implements Serializable {
 	 * {@code null} is accepted, but will be converted to an empty String.
 	 * </p>
 	 *
-	 * @param summaryObjectStartText the new start of summary text
+	 * @param sizeStartText the new start of size text
 	 */
-	protected void setSummaryObjectStartText(String summaryObjectStartText) {
-		if (summaryObjectStartText == null) {
-			summaryObjectStartText = StringUtils.EMPTY;
+	protected void setSizeStartText(String sizeStartText) {
+		if (sizeStartText == null) {
+			sizeStartText = StringUtils.EMPTY;
 		}
-		this.summaryObjectStartText = summaryObjectStartText;
+		this.sizeStartText = sizeStartText;
 	}
 
-	// ---------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * Gets the end text to output when an {@code Object} is output in summary mode.
-	 * </p>
-	 *
-	 * <p>
-	 * This is output after the size value.
-	 * </p>
-	 *
-	 * @return the current end of summary text
-	 */
-	protected String getSummaryObjectEndText() {
-		return summaryObjectEndText;
-	}
+	// ----------------------------------------------------------------------------
 
 	/**
 	 * <p>
@@ -2331,580 +2834,77 @@ public abstract class ToStringStyle implements Serializable {
 
 	/**
 	 * <p>
-	 * Default {@code ToStringStyle}.
+	 * Sets the start text to output when an {@code Object} is output in summary
+	 * mode.
 	 * </p>
 	 *
 	 * <p>
-	 * This is an inner class rather than using {@code StandardToStringStyle} to
-	 * ensure its immutability.
+	 * This is output before the size value.
 	 * </p>
+	 *
+	 * <p>
+	 * {@code null} is accepted, but will be converted to an empty String.
+	 * </p>
+	 *
+	 * @param summaryObjectStartText the new start of summary text
 	 */
-	private static final class DefaultToStringStyle extends ToStringStyle {
-
-		/**
-		 * Required for serialization support.
-		 *
-		 * @see java.io.Serializable
-		 */
-		private static final long serialVersionUID = 1L;
-
-		/**
-		 * <p>
-		 * Constructor.
-		 * </p>
-		 *
-		 * <p>
-		 * Use the static constant rather than instantiating.
-		 * </p>
-		 */
-		DefaultToStringStyle() {
+	protected void setSummaryObjectStartText(String summaryObjectStartText) {
+		if (summaryObjectStartText == null) {
+			summaryObjectStartText = StringUtils.EMPTY;
 		}
-
-		/**
-		 * <p>
-		 * Ensure {@code Singleton} after serialization.
-		 * </p>
-		 *
-		 * @return the singleton
-		 */
-		private Object readResolve() {
-			return DEFAULT_STYLE;
-		}
-
+		this.summaryObjectStartText = summaryObjectStartText;
 	}
 
 	// ----------------------------------------------------------------------------
 
 	/**
 	 * <p>
-	 * {@code ToStringStyle} that does not print out the field names.
+	 * Sets whether to use the class name.
 	 * </p>
 	 *
-	 * <p>
-	 * This is an inner class rather than using {@code StandardToStringStyle} to
-	 * ensure its immutability.
+	 * @param useClassName the new useClassName flag
 	 */
-	private static final class NoFieldNameToStringStyle extends ToStringStyle {
-
-		private static final long serialVersionUID = 1L;
-
-		/**
-		 * <p>
-		 * Constructor.
-		 * </p>
-		 *
-		 * <p>
-		 * Use the static constant rather than instantiating.
-		 * </p>
-		 */
-		NoFieldNameToStringStyle() {
-			this.setUseFieldNames(false);
-		}
-
-		/**
-		 * <p>
-		 * Ensure {@code Singleton} after serialization.
-		 * </p>
-		 *
-		 * @return the singleton
-		 */
-		private Object readResolve() {
-			return NO_FIELD_NAMES_STYLE;
-		}
-
+	protected void setUseClassName(final boolean useClassName) {
+		this.useClassName = useClassName;
 	}
 
 	// ----------------------------------------------------------------------------
 
 	/**
 	 * <p>
-	 * {@code ToStringStyle} that prints out the short class name and no identity
-	 * hashcode.
+	 * Sets whether to use the field names passed in.
 	 * </p>
 	 *
-	 * <p>
-	 * This is an inner class rather than using {@code StandardToStringStyle} to
-	 * ensure its immutability.
-	 * </p>
+	 * @param useFieldNames the new useFieldNames flag
 	 */
-	private static final class ShortPrefixToStringStyle extends ToStringStyle {
-
-		private static final long serialVersionUID = 1L;
-
-		/**
-		 * <p>
-		 * Constructor.
-		 * </p>
-		 *
-		 * <p>
-		 * Use the static constant rather than instantiating.
-		 * </p>
-		 */
-		ShortPrefixToStringStyle() {
-			this.setUseShortClassName(true);
-			this.setUseIdentityHashCode(false);
-		}
-
-		/**
-		 * <p>
-		 * Ensure <code>Singleton</ode> after serialization.
-		 * </p>
-		 * 
-		 * @return the singleton
-		 */
-		private Object readResolve() {
-			return SHORT_PREFIX_STYLE;
-		}
-
+	protected void setUseFieldNames(final boolean useFieldNames) {
+		this.useFieldNames = useFieldNames;
 	}
 
 	// ----------------------------------------------------------------------------
 
 	/**
 	 * <p>
-	 * {@code ToStringStyle} that does not print out the classname, identity
-	 * hashcode, content start or field name.
+	 * Sets whether to use the identity hash code.
 	 * </p>
 	 *
-	 * <p>
-	 * This is an inner class rather than using {@code StandardToStringStyle} to
-	 * ensure its immutability.
-	 * </p>
+	 * @param useIdentityHashCode the new useIdentityHashCode flag
 	 */
-	private static final class SimpleToStringStyle extends ToStringStyle {
-
-		private static final long serialVersionUID = 1L;
-
-		/**
-		 * <p>
-		 * Constructor.
-		 * </p>
-		 *
-		 * <p>
-		 * Use the static constant rather than instantiating.
-		 * </p>
-		 */
-		SimpleToStringStyle() {
-			this.setUseClassName(false);
-			this.setUseIdentityHashCode(false);
-			this.setUseFieldNames(false);
-			this.setContentStart(StringUtils.EMPTY);
-			this.setContentEnd(StringUtils.EMPTY);
-		}
-
-		/**
-		 * <p>
-		 * Ensure <code>Singleton</ode> after serialization.
-		 * </p>
-		 * 
-		 * @return the singleton
-		 */
-		private Object readResolve() {
-			return SIMPLE_STYLE;
-		}
-
+	protected void setUseIdentityHashCode(final boolean useIdentityHashCode) {
+		this.useIdentityHashCode = useIdentityHashCode;
 	}
 
 	// ----------------------------------------------------------------------------
 
 	/**
 	 * <p>
-	 * {@code ToStringStyle} that outputs on multiple lines.
+	 * Sets whether to output short or long class names.
 	 * </p>
 	 *
-	 * <p>
-	 * This is an inner class rather than using {@code StandardToStringStyle} to
-	 * ensure its immutability.
-	 * </p>
+	 * @param useShortClassName the new useShortClassName flag
+	 * @since 2.0
 	 */
-	private static final class MultiLineToStringStyle extends ToStringStyle {
-
-		private static final long serialVersionUID = 1L;
-
-		/**
-		 * <p>
-		 * Constructor.
-		 * </p>
-		 *
-		 * <p>
-		 * Use the static constant rather than instantiating.
-		 * </p>
-		 */
-		MultiLineToStringStyle() {
-			this.setContentStart("[");
-			this.setFieldSeparator(System.lineSeparator() + "  ");
-			this.setFieldSeparatorAtStart(true);
-			this.setContentEnd(System.lineSeparator() + "]");
-		}
-
-		/**
-		 * <p>
-		 * Ensure {@code Singleton} after serialization.
-		 * </p>
-		 *
-		 * @return the singleton
-		 */
-		private Object readResolve() {
-			return MULTI_LINE_STYLE;
-		}
-
-	}
-
-	// ----------------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * {@code ToStringStyle} that does not print out the classname and identity hash
-	 * code but prints content start and field names.
-	 * </p>
-	 *
-	 * <p>
-	 * This is an inner class rather than using {@code StandardToStringStyle} to
-	 * ensure its immutability.
-	 * </p>
-	 */
-	private static final class NoClassNameToStringStyle extends ToStringStyle {
-
-		private static final long serialVersionUID = 1L;
-
-		/**
-		 * <p>
-		 * Constructor.
-		 * </p>
-		 *
-		 * <p>
-		 * Use the static constant rather than instantiating.
-		 * </p>
-		 */
-		NoClassNameToStringStyle() {
-			this.setUseClassName(false);
-			this.setUseIdentityHashCode(false);
-		}
-
-		/**
-		 * <p>
-		 * Ensure {@code Singleton} after serialization.
-		 * </p>
-		 *
-		 * @return the singleton
-		 */
-		private Object readResolve() {
-			return NO_CLASS_NAME_STYLE;
-		}
-
-	}
-
-	// ----------------------------------------------------------------------------
-
-	/**
-	 * <p>
-	 * {@code ToStringStyle} that outputs with JSON format.
-	 * </p>
-	 *
-	 * <p>
-	 * This is an inner class rather than using {@code StandardToStringStyle} to
-	 * ensure its immutability.
-	 * </p>
-	 *
-	 * @since 3.4
-	 * @see <a href="http://json.org">json.org</a>
-	 */
-	private static final class JsonToStringStyle extends ToStringStyle {
-
-		private static final long serialVersionUID = 1L;
-
-		private static final String FIELD_NAME_QUOTE = "\"";
-
-		/**
-		 * <p>
-		 * Constructor.
-		 * </p>
-		 *
-		 * <p>
-		 * Use the static constant rather than instantiating.
-		 * </p>
-		 */
-		JsonToStringStyle() {
-			this.setUseClassName(false);
-			this.setUseIdentityHashCode(false);
-
-			this.setContentStart("{");
-			this.setContentEnd("}");
-
-			this.setArrayStart("[");
-			this.setArrayEnd("]");
-
-			this.setFieldSeparator(",");
-			this.setFieldNameValueSeparator(":");
-
-			this.setNullText("null");
-
-			this.setSummaryObjectStartText("\"<");
-			this.setSummaryObjectEndText(">\"");
-
-			this.setSizeStartText("\"<size=");
-			this.setSizeEndText(">\"");
-		}
-
-		@Override
-		public void append(final StringBuffer buffer, final String fieldName, final Object[] array,
-				final Boolean fullDetail) {
-
-			if (fieldName == null) {
-				throw new UnsupportedOperationException("Field names are mandatory when using JsonToStringStyle");
-			}
-			if (!isFullDetail(fullDetail)) {
-				throw new UnsupportedOperationException("FullDetail must be true when using JsonToStringStyle");
-			}
-
-			super.append(buffer, fieldName, array, fullDetail);
-		}
-
-		@Override
-		public void append(final StringBuffer buffer, final String fieldName, final long[] array,
-				final Boolean fullDetail) {
-
-			if (fieldName == null) {
-				throw new UnsupportedOperationException("Field names are mandatory when using JsonToStringStyle");
-			}
-			if (!isFullDetail(fullDetail)) {
-				throw new UnsupportedOperationException("FullDetail must be true when using JsonToStringStyle");
-			}
-
-			super.append(buffer, fieldName, array, fullDetail);
-		}
-
-		@Override
-		public void append(final StringBuffer buffer, final String fieldName, final int[] array,
-				final Boolean fullDetail) {
-
-			if (fieldName == null) {
-				throw new UnsupportedOperationException("Field names are mandatory when using JsonToStringStyle");
-			}
-			if (!isFullDetail(fullDetail)) {
-				throw new UnsupportedOperationException("FullDetail must be true when using JsonToStringStyle");
-			}
-
-			super.append(buffer, fieldName, array, fullDetail);
-		}
-
-		@Override
-		public void append(final StringBuffer buffer, final String fieldName, final short[] array,
-				final Boolean fullDetail) {
-
-			if (fieldName == null) {
-				throw new UnsupportedOperationException("Field names are mandatory when using JsonToStringStyle");
-			}
-			if (!isFullDetail(fullDetail)) {
-				throw new UnsupportedOperationException("FullDetail must be true when using JsonToStringStyle");
-			}
-
-			super.append(buffer, fieldName, array, fullDetail);
-		}
-
-		@Override
-		public void append(final StringBuffer buffer, final String fieldName, final byte[] array,
-				final Boolean fullDetail) {
-
-			if (fieldName == null) {
-				throw new UnsupportedOperationException("Field names are mandatory when using JsonToStringStyle");
-			}
-			if (!isFullDetail(fullDetail)) {
-				throw new UnsupportedOperationException("FullDetail must be true when using JsonToStringStyle");
-			}
-
-			super.append(buffer, fieldName, array, fullDetail);
-		}
-
-		@Override
-		public void append(final StringBuffer buffer, final String fieldName, final char[] array,
-				final Boolean fullDetail) {
-
-			if (fieldName == null) {
-				throw new UnsupportedOperationException("Field names are mandatory when using JsonToStringStyle");
-			}
-			if (!isFullDetail(fullDetail)) {
-				throw new UnsupportedOperationException("FullDetail must be true when using JsonToStringStyle");
-			}
-
-			super.append(buffer, fieldName, array, fullDetail);
-		}
-
-		@Override
-		public void append(final StringBuffer buffer, final String fieldName, final double[] array,
-				final Boolean fullDetail) {
-
-			if (fieldName == null) {
-				throw new UnsupportedOperationException("Field names are mandatory when using JsonToStringStyle");
-			}
-			if (!isFullDetail(fullDetail)) {
-				throw new UnsupportedOperationException("FullDetail must be true when using JsonToStringStyle");
-			}
-
-			super.append(buffer, fieldName, array, fullDetail);
-		}
-
-		@Override
-		public void append(final StringBuffer buffer, final String fieldName, final float[] array,
-				final Boolean fullDetail) {
-
-			if (fieldName == null) {
-				throw new UnsupportedOperationException("Field names are mandatory when using JsonToStringStyle");
-			}
-			if (!isFullDetail(fullDetail)) {
-				throw new UnsupportedOperationException("FullDetail must be true when using JsonToStringStyle");
-			}
-
-			super.append(buffer, fieldName, array, fullDetail);
-		}
-
-		@Override
-		public void append(final StringBuffer buffer, final String fieldName, final boolean[] array,
-				final Boolean fullDetail) {
-
-			if (fieldName == null) {
-				throw new UnsupportedOperationException("Field names are mandatory when using JsonToStringStyle");
-			}
-			if (!isFullDetail(fullDetail)) {
-				throw new UnsupportedOperationException("FullDetail must be true when using JsonToStringStyle");
-			}
-
-			super.append(buffer, fieldName, array, fullDetail);
-		}
-
-		@Override
-		public void append(final StringBuffer buffer, final String fieldName, final Object value,
-				final Boolean fullDetail) {
-
-			if (fieldName == null) {
-				throw new UnsupportedOperationException("Field names are mandatory when using JsonToStringStyle");
-			}
-			if (!isFullDetail(fullDetail)) {
-				throw new UnsupportedOperationException("FullDetail must be true when using JsonToStringStyle");
-			}
-
-			super.append(buffer, fieldName, value, fullDetail);
-		}
-
-		@Override
-		protected void appendDetail(final StringBuffer buffer, final String fieldName, final char value) {
-			appendValueAsString(buffer, String.valueOf(value));
-		}
-
-		@Override
-		protected void appendDetail(final StringBuffer buffer, final String fieldName, final Object value) {
-
-			if (value == null) {
-				appendNullText(buffer, fieldName);
-				return;
-			}
-
-			if (value instanceof String || value instanceof Character) {
-				appendValueAsString(buffer, value.toString());
-				return;
-			}
-
-			if (value instanceof Number || value instanceof Boolean) {
-				buffer.append(value);
-				return;
-			}
-
-			final String valueAsString = value.toString();
-			if (isJsonObject(valueAsString) || isJsonArray(valueAsString)) {
-				buffer.append(value);
-				return;
-			}
-
-			appendDetail(buffer, fieldName, valueAsString);
-		}
-
-		@Override
-		protected void appendDetail(final StringBuffer buffer, final String fieldName, final Collection<?> coll) {
-			if (coll != null && !coll.isEmpty()) {
-				buffer.append(getArrayStart());
-				int i = 0;
-				for (final Object item : coll) {
-					appendDetail(buffer, fieldName, i++, item);
-				}
-				buffer.append(getArrayEnd());
-				return;
-			}
-
-			buffer.append(coll);
-		}
-
-		@Override
-		protected void appendDetail(final StringBuffer buffer, final String fieldName, final Map<?, ?> map) {
-			if (map != null && !map.isEmpty()) {
-				buffer.append(getContentStart());
-
-				boolean firstItem = true;
-				for (final Entry<?, ?> entry : map.entrySet()) {
-					final String keyStr = Objects.toString(entry.getKey(), null);
-					if (keyStr != null) {
-						if (firstItem) {
-							firstItem = false;
-						} else {
-							appendFieldEnd(buffer, keyStr);
-						}
-						appendFieldStart(buffer, keyStr);
-						final Object value = entry.getValue();
-						if (value == null) {
-							appendNullText(buffer, keyStr);
-						} else {
-							appendInternal(buffer, keyStr, value, true);
-						}
-					}
-				}
-
-				buffer.append(getContentEnd());
-				return;
-			}
-
-			buffer.append(map);
-		}
-
-		private boolean isJsonArray(final String valueAsString) {
-			return valueAsString.startsWith(getArrayStart()) && valueAsString.endsWith(getArrayEnd());
-		}
-
-		private boolean isJsonObject(final String valueAsString) {
-			return valueAsString.startsWith(getContentStart()) && valueAsString.endsWith(getContentEnd());
-		}
-
-		/**
-		 * Appends the given String enclosed in double-quotes to the given StringBuffer.
-		 *
-		 * @param buffer the StringBuffer to append the value to.
-		 * @param value  the value to append.
-		 */
-		private void appendValueAsString(final StringBuffer buffer, final String value) {
-			// buffer.append('"').append(StringEscapeUtils.escapeJson(value)).append('"');
-			throw new UnsupportedOperationException("Not supported in TeaVM");
-		}
-
-		@Override
-		protected void appendFieldStart(final StringBuffer buffer, final String fieldName) {
-			throw new UnsupportedOperationException("Not supported in TeaVM");
-			/*
-			 * if (fieldName == null) { throw new UnsupportedOperationException(
-			 * "Field names are mandatory when using JsonToStringStyle"); }
-			 * 
-			 * super.appendFieldStart(buffer, FIELD_NAME_QUOTE +
-			 * StringEscapeUtils.escapeJson(fieldName) + FIELD_NAME_QUOTE);
-			 */
-		}
-
-		/**
-		 * <p>
-		 * Ensure {@code Singleton} after serialization.
-		 * </p>
-		 *
-		 * @return the singleton
-		 */
-		private Object readResolve() {
-			return JSON_STYLE;
-		}
-
+	protected void setUseShortClassName(final boolean useShortClassName) {
+		this.useShortClassName = useShortClassName;
 	}
 }

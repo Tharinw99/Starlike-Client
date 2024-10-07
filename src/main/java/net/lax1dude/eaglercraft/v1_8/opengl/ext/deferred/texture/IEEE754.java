@@ -2,7 +2,8 @@ package net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.texture;
 
 public class IEEE754 {
 
-	// source: https://stackoverflow.com/questions/6162651/half-precision-floating-point-in-java
+	// source:
+	// https://stackoverflow.com/questions/6162651/half-precision-floating-point-in-java
 
 	public static int encodeHalfFloat(float fval) {
 		int fbits = Float.floatToIntBits(fval);

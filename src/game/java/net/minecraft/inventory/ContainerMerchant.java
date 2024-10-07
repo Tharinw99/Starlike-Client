@@ -6,22 +6,25 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -52,24 +55,47 @@ public class ContainerMerchant extends Container {
 
 	}
 
+	public boolean canInteractWith(EntityPlayer entityplayer) {
+		return this.theMerchant.getCustomer() == entityplayer;
+	}
+
+	/**
+	 * + Looks for changes made in the container, sends them to every listener.
+	 */
+	public void detectAndSendChanges() {
+		super.detectAndSendChanges();
+	}
+
 	public InventoryMerchant getMerchantInventory() {
 		return this.merchantInventory;
+	}
+
+	/**
+	 * + Called when the container is closed.
+	 */
+	public void onContainerClosed(EntityPlayer entityplayer) {
+		super.onContainerClosed(entityplayer);
+		this.theMerchant.setCustomer((EntityPlayer) null);
+		super.onContainerClosed(entityplayer);
+		if (!this.theWorld.isRemote) {
+			ItemStack itemstack = this.merchantInventory.removeStackFromSlot(0);
+			if (itemstack != null) {
+				entityplayer.dropPlayerItemWithRandomChoice(itemstack, false);
+			}
+
+			itemstack = this.merchantInventory.removeStackFromSlot(1);
+			if (itemstack != null) {
+				entityplayer.dropPlayerItemWithRandomChoice(itemstack, false);
+			}
+		}
 	}
 
 	public void onCraftGuiOpened(ICrafting icrafting) {
 		super.onCraftGuiOpened(icrafting);
 	}
 
-	/**+
-	 * Looks for changes made in the container, sends them to every
-	 * listener.
-	 */
-	public void detectAndSendChanges() {
-		super.detectAndSendChanges();
-	}
-
-	/**+
-	 * Callback for when the crafting matrix is changed.
+	/**
+	 * + Callback for when the crafting matrix is changed.
 	 */
 	public void onCraftMatrixChanged(IInventory iinventory) {
 		this.merchantInventory.resetRecipeAndSlots();
@@ -80,15 +106,8 @@ public class ContainerMerchant extends Container {
 		this.merchantInventory.setCurrentRecipeIndex(currentRecipeIndex);
 	}
 
-	public void updateProgressBar(int var1, int var2) {
-	}
-
-	public boolean canInteractWith(EntityPlayer entityplayer) {
-		return this.theMerchant.getCustomer() == entityplayer;
-	}
-
-	/**+
-	 * Take a stack from the specified inventory slot.
+	/**
+	 * + Take a stack from the specified inventory slot.
 	 */
 	public ItemStack transferStackInSlot(EntityPlayer entityplayer, int i) {
 		ItemStack itemstack = null;
@@ -130,23 +149,6 @@ public class ContainerMerchant extends Container {
 		return itemstack;
 	}
 
-	/**+
-	 * Called when the container is closed.
-	 */
-	public void onContainerClosed(EntityPlayer entityplayer) {
-		super.onContainerClosed(entityplayer);
-		this.theMerchant.setCustomer((EntityPlayer) null);
-		super.onContainerClosed(entityplayer);
-		if (!this.theWorld.isRemote) {
-			ItemStack itemstack = this.merchantInventory.removeStackFromSlot(0);
-			if (itemstack != null) {
-				entityplayer.dropPlayerItemWithRandomChoice(itemstack, false);
-			}
-
-			itemstack = this.merchantInventory.removeStackFromSlot(1);
-			if (itemstack != null) {
-				entityplayer.dropPlayerItemWithRandomChoice(itemstack, false);
-			}
-		}
+	public void updateProgressBar(int var1, int var2) {
 	}
 }

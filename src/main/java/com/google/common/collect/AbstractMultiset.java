@@ -48,37 +48,33 @@ import com.google.common.base.Objects;
 abstract class AbstractMultiset<E> extends AbstractCollection<E> implements Multiset<E> {
 	// Query Operations
 
-	@Override
-	public int size() {
-		return Multisets.sizeImpl(this);
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return entrySet().isEmpty();
-	}
-
-	@Override
-	public boolean contains(@Nullable Object element) {
-		return count(element) > 0;
-	}
-
-	@Override
-	public Iterator<E> iterator() {
-		return Multisets.iteratorImpl(this);
-	}
-
-	@Override
-	public int count(@Nullable Object element) {
-		for (Entry<E> entry : entrySet()) {
-			if (Objects.equal(entry.getElement(), element)) {
-				return entry.getCount();
-			}
+	class ElementSet extends Multisets.ElementSet<E> {
+		@Override
+		Multiset<E> multiset() {
+			return AbstractMultiset.this;
 		}
-		return 0;
 	}
 
-	// Modification Operations
+	class EntrySet extends Multisets.EntrySet<E> {
+		@Override
+		public Iterator<Entry<E>> iterator() {
+			return entryIterator();
+		}
+
+		@Override
+		Multiset<E> multiset() {
+			return AbstractMultiset.this;
+		}
+
+		@Override
+		public int size() {
+			return distinctElements();
+		}
+	}
+
+	private transient Set<E> elementSet;
+
+	private transient Set<Entry<E>> entrySet;
 
 	@Override
 	public boolean add(@Nullable E element) {
@@ -86,32 +82,12 @@ abstract class AbstractMultiset<E> extends AbstractCollection<E> implements Mult
 		return true;
 	}
 
+	// Modification Operations
+
 	@Override
 	public int add(@Nullable E element, int occurrences) {
 		throw new UnsupportedOperationException();
 	}
-
-	@Override
-	public boolean remove(@Nullable Object element) {
-		return remove(element, 1) > 0;
-	}
-
-	@Override
-	public int remove(@Nullable Object element, int occurrences) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public int setCount(@Nullable E element, int count) {
-		return setCountImpl(this, element, count);
-	}
-
-	@Override
-	public boolean setCount(@Nullable E element, int oldCount, int newCount) {
-		return setCountImpl(this, element, oldCount, newCount);
-	}
-
-	// Bulk Operations
 
 	/**
 	 * {@inheritDoc}
@@ -126,31 +102,23 @@ abstract class AbstractMultiset<E> extends AbstractCollection<E> implements Mult
 	}
 
 	@Override
-	public boolean removeAll(Collection<?> elementsToRemove) {
-		return Multisets.removeAllImpl(this, elementsToRemove);
-	}
-
-	@Override
-	public boolean retainAll(Collection<?> elementsToRetain) {
-		return Multisets.retainAllImpl(this, elementsToRetain);
-	}
-
-	@Override
 	public void clear() {
 		Iterators.clear(entryIterator());
 	}
 
-	// Views
-
-	private transient Set<E> elementSet;
+	@Override
+	public boolean contains(@Nullable Object element) {
+		return count(element) > 0;
+	}
 
 	@Override
-	public Set<E> elementSet() {
-		Set<E> result = elementSet;
-		if (result == null) {
-			elementSet = result = createElementSet();
+	public int count(@Nullable Object element) {
+		for (Entry<E> entry : entrySet()) {
+			if (Objects.equal(entry.getElement(), element)) {
+				return entry.getCount();
+			}
 		}
-		return result;
+		return 0;
 	}
 
 	/**
@@ -161,47 +129,32 @@ abstract class AbstractMultiset<E> extends AbstractCollection<E> implements Mult
 		return new ElementSet();
 	}
 
-	class ElementSet extends Multisets.ElementSet<E> {
-		@Override
-		Multiset<E> multiset() {
-			return AbstractMultiset.this;
+	// Bulk Operations
+
+	Set<Entry<E>> createEntrySet() {
+		return new EntrySet();
+	}
+
+	abstract int distinctElements();
+
+	@Override
+	public Set<E> elementSet() {
+		Set<E> result = elementSet;
+		if (result == null) {
+			elementSet = result = createElementSet();
 		}
+		return result;
 	}
 
 	abstract Iterator<Entry<E>> entryIterator();
 
-	abstract int distinctElements();
-
-	private transient Set<Entry<E>> entrySet;
+	// Views
 
 	@Override
 	public Set<Entry<E>> entrySet() {
 		Set<Entry<E>> result = entrySet;
 		return (result == null) ? entrySet = createEntrySet() : result;
 	}
-
-	class EntrySet extends Multisets.EntrySet<E> {
-		@Override
-		Multiset<E> multiset() {
-			return AbstractMultiset.this;
-		}
-
-		@Override
-		public Iterator<Entry<E>> iterator() {
-			return entryIterator();
-		}
-
-		@Override
-		public int size() {
-			return distinctElements();
-		}
-	}
-
-	Set<Entry<E>> createEntrySet() {
-		return new EntrySet();
-	}
-
-	// Object methods
 
 	/**
 	 * {@inheritDoc}
@@ -225,6 +178,53 @@ abstract class AbstractMultiset<E> extends AbstractCollection<E> implements Mult
 	@Override
 	public int hashCode() {
 		return entrySet().hashCode();
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return entrySet().isEmpty();
+	}
+
+	@Override
+	public Iterator<E> iterator() {
+		return Multisets.iteratorImpl(this);
+	}
+
+	@Override
+	public boolean remove(@Nullable Object element) {
+		return remove(element, 1) > 0;
+	}
+
+	@Override
+	public int remove(@Nullable Object element, int occurrences) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public boolean removeAll(Collection<?> elementsToRemove) {
+		return Multisets.removeAllImpl(this, elementsToRemove);
+	}
+
+	@Override
+	public boolean retainAll(Collection<?> elementsToRetain) {
+		return Multisets.retainAllImpl(this, elementsToRetain);
+	}
+
+	@Override
+	public int setCount(@Nullable E element, int count) {
+		return setCountImpl(this, element, count);
+	}
+
+	// Object methods
+
+	@Override
+	public boolean setCount(@Nullable E element, int oldCount, int newCount) {
+		return setCountImpl(this, element, oldCount, newCount);
+	}
+
+	@Override
+	public int size() {
+		return Multisets.sizeImpl(this);
 	}
 
 	/**

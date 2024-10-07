@@ -38,14 +38,14 @@ import com.google.common.annotations.GwtCompatible;
  */
 @GwtCompatible(emulated = true)
 public final class Charsets {
-	private Charsets() {
-	}
-
 	/**
 	 * UTF-8: eight-bit UCS Transformation Format.
 	 *
 	 */
 	public static final Charset UTF_8 = Charset.forName("UTF-8");
+
+	private Charsets() {
+	}
 
 	/*
 	 * Please do not add new Charset references to this class, unless those

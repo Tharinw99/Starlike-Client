@@ -75,71 +75,187 @@ public class CharUtils {
 
 	/**
 	 * <p>
-	 * {@code CharUtils} instances should NOT be constructed in standard
-	 * programming. Instead, the class should be used as
-	 * {@code CharUtils.toString('c');}.
+	 * Compares two {@code char} values numerically. This is the same functionality
+	 * as provided in Java 7.
 	 * </p>
 	 *
-	 * <p>
-	 * This constructor is public to permit tools that require a JavaBean instance
-	 * to operate.
-	 * </p>
+	 * @param x the first {@code char} to compare
+	 * @param y the second {@code char} to compare
+	 * @return the value {@code 0} if {@code x == y}; a value less than {@code 0} if
+	 *         {@code x < y}; and a value greater than {@code 0} if {@code x > y}
+	 * @since 3.4
 	 */
-	public CharUtils() {
+	public static int compare(final char x, final char y) {
+		return x - y;
 	}
 
-	// -----------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	/**
 	 * <p>
-	 * Converts the character to a Character.
-	 * </p>
-	 *
-	 * <p>
-	 * For ASCII 7 bit characters, this uses a cache that will return the same
-	 * Character object each time.
+	 * Checks whether the character is ASCII 7 bit.
 	 * </p>
 	 *
 	 * <pre>
-	 *   CharUtils.toCharacterObject(' ')  = ' '
-	 *   CharUtils.toCharacterObject('A')  = 'A'
+	 *   CharUtils.isAscii('a')  = true
+	 *   CharUtils.isAscii('A')  = true
+	 *   CharUtils.isAscii('3')  = true
+	 *   CharUtils.isAscii('-')  = true
+	 *   CharUtils.isAscii('\n') = true
+	 *   CharUtils.isAscii('&copy;') = false
 	 * </pre>
 	 *
-	 * @deprecated Java 5 introduced {@link Character#valueOf(char)} which caches
-	 *             chars 0 through 127.
-	 * @param ch the character to convert
-	 * @return a Character of the specified character
+	 * @param ch the character to check
+	 * @return true if less than 128
 	 */
-	@Deprecated
-	public static Character toCharacterObject(final char ch) {
-		return Character.valueOf(ch);
+	public static boolean isAscii(final char ch) {
+		return ch < 128;
 	}
 
 	/**
 	 * <p>
-	 * Converts the String to a Character using the first character, returning null
-	 * for empty Strings.
-	 * </p>
-	 *
-	 * <p>
-	 * For ASCII 7 bit characters, this uses a cache that will return the same
-	 * Character object each time.
+	 * Checks whether the character is ASCII 7 bit alphabetic.
 	 * </p>
 	 *
 	 * <pre>
-	 *   CharUtils.toCharacterObject(null) = null
-	 *   CharUtils.toCharacterObject("")   = null
-	 *   CharUtils.toCharacterObject("A")  = 'A'
-	 *   CharUtils.toCharacterObject("BA") = 'B'
+	 *   CharUtils.isAsciiAlpha('a')  = true
+	 *   CharUtils.isAsciiAlpha('A')  = true
+	 *   CharUtils.isAsciiAlpha('3')  = false
+	 *   CharUtils.isAsciiAlpha('-')  = false
+	 *   CharUtils.isAsciiAlpha('\n') = false
+	 *   CharUtils.isAsciiAlpha('&copy;') = false
 	 * </pre>
 	 *
-	 * @param str the character to convert
-	 * @return the Character value of the first letter of the String
+	 * @param ch the character to check
+	 * @return true if between 65 and 90 or 97 and 122 inclusive
 	 */
-	public static Character toCharacterObject(final String str) {
-		if (StringUtils.isEmpty(str)) {
-			return null;
-		}
-		return Character.valueOf(str.charAt(0));
+	public static boolean isAsciiAlpha(final char ch) {
+		return isAsciiAlphaUpper(ch) || isAsciiAlphaLower(ch);
+	}
+
+	/**
+	 * <p>
+	 * Checks whether the character is ASCII 7 bit alphabetic lower case.
+	 * </p>
+	 *
+	 * <pre>
+	 *   CharUtils.isAsciiAlphaLower('a')  = true
+	 *   CharUtils.isAsciiAlphaLower('A')  = false
+	 *   CharUtils.isAsciiAlphaLower('3')  = false
+	 *   CharUtils.isAsciiAlphaLower('-')  = false
+	 *   CharUtils.isAsciiAlphaLower('\n') = false
+	 *   CharUtils.isAsciiAlphaLower('&copy;') = false
+	 * </pre>
+	 *
+	 * @param ch the character to check
+	 * @return true if between 97 and 122 inclusive
+	 */
+	public static boolean isAsciiAlphaLower(final char ch) {
+		return ch >= 'a' && ch <= 'z';
+	}
+
+	/**
+	 * <p>
+	 * Checks whether the character is ASCII 7 bit numeric.
+	 * </p>
+	 *
+	 * <pre>
+	 *   CharUtils.isAsciiAlphanumeric('a')  = true
+	 *   CharUtils.isAsciiAlphanumeric('A')  = true
+	 *   CharUtils.isAsciiAlphanumeric('3')  = true
+	 *   CharUtils.isAsciiAlphanumeric('-')  = false
+	 *   CharUtils.isAsciiAlphanumeric('\n') = false
+	 *   CharUtils.isAsciiAlphanumeric('&copy;') = false
+	 * </pre>
+	 *
+	 * @param ch the character to check
+	 * @return true if between 48 and 57 or 65 and 90 or 97 and 122 inclusive
+	 */
+	public static boolean isAsciiAlphanumeric(final char ch) {
+		return isAsciiAlpha(ch) || isAsciiNumeric(ch);
+	}
+
+	/**
+	 * <p>
+	 * Checks whether the character is ASCII 7 bit alphabetic upper case.
+	 * </p>
+	 *
+	 * <pre>
+	 *   CharUtils.isAsciiAlphaUpper('a')  = false
+	 *   CharUtils.isAsciiAlphaUpper('A')  = true
+	 *   CharUtils.isAsciiAlphaUpper('3')  = false
+	 *   CharUtils.isAsciiAlphaUpper('-')  = false
+	 *   CharUtils.isAsciiAlphaUpper('\n') = false
+	 *   CharUtils.isAsciiAlphaUpper('&copy;') = false
+	 * </pre>
+	 *
+	 * @param ch the character to check
+	 * @return true if between 65 and 90 inclusive
+	 */
+	public static boolean isAsciiAlphaUpper(final char ch) {
+		return ch >= 'A' && ch <= 'Z';
+	}
+
+	/**
+	 * <p>
+	 * Checks whether the character is ASCII 7 bit control.
+	 * </p>
+	 *
+	 * <pre>
+	 *   CharUtils.isAsciiControl('a')  = false
+	 *   CharUtils.isAsciiControl('A')  = false
+	 *   CharUtils.isAsciiControl('3')  = false
+	 *   CharUtils.isAsciiControl('-')  = false
+	 *   CharUtils.isAsciiControl('\n') = true
+	 *   CharUtils.isAsciiControl('&copy;') = false
+	 * </pre>
+	 *
+	 * @param ch the character to check
+	 * @return true if less than 32 or equals 127
+	 */
+	public static boolean isAsciiControl(final char ch) {
+		return ch < 32 || ch == 127;
+	}
+
+	/**
+	 * <p>
+	 * Checks whether the character is ASCII 7 bit numeric.
+	 * </p>
+	 *
+	 * <pre>
+	 *   CharUtils.isAsciiNumeric('a')  = false
+	 *   CharUtils.isAsciiNumeric('A')  = false
+	 *   CharUtils.isAsciiNumeric('3')  = true
+	 *   CharUtils.isAsciiNumeric('-')  = false
+	 *   CharUtils.isAsciiNumeric('\n') = false
+	 *   CharUtils.isAsciiNumeric('&copy;') = false
+	 * </pre>
+	 *
+	 * @param ch the character to check
+	 * @return true if between 48 and 57 inclusive
+	 */
+	public static boolean isAsciiNumeric(final char ch) {
+		return ch >= '0' && ch <= '9';
+	}
+
+	/**
+	 * <p>
+	 * Checks whether the character is ASCII 7 bit printable.
+	 * </p>
+	 *
+	 * <pre>
+	 *   CharUtils.isAsciiPrintable('a')  = true
+	 *   CharUtils.isAsciiPrintable('A')  = true
+	 *   CharUtils.isAsciiPrintable('3')  = true
+	 *   CharUtils.isAsciiPrintable('-')  = true
+	 *   CharUtils.isAsciiPrintable('\n') = false
+	 *   CharUtils.isAsciiPrintable('&copy;') = false
+	 * </pre>
+	 *
+	 * @param ch the character to check
+	 * @return true if between 32 and 126 inclusive
+	 */
+	public static boolean isAsciiPrintable(final char ch) {
+		return ch >= 32 && ch < 127;
 	}
 
 	// -----------------------------------------------------------------------
@@ -232,6 +348,60 @@ public class CharUtils {
 			return defaultValue;
 		}
 		return str.charAt(0);
+	}
+
+	// -----------------------------------------------------------------------
+	/**
+	 * <p>
+	 * Converts the character to a Character.
+	 * </p>
+	 *
+	 * <p>
+	 * For ASCII 7 bit characters, this uses a cache that will return the same
+	 * Character object each time.
+	 * </p>
+	 *
+	 * <pre>
+	 *   CharUtils.toCharacterObject(' ')  = ' '
+	 *   CharUtils.toCharacterObject('A')  = 'A'
+	 * </pre>
+	 *
+	 * @deprecated Java 5 introduced {@link Character#valueOf(char)} which caches
+	 *             chars 0 through 127.
+	 * @param ch the character to convert
+	 * @return a Character of the specified character
+	 */
+	@Deprecated
+	public static Character toCharacterObject(final char ch) {
+		return Character.valueOf(ch);
+	}
+
+	/**
+	 * <p>
+	 * Converts the String to a Character using the first character, returning null
+	 * for empty Strings.
+	 * </p>
+	 *
+	 * <p>
+	 * For ASCII 7 bit characters, this uses a cache that will return the same
+	 * Character object each time.
+	 * </p>
+	 *
+	 * <pre>
+	 *   CharUtils.toCharacterObject(null) = null
+	 *   CharUtils.toCharacterObject("")   = null
+	 *   CharUtils.toCharacterObject("A")  = 'A'
+	 *   CharUtils.toCharacterObject("BA") = 'B'
+	 * </pre>
+	 *
+	 * @param str the character to convert
+	 * @return the Character value of the first letter of the String
+	 */
+	public static Character toCharacterObject(final String str) {
+		if (StringUtils.isEmpty(str)) {
+			return null;
+		}
+		return Character.valueOf(str.charAt(0));
 	}
 
 	// -----------------------------------------------------------------------
@@ -448,188 +618,18 @@ public class CharUtils {
 		return unicodeEscaped(ch.charValue());
 	}
 
-	// --------------------------------------------------------------------------
 	/**
 	 * <p>
-	 * Checks whether the character is ASCII 7 bit.
+	 * {@code CharUtils} instances should NOT be constructed in standard
+	 * programming. Instead, the class should be used as
+	 * {@code CharUtils.toString('c');}.
 	 * </p>
 	 *
-	 * <pre>
-	 *   CharUtils.isAscii('a')  = true
-	 *   CharUtils.isAscii('A')  = true
-	 *   CharUtils.isAscii('3')  = true
-	 *   CharUtils.isAscii('-')  = true
-	 *   CharUtils.isAscii('\n') = true
-	 *   CharUtils.isAscii('&copy;') = false
-	 * </pre>
-	 *
-	 * @param ch the character to check
-	 * @return true if less than 128
-	 */
-	public static boolean isAscii(final char ch) {
-		return ch < 128;
-	}
-
-	/**
 	 * <p>
-	 * Checks whether the character is ASCII 7 bit printable.
+	 * This constructor is public to permit tools that require a JavaBean instance
+	 * to operate.
 	 * </p>
-	 *
-	 * <pre>
-	 *   CharUtils.isAsciiPrintable('a')  = true
-	 *   CharUtils.isAsciiPrintable('A')  = true
-	 *   CharUtils.isAsciiPrintable('3')  = true
-	 *   CharUtils.isAsciiPrintable('-')  = true
-	 *   CharUtils.isAsciiPrintable('\n') = false
-	 *   CharUtils.isAsciiPrintable('&copy;') = false
-	 * </pre>
-	 *
-	 * @param ch the character to check
-	 * @return true if between 32 and 126 inclusive
 	 */
-	public static boolean isAsciiPrintable(final char ch) {
-		return ch >= 32 && ch < 127;
-	}
-
-	/**
-	 * <p>
-	 * Checks whether the character is ASCII 7 bit control.
-	 * </p>
-	 *
-	 * <pre>
-	 *   CharUtils.isAsciiControl('a')  = false
-	 *   CharUtils.isAsciiControl('A')  = false
-	 *   CharUtils.isAsciiControl('3')  = false
-	 *   CharUtils.isAsciiControl('-')  = false
-	 *   CharUtils.isAsciiControl('\n') = true
-	 *   CharUtils.isAsciiControl('&copy;') = false
-	 * </pre>
-	 *
-	 * @param ch the character to check
-	 * @return true if less than 32 or equals 127
-	 */
-	public static boolean isAsciiControl(final char ch) {
-		return ch < 32 || ch == 127;
-	}
-
-	/**
-	 * <p>
-	 * Checks whether the character is ASCII 7 bit alphabetic.
-	 * </p>
-	 *
-	 * <pre>
-	 *   CharUtils.isAsciiAlpha('a')  = true
-	 *   CharUtils.isAsciiAlpha('A')  = true
-	 *   CharUtils.isAsciiAlpha('3')  = false
-	 *   CharUtils.isAsciiAlpha('-')  = false
-	 *   CharUtils.isAsciiAlpha('\n') = false
-	 *   CharUtils.isAsciiAlpha('&copy;') = false
-	 * </pre>
-	 *
-	 * @param ch the character to check
-	 * @return true if between 65 and 90 or 97 and 122 inclusive
-	 */
-	public static boolean isAsciiAlpha(final char ch) {
-		return isAsciiAlphaUpper(ch) || isAsciiAlphaLower(ch);
-	}
-
-	/**
-	 * <p>
-	 * Checks whether the character is ASCII 7 bit alphabetic upper case.
-	 * </p>
-	 *
-	 * <pre>
-	 *   CharUtils.isAsciiAlphaUpper('a')  = false
-	 *   CharUtils.isAsciiAlphaUpper('A')  = true
-	 *   CharUtils.isAsciiAlphaUpper('3')  = false
-	 *   CharUtils.isAsciiAlphaUpper('-')  = false
-	 *   CharUtils.isAsciiAlphaUpper('\n') = false
-	 *   CharUtils.isAsciiAlphaUpper('&copy;') = false
-	 * </pre>
-	 *
-	 * @param ch the character to check
-	 * @return true if between 65 and 90 inclusive
-	 */
-	public static boolean isAsciiAlphaUpper(final char ch) {
-		return ch >= 'A' && ch <= 'Z';
-	}
-
-	/**
-	 * <p>
-	 * Checks whether the character is ASCII 7 bit alphabetic lower case.
-	 * </p>
-	 *
-	 * <pre>
-	 *   CharUtils.isAsciiAlphaLower('a')  = true
-	 *   CharUtils.isAsciiAlphaLower('A')  = false
-	 *   CharUtils.isAsciiAlphaLower('3')  = false
-	 *   CharUtils.isAsciiAlphaLower('-')  = false
-	 *   CharUtils.isAsciiAlphaLower('\n') = false
-	 *   CharUtils.isAsciiAlphaLower('&copy;') = false
-	 * </pre>
-	 *
-	 * @param ch the character to check
-	 * @return true if between 97 and 122 inclusive
-	 */
-	public static boolean isAsciiAlphaLower(final char ch) {
-		return ch >= 'a' && ch <= 'z';
-	}
-
-	/**
-	 * <p>
-	 * Checks whether the character is ASCII 7 bit numeric.
-	 * </p>
-	 *
-	 * <pre>
-	 *   CharUtils.isAsciiNumeric('a')  = false
-	 *   CharUtils.isAsciiNumeric('A')  = false
-	 *   CharUtils.isAsciiNumeric('3')  = true
-	 *   CharUtils.isAsciiNumeric('-')  = false
-	 *   CharUtils.isAsciiNumeric('\n') = false
-	 *   CharUtils.isAsciiNumeric('&copy;') = false
-	 * </pre>
-	 *
-	 * @param ch the character to check
-	 * @return true if between 48 and 57 inclusive
-	 */
-	public static boolean isAsciiNumeric(final char ch) {
-		return ch >= '0' && ch <= '9';
-	}
-
-	/**
-	 * <p>
-	 * Checks whether the character is ASCII 7 bit numeric.
-	 * </p>
-	 *
-	 * <pre>
-	 *   CharUtils.isAsciiAlphanumeric('a')  = true
-	 *   CharUtils.isAsciiAlphanumeric('A')  = true
-	 *   CharUtils.isAsciiAlphanumeric('3')  = true
-	 *   CharUtils.isAsciiAlphanumeric('-')  = false
-	 *   CharUtils.isAsciiAlphanumeric('\n') = false
-	 *   CharUtils.isAsciiAlphanumeric('&copy;') = false
-	 * </pre>
-	 *
-	 * @param ch the character to check
-	 * @return true if between 48 and 57 or 65 and 90 or 97 and 122 inclusive
-	 */
-	public static boolean isAsciiAlphanumeric(final char ch) {
-		return isAsciiAlpha(ch) || isAsciiNumeric(ch);
-	}
-
-	/**
-	 * <p>
-	 * Compares two {@code char} values numerically. This is the same functionality
-	 * as provided in Java 7.
-	 * </p>
-	 *
-	 * @param x the first {@code char} to compare
-	 * @param y the second {@code char} to compare
-	 * @return the value {@code 0} if {@code x == y}; a value less than {@code 0} if
-	 *         {@code x < y}; and a value greater than {@code 0} if {@code x > y}
-	 * @since 3.4
-	 */
-	public static int compare(final char x, final char y) {
-		return x - y;
+	public CharUtils() {
 	}
 }

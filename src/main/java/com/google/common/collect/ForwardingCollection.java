@@ -56,46 +56,8 @@ public abstract class ForwardingCollection<E> extends ForwardingObject implement
 	}
 
 	@Override
-	protected abstract Collection<E> delegate();
-
-	@Override
-	public Iterator<E> iterator() {
-		return delegate().iterator();
-	}
-
-	@Override
-	public int size() {
-		return delegate().size();
-	}
-
-	@Override
-	public boolean removeAll(Collection<?> collection) {
-		return delegate().removeAll(collection);
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return delegate().isEmpty();
-	}
-
-	@Override
-	public boolean contains(Object object) {
-		return delegate().contains(object);
-	}
-
-	@Override
 	public boolean add(E element) {
 		return delegate().add(element);
-	}
-
-	@Override
-	public boolean remove(Object object) {
-		return delegate().remove(object);
-	}
-
-	@Override
-	public boolean containsAll(Collection<?> collection) {
-		return delegate().containsAll(collection);
 	}
 
 	@Override
@@ -104,23 +66,73 @@ public abstract class ForwardingCollection<E> extends ForwardingObject implement
 	}
 
 	@Override
-	public boolean retainAll(Collection<?> collection) {
-		return delegate().retainAll(collection);
-	}
-
-	@Override
 	public void clear() {
 		delegate().clear();
 	}
 
 	@Override
-	public Object[] toArray() {
-		return delegate().toArray();
+	public boolean contains(Object object) {
+		return delegate().contains(object);
 	}
 
 	@Override
-	public <T> T[] toArray(T[] array) {
-		return delegate().toArray(array);
+	public boolean containsAll(Collection<?> collection) {
+		return delegate().containsAll(collection);
+	}
+
+	@Override
+	protected abstract Collection<E> delegate();
+
+	@Override
+	public boolean isEmpty() {
+		return delegate().isEmpty();
+	}
+
+	@Override
+	public Iterator<E> iterator() {
+		return delegate().iterator();
+	}
+
+	@Override
+	public boolean remove(Object object) {
+		return delegate().remove(object);
+	}
+
+	@Override
+	public boolean removeAll(Collection<?> collection) {
+		return delegate().removeAll(collection);
+	}
+
+	@Override
+	public boolean retainAll(Collection<?> collection) {
+		return delegate().retainAll(collection);
+	}
+
+	@Override
+	public int size() {
+		return delegate().size();
+	}
+
+	/**
+	 * A sensible definition of {@link #addAll} in terms of {@link #add}. If you
+	 * override {@link #add}, you may wish to override {@link #addAll} to forward to
+	 * this implementation.
+	 *
+	 * @since 7.0
+	 */
+	protected boolean standardAddAll(Collection<? extends E> collection) {
+		return Iterators.addAll(this, collection.iterator());
+	}
+
+	/**
+	 * A sensible definition of {@link #clear} in terms of {@link #iterator}, using
+	 * the iterator's {@code remove} method. If you override {@link #iterator}, you
+	 * may wish to override {@link #clear} to forward to this implementation.
+	 *
+	 * @since 7.0
+	 */
+	protected void standardClear() {
+		Iterators.clear(iterator());
 	}
 
 	/**
@@ -146,14 +158,15 @@ public abstract class ForwardingCollection<E> extends ForwardingObject implement
 	}
 
 	/**
-	 * A sensible definition of {@link #addAll} in terms of {@link #add}. If you
-	 * override {@link #add}, you may wish to override {@link #addAll} to forward to
-	 * this implementation.
+	 * A sensible definition of {@link #isEmpty} as {@code !iterator().hasNext}. If
+	 * you override {@link #isEmpty}, you may wish to override {@link #isEmpty} to
+	 * forward to this implementation. Alternately, it may be more efficient to
+	 * implement {@code isEmpty} as {@code size() == 0}.
 	 *
 	 * @since 7.0
 	 */
-	protected boolean standardAddAll(Collection<? extends E> collection) {
-		return Iterators.addAll(this, collection.iterator());
+	protected boolean standardIsEmpty() {
+		return !iterator().hasNext();
 	}
 
 	/**
@@ -199,40 +212,6 @@ public abstract class ForwardingCollection<E> extends ForwardingObject implement
 	}
 
 	/**
-	 * A sensible definition of {@link #clear} in terms of {@link #iterator}, using
-	 * the iterator's {@code remove} method. If you override {@link #iterator}, you
-	 * may wish to override {@link #clear} to forward to this implementation.
-	 *
-	 * @since 7.0
-	 */
-	protected void standardClear() {
-		Iterators.clear(iterator());
-	}
-
-	/**
-	 * A sensible definition of {@link #isEmpty} as {@code !iterator().hasNext}. If
-	 * you override {@link #isEmpty}, you may wish to override {@link #isEmpty} to
-	 * forward to this implementation. Alternately, it may be more efficient to
-	 * implement {@code isEmpty} as {@code size() == 0}.
-	 *
-	 * @since 7.0
-	 */
-	protected boolean standardIsEmpty() {
-		return !iterator().hasNext();
-	}
-
-	/**
-	 * A sensible definition of {@link #toString} in terms of {@link #iterator}. If
-	 * you override {@link #iterator}, you may wish to override {@link #toString} to
-	 * forward to this implementation.
-	 *
-	 * @since 7.0
-	 */
-	protected String standardToString() {
-		return Collections2.toStringImpl(this);
-	}
-
-	/**
 	 * A sensible definition of {@link #toArray()} in terms of
 	 * {@link #toArray(Object[])}. If you override {@link #toArray(Object[])}, you
 	 * may wish to override {@link #toArray} to forward to this implementation.
@@ -253,5 +232,26 @@ public abstract class ForwardingCollection<E> extends ForwardingObject implement
 	 */
 	protected <T> T[] standardToArray(T[] array) {
 		return ObjectArrays.toArrayImpl(this, array);
+	}
+
+	/**
+	 * A sensible definition of {@link #toString} in terms of {@link #iterator}. If
+	 * you override {@link #iterator}, you may wish to override {@link #toString} to
+	 * forward to this implementation.
+	 *
+	 * @since 7.0
+	 */
+	protected String standardToString() {
+		return Collections2.toStringImpl(this);
+	}
+
+	@Override
+	public Object[] toArray() {
+		return delegate().toArray();
+	}
+
+	@Override
+	public <T> T[] toArray(T[] array) {
+		return delegate().toArray(array);
 	}
 }

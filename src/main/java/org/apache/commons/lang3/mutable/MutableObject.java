@@ -54,27 +54,6 @@ public class MutableObject<T> implements Mutable<T>, Serializable {
 
 	// -----------------------------------------------------------------------
 	/**
-	 * Gets the value.
-	 *
-	 * @return the value, may be null
-	 */
-	@Override
-	public T getValue() {
-		return this.value;
-	}
-
-	/**
-	 * Sets the value.
-	 *
-	 * @param value the value to set
-	 */
-	@Override
-	public void setValue(final T value) {
-		this.value = value;
-	}
-
-	// -----------------------------------------------------------------------
-	/**
 	 * <p>
 	 * Compares this object against the specified object. The result is {@code true}
 	 * if and only if the argument is not {@code null} and is a
@@ -101,6 +80,17 @@ public class MutableObject<T> implements Mutable<T>, Serializable {
 		return false;
 	}
 
+	// -----------------------------------------------------------------------
+	/**
+	 * Gets the value.
+	 *
+	 * @return the value, may be null
+	 */
+	@Override
+	public T getValue() {
+		return this.value;
+	}
+
 	/**
 	 * Returns the value's hash code or {@code 0} if the value is {@code null}.
 	 *
@@ -109,6 +99,16 @@ public class MutableObject<T> implements Mutable<T>, Serializable {
 	@Override
 	public int hashCode() {
 		return value == null ? 0 : value.hashCode();
+	}
+
+	/**
+	 * Sets the value.
+	 *
+	 * @param value the value to set
+	 */
+	@Override
+	public void setValue(final T value) {
+		this.value = value;
 	}
 
 	// -----------------------------------------------------------------------

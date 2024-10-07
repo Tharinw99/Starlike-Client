@@ -63,19 +63,6 @@ public class SerializationException extends RuntimeException {
 
 	/**
 	 * <p>
-	 * Constructs a new {@code SerializationException} with specified nested
-	 * {@code Throwable}.
-	 * </p>
-	 *
-	 * @param cause The {@code Exception} or {@code Error} that caused this
-	 *              exception to be thrown.
-	 */
-	public SerializationException(final Throwable cause) {
-		super(cause);
-	}
-
-	/**
-	 * <p>
 	 * Constructs a new {@code SerializationException} with specified detail message
 	 * and nested {@code Throwable}.
 	 * </p>
@@ -86,6 +73,19 @@ public class SerializationException extends RuntimeException {
 	 */
 	public SerializationException(final String msg, final Throwable cause) {
 		super(msg, cause);
+	}
+
+	/**
+	 * <p>
+	 * Constructs a new {@code SerializationException} with specified nested
+	 * {@code Throwable}.
+	 * </p>
+	 *
+	 * @param cause The {@code Exception} or {@code Error} that caused this
+	 *              exception to be thrown.
+	 */
+	public SerializationException(final Throwable cause) {
+		super(cause);
 	}
 
 }

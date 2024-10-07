@@ -34,34 +34,14 @@ class DescendingImmutableSortedSet<E> extends ImmutableSortedSet<E> {
 	}
 
 	@Override
-	public int size() {
-		return forward.size();
-	}
-
-	@Override
-	public UnmodifiableIterator<E> iterator() {
-		return forward.descendingIterator();
-	}
-
-	@Override
-	ImmutableSortedSet<E> headSetImpl(E toElement, boolean inclusive) {
-		return forward.tailSet(toElement, inclusive).descendingSet();
-	}
-
-	@Override
-	ImmutableSortedSet<E> subSetImpl(E fromElement, boolean fromInclusive, E toElement, boolean toInclusive) {
-		return forward.subSet(toElement, toInclusive, fromElement, fromInclusive).descendingSet();
-	}
-
-	@Override
-	ImmutableSortedSet<E> tailSetImpl(E fromElement, boolean inclusive) {
-		return forward.headSet(fromElement, inclusive).descendingSet();
+	public E ceiling(E element) {
+		return forward.floor(element);
 	}
 
 	@Override
 	@GwtIncompatible("NavigableSet")
-	public ImmutableSortedSet<E> descendingSet() {
-		return forward;
+	ImmutableSortedSet<E> createDescendingSet() {
+		throw new AssertionError("should never be called");
 	}
 
 	@Override
@@ -72,13 +52,8 @@ class DescendingImmutableSortedSet<E> extends ImmutableSortedSet<E> {
 
 	@Override
 	@GwtIncompatible("NavigableSet")
-	ImmutableSortedSet<E> createDescendingSet() {
-		throw new AssertionError("should never be called");
-	}
-
-	@Override
-	public E lower(E element) {
-		return forward.higher(element);
+	public ImmutableSortedSet<E> descendingSet() {
+		return forward;
 	}
 
 	@Override
@@ -87,8 +62,8 @@ class DescendingImmutableSortedSet<E> extends ImmutableSortedSet<E> {
 	}
 
 	@Override
-	public E ceiling(E element) {
-		return forward.floor(element);
+	ImmutableSortedSet<E> headSetImpl(E toElement, boolean inclusive) {
+		return forward.tailSet(toElement, inclusive).descendingSet();
 	}
 
 	@Override
@@ -109,5 +84,30 @@ class DescendingImmutableSortedSet<E> extends ImmutableSortedSet<E> {
 	@Override
 	boolean isPartialView() {
 		return forward.isPartialView();
+	}
+
+	@Override
+	public UnmodifiableIterator<E> iterator() {
+		return forward.descendingIterator();
+	}
+
+	@Override
+	public E lower(E element) {
+		return forward.higher(element);
+	}
+
+	@Override
+	public int size() {
+		return forward.size();
+	}
+
+	@Override
+	ImmutableSortedSet<E> subSetImpl(E fromElement, boolean fromInclusive, E toElement, boolean toInclusive) {
+		return forward.subSet(toElement, toInclusive, fromElement, fromInclusive).descendingSet();
+	}
+
+	@Override
+	ImmutableSortedSet<E> tailSetImpl(E fromElement, boolean inclusive) {
+		return forward.headSet(fromElement, inclusive).descendingSet();
 	}
 }

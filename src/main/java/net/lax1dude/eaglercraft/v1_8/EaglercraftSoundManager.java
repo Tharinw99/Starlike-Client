@@ -27,41 +27,42 @@ import net.minecraft.util.ResourceLocation;
 /**
  * Copyright (c) 2022-2023 lax1dude, ayunami2000. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class EaglercraftSoundManager {
-	
+
 	protected static class ActiveSoundEvent {
 
 		protected final EaglercraftSoundManager manager;
-		
+
 		protected final ISound soundInstance;
 		protected final SoundCategory soundCategory;
 		protected final SoundPoolEntry soundConfig;
 		protected IAudioHandle soundHandle;
-		
+
 		protected float activeX;
 		protected float activeY;
 		protected float activeZ;
-		
+
 		protected float activePitch;
 		protected float activeGain;
-		
+
 		protected int repeatCounter = 0;
 		protected boolean paused = false;
-		
-		protected ActiveSoundEvent(EaglercraftSoundManager manager, ISound soundInstance,
-				SoundCategory soundCategory, SoundPoolEntry soundConfig, IAudioHandle soundHandle) {
+
+		protected ActiveSoundEvent(EaglercraftSoundManager manager, ISound soundInstance, SoundCategory soundCategory,
+				SoundPoolEntry soundConfig, IAudioHandle soundHandle) {
 			this.manager = manager;
 			this.soundInstance = soundInstance;
 			this.soundCategory = soundCategory;
@@ -73,271 +74,155 @@ public class EaglercraftSoundManager {
 			this.activePitch = soundInstance.getPitch();
 			this.activeGain = soundInstance.getVolume();
 		}
-		
+
 		protected void updateLocation() {
 			float x = soundInstance.getXPosF();
 			float y = soundInstance.getYPosF();
 			float z = soundInstance.getZPosF();
 			float pitch = soundInstance.getPitch();
 			float gain = soundInstance.getVolume();
-			if(x != activeX || y != activeY || z != activeZ) {
+			if (x != activeX || y != activeY || z != activeZ) {
 				soundHandle.move(x, y, z);
 				activeX = x;
 				activeY = y;
 				activeZ = z;
 			}
-			if(pitch != activePitch) {
-				soundHandle.pitch(MathHelper.clamp_float(pitch * (float)soundConfig.getPitch(), 0.5f, 2.0f));
+			if (pitch != activePitch) {
+				soundHandle.pitch(MathHelper.clamp_float(pitch * (float) soundConfig.getPitch(), 0.5f, 2.0f));
 				activePitch = pitch;
 			}
-			if(gain != activeGain) {
-				float attenuatedGain = gain * manager.categoryVolumes[SoundCategory.MASTER.getCategoryId()] *
-						(soundCategory == SoundCategory.MASTER ? 1.0f : manager.categoryVolumes[soundCategory.getCategoryId()])
-						* (float)soundConfig.getVolume();
+			if (gain != activeGain) {
+				float attenuatedGain = gain * manager.categoryVolumes[SoundCategory.MASTER.getCategoryId()]
+						* (soundCategory == SoundCategory.MASTER ? 1.0f
+								: manager.categoryVolumes[soundCategory.getCategoryId()])
+						* (float) soundConfig.getVolume();
 				soundHandle.gain(MathHelper.clamp_float(attenuatedGain, 0.0f, 1.0f));
 				activeGain = gain;
 			}
 		}
-		
+
 	}
-	
+
 	protected static class WaitingSoundEvent {
-		
+
 		protected final ISound playSound;
 		protected int playTicks;
 		protected boolean paused = false;
-		
+
 		private WaitingSoundEvent(ISound playSound, int playTicks) {
 			this.playSound = playSound;
 			this.playTicks = playTicks;
 		}
-		
+
 	}
-	
+
 	private static final Logger logger = LogManager.getLogger("SoundManager");
-	
+
 	private final GameSettings settings;
 	private final SoundHandler handler;
 	private final float[] categoryVolumes;
 	private final List<ActiveSoundEvent> activeSounds;
 	private final List<WaitingSoundEvent> queuedSounds;
 
+	private final PlatformAudio.IAudioCacheLoader browserResourcePackLoader = filename -> {
+		try {
+			return EaglerInputStream.inputStreamToBytesQuiet(Minecraft.getMinecraft().getResourceManager()
+					.getResource(new ResourceLocation(filename)).getInputStream());
+		} catch (Throwable t) {
+			return null;
+		}
+	};
+
 	public EaglercraftSoundManager(GameSettings settings, SoundHandler handler) {
 		this.settings = settings;
 		this.handler = handler;
-		categoryVolumes = new float[] {
-				settings.getSoundLevel(SoundCategory.MASTER), settings.getSoundLevel(SoundCategory.MUSIC),
-				settings.getSoundLevel(SoundCategory.RECORDS), settings.getSoundLevel(SoundCategory.WEATHER),
-				settings.getSoundLevel(SoundCategory.BLOCKS), settings.getSoundLevel(SoundCategory.MOBS),
-				settings.getSoundLevel(SoundCategory.ANIMALS), settings.getSoundLevel(SoundCategory.PLAYERS),
-				settings.getSoundLevel(SoundCategory.AMBIENT)
-		};
+		categoryVolumes = new float[] { settings.getSoundLevel(SoundCategory.MASTER),
+				settings.getSoundLevel(SoundCategory.MUSIC), settings.getSoundLevel(SoundCategory.RECORDS),
+				settings.getSoundLevel(SoundCategory.WEATHER), settings.getSoundLevel(SoundCategory.BLOCKS),
+				settings.getSoundLevel(SoundCategory.MOBS), settings.getSoundLevel(SoundCategory.ANIMALS),
+				settings.getSoundLevel(SoundCategory.PLAYERS), settings.getSoundLevel(SoundCategory.AMBIENT) };
 		activeSounds = new LinkedList<>();
 		queuedSounds = new LinkedList<>();
 	}
 
-	public void unloadSoundSystem() {
-		// handled by PlatformApplication
-	}
-	
-	public void reloadSoundSystem() {
-		PlatformAudio.flushAudioCache();
-	}
-	
-	public void setSoundCategoryVolume(SoundCategory category, float volume) {
-		categoryVolumes[category.getCategoryId()] = volume;
-		Iterator<ActiveSoundEvent> soundItr = activeSounds.iterator();
-		while(soundItr.hasNext()) {
-			ActiveSoundEvent evt = soundItr.next();
-			if((category == SoundCategory.MASTER || evt.soundCategory == category)
-					&& !evt.soundHandle.shouldFree()) {
-				float newVolume = (evt.activeGain = evt.soundInstance.getVolume()) * categoryVolumes[SoundCategory.MASTER.getCategoryId()] *
-					(evt.soundCategory == SoundCategory.MASTER ? 1.0f : categoryVolumes[evt.soundCategory.getCategoryId()])
-					* (float)evt.soundConfig.getVolume();
-				newVolume = MathHelper.clamp_float(newVolume, 0.0f, 1.0f);
-				if(newVolume > 0.0f) {
-					evt.soundHandle.gain(newVolume);
-				}else {
-					evt.soundHandle.end();
-					soundItr.remove();
-				}
-			}
-		}
-	}
-	
-	public void stopAllSounds() {
-		Iterator<ActiveSoundEvent> soundItr = activeSounds.iterator();
-		while(soundItr.hasNext()) {
-			ActiveSoundEvent evt = soundItr.next();
-			if(!evt.soundHandle.shouldFree()) {
-				evt.soundHandle.end();
-			}
-		}
-		activeSounds.clear();
-	}
-	
-	public void pauseAllSounds() {
-		Iterator<ActiveSoundEvent> soundItr = activeSounds.iterator();
-		while(soundItr.hasNext()) {
-			ActiveSoundEvent evt = soundItr.next();
-			if(!evt.soundHandle.shouldFree()) {
-				evt.soundHandle.pause(true);
-				evt.paused = true;
-			}
-		}
-		Iterator<WaitingSoundEvent> soundItr2 = queuedSounds.iterator();
-		while(soundItr2.hasNext()) {
-			soundItr2.next().paused = true;
-		}
-	}
-	
-	public void resumeAllSounds() {
-		Iterator<ActiveSoundEvent> soundItr = activeSounds.iterator();
-		while(soundItr.hasNext()) {
-			ActiveSoundEvent evt = soundItr.next();
-			if(!evt.soundHandle.shouldFree()) {
-				evt.soundHandle.pause(false);
-				evt.paused = false;
-			}
-		}
-		Iterator<WaitingSoundEvent> soundItr2 = queuedSounds.iterator();
-		while(soundItr2.hasNext()) {
-			soundItr2.next().paused = false;
-		}
-	}
-	
-	public void updateAllSounds() {
-		Iterator<ActiveSoundEvent> soundItr = activeSounds.iterator();
-		while(soundItr.hasNext()) {
-			ActiveSoundEvent evt = soundItr.next();
-			if(!evt.paused && (evt.soundInstance instanceof ITickable)) {
-				boolean destroy = false;
-				try {
-					((ITickable)evt.soundInstance).update();
-					if ((evt.soundInstance instanceof ITickableSound)
-							&& ((ITickableSound) evt.soundInstance).isDonePlaying()) {
-						destroy = true;
-					}
-				}catch(Throwable t) {
-					logger.error("Error ticking sound: {}", t.toString());
-					logger.error(t);
-					destroy = true;
-				}
-				if(destroy) {
-					if(!evt.soundHandle.shouldFree()) {
-						evt.soundHandle.end();
-					}
-					soundItr.remove();
-				}
-			}
-			if(evt.soundHandle.shouldFree()) {
-				if(evt.soundInstance.canRepeat()) {
-					if(!evt.paused && ++evt.repeatCounter > evt.soundInstance.getRepeatDelay()) {
-						evt.repeatCounter = 0;
-						evt.updateLocation();
-						evt.soundHandle.restart();
-					}
-				}else {
-					soundItr.remove();
-				}
-			}else {
-				evt.updateLocation();
-			}
-		}
-		Iterator<WaitingSoundEvent> soundItr2 = queuedSounds.iterator();
-		while(soundItr2.hasNext()) {
-			WaitingSoundEvent evt = soundItr2.next();
-			if(!evt.paused && --evt.playTicks <= 0) {
-				soundItr2.remove();
-				playSound(evt.playSound);
-			}
-		}
-		PlatformAudio.clearAudioCache();
-	}
-	
 	public boolean isSoundPlaying(ISound sound) {
 		Iterator<ActiveSoundEvent> soundItr = activeSounds.iterator();
-		while(soundItr.hasNext()) {
+		while (soundItr.hasNext()) {
 			ActiveSoundEvent evt = soundItr.next();
-			if(evt.soundInstance == sound) {
+			if (evt.soundInstance == sound) {
 				return !evt.soundHandle.shouldFree();
 			}
 		}
 		return false;
 	}
-	
-	public void stopSound(ISound sound) {
+
+	public void pauseAllSounds() {
 		Iterator<ActiveSoundEvent> soundItr = activeSounds.iterator();
-		while(soundItr.hasNext()) {
+		while (soundItr.hasNext()) {
 			ActiveSoundEvent evt = soundItr.next();
-			if(evt.soundInstance == sound) {
-				if(!evt.soundHandle.shouldFree()) {
-					evt.soundHandle.end();
-					soundItr.remove();
-					return;
-				}
+			if (!evt.soundHandle.shouldFree()) {
+				evt.soundHandle.pause(true);
+				evt.paused = true;
 			}
 		}
 		Iterator<WaitingSoundEvent> soundItr2 = queuedSounds.iterator();
-		while(soundItr2.hasNext()) {
-			if(soundItr2.next().playSound == sound) {
-				soundItr2.remove();
-			}
+		while (soundItr2.hasNext()) {
+			soundItr2.next().paused = true;
 		}
 	}
 
-	private final PlatformAudio.IAudioCacheLoader browserResourcePackLoader = filename -> {
-		try {
-			return EaglerInputStream.inputStreamToBytesQuiet(Minecraft.getMinecraft().getResourceManager()
-					.getResource(new ResourceLocation(filename)).getInputStream());
-		}catch(Throwable t) {
-			return null;
-		}
-	};
+	public void playDelayedSound(ISound sound, int delay) {
+		queuedSounds.add(new WaitingSoundEvent(sound, delay));
+	}
 
 	public void playSound(ISound sound) {
-		if(!PlatformAudio.available()) {
+		if (!PlatformAudio.available()) {
 			return;
 		}
-		if(sound != null && categoryVolumes[SoundCategory.MASTER.getCategoryId()] > 0.0f) {
+		if (sound != null && categoryVolumes[SoundCategory.MASTER.getCategoryId()] > 0.0f) {
 			SoundEventAccessorComposite accessor = handler.getSound(sound.getSoundLocation());
-			if(accessor == null) {
+			if (accessor == null) {
 				logger.warn("Unable to play unknown soundEvent(1): {}", sound.getSoundLocation().toString());
-			}else {
+			} else {
 				SoundPoolEntry etr = accessor.cloneEntry();
 				if (etr == SoundHandler.missing_sound) {
 					logger.warn("Unable to play empty soundEvent(2): {}", etr.getSoundPoolEntryLocation().toString());
-				}else {
+				} else {
 					ResourceLocation lc = etr.getSoundPoolEntryLocation();
 					IAudioResource trk;
-					if(EagRuntime.getPlatformType() != EnumPlatformType.DESKTOP) {
-						trk = PlatformAudio.loadAudioDataNew(lc.toString(), !etr.isStreamingSound(), browserResourcePackLoader);
-					}else {
+					if (EagRuntime.getPlatformType() != EnumPlatformType.DESKTOP) {
+						trk = PlatformAudio.loadAudioDataNew(lc.toString(), !etr.isStreamingSound(),
+								browserResourcePackLoader);
+					} else {
 						trk = PlatformAudio.loadAudioData(
-								"/assets/" + lc.getResourceDomain() + "/" + lc.getResourcePath(), !etr.isStreamingSound());
+								"/assets/" + lc.getResourceDomain() + "/" + lc.getResourcePath(),
+								!etr.isStreamingSound());
 					}
-					if(trk == null) {
+					if (trk == null) {
 						logger.warn("Unable to play unknown soundEvent(3): {}", sound.getSoundLocation().toString());
-					}else {
-						
-						ActiveSoundEvent newSound = new ActiveSoundEvent(this, sound, accessor.getSoundCategory(), etr, null);
+					} else {
 
-						float pitch = MathHelper.clamp_float(newSound.activePitch * (float)etr.getPitch(), 0.5f, 2.0f);
-						float attenuatedGain = newSound.activeGain * categoryVolumes[SoundCategory.MASTER.getCategoryId()] *
-								(accessor.getSoundCategory() == SoundCategory.MASTER ? 1.0f :
-								categoryVolumes[accessor.getSoundCategory().getCategoryId()]) * (float)etr.getVolume();
-						
+						ActiveSoundEvent newSound = new ActiveSoundEvent(this, sound, accessor.getSoundCategory(), etr,
+								null);
+
+						float pitch = MathHelper.clamp_float(newSound.activePitch * (float) etr.getPitch(), 0.5f, 2.0f);
+						float attenuatedGain = newSound.activeGain
+								* categoryVolumes[SoundCategory.MASTER.getCategoryId()]
+								* (accessor.getSoundCategory() == SoundCategory.MASTER ? 1.0f
+										: categoryVolumes[accessor.getSoundCategory().getCategoryId()])
+								* (float) etr.getVolume();
+
 						AttenuationType tp = sound.getAttenuationType();
-						if(tp == AttenuationType.LINEAR) {
+						if (tp == AttenuationType.LINEAR) {
 							newSound.soundHandle = PlatformAudio.beginPlayback(trk, newSound.activeX, newSound.activeY,
 									newSound.activeZ, attenuatedGain, pitch);
-						}else {
+						} else {
 							newSound.soundHandle = PlatformAudio.beginPlaybackStatic(trk, attenuatedGain, pitch);
 						}
-						
-						if(newSound.soundHandle == null) {
+
+						if (newSound.soundHandle == null) {
 							logger.error("Unable to play soundEvent(4): {}", sound.getSoundLocation().toString());
-						}else {
+						} else {
 							activeSounds.add(newSound);
 						}
 					}
@@ -345,28 +230,150 @@ public class EaglercraftSoundManager {
 			}
 		}
 	}
-	
-	public void playDelayedSound(ISound sound, int delay) {
-		queuedSounds.add(new WaitingSoundEvent(sound, delay));
+
+	public void reloadSoundSystem() {
+		PlatformAudio.flushAudioCache();
 	}
-	
+
+	public void resumeAllSounds() {
+		Iterator<ActiveSoundEvent> soundItr = activeSounds.iterator();
+		while (soundItr.hasNext()) {
+			ActiveSoundEvent evt = soundItr.next();
+			if (!evt.soundHandle.shouldFree()) {
+				evt.soundHandle.pause(false);
+				evt.paused = false;
+			}
+		}
+		Iterator<WaitingSoundEvent> soundItr2 = queuedSounds.iterator();
+		while (soundItr2.hasNext()) {
+			soundItr2.next().paused = false;
+		}
+	}
+
 	public void setListener(EntityPlayer player, float partialTicks) {
-		if(!PlatformAudio.available()) {
+		if (!PlatformAudio.available()) {
 			return;
 		}
-		if(player != null) {
+		if (player != null) {
 			try {
 				float f = player.prevRotationPitch + (player.rotationPitch - player.prevRotationPitch) * partialTicks;
 				float f1 = player.prevRotationYaw + (player.rotationYaw - player.prevRotationYaw) * partialTicks;
 				double d0 = player.prevPosX + (player.posX - player.prevPosX) * (double) partialTicks;
-				double d1 = player.prevPosY + (player.posY - player.prevPosY) * (double) partialTicks + (double) player.getEyeHeight();
+				double d1 = player.prevPosY + (player.posY - player.prevPosY) * (double) partialTicks
+						+ (double) player.getEyeHeight();
 				double d2 = player.prevPosZ + (player.posZ - player.prevPosZ) * (double) partialTicks;
-				PlatformAudio.setListener((float)d0, (float)d1, (float)d2, f, f1);
-			}catch(Throwable t) {
+				PlatformAudio.setListener((float) d0, (float) d1, (float) d2, f, f1);
+			} catch (Throwable t) {
 				// eaglercraft 1.5.2 had Infinity/NaN crashes for this function which
 				// couldn't be resolved via if statement checks in the above variables
 			}
 		}
 	}
-	
+
+	public void setSoundCategoryVolume(SoundCategory category, float volume) {
+		categoryVolumes[category.getCategoryId()] = volume;
+		Iterator<ActiveSoundEvent> soundItr = activeSounds.iterator();
+		while (soundItr.hasNext()) {
+			ActiveSoundEvent evt = soundItr.next();
+			if ((category == SoundCategory.MASTER || evt.soundCategory == category) && !evt.soundHandle.shouldFree()) {
+				float newVolume = (evt.activeGain = evt.soundInstance.getVolume())
+						* categoryVolumes[SoundCategory.MASTER.getCategoryId()]
+						* (evt.soundCategory == SoundCategory.MASTER ? 1.0f
+								: categoryVolumes[evt.soundCategory.getCategoryId()])
+						* (float) evt.soundConfig.getVolume();
+				newVolume = MathHelper.clamp_float(newVolume, 0.0f, 1.0f);
+				if (newVolume > 0.0f) {
+					evt.soundHandle.gain(newVolume);
+				} else {
+					evt.soundHandle.end();
+					soundItr.remove();
+				}
+			}
+		}
+	}
+
+	public void stopAllSounds() {
+		Iterator<ActiveSoundEvent> soundItr = activeSounds.iterator();
+		while (soundItr.hasNext()) {
+			ActiveSoundEvent evt = soundItr.next();
+			if (!evt.soundHandle.shouldFree()) {
+				evt.soundHandle.end();
+			}
+		}
+		activeSounds.clear();
+	}
+
+	public void stopSound(ISound sound) {
+		Iterator<ActiveSoundEvent> soundItr = activeSounds.iterator();
+		while (soundItr.hasNext()) {
+			ActiveSoundEvent evt = soundItr.next();
+			if (evt.soundInstance == sound) {
+				if (!evt.soundHandle.shouldFree()) {
+					evt.soundHandle.end();
+					soundItr.remove();
+					return;
+				}
+			}
+		}
+		Iterator<WaitingSoundEvent> soundItr2 = queuedSounds.iterator();
+		while (soundItr2.hasNext()) {
+			if (soundItr2.next().playSound == sound) {
+				soundItr2.remove();
+			}
+		}
+	}
+
+	public void unloadSoundSystem() {
+		// handled by PlatformApplication
+	}
+
+	public void updateAllSounds() {
+		Iterator<ActiveSoundEvent> soundItr = activeSounds.iterator();
+		while (soundItr.hasNext()) {
+			ActiveSoundEvent evt = soundItr.next();
+			if (!evt.paused && (evt.soundInstance instanceof ITickable)) {
+				boolean destroy = false;
+				try {
+					((ITickable) evt.soundInstance).update();
+					if ((evt.soundInstance instanceof ITickableSound)
+							&& ((ITickableSound) evt.soundInstance).isDonePlaying()) {
+						destroy = true;
+					}
+				} catch (Throwable t) {
+					logger.error("Error ticking sound: {}", t.toString());
+					logger.error(t);
+					destroy = true;
+				}
+				if (destroy) {
+					if (!evt.soundHandle.shouldFree()) {
+						evt.soundHandle.end();
+					}
+					soundItr.remove();
+				}
+			}
+			if (evt.soundHandle.shouldFree()) {
+				if (evt.soundInstance.canRepeat()) {
+					if (!evt.paused && ++evt.repeatCounter > evt.soundInstance.getRepeatDelay()) {
+						evt.repeatCounter = 0;
+						evt.updateLocation();
+						evt.soundHandle.restart();
+					}
+				} else {
+					soundItr.remove();
+				}
+			} else {
+				evt.updateLocation();
+			}
+		}
+		Iterator<WaitingSoundEvent> soundItr2 = queuedSounds.iterator();
+		while (soundItr2.hasNext()) {
+			WaitingSoundEvent evt = soundItr2.next();
+			if (!evt.paused && --evt.playTicks <= 0) {
+				soundItr2.remove();
+				playSound(evt.playSound);
+			}
+		}
+		PlatformAudio.clearAudioCache();
+	}
+
 }

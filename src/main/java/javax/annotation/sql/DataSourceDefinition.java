@@ -175,13 +175,6 @@ import java.lang.annotation.Target;
 public @interface DataSourceDefinition {
 
 	/**
-	 * JNDI name by which the data source will be registered.
-	 * 
-	 * @since 1.1
-	 */
-	String name();
-
-	/**
 	 * Name of a DataSource class that implements <code>javax.sql.DataSource</code>
 	 * or <code>javax.sql.XADataSource</code> or
 	 * <code>javax.sql.ConnectionPoolDataSource</code>.
@@ -191,36 +184,6 @@ public @interface DataSourceDefinition {
 	String className();
 
 	/**
-	 * Description of this data source
-	 * 
-	 * @since 1.1
-	 */
-	String description() default "";
-
-	/**
-	 * A JDBC URL. If the <code>url</code> annotation element contains a DataSource
-	 * property that was also specified using the corresponding annotation element,
-	 * the precedence order is undefined and implementation specific.
-	 * 
-	 * @since 1.1
-	 */
-	String url() default "";
-
-	/**
-	 * User name to use for connection authentication.
-	 * 
-	 * @since 1.1
-	 */
-	String user() default "";
-
-	/**
-	 * Password to use for connection authentication.
-	 * 
-	 * @since 1.1
-	 */
-	String password() default "";
-
-	/**
 	 * Name of a database on a server.
 	 * 
 	 * @since 1.1
@@ -228,18 +191,21 @@ public @interface DataSourceDefinition {
 	String databaseName() default "";
 
 	/**
-	 * Port number where a server is listening for requests.
+	 * Description of this data source
 	 * 
 	 * @since 1.1
 	 */
-	int portNumber() default -1;
+	String description() default "";
 
 	/**
-	 * Database server name.
+	 * Number of connections that should be created when a connection pool is
+	 * initialized.
+	 * <p>
+	 * Default is vendor-specific
 	 * 
 	 * @since 1.1
 	 */
-	String serverName() default "localhost";
+	int initialPoolSize() default -1;
 
 	/**
 	 * Isolation level for connections. The Isolation level must be one of the
@@ -260,43 +226,16 @@ public @interface DataSourceDefinition {
 	int isolationLevel() default -1;
 
 	/**
-	 * Set to <code>false</code> if connections should not participate in
-	 * transactions.
-	 * <p>
-	 * Default is to enlist in a transaction when one is active or becomes active.
-	 * 
-	 * @since 1.1
-	 */
-	boolean transactional() default true;
-
-	/**
-	 * Number of connections that should be created when a connection pool is
-	 * initialized.
-	 * <p>
-	 * Default is vendor-specific
-	 * 
-	 * @since 1.1
-	 */
-	int initialPoolSize() default -1;
-
-	/**
-	 * Maximum number of connections that should be concurrently allocated for a
-	 * connection pool.
+	 * Sets the maximum time in seconds that this data source will wait while
+	 * attempting to connect to a database. A value of zero specifies that the
+	 * timeout is the default system timeout if there is one; otherwise, it
+	 * specifies that there is no timeout.
 	 * <p>
 	 * Default is vendor-specific.
 	 * 
 	 * @since 1.1
 	 */
-	int maxPoolSize() default -1;
-
-	/**
-	 * Minimum number of connections that should be allocated for a connection pool.
-	 * <p>
-	 * Default is vendor-specific.
-	 * 
-	 * @since 1.1
-	 */
-	int minPoolSize() default -1;
+	int loginTimeout() default 0;
 
 	/**
 	 * The number of seconds that a physical connection should remain unused in the
@@ -309,6 +248,16 @@ public @interface DataSourceDefinition {
 	int maxIdleTime() default -1;
 
 	/**
+	 * Maximum number of connections that should be concurrently allocated for a
+	 * connection pool.
+	 * <p>
+	 * Default is vendor-specific.
+	 * 
+	 * @since 1.1
+	 */
+	int maxPoolSize() default -1;
+
+	/**
 	 * The total number of statements that a connection pool should keep open. A
 	 * value of 0 indicates that the caching of statements is disabled for a
 	 * connection pool.
@@ -318,6 +267,36 @@ public @interface DataSourceDefinition {
 	 * @since 1.1
 	 */
 	int maxStatements() default -1;
+
+	/**
+	 * Minimum number of connections that should be allocated for a connection pool.
+	 * <p>
+	 * Default is vendor-specific.
+	 * 
+	 * @since 1.1
+	 */
+	int minPoolSize() default -1;
+
+	/**
+	 * JNDI name by which the data source will be registered.
+	 * 
+	 * @since 1.1
+	 */
+	String name();
+
+	/**
+	 * Password to use for connection authentication.
+	 * 
+	 * @since 1.1
+	 */
+	String password() default "";
+
+	/**
+	 * Port number where a server is listening for requests.
+	 * 
+	 * @since 1.1
+	 */
+	int portNumber() default -1;
 
 	/**
 	 * Used to specify vendor-specific properties and less commonly used
@@ -342,14 +321,35 @@ public @interface DataSourceDefinition {
 	String[] properties() default {};
 
 	/**
-	 * Sets the maximum time in seconds that this data source will wait while
-	 * attempting to connect to a database. A value of zero specifies that the
-	 * timeout is the default system timeout if there is one; otherwise, it
-	 * specifies that there is no timeout.
-	 * <p>
-	 * Default is vendor-specific.
+	 * Database server name.
 	 * 
 	 * @since 1.1
 	 */
-	int loginTimeout() default 0;
+	String serverName() default "localhost";
+
+	/**
+	 * Set to <code>false</code> if connections should not participate in
+	 * transactions.
+	 * <p>
+	 * Default is to enlist in a transaction when one is active or becomes active.
+	 * 
+	 * @since 1.1
+	 */
+	boolean transactional() default true;
+
+	/**
+	 * A JDBC URL. If the <code>url</code> annotation element contains a DataSource
+	 * property that was also specified using the corresponding annotation element,
+	 * the precedence order is undefined and implementation specific.
+	 * 
+	 * @since 1.1
+	 */
+	String url() default "";
+
+	/**
+	 * User name to use for connection authentication.
+	 * 
+	 * @since 1.1
+	 */
+	String user() default "";
 }

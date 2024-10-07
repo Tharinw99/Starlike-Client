@@ -29,22 +29,25 @@ import net.minecraft.network.EnumConnectionState;
 import net.minecraft.network.play.client.C17PacketCustomPayload;
 import net.minecraft.util.ChatComponentText;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -61,6 +64,16 @@ public class GuiConnecting extends GuiScreen {
 	private boolean hasOpened;
 	private final GuiScreen previousGuiScreen;
 	private int timer = 0;
+
+	public GuiConnecting(GuiConnecting previous, String password) {
+		this(previous, password, false);
+	}
+
+	public GuiConnecting(GuiConnecting previous, String password, boolean allowPlaintext) {
+		this.mc = previous.mc;
+		this.previousGuiScreen = previous.previousGuiScreen;
+		this.connect(previous.currentAddress, password, allowPlaintext, previous.allowCookies);
+	}
 
 	public GuiConnecting(GuiScreen parGuiScreen, Minecraft mcIn, ServerData parServerData) {
 		this(parGuiScreen, mcIn, parServerData, false);
@@ -116,14 +129,47 @@ public class GuiConnecting extends GuiScreen {
 				allowCookies && EagRuntime.getConfiguration().isEnableServerCookies());
 	}
 
-	public GuiConnecting(GuiConnecting previous, String password) {
-		this(previous, password, false);
+	/**
+	 * + Called by the controls from the buttonList when activated. (Mouse pressed
+	 * for buttons)
+	 */
+	protected void actionPerformed(GuiButton parGuiButton) {
+		if (parGuiButton.id == 0) {
+			this.cancel = true;
+			if (this.networkManager != null) {
+				this.networkManager.closeChannel(new ChatComponentText("Aborted"));
+			} else if (this.webSocket != null) {
+				this.webSocket.close();
+			}
+
+			this.mc.displayGuiScreen(this.previousGuiScreen);
+		}
+
 	}
 
-	public GuiConnecting(GuiConnecting previous, String password, boolean allowPlaintext) {
-		this.mc = previous.mc;
-		this.previousGuiScreen = previous.previousGuiScreen;
-		this.connect(previous.currentAddress, password, allowPlaintext, previous.allowCookies);
+	public boolean canCloseGui() {
+		return false;
+	}
+
+	private void checkRatelimit() {
+		if (this.webSocket != null) {
+			List<IWebSocketFrame> strFrames = webSocket.getNextStringFrames();
+			if (strFrames != null) {
+				for (int i = 0; i < strFrames.size(); ++i) {
+					String str = strFrames.get(i).getString();
+					if (str.equalsIgnoreCase("BLOCKED")) {
+						RateLimitTracker.registerBlock(currentAddress);
+						mc.displayGuiScreen(GuiDisconnected.createRateLimitKick(previousGuiScreen));
+						logger.info("Handshake Failure: Too Many Requests!");
+					} else if (str.equalsIgnoreCase("LOCKED")) {
+						RateLimitTracker.registerLockOut(currentAddress);
+						mc.displayGuiScreen(GuiDisconnected.createRateLimitKick(previousGuiScreen));
+						logger.info("Handshake Failure: Too Many Requests!");
+						logger.info("Server has locked this client out");
+					}
+				}
+			}
+		}
 	}
 
 	private void connect(String ip, String password, boolean allowPlaintext, boolean allowCookies) {
@@ -133,8 +179,44 @@ public class GuiConnecting extends GuiScreen {
 		this.allowCookies = allowCookies;
 	}
 
-	/**+
-	 * Called from the main game loop to update the screen.
+	/**
+	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
+	 * renderPartialTicks
+	 */
+	public void drawScreen(int i, int j, float f) {
+		this.drawDefaultBackground();
+		if (this.networkManager == null || !this.networkManager.isChannelOpen()) {
+			this.drawCenteredString(this.fontRendererObj, I18n.format("connect.connecting", new Object[0]),
+					this.width / 2, this.height / 2 - 50, 16777215);
+		} else {
+			this.drawCenteredString(this.fontRendererObj, I18n.format("connect.authorizing", new Object[0]),
+					this.width / 2, this.height / 2 - 50, 16777215);
+		}
+
+		super.drawScreen(i, j, f);
+	}
+
+	/**
+	 * + Adds the buttons (and other controls) to the screen in question. Called
+	 * when the GUI is displayed and when the window resizes, the buttonList is
+	 * cleared beforehand.
+	 */
+	public void initGui() {
+		this.buttonList.clear();
+		this.buttonList.add(
+				new GuiButton(0, this.width / 2 - 100, this.height / 2 - 10, I18n.format("gui.cancel", new Object[0])));
+	}
+
+	/**
+	 * + Fired when a key is typed (except F11 which toggles full screen). This is
+	 * the equivalent of KeyListener.keyTyped(KeyEvent e). Args : character
+	 * (character on the key), keyCode (lwjgl Keyboard key code)
+	 */
+	protected void keyTyped(char parChar1, int parInt1) {
+	}
+
+	/**
+	 * + Called from the main game loop to update the screen.
 	 */
 	public void updateScreen() {
 		++timer;
@@ -236,85 +318,5 @@ public class GuiConnecting extends GuiScreen {
 						new ChatComponentText("Handshake timed out")));
 			}
 		}
-	}
-
-	/**+
-	 * Fired when a key is typed (except F11 which toggles full
-	 * screen). This is the equivalent of
-	 * KeyListener.keyTyped(KeyEvent e). Args : character (character
-	 * on the key), keyCode (lwjgl Keyboard key code)
-	 */
-	protected void keyTyped(char parChar1, int parInt1) {
-	}
-
-	/**+
-	 * Adds the buttons (and other controls) to the screen in
-	 * question. Called when the GUI is displayed and when the
-	 * window resizes, the buttonList is cleared beforehand.
-	 */
-	public void initGui() {
-		this.buttonList.clear();
-		this.buttonList.add(
-				new GuiButton(0, this.width / 2 - 100, this.height / 2 - 10, I18n.format("gui.cancel", new Object[0])));
-	}
-
-	/**+
-	 * Called by the controls from the buttonList when activated.
-	 * (Mouse pressed for buttons)
-	 */
-	protected void actionPerformed(GuiButton parGuiButton) {
-		if (parGuiButton.id == 0) {
-			this.cancel = true;
-			if (this.networkManager != null) {
-				this.networkManager.closeChannel(new ChatComponentText("Aborted"));
-			} else if (this.webSocket != null) {
-				this.webSocket.close();
-			}
-
-			this.mc.displayGuiScreen(this.previousGuiScreen);
-		}
-
-	}
-
-	/**+
-	 * Draws the screen and all the components in it. Args : mouseX,
-	 * mouseY, renderPartialTicks
-	 */
-	public void drawScreen(int i, int j, float f) {
-		this.drawDefaultBackground();
-		if (this.networkManager == null || !this.networkManager.isChannelOpen()) {
-			this.drawCenteredString(this.fontRendererObj, I18n.format("connect.connecting", new Object[0]),
-					this.width / 2, this.height / 2 - 50, 16777215);
-		} else {
-			this.drawCenteredString(this.fontRendererObj, I18n.format("connect.authorizing", new Object[0]),
-					this.width / 2, this.height / 2 - 50, 16777215);
-		}
-
-		super.drawScreen(i, j, f);
-	}
-
-	private void checkRatelimit() {
-		if (this.webSocket != null) {
-			List<IWebSocketFrame> strFrames = webSocket.getNextStringFrames();
-			if (strFrames != null) {
-				for (int i = 0; i < strFrames.size(); ++i) {
-					String str = strFrames.get(i).getString();
-					if (str.equalsIgnoreCase("BLOCKED")) {
-						RateLimitTracker.registerBlock(currentAddress);
-						mc.displayGuiScreen(GuiDisconnected.createRateLimitKick(previousGuiScreen));
-						logger.info("Handshake Failure: Too Many Requests!");
-					} else if (str.equalsIgnoreCase("LOCKED")) {
-						RateLimitTracker.registerLockOut(currentAddress);
-						mc.displayGuiScreen(GuiDisconnected.createRateLimitKick(previousGuiScreen));
-						logger.info("Handshake Failure: Too Many Requests!");
-						logger.info("Server has locked this client out");
-					}
-				}
-			}
-		}
-	}
-
-	public boolean canCloseGui() {
-		return false;
 	}
 }

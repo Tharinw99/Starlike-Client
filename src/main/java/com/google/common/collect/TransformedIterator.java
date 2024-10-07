@@ -36,8 +36,6 @@ abstract class TransformedIterator<F, T> implements Iterator<T> {
 		this.backingIterator = checkNotNull(backingIterator);
 	}
 
-	abstract T transform(F from);
-
 	@Override
 	public final boolean hasNext() {
 		return backingIterator.hasNext();
@@ -52,4 +50,6 @@ abstract class TransformedIterator<F, T> implements Iterator<T> {
 	public final void remove() {
 		backingIterator.remove();
 	}
+
+	abstract T transform(F from);
 }

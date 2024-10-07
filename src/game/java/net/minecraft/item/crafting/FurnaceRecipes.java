@@ -14,33 +14,34 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemFishFood;
 import net.minecraft.item.ItemStack;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class FurnaceRecipes {
 	private static FurnaceRecipes smeltingBase;
-	private Map<ItemStack, ItemStack> smeltingList = Maps.newHashMap();
-	private Map<ItemStack, Float> experienceList = Maps.newHashMap();
 
-	/**+
-	 * Returns an instance of FurnaceRecipes.
+	/**
+	 * + Returns an instance of FurnaceRecipes.
 	 */
 	public static FurnaceRecipes instance() {
 		if (smeltingBase == null) {
@@ -48,6 +49,10 @@ public class FurnaceRecipes {
 		}
 		return smeltingBase;
 	}
+
+	private Map<ItemStack, ItemStack> smeltingList = Maps.newHashMap();
+
+	private Map<ItemStack, Float> experienceList = Maps.newHashMap();
 
 	private FurnaceRecipes() {
 		this.addSmeltingRecipeForBlock(Blocks.iron_ore, new ItemStack(Items.iron_ingot), 0.7F);
@@ -72,7 +77,6 @@ public class FurnaceRecipes {
 		this.addSmelting(Items.potato, new ItemStack(Items.baked_potato), 0.35F);
 		this.addSmeltingRecipeForBlock(Blocks.netherrack, new ItemStack(Items.netherbrick), 0.1F);
 		this.addSmeltingRecipe(new ItemStack(Blocks.sponge, 1, 1), new ItemStack(Blocks.sponge, 1, 0), 0.15F);
-		this.addSmeltingRecipeForBlock(Blocks.platinum_ore, new ItemStack(Items.platinum_ingot), 0.7F);
 
 		ItemFishFood.FishType[] types = ItemFishFood.FishType.values();
 		for (int i = 0; i < types.length; ++i) {
@@ -88,56 +92,42 @@ public class FurnaceRecipes {
 		this.addSmeltingRecipeForBlock(Blocks.lapis_ore, new ItemStack(Items.dye, 1, EnumDyeColor.BLUE.getDyeDamage()),
 				0.2F);
 		this.addSmeltingRecipeForBlock(Blocks.quartz_ore, new ItemStack(Items.quartz), 0.2F);
+
+		this.addSmeltingRecipeForBlock(Blocks.cobbled_deepstone, new ItemStack(Blocks.deepstone), 0.1F);
+		this.addSmeltingRecipeForBlock(Blocks.platinum_ore, new ItemStack(Items.platinum_ingot), 1.5F);
+		this.addSmeltingRecipeForBlock(Blocks.titanium_ore, new ItemStack(Items.titanium_ingot), 2.0F);
+		this.addSmeltingRecipeForBlock(Blocks.uranium_ore, new ItemStack(Items.uranium_crystal), 0.2F);
 	}
 
-	/**+
-	 * Adds a smelting recipe, where the input item is an instance
-	 * of Block.
-	 */
-	public void addSmeltingRecipeForBlock(Block input, ItemStack stack, float experience) {
-		this.addSmelting(Item.getItemFromBlock(input), stack, experience);
-	}
-
-	/**+
-	 * Adds a smelting recipe using an Item as the input item.
+	/**
+	 * + Adds a smelting recipe using an Item as the input item.
 	 */
 	public void addSmelting(Item input, ItemStack stack, float experience) {
 		this.addSmeltingRecipe(new ItemStack(input, 1, 32767), stack, experience);
 	}
 
-	/**+
-	 * Adds a smelting recipe using an ItemStack as the input for
-	 * the recipe.
+	/**
+	 * + Adds a smelting recipe using an ItemStack as the input for the recipe.
 	 */
 	public void addSmeltingRecipe(ItemStack input, ItemStack stack, float experience) {
 		this.smeltingList.put(input, stack);
 		this.experienceList.put(stack, Float.valueOf(experience));
 	}
 
-	/**+
-	 * Returns the smelting result of an item.
+	/**
+	 * + Adds a smelting recipe, where the input item is an instance of Block.
 	 */
-	public ItemStack getSmeltingResult(ItemStack stack) {
-		for (Entry entry : this.smeltingList.entrySet()) {
-			if (this.compareItemStacks(stack, (ItemStack) entry.getKey())) {
-				return (ItemStack) entry.getValue();
-			}
-		}
-
-		return null;
+	public void addSmeltingRecipeForBlock(Block input, ItemStack stack, float experience) {
+		this.addSmelting(Item.getItemFromBlock(input), stack, experience);
 	}
 
-	/**+
-	 * Compares two itemstacks to ensure that they are the same.
-	 * This checks both the item and the metadata of the item.
+	/**
+	 * + Compares two itemstacks to ensure that they are the same. This checks both
+	 * the item and the metadata of the item.
 	 */
 	private boolean compareItemStacks(ItemStack stack1, ItemStack stack2) {
 		return stack2.getItem() == stack1.getItem()
 				&& (stack2.getMetadata() == 32767 || stack2.getMetadata() == stack1.getMetadata());
-	}
-
-	public Map<ItemStack, ItemStack> getSmeltingList() {
-		return this.smeltingList;
 	}
 
 	public float getSmeltingExperience(ItemStack stack) {
@@ -148,5 +138,22 @@ public class FurnaceRecipes {
 		}
 
 		return 0.0F;
+	}
+
+	public Map<ItemStack, ItemStack> getSmeltingList() {
+		return this.smeltingList;
+	}
+
+	/**
+	 * + Returns the smelting result of an item.
+	 */
+	public ItemStack getSmeltingResult(ItemStack stack) {
+		for (Entry entry : this.smeltingList.entrySet()) {
+			if (this.compareItemStacks(stack, (ItemStack) entry.getKey())) {
+				return (ItemStack) entry.getValue();
+			}
+		}
+
+		return null;
 	}
 }

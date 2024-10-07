@@ -35,26 +35,6 @@ import com.google.common.annotations.GwtCompatible;
  */
 @GwtCompatible
 final class Constraints {
-	private Constraints() {
-	}
-
-	/**
-	 * Returns a constrained view of the specified collection, using the specified
-	 * constraint. Any operations that add new elements to the collection will call
-	 * the provided constraint. However, this method does not verify that existing
-	 * elements satisfy the constraint.
-	 *
-	 * <p>
-	 * The returned collection is not serializable.
-	 *
-	 * @param collection the collection to constrain
-	 * @param constraint the constraint that validates added elements
-	 * @return a constrained view of the collection
-	 */
-	public static <E> Collection<E> constrainedCollection(Collection<E> collection, Constraint<? super E> constraint) {
-		return new ConstrainedCollection<E>(collection, constraint);
-	}
-
 	/** @see Constraints#constrainedCollection */
 	static class ConstrainedCollection<E> extends ForwardingCollection<E> {
 		private final Collection<E> delegate;
@@ -66,142 +46,20 @@ final class Constraints {
 		}
 
 		@Override
+		public boolean add(E element) {
+			constraint.checkElement(element);
+			return delegate.add(element);
+		}
+
+		@Override
+		public boolean addAll(Collection<? extends E> elements) {
+			return delegate.addAll(checkElements(elements, constraint));
+		}
+
+		@Override
 		protected Collection<E> delegate() {
 			return delegate;
 		}
-
-		@Override
-		public boolean add(E element) {
-			constraint.checkElement(element);
-			return delegate.add(element);
-		}
-
-		@Override
-		public boolean addAll(Collection<? extends E> elements) {
-			return delegate.addAll(checkElements(elements, constraint));
-		}
-	}
-
-	/**
-	 * Returns a constrained view of the specified set, using the specified
-	 * constraint. Any operations that add new elements to the set will call the
-	 * provided constraint. However, this method does not verify that existing
-	 * elements satisfy the constraint.
-	 *
-	 * <p>
-	 * The returned set is not serializable.
-	 *
-	 * @param set        the set to constrain
-	 * @param constraint the constraint that validates added elements
-	 * @return a constrained view of the set
-	 */
-	public static <E> Set<E> constrainedSet(Set<E> set, Constraint<? super E> constraint) {
-		return new ConstrainedSet<E>(set, constraint);
-	}
-
-	/** @see Constraints#constrainedSet */
-	static class ConstrainedSet<E> extends ForwardingSet<E> {
-		private final Set<E> delegate;
-		private final Constraint<? super E> constraint;
-
-		public ConstrainedSet(Set<E> delegate, Constraint<? super E> constraint) {
-			this.delegate = checkNotNull(delegate);
-			this.constraint = checkNotNull(constraint);
-		}
-
-		@Override
-		protected Set<E> delegate() {
-			return delegate;
-		}
-
-		@Override
-		public boolean add(E element) {
-			constraint.checkElement(element);
-			return delegate.add(element);
-		}
-
-		@Override
-		public boolean addAll(Collection<? extends E> elements) {
-			return delegate.addAll(checkElements(elements, constraint));
-		}
-	}
-
-	/**
-	 * Returns a constrained view of the specified sorted set, using the specified
-	 * constraint. Any operations that add new elements to the sorted set will call
-	 * the provided constraint. However, this method does not verify that existing
-	 * elements satisfy the constraint.
-	 *
-	 * <p>
-	 * The returned set is not serializable.
-	 *
-	 * @param sortedSet  the sorted set to constrain
-	 * @param constraint the constraint that validates added elements
-	 * @return a constrained view of the sorted set
-	 */
-	public static <E> SortedSet<E> constrainedSortedSet(SortedSet<E> sortedSet, Constraint<? super E> constraint) {
-		return new ConstrainedSortedSet<E>(sortedSet, constraint);
-	}
-
-	/** @see Constraints#constrainedSortedSet */
-	private static class ConstrainedSortedSet<E> extends ForwardingSortedSet<E> {
-		final SortedSet<E> delegate;
-		final Constraint<? super E> constraint;
-
-		ConstrainedSortedSet(SortedSet<E> delegate, Constraint<? super E> constraint) {
-			this.delegate = checkNotNull(delegate);
-			this.constraint = checkNotNull(constraint);
-		}
-
-		@Override
-		protected SortedSet<E> delegate() {
-			return delegate;
-		}
-
-		@Override
-		public SortedSet<E> headSet(E toElement) {
-			return constrainedSortedSet(delegate.headSet(toElement), constraint);
-		}
-
-		@Override
-		public SortedSet<E> subSet(E fromElement, E toElement) {
-			return constrainedSortedSet(delegate.subSet(fromElement, toElement), constraint);
-		}
-
-		@Override
-		public SortedSet<E> tailSet(E fromElement) {
-			return constrainedSortedSet(delegate.tailSet(fromElement), constraint);
-		}
-
-		@Override
-		public boolean add(E element) {
-			constraint.checkElement(element);
-			return delegate.add(element);
-		}
-
-		@Override
-		public boolean addAll(Collection<? extends E> elements) {
-			return delegate.addAll(checkElements(elements, constraint));
-		}
-	}
-
-	/**
-	 * Returns a constrained view of the specified list, using the specified
-	 * constraint. Any operations that add new elements to the list will call the
-	 * provided constraint. However, this method does not verify that existing
-	 * elements satisfy the constraint.
-	 *
-	 * <p>
-	 * If {@code list} implements {@link RandomAccess}, so will the returned list.
-	 * The returned list is not serializable.
-	 *
-	 * @param list       the list to constrain
-	 * @param constraint the constraint that validates added elements
-	 * @return a constrained view of the list
-	 */
-	public static <E> List<E> constrainedList(List<E> list, Constraint<? super E> constraint) {
-		return (list instanceof RandomAccess) ? new ConstrainedRandomAccessList<E>(list, constraint)
-				: new ConstrainedList<E>(list, constraint);
 	}
 
 	/** @see Constraints#constrainedList */
@@ -213,11 +71,6 @@ final class Constraints {
 		ConstrainedList(List<E> delegate, Constraint<? super E> constraint) {
 			this.delegate = checkNotNull(delegate);
 			this.constraint = checkNotNull(constraint);
-		}
-
-		@Override
-		protected List<E> delegate() {
-			return delegate;
 		}
 
 		@Override
@@ -243,6 +96,11 @@ final class Constraints {
 		}
 
 		@Override
+		protected List<E> delegate() {
+			return delegate;
+		}
+
+		@Override
 		public ListIterator<E> listIterator() {
 			return constrainedListIterator(delegate.listIterator(), constraint);
 		}
@@ -264,11 +122,152 @@ final class Constraints {
 		}
 	}
 
+	/** @see Constraints#constrainedListIterator */
+	static class ConstrainedListIterator<E> extends ForwardingListIterator<E> {
+		private final ListIterator<E> delegate;
+		private final Constraint<? super E> constraint;
+
+		public ConstrainedListIterator(ListIterator<E> delegate, Constraint<? super E> constraint) {
+			this.delegate = delegate;
+			this.constraint = constraint;
+		}
+
+		@Override
+		public void add(E element) {
+			constraint.checkElement(element);
+			delegate.add(element);
+		}
+
+		@Override
+		protected ListIterator<E> delegate() {
+			return delegate;
+		}
+
+		@Override
+		public void set(E element) {
+			constraint.checkElement(element);
+			delegate.set(element);
+		}
+	}
+
 	/** @see Constraints#constrainedList */
 	static class ConstrainedRandomAccessList<E> extends ConstrainedList<E> implements RandomAccess {
 		ConstrainedRandomAccessList(List<E> delegate, Constraint<? super E> constraint) {
 			super(delegate, constraint);
 		}
+	}
+
+	/** @see Constraints#constrainedSet */
+	static class ConstrainedSet<E> extends ForwardingSet<E> {
+		private final Set<E> delegate;
+		private final Constraint<? super E> constraint;
+
+		public ConstrainedSet(Set<E> delegate, Constraint<? super E> constraint) {
+			this.delegate = checkNotNull(delegate);
+			this.constraint = checkNotNull(constraint);
+		}
+
+		@Override
+		public boolean add(E element) {
+			constraint.checkElement(element);
+			return delegate.add(element);
+		}
+
+		@Override
+		public boolean addAll(Collection<? extends E> elements) {
+			return delegate.addAll(checkElements(elements, constraint));
+		}
+
+		@Override
+		protected Set<E> delegate() {
+			return delegate;
+		}
+	}
+
+	/** @see Constraints#constrainedSortedSet */
+	private static class ConstrainedSortedSet<E> extends ForwardingSortedSet<E> {
+		final SortedSet<E> delegate;
+		final Constraint<? super E> constraint;
+
+		ConstrainedSortedSet(SortedSet<E> delegate, Constraint<? super E> constraint) {
+			this.delegate = checkNotNull(delegate);
+			this.constraint = checkNotNull(constraint);
+		}
+
+		@Override
+		public boolean add(E element) {
+			constraint.checkElement(element);
+			return delegate.add(element);
+		}
+
+		@Override
+		public boolean addAll(Collection<? extends E> elements) {
+			return delegate.addAll(checkElements(elements, constraint));
+		}
+
+		@Override
+		protected SortedSet<E> delegate() {
+			return delegate;
+		}
+
+		@Override
+		public SortedSet<E> headSet(E toElement) {
+			return constrainedSortedSet(delegate.headSet(toElement), constraint);
+		}
+
+		@Override
+		public SortedSet<E> subSet(E fromElement, E toElement) {
+			return constrainedSortedSet(delegate.subSet(fromElement, toElement), constraint);
+		}
+
+		@Override
+		public SortedSet<E> tailSet(E fromElement) {
+			return constrainedSortedSet(delegate.tailSet(fromElement), constraint);
+		}
+	}
+
+	private static <E> Collection<E> checkElements(Collection<E> elements, Constraint<? super E> constraint) {
+		Collection<E> copy = Lists.newArrayList(elements);
+		for (E element : copy) {
+			constraint.checkElement(element);
+		}
+		return copy;
+	}
+
+	/**
+	 * Returns a constrained view of the specified collection, using the specified
+	 * constraint. Any operations that add new elements to the collection will call
+	 * the provided constraint. However, this method does not verify that existing
+	 * elements satisfy the constraint.
+	 *
+	 * <p>
+	 * The returned collection is not serializable.
+	 *
+	 * @param collection the collection to constrain
+	 * @param constraint the constraint that validates added elements
+	 * @return a constrained view of the collection
+	 */
+	public static <E> Collection<E> constrainedCollection(Collection<E> collection, Constraint<? super E> constraint) {
+		return new ConstrainedCollection<E>(collection, constraint);
+	}
+
+	/**
+	 * Returns a constrained view of the specified list, using the specified
+	 * constraint. Any operations that add new elements to the list will call the
+	 * provided constraint. However, this method does not verify that existing
+	 * elements satisfy the constraint.
+	 *
+	 * <p>
+	 * If {@code list} implements {@link RandomAccess}, so will the returned list.
+	 * The returned list is not serializable.
+	 *
+	 * @param list       the list to constrain
+	 * @param constraint the constraint that validates added elements
+	 * @return a constrained view of the list
+	 */
+	public static <E> List<E> constrainedList(List<E> list, Constraint<? super E> constraint) {
+		return (list instanceof RandomAccess) ? new ConstrainedRandomAccessList<E>(list, constraint)
+				: new ConstrainedList<E>(list, constraint);
 	}
 
 	/**
@@ -285,32 +284,38 @@ final class Constraints {
 		return new ConstrainedListIterator<E>(listIterator, constraint);
 	}
 
-	/** @see Constraints#constrainedListIterator */
-	static class ConstrainedListIterator<E> extends ForwardingListIterator<E> {
-		private final ListIterator<E> delegate;
-		private final Constraint<? super E> constraint;
+	/**
+	 * Returns a constrained view of the specified set, using the specified
+	 * constraint. Any operations that add new elements to the set will call the
+	 * provided constraint. However, this method does not verify that existing
+	 * elements satisfy the constraint.
+	 *
+	 * <p>
+	 * The returned set is not serializable.
+	 *
+	 * @param set        the set to constrain
+	 * @param constraint the constraint that validates added elements
+	 * @return a constrained view of the set
+	 */
+	public static <E> Set<E> constrainedSet(Set<E> set, Constraint<? super E> constraint) {
+		return new ConstrainedSet<E>(set, constraint);
+	}
 
-		public ConstrainedListIterator(ListIterator<E> delegate, Constraint<? super E> constraint) {
-			this.delegate = delegate;
-			this.constraint = constraint;
-		}
-
-		@Override
-		protected ListIterator<E> delegate() {
-			return delegate;
-		}
-
-		@Override
-		public void add(E element) {
-			constraint.checkElement(element);
-			delegate.add(element);
-		}
-
-		@Override
-		public void set(E element) {
-			constraint.checkElement(element);
-			delegate.set(element);
-		}
+	/**
+	 * Returns a constrained view of the specified sorted set, using the specified
+	 * constraint. Any operations that add new elements to the sorted set will call
+	 * the provided constraint. However, this method does not verify that existing
+	 * elements satisfy the constraint.
+	 *
+	 * <p>
+	 * The returned set is not serializable.
+	 *
+	 * @param sortedSet  the sorted set to constrain
+	 * @param constraint the constraint that validates added elements
+	 * @return a constrained view of the sorted set
+	 */
+	public static <E> SortedSet<E> constrainedSortedSet(SortedSet<E> sortedSet, Constraint<? super E> constraint) {
+		return new ConstrainedSortedSet<E>(sortedSet, constraint);
 	}
 
 	static <E> Collection<E> constrainedTypePreservingCollection(Collection<E> collection, Constraint<E> constraint) {
@@ -330,11 +335,6 @@ final class Constraints {
 	 * having addAll() call add() repeatedly instead.
 	 */
 
-	private static <E> Collection<E> checkElements(Collection<E> elements, Constraint<? super E> constraint) {
-		Collection<E> copy = Lists.newArrayList(elements);
-		for (E element : copy) {
-			constraint.checkElement(element);
-		}
-		return copy;
+	private Constraints() {
 	}
 }

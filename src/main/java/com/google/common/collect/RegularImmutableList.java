@@ -33,24 +33,14 @@ class RegularImmutableList<E> extends ImmutableList<E> {
 	private final transient int size;
 	private final transient Object[] array;
 
-	RegularImmutableList(Object[] array, int offset, int size) {
-		this.offset = offset;
-		this.size = size;
-		this.array = array;
-	}
-
 	RegularImmutableList(Object[] array) {
 		this(array, 0, array.length);
 	}
 
-	@Override
-	public int size() {
-		return size;
-	}
-
-	@Override
-	boolean isPartialView() {
-		return size != array.length;
+	RegularImmutableList(Object[] array, int offset, int size) {
+		this.offset = offset;
+		this.size = size;
+		this.array = array;
 	}
 
 	@Override
@@ -81,6 +71,11 @@ class RegularImmutableList<E> extends ImmutableList<E> {
 	}
 
 	@Override
+	boolean isPartialView() {
+		return size != array.length;
+	}
+
+	@Override
 	public int lastIndexOf(@Nullable Object object) {
 		if (object == null) {
 			return -1;
@@ -93,17 +88,22 @@ class RegularImmutableList<E> extends ImmutableList<E> {
 		return -1;
 	}
 
-	@Override
-	ImmutableList<E> subListUnchecked(int fromIndex, int toIndex) {
-		return new RegularImmutableList<E>(array, offset + fromIndex, toIndex - fromIndex);
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public UnmodifiableListIterator<E> listIterator(int index) {
 		// for performance
 		// The fake cast to E is safe because the creation methods only allow E's
 		return (UnmodifiableListIterator<E>) Iterators.forArray(array, offset, size, index);
+	}
+
+	@Override
+	public int size() {
+		return size;
+	}
+
+	@Override
+	ImmutableList<E> subListUnchecked(int fromIndex, int toIndex) {
+		return new RegularImmutableList<E>(array, offset + fromIndex, toIndex - fromIndex);
 	}
 
 	// TODO(user): benchmark optimizations for equals() and see if they're

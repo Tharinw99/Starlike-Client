@@ -1,8 +1,15 @@
 package net.minecraft.client;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
-
 import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglBindFramebuffer;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_BACK;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_COLOR_BUFFER_BIT;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_DEPTH_BUFFER_BIT;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_GREATER;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_LEQUAL;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_MAX_TEXTURE_SIZE;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_MODELVIEW;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_PROJECTION;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_SMOOTH;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +18,10 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
+
+import org.apache.commons.lang3.Validate;
+
+import com.google.common.collect.Lists;
 
 import net.lax1dude.eaglercraft.v1_8.ClientUUIDLoadingCache;
 import net.lax1dude.eaglercraft.v1_8.Display;
@@ -25,17 +36,12 @@ import net.lax1dude.eaglercraft.v1_8.PauseMenuCustomizeState;
 import net.lax1dude.eaglercraft.v1_8.PointerInputAbstraction;
 import net.lax1dude.eaglercraft.v1_8.Touch;
 import net.lax1dude.eaglercraft.v1_8.cookie.ServerCookieDataStore;
-import net.lax1dude.eaglercraft.v1_8.internal.PlatformInput;
-
-import org.apache.commons.lang3.Validate;
-
-import com.google.common.collect.Lists;
-
 import net.lax1dude.eaglercraft.v1_8.futures.Executors;
 import net.lax1dude.eaglercraft.v1_8.futures.FutureTask;
 import net.lax1dude.eaglercraft.v1_8.futures.ListenableFuture;
 import net.lax1dude.eaglercraft.v1_8.futures.ListenableFutureTask;
 import net.lax1dude.eaglercraft.v1_8.internal.EnumPlatformType;
+import net.lax1dude.eaglercraft.v1_8.internal.PlatformInput;
 import net.lax1dude.eaglercraft.v1_8.internal.PlatformRuntime;
 import net.lax1dude.eaglercraft.v1_8.internal.PlatformWebRTC;
 import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
@@ -199,22 +205,25 @@ import net.minecraft.world.WorldProviderHell;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.storage.ISaveFormat;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -223,9 +232,62 @@ public class Minecraft implements IThreadListener {
 	private static final Logger logger = LogManager.getLogger();
 	private static final ResourceLocation locationMojangPng = new ResourceLocation("textures/gui/title/mojang.png");
 	public static final boolean isRunningOnMac = false;
+	private static Minecraft theMinecraft;
+	private static int debugFPS;
+
+	public static int getDebugFPS() {
+		return debugFPS;
+	}
+
+	/**
+	 * + Used in the usage snooper.
+	 */
+	public static int getGLMaximumTextureSize() {
+		return EaglercraftGPU.glGetInteger(GL_MAX_TEXTURE_SIZE);
+	}
+
+	/**
+	 * + Return the singleton Minecraft instance for the game
+	 */
+	public static Minecraft getMinecraft() {
+		return theMinecraft;
+	}
+
+	/**
+	 * + Gets the system time in milliseconds.
+	 */
+	public static long getSystemTime() {
+		return EagRuntime.steadyTimeMillis();
+	}
+
+	/**
+	 * + Returns if ambient occlusion is enabled
+	 */
+	public static boolean isAmbientOcclusionEnabled() {
+		if (theMinecraft == null)
+			return false;
+		GameSettings g = theMinecraft.gameSettings;
+		return g.ambientOcclusion != 0 && !g.shadersAODisable;
+	}
+
+	public static boolean isFancyGraphicsEnabled() {
+		return theMinecraft != null && theMinecraft.gameSettings.fancyGraphics;
+	}
+
+	public static boolean isGuiEnabled() {
+		return theMinecraft == null || !theMinecraft.gameSettings.hideGUI;
+	}
+
+	private static boolean isJvm64bit() {
+		return true;
+	}
+
+	public static void stopIntegratedServer() {
+
+	}
+
 	private ServerData currentServerData;
 	private TextureManager renderEngine;
-	private static Minecraft theMinecraft;
 	public PlayerControllerMP playerController;
 	private boolean fullscreen;
 	private boolean enableGLErrorChecking = true;
@@ -263,7 +325,6 @@ public class Minecraft implements IThreadListener {
 	public GameSettings gameSettings;
 	public MouseHelper mouseHelper;
 	private final String launchedVersion;
-	private static int debugFPS;
 	private int rightClickDelayTimer;
 	private String serverName;
 	private int serverPort;
@@ -275,9 +336,9 @@ public class Minecraft implements IThreadListener {
 	private final boolean jvm64bit;
 	private EaglercraftNetworkManager myNetworkManager;
 	private boolean integratedServerIsRunning;
-	/**+
-	 * Keeps track of how long the debug crash keycombo (F3+C) has
-	 * been pressed for, in order to crash after 10 seconds.
+	/**
+	 * + Keeps track of how long the debug crash keycombo (F3+C) has been pressed
+	 * for, in order to crash after 10 seconds.
 	 */
 	private long debugCrashKeyPressTime = -1L;
 	private IReloadableResourceManager mcResourceManager;
@@ -295,43 +356,58 @@ public class Minecraft implements IThreadListener {
 	private final Thread mcThread = Thread.currentThread();
 	private ModelManager modelManager;
 	private BlockRendererDispatcher blockRenderDispatcher;
-	/**+
-	 * Set to true to keep the game loop running. Set to false by
-	 * shutdown() to allow the game loop to exit cleanly.
+	/**
+	 * + Set to true to keep the game loop running. Set to false by shutdown() to
+	 * allow the game loop to exit cleanly.
 	 */
 	volatile boolean running = true;
-	/**+
-	 * String that shows the debug information
+	/**
+	 * + String that shows the debug information
 	 */
 	public String debug = "";
 	public boolean field_175613_B = false;
 	public boolean field_175614_C = false;
 	public boolean field_175611_D = false;
+
 	public boolean renderChunksMany = true;
+
 	long debugUpdateTime = getSystemTime();
 	int fpsCounter;
 	long prevFrameTime = -1L;
-	/**+
-	 * Profiler currently displayed in the debug screen pie chart
+
+	/**
+	 * + Profiler currently displayed in the debug screen pie chart
 	 */
 	private String debugProfilerName = "root";
 	public int joinWorldTickCounter = 0;
 	private int dontPauseTimer = 0;
 	public int bungeeOutdatedMsgTimer = 0;
 	private boolean isLANOpen = false;
-
 	public SkullCommand eagskullCommand;
 
 	public GuiVoiceOverlay voiceOverlay;
+
 	public ServerNotificationRenderer notifRenderer;
+
 	public TouchOverlayRenderer touchOverlayRenderer;
 
 	public float startZoomValue = 18.0f;
+
 	public float adjustedZoomValue = 18.0f;
+
 	public boolean isZoomKey = false;
+
 	private String reconnectURI = null;
+
 	public boolean mouseGrabSupported = false;
+
 	public ScaledResolution scaledResolution = null;
+
+	private long placeTouchStartTime = -1l;
+
+	private long mineTouchStartTime = -1l;
+
+	private boolean wasMiningTouch = false;
 
 	public Minecraft(GameConfiguration gameConfig) {
 		theMinecraft = this;
@@ -357,216 +433,225 @@ public class Minecraft implements IThreadListener {
 		Bootstrap.register();
 	}
 
-	public void run() {
-		this.running = true;
-
-		try {
-			this.startGame();
-		} catch (Throwable throwable) {
-			CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Initializing game");
-			crashreport.makeCategory("Initialization");
-			this.displayCrashReport(this.addGraphicsAndWorldToCrashReport(crashreport));
-			return;
-		}
-
-		try {
-			while (true) {
-				if (!this.running) {
-					break;
-				}
-
-				if (!this.hasCrashed || this.crashReporter == null) {
-					this.runGameLoop();
-					continue;
-				}
-
-				this.displayCrashReport(this.crashReporter);
-			}
-		} catch (MinecraftError var12) {
-			// ??
-		} catch (ReportedException reportedexception) {
-			this.addGraphicsAndWorldToCrashReport(reportedexception.getCrashReport());
-			logger.fatal("Reported exception thrown!", reportedexception);
-			this.displayCrashReport(reportedexception.getCrashReport());
-		} catch (Throwable throwable1) {
-			CrashReport crashreport1 = this
-					.addGraphicsAndWorldToCrashReport(new CrashReport("Unexpected error", throwable1));
-			logger.fatal("Unreported exception thrown!", throwable1);
-			this.displayCrashReport(crashreport1);
-		} finally {
-			this.shutdownMinecraftApplet();
-		}
-
-	}
-
-	/**+
-	 * Starts the game: initializes the canvas, the title, the
-	 * settings, etcetera.
+	/**
+	 * + adds core server Info (GL version , Texture pack, isModded, type), and the
+	 * worldInfo to the crash report
 	 */
-	private void startGame() throws IOException {
-		this.gameSettings = new GameSettings(this);
-		this.defaultResourcePacks.add(this.mcDefaultResourcePack);
-		if (this.gameSettings.overrideHeight > 0 && this.gameSettings.overrideWidth > 0) {
-			this.displayWidth = this.gameSettings.overrideWidth;
-			this.displayHeight = this.gameSettings.overrideHeight;
-		}
-
-		logger.info("EagRuntime Version: " + EagRuntime.getVersion());
-		this.createDisplay();
-		this.registerMetadataSerializers();
-		EaglerFolderResourcePack.deleteOldResourcePacks(EaglerFolderResourcePack.SERVER_RESOURCE_PACKS, 604800000L);
-		this.mcResourcePackRepository = new ResourcePackRepository(this.mcDefaultResourcePack, this.metadataSerializer_,
-				this.gameSettings);
-		this.mcResourceManager = new SimpleReloadableResourceManager(this.metadataSerializer_);
-		this.mcLanguageManager = new LanguageManager(this.metadataSerializer_, this.gameSettings.language);
-		this.mcResourceManager.registerReloadListener(this.mcLanguageManager);
-		this.scaledResolution = new ScaledResolution(this);
-		this.refreshResources();
-		this.renderEngine = new TextureManager(this.mcResourceManager);
-		this.mcResourceManager.registerReloadListener(this.renderEngine);
-		this.drawSplashScreen(this.renderEngine);
-		this.mcSoundHandler = new SoundHandler(this.mcResourceManager, this.gameSettings);
-		this.mcResourceManager.registerReloadListener(this.mcSoundHandler);
-		this.mcMusicTicker = new MusicTicker(this);
-		this.fontRendererObj = EaglerFontRenderer.createSupportedFontRenderer(this.gameSettings,
-				new ResourceLocation("textures/font/ascii.png"), this.renderEngine, false);
-		if (this.gameSettings.language != null) {
-			this.fontRendererObj.setUnicodeFlag(this.isUnicode());
-			this.fontRendererObj.setBidiFlag(this.mcLanguageManager.isCurrentLanguageBidirectional());
-		}
-
-		this.standardGalacticFontRenderer = EaglerFontRenderer.createSupportedFontRenderer(this.gameSettings,
-				new ResourceLocation("textures/font/ascii_sga.png"), this.renderEngine, false);
-		this.mcResourceManager.registerReloadListener(this.fontRendererObj);
-		this.mcResourceManager.registerReloadListener(this.standardGalacticFontRenderer);
-		this.mcResourceManager.registerReloadListener(new GrassColorReloadListener());
-		this.mcResourceManager.registerReloadListener(new FoliageColorReloadListener());
-		this.mcResourceManager.registerReloadListener(new ShaderPackInfoReloadListener());
-		this.mcResourceManager.registerReloadListener(PBRTextureMapUtils.blockMaterialConstants);
-		this.mcResourceManager.registerReloadListener(new TemperaturesLUT());
-		this.mcResourceManager.registerReloadListener(new MetalsLUT());
-		this.mcResourceManager.registerReloadListener(new EmissiveItems());
-		this.mcResourceManager.registerReloadListener(new BlockVertexIDs());
-		this.mcResourceManager.registerReloadListener(new EaglerMeshLoader());
-		AchievementList.openInventory.setStatStringFormatter(new IStatStringFormat() {
-			public String formatString(String parString1) {
-				try {
-					return HString.format(parString1, new Object[] { GameSettings
-							.getKeyDisplayString(Minecraft.this.gameSettings.keyBindInventory.getKeyCode()) });
-				} catch (Exception exception) {
-					return "Error: " + exception.getLocalizedMessage();
-				}
+	public CrashReport addGraphicsAndWorldToCrashReport(CrashReport theCrash) {
+		theCrash.getCategory().addCrashSectionCallable("Launched Version", new Callable<String>() {
+			public String call() throws Exception {
+				return Minecraft.this.launchedVersion;
 			}
 		});
-		this.mouseHelper = new MouseHelper();
-		this.checkGLError("Pre startup");
-		GlStateManager.enableTexture2D();
-		GlStateManager.shadeModel(GL_SMOOTH);
-		GlStateManager.clearDepth(1.0f);
-		GlStateManager.enableDepth();
-		GlStateManager.depthFunc(GL_LEQUAL);
-		GlStateManager.enableAlpha();
-		GlStateManager.alphaFunc(GL_GREATER, 0.1F);
-		GlStateManager.cullFace(GL_BACK);
-		GlStateManager.matrixMode(GL_PROJECTION);
-		GlStateManager.loadIdentity();
-		GlStateManager.matrixMode(GL_MODELVIEW);
-		this.checkGLError("Startup");
-		this.textureMapBlocks = new TextureMap("textures");
-		this.textureMapBlocks.setEnablePBREagler(gameSettings.shaders);
-		this.textureMapBlocks.setMipmapLevels(this.gameSettings.mipmapLevels);
-		this.renderEngine.loadTickableTexture(TextureMap.locationBlocksTexture, this.textureMapBlocks);
-		this.renderEngine.bindTexture(TextureMap.locationBlocksTexture);
-		this.textureMapBlocks.setBlurMipmapDirect(false, this.gameSettings.mipmapLevels > 0);
-		this.modelManager = new ModelManager(this.textureMapBlocks);
-		this.mcResourceManager.registerReloadListener(this.modelManager);
-		this.renderItem = new RenderItem(this.renderEngine, this.modelManager);
-		this.renderManager = new RenderManager(this.renderEngine, this.renderItem);
-		this.itemRenderer = new ItemRenderer(this);
-		this.mcResourceManager.registerReloadListener(this.renderItem);
-		this.entityRenderer = new EntityRenderer(this, this.mcResourceManager);
-		this.mcResourceManager.registerReloadListener(this.entityRenderer);
-		this.blockRenderDispatcher = new BlockRendererDispatcher(this.modelManager.getBlockModelShapes(),
-				this.gameSettings);
-		this.mcResourceManager.registerReloadListener(this.blockRenderDispatcher);
-		this.renderGlobal = new RenderGlobal(this);
-		this.mcResourceManager.registerReloadListener(this.renderGlobal);
-		this.guiAchievement = new GuiAchievement(this);
-		GlStateManager.viewport(0, 0, this.displayWidth, this.displayHeight);
-		this.effectRenderer = new EffectRenderer(this.theWorld, this.renderEngine);
-		SkinPreviewRenderer.initialize();
-		this.checkGLError("Post startup");
-		this.ingameGUI = new GuiIngame(this);
+		theCrash.getCategory().addCrashSectionCallable("LWJGL", new Callable<String>() {
+			public String call() {
+				return EagRuntime.getVersion();
+			}
+		});
+		theCrash.getCategory().addCrashSectionCallable("OpenGL", new Callable<String>() {
+			public String call() {
+				return EaglercraftGPU.glGetString(7937) + " GL version " + EaglercraftGPU.glGetString(7938) + ", "
+						+ EaglercraftGPU.glGetString(7936);
+			}
+		});
+		theCrash.getCategory().addCrashSectionCallable("Is Eagler Shaders", new Callable<String>() {
+			public String call() throws Exception {
+				return Minecraft.this.gameSettings.shaders ? "Yes" : "No";
+			}
+		});
+		theCrash.getCategory().addCrashSectionCallable("Is Dynamic Lights", new Callable<String>() {
+			public String call() throws Exception {
+				return !Minecraft.this.gameSettings.shaders && Minecraft.this.gameSettings.enableDynamicLights ? "Yes"
+						: "No";
+			}
+		});
+		theCrash.getCategory().addCrashSectionCallable("In Ext. Pipeline", new Callable<String>() {
+			public String call() throws Exception {
+				return GlStateManager.isExtensionPipeline() ? "Yes" : "No";
+			}
+		});
+		theCrash.getCategory().addCrashSectionCallable("GPU Shader5 Capable", new Callable<String>() {
+			public String call() throws Exception {
+				return EaglercraftGPU.checkShader5Capable() ? "Yes" : "No";
+			}
+		});
+		theCrash.getCategory().addCrashSectionCallable("GPU TexStorage Capable", new Callable<String>() {
+			public String call() throws Exception {
+				return EaglercraftGPU.checkTexStorageCapable() ? "Yes" : "No";
+			}
+		});
+		theCrash.getCategory().addCrashSectionCallable("GPU TextureLOD Capable", new Callable<String>() {
+			public String call() throws Exception {
+				return EaglercraftGPU.checkTextureLODCapable() ? "Yes" : "No";
+			}
+		});
+		theCrash.getCategory().addCrashSectionCallable("GPU Instancing Capable", new Callable<String>() {
+			public String call() throws Exception {
+				return EaglercraftGPU.checkInstancingCapable() ? "Yes" : "No";
+			}
+		});
+		theCrash.getCategory().addCrashSectionCallable("GPU VAO Capable", new Callable<String>() {
+			public String call() throws Exception {
+				return EaglercraftGPU.checkVAOCapable() ? "Yes" : "No";
+			}
+		});
+		theCrash.getCategory().addCrashSectionCallable("Is Software VAOs", new Callable<String>() {
+			public String call() throws Exception {
+				return EaglercraftGPU.areVAOsEmulated() ? "Yes" : "No";
+			}
+		});
+		theCrash.getCategory().addCrashSectionCallable("GPU Render-to-MipMap", new Callable<String>() {
+			public String call() throws Exception {
+				return EaglercraftGPU.checkFBORenderMipmapCapable() ? "Yes" : "No";
+			}
+		});
+		theCrash.getCategory().addCrashSectionCallable("Touch Mode", new Callable<String>() {
+			public String call() throws Exception {
+				return PointerInputAbstraction.isTouchMode() ? "Yes" : "No";
+			}
+		});
+		theCrash.getCategory().addCrashSectionCallable("Is Modded", new Callable<String>() {
+			public String call() throws Exception {
+				return "Definitely Not; You're an eagler";
+			}
+		});
+		theCrash.getCategory().addCrashSectionCallable("Type", new Callable<String>() {
+			public String call() throws Exception {
+				return "Client (map_client.txt)";
+			}
+		});
+		theCrash.getCategory().addCrashSectionCallable("Resource Packs", new Callable<String>() {
+			public String call() throws Exception {
+				StringBuilder stringbuilder = new StringBuilder();
 
-		this.mouseGrabSupported = Mouse.isMouseGrabSupported();
-		PointerInputAbstraction.init(this);
+				for (String s : Minecraft.this.gameSettings.resourcePacks) {
+					if (stringbuilder.length() > 0) {
+						stringbuilder.append(", ");
+					}
 
-		this.eagskullCommand = new SkullCommand(this);
-		this.voiceOverlay = new GuiVoiceOverlay(this);
-		this.voiceOverlay.setResolution(scaledResolution.getScaledWidth(), scaledResolution.getScaledHeight());
+					stringbuilder.append(s);
+					if (Minecraft.this.gameSettings.field_183018_l.contains(s)) {
+						stringbuilder.append(" (incompatible)");
+					}
+				}
 
-		this.notifRenderer = new ServerNotificationRenderer();
-		this.notifRenderer.init();
-		this.notifRenderer.setResolution(this, scaledResolution.getScaledWidth(), scaledResolution.getScaledHeight(),
-				scaledResolution.getScaleFactor());
-		this.touchOverlayRenderer = new TouchOverlayRenderer(this);
-
-		ServerList.initServerList(this);
-		EaglerProfile.read();
-		ServerCookieDataStore.load();
-
-		GuiScreen mainMenu = new GuiMainMenu();
-		if (isDemo()) {
-			mainMenu = new GuiScreenDemoIntegratedServerStartup(mainMenu);
+				return stringbuilder.toString();
+			}
+		});
+		theCrash.getCategory().addCrashSectionCallable("Current Language", new Callable<String>() {
+			public String call() throws Exception {
+				return Minecraft.this.mcLanguageManager.getCurrentLanguage().toString();
+			}
+		});
+		theCrash.getCategory().addCrashSectionCallable("Profiler Position", new Callable<String>() {
+			public String call() throws Exception {
+				return "N/A (disabled)";
+			}
+		});
+		if (this.theWorld != null) {
+			this.theWorld.addWorldInfoToCrashReport(theCrash);
 		}
-		if (this.serverName != null) {
-			mainMenu = new GuiConnecting(mainMenu, this, this.serverName, this.serverPort);
+
+		return theCrash;
+	}
+
+	public void addScheduledTask(Runnable runnableToSchedule) {
+		this.addScheduledTaskFuture(Executors.callable(runnableToSchedule));
+	}
+
+	public <V> ListenableFuture<V> addScheduledTaskFuture(Callable<V> callableToSchedule) {
+		Validate.notNull(callableToSchedule);
+		ListenableFutureTask listenablefuturetask = ListenableFutureTask.create(callableToSchedule);
+		synchronized (this.scheduledTasks) {
+			this.scheduledTasks.add(listenablefuturetask);
+			return listenablefuturetask;
+		}
+	}
+
+	public ListenableFuture<Object> addScheduledTaskFuture(Runnable runnableToSchedule) {
+		Validate.notNull(runnableToSchedule);
+		return this.addScheduledTaskFuture(Executors.callable(runnableToSchedule));
+	}
+
+	public boolean areKeysLocked() {
+		return PlatformInput.lockKeys;
+	}
+
+	/**
+	 * + Checks for an OpenGL error. If there is one, prints the error ID and error
+	 * string.
+	 */
+	public void checkGLError(String message) {
+		if (this.enableGLErrorChecking) {
+			int i = EaglercraftGPU.glGetError();
+			if (i != 0) {
+				String s = EaglercraftGPU.gluErrorString(i);
+				logger.error("########## GL ERROR ##########");
+				logger.error("@ " + message);
+				logger.error(i + ": " + s);
+			}
+
+		}
+	}
+
+	protected void checkWindowResize() {
+		float dpiFetch = -1.0f;
+		if (!this.fullscreen
+				&& (Display.wasResized() || (dpiFetch = Math.max(Display.getDPI(), 1.0f)) != this.displayDPI)) {
+			int i = this.displayWidth;
+			int j = this.displayHeight;
+			float f = this.displayDPI;
+			this.displayWidth = Display.getWidth();
+			this.displayHeight = Display.getHeight();
+			this.displayDPI = dpiFetch == -1.0f ? Math.max(Display.getDPI(), 1.0f) : dpiFetch;
+			if (this.displayWidth != i || this.displayHeight != j || this.displayDPI != f) {
+				if (this.displayWidth <= 0) {
+					this.displayWidth = 1;
+				}
+
+				if (this.displayHeight <= 0) {
+					this.displayHeight = 1;
+				}
+
+				this.resize(this.displayWidth, this.displayHeight);
+			}
 		}
 
-		mainMenu = new GuiScreenEditProfile(mainMenu);
+	}
 
-		if (!EagRuntime.getConfiguration().isForceProfanityFilter() && !gameSettings.hasShownProfanityFilter) {
-			mainMenu = new GuiScreenContentWarning(mainMenu);
+	public void clearTitles() {
+		ingameGUI.displayTitle(null, null, -1, -1, -1);
+	}
+
+	private void clickMouse() {
+		if (this.leftClickCounter <= 0) {
+			this.thePlayer.swingItem();
+			if (this.objectMouseOver == null) {
+				logger.error("Null returned as \'hitResult\', this shouldn\'t happen!");
+				if (this.playerController.isNotCreative()) {
+					this.leftClickCounter = 10;
+				}
+
+			} else {
+				switch (this.objectMouseOver.typeOfHit) {
+				case ENTITY:
+					this.playerController.attackEntity(this.thePlayer, this.objectMouseOver.entityHit);
+					break;
+				case BLOCK:
+					BlockPos blockpos = this.objectMouseOver.getBlockPos();
+					if (this.theWorld.getBlockState(blockpos).getBlock().getMaterial() != Material.air) {
+						this.playerController.clickBlock(blockpos, this.objectMouseOver.sideHit);
+						break;
+					}
+				case MISS:
+				default:
+					if (this.playerController.isNotCreative()) {
+						this.leftClickCounter = 10;
+					}
+				}
+
+			}
 		}
-
-		this.displayGuiScreen(mainMenu);
-
-		this.renderEngine.deleteTexture(this.mojangLogo);
-		this.mojangLogo = null;
-		this.loadingScreen = new LoadingScreenRenderer(this);
-
-		while (Mouse.next())
-			;
-		while (Keyboard.next())
-			;
-		while (Touch.next())
-			;
-	}
-
-	private void registerMetadataSerializers() {
-		this.metadataSerializer_.registerMetadataSectionType(new TextureMetadataSectionSerializer(),
-				TextureMetadataSection.class);
-		this.metadataSerializer_.registerMetadataSectionType(new FontMetadataSectionSerializer(),
-				FontMetadataSection.class);
-		this.metadataSerializer_.registerMetadataSectionType(new AnimationMetadataSectionSerializer(),
-				AnimationMetadataSection.class);
-		this.metadataSerializer_.registerMetadataSectionType(new PackMetadataSectionSerializer(),
-				PackMetadataSection.class);
-		this.metadataSerializer_.registerMetadataSectionType(new LanguageMetadataSectionSerializer(),
-				LanguageMetadataSection.class);
-	}
-
-	private void createDisplay() {
-		Display.create();
-		Display.setTitle("Eaglercraft 1.8.8");
-	}
-
-	private static boolean isJvm64bit() {
-		return true;
-	}
-
-	public String getVersion() {
-		return this.launchedVersion;
 	}
 
 	public void crashed(CrashReport crash) {
@@ -574,8 +659,27 @@ public class Minecraft implements IThreadListener {
 		this.crashReporter = crash;
 	}
 
-	/**+
-	 * Wrapper around displayCrashReportInternal
+	private void createDisplay() {
+		Display.create();
+		Display.setTitle("Eaglercraft 1.8.8");
+	}
+
+	public void dispatchKeypresses() {
+		int i = Keyboard.getEventKey() == 0 ? Keyboard.getEventCharacter() : Keyboard.getEventKey();
+		if (i != 0 && !Keyboard.isRepeatEvent()) {
+			if (!(this.currentScreen instanceof GuiControls)
+					|| ((GuiControls) this.currentScreen).time <= getSystemTime() - 20L) {
+				if (Keyboard.getEventKeyState()) {
+					if (i == this.gameSettings.keyBindScreenshot.getKeyCode()) {
+						this.ingameGUI.getChatGUI().printChatMessage(ScreenShotHelper.saveScreenshot());
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * + Wrapper around displayCrashReportInternal
 	 */
 	public void displayCrashReport(CrashReport crashReportIn) {
 		String report = crashReportIn.getCompleteReport();
@@ -593,53 +697,48 @@ public class Minecraft implements IThreadListener {
 		}
 	}
 
-	public boolean isUnicode() {
-		return this.mcLanguageManager.isCurrentLocaleUnicode() || this.gameSettings.forceUnicodeFont;
-	}
-
-	public void refreshResources() {
-		GlStateManager.recompileShaders();
-
-		ArrayList arraylist = Lists.newArrayList(this.defaultResourcePacks);
-
-		for (ResourcePackRepository.Entry resourcepackrepository$entry : this.mcResourcePackRepository
-				.getRepositoryEntries()) {
-			arraylist.add(resourcepackrepository$entry.getResourcePack());
+	/**
+	 * + Sets the argument GuiScreen as the main (topmost visible) screen.
+	 */
+	public void displayGuiScreen(GuiScreen guiScreenIn) {
+		if (this.currentScreen != null) {
+			this.currentScreen.onGuiClosed();
 		}
 
-		if (this.mcResourcePackRepository.getResourcePackInstance() != null) {
-			arraylist.add(this.mcResourcePackRepository.getResourcePackInstance());
+		if (guiScreenIn == null && this.theWorld == null) {
+			guiScreenIn = new GuiMainMenu();
+		} else if (guiScreenIn == null && this.thePlayer.getHealth() <= 0.0F) {
+			guiScreenIn = new GuiGameOver();
 		}
 
-		try {
-			this.mcResourceManager.reloadResources(arraylist);
-		} catch (RuntimeException runtimeexception) {
-			logger.info("Caught error stitching, removing all assigned resourcepacks");
-			logger.info(runtimeexception);
-			arraylist.clear();
-			arraylist.addAll(this.defaultResourcePacks);
-			this.mcResourcePackRepository.setRepositories(Collections.emptyList());
-			this.mcResourceManager.reloadResources(arraylist);
-			this.gameSettings.resourcePacks.clear();
-			this.gameSettings.field_183018_l.clear();
-			this.gameSettings.saveOptions();
+		if (guiScreenIn instanceof GuiMainMenu) {
+			this.gameSettings.showDebugInfo = false;
+			this.ingameGUI.getChatGUI().clearChatMessages();
 		}
 
-		ShaderSource.clearCache();
-		GuiMainMenu.doResourceReloadHack();
-
-		this.mcLanguageManager.parseLanguageMetadata(arraylist);
-		if (this.renderGlobal != null) {
-			this.renderGlobal.loadRenderers();
-		}
-
-	}
-
-	private void updateDisplayMode() {
-		this.displayWidth = Display.getWidth();
-		this.displayHeight = Display.getHeight();
-		this.displayDPI = Display.getDPI();
+		this.currentScreen = (GuiScreen) guiScreenIn;
 		this.scaledResolution = new ScaledResolution(this);
+		if (guiScreenIn != null) {
+			this.setIngameNotInFocus();
+			((GuiScreen) guiScreenIn).setWorldAndResolution(this, scaledResolution.getScaledWidth(),
+					scaledResolution.getScaledHeight());
+			this.skipRenderWorld = false;
+		} else {
+			this.mcSoundHandler.resumeSounds();
+			this.setIngameFocus();
+		}
+		EagRuntime.getConfiguration().getHooks().callScreenChangedHook(
+				currentScreen != null ? currentScreen.getClass().getName() : null, scaledResolution.getScaledWidth(),
+				scaledResolution.getScaledHeight(), displayWidth, displayHeight, scaledResolution.getScaleFactor());
+	}
+
+	/**
+	 * + Displays the ingame menu
+	 */
+	public void displayInGameMenu() {
+		if (this.currentScreen == null) {
+			this.displayGuiScreen(new GuiIngameMenu());
+		}
 	}
 
 	private void drawSplashScreen(TextureManager textureManagerInstance) {
@@ -692,6 +791,31 @@ public class Minecraft implements IThreadListener {
 		this.updateDisplay();
 	}
 
+	private ItemStack func_181036_a(Item parItem, int parInt1, TileEntity parTileEntity) {
+		ItemStack itemstack = new ItemStack(parItem, 1, parInt1);
+		NBTTagCompound nbttagcompound = new NBTTagCompound();
+		parTileEntity.writeToNBT(nbttagcompound);
+		if (parItem == Items.skull && nbttagcompound.hasKey("Owner")) {
+			NBTTagCompound nbttagcompound2 = nbttagcompound.getCompoundTag("Owner");
+			NBTTagCompound nbttagcompound3 = new NBTTagCompound();
+			nbttagcompound3.setTag("SkullOwner", nbttagcompound2);
+			itemstack.setTagCompound(nbttagcompound3);
+			return itemstack;
+		} else {
+			itemstack.setTagInfo("BlockEntityTag", nbttagcompound);
+			NBTTagCompound nbttagcompound1 = new NBTTagCompound();
+			NBTTagList nbttaglist = new NBTTagList();
+			nbttaglist.appendTag(new NBTTagString("(+NBT)"));
+			nbttagcompound1.setTag("Lore", nbttaglist);
+			itemstack.setTagInfo("display", nbttagcompound1);
+			return itemstack;
+		}
+	}
+
+	public MusicTicker func_181535_r() {
+		return this.mcMusicTicker;
+	}
+
 	public void func_181536_a(int parInt1, int parInt2, int parInt3, int parInt4, int parInt5, int parInt6, int parInt7,
 			int parInt8, int parInt9, int parInt10) {
 		float f = 0.00390625F;
@@ -713,108 +837,594 @@ public class Minecraft implements IThreadListener {
 		Tessellator.getInstance().draw();
 	}
 
-	/**+
-	 * Sets the argument GuiScreen as the main (topmost visible)
-	 * screen.
+	public void func_181537_a(boolean parFlag) {
+		this.field_181541_X = parFlag;
+	}
+
+	private String func_181538_aA() {
+		return this.currentServerData != null ? "multiplayer" : "out_of_game";
+	}
+
+	public FrameTimer func_181539_aj() {
+		return this.field_181542_y;
+	}
+
+	public boolean func_181540_al() {
+		return this.field_181541_X;
+	}
+
+	public MusicTicker.MusicType getAmbientMusicType() {
+		return this.thePlayer != null ? (this.thePlayer.worldObj.provider instanceof WorldProviderHell
+				? MusicTicker.MusicType.NETHER
+				: (this.thePlayer.worldObj.provider instanceof WorldProviderEnd
+						? (BossStatus.bossName != null && BossStatus.statusBarTime > 0 ? MusicTicker.MusicType.END_BOSS
+								: MusicTicker.MusicType.END)
+						: (this.thePlayer.capabilities.isCreativeMode && this.thePlayer.capabilities.allowFlying
+								? MusicTicker.MusicType.CREATIVE
+								: MusicTicker.MusicType.GAME)))
+				: MusicTicker.MusicType.MENU;
+	}
+
+	public BlockRendererDispatcher getBlockRendererDispatcher() {
+		return this.blockRenderDispatcher;
+	}
+
+	public ServerData getCurrentServerData() {
+		return this.currentServerData;
+	}
+
+	public boolean getEnableFNAWSkins() {
+		boolean ret = this.gameSettings.enableFNAWSkins;
+		if (this.thePlayer != null) {
+			if (this.thePlayer.sendQueue.currentFNAWSkinForcedState) {
+				ret = true;
+			} else {
+				ret &= this.thePlayer.sendQueue.currentFNAWSkinAllowedState;
+			}
+		}
+		return ret;
+	}
+
+	public ItemRenderer getItemRenderer() {
+		return this.itemRenderer;
+	}
+
+	public LanguageManager getLanguageManager() {
+		return this.mcLanguageManager;
+	}
+
+	public int getLimitFramerate() {
+		return this.theWorld == null && this.currentScreen != null ? 30 : this.gameSettings.limitFramerate;
+	}
+
+	public ModelManager getModelManager() {
+		return modelManager;
+	}
+
+	public NetHandlerPlayClient getNetHandler() {
+		return this.thePlayer != null ? this.thePlayer.sendQueue : null;
+	}
+
+	public RenderItem getRenderItem() {
+		return this.renderItem;
+	}
+
+	public RenderManager getRenderManager() {
+		return this.renderManager;
+	}
+
+	public Entity getRenderViewEntity() {
+		return this.renderViewEntity;
+	}
+
+	public IResourceManager getResourceManager() {
+		return this.mcResourceManager;
+	}
+
+	public ResourcePackRepository getResourcePackRepository() {
+		return this.mcResourcePackRepository;
+	}
+
+	/**
+	 * + Returns the save loader that is currently being used
 	 */
-	public void displayGuiScreen(GuiScreen guiScreenIn) {
-		if (this.currentScreen != null) {
-			this.currentScreen.onGuiClosed();
+	public ISaveFormat getSaveLoader() {
+		return SingleplayerServerController.instance;
+	}
+
+	public Session getSession() {
+		return this.session;
+	}
+
+	public SoundHandler getSoundHandler() {
+		return this.mcSoundHandler;
+	}
+
+	public TextureManager getTextureManager() {
+		return this.renderEngine;
+	}
+
+	public TextureMap getTextureMapBlocks() {
+		return this.textureMapBlocks;
+	}
+
+	public String getVersion() {
+		return this.launchedVersion;
+	}
+
+	private void handlePlaceTouchEnd() {
+		if (placeTouchStartTime != -1l) {
+			int len = (int) (EagRuntime.steadyTimeMillis() - placeTouchStartTime);
+			if (len < 350l && !PointerInputAbstraction.isDraggingNotTouching()) {
+				if (objectMouseOver != null && objectMouseOver.typeOfHit == MovingObjectType.ENTITY) {
+					clickMouse();
+				} else {
+					rightClickMouse();
+				}
+			}
+			placeTouchStartTime = -1l;
+		}
+	}
+
+	private void handlePlaceTouchStart() {
+		if (placeTouchStartTime == -1l) {
+			placeTouchStartTime = EagRuntime.steadyTimeMillis();
+		}
+	}
+
+	public void handleReconnectPacket(String redirectURI) {
+		this.reconnectURI = redirectURI;
+	}
+
+	/**
+	 * + Gets whether this is a demo or not.
+	 */
+	public final boolean isDemo() {
+		return EagRuntime.getConfiguration().isDemo();
+	}
+
+	public boolean isEnableProfanityFilter() {
+		return EagRuntime.getConfiguration().isForceProfanityFilter() || gameSettings.enableProfanityFilter;
+	}
+
+	public boolean isFramerateLimitBelowMax() {
+		return (float) this.getLimitFramerate() < GameSettings.Options.FRAMERATE_LIMIT.getValueMax();
+	}
+
+	/**
+	 * + Returns whether we're in full screen or not.
+	 */
+	public boolean isFullScreen() {
+		return Display.isFullscreen();
+	}
+
+	public boolean isGamePaused() {
+		return this.isGamePaused;
+	}
+
+	public boolean isIntegratedServerRunning() {
+		return SingleplayerServerController.isWorldRunning();
+	}
+
+	public boolean isJava64bit() {
+		return this.jvm64bit;
+	}
+
+	private boolean isMiningTouch() {
+		if (mineTouchStartTime == -1l)
+			return false;
+		long l = EagRuntime.steadyTimeMillis();
+		return (placeTouchStartTime == -1l || (l - placeTouchStartTime) >= 350l) && (l - mineTouchStartTime) >= 350l;
+	}
+
+	/**
+	 * + Returns true if there is only one player playing, and the current server is
+	 * the integrated one.
+	 */
+	public boolean isSingleplayer() {
+		return SingleplayerServerController.isWorldRunning();
+	}
+
+	/**
+	 * + Returns whether snooping is enabled or not.
+	 */
+	public boolean isSnooperEnabled() {
+		return this.gameSettings.snooperEnabled;
+	}
+
+	public boolean isUnicode() {
+		return this.mcLanguageManager.isCurrentLocaleUnicode() || this.gameSettings.forceUnicodeFont;
+	}
+
+	/**
+	 * + Arguments: World foldername, World ingame name, WorldSettings
+	 */
+	public void launchIntegratedServer(String folderName, String worldName, WorldSettings worldSettingsIn) {
+		this.loadWorld((WorldClient) null);
+		renderManager.setEnableFNAWSkins(this.gameSettings.enableFNAWSkins);
+		session.reset();
+		EaglerProfile.clearServerSkinOverride();
+		PauseMenuCustomizeState.reset();
+		SingleplayerServerController.launchEaglercraftServer(folderName, gameSettings.difficulty.getDifficultyId(),
+				Math.max(gameSettings.renderDistanceChunks, 2), worldSettingsIn);
+		EagRuntime.setMCServerWindowGlobal("singleplayer");
+		this.displayGuiScreen(new GuiScreenIntegratedServerBusy(
+				new GuiScreenSingleplayerConnecting(new GuiMainMenu(), "Connecting to " + folderName),
+				"singleplayer.busy.startingIntegratedServer", "singleplayer.failed.startingIntegratedServer",
+				() -> SingleplayerServerController.isWorldReady(), (t, u) -> {
+					Minecraft.this.displayGuiScreen(GuiScreenIntegratedServerBusy.createException(new GuiMainMenu(),
+							((GuiScreenIntegratedServerBusy) t).failMessage, u));
+				}));
+	}
+
+	/**
+	 * + unloads the current world first
+	 */
+	public void loadWorld(WorldClient worldClientIn) {
+		this.loadWorld(worldClientIn, "");
+	}
+
+	/**
+	 * + unloads the current world first
+	 */
+	public void loadWorld(WorldClient worldClientIn, String loadingMessage) {
+		if (worldClientIn == null) {
+			NetHandlerPlayClient nethandlerplayclient = this.getNetHandler();
+			if (nethandlerplayclient != null) {
+				nethandlerplayclient.cleanup();
+			}
+			session.reset();
+			EaglerProfile.clearServerSkinOverride();
+			PauseMenuCustomizeState.reset();
+			ClientUUIDLoadingCache.flushRequestCache();
+			WebViewOverlayController.setPacketSendCallback(null);
+
+			this.guiAchievement.clearAchievements();
+			this.entityRenderer.getMapItemRenderer().clearLoadedMaps();
 		}
 
-		if (guiScreenIn == null && this.theWorld == null) {
-			guiScreenIn = new GuiMainMenu();
-		} else if (guiScreenIn == null && this.thePlayer.getHealth() <= 0.0F) {
-			guiScreenIn = new GuiGameOver();
+		this.renderViewEntity = null;
+		this.myNetworkManager = null;
+		if (this.loadingScreen != null) {
+			this.loadingScreen.resetProgressAndMessage(loadingMessage);
+			this.loadingScreen.displayLoadingString("");
 		}
 
-		if (guiScreenIn instanceof GuiMainMenu) {
-			this.gameSettings.showDebugInfo = false;
-			this.ingameGUI.getChatGUI().clearChatMessages();
+		if (worldClientIn == null && this.theWorld != null) {
+			this.mcResourcePackRepository.func_148529_f();
+			this.ingameGUI.func_181029_i();
+			this.setServerData((ServerData) null);
+			this.integratedServerIsRunning = false;
 		}
 
-		this.currentScreen = (GuiScreen) guiScreenIn;
-		this.scaledResolution = new ScaledResolution(this);
-		if (guiScreenIn != null) {
-			this.setIngameNotInFocus();
-			((GuiScreen) guiScreenIn).setWorldAndResolution(this, scaledResolution.getScaledWidth(),
-					scaledResolution.getScaledHeight());
-			this.skipRenderWorld = false;
+		this.mcSoundHandler.stopSounds();
+		this.theWorld = worldClientIn;
+		if (worldClientIn != null) {
+			if (this.renderGlobal != null) {
+				this.renderGlobal.setWorldAndLoadRenderers(worldClientIn);
+			}
+
+			if (this.effectRenderer != null) {
+				this.effectRenderer.clearEffects(worldClientIn);
+			}
+
+			if (this.thePlayer == null) {
+				this.thePlayer = this.playerController.func_178892_a(worldClientIn, new StatFileWriter());
+				this.playerController.flipPlayer(this.thePlayer);
+			}
+
+			this.thePlayer.preparePlayerToSpawn();
+			worldClientIn.spawnEntityInWorld(this.thePlayer);
+			this.thePlayer.movementInput = new MovementInputFromOptions(this.gameSettings);
+			this.playerController.setPlayerCapabilities(this.thePlayer);
+			this.renderViewEntity = this.thePlayer;
 		} else {
-			this.mcSoundHandler.resumeSounds();
-			this.setIngameFocus();
+			this.thePlayer = null;
 		}
+
+		System.gc();
+		this.systemTime = 0L;
+	}
+
+	/**
+	 * + Called when user clicked he's mouse middle button (pick block)
+	 */
+	public void middleClickMouse() {
+		if (this.objectMouseOver != null) {
+			boolean flag = this.thePlayer.capabilities.isCreativeMode;
+			int i = 0;
+			boolean flag1 = false;
+			TileEntity tileentity = null;
+			Object object;
+			if (this.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+				BlockPos blockpos = this.objectMouseOver.getBlockPos();
+				Block block = this.theWorld.getBlockState(blockpos).getBlock();
+				if (block.getMaterial() == Material.air) {
+					return;
+				}
+
+				object = block.getItem(this.theWorld, blockpos);
+				if (object == null) {
+					return;
+				}
+
+				if (flag && GuiScreen.isCtrlKeyDown()) {
+					tileentity = this.theWorld.getTileEntity(blockpos);
+				}
+
+				Block block1 = object instanceof ItemBlock && !block.isFlowerPot()
+						? Block.getBlockFromItem((Item) object)
+						: block;
+				i = block1.getDamageValue(this.theWorld, blockpos);
+				flag1 = ((Item) object).getHasSubtypes();
+			} else {
+				if (this.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY
+						|| this.objectMouseOver.entityHit == null || !flag) {
+					return;
+				}
+
+				if (this.objectMouseOver.entityHit instanceof EntityPainting) {
+					object = Items.painting;
+				} else if (this.objectMouseOver.entityHit instanceof EntityLeashKnot) {
+					object = Items.lead;
+				} else if (this.objectMouseOver.entityHit instanceof EntityItemFrame) {
+					EntityItemFrame entityitemframe = (EntityItemFrame) this.objectMouseOver.entityHit;
+					ItemStack itemstack = entityitemframe.getDisplayedItem();
+					if (itemstack == null) {
+						object = Items.item_frame;
+					} else {
+						object = itemstack.getItem();
+						i = itemstack.getMetadata();
+						flag1 = true;
+					}
+				} else if (this.objectMouseOver.entityHit instanceof EntityMinecart) {
+					EntityMinecart entityminecart = (EntityMinecart) this.objectMouseOver.entityHit;
+					switch (entityminecart.getMinecartType()) {
+					case FURNACE:
+						object = Items.furnace_minecart;
+						break;
+					case CHEST:
+						object = Items.chest_minecart;
+						break;
+					case TNT:
+						object = Items.tnt_minecart;
+						break;
+					case HOPPER:
+						object = Items.hopper_minecart;
+						break;
+					case COMMAND_BLOCK:
+						object = Items.command_block_minecart;
+						break;
+					default:
+						object = Items.minecart;
+					}
+				} else if (this.objectMouseOver.entityHit instanceof EntityBoat) {
+					object = Items.boat;
+				} else if (this.objectMouseOver.entityHit instanceof EntityArmorStand) {
+					object = Items.armor_stand;
+				} else {
+					object = Items.spawn_egg;
+					i = EntityList.getEntityID(this.objectMouseOver.entityHit);
+					flag1 = true;
+					if (!EntityList.entityEggs.containsKey(Integer.valueOf(i))) {
+						return;
+					}
+				}
+			}
+
+			InventoryPlayer inventoryplayer = this.thePlayer.inventory;
+			if (tileentity == null) {
+				inventoryplayer.setCurrentItem((Item) object, i, flag1, flag);
+			} else {
+				ItemStack itemstack1 = this.func_181036_a((Item) object, i, tileentity);
+				inventoryplayer.setInventorySlotContents(inventoryplayer.currentItem, itemstack1);
+			}
+
+			if (flag) {
+				int j = this.thePlayer.inventoryContainer.inventorySlots.size() - 9 + inventoryplayer.currentItem;
+				this.playerController.sendSlotPacket(inventoryplayer.getStackInSlot(inventoryplayer.currentItem), j);
+			}
+
+		}
+	}
+
+	private void processTouchMine() {
+		if ((currentScreen == null || currentScreen.allowUserInput)
+				&& PointerInputAbstraction.isTouchingScreenNotButton()) {
+			if (PointerInputAbstraction.isDraggingNotTouching()) {
+				if (mineTouchStartTime != -1l) {
+					long l = EagRuntime.steadyTimeMillis();
+					if ((placeTouchStartTime == -1l || (l - placeTouchStartTime) < 350l)
+							|| (l - mineTouchStartTime) < 350l) {
+						mineTouchStartTime = -1l;
+					}
+				}
+			} else {
+				if (mineTouchStartTime == -1l) {
+					mineTouchStartTime = EagRuntime.steadyTimeMillis();
+				}
+			}
+		} else {
+			mineTouchStartTime = -1l;
+		}
+	}
+
+	public void refreshResources() {
+		GlStateManager.recompileShaders();
+
+		ArrayList arraylist = Lists.newArrayList(this.defaultResourcePacks);
+
+		for (ResourcePackRepository.Entry resourcepackrepository$entry : this.mcResourcePackRepository
+				.getRepositoryEntries()) {
+			arraylist.add(resourcepackrepository$entry.getResourcePack());
+		}
+
+		if (this.mcResourcePackRepository.getResourcePackInstance() != null) {
+			arraylist.add(this.mcResourcePackRepository.getResourcePackInstance());
+		}
+
+		try {
+			this.mcResourceManager.reloadResources(arraylist);
+		} catch (RuntimeException runtimeexception) {
+			logger.info("Caught error stitching, removing all assigned resourcepacks");
+			logger.info(runtimeexception);
+			arraylist.clear();
+			arraylist.addAll(this.defaultResourcePacks);
+			this.mcResourcePackRepository.setRepositories(Collections.emptyList());
+			this.mcResourceManager.reloadResources(arraylist);
+			this.gameSettings.resourcePacks.clear();
+			this.gameSettings.field_183018_l.clear();
+			this.gameSettings.saveOptions();
+		}
+
+		ShaderSource.clearCache();
+		GuiMainMenu.doResourceReloadHack();
+
+		this.mcLanguageManager.parseLanguageMetadata(arraylist);
+		if (this.renderGlobal != null) {
+			this.renderGlobal.loadRenderers();
+		}
+
+	}
+
+	private void registerMetadataSerializers() {
+		this.metadataSerializer_.registerMetadataSectionType(new TextureMetadataSectionSerializer(),
+				TextureMetadataSection.class);
+		this.metadataSerializer_.registerMetadataSectionType(new FontMetadataSectionSerializer(),
+				FontMetadataSection.class);
+		this.metadataSerializer_.registerMetadataSectionType(new AnimationMetadataSectionSerializer(),
+				AnimationMetadataSection.class);
+		this.metadataSerializer_.registerMetadataSectionType(new PackMetadataSectionSerializer(),
+				PackMetadataSection.class);
+		this.metadataSerializer_.registerMetadataSectionType(new LanguageMetadataSectionSerializer(),
+				LanguageMetadataSection.class);
+	}
+
+	/**
+	 * + Called to resize the current screen.
+	 */
+	private void resize(int width, int height) {
+		this.displayWidth = Math.max(1, width);
+		this.displayHeight = Math.max(1, height);
+		this.scaledResolution = new ScaledResolution(this);
+		if (this.currentScreen != null) {
+			this.currentScreen.onResize(this, scaledResolution.getScaledWidth(), scaledResolution.getScaledHeight());
+		}
+
+		this.loadingScreen = new LoadingScreenRenderer(this);
+
+		if (voiceOverlay != null) {
+			voiceOverlay.setResolution(scaledResolution.getScaledWidth(), scaledResolution.getScaledHeight());
+		}
+		if (notifRenderer != null) {
+			notifRenderer.setResolution(this, scaledResolution.getScaledWidth(), scaledResolution.getScaledHeight(),
+					scaledResolution.getScaleFactor());
+		}
+
 		EagRuntime.getConfiguration().getHooks().callScreenChangedHook(
 				currentScreen != null ? currentScreen.getClass().getName() : null, scaledResolution.getScaledWidth(),
 				scaledResolution.getScaledHeight(), displayWidth, displayHeight, scaledResolution.getScaleFactor());
 	}
 
-	public void shutdownIntegratedServer(GuiScreen cont) {
-		if (SingleplayerServerController.shutdownEaglercraftServer()
-				|| SingleplayerServerController.getStatusState() == IntegratedServerState.WORLD_UNLOADING) {
-			displayGuiScreen(new GuiScreenIntegratedServerBusy(cont, "singleplayer.busy.stoppingIntegratedServer",
-					"singleplayer.failed.stoppingIntegratedServer", SingleplayerServerController::isReady));
-		} else {
-			displayGuiScreen(cont);
-		}
-	}
-
-	/**+
-	 * Checks for an OpenGL error. If there is one, prints the error
-	 * ID and error string.
+	/**
+	 * + Called when user clicked he's mouse right button (place)
 	 */
-	public void checkGLError(String message) {
-		if (this.enableGLErrorChecking) {
-			int i = EaglercraftGPU.glGetError();
-			if (i != 0) {
-				String s = EaglercraftGPU.gluErrorString(i);
-				logger.error("########## GL ERROR ##########");
-				logger.error("@ " + message);
-				logger.error(i + ": " + s);
-			}
+	public void rightClickMouse() {
+		if (!this.playerController.func_181040_m()) {
+			this.rightClickDelayTimer = 4;
+			boolean flag = true;
+			ItemStack itemstack = this.thePlayer.inventory.getCurrentItem();
+			if (this.objectMouseOver == null) {
+				logger.warn("Null returned as \'hitResult\', this shouldn\'t happen!");
+			} else {
+				switch (this.objectMouseOver.typeOfHit) {
+				case ENTITY:
+					if (this.playerController.func_178894_a(this.thePlayer, this.objectMouseOver.entityHit,
+							this.objectMouseOver)) {
+						flag = false;
+					} else if (this.playerController.interactWithEntitySendPacket(this.thePlayer,
+							this.objectMouseOver.entityHit)) {
+						flag = false;
+					}
+					break;
+				case BLOCK:
+					BlockPos blockpos = this.objectMouseOver.getBlockPos();
+					if (this.theWorld.getBlockState(blockpos).getBlock().getMaterial() != Material.air) {
+						int i = itemstack != null ? itemstack.stackSize : 0;
+						if (this.playerController.onPlayerRightClick(this.thePlayer, this.theWorld, itemstack, blockpos,
+								this.objectMouseOver.sideHit, this.objectMouseOver.hitVec)) {
+							flag = false;
+							this.thePlayer.swingItem();
+						}
 
-		}
-	}
+						if (itemstack == null) {
+							return;
+						}
 
-	/**+
-	 * Shuts down the minecraft applet by stopping the resource
-	 * downloads, and clearing up GL stuff; called when the
-	 * application (or web page) is exited.
-	 */
-	public void shutdownMinecraftApplet() {
-		try {
-			logger.info("Stopping!");
-
-			try {
-				this.loadWorld((WorldClient) null);
-			} catch (Throwable var5) {
-				;
-			}
-
-			this.mcSoundHandler.unloadSounds();
-			if (SingleplayerServerController.isWorldRunning()) {
-				SingleplayerServerController.shutdownEaglercraftServer();
-				while (SingleplayerServerController.getStatusState() == IntegratedServerState.WORLD_UNLOADING) {
-					EagUtils.sleep(50l);
-					SingleplayerServerController.runTick();
+						if (itemstack.stackSize == 0) {
+							this.thePlayer.inventory.mainInventory[this.thePlayer.inventory.currentItem] = null;
+						} else if (itemstack.stackSize != i || this.playerController.isInCreativeMode()) {
+							this.entityRenderer.itemRenderer.resetEquippedProgress();
+						}
+					}
 				}
 			}
-			if (SingleplayerServerController.isIntegratedServerWorkerAlive()
-					&& SingleplayerServerController.canKillWorker()) {
-				SingleplayerServerController.killWorker();
-				EagUtils.sleep(50l);
-			}
-		} finally {
-			EagRuntime.destroy();
-			if (!this.hasCrashed) {
-				EagRuntime.exit();
+
+			if (flag) {
+				ItemStack itemstack1 = this.thePlayer.inventory.getCurrentItem();
+				if (itemstack1 != null
+						&& this.playerController.sendUseItem(this.thePlayer, this.theWorld, itemstack1)) {
+					this.entityRenderer.itemRenderer.resetEquippedProgress2();
+				}
 			}
 
 		}
 	}
 
-	/**+
-	 * Called repeatedly from run()
+	public void run() {
+		this.running = true;
+
+		try {
+			this.startGame();
+		} catch (Throwable throwable) {
+			CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Initializing game");
+			crashreport.makeCategory("Initialization");
+			this.displayCrashReport(this.addGraphicsAndWorldToCrashReport(crashreport));
+			return;
+		}
+
+		try {
+			while (true) {
+				if (!this.running) {
+					break;
+				}
+
+				if (!this.hasCrashed || this.crashReporter == null) {
+					this.runGameLoop();
+					continue;
+				}
+
+				this.displayCrashReport(this.crashReporter);
+			}
+		} catch (MinecraftError var12) {
+			// ??
+		} catch (ReportedException reportedexception) {
+			this.addGraphicsAndWorldToCrashReport(reportedexception.getCrashReport());
+			logger.fatal("Reported exception thrown!", reportedexception);
+			this.displayCrashReport(reportedexception.getCrashReport());
+		} catch (Throwable throwable1) {
+			CrashReport crashreport1 = this
+					.addGraphicsAndWorldToCrashReport(new CrashReport("Unexpected error", throwable1));
+			logger.fatal("Unreported exception thrown!", throwable1);
+			this.displayCrashReport(crashreport1);
+		} finally {
+			this.shutdownMinecraftApplet();
+		}
+
+	}
+
+	/**
+	 * + Called repeatedly from run()
 	 */
 	private void runGameLoop() throws IOException {
 		long i = System.nanoTime();
@@ -913,245 +1523,8 @@ public class Minecraft implements IThreadListener {
 		Mouse.tickCursorShape();
 	}
 
-	public void updateDisplay() {
-		if (Display.isVSyncSupported()) {
-			Display.setVSync(this.gameSettings.enableVsync);
-		} else {
-			this.gameSettings.enableVsync = false;
-		}
-		Display.update();
-		this.checkWindowResize();
-	}
-
-	protected void checkWindowResize() {
-		float dpiFetch = -1.0f;
-		if (!this.fullscreen
-				&& (Display.wasResized() || (dpiFetch = Math.max(Display.getDPI(), 1.0f)) != this.displayDPI)) {
-			int i = this.displayWidth;
-			int j = this.displayHeight;
-			float f = this.displayDPI;
-			this.displayWidth = Display.getWidth();
-			this.displayHeight = Display.getHeight();
-			this.displayDPI = dpiFetch == -1.0f ? Math.max(Display.getDPI(), 1.0f) : dpiFetch;
-			if (this.displayWidth != i || this.displayHeight != j || this.displayDPI != f) {
-				if (this.displayWidth <= 0) {
-					this.displayWidth = 1;
-				}
-
-				if (this.displayHeight <= 0) {
-					this.displayHeight = 1;
-				}
-
-				this.resize(this.displayWidth, this.displayHeight);
-			}
-		}
-
-	}
-
-	public int getLimitFramerate() {
-		return this.theWorld == null && this.currentScreen != null ? 30 : this.gameSettings.limitFramerate;
-	}
-
-	public boolean isFramerateLimitBelowMax() {
-		return (float) this.getLimitFramerate() < GameSettings.Options.FRAMERATE_LIMIT.getValueMax();
-	}
-
-	/**+
-	 * Called when the window is closing. Sets 'running' to false
-	 * which allows the game loop to exit cleanly.
-	 */
-	public void shutdown() {
-		this.running = false;
-	}
-
-	/**+
-	 * Will set the focus to ingame if the Minecraft window is the
-	 * active with focus. Also clears any GUI screen currently
-	 * displayed
-	 */
-	public void setIngameFocus() {
-		boolean touch = PointerInputAbstraction.isTouchMode();
-		if (touch || Display.isActive()) {
-			if (!this.inGameHasFocus) {
-				this.inGameHasFocus = true;
-				if (!touch && mouseGrabSupported) {
-					this.mouseHelper.grabMouseCursor();
-				}
-				this.displayGuiScreen((GuiScreen) null);
-				this.leftClickCounter = 10000;
-			}
-		}
-	}
-
-	/**+
-	 * Resets the player keystate, disables the ingame focus, and
-	 * ungrabs the mouse cursor.
-	 */
-	public void setIngameNotInFocus() {
-		if (this.inGameHasFocus) {
-			KeyBinding.unPressAllKeys();
-			this.inGameHasFocus = false;
-			if (!PointerInputAbstraction.isTouchMode() && mouseGrabSupported) {
-				this.mouseHelper.ungrabMouseCursor();
-			}
-		}
-	}
-
-	/**+
-	 * Displays the ingame menu
-	 */
-	public void displayInGameMenu() {
-		if (this.currentScreen == null) {
-			this.displayGuiScreen(new GuiIngameMenu());
-		}
-	}
-
-	private void sendClickBlockToController(boolean leftClick) {
-		if (!leftClick) {
-			this.leftClickCounter = 0;
-		}
-
-		if (this.leftClickCounter <= 0 && !this.thePlayer.isUsingItem()) {
-			if (leftClick && this.objectMouseOver != null
-					&& this.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-				BlockPos blockpos = this.objectMouseOver.getBlockPos();
-				if (this.theWorld.getBlockState(blockpos).getBlock().getMaterial() != Material.air
-						&& this.playerController.onPlayerDamageBlock(blockpos, this.objectMouseOver.sideHit)) {
-					this.effectRenderer.addBlockHitEffects(blockpos, this.objectMouseOver.sideHit);
-					this.thePlayer.swingItem();
-				}
-
-			} else {
-				this.playerController.resetBlockRemoving();
-			}
-		}
-	}
-
-	private void clickMouse() {
-		if (this.leftClickCounter <= 0) {
-			this.thePlayer.swingItem();
-			if (this.objectMouseOver == null) {
-				logger.error("Null returned as \'hitResult\', this shouldn\'t happen!");
-				if (this.playerController.isNotCreative()) {
-					this.leftClickCounter = 10;
-				}
-
-			} else {
-				switch (this.objectMouseOver.typeOfHit) {
-				case ENTITY:
-					this.playerController.attackEntity(this.thePlayer, this.objectMouseOver.entityHit);
-					break;
-				case BLOCK:
-					BlockPos blockpos = this.objectMouseOver.getBlockPos();
-					if (this.theWorld.getBlockState(blockpos).getBlock().getMaterial() != Material.air) {
-						this.playerController.clickBlock(blockpos, this.objectMouseOver.sideHit);
-						break;
-					}
-				case MISS:
-				default:
-					if (this.playerController.isNotCreative()) {
-						this.leftClickCounter = 10;
-					}
-				}
-
-			}
-		}
-	}
-
-	/**+
-	 * Called when user clicked he's mouse right button (place)
-	 */
-	public void rightClickMouse() {
-		if (!this.playerController.func_181040_m()) {
-			this.rightClickDelayTimer = 4;
-			boolean flag = true;
-			ItemStack itemstack = this.thePlayer.inventory.getCurrentItem();
-			if (this.objectMouseOver == null) {
-				logger.warn("Null returned as \'hitResult\', this shouldn\'t happen!");
-			} else {
-				switch (this.objectMouseOver.typeOfHit) {
-				case ENTITY:
-					if (this.playerController.func_178894_a(this.thePlayer, this.objectMouseOver.entityHit,
-							this.objectMouseOver)) {
-						flag = false;
-					} else if (this.playerController.interactWithEntitySendPacket(this.thePlayer,
-							this.objectMouseOver.entityHit)) {
-						flag = false;
-					}
-					break;
-				case BLOCK:
-					BlockPos blockpos = this.objectMouseOver.getBlockPos();
-					if (this.theWorld.getBlockState(blockpos).getBlock().getMaterial() != Material.air) {
-						int i = itemstack != null ? itemstack.stackSize : 0;
-						if (this.playerController.onPlayerRightClick(this.thePlayer, this.theWorld, itemstack, blockpos,
-								this.objectMouseOver.sideHit, this.objectMouseOver.hitVec)) {
-							flag = false;
-							this.thePlayer.swingItem();
-						}
-
-						if (itemstack == null) {
-							return;
-						}
-
-						if (itemstack.stackSize == 0) {
-							this.thePlayer.inventory.mainInventory[this.thePlayer.inventory.currentItem] = null;
-						} else if (itemstack.stackSize != i || this.playerController.isInCreativeMode()) {
-							this.entityRenderer.itemRenderer.resetEquippedProgress();
-						}
-					}
-				}
-			}
-
-			if (flag) {
-				ItemStack itemstack1 = this.thePlayer.inventory.getCurrentItem();
-				if (itemstack1 != null
-						&& this.playerController.sendUseItem(this.thePlayer, this.theWorld, itemstack1)) {
-					this.entityRenderer.itemRenderer.resetEquippedProgress2();
-				}
-			}
-
-		}
-	}
-
-	/**+
-	 * Toggles fullscreen mode.
-	 */
-	public void toggleFullscreen() {
-		Display.toggleFullscreen();
-	}
-
-	/**+
-	 * Called to resize the current screen.
-	 */
-	private void resize(int width, int height) {
-		this.displayWidth = Math.max(1, width);
-		this.displayHeight = Math.max(1, height);
-		this.scaledResolution = new ScaledResolution(this);
-		if (this.currentScreen != null) {
-			this.currentScreen.onResize(this, scaledResolution.getScaledWidth(), scaledResolution.getScaledHeight());
-		}
-
-		this.loadingScreen = new LoadingScreenRenderer(this);
-
-		if (voiceOverlay != null) {
-			voiceOverlay.setResolution(scaledResolution.getScaledWidth(), scaledResolution.getScaledHeight());
-		}
-		if (notifRenderer != null) {
-			notifRenderer.setResolution(this, scaledResolution.getScaledWidth(), scaledResolution.getScaledHeight(),
-					scaledResolution.getScaleFactor());
-		}
-
-		EagRuntime.getConfiguration().getHooks().callScreenChangedHook(
-				currentScreen != null ? currentScreen.getClass().getName() : null, scaledResolution.getScaledWidth(),
-				scaledResolution.getScaledHeight(), displayWidth, displayHeight, scaledResolution.getScaleFactor());
-	}
-
-	public MusicTicker func_181535_r() {
-		return this.mcMusicTicker;
-	}
-
-	/**+
-	 * Runs the current tick.
+	/**
+	 * + Runs the current tick.
 	 */
 	public void runTick() throws IOException {
 		if (this.rightClickDelayTimer > 0) {
@@ -1347,7 +1720,7 @@ public class Minecraft implements IThreadListener {
 						int j = Mouse.getEventDWheel();
 						if (j != 0) {
 							if (this.isZoomKey) {
-								this.adjustedZoomValue = MathHelper.clamp_float(adjustedZoomValue - j * 4.0f, 5.0f,
+								this.adjustedZoomValue = MathHelper.clamp_float(adjustedZoomValue - j * 4.0f, 4.0f,
 										32.0f);
 							} else if (this.thePlayer.isSpectator()) {
 								j = j < 0 ? -1 : 1;
@@ -1699,9 +2072,8 @@ public class Minecraft implements IThreadListener {
 						ingameGUI.getChatGUI().printChatMessage((new ChatComponentText(pfx + " Click: "))
 								.appendSibling((new ChatComponentText("" + EnumChatFormatting.GREEN
 										+ EnumChatFormatting.UNDERLINE + EaglerXBungeeVersion.getPluginButton()))
-												.setChatStyle((new ChatStyle()).setChatClickEvent(
-														new ClickEvent(ClickEvent.Action.EAGLER_PLUGIN_DOWNLOAD,
-																"plugin_download.zip")))));
+										.setChatStyle((new ChatStyle()).setChatClickEvent(new ClickEvent(
+												ClickEvent.Action.EAGLER_PLUGIN_DOWNLOAD, "plugin_download.zip")))));
 						ingameGUI.getChatGUI().printChatMessage(
 								new ChatComponentText(pfx + " ---------------------------------------"));
 					}
@@ -1752,161 +2124,35 @@ public class Minecraft implements IThreadListener {
 		this.systemTime = getSystemTime();
 	}
 
-	private long placeTouchStartTime = -1l;
-	private long mineTouchStartTime = -1l;
-	private boolean wasMiningTouch = false;
+	public ListenableFuture<Object> scheduleResourcesRefresh() {
+		return this.addScheduledTaskFuture(new Runnable() {
+			public void run() {
+				Minecraft.this.loadingScreen.eaglerShow(I18n.format("resourcePack.load.refreshing"),
+						I18n.format("resourcePack.load.pleaseWait"));
+				Minecraft.this.refreshResources();
+			}
+		});
+	}
 
-	private void processTouchMine() {
-		if ((currentScreen == null || currentScreen.allowUserInput)
-				&& PointerInputAbstraction.isTouchingScreenNotButton()) {
-			if (PointerInputAbstraction.isDraggingNotTouching()) {
-				if (mineTouchStartTime != -1l) {
-					long l = EagRuntime.steadyTimeMillis();
-					if ((placeTouchStartTime == -1l || (l - placeTouchStartTime) < 350l)
-							|| (l - mineTouchStartTime) < 350l) {
-						mineTouchStartTime = -1l;
-					}
+	private void sendClickBlockToController(boolean leftClick) {
+		if (!leftClick) {
+			this.leftClickCounter = 0;
+		}
+
+		if (this.leftClickCounter <= 0 && !this.thePlayer.isUsingItem()) {
+			if (leftClick && this.objectMouseOver != null
+					&& this.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+				BlockPos blockpos = this.objectMouseOver.getBlockPos();
+				if (this.theWorld.getBlockState(blockpos).getBlock().getMaterial() != Material.air
+						&& this.playerController.onPlayerDamageBlock(blockpos, this.objectMouseOver.sideHit)) {
+					this.effectRenderer.addBlockHitEffects(blockpos, this.objectMouseOver.sideHit);
+					this.thePlayer.swingItem();
 				}
+
 			} else {
-				if (mineTouchStartTime == -1l) {
-					mineTouchStartTime = EagRuntime.steadyTimeMillis();
-				}
+				this.playerController.resetBlockRemoving();
 			}
-		} else {
-			mineTouchStartTime = -1l;
 		}
-	}
-
-	private boolean isMiningTouch() {
-		if (mineTouchStartTime == -1l)
-			return false;
-		long l = EagRuntime.steadyTimeMillis();
-		return (placeTouchStartTime == -1l || (l - placeTouchStartTime) >= 350l) && (l - mineTouchStartTime) >= 350l;
-	}
-
-	private void handlePlaceTouchStart() {
-		if (placeTouchStartTime == -1l) {
-			placeTouchStartTime = EagRuntime.steadyTimeMillis();
-		}
-	}
-
-	private void handlePlaceTouchEnd() {
-		if (placeTouchStartTime != -1l) {
-			int len = (int) (EagRuntime.steadyTimeMillis() - placeTouchStartTime);
-			if (len < 350l && !PointerInputAbstraction.isDraggingNotTouching()) {
-				if (objectMouseOver != null && objectMouseOver.typeOfHit == MovingObjectType.ENTITY) {
-					clickMouse();
-				} else {
-					rightClickMouse();
-				}
-			}
-			placeTouchStartTime = -1l;
-		}
-	}
-
-	public void togglePerspective() {
-		++this.gameSettings.thirdPersonView;
-		if (this.gameSettings.thirdPersonView > 2) {
-			this.gameSettings.thirdPersonView = 0;
-		}
-
-		if (this.gameSettings.thirdPersonView == 0) {
-			this.entityRenderer.loadEntityShader(this.getRenderViewEntity());
-		} else if (this.gameSettings.thirdPersonView == 1) {
-			this.entityRenderer.loadEntityShader((Entity) null);
-		}
-
-		this.renderGlobal.setDisplayListEntitiesDirty();
-	}
-
-	/**+
-	 * Arguments: World foldername, World ingame name, WorldSettings
-	 */
-	public void launchIntegratedServer(String folderName, String worldName, WorldSettings worldSettingsIn) {
-		this.loadWorld((WorldClient) null);
-		renderManager.setEnableFNAWSkins(this.gameSettings.enableFNAWSkins);
-		session.reset();
-		EaglerProfile.clearServerSkinOverride();
-		PauseMenuCustomizeState.reset();
-		SingleplayerServerController.launchEaglercraftServer(folderName, gameSettings.difficulty.getDifficultyId(),
-				Math.max(gameSettings.renderDistanceChunks, 2), worldSettingsIn);
-		EagRuntime.setMCServerWindowGlobal("singleplayer");
-		this.displayGuiScreen(new GuiScreenIntegratedServerBusy(
-				new GuiScreenSingleplayerConnecting(new GuiMainMenu(), "Connecting to " + folderName),
-				"singleplayer.busy.startingIntegratedServer", "singleplayer.failed.startingIntegratedServer",
-				() -> SingleplayerServerController.isWorldReady(), (t, u) -> {
-					Minecraft.this.displayGuiScreen(GuiScreenIntegratedServerBusy.createException(new GuiMainMenu(),
-							((GuiScreenIntegratedServerBusy) t).failMessage, u));
-				}));
-	}
-
-	/**+
-	 * unloads the current world first
-	 */
-	public void loadWorld(WorldClient worldClientIn) {
-		this.loadWorld(worldClientIn, "");
-	}
-
-	/**+
-	 * unloads the current world first
-	 */
-	public void loadWorld(WorldClient worldClientIn, String loadingMessage) {
-		if (worldClientIn == null) {
-			NetHandlerPlayClient nethandlerplayclient = this.getNetHandler();
-			if (nethandlerplayclient != null) {
-				nethandlerplayclient.cleanup();
-			}
-			session.reset();
-			EaglerProfile.clearServerSkinOverride();
-			PauseMenuCustomizeState.reset();
-			ClientUUIDLoadingCache.flushRequestCache();
-			WebViewOverlayController.setPacketSendCallback(null);
-
-			this.guiAchievement.clearAchievements();
-			this.entityRenderer.getMapItemRenderer().clearLoadedMaps();
-		}
-
-		this.renderViewEntity = null;
-		this.myNetworkManager = null;
-		if (this.loadingScreen != null) {
-			this.loadingScreen.resetProgressAndMessage(loadingMessage);
-			this.loadingScreen.displayLoadingString("");
-		}
-
-		if (worldClientIn == null && this.theWorld != null) {
-			this.mcResourcePackRepository.func_148529_f();
-			this.ingameGUI.func_181029_i();
-			this.setServerData((ServerData) null);
-			this.integratedServerIsRunning = false;
-		}
-
-		this.mcSoundHandler.stopSounds();
-		this.theWorld = worldClientIn;
-		if (worldClientIn != null) {
-			if (this.renderGlobal != null) {
-				this.renderGlobal.setWorldAndLoadRenderers(worldClientIn);
-			}
-
-			if (this.effectRenderer != null) {
-				this.effectRenderer.clearEffects(worldClientIn);
-			}
-
-			if (this.thePlayer == null) {
-				this.thePlayer = this.playerController.func_178892_a(worldClientIn, new StatFileWriter());
-				this.playerController.flipPlayer(this.thePlayer);
-			}
-
-			this.thePlayer.preparePlayerToSpawn();
-			worldClientIn.spawnEntityInWorld(this.thePlayer);
-			this.thePlayer.movementInput = new MovementInputFromOptions(this.gameSettings);
-			this.playerController.setPlayerCapabilities(this.thePlayer);
-			this.renderViewEntity = this.thePlayer;
-		} else {
-			this.thePlayer = null;
-		}
-
-		System.gc();
-		this.systemTime = 0L;
 	}
 
 	public void setDimensionAndSpawnPlayer(int dimension) {
@@ -1940,415 +2186,36 @@ public class Minecraft implements IThreadListener {
 
 	}
 
-	/**+
-	 * Gets whether this is a demo or not.
+	/**
+	 * + Will set the focus to ingame if the Minecraft window is the active with
+	 * focus. Also clears any GUI screen currently displayed
 	 */
-	public final boolean isDemo() {
-		return EagRuntime.getConfiguration().isDemo();
-	}
-
-	public NetHandlerPlayClient getNetHandler() {
-		return this.thePlayer != null ? this.thePlayer.sendQueue : null;
-	}
-
-	public static boolean isGuiEnabled() {
-		return theMinecraft == null || !theMinecraft.gameSettings.hideGUI;
-	}
-
-	public static boolean isFancyGraphicsEnabled() {
-		return theMinecraft != null && theMinecraft.gameSettings.fancyGraphics;
-	}
-
-	/**+
-	 * Returns if ambient occlusion is enabled
-	 */
-	public static boolean isAmbientOcclusionEnabled() {
-		if (theMinecraft == null)
-			return false;
-		GameSettings g = theMinecraft.gameSettings;
-		return g.ambientOcclusion != 0 && !g.shadersAODisable;
-	}
-
-	/**+
-	 * Called when user clicked he's mouse middle button (pick
-	 * block)
-	 */
-	public void middleClickMouse() {
-		if (this.objectMouseOver != null) {
-			boolean flag = this.thePlayer.capabilities.isCreativeMode;
-			int i = 0;
-			boolean flag1 = false;
-			TileEntity tileentity = null;
-			Object object;
-			if (this.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-				BlockPos blockpos = this.objectMouseOver.getBlockPos();
-				Block block = this.theWorld.getBlockState(blockpos).getBlock();
-				if (block.getMaterial() == Material.air) {
-					return;
+	public void setIngameFocus() {
+		boolean touch = PointerInputAbstraction.isTouchMode();
+		if (touch || Display.isActive()) {
+			if (!this.inGameHasFocus) {
+				this.inGameHasFocus = true;
+				if (!touch && mouseGrabSupported) {
+					this.mouseHelper.grabMouseCursor();
 				}
-
-				object = block.getItem(this.theWorld, blockpos);
-				if (object == null) {
-					return;
-				}
-
-				if (flag && GuiScreen.isCtrlKeyDown()) {
-					tileentity = this.theWorld.getTileEntity(blockpos);
-				}
-
-				Block block1 = object instanceof ItemBlock && !block.isFlowerPot()
-						? Block.getBlockFromItem((Item) object)
-						: block;
-				i = block1.getDamageValue(this.theWorld, blockpos);
-				flag1 = ((Item) object).getHasSubtypes();
-			} else {
-				if (this.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY
-						|| this.objectMouseOver.entityHit == null || !flag) {
-					return;
-				}
-
-				if (this.objectMouseOver.entityHit instanceof EntityPainting) {
-					object = Items.painting;
-				} else if (this.objectMouseOver.entityHit instanceof EntityLeashKnot) {
-					object = Items.lead;
-				} else if (this.objectMouseOver.entityHit instanceof EntityItemFrame) {
-					EntityItemFrame entityitemframe = (EntityItemFrame) this.objectMouseOver.entityHit;
-					ItemStack itemstack = entityitemframe.getDisplayedItem();
-					if (itemstack == null) {
-						object = Items.item_frame;
-					} else {
-						object = itemstack.getItem();
-						i = itemstack.getMetadata();
-						flag1 = true;
-					}
-				} else if (this.objectMouseOver.entityHit instanceof EntityMinecart) {
-					EntityMinecart entityminecart = (EntityMinecart) this.objectMouseOver.entityHit;
-					switch (entityminecart.getMinecartType()) {
-					case FURNACE:
-						object = Items.furnace_minecart;
-						break;
-					case CHEST:
-						object = Items.chest_minecart;
-						break;
-					case TNT:
-						object = Items.tnt_minecart;
-						break;
-					case HOPPER:
-						object = Items.hopper_minecart;
-						break;
-					case COMMAND_BLOCK:
-						object = Items.command_block_minecart;
-						break;
-					default:
-						object = Items.minecart;
-					}
-				} else if (this.objectMouseOver.entityHit instanceof EntityBoat) {
-					object = Items.boat;
-				} else if (this.objectMouseOver.entityHit instanceof EntityArmorStand) {
-					object = Items.armor_stand;
-				} else {
-					object = Items.spawn_egg;
-					i = EntityList.getEntityID(this.objectMouseOver.entityHit);
-					flag1 = true;
-					if (!EntityList.entityEggs.containsKey(Integer.valueOf(i))) {
-						return;
-					}
-				}
-			}
-
-			InventoryPlayer inventoryplayer = this.thePlayer.inventory;
-			if (tileentity == null) {
-				inventoryplayer.setCurrentItem((Item) object, i, flag1, flag);
-			} else {
-				ItemStack itemstack1 = this.func_181036_a((Item) object, i, tileentity);
-				inventoryplayer.setInventorySlotContents(inventoryplayer.currentItem, itemstack1);
-			}
-
-			if (flag) {
-				int j = this.thePlayer.inventoryContainer.inventorySlots.size() - 9 + inventoryplayer.currentItem;
-				this.playerController.sendSlotPacket(inventoryplayer.getStackInSlot(inventoryplayer.currentItem), j);
-			}
-
-		}
-	}
-
-	private ItemStack func_181036_a(Item parItem, int parInt1, TileEntity parTileEntity) {
-		ItemStack itemstack = new ItemStack(parItem, 1, parInt1);
-		NBTTagCompound nbttagcompound = new NBTTagCompound();
-		parTileEntity.writeToNBT(nbttagcompound);
-		if (parItem == Items.skull && nbttagcompound.hasKey("Owner")) {
-			NBTTagCompound nbttagcompound2 = nbttagcompound.getCompoundTag("Owner");
-			NBTTagCompound nbttagcompound3 = new NBTTagCompound();
-			nbttagcompound3.setTag("SkullOwner", nbttagcompound2);
-			itemstack.setTagCompound(nbttagcompound3);
-			return itemstack;
-		} else {
-			itemstack.setTagInfo("BlockEntityTag", nbttagcompound);
-			NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-			NBTTagList nbttaglist = new NBTTagList();
-			nbttaglist.appendTag(new NBTTagString("(+NBT)"));
-			nbttagcompound1.setTag("Lore", nbttaglist);
-			itemstack.setTagInfo("display", nbttagcompound1);
-			return itemstack;
-		}
-	}
-
-	/**+
-	 * adds core server Info (GL version , Texture pack, isModded,
-	 * type), and the worldInfo to the crash report
-	 */
-	public CrashReport addGraphicsAndWorldToCrashReport(CrashReport theCrash) {
-		theCrash.getCategory().addCrashSectionCallable("Launched Version", new Callable<String>() {
-			public String call() throws Exception {
-				return Minecraft.this.launchedVersion;
-			}
-		});
-		theCrash.getCategory().addCrashSectionCallable("LWJGL", new Callable<String>() {
-			public String call() {
-				return EagRuntime.getVersion();
-			}
-		});
-		theCrash.getCategory().addCrashSectionCallable("OpenGL", new Callable<String>() {
-			public String call() {
-				return EaglercraftGPU.glGetString(7937) + " GL version " + EaglercraftGPU.glGetString(7938) + ", "
-						+ EaglercraftGPU.glGetString(7936);
-			}
-		});
-		theCrash.getCategory().addCrashSectionCallable("Is Eagler Shaders", new Callable<String>() {
-			public String call() throws Exception {
-				return Minecraft.this.gameSettings.shaders ? "Yes" : "No";
-			}
-		});
-		theCrash.getCategory().addCrashSectionCallable("Is Dynamic Lights", new Callable<String>() {
-			public String call() throws Exception {
-				return !Minecraft.this.gameSettings.shaders && Minecraft.this.gameSettings.enableDynamicLights ? "Yes"
-						: "No";
-			}
-		});
-		theCrash.getCategory().addCrashSectionCallable("In Ext. Pipeline", new Callable<String>() {
-			public String call() throws Exception {
-				return GlStateManager.isExtensionPipeline() ? "Yes" : "No";
-			}
-		});
-		theCrash.getCategory().addCrashSectionCallable("GPU Shader5 Capable", new Callable<String>() {
-			public String call() throws Exception {
-				return EaglercraftGPU.checkShader5Capable() ? "Yes" : "No";
-			}
-		});
-		theCrash.getCategory().addCrashSectionCallable("GPU TexStorage Capable", new Callable<String>() {
-			public String call() throws Exception {
-				return EaglercraftGPU.checkTexStorageCapable() ? "Yes" : "No";
-			}
-		});
-		theCrash.getCategory().addCrashSectionCallable("GPU TextureLOD Capable", new Callable<String>() {
-			public String call() throws Exception {
-				return EaglercraftGPU.checkTextureLODCapable() ? "Yes" : "No";
-			}
-		});
-		theCrash.getCategory().addCrashSectionCallable("GPU Instancing Capable", new Callable<String>() {
-			public String call() throws Exception {
-				return EaglercraftGPU.checkInstancingCapable() ? "Yes" : "No";
-			}
-		});
-		theCrash.getCategory().addCrashSectionCallable("GPU VAO Capable", new Callable<String>() {
-			public String call() throws Exception {
-				return EaglercraftGPU.checkVAOCapable() ? "Yes" : "No";
-			}
-		});
-		theCrash.getCategory().addCrashSectionCallable("Is Software VAOs", new Callable<String>() {
-			public String call() throws Exception {
-				return EaglercraftGPU.areVAOsEmulated() ? "Yes" : "No";
-			}
-		});
-		theCrash.getCategory().addCrashSectionCallable("GPU Render-to-MipMap", new Callable<String>() {
-			public String call() throws Exception {
-				return EaglercraftGPU.checkFBORenderMipmapCapable() ? "Yes" : "No";
-			}
-		});
-		theCrash.getCategory().addCrashSectionCallable("Touch Mode", new Callable<String>() {
-			public String call() throws Exception {
-				return PointerInputAbstraction.isTouchMode() ? "Yes" : "No";
-			}
-		});
-		theCrash.getCategory().addCrashSectionCallable("Is Modded", new Callable<String>() {
-			public String call() throws Exception {
-				return "Definitely Not; You're an eagler";
-			}
-		});
-		theCrash.getCategory().addCrashSectionCallable("Type", new Callable<String>() {
-			public String call() throws Exception {
-				return "Client (map_client.txt)";
-			}
-		});
-		theCrash.getCategory().addCrashSectionCallable("Resource Packs", new Callable<String>() {
-			public String call() throws Exception {
-				StringBuilder stringbuilder = new StringBuilder();
-
-				for (String s : Minecraft.this.gameSettings.resourcePacks) {
-					if (stringbuilder.length() > 0) {
-						stringbuilder.append(", ");
-					}
-
-					stringbuilder.append(s);
-					if (Minecraft.this.gameSettings.field_183018_l.contains(s)) {
-						stringbuilder.append(" (incompatible)");
-					}
-				}
-
-				return stringbuilder.toString();
-			}
-		});
-		theCrash.getCategory().addCrashSectionCallable("Current Language", new Callable<String>() {
-			public String call() throws Exception {
-				return Minecraft.this.mcLanguageManager.getCurrentLanguage().toString();
-			}
-		});
-		theCrash.getCategory().addCrashSectionCallable("Profiler Position", new Callable<String>() {
-			public String call() throws Exception {
-				return "N/A (disabled)";
-			}
-		});
-		if (this.theWorld != null) {
-			this.theWorld.addWorldInfoToCrashReport(theCrash);
-		}
-
-		return theCrash;
-	}
-
-	/**+
-	 * Return the singleton Minecraft instance for the game
-	 */
-	public static Minecraft getMinecraft() {
-		return theMinecraft;
-	}
-
-	public ListenableFuture<Object> scheduleResourcesRefresh() {
-		return this.addScheduledTaskFuture(new Runnable() {
-			public void run() {
-				Minecraft.this.loadingScreen.eaglerShow(I18n.format("resourcePack.load.refreshing"),
-						I18n.format("resourcePack.load.pleaseWait"));
-				Minecraft.this.refreshResources();
-			}
-		});
-	}
-
-	private String func_181538_aA() {
-		return this.currentServerData != null ? "multiplayer" : "out_of_game";
-	}
-
-	/**+
-	 * Returns whether snooping is enabled or not.
-	 */
-	public boolean isSnooperEnabled() {
-		return this.gameSettings.snooperEnabled;
-	}
-
-	/**+
-	 * Set the current ServerData instance.
-	 */
-	public void setServerData(ServerData serverDataIn) {
-		this.currentServerData = serverDataIn;
-		EagRuntime.setMCServerWindowGlobal(serverDataIn != null ? serverDataIn.serverIP : null);
-	}
-
-	public ServerData getCurrentServerData() {
-		return this.currentServerData;
-	}
-
-	public boolean isIntegratedServerRunning() {
-		return SingleplayerServerController.isWorldRunning();
-	}
-
-	/**+
-	 * Returns true if there is only one player playing, and the
-	 * current server is the integrated one.
-	 */
-	public boolean isSingleplayer() {
-		return SingleplayerServerController.isWorldRunning();
-	}
-
-	public static void stopIntegratedServer() {
-
-	}
-
-	/**+
-	 * Gets the system time in milliseconds.
-	 */
-	public static long getSystemTime() {
-		return EagRuntime.steadyTimeMillis();
-	}
-
-	/**+
-	 * Returns whether we're in full screen or not.
-	 */
-	public boolean isFullScreen() {
-		return Display.isFullscreen();
-	}
-
-	public Session getSession() {
-		return this.session;
-	}
-
-	public TextureManager getTextureManager() {
-		return this.renderEngine;
-	}
-
-	public IResourceManager getResourceManager() {
-		return this.mcResourceManager;
-	}
-
-	public ResourcePackRepository getResourcePackRepository() {
-		return this.mcResourcePackRepository;
-	}
-
-	public LanguageManager getLanguageManager() {
-		return this.mcLanguageManager;
-	}
-
-	public TextureMap getTextureMapBlocks() {
-		return this.textureMapBlocks;
-	}
-
-	public boolean isJava64bit() {
-		return this.jvm64bit;
-	}
-
-	public boolean isGamePaused() {
-		return this.isGamePaused;
-	}
-
-	public SoundHandler getSoundHandler() {
-		return this.mcSoundHandler;
-	}
-
-	public MusicTicker.MusicType getAmbientMusicType() {
-		return this.thePlayer != null ? (this.thePlayer.worldObj.provider instanceof WorldProviderHell
-				? MusicTicker.MusicType.NETHER
-				: (this.thePlayer.worldObj.provider instanceof WorldProviderEnd
-						? (BossStatus.bossName != null && BossStatus.statusBarTime > 0 ? MusicTicker.MusicType.END_BOSS
-								: MusicTicker.MusicType.END)
-						: (this.thePlayer.capabilities.isCreativeMode && this.thePlayer.capabilities.allowFlying
-								? MusicTicker.MusicType.CREATIVE
-								: MusicTicker.MusicType.GAME)))
-				: MusicTicker.MusicType.MENU;
-	}
-
-	public void dispatchKeypresses() {
-		int i = Keyboard.getEventKey() == 0 ? Keyboard.getEventCharacter() : Keyboard.getEventKey();
-		if (i != 0 && !Keyboard.isRepeatEvent()) {
-			if (!(this.currentScreen instanceof GuiControls)
-					|| ((GuiControls) this.currentScreen).time <= getSystemTime() - 20L) {
-				if (Keyboard.getEventKeyState()) {
-					if (i == this.gameSettings.keyBindScreenshot.getKeyCode()) {
-						this.ingameGUI.getChatGUI().printChatMessage(ScreenShotHelper.saveScreenshot());
-					}
-				}
+				this.displayGuiScreen((GuiScreen) null);
+				this.leftClickCounter = 10000;
 			}
 		}
 	}
 
-	public Entity getRenderViewEntity() {
-		return this.renderViewEntity;
+	/**
+	 * + Resets the player keystate, disables the ingame focus, and ungrabs the
+	 * mouse cursor.
+	 */
+	public void setIngameNotInFocus() {
+		if (this.inGameHasFocus) {
+			KeyBinding.unPressAllKeys();
+			this.inGameHasFocus = false;
+			if (!PointerInputAbstraction.isTouchMode() && mouseGrabSupported) {
+				this.mouseHelper.ungrabMouseCursor();
+			}
+		}
 	}
 
 	public void setRenderViewEntity(Entity viewingEntity) {
@@ -2356,100 +2223,248 @@ public class Minecraft implements IThreadListener {
 		this.entityRenderer.loadEntityShader(viewingEntity);
 	}
 
-	public <V> ListenableFuture<V> addScheduledTaskFuture(Callable<V> callableToSchedule) {
-		Validate.notNull(callableToSchedule);
-		ListenableFutureTask listenablefuturetask = ListenableFutureTask.create(callableToSchedule);
-		synchronized (this.scheduledTasks) {
-			this.scheduledTasks.add(listenablefuturetask);
-			return listenablefuturetask;
+	/**
+	 * + Set the current ServerData instance.
+	 */
+	public void setServerData(ServerData serverDataIn) {
+		this.currentServerData = serverDataIn;
+		EagRuntime.setMCServerWindowGlobal(serverDataIn != null ? serverDataIn.serverIP : null);
+	}
+
+	/**
+	 * + Called when the window is closing. Sets 'running' to false which allows the
+	 * game loop to exit cleanly.
+	 */
+	public void shutdown() {
+		this.running = false;
+	}
+
+	public void shutdownIntegratedServer(GuiScreen cont) {
+		if (SingleplayerServerController.shutdownEaglercraftServer()
+				|| SingleplayerServerController.getStatusState() == IntegratedServerState.WORLD_UNLOADING) {
+			displayGuiScreen(new GuiScreenIntegratedServerBusy(cont, "singleplayer.busy.stoppingIntegratedServer",
+					"singleplayer.failed.stoppingIntegratedServer", SingleplayerServerController::isReady));
+		} else {
+			displayGuiScreen(cont);
 		}
 	}
 
-	public ListenableFuture<Object> addScheduledTaskFuture(Runnable runnableToSchedule) {
-		Validate.notNull(runnableToSchedule);
-		return this.addScheduledTaskFuture(Executors.callable(runnableToSchedule));
-	}
-
-	public void addScheduledTask(Runnable runnableToSchedule) {
-		this.addScheduledTaskFuture(Executors.callable(runnableToSchedule));
-	}
-
-	public BlockRendererDispatcher getBlockRendererDispatcher() {
-		return this.blockRenderDispatcher;
-	}
-
-	public RenderManager getRenderManager() {
-		return this.renderManager;
-	}
-
-	public RenderItem getRenderItem() {
-		return this.renderItem;
-	}
-
-	public ItemRenderer getItemRenderer() {
-		return this.itemRenderer;
-	}
-
-	public static int getDebugFPS() {
-		return debugFPS;
-	}
-
-	public FrameTimer func_181539_aj() {
-		return this.field_181542_y;
-	}
-
-	public boolean func_181540_al() {
-		return this.field_181541_X;
-	}
-
-	public void func_181537_a(boolean parFlag) {
-		this.field_181541_X = parFlag;
-	}
-
-	/**+
-	 * Used in the usage snooper.
+	/**
+	 * + Shuts down the minecraft applet by stopping the resource downloads, and
+	 * clearing up GL stuff; called when the application (or web page) is exited.
 	 */
-	public static int getGLMaximumTextureSize() {
-		return EaglercraftGPU.glGetInteger(GL_MAX_TEXTURE_SIZE);
-	}
+	public void shutdownMinecraftApplet() {
+		try {
+			logger.info("Stopping!");
 
-	public boolean areKeysLocked() {
-		return PlatformInput.lockKeys;
-	}
-
-	public ModelManager getModelManager() {
-		return modelManager;
-	}
-
-	/**+
-	 * Returns the save loader that is currently being used
-	 */
-	public ISaveFormat getSaveLoader() {
-		return SingleplayerServerController.instance;
-	}
-
-	public void clearTitles() {
-		ingameGUI.displayTitle(null, null, -1, -1, -1);
-	}
-
-	public boolean getEnableFNAWSkins() {
-		boolean ret = this.gameSettings.enableFNAWSkins;
-		if (this.thePlayer != null) {
-			if (this.thePlayer.sendQueue.currentFNAWSkinForcedState) {
-				ret = true;
-			} else {
-				ret &= this.thePlayer.sendQueue.currentFNAWSkinAllowedState;
+			try {
+				this.loadWorld((WorldClient) null);
+			} catch (Throwable var5) {
+				;
 			}
+
+			this.mcSoundHandler.unloadSounds();
+			if (SingleplayerServerController.isWorldRunning()) {
+				SingleplayerServerController.shutdownEaglercraftServer();
+				while (SingleplayerServerController.getStatusState() == IntegratedServerState.WORLD_UNLOADING) {
+					EagUtils.sleep(50l);
+					SingleplayerServerController.runTick();
+				}
+			}
+			if (SingleplayerServerController.isIntegratedServerWorkerAlive()
+					&& SingleplayerServerController.canKillWorker()) {
+				SingleplayerServerController.killWorker();
+				EagUtils.sleep(50l);
+			}
+		} finally {
+			EagRuntime.destroy();
+			if (!this.hasCrashed) {
+				EagRuntime.exit();
+			}
+
 		}
-		return ret;
 	}
 
-	public void handleReconnectPacket(String redirectURI) {
-		this.reconnectURI = redirectURI;
+	/**
+	 * + Starts the game: initializes the canvas, the title, the settings, etcetera.
+	 */
+	private void startGame() throws IOException {
+		this.gameSettings = new GameSettings(this);
+		this.defaultResourcePacks.add(this.mcDefaultResourcePack);
+		if (this.gameSettings.overrideHeight > 0 && this.gameSettings.overrideWidth > 0) {
+			this.displayWidth = this.gameSettings.overrideWidth;
+			this.displayHeight = this.gameSettings.overrideHeight;
+		}
+
+		logger.info("EagRuntime Version: " + EagRuntime.getVersion());
+		this.createDisplay();
+		this.registerMetadataSerializers();
+		EaglerFolderResourcePack.deleteOldResourcePacks(EaglerFolderResourcePack.SERVER_RESOURCE_PACKS, 604800000L);
+		this.mcResourcePackRepository = new ResourcePackRepository(this.mcDefaultResourcePack, this.metadataSerializer_,
+				this.gameSettings);
+		this.mcResourceManager = new SimpleReloadableResourceManager(this.metadataSerializer_);
+		this.mcLanguageManager = new LanguageManager(this.metadataSerializer_, this.gameSettings.language);
+		this.mcResourceManager.registerReloadListener(this.mcLanguageManager);
+		this.scaledResolution = new ScaledResolution(this);
+		this.refreshResources();
+		this.renderEngine = new TextureManager(this.mcResourceManager);
+		this.mcResourceManager.registerReloadListener(this.renderEngine);
+		this.drawSplashScreen(this.renderEngine);
+		this.mcSoundHandler = new SoundHandler(this.mcResourceManager, this.gameSettings);
+		this.mcResourceManager.registerReloadListener(this.mcSoundHandler);
+		this.mcMusicTicker = new MusicTicker(this);
+		this.fontRendererObj = EaglerFontRenderer.createSupportedFontRenderer(this.gameSettings,
+				new ResourceLocation("textures/font/ascii.png"), this.renderEngine, false);
+		if (this.gameSettings.language != null) {
+			this.fontRendererObj.setUnicodeFlag(this.isUnicode());
+			this.fontRendererObj.setBidiFlag(this.mcLanguageManager.isCurrentLanguageBidirectional());
+		}
+
+		this.standardGalacticFontRenderer = EaglerFontRenderer.createSupportedFontRenderer(this.gameSettings,
+				new ResourceLocation("textures/font/ascii_sga.png"), this.renderEngine, false);
+		this.mcResourceManager.registerReloadListener(this.fontRendererObj);
+		this.mcResourceManager.registerReloadListener(this.standardGalacticFontRenderer);
+		this.mcResourceManager.registerReloadListener(new GrassColorReloadListener());
+		this.mcResourceManager.registerReloadListener(new FoliageColorReloadListener());
+		this.mcResourceManager.registerReloadListener(new ShaderPackInfoReloadListener());
+		this.mcResourceManager.registerReloadListener(PBRTextureMapUtils.blockMaterialConstants);
+		this.mcResourceManager.registerReloadListener(new TemperaturesLUT());
+		this.mcResourceManager.registerReloadListener(new MetalsLUT());
+		this.mcResourceManager.registerReloadListener(new EmissiveItems());
+		this.mcResourceManager.registerReloadListener(new BlockVertexIDs());
+		this.mcResourceManager.registerReloadListener(new EaglerMeshLoader());
+		AchievementList.openInventory.setStatStringFormatter(new IStatStringFormat() {
+			public String formatString(String parString1) {
+				try {
+					return HString.format(parString1, new Object[] { GameSettings
+							.getKeyDisplayString(Minecraft.this.gameSettings.keyBindInventory.getKeyCode()) });
+				} catch (Exception exception) {
+					return "Error: " + exception.getLocalizedMessage();
+				}
+			}
+		});
+		this.mouseHelper = new MouseHelper();
+		this.checkGLError("Pre startup");
+		GlStateManager.enableTexture2D();
+		GlStateManager.shadeModel(GL_SMOOTH);
+		GlStateManager.clearDepth(1.0f);
+		GlStateManager.enableDepth();
+		GlStateManager.depthFunc(GL_LEQUAL);
+		GlStateManager.enableAlpha();
+		GlStateManager.alphaFunc(GL_GREATER, 0.1F);
+		GlStateManager.cullFace(GL_BACK);
+		GlStateManager.matrixMode(GL_PROJECTION);
+		GlStateManager.loadIdentity();
+		GlStateManager.matrixMode(GL_MODELVIEW);
+		this.checkGLError("Startup");
+		this.textureMapBlocks = new TextureMap("textures");
+		this.textureMapBlocks.setEnablePBREagler(gameSettings.shaders);
+		this.textureMapBlocks.setMipmapLevels(this.gameSettings.mipmapLevels);
+		this.renderEngine.loadTickableTexture(TextureMap.locationBlocksTexture, this.textureMapBlocks);
+		this.renderEngine.bindTexture(TextureMap.locationBlocksTexture);
+		this.textureMapBlocks.setBlurMipmapDirect(false, this.gameSettings.mipmapLevels > 0);
+		this.modelManager = new ModelManager(this.textureMapBlocks);
+		this.mcResourceManager.registerReloadListener(this.modelManager);
+		this.renderItem = new RenderItem(this.renderEngine, this.modelManager);
+		this.renderManager = new RenderManager(this.renderEngine, this.renderItem);
+		this.itemRenderer = new ItemRenderer(this);
+		this.mcResourceManager.registerReloadListener(this.renderItem);
+		this.entityRenderer = new EntityRenderer(this, this.mcResourceManager);
+		this.mcResourceManager.registerReloadListener(this.entityRenderer);
+		this.blockRenderDispatcher = new BlockRendererDispatcher(this.modelManager.getBlockModelShapes(),
+				this.gameSettings);
+		this.mcResourceManager.registerReloadListener(this.blockRenderDispatcher);
+		this.renderGlobal = new RenderGlobal(this);
+		this.mcResourceManager.registerReloadListener(this.renderGlobal);
+		this.guiAchievement = new GuiAchievement(this);
+		GlStateManager.viewport(0, 0, this.displayWidth, this.displayHeight);
+		this.effectRenderer = new EffectRenderer(this.theWorld, this.renderEngine);
+		SkinPreviewRenderer.initialize();
+		this.checkGLError("Post startup");
+		this.ingameGUI = new GuiIngame(this);
+
+		this.mouseGrabSupported = Mouse.isMouseGrabSupported();
+		PointerInputAbstraction.init(this);
+
+		this.eagskullCommand = new SkullCommand(this);
+		this.voiceOverlay = new GuiVoiceOverlay(this);
+		this.voiceOverlay.setResolution(scaledResolution.getScaledWidth(), scaledResolution.getScaledHeight());
+
+		this.notifRenderer = new ServerNotificationRenderer();
+		this.notifRenderer.init();
+		this.notifRenderer.setResolution(this, scaledResolution.getScaledWidth(), scaledResolution.getScaledHeight(),
+				scaledResolution.getScaleFactor());
+		this.touchOverlayRenderer = new TouchOverlayRenderer(this);
+
+		ServerList.initServerList(this);
+		EaglerProfile.read();
+		ServerCookieDataStore.load();
+
+		GuiScreen mainMenu = new GuiMainMenu();
+		if (isDemo()) {
+			mainMenu = new GuiScreenDemoIntegratedServerStartup(mainMenu);
+		}
+		if (this.serverName != null) {
+			mainMenu = new GuiConnecting(mainMenu, this, this.serverName, this.serverPort);
+		}
+
+		mainMenu = new GuiScreenEditProfile(mainMenu);
+
+		if (!EagRuntime.getConfiguration().isForceProfanityFilter() && !gameSettings.hasShownProfanityFilter) {
+			mainMenu = new GuiScreenContentWarning(mainMenu);
+		}
+
+		this.displayGuiScreen(mainMenu);
+
+		this.renderEngine.deleteTexture(this.mojangLogo);
+		this.mojangLogo = null;
+		this.loadingScreen = new LoadingScreenRenderer(this);
+
+		while (Mouse.next())
+			;
+		while (Keyboard.next())
+			;
+		while (Touch.next())
+			;
 	}
 
-	public boolean isEnableProfanityFilter() {
-		return EagRuntime.getConfiguration().isForceProfanityFilter() || gameSettings.enableProfanityFilter;
+	/**
+	 * + Toggles fullscreen mode.
+	 */
+	public void toggleFullscreen() {
+		Display.toggleFullscreen();
+	}
+
+	public void togglePerspective() {
+		++this.gameSettings.thirdPersonView;
+		if (this.gameSettings.thirdPersonView > 2) {
+			this.gameSettings.thirdPersonView = 0;
+		}
+
+		if (this.gameSettings.thirdPersonView == 0) {
+			this.entityRenderer.loadEntityShader(this.getRenderViewEntity());
+		} else if (this.gameSettings.thirdPersonView == 1) {
+			this.entityRenderer.loadEntityShader((Entity) null);
+		}
+
+		this.renderGlobal.setDisplayListEntitiesDirty();
+	}
+
+	public void updateDisplay() {
+		if (Display.isVSyncSupported()) {
+			Display.setVSync(this.gameSettings.enableVsync);
+		} else {
+			this.gameSettings.enableVsync = false;
+		}
+		Display.update();
+		this.checkWindowResize();
+	}
+
+	private void updateDisplayMode() {
+		this.displayWidth = Display.getWidth();
+		this.displayHeight = Display.getHeight();
+		this.displayDPI = Display.getDPI();
+		this.scaledResolution = new ScaledResolution(this);
 	}
 
 }

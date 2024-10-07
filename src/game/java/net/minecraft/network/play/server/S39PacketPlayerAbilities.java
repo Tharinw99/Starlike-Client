@@ -7,22 +7,25 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -47,8 +50,39 @@ public class S39PacketPlayerAbilities implements Packet<INetHandlerPlayClient> {
 		this.setWalkSpeed(capabilities.getWalkSpeed());
 	}
 
-	/**+
-	 * Reads the raw packet data from the data stream.
+	public float getFlySpeed() {
+		return this.flySpeed;
+	}
+
+	public float getWalkSpeed() {
+		return this.walkSpeed;
+	}
+
+	public boolean isAllowFlying() {
+		return this.allowFlying;
+	}
+
+	public boolean isCreativeMode() {
+		return this.creativeMode;
+	}
+
+	public boolean isFlying() {
+		return this.flying;
+	}
+
+	public boolean isInvulnerable() {
+		return this.invulnerable;
+	}
+
+	/**
+	 * + Passes this Packet on to the NetHandler for processing.
+	 */
+	public void processPacket(INetHandlerPlayClient inethandlerplayclient) {
+		inethandlerplayclient.handlePlayerAbilities(this);
+	}
+
+	/**
+	 * + Reads the raw packet data from the data stream.
 	 */
 	public void readPacketData(PacketBuffer parPacketBuffer) throws IOException {
 		byte b0 = parPacketBuffer.readByte();
@@ -60,8 +94,32 @@ public class S39PacketPlayerAbilities implements Packet<INetHandlerPlayClient> {
 		this.setWalkSpeed(parPacketBuffer.readFloat());
 	}
 
-	/**+
-	 * Writes the raw packet data to the data stream.
+	public void setAllowFlying(boolean isAllowFlying) {
+		this.allowFlying = isAllowFlying;
+	}
+
+	public void setCreativeMode(boolean isCreativeMode) {
+		this.creativeMode = isCreativeMode;
+	}
+
+	public void setFlying(boolean isFlying) {
+		this.flying = isFlying;
+	}
+
+	public void setFlySpeed(float flySpeedIn) {
+		this.flySpeed = flySpeedIn;
+	}
+
+	public void setInvulnerable(boolean isInvulnerable) {
+		this.invulnerable = isInvulnerable;
+	}
+
+	public void setWalkSpeed(float walkSpeedIn) {
+		this.walkSpeed = walkSpeedIn;
+	}
+
+	/**
+	 * + Writes the raw packet data to the data stream.
 	 */
 	public void writePacketData(PacketBuffer parPacketBuffer) throws IOException {
 		byte b0 = 0;
@@ -84,60 +142,5 @@ public class S39PacketPlayerAbilities implements Packet<INetHandlerPlayClient> {
 		parPacketBuffer.writeByte(b0);
 		parPacketBuffer.writeFloat(this.flySpeed);
 		parPacketBuffer.writeFloat(this.walkSpeed);
-	}
-
-	/**+
-	 * Passes this Packet on to the NetHandler for processing.
-	 */
-	public void processPacket(INetHandlerPlayClient inethandlerplayclient) {
-		inethandlerplayclient.handlePlayerAbilities(this);
-	}
-
-	public boolean isInvulnerable() {
-		return this.invulnerable;
-	}
-
-	public void setInvulnerable(boolean isInvulnerable) {
-		this.invulnerable = isInvulnerable;
-	}
-
-	public boolean isFlying() {
-		return this.flying;
-	}
-
-	public void setFlying(boolean isFlying) {
-		this.flying = isFlying;
-	}
-
-	public boolean isAllowFlying() {
-		return this.allowFlying;
-	}
-
-	public void setAllowFlying(boolean isAllowFlying) {
-		this.allowFlying = isAllowFlying;
-	}
-
-	public boolean isCreativeMode() {
-		return this.creativeMode;
-	}
-
-	public void setCreativeMode(boolean isCreativeMode) {
-		this.creativeMode = isCreativeMode;
-	}
-
-	public float getFlySpeed() {
-		return this.flySpeed;
-	}
-
-	public void setFlySpeed(float flySpeedIn) {
-		this.flySpeed = flySpeedIn;
-	}
-
-	public float getWalkSpeed() {
-		return this.walkSpeed;
-	}
-
-	public void setWalkSpeed(float walkSpeedIn) {
-		this.walkSpeed = walkSpeedIn;
 	}
 }

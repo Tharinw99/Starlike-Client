@@ -1,13 +1,5 @@
 package net.minecraft.network;
 
-import com.google.common.collect.Lists;
-import com.google.common.primitives.Doubles;
-import com.google.common.primitives.Floats;
-import net.lax1dude.eaglercraft.v1_8.socket.protocol.GamePluginMessageProtocol;
-import net.lax1dude.eaglercraft.v1_8.socket.protocol.client.GameProtocolMessageController;
-import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.GameMessagePacket;
-import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketUpdateCertEAG;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,6 +7,20 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.google.common.collect.Lists;
+import com.google.common.primitives.Doubles;
+import com.google.common.primitives.Floats;
+
+import net.lax1dude.eaglercraft.v1_8.EagRuntime;
+import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
+import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.GamePluginMessageProtocol;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.client.GameProtocolMessageController;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.GameMessagePacket;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketUpdateCertEAG;
+import net.lax1dude.eaglercraft.v1_8.sp.server.socket.IntegratedServerPlayerNetworkManager;
 import net.minecraft.block.material.Material;
 import net.minecraft.command.server.CommandBlockLogic;
 import net.minecraft.crash.CrashReport;
@@ -91,30 +97,26 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.IntHashMap;
 import net.minecraft.util.ReportedException;
 import net.minecraft.world.WorldServer;
-import net.lax1dude.eaglercraft.v1_8.sp.server.socket.IntegratedServerPlayerNetworkManager;
 
-import org.apache.commons.lang3.StringUtils;
-
-import net.lax1dude.eaglercraft.v1_8.EagRuntime;
-import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
-import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
-
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -151,80 +153,8 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 		playerIn.playerNetServerHandler = this;
 	}
 
-	public GameProtocolMessageController getEaglerMessageController() {
-		return eaglerMessageController;
-	}
-
-	public void setEaglerMessageController(GameProtocolMessageController eaglerMessageController) {
-		this.eaglerMessageController = eaglerMessageController;
-	}
-
-	public GamePluginMessageProtocol getEaglerMessageProtocol() {
-		return eaglerMessageController != null ? eaglerMessageController.protocol : null;
-	}
-
-	public void sendEaglerMessage(GameMessagePacket packet) {
-		try {
-			eaglerMessageController.sendPacket(packet);
-		} catch (IOException e) {
-			logger.error("Failed to send eaglercraft plugin message packet: " + packet);
-			logger.error(e);
-		}
-	}
-
-	/**+
-	 * Like the old updateEntity(), except more generic.
-	 */
-	public void update() {
-		this.field_147366_g = false;
-		++this.networkTickCount;
-		if ((long) this.networkTickCount - this.lastSentPingPacket > 40L) {
-			this.lastSentPingPacket = (long) this.networkTickCount;
-			this.lastPingTime = this.currentTimeMillis();
-			this.field_147378_h = (int) this.lastPingTime;
-			this.sendPacket(new S00PacketKeepAlive(this.field_147378_h));
-		}
-
-		if (this.chatSpamThresholdCount > 0) {
-			--this.chatSpamThresholdCount;
-		}
-
-		if (this.itemDropThreshold > 0) {
-			--this.itemDropThreshold;
-		}
-
-		if (this.playerEntity.getLastActiveTime() > 0L && this.serverController.getMaxPlayerIdleMinutes() > 0
-				&& MinecraftServer.getCurrentTimeMillis() - this.playerEntity
-						.getLastActiveTime() > (long) (this.serverController.getMaxPlayerIdleMinutes() * 1000 * 60)) {
-			this.kickPlayerFromServer("You have been idle for too long!");
-		}
-
-		if (this.eaglerMessageController != null) {
-			this.eaglerMessageController.flush();
-		}
-	}
-
-	public IntegratedServerPlayerNetworkManager getNetworkManager() {
-		return this.netManager;
-	}
-
-	/**+
-	 * Kick a player from the server with a reason
-	 */
-	public void kickPlayerFromServer(String reason) {
-		final ChatComponentText chatcomponenttext = new ChatComponentText(reason);
-		this.netManager.sendPacket(new S40PacketDisconnect(chatcomponenttext));
-		this.netManager.closeChannel(chatcomponenttext);
-	}
-
-	/**+
-	 * Processes player movement input. Includes walking, strafing,
-	 * jumping, sneaking; excludes riding and toggling
-	 * flying/sprinting
-	 */
-	public void processInput(C0CPacketInput c0cpacketinput) {
-		this.playerEntity.setEntityActionState(c0cpacketinput.getStrafeSpeed(), c0cpacketinput.getForwardSpeed(),
-				c0cpacketinput.isJumping(), c0cpacketinput.isSneaking());
+	private long currentTimeMillis() {
+		return EagRuntime.steadyTimeMillis();
 	}
 
 	private boolean func_183006_b(C03PacketPlayer parC03PacketPlayer) {
@@ -234,9 +164,415 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 				|| !Floats.isFinite(parC03PacketPlayer.getPitch()) || !Floats.isFinite(parC03PacketPlayer.getYaw());
 	}
 
-	/**+
-	 * Processes clients perspective on player positioning and/or
-	 * orientation
+	public GameProtocolMessageController getEaglerMessageController() {
+		return eaglerMessageController;
+	}
+
+	public GamePluginMessageProtocol getEaglerMessageProtocol() {
+		return eaglerMessageController != null ? eaglerMessageController.protocol : null;
+	}
+
+	public IntegratedServerPlayerNetworkManager getNetworkManager() {
+		return this.netManager;
+	}
+
+	public void handleAnimation(C0APacketAnimation c0apacketanimation) {
+		this.playerEntity.markPlayerActive();
+		this.playerEntity.swingItem();
+	}
+
+	public void handleResourcePackStatus(C19PacketResourcePackStatus var1) {
+	}
+
+	/**
+	 * + Handle commands that start with a /
+	 */
+	private void handleSlashCommand(String command) {
+		this.serverController.getCommandManager().executeCommand(this.playerEntity, command);
+	}
+
+	public void handleSpectate(C18PacketSpectate c18packetspectate) {
+		if (this.playerEntity.isSpectator()) {
+			Entity entity = null;
+
+			WorldServer[] srv = this.serverController.worldServers;
+			for (int i = 0; i < srv.length; ++i) {
+				WorldServer worldserver = srv[i];
+				if (worldserver != null) {
+					entity = c18packetspectate.getEntity(worldserver);
+					if (entity != null) {
+						break;
+					}
+				}
+			}
+
+			if (entity != null) {
+				this.playerEntity.setSpectatingEntity(this.playerEntity);
+				this.playerEntity.mountEntity((Entity) null);
+				if (entity.worldObj != this.playerEntity.worldObj) {
+					WorldServer worldserver1 = this.playerEntity.getServerForPlayer();
+					WorldServer worldserver2 = (WorldServer) entity.worldObj;
+					this.playerEntity.dimension = entity.dimension;
+					this.sendPacket(new S07PacketRespawn(this.playerEntity.dimension, worldserver1.getDifficulty(),
+							worldserver1.getWorldInfo().getTerrainType(),
+							this.playerEntity.theItemInWorldManager.getGameType()));
+					worldserver1.removePlayerEntityDangerously(this.playerEntity);
+					this.playerEntity.isDead = false;
+					this.playerEntity.setLocationAndAngles(entity.posX, entity.posY, entity.posZ, entity.rotationYaw,
+							entity.rotationPitch);
+					if (this.playerEntity.isEntityAlive()) {
+						worldserver1.updateEntityWithOptionalForce(this.playerEntity, false);
+						worldserver2.spawnEntityInWorld(this.playerEntity);
+						worldserver2.updateEntityWithOptionalForce(this.playerEntity, false);
+					}
+
+					this.playerEntity.setWorld(worldserver2);
+					this.serverController.getConfigurationManager().preparePlayer(this.playerEntity, worldserver1);
+					this.playerEntity.setPositionAndUpdate(entity.posX, entity.posY, entity.posZ);
+					this.playerEntity.theItemInWorldManager.setWorld(worldserver2);
+					this.serverController.getConfigurationManager().updateTimeAndWeatherForPlayer(this.playerEntity,
+							worldserver2);
+					this.serverController.getConfigurationManager().syncPlayerInventory(this.playerEntity);
+				} else {
+					this.playerEntity.setPositionAndUpdate(entity.posX, entity.posY, entity.posZ);
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * + Kick a player from the server with a reason
+	 */
+	public void kickPlayerFromServer(String reason) {
+		final ChatComponentText chatcomponenttext = new ChatComponentText(reason);
+		this.netManager.sendPacket(new S40PacketDisconnect(chatcomponenttext));
+		this.netManager.closeChannel(chatcomponenttext);
+	}
+
+	/**
+	 * + Invoked when disconnecting, the parameter is a ChatComponent describing the
+	 * reason for termination
+	 */
+	public void onDisconnect(IChatComponent ichatcomponent) {
+		if (!hasDisconnected) {
+			hasDisconnected = true;
+			logger.info(this.playerEntity.getName() + " lost connection: " + ichatcomponent);
+			this.serverController.refreshStatusNextTick();
+			ChatComponentTranslation chatcomponenttranslation = new ChatComponentTranslation("multiplayer.player.left",
+					new Object[] { this.playerEntity.getDisplayName() });
+			chatcomponenttranslation.getChatStyle().setColor(EnumChatFormatting.YELLOW);
+			this.serverController.getConfigurationManager().sendChatMsg(chatcomponenttranslation);
+			this.playerEntity.mountEntityAndWakeUp();
+			this.serverController.getConfigurationManager().playerLoggedOut(this.playerEntity);
+			if (this.playerEntity.getName().equals(this.serverController.getServerOwner())) {
+				logger.info("Stopping singleplayer server as player logged out");
+				this.serverController.initiateShutdown();
+			}
+		}
+	}
+
+	/**
+	 * + Process chat messages (broadcast back to clients) and commands (executes)
+	 */
+	public void processChatMessage(C01PacketChatMessage c01packetchatmessage) {
+		if (this.playerEntity.getChatVisibility() == EntityPlayer.EnumChatVisibility.HIDDEN) {
+			ChatComponentTranslation chatcomponenttranslation = new ChatComponentTranslation("chat.cannotSend",
+					new Object[0]);
+			chatcomponenttranslation.getChatStyle().setColor(EnumChatFormatting.RED);
+			this.sendPacket(new S02PacketChat(chatcomponenttranslation));
+		} else {
+			this.playerEntity.markPlayerActive();
+			String s = c01packetchatmessage.getMessage();
+			s = StringUtils.normalizeSpace(s);
+
+			for (int i = 0; i < s.length(); ++i) {
+				if (!ChatAllowedCharacters.isAllowedCharacter(s.charAt(i))) {
+					this.kickPlayerFromServer("Illegal characters in chat");
+					return;
+				}
+			}
+
+			if (s.startsWith("/")) {
+				this.handleSlashCommand(s);
+			} else {
+				if (this.serverController.worldServers[0].getWorldInfo().getGameRulesInstance()
+						.getBoolean("colorCodes")) {
+					s = net.minecraft.util.StringUtils.translateControlCodesAlternate(s);
+				}
+				ChatComponentTranslation chatcomponenttranslation1 = new ChatComponentTranslation("chat.type.text",
+						new Object[] { this.playerEntity.getDisplayName(), s });
+				this.serverController.getConfigurationManager().sendChatMsgImpl(chatcomponenttranslation1, false);
+			}
+
+			this.chatSpamThresholdCount += 20;
+			if (this.chatSpamThresholdCount > 200 && !this.serverController.getConfigurationManager()
+					.canSendCommands(this.playerEntity.getGameProfile())) {
+				this.kickPlayerFromServer("disconnect.spam");
+			}
+
+		}
+	}
+
+	/**
+	 * + Executes a container/inventory slot manipulation as indicated by the
+	 * packet. Sends the serverside result if they didn't match the indicated result
+	 * and prevents further manipulation by the player until he confirms that it has
+	 * the same open container/inventory
+	 */
+	public void processClickWindow(C0EPacketClickWindow c0epacketclickwindow) {
+		this.playerEntity.markPlayerActive();
+		if (this.playerEntity.openContainer.windowId == c0epacketclickwindow.getWindowId()
+				&& this.playerEntity.openContainer.getCanCraft(this.playerEntity)) {
+			if (this.playerEntity.isSpectator()) {
+				ArrayList arraylist = Lists.newArrayList();
+
+				for (int i = 0; i < this.playerEntity.openContainer.inventorySlots.size(); ++i) {
+					arraylist.add(((Slot) this.playerEntity.openContainer.inventorySlots.get(i)).getStack());
+				}
+
+				this.playerEntity.updateCraftingInventory(this.playerEntity.openContainer, arraylist);
+			} else {
+				ItemStack itemstack = this.playerEntity.openContainer.slotClick(c0epacketclickwindow.getSlotId(),
+						c0epacketclickwindow.getUsedButton(), c0epacketclickwindow.getMode(), this.playerEntity);
+				if (ItemStack.areItemStacksEqual(c0epacketclickwindow.getClickedItem(), itemstack)) {
+					this.playerEntity.playerNetServerHandler.sendPacket(new S32PacketConfirmTransaction(
+							c0epacketclickwindow.getWindowId(), c0epacketclickwindow.getActionNumber(), true));
+					this.playerEntity.isChangingQuantityOnly = true;
+					this.playerEntity.openContainer.detectAndSendChanges();
+					this.playerEntity.updateHeldItem();
+					this.playerEntity.isChangingQuantityOnly = false;
+				} else {
+					this.field_147372_n.addKey(this.playerEntity.openContainer.windowId,
+							Short.valueOf(c0epacketclickwindow.getActionNumber()));
+					this.playerEntity.playerNetServerHandler.sendPacket(new S32PacketConfirmTransaction(
+							c0epacketclickwindow.getWindowId(), c0epacketclickwindow.getActionNumber(), false));
+					this.playerEntity.openContainer.setCanCraft(this.playerEntity, false);
+					ArrayList arraylist1 = Lists.newArrayList();
+
+					for (int j = 0; j < this.playerEntity.openContainer.inventorySlots.size(); ++j) {
+						arraylist1.add(((Slot) this.playerEntity.openContainer.inventorySlots.get(j)).getStack());
+					}
+
+					this.playerEntity.updateCraftingInventory(this.playerEntity.openContainer, arraylist1);
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * + Updates serverside copy of client settings: language, render distance, chat
+	 * visibility, chat colours, difficulty, and whether to show the cape
+	 */
+	public void processClientSettings(C15PacketClientSettings c15packetclientsettings) {
+		this.playerEntity.handleClientSettings(c15packetclientsettings);
+	}
+
+	/**
+	 * + Processes the client status updates: respawn attempt from player, opening
+	 * statistics or achievements, or acquiring 'open inventory' achievement
+	 */
+	public void processClientStatus(C16PacketClientStatus c16packetclientstatus) {
+		this.playerEntity.markPlayerActive();
+		C16PacketClientStatus.EnumState c16packetclientstatus$enumstate = c16packetclientstatus.getStatus();
+		switch (c16packetclientstatus$enumstate) {
+		case PERFORM_RESPAWN:
+			if (this.playerEntity.playerConqueredTheEnd) {
+				this.playerEntity = this.serverController.getConfigurationManager()
+						.recreatePlayerEntity(this.playerEntity, 0, true);
+			} else if (this.playerEntity.getServerForPlayer().getWorldInfo().isHardcoreModeEnabled()) {
+				if (this.serverController.isSinglePlayer()
+						&& this.playerEntity.getName().equals(this.serverController.getServerOwner())) {
+					this.playerEntity.playerNetServerHandler
+							.kickPlayerFromServer("You have died. Game over, man, it\'s game over!");
+					this.serverController.deleteWorldAndStopServer();
+				} else {
+					this.playerEntity.playerNetServerHandler
+							.kickPlayerFromServer("You have died. Game over, man, it\'s game over!");
+				}
+			} else {
+				if (this.playerEntity.getHealth() > 0.0F) {
+					return;
+				}
+
+				this.playerEntity = this.serverController.getConfigurationManager()
+						.recreatePlayerEntity(this.playerEntity, 0, false);
+			}
+			break;
+		case REQUEST_STATS:
+			this.playerEntity.getStatFile().func_150876_a(this.playerEntity);
+			break;
+		case OPEN_INVENTORY_ACHIEVEMENT:
+			this.playerEntity.triggerAchievement(AchievementList.openInventory);
+		}
+
+	}
+
+	/**
+	 * + Processes the client closing windows (container)
+	 */
+	public void processCloseWindow(C0DPacketCloseWindow c0dpacketclosewindow) {
+		this.playerEntity.closeContainer();
+	}
+
+	/**
+	 * + Received in response to the server requesting to confirm that the
+	 * client-side open container matches the servers' after a mismatched
+	 * container-slot manipulation. It will unlock the player's ability to
+	 * manipulate the container contents
+	 */
+	public void processConfirmTransaction(C0FPacketConfirmTransaction c0fpacketconfirmtransaction) {
+		Short oshort = (Short) this.field_147372_n.lookup(this.playerEntity.openContainer.windowId);
+		if (oshort != null && c0fpacketconfirmtransaction.getUid() == oshort.shortValue()
+				&& this.playerEntity.openContainer.windowId == c0fpacketconfirmtransaction.getWindowId()
+				&& !this.playerEntity.openContainer.getCanCraft(this.playerEntity)
+				&& !this.playerEntity.isSpectator()) {
+			this.playerEntity.openContainer.setCanCraft(this.playerEntity, true);
+		}
+
+	}
+
+	/**
+	 * + Update the server with an ItemStack in a slot.
+	 */
+	public void processCreativeInventoryAction(C10PacketCreativeInventoryAction c10packetcreativeinventoryaction) {
+		if (this.playerEntity.theItemInWorldManager.isCreative()) {
+			boolean flag = c10packetcreativeinventoryaction.getSlotId() < 0;
+			ItemStack itemstack = c10packetcreativeinventoryaction.getStack();
+			if (itemstack != null && itemstack.hasTagCompound()
+					&& itemstack.getTagCompound().hasKey("BlockEntityTag", 10)) {
+				NBTTagCompound nbttagcompound = itemstack.getTagCompound().getCompoundTag("BlockEntityTag");
+				if (nbttagcompound.hasKey("x") && nbttagcompound.hasKey("y") && nbttagcompound.hasKey("z")) {
+					BlockPos blockpos = new BlockPos(nbttagcompound.getInteger("x"), nbttagcompound.getInteger("y"),
+							nbttagcompound.getInteger("z"));
+					TileEntity tileentity = this.playerEntity.worldObj.getTileEntity(blockpos);
+					if (tileentity != null) {
+						NBTTagCompound nbttagcompound1 = new NBTTagCompound();
+						tileentity.writeToNBT(nbttagcompound1);
+						nbttagcompound1.removeTag("x");
+						nbttagcompound1.removeTag("y");
+						nbttagcompound1.removeTag("z");
+						itemstack.setTagInfo("BlockEntityTag", nbttagcompound1);
+					}
+				}
+			}
+
+			boolean flag1 = c10packetcreativeinventoryaction.getSlotId() >= 1
+					&& c10packetcreativeinventoryaction.getSlotId() < 36 + InventoryPlayer.getHotbarSize();
+			boolean flag2 = itemstack == null || itemstack.getItem() != null;
+			boolean flag3 = itemstack == null
+					|| itemstack.getMetadata() >= 0 && itemstack.stackSize <= 64 && itemstack.stackSize > 0;
+			if (flag1 && flag2 && flag3) {
+				if (itemstack == null) {
+					this.playerEntity.inventoryContainer.putStackInSlot(c10packetcreativeinventoryaction.getSlotId(),
+							(ItemStack) null);
+				} else {
+					this.playerEntity.inventoryContainer.putStackInSlot(c10packetcreativeinventoryaction.getSlotId(),
+							itemstack);
+				}
+
+				this.playerEntity.inventoryContainer.setCanCraft(this.playerEntity, true);
+			} else if (flag && flag2 && flag3 && this.itemDropThreshold < 200) {
+				this.itemDropThreshold += 20;
+				EntityItem entityitem = this.playerEntity.dropPlayerItemWithRandomChoice(itemstack, true);
+				if (entityitem != null) {
+					entityitem.setAgeToCreativeDespawnTime();
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * + Enchants the item identified by the packet given some convoluted conditions
+	 * (matching window, which should/shouldn't be in use?)
+	 */
+	public void processEnchantItem(C11PacketEnchantItem c11packetenchantitem) {
+		this.playerEntity.markPlayerActive();
+		if (this.playerEntity.openContainer.windowId == c11packetenchantitem.getWindowId()
+				&& this.playerEntity.openContainer.getCanCraft(this.playerEntity) && !this.playerEntity.isSpectator()) {
+			this.playerEntity.openContainer.enchantItem(this.playerEntity, c11packetenchantitem.getButton());
+			this.playerEntity.openContainer.detectAndSendChanges();
+		}
+
+	}
+
+	/**
+	 * + Processes a range of action-types: sneaking, sprinting, waking from sleep,
+	 * opening the inventory or setting jump height of the horse the player is
+	 * riding
+	 */
+	public void processEntityAction(C0BPacketEntityAction c0bpacketentityaction) {
+		this.playerEntity.markPlayerActive();
+		switch (c0bpacketentityaction.getAction()) {
+		case START_SNEAKING:
+			this.playerEntity.setSneaking(true);
+			break;
+		case STOP_SNEAKING:
+			this.playerEntity.setSneaking(false);
+			break;
+		case START_SPRINTING:
+			this.playerEntity.setSprinting(true);
+			break;
+		case STOP_SPRINTING:
+			this.playerEntity.setSprinting(false);
+			break;
+		case STOP_SLEEPING:
+			this.playerEntity.wakeUpPlayer(false, true, true);
+			this.hasMoved = false;
+			break;
+		case RIDING_JUMP:
+			if (this.playerEntity.ridingEntity instanceof EntityHorse) {
+				((EntityHorse) this.playerEntity.ridingEntity).setJumpPower(c0bpacketentityaction.getAuxData());
+			}
+			break;
+		case OPEN_INVENTORY:
+			if (this.playerEntity.ridingEntity instanceof EntityHorse) {
+				((EntityHorse) this.playerEntity.ridingEntity).openGUI(this.playerEntity);
+			}
+			break;
+		default:
+			throw new IllegalArgumentException("Invalid client command!");
+		}
+
+	}
+
+	/**
+	 * + Updates which quickbar slot is selected
+	 */
+	public void processHeldItemChange(C09PacketHeldItemChange c09packethelditemchange) {
+		if (c09packethelditemchange.getSlotId() >= 0
+				&& c09packethelditemchange.getSlotId() < InventoryPlayer.getHotbarSize()) {
+			this.playerEntity.inventory.currentItem = c09packethelditemchange.getSlotId();
+			this.playerEntity.markPlayerActive();
+		} else {
+			logger.warn(this.playerEntity.getName() + " tried to set an invalid carried item");
+		}
+	}
+
+	/**
+	 * + Processes player movement input. Includes walking, strafing, jumping,
+	 * sneaking; excludes riding and toggling flying/sprinting
+	 */
+	public void processInput(C0CPacketInput c0cpacketinput) {
+		this.playerEntity.setEntityActionState(c0cpacketinput.getStrafeSpeed(), c0cpacketinput.getForwardSpeed(),
+				c0cpacketinput.isJumping(), c0cpacketinput.isSneaking());
+	}
+
+	/**
+	 * + Updates a players' ping statistics
+	 */
+	public void processKeepAlive(C00PacketKeepAlive c00packetkeepalive) {
+		if (c00packetkeepalive.getKey() == this.field_147378_h) {
+			int i = (int) (this.currentTimeMillis() - this.lastPingTime);
+			this.playerEntity.ping = (this.playerEntity.ping * 3 + i) / 4;
+		}
+
+	}
+
+	/**
+	 * + Processes clients perspective on player positioning and/or orientation
 	 */
 	public void processPlayer(C03PacketPlayer c03packetplayer) {
 		if (this.func_183006_b(c03packetplayer)) {
@@ -429,115 +765,16 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 		}
 	}
 
-	public void setPlayerLocation(double x, double y, double z, float yaw, float pitch) {
-		this.setPlayerLocation(x, y, z, yaw, pitch, Collections.emptySet());
-	}
-
-	public void setPlayerLocation(double x, double y, double z, float yaw, float pitch,
-			Set<S08PacketPlayerPosLook.EnumFlags> relativeSet) {
-		this.hasMoved = false;
-		this.lastPosX = x;
-		this.lastPosY = y;
-		this.lastPosZ = z;
-		if (relativeSet.contains(S08PacketPlayerPosLook.EnumFlags.X)) {
-			this.lastPosX += this.playerEntity.posX;
-		}
-
-		if (relativeSet.contains(S08PacketPlayerPosLook.EnumFlags.Y)) {
-			this.lastPosY += this.playerEntity.posY;
-		}
-
-		if (relativeSet.contains(S08PacketPlayerPosLook.EnumFlags.Z)) {
-			this.lastPosZ += this.playerEntity.posZ;
-		}
-
-		float f = yaw;
-		float f1 = pitch;
-		if (relativeSet.contains(S08PacketPlayerPosLook.EnumFlags.Y_ROT)) {
-			f = yaw + this.playerEntity.rotationYaw;
-		}
-
-		if (relativeSet.contains(S08PacketPlayerPosLook.EnumFlags.X_ROT)) {
-			f1 = pitch + this.playerEntity.rotationPitch;
-		}
-
-		this.playerEntity.setPositionAndRotation(this.lastPosX, this.lastPosY, this.lastPosZ, f, f1);
-		this.playerEntity.playerNetServerHandler
-				.sendPacket(new S08PacketPlayerPosLook(x, y, z, yaw, pitch, relativeSet));
-	}
-
-	/**+
-	 * Processes the player initiating/stopping digging on a
-	 * particular spot, as well as a player dropping items?. (0:
-	 * initiated, 1: reinitiated, 2? , 3-4 drop item (respectively
-	 * without or with player control), 5: stopped; x,y,z, side
-	 * clicked on;)
+	/**
+	 * + Processes a player starting/stopping flying
 	 */
-	public void processPlayerDigging(C07PacketPlayerDigging c07packetplayerdigging) {
-		WorldServer worldserver = this.serverController.worldServerForDimension(this.playerEntity.dimension);
-		BlockPos blockpos = c07packetplayerdigging.getPosition();
-		this.playerEntity.markPlayerActive();
-		switch (c07packetplayerdigging.getStatus()) {
-		case DROP_ITEM:
-			if (!this.playerEntity.isSpectator()) {
-				this.playerEntity.dropOneItem(false);
-			}
-
-			return;
-		case DROP_ALL_ITEMS:
-			if (!this.playerEntity.isSpectator()) {
-				this.playerEntity.dropOneItem(true);
-			}
-
-			return;
-		case RELEASE_USE_ITEM:
-			this.playerEntity.stopUsingItem();
-			return;
-		case START_DESTROY_BLOCK:
-		case ABORT_DESTROY_BLOCK:
-		case STOP_DESTROY_BLOCK:
-			double d0 = this.playerEntity.posX - ((double) blockpos.getX() + 0.5D);
-			double d1 = this.playerEntity.posY - ((double) blockpos.getY() + 0.5D) + 1.5D;
-			double d2 = this.playerEntity.posZ - ((double) blockpos.getZ() + 0.5D);
-			double d3 = d0 * d0 + d1 * d1 + d2 * d2;
-			if (d3 > 36.0D) {
-				return;
-			} else if (blockpos.getY() >= this.serverController.getBuildLimit()) {
-				return;
-			} else {
-				if (c07packetplayerdigging.getStatus() == C07PacketPlayerDigging.Action.START_DESTROY_BLOCK) {
-					if (!this.serverController.isBlockProtected(worldserver, blockpos, this.playerEntity)
-							&& worldserver.getWorldBorder().contains(blockpos)) {
-						this.playerEntity.theItemInWorldManager.onBlockClicked(blockpos,
-								c07packetplayerdigging.getFacing());
-					} else {
-						this.playerEntity.playerNetServerHandler
-								.sendPacket(new S23PacketBlockChange(worldserver, blockpos));
-					}
-				} else {
-					if (c07packetplayerdigging.getStatus() == C07PacketPlayerDigging.Action.STOP_DESTROY_BLOCK) {
-						this.playerEntity.theItemInWorldManager.blockRemoving(blockpos);
-					} else if (c07packetplayerdigging
-							.getStatus() == C07PacketPlayerDigging.Action.ABORT_DESTROY_BLOCK) {
-						this.playerEntity.theItemInWorldManager.cancelDestroyingBlock();
-					}
-
-					if (worldserver.getBlockState(blockpos).getBlock().getMaterial() != Material.air) {
-						this.playerEntity.playerNetServerHandler
-								.sendPacket(new S23PacketBlockChange(worldserver, blockpos));
-					}
-				}
-
-				return;
-			}
-		default:
-			throw new IllegalArgumentException("Invalid player action");
-		}
+	public void processPlayerAbilities(C13PacketPlayerAbilities c13packetplayerabilities) {
+		this.playerEntity.capabilities.isFlying = c13packetplayerabilities.isFlying()
+				&& this.playerEntity.capabilities.allowFlying;
 	}
 
-	/**+
-	 * Processes block placement and block activation (anvil,
-	 * furnace, etc.)
+	/**
+	 * + Processes block placement and block activation (anvil, furnace, etc.)
 	 */
 	public void processPlayerBlockPlacement(C08PacketPlayerBlockPlacement c08packetplayerblockplacement) {
 		WorldServer worldserver = this.serverController.worldServerForDimension(this.playerEntity.dimension);
@@ -603,430 +840,87 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 
 	}
 
-	public void handleSpectate(C18PacketSpectate c18packetspectate) {
-		if (this.playerEntity.isSpectator()) {
-			Entity entity = null;
-
-			WorldServer[] srv = this.serverController.worldServers;
-			for (int i = 0; i < srv.length; ++i) {
-				WorldServer worldserver = srv[i];
-				if (worldserver != null) {
-					entity = c18packetspectate.getEntity(worldserver);
-					if (entity != null) {
-						break;
-					}
-				}
-			}
-
-			if (entity != null) {
-				this.playerEntity.setSpectatingEntity(this.playerEntity);
-				this.playerEntity.mountEntity((Entity) null);
-				if (entity.worldObj != this.playerEntity.worldObj) {
-					WorldServer worldserver1 = this.playerEntity.getServerForPlayer();
-					WorldServer worldserver2 = (WorldServer) entity.worldObj;
-					this.playerEntity.dimension = entity.dimension;
-					this.sendPacket(new S07PacketRespawn(this.playerEntity.dimension, worldserver1.getDifficulty(),
-							worldserver1.getWorldInfo().getTerrainType(),
-							this.playerEntity.theItemInWorldManager.getGameType()));
-					worldserver1.removePlayerEntityDangerously(this.playerEntity);
-					this.playerEntity.isDead = false;
-					this.playerEntity.setLocationAndAngles(entity.posX, entity.posY, entity.posZ, entity.rotationYaw,
-							entity.rotationPitch);
-					if (this.playerEntity.isEntityAlive()) {
-						worldserver1.updateEntityWithOptionalForce(this.playerEntity, false);
-						worldserver2.spawnEntityInWorld(this.playerEntity);
-						worldserver2.updateEntityWithOptionalForce(this.playerEntity, false);
-					}
-
-					this.playerEntity.setWorld(worldserver2);
-					this.serverController.getConfigurationManager().preparePlayer(this.playerEntity, worldserver1);
-					this.playerEntity.setPositionAndUpdate(entity.posX, entity.posY, entity.posZ);
-					this.playerEntity.theItemInWorldManager.setWorld(worldserver2);
-					this.serverController.getConfigurationManager().updateTimeAndWeatherForPlayer(this.playerEntity,
-							worldserver2);
-					this.serverController.getConfigurationManager().syncPlayerInventory(this.playerEntity);
-				} else {
-					this.playerEntity.setPositionAndUpdate(entity.posX, entity.posY, entity.posZ);
-				}
-			}
-		}
-
-	}
-
-	public void handleResourcePackStatus(C19PacketResourcePackStatus var1) {
-	}
-
-	/**+
-	 * Invoked when disconnecting, the parameter is a ChatComponent
-	 * describing the reason for termination
+	/**
+	 * + Processes the player initiating/stopping digging on a particular spot, as
+	 * well as a player dropping items?. (0: initiated, 1: reinitiated, 2? , 3-4
+	 * drop item (respectively without or with player control), 5: stopped; x,y,z,
+	 * side clicked on;)
 	 */
-	public void onDisconnect(IChatComponent ichatcomponent) {
-		if (!hasDisconnected) {
-			hasDisconnected = true;
-			logger.info(this.playerEntity.getName() + " lost connection: " + ichatcomponent);
-			this.serverController.refreshStatusNextTick();
-			ChatComponentTranslation chatcomponenttranslation = new ChatComponentTranslation("multiplayer.player.left",
-					new Object[] { this.playerEntity.getDisplayName() });
-			chatcomponenttranslation.getChatStyle().setColor(EnumChatFormatting.YELLOW);
-			this.serverController.getConfigurationManager().sendChatMsg(chatcomponenttranslation);
-			this.playerEntity.mountEntityAndWakeUp();
-			this.serverController.getConfigurationManager().playerLoggedOut(this.playerEntity);
-			if (this.playerEntity.getName().equals(this.serverController.getServerOwner())) {
-				logger.info("Stopping singleplayer server as player logged out");
-				this.serverController.initiateShutdown();
-			}
-		}
-	}
-
-	public void sendPacket(final Packet packetIn) {
-		if (packetIn instanceof S02PacketChat) {
-			S02PacketChat s02packetchat = (S02PacketChat) packetIn;
-			EntityPlayer.EnumChatVisibility entityplayer$enumchatvisibility = this.playerEntity.getChatVisibility();
-			if (entityplayer$enumchatvisibility == EntityPlayer.EnumChatVisibility.HIDDEN) {
-				return;
-			}
-
-			if (entityplayer$enumchatvisibility == EntityPlayer.EnumChatVisibility.SYSTEM && !s02packetchat.isChat()) {
-				return;
-			}
-		}
-
-		try {
-			this.netManager.sendPacket(packetIn);
-		} catch (Throwable throwable) {
-			CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Sending packet");
-			CrashReportCategory crashreportcategory = crashreport.makeCategory("Packet being sent");
-			crashreportcategory.addCrashSectionCallable("Packet class", new Callable<String>() {
-				public String call() throws Exception {
-					return packetIn.getClass().getCanonicalName();
-				}
-			});
-			throw new ReportedException(crashreport);
-		}
-	}
-
-	/**+
-	 * Updates which quickbar slot is selected
-	 */
-	public void processHeldItemChange(C09PacketHeldItemChange c09packethelditemchange) {
-		if (c09packethelditemchange.getSlotId() >= 0
-				&& c09packethelditemchange.getSlotId() < InventoryPlayer.getHotbarSize()) {
-			this.playerEntity.inventory.currentItem = c09packethelditemchange.getSlotId();
-			this.playerEntity.markPlayerActive();
-		} else {
-			logger.warn(this.playerEntity.getName() + " tried to set an invalid carried item");
-		}
-	}
-
-	/**+
-	 * Process chat messages (broadcast back to clients) and
-	 * commands (executes)
-	 */
-	public void processChatMessage(C01PacketChatMessage c01packetchatmessage) {
-		if (this.playerEntity.getChatVisibility() == EntityPlayer.EnumChatVisibility.HIDDEN) {
-			ChatComponentTranslation chatcomponenttranslation = new ChatComponentTranslation("chat.cannotSend",
-					new Object[0]);
-			chatcomponenttranslation.getChatStyle().setColor(EnumChatFormatting.RED);
-			this.sendPacket(new S02PacketChat(chatcomponenttranslation));
-		} else {
-			this.playerEntity.markPlayerActive();
-			String s = c01packetchatmessage.getMessage();
-			s = StringUtils.normalizeSpace(s);
-
-			for (int i = 0; i < s.length(); ++i) {
-				if (!ChatAllowedCharacters.isAllowedCharacter(s.charAt(i))) {
-					this.kickPlayerFromServer("Illegal characters in chat");
-					return;
-				}
-			}
-
-			if (s.startsWith("/")) {
-				this.handleSlashCommand(s);
-			} else {
-				if (this.serverController.worldServers[0].getWorldInfo().getGameRulesInstance()
-						.getBoolean("colorCodes")) {
-					s = net.minecraft.util.StringUtils.translateControlCodesAlternate(s);
-				}
-				ChatComponentTranslation chatcomponenttranslation1 = new ChatComponentTranslation("chat.type.text",
-						new Object[] { this.playerEntity.getDisplayName(), s });
-				this.serverController.getConfigurationManager().sendChatMsgImpl(chatcomponenttranslation1, false);
-			}
-
-			this.chatSpamThresholdCount += 20;
-			if (this.chatSpamThresholdCount > 200 && !this.serverController.getConfigurationManager()
-					.canSendCommands(this.playerEntity.getGameProfile())) {
-				this.kickPlayerFromServer("disconnect.spam");
-			}
-
-		}
-	}
-
-	/**+
-	 * Handle commands that start with a /
-	 */
-	private void handleSlashCommand(String command) {
-		this.serverController.getCommandManager().executeCommand(this.playerEntity, command);
-	}
-
-	public void handleAnimation(C0APacketAnimation c0apacketanimation) {
-		this.playerEntity.markPlayerActive();
-		this.playerEntity.swingItem();
-	}
-
-	/**+
-	 * Processes a range of action-types: sneaking, sprinting,
-	 * waking from sleep, opening the inventory or setting jump
-	 * height of the horse the player is riding
-	 */
-	public void processEntityAction(C0BPacketEntityAction c0bpacketentityaction) {
-		this.playerEntity.markPlayerActive();
-		switch (c0bpacketentityaction.getAction()) {
-		case START_SNEAKING:
-			this.playerEntity.setSneaking(true);
-			break;
-		case STOP_SNEAKING:
-			this.playerEntity.setSneaking(false);
-			break;
-		case START_SPRINTING:
-			this.playerEntity.setSprinting(true);
-			break;
-		case STOP_SPRINTING:
-			this.playerEntity.setSprinting(false);
-			break;
-		case STOP_SLEEPING:
-			this.playerEntity.wakeUpPlayer(false, true, true);
-			this.hasMoved = false;
-			break;
-		case RIDING_JUMP:
-			if (this.playerEntity.ridingEntity instanceof EntityHorse) {
-				((EntityHorse) this.playerEntity.ridingEntity).setJumpPower(c0bpacketentityaction.getAuxData());
-			}
-			break;
-		case OPEN_INVENTORY:
-			if (this.playerEntity.ridingEntity instanceof EntityHorse) {
-				((EntityHorse) this.playerEntity.ridingEntity).openGUI(this.playerEntity);
-			}
-			break;
-		default:
-			throw new IllegalArgumentException("Invalid client command!");
-		}
-
-	}
-
-	/**+
-	 * Processes interactions ((un)leashing, opening command block
-	 * GUI) and attacks on an entity with players currently equipped
-	 * item
-	 */
-	public void processUseEntity(C02PacketUseEntity c02packetuseentity) {
+	public void processPlayerDigging(C07PacketPlayerDigging c07packetplayerdigging) {
 		WorldServer worldserver = this.serverController.worldServerForDimension(this.playerEntity.dimension);
-		Entity entity = c02packetuseentity.getEntityFromWorld(worldserver);
+		BlockPos blockpos = c07packetplayerdigging.getPosition();
 		this.playerEntity.markPlayerActive();
-		if (entity != null) {
-			boolean flag = this.playerEntity.canEntityBeSeen(entity);
-			double d0 = 36.0D;
-			if (!flag) {
-				d0 = 9.0D;
+		switch (c07packetplayerdigging.getStatus()) {
+		case DROP_ITEM:
+			if (!this.playerEntity.isSpectator()) {
+				this.playerEntity.dropOneItem(false);
 			}
 
-			if (this.playerEntity.getDistanceSqToEntity(entity) < d0) {
-				if (c02packetuseentity.getAction() == C02PacketUseEntity.Action.INTERACT) {
-					this.playerEntity.interactWith(entity);
-				} else if (c02packetuseentity.getAction() == C02PacketUseEntity.Action.INTERACT_AT) {
-					entity.interactAt(this.playerEntity, c02packetuseentity.getHitVec());
-				} else if (c02packetuseentity.getAction() == C02PacketUseEntity.Action.ATTACK) {
-					if (entity instanceof EntityItem || entity instanceof EntityXPOrb || entity instanceof EntityArrow
-							|| entity == this.playerEntity) {
-						this.kickPlayerFromServer("Attempting to attack an invalid entity");
-						this.serverController.logWarning(
-								"Player " + this.playerEntity.getName() + " tried to attack an invalid entity");
-						return;
-					}
-
-					this.playerEntity.attackTargetEntityWithCurrentItem(entity);
-				}
+			return;
+		case DROP_ALL_ITEMS:
+			if (!this.playerEntity.isSpectator()) {
+				this.playerEntity.dropOneItem(true);
 			}
-		}
 
-	}
-
-	/**+
-	 * Processes the client status updates: respawn attempt from
-	 * player, opening statistics or achievements, or acquiring
-	 * 'open inventory' achievement
-	 */
-	public void processClientStatus(C16PacketClientStatus c16packetclientstatus) {
-		this.playerEntity.markPlayerActive();
-		C16PacketClientStatus.EnumState c16packetclientstatus$enumstate = c16packetclientstatus.getStatus();
-		switch (c16packetclientstatus$enumstate) {
-		case PERFORM_RESPAWN:
-			if (this.playerEntity.playerConqueredTheEnd) {
-				this.playerEntity = this.serverController.getConfigurationManager()
-						.recreatePlayerEntity(this.playerEntity, 0, true);
-			} else if (this.playerEntity.getServerForPlayer().getWorldInfo().isHardcoreModeEnabled()) {
-				if (this.serverController.isSinglePlayer()
-						&& this.playerEntity.getName().equals(this.serverController.getServerOwner())) {
-					this.playerEntity.playerNetServerHandler
-							.kickPlayerFromServer("You have died. Game over, man, it\'s game over!");
-					this.serverController.deleteWorldAndStopServer();
-				} else {
-					this.playerEntity.playerNetServerHandler
-							.kickPlayerFromServer("You have died. Game over, man, it\'s game over!");
-				}
+			return;
+		case RELEASE_USE_ITEM:
+			this.playerEntity.stopUsingItem();
+			return;
+		case START_DESTROY_BLOCK:
+		case ABORT_DESTROY_BLOCK:
+		case STOP_DESTROY_BLOCK:
+			double d0 = this.playerEntity.posX - ((double) blockpos.getX() + 0.5D);
+			double d1 = this.playerEntity.posY - ((double) blockpos.getY() + 0.5D) + 1.5D;
+			double d2 = this.playerEntity.posZ - ((double) blockpos.getZ() + 0.5D);
+			double d3 = d0 * d0 + d1 * d1 + d2 * d2;
+			if (d3 > 36.0D) {
+				return;
+			} else if (blockpos.getY() >= this.serverController.getBuildLimit()) {
+				return;
 			} else {
-				if (this.playerEntity.getHealth() > 0.0F) {
-					return;
-				}
-
-				this.playerEntity = this.serverController.getConfigurationManager()
-						.recreatePlayerEntity(this.playerEntity, 0, false);
-			}
-			break;
-		case REQUEST_STATS:
-			this.playerEntity.getStatFile().func_150876_a(this.playerEntity);
-			break;
-		case OPEN_INVENTORY_ACHIEVEMENT:
-			this.playerEntity.triggerAchievement(AchievementList.openInventory);
-		}
-
-	}
-
-	/**+
-	 * Processes the client closing windows (container)
-	 */
-	public void processCloseWindow(C0DPacketCloseWindow c0dpacketclosewindow) {
-		this.playerEntity.closeContainer();
-	}
-
-	/**+
-	 * Executes a container/inventory slot manipulation as indicated
-	 * by the packet. Sends the serverside result if they didn't
-	 * match the indicated result and prevents further manipulation
-	 * by the player until he confirms that it has the same open
-	 * container/inventory
-	 */
-	public void processClickWindow(C0EPacketClickWindow c0epacketclickwindow) {
-		this.playerEntity.markPlayerActive();
-		if (this.playerEntity.openContainer.windowId == c0epacketclickwindow.getWindowId()
-				&& this.playerEntity.openContainer.getCanCraft(this.playerEntity)) {
-			if (this.playerEntity.isSpectator()) {
-				ArrayList arraylist = Lists.newArrayList();
-
-				for (int i = 0; i < this.playerEntity.openContainer.inventorySlots.size(); ++i) {
-					arraylist.add(((Slot) this.playerEntity.openContainer.inventorySlots.get(i)).getStack());
-				}
-
-				this.playerEntity.updateCraftingInventory(this.playerEntity.openContainer, arraylist);
-			} else {
-				ItemStack itemstack = this.playerEntity.openContainer.slotClick(c0epacketclickwindow.getSlotId(),
-						c0epacketclickwindow.getUsedButton(), c0epacketclickwindow.getMode(), this.playerEntity);
-				if (ItemStack.areItemStacksEqual(c0epacketclickwindow.getClickedItem(), itemstack)) {
-					this.playerEntity.playerNetServerHandler.sendPacket(new S32PacketConfirmTransaction(
-							c0epacketclickwindow.getWindowId(), c0epacketclickwindow.getActionNumber(), true));
-					this.playerEntity.isChangingQuantityOnly = true;
-					this.playerEntity.openContainer.detectAndSendChanges();
-					this.playerEntity.updateHeldItem();
-					this.playerEntity.isChangingQuantityOnly = false;
+				if (c07packetplayerdigging.getStatus() == C07PacketPlayerDigging.Action.START_DESTROY_BLOCK) {
+					if (!this.serverController.isBlockProtected(worldserver, blockpos, this.playerEntity)
+							&& worldserver.getWorldBorder().contains(blockpos)) {
+						this.playerEntity.theItemInWorldManager.onBlockClicked(blockpos,
+								c07packetplayerdigging.getFacing());
+					} else {
+						this.playerEntity.playerNetServerHandler
+								.sendPacket(new S23PacketBlockChange(worldserver, blockpos));
+					}
 				} else {
-					this.field_147372_n.addKey(this.playerEntity.openContainer.windowId,
-							Short.valueOf(c0epacketclickwindow.getActionNumber()));
-					this.playerEntity.playerNetServerHandler.sendPacket(new S32PacketConfirmTransaction(
-							c0epacketclickwindow.getWindowId(), c0epacketclickwindow.getActionNumber(), false));
-					this.playerEntity.openContainer.setCanCraft(this.playerEntity, false);
-					ArrayList arraylist1 = Lists.newArrayList();
-
-					for (int j = 0; j < this.playerEntity.openContainer.inventorySlots.size(); ++j) {
-						arraylist1.add(((Slot) this.playerEntity.openContainer.inventorySlots.get(j)).getStack());
+					if (c07packetplayerdigging.getStatus() == C07PacketPlayerDigging.Action.STOP_DESTROY_BLOCK) {
+						this.playerEntity.theItemInWorldManager.blockRemoving(blockpos);
+					} else if (c07packetplayerdigging
+							.getStatus() == C07PacketPlayerDigging.Action.ABORT_DESTROY_BLOCK) {
+						this.playerEntity.theItemInWorldManager.cancelDestroyingBlock();
 					}
 
-					this.playerEntity.updateCraftingInventory(this.playerEntity.openContainer, arraylist1);
-				}
-			}
-		}
-
-	}
-
-	/**+
-	 * Enchants the item identified by the packet given some
-	 * convoluted conditions (matching window, which
-	 * should/shouldn't be in use?)
-	 */
-	public void processEnchantItem(C11PacketEnchantItem c11packetenchantitem) {
-		this.playerEntity.markPlayerActive();
-		if (this.playerEntity.openContainer.windowId == c11packetenchantitem.getWindowId()
-				&& this.playerEntity.openContainer.getCanCraft(this.playerEntity) && !this.playerEntity.isSpectator()) {
-			this.playerEntity.openContainer.enchantItem(this.playerEntity, c11packetenchantitem.getButton());
-			this.playerEntity.openContainer.detectAndSendChanges();
-		}
-
-	}
-
-	/**+
-	 * Update the server with an ItemStack in a slot.
-	 */
-	public void processCreativeInventoryAction(C10PacketCreativeInventoryAction c10packetcreativeinventoryaction) {
-		if (this.playerEntity.theItemInWorldManager.isCreative()) {
-			boolean flag = c10packetcreativeinventoryaction.getSlotId() < 0;
-			ItemStack itemstack = c10packetcreativeinventoryaction.getStack();
-			if (itemstack != null && itemstack.hasTagCompound()
-					&& itemstack.getTagCompound().hasKey("BlockEntityTag", 10)) {
-				NBTTagCompound nbttagcompound = itemstack.getTagCompound().getCompoundTag("BlockEntityTag");
-				if (nbttagcompound.hasKey("x") && nbttagcompound.hasKey("y") && nbttagcompound.hasKey("z")) {
-					BlockPos blockpos = new BlockPos(nbttagcompound.getInteger("x"), nbttagcompound.getInteger("y"),
-							nbttagcompound.getInteger("z"));
-					TileEntity tileentity = this.playerEntity.worldObj.getTileEntity(blockpos);
-					if (tileentity != null) {
-						NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-						tileentity.writeToNBT(nbttagcompound1);
-						nbttagcompound1.removeTag("x");
-						nbttagcompound1.removeTag("y");
-						nbttagcompound1.removeTag("z");
-						itemstack.setTagInfo("BlockEntityTag", nbttagcompound1);
+					if (worldserver.getBlockState(blockpos).getBlock().getMaterial() != Material.air) {
+						this.playerEntity.playerNetServerHandler
+								.sendPacket(new S23PacketBlockChange(worldserver, blockpos));
 					}
 				}
-			}
 
-			boolean flag1 = c10packetcreativeinventoryaction.getSlotId() >= 1
-					&& c10packetcreativeinventoryaction.getSlotId() < 36 + InventoryPlayer.getHotbarSize();
-			boolean flag2 = itemstack == null || itemstack.getItem() != null;
-			boolean flag3 = itemstack == null
-					|| itemstack.getMetadata() >= 0 && itemstack.stackSize <= 64 && itemstack.stackSize > 0;
-			if (flag1 && flag2 && flag3) {
-				if (itemstack == null) {
-					this.playerEntity.inventoryContainer.putStackInSlot(c10packetcreativeinventoryaction.getSlotId(),
-							(ItemStack) null);
-				} else {
-					this.playerEntity.inventoryContainer.putStackInSlot(c10packetcreativeinventoryaction.getSlotId(),
-							itemstack);
-				}
-
-				this.playerEntity.inventoryContainer.setCanCraft(this.playerEntity, true);
-			} else if (flag && flag2 && flag3 && this.itemDropThreshold < 200) {
-				this.itemDropThreshold += 20;
-				EntityItem entityitem = this.playerEntity.dropPlayerItemWithRandomChoice(itemstack, true);
-				if (entityitem != null) {
-					entityitem.setAgeToCreativeDespawnTime();
-				}
+				return;
 			}
+		default:
+			throw new IllegalArgumentException("Invalid player action");
 		}
-
 	}
 
-	/**+
-	 * Received in response to the server requesting to confirm that
-	 * the client-side open container matches the servers' after a
-	 * mismatched container-slot manipulation. It will unlock the
-	 * player's ability to manipulate the container contents
+	/**
+	 * + Retrieves possible tab completions for the requested command string and
+	 * sends them to the client
 	 */
-	public void processConfirmTransaction(C0FPacketConfirmTransaction c0fpacketconfirmtransaction) {
-		Short oshort = (Short) this.field_147372_n.lookup(this.playerEntity.openContainer.windowId);
-		if (oshort != null && c0fpacketconfirmtransaction.getUid() == oshort.shortValue()
-				&& this.playerEntity.openContainer.windowId == c0fpacketconfirmtransaction.getWindowId()
-				&& !this.playerEntity.openContainer.getCanCraft(this.playerEntity)
-				&& !this.playerEntity.isSpectator()) {
-			this.playerEntity.openContainer.setCanCraft(this.playerEntity, true);
+	public void processTabComplete(C14PacketTabComplete c14packettabcomplete) {
+		List<String> lst = this.serverController.getTabCompletions(this.playerEntity, c14packettabcomplete.getMessage(),
+				c14packettabcomplete.getTargetBlock());
+		String[] fuckOff = new String[lst.size()];
+		for (int i = 0; i < fuckOff.length; ++i) {
+			fuckOff[i] = lst.get(i);
 		}
 
+		this.playerEntity.playerNetServerHandler.sendPacket(new S3APacketTabComplete(fuckOff));
 	}
 
 	public void processUpdateSign(C12PacketUpdateSign c12packetupdatesign) {
@@ -1063,56 +957,44 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 
 	}
 
-	/**+
-	 * Updates a players' ping statistics
+	/**
+	 * + Processes interactions ((un)leashing, opening command block GUI) and
+	 * attacks on an entity with players currently equipped item
 	 */
-	public void processKeepAlive(C00PacketKeepAlive c00packetkeepalive) {
-		if (c00packetkeepalive.getKey() == this.field_147378_h) {
-			int i = (int) (this.currentTimeMillis() - this.lastPingTime);
-			this.playerEntity.ping = (this.playerEntity.ping * 3 + i) / 4;
+	public void processUseEntity(C02PacketUseEntity c02packetuseentity) {
+		WorldServer worldserver = this.serverController.worldServerForDimension(this.playerEntity.dimension);
+		Entity entity = c02packetuseentity.getEntityFromWorld(worldserver);
+		this.playerEntity.markPlayerActive();
+		if (entity != null) {
+			boolean flag = this.playerEntity.canEntityBeSeen(entity);
+			double d0 = 36.0D;
+			if (!flag) {
+				d0 = 9.0D;
+			}
+
+			if (this.playerEntity.getDistanceSqToEntity(entity) < d0) {
+				if (c02packetuseentity.getAction() == C02PacketUseEntity.Action.INTERACT) {
+					this.playerEntity.interactWith(entity);
+				} else if (c02packetuseentity.getAction() == C02PacketUseEntity.Action.INTERACT_AT) {
+					entity.interactAt(this.playerEntity, c02packetuseentity.getHitVec());
+				} else if (c02packetuseentity.getAction() == C02PacketUseEntity.Action.ATTACK) {
+					if (entity instanceof EntityItem || entity instanceof EntityXPOrb || entity instanceof EntityArrow
+							|| entity == this.playerEntity) {
+						this.kickPlayerFromServer("Attempting to attack an invalid entity");
+						this.serverController.logWarning(
+								"Player " + this.playerEntity.getName() + " tried to attack an invalid entity");
+						return;
+					}
+
+					this.playerEntity.attackTargetEntityWithCurrentItem(entity);
+				}
+			}
 		}
 
 	}
 
-	private long currentTimeMillis() {
-		return EagRuntime.steadyTimeMillis();
-	}
-
-	/**+
-	 * Processes a player starting/stopping flying
-	 */
-	public void processPlayerAbilities(C13PacketPlayerAbilities c13packetplayerabilities) {
-		this.playerEntity.capabilities.isFlying = c13packetplayerabilities.isFlying()
-				&& this.playerEntity.capabilities.allowFlying;
-	}
-
-	/**+
-	 * Retrieves possible tab completions for the requested command
-	 * string and sends them to the client
-	 */
-	public void processTabComplete(C14PacketTabComplete c14packettabcomplete) {
-		List<String> lst = this.serverController.getTabCompletions(this.playerEntity, c14packettabcomplete.getMessage(),
-				c14packettabcomplete.getTargetBlock());
-		String[] fuckOff = new String[lst.size()];
-		for (int i = 0; i < fuckOff.length; ++i) {
-			fuckOff[i] = lst.get(i);
-		}
-
-		this.playerEntity.playerNetServerHandler.sendPacket(new S3APacketTabComplete(fuckOff));
-	}
-
-	/**+
-	 * Updates serverside copy of client settings: language, render
-	 * distance, chat visibility, chat colours, difficulty, and
-	 * whether to show the cape
-	 */
-	public void processClientSettings(C15PacketClientSettings c15packetclientsettings) {
-		this.playerEntity.handleClientSettings(c15packetclientsettings);
-	}
-
-	/**+
-	 * Synchronizes serverside and clientside book contents and
-	 * signing
+	/**
+	 * + Synchronizes serverside and clientside book contents and signing
 	 */
 	public void processVanilla250Packet(C17PacketCustomPayload c17packetcustompayload) {
 		if ("MC|BEdit".equals(c17packetcustompayload.getChannelName())) {
@@ -1285,6 +1167,115 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 						c17packetcustompayload.getChannelName());
 				logger.error(e);
 			}
+		}
+	}
+
+	public void sendEaglerMessage(GameMessagePacket packet) {
+		try {
+			eaglerMessageController.sendPacket(packet);
+		} catch (IOException e) {
+			logger.error("Failed to send eaglercraft plugin message packet: " + packet);
+			logger.error(e);
+		}
+	}
+
+	public void sendPacket(final Packet packetIn) {
+		if (packetIn instanceof S02PacketChat) {
+			S02PacketChat s02packetchat = (S02PacketChat) packetIn;
+			EntityPlayer.EnumChatVisibility entityplayer$enumchatvisibility = this.playerEntity.getChatVisibility();
+			if (entityplayer$enumchatvisibility == EntityPlayer.EnumChatVisibility.HIDDEN) {
+				return;
+			}
+
+			if (entityplayer$enumchatvisibility == EntityPlayer.EnumChatVisibility.SYSTEM && !s02packetchat.isChat()) {
+				return;
+			}
+		}
+
+		try {
+			this.netManager.sendPacket(packetIn);
+		} catch (Throwable throwable) {
+			CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Sending packet");
+			CrashReportCategory crashreportcategory = crashreport.makeCategory("Packet being sent");
+			crashreportcategory.addCrashSectionCallable("Packet class", new Callable<String>() {
+				public String call() throws Exception {
+					return packetIn.getClass().getCanonicalName();
+				}
+			});
+			throw new ReportedException(crashreport);
+		}
+	}
+
+	public void setEaglerMessageController(GameProtocolMessageController eaglerMessageController) {
+		this.eaglerMessageController = eaglerMessageController;
+	}
+
+	public void setPlayerLocation(double x, double y, double z, float yaw, float pitch) {
+		this.setPlayerLocation(x, y, z, yaw, pitch, Collections.emptySet());
+	}
+
+	public void setPlayerLocation(double x, double y, double z, float yaw, float pitch,
+			Set<S08PacketPlayerPosLook.EnumFlags> relativeSet) {
+		this.hasMoved = false;
+		this.lastPosX = x;
+		this.lastPosY = y;
+		this.lastPosZ = z;
+		if (relativeSet.contains(S08PacketPlayerPosLook.EnumFlags.X)) {
+			this.lastPosX += this.playerEntity.posX;
+		}
+
+		if (relativeSet.contains(S08PacketPlayerPosLook.EnumFlags.Y)) {
+			this.lastPosY += this.playerEntity.posY;
+		}
+
+		if (relativeSet.contains(S08PacketPlayerPosLook.EnumFlags.Z)) {
+			this.lastPosZ += this.playerEntity.posZ;
+		}
+
+		float f = yaw;
+		float f1 = pitch;
+		if (relativeSet.contains(S08PacketPlayerPosLook.EnumFlags.Y_ROT)) {
+			f = yaw + this.playerEntity.rotationYaw;
+		}
+
+		if (relativeSet.contains(S08PacketPlayerPosLook.EnumFlags.X_ROT)) {
+			f1 = pitch + this.playerEntity.rotationPitch;
+		}
+
+		this.playerEntity.setPositionAndRotation(this.lastPosX, this.lastPosY, this.lastPosZ, f, f1);
+		this.playerEntity.playerNetServerHandler
+				.sendPacket(new S08PacketPlayerPosLook(x, y, z, yaw, pitch, relativeSet));
+	}
+
+	/**
+	 * + Like the old updateEntity(), except more generic.
+	 */
+	public void update() {
+		this.field_147366_g = false;
+		++this.networkTickCount;
+		if ((long) this.networkTickCount - this.lastSentPingPacket > 40L) {
+			this.lastSentPingPacket = (long) this.networkTickCount;
+			this.lastPingTime = this.currentTimeMillis();
+			this.field_147378_h = (int) this.lastPingTime;
+			this.sendPacket(new S00PacketKeepAlive(this.field_147378_h));
+		}
+
+		if (this.chatSpamThresholdCount > 0) {
+			--this.chatSpamThresholdCount;
+		}
+
+		if (this.itemDropThreshold > 0) {
+			--this.itemDropThreshold;
+		}
+
+		if (this.playerEntity.getLastActiveTime() > 0L && this.serverController.getMaxPlayerIdleMinutes() > 0
+				&& MinecraftServer.getCurrentTimeMillis() - this.playerEntity
+						.getLastActiveTime() > (long) (this.serverController.getMaxPlayerIdleMinutes() * 1000 * 60)) {
+			this.kickPlayerFromServer("You have been idle for too long!");
+		}
+
+		if (this.eaglerMessageController != null) {
+			this.eaglerMessageController.flush();
 		}
 	}
 }

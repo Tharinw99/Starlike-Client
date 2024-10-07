@@ -127,18 +127,18 @@ public enum StandardSystemProperty {
 	}
 
 	/**
-	 * Returns the current value for this system property by delegating to
-	 * {@link System#getProperty(String)}.
-	 */
-	public String value() {
-		return System.getProperty(key);
-	}
-
-	/**
 	 * Returns a string representation of this system property.
 	 */
 	@Override
 	public String toString() {
 		return key() + "=" + value();
+	}
+
+	/**
+	 * Returns the current value for this system property by delegating to
+	 * {@link System#getProperty(String)}.
+	 */
+	public String value() {
+		return System.getProperty(key);
 	}
 }

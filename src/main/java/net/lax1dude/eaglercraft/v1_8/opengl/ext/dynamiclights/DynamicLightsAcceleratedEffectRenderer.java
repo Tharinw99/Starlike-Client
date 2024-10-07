@@ -1,7 +1,27 @@
 package net.lax1dude.eaglercraft.v1_8.opengl.ext.dynamiclights;
 
-import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL.*;
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglBufferData;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglBufferSubData;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDeleteBuffers;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDeleteVertexArrays;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDrawArraysInstanced;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglEnableVertexAttribArray;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGenBuffers;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGenVertexArrays;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniform2f;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniform3f;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniformMatrix4fv;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglVertexAttribDivisor;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglVertexAttribPointer;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ARRAY_BUFFER;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_FLOAT;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_MODELVIEW_MATRIX;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_PROJECTION_MATRIX;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_STATIC_DRAW;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_STREAM_DRAW;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TRIANGLES;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_UNSIGNED_BYTE;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_UNSIGNED_SHORT;
 
 import net.lax1dude.eaglercraft.v1_8.EagRuntime;
 import net.lax1dude.eaglercraft.v1_8.internal.IBufferArrayGL;
@@ -23,14 +43,15 @@ import net.minecraft.util.MathHelper;
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -39,93 +60,75 @@ public class DynamicLightsAcceleratedEffectRenderer extends AbstractAcceleratedE
 
 	private static final Logger logger = LogManager.getLogger("DynamicLightsAcceleratedEffectRenderer");
 
-	private ByteBuffer particleBuffer = null;
-	private int particleCount = 0;
-	private boolean particlesHasOverflowed = false;
-
 	private static final int BYTES_PER_PARTICLE = 24;
 	private static final int PARTICLE_LIMIT = 5461;
+	public static boolean isMaterialNormalTexture = false;
+
+	private ByteBuffer particleBuffer = null;
+	private int particleCount = 0;
+
+	private boolean particlesHasOverflowed = false;
 
 	private DynamicLightsAccelParticleShader shaderProgram = null;
-
 	private IBufferArrayGL vertexArray = null;
+
 	private IBufferGL vertexBuffer = null;
 
 	private IBufferGL instancesBuffer = null;
-
 	private float f1;
 	private float f2;
 	private float f3;
 	private float f4;
+
 	private float f5;
 
-	public static boolean isMaterialNormalTexture = false;
+	@Override
+	public void begin(float partialTicks) {
+		this.partialTicks = partialTicks;
 
-	public void initialize() {
-		destroy();
+		particleBuffer.clear();
+		particleCount = 0;
+		particlesHasOverflowed = false;
 
-		if(DynamicLightsPipelineCompiler.matrixCopyBuffer == null) {
-			DynamicLightsPipelineCompiler.matrixCopyBuffer = GLAllocation.createDirectFloatBuffer(16);
+		Entity et = Minecraft.getMinecraft().getRenderViewEntity();
+		if (et != null) {
+			f1 = MathHelper.cos(et.rotationYaw * 0.017453292F);
+			f2 = MathHelper.sin(et.rotationYaw * 0.017453292F);
+			f3 = -f2 * MathHelper.sin(et.rotationPitch * 0.017453292F);
+			f4 = f1 * MathHelper.sin(et.rotationPitch * 0.017453292F);
+			f5 = MathHelper.cos(et.rotationPitch * 0.017453292F);
 		}
+	}
 
-		shaderProgram = DynamicLightsAccelParticleShader.compile();
-		shaderProgram.loadUniforms();
-
-		particleBuffer = EagRuntime.allocateByteBuffer(PARTICLE_LIMIT * BYTES_PER_PARTICLE);
-
-		vertexArray = _wglGenVertexArrays();
-		vertexBuffer = _wglGenBuffers();
-		instancesBuffer = _wglGenBuffers();
-
-		FloatBuffer verts = EagRuntime.allocateFloatBuffer(12);
-		verts.put(new float[] {
-				-1.0f, -1.0f,  -1.0f,  1.0f,   1.0f, -1.0f,
-				-1.0f,  1.0f,   1.0f,  1.0f,   1.0f, -1.0f
-		});
-		verts.flip();
-
-		EaglercraftGPU.bindGLBufferArray(vertexArray);
-
-		EaglercraftGPU.bindGLArrayBuffer(vertexBuffer);
-		_wglBufferData(GL_ARRAY_BUFFER, verts, GL_STATIC_DRAW);
-
-		EagRuntime.freeFloatBuffer(verts);
-
-		_wglEnableVertexAttribArray(0);
-		_wglVertexAttribPointer(0, 2, GL_FLOAT, false, 8, 0);
-		_wglVertexAttribDivisor(0, 0);
-
-		EaglercraftGPU.bindGLArrayBuffer(instancesBuffer);
-		_wglBufferData(GL_ARRAY_BUFFER, particleBuffer.remaining(), GL_STREAM_DRAW);
-
-		_wglEnableVertexAttribArray(1);
-		_wglVertexAttribPointer(1, 3, GL_FLOAT, false, 24, 0);
-		_wglVertexAttribDivisor(1, 1);
-
-		_wglEnableVertexAttribArray(2);
-		_wglVertexAttribPointer(2, 2, GL_UNSIGNED_SHORT, false, 24, 12);
-		_wglVertexAttribDivisor(2, 1);
-
-		_wglEnableVertexAttribArray(3);
-		_wglVertexAttribPointer(3, 2, GL_UNSIGNED_BYTE, true, 24, 16);
-		_wglVertexAttribDivisor(3, 1);
-
-		_wglEnableVertexAttribArray(4);
-		_wglVertexAttribPointer(4, 2, GL_UNSIGNED_BYTE, false, 24, 18);
-		_wglVertexAttribDivisor(4, 1);
-
-		_wglEnableVertexAttribArray(5);
-		_wglVertexAttribPointer(5, 4, GL_UNSIGNED_BYTE, true, 24, 20);
-		_wglVertexAttribDivisor(5, 1);
-
+	public void destroy() {
+		if (particleBuffer != null) {
+			EagRuntime.freeByteBuffer(particleBuffer);
+			particleBuffer = null;
+		}
+		if (shaderProgram != null) {
+			shaderProgram.destroy();
+			shaderProgram = null;
+		}
+		if (vertexArray != null) {
+			_wglDeleteVertexArrays(vertexArray);
+			vertexArray = null;
+		}
+		if (vertexBuffer != null) {
+			_wglDeleteBuffers(vertexBuffer);
+			vertexBuffer = null;
+		}
+		if (instancesBuffer != null) {
+			_wglDeleteBuffers(instancesBuffer);
+			instancesBuffer = null;
+		}
 	}
 
 	@Override
 	public void draw(float texCoordWidth, float texCoordHeight) {
-		if(particleCount == 0) {
+		if (particleCount == 0) {
 			return;
 		}
-	
+
 		shaderProgram.useProgram();
 
 		_wglUniform3f(shaderProgram.uniforms.u_texCoordSize2f_particleSize1f, texCoordWidth, texCoordHeight, 0.0625f);
@@ -163,32 +166,15 @@ public class DynamicLightsAcceleratedEffectRenderer extends AbstractAcceleratedE
 	}
 
 	@Override
-	public void begin(float partialTicks) {
-		this.partialTicks = partialTicks;
-
-		particleBuffer.clear();
-		particleCount = 0;
-		particlesHasOverflowed = false;
-
-		Entity et = Minecraft.getMinecraft().getRenderViewEntity();
-		if(et != null) {
-			f1 = MathHelper.cos(et.rotationYaw * 0.017453292F);
-			f2 = MathHelper.sin(et.rotationYaw * 0.017453292F);
-			f3 = -f2 * MathHelper.sin(et.rotationPitch * 0.017453292F);
-			f4 = f1 * MathHelper.sin(et.rotationPitch * 0.017453292F);
-			f5 = MathHelper.cos(et.rotationPitch * 0.017453292F);
-		}
-	}
-
-	@Override
 	public void drawParticle(float posX, float posY, float posZ, int particleIndexX, int particleIndexY,
 			int lightMapData, int texSize, float particleSize, int rgba) {
-		if(particlesHasOverflowed) {
+		if (particlesHasOverflowed) {
 			return;
 		}
-		if(particleCount >= PARTICLE_LIMIT) {
+		if (particleCount >= PARTICLE_LIMIT) {
 			particlesHasOverflowed = true;
-			logger.error("Particle buffer has overflowed! Exceeded {} particles, no more particles will be rendered.", PARTICLE_LIMIT);
+			logger.error("Particle buffer has overflowed! Exceeded {} particles, no more particles will be rendered.",
+					PARTICLE_LIMIT);
 			return;
 		}
 		++particleCount;
@@ -196,35 +182,68 @@ public class DynamicLightsAcceleratedEffectRenderer extends AbstractAcceleratedE
 		buf.putFloat(posX);
 		buf.putFloat(posY);
 		buf.putFloat(posZ);
-		buf.putShort((short)particleIndexX);
-		buf.putShort((short)particleIndexY);
-		buf.put((byte)(lightMapData & 0xFF));
-		buf.put((byte)((lightMapData >> 16) & 0xFF));
-		buf.put((byte)(particleSize * 16.0f));
-		buf.put((byte)texSize);
+		buf.putShort((short) particleIndexX);
+		buf.putShort((short) particleIndexY);
+		buf.put((byte) (lightMapData & 0xFF));
+		buf.put((byte) ((lightMapData >> 16) & 0xFF));
+		buf.put((byte) (particleSize * 16.0f));
+		buf.put((byte) texSize);
 		buf.putInt(rgba);
 	}
 
-	public void destroy() {
-		if(particleBuffer != null) {
-			EagRuntime.freeByteBuffer(particleBuffer);
-			particleBuffer = null;
+	public void initialize() {
+		destroy();
+
+		if (DynamicLightsPipelineCompiler.matrixCopyBuffer == null) {
+			DynamicLightsPipelineCompiler.matrixCopyBuffer = GLAllocation.createDirectFloatBuffer(16);
 		}
-		if(shaderProgram != null) {
-			shaderProgram.destroy();
-			shaderProgram = null;
-		}
-		if(vertexArray != null) {
-			_wglDeleteVertexArrays(vertexArray);
-			vertexArray = null;
-		}
-		if(vertexBuffer != null) {
-			_wglDeleteBuffers(vertexBuffer);
-			vertexBuffer = null;
-		}
-		if(instancesBuffer != null) {
-			_wglDeleteBuffers(instancesBuffer);
-			instancesBuffer = null;
-		}
+
+		shaderProgram = DynamicLightsAccelParticleShader.compile();
+		shaderProgram.loadUniforms();
+
+		particleBuffer = EagRuntime.allocateByteBuffer(PARTICLE_LIMIT * BYTES_PER_PARTICLE);
+
+		vertexArray = _wglGenVertexArrays();
+		vertexBuffer = _wglGenBuffers();
+		instancesBuffer = _wglGenBuffers();
+
+		FloatBuffer verts = EagRuntime.allocateFloatBuffer(12);
+		verts.put(new float[] { -1.0f, -1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, -1.0f });
+		verts.flip();
+
+		EaglercraftGPU.bindGLBufferArray(vertexArray);
+
+		EaglercraftGPU.bindGLArrayBuffer(vertexBuffer);
+		_wglBufferData(GL_ARRAY_BUFFER, verts, GL_STATIC_DRAW);
+
+		EagRuntime.freeFloatBuffer(verts);
+
+		_wglEnableVertexAttribArray(0);
+		_wglVertexAttribPointer(0, 2, GL_FLOAT, false, 8, 0);
+		_wglVertexAttribDivisor(0, 0);
+
+		EaglercraftGPU.bindGLArrayBuffer(instancesBuffer);
+		_wglBufferData(GL_ARRAY_BUFFER, particleBuffer.remaining(), GL_STREAM_DRAW);
+
+		_wglEnableVertexAttribArray(1);
+		_wglVertexAttribPointer(1, 3, GL_FLOAT, false, 24, 0);
+		_wglVertexAttribDivisor(1, 1);
+
+		_wglEnableVertexAttribArray(2);
+		_wglVertexAttribPointer(2, 2, GL_UNSIGNED_SHORT, false, 24, 12);
+		_wglVertexAttribDivisor(2, 1);
+
+		_wglEnableVertexAttribArray(3);
+		_wglVertexAttribPointer(3, 2, GL_UNSIGNED_BYTE, true, 24, 16);
+		_wglVertexAttribDivisor(3, 1);
+
+		_wglEnableVertexAttribArray(4);
+		_wglVertexAttribPointer(4, 2, GL_UNSIGNED_BYTE, false, 24, 18);
+		_wglVertexAttribDivisor(4, 1);
+
+		_wglEnableVertexAttribArray(5);
+		_wglVertexAttribPointer(5, 4, GL_UNSIGNED_BYTE, true, 24, 20);
+		_wglVertexAttribDivisor(5, 1);
+
 	}
 }

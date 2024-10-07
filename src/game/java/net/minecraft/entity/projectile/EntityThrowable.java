@@ -1,6 +1,7 @@
 package net.minecraft.entity.projectile;
 
 import java.util.List;
+
 import net.lax1dude.eaglercraft.v1_8.EaglercraftUUID;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -19,22 +20,25 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -56,22 +60,11 @@ public abstract class EntityThrowable extends Entity implements IProjectile {
 		this.setSize(0.25F, 0.25F);
 	}
 
-	protected void entityInit() {
-	}
-
-	/**+
-	 * Checks if the entity is in range to render by using the past
-	 * in distance and comparing it to its average edge length * 64
-	 * * renderDistanceWeight Args: distance
-	 */
-	public boolean isInRangeToRenderDist(double d0) {
-		double d1 = this.getEntityBoundingBox().getAverageEdgeLength() * 4.0D;
-		if (Double.isNaN(d1)) {
-			d1 = 4.0D;
-		}
-
-		d1 = d1 * 64.0D;
-		return d0 < d1 * d1;
+	public EntityThrowable(World worldIn, double x, double y, double z) {
+		super(worldIn);
+		this.ticksInGround = 0;
+		this.setSize(0.25F, 0.25F);
+		this.setPosition(x, y, z);
 	}
 
 	public EntityThrowable(World worldIn, EntityLivingBase throwerIn) {
@@ -94,66 +87,62 @@ public abstract class EntityThrowable extends Entity implements IProjectile {
 		this.setThrowableHeading(this.motionX, this.motionY, this.motionZ, this.getVelocity(), 1.0F);
 	}
 
-	public EntityThrowable(World worldIn, double x, double y, double z) {
-		super(worldIn);
-		this.ticksInGround = 0;
-		this.setSize(0.25F, 0.25F);
-		this.setPosition(x, y, z);
+	protected void entityInit() {
 	}
 
-	protected float getVelocity() {
-		return 1.5F;
+	/**
+	 * + Gets the amount of gravity to apply to the thrown entity with each tick.
+	 */
+	protected float getGravityVelocity() {
+		return 0.03F;
 	}
 
 	protected float getInaccuracy() {
 		return 0.0F;
 	}
 
-	/**+
-	 * Similar to setArrowHeading, it's point the throwable entity
-	 * to a x, y, z direction.
-	 */
-	public void setThrowableHeading(double d0, double d1, double d2, float f, float f1) {
-		float f2 = MathHelper.sqrt_double(d0 * d0 + d1 * d1 + d2 * d2);
-		d0 = d0 / (double) f2;
-		d1 = d1 / (double) f2;
-		d2 = d2 / (double) f2;
-		d0 = d0 + this.rand.nextGaussian() * 0.007499999832361937D * (double) f1;
-		d1 = d1 + this.rand.nextGaussian() * 0.007499999832361937D * (double) f1;
-		d2 = d2 + this.rand.nextGaussian() * 0.007499999832361937D * (double) f1;
-		d0 = d0 * (double) f;
-		d1 = d1 * (double) f;
-		d2 = d2 * (double) f;
-		this.motionX = d0;
-		this.motionY = d1;
-		this.motionZ = d2;
-		float f3 = MathHelper.sqrt_double(d0 * d0 + d2 * d2);
-		this.prevRotationYaw = this.rotationYaw = (float) (MathHelper.func_181159_b(d0, d2) * 180.0D
-				/ 3.1415927410125732D);
-		this.prevRotationPitch = this.rotationPitch = (float) (MathHelper.func_181159_b(d1, (double) f3) * 180.0D
-				/ 3.1415927410125732D);
-		this.ticksInGround = 0;
-	}
-
-	/**+
-	 * Sets the velocity to the args. Args: x, y, z
-	 */
-	public void setVelocity(double d0, double d1, double d2) {
-		this.motionX = d0;
-		this.motionY = d1;
-		this.motionZ = d2;
-		if (this.prevRotationPitch == 0.0F && this.prevRotationYaw == 0.0F) {
-			float f = MathHelper.sqrt_double(d0 * d0 + d2 * d2);
-			this.prevRotationYaw = this.rotationYaw = (float) (MathHelper.func_181159_b(d0, d2) * 180.0D
-					/ 3.1415927410125732D);
-			this.prevRotationPitch = this.rotationPitch = (float) (MathHelper.func_181159_b(d1, (double) f) * 180.0D
-					/ 3.1415927410125732D);
+	public EntityLivingBase getThrower() {
+		if (this.thrower == null && this.throwerName != null && this.throwerName.length() > 0) {
+			this.thrower = this.worldObj.getPlayerEntityByName(this.throwerName);
+			if (this.thrower == null && this.worldObj instanceof WorldServer) {
+				try {
+					Entity entity = ((WorldServer) this.worldObj)
+							.getEntityFromUuid(EaglercraftUUID.fromString(this.throwerName));
+					if (entity instanceof EntityLivingBase) {
+						this.thrower = (EntityLivingBase) entity;
+					}
+				} catch (Throwable var2) {
+					this.thrower = null;
+				}
+			}
 		}
 
+		return this.thrower;
 	}
 
-	/**+
-	 * Called to update the entity's position/logic.
+	protected float getVelocity() {
+		return 1.5F;
+	}
+
+	/**
+	 * + Checks if the entity is in range to render by using the past in distance
+	 * and comparing it to its average edge length * 64 * renderDistanceWeight Args:
+	 * distance
+	 */
+	public boolean isInRangeToRenderDist(double d0) {
+		double d1 = this.getEntityBoundingBox().getAverageEdgeLength() * 4.0D;
+		if (Double.isNaN(d1)) {
+			d1 = 4.0D;
+		}
+
+		d1 = d1 * 64.0D;
+		return d0 < d1 * d1;
+	}
+
+	protected abstract void onImpact(MovingObjectPosition var1);
+
+	/**
+	 * + Called to update the entity's position/logic.
 	 */
 	public void onUpdate() {
 		this.lastTickPosX = this.posX;
@@ -280,38 +269,8 @@ public abstract class EntityThrowable extends Entity implements IProjectile {
 		this.setPosition(this.posX, this.posY, this.posZ);
 	}
 
-	/**+
-	 * Gets the amount of gravity to apply to the thrown entity with
-	 * each tick.
-	 */
-	protected float getGravityVelocity() {
-		return 0.03F;
-	}
-
-	protected abstract void onImpact(MovingObjectPosition var1);
-
-	/**+
-	 * (abstract) Protected helper method to write subclass entity
-	 * data to NBT.
-	 */
-	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
-		nbttagcompound.setShort("xTile", (short) this.xTile);
-		nbttagcompound.setShort("yTile", (short) this.yTile);
-		nbttagcompound.setShort("zTile", (short) this.zTile);
-		ResourceLocation resourcelocation = (ResourceLocation) Block.blockRegistry.getNameForObject(this.inTile);
-		nbttagcompound.setString("inTile", resourcelocation == null ? "" : resourcelocation.toString());
-		nbttagcompound.setByte("shake", (byte) this.throwableShake);
-		nbttagcompound.setByte("inGround", (byte) (this.inGround ? 1 : 0));
-		if ((this.throwerName == null || this.throwerName.length() == 0) && this.thrower instanceof EntityPlayer) {
-			this.throwerName = this.thrower.getName();
-		}
-
-		nbttagcompound.setString("ownerName", this.throwerName == null ? "" : this.throwerName);
-	}
-
-	/**+
-	 * (abstract) Protected helper method to read subclass entity
-	 * data from NBT.
+	/**
+	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		this.xTile = nbttagcompound.getShort("xTile");
@@ -334,22 +293,64 @@ public abstract class EntityThrowable extends Entity implements IProjectile {
 		this.thrower = this.getThrower();
 	}
 
-	public EntityLivingBase getThrower() {
-		if (this.thrower == null && this.throwerName != null && this.throwerName.length() > 0) {
-			this.thrower = this.worldObj.getPlayerEntityByName(this.throwerName);
-			if (this.thrower == null && this.worldObj instanceof WorldServer) {
-				try {
-					Entity entity = ((WorldServer) this.worldObj)
-							.getEntityFromUuid(EaglercraftUUID.fromString(this.throwerName));
-					if (entity instanceof EntityLivingBase) {
-						this.thrower = (EntityLivingBase) entity;
-					}
-				} catch (Throwable var2) {
-					this.thrower = null;
-				}
-			}
+	/**
+	 * + Similar to setArrowHeading, it's point the throwable entity to a x, y, z
+	 * direction.
+	 */
+	public void setThrowableHeading(double d0, double d1, double d2, float f, float f1) {
+		float f2 = MathHelper.sqrt_double(d0 * d0 + d1 * d1 + d2 * d2);
+		d0 = d0 / (double) f2;
+		d1 = d1 / (double) f2;
+		d2 = d2 / (double) f2;
+		d0 = d0 + this.rand.nextGaussian() * 0.007499999832361937D * (double) f1;
+		d1 = d1 + this.rand.nextGaussian() * 0.007499999832361937D * (double) f1;
+		d2 = d2 + this.rand.nextGaussian() * 0.007499999832361937D * (double) f1;
+		d0 = d0 * (double) f;
+		d1 = d1 * (double) f;
+		d2 = d2 * (double) f;
+		this.motionX = d0;
+		this.motionY = d1;
+		this.motionZ = d2;
+		float f3 = MathHelper.sqrt_double(d0 * d0 + d2 * d2);
+		this.prevRotationYaw = this.rotationYaw = (float) (MathHelper.func_181159_b(d0, d2) * 180.0D
+				/ 3.1415927410125732D);
+		this.prevRotationPitch = this.rotationPitch = (float) (MathHelper.func_181159_b(d1, (double) f3) * 180.0D
+				/ 3.1415927410125732D);
+		this.ticksInGround = 0;
+	}
+
+	/**
+	 * + Sets the velocity to the args. Args: x, y, z
+	 */
+	public void setVelocity(double d0, double d1, double d2) {
+		this.motionX = d0;
+		this.motionY = d1;
+		this.motionZ = d2;
+		if (this.prevRotationPitch == 0.0F && this.prevRotationYaw == 0.0F) {
+			float f = MathHelper.sqrt_double(d0 * d0 + d2 * d2);
+			this.prevRotationYaw = this.rotationYaw = (float) (MathHelper.func_181159_b(d0, d2) * 180.0D
+					/ 3.1415927410125732D);
+			this.prevRotationPitch = this.rotationPitch = (float) (MathHelper.func_181159_b(d1, (double) f) * 180.0D
+					/ 3.1415927410125732D);
 		}
 
-		return this.thrower;
+	}
+
+	/**
+	 * + (abstract) Protected helper method to write subclass entity data to NBT.
+	 */
+	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
+		nbttagcompound.setShort("xTile", (short) this.xTile);
+		nbttagcompound.setShort("yTile", (short) this.yTile);
+		nbttagcompound.setShort("zTile", (short) this.zTile);
+		ResourceLocation resourcelocation = (ResourceLocation) Block.blockRegistry.getNameForObject(this.inTile);
+		nbttagcompound.setString("inTile", resourcelocation == null ? "" : resourcelocation.toString());
+		nbttagcompound.setByte("shake", (byte) this.throwableShake);
+		nbttagcompound.setByte("inGround", (byte) (this.inGround ? 1 : 0));
+		if ((this.throwerName == null || this.throwerName.length() == 0) && this.thrower instanceof EntityPlayer) {
+			this.throwerName = this.thrower.getName();
+		}
+
+		nbttagcompound.setString("ownerName", this.throwerName == null ? "" : this.throwerName);
 	}
 }

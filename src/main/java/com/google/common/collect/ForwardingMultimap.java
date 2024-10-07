@@ -43,9 +43,6 @@ public abstract class ForwardingMultimap<K, V> extends ForwardingObject implemen
 	}
 
 	@Override
-	protected abstract Multimap<K, V> delegate();
-
-	@Override
 	public Map<K, Collection<V>> asMap() {
 		return delegate().asMap();
 	}
@@ -71,13 +68,26 @@ public abstract class ForwardingMultimap<K, V> extends ForwardingObject implemen
 	}
 
 	@Override
+	protected abstract Multimap<K, V> delegate();
+
+	@Override
 	public Collection<Entry<K, V>> entries() {
 		return delegate().entries();
 	}
 
 	@Override
+	public boolean equals(@Nullable Object object) {
+		return object == this || delegate().equals(object);
+	}
+
+	@Override
 	public Collection<V> get(@Nullable K key) {
 		return delegate().get(key);
+	}
+
+	@Override
+	public int hashCode() {
+		return delegate().hashCode();
 	}
 
 	@Override
@@ -133,15 +143,5 @@ public abstract class ForwardingMultimap<K, V> extends ForwardingObject implemen
 	@Override
 	public Collection<V> values() {
 		return delegate().values();
-	}
-
-	@Override
-	public boolean equals(@Nullable Object object) {
-		return object == this || delegate().equals(object);
-	}
-
-	@Override
-	public int hashCode() {
-		return delegate().hashCode();
 	}
 }

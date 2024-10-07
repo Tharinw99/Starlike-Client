@@ -36,54 +36,6 @@ import com.google.common.annotations.GwtCompatible;
 @Beta
 @GwtCompatible
 public final class Escapers {
-	private Escapers() {
-	}
-
-	/**
-	 * Returns an {@link Escaper} that does no escaping, passing all character data
-	 * through unchanged.
-	 */
-	public static Escaper nullEscaper() {
-		return NULL_ESCAPER;
-	}
-
-	// An Escaper that efficiently performs no escaping.
-	// Extending CharEscaper (instead of Escaper) makes Escapers.compose() easier.
-	private static final Escaper NULL_ESCAPER = new CharEscaper() {
-		@Override
-		public String escape(String string) {
-			return checkNotNull(string);
-		}
-
-		@Override
-		protected char[] escape(char c) {
-			// TODO: Fix tests not to call this directly and make it throw an error.
-			return null;
-		}
-	};
-
-	/**
-	 * Returns a builder for creating simple, fast escapers. A builder instance can
-	 * be reused and each escaper that is created will be a snapshot of the current
-	 * builder state. Builders are not thread safe.
-	 *
-	 * <p>
-	 * The initial state of the builder is such that:
-	 * <ul>
-	 * <li>There are no replacement mappings
-	 * <li>
-	 * <li>{@code safeMin == Character.MIN_VALUE}</li>
-	 * <li>{@code safeMax == Character.MAX_VALUE}</li>
-	 * <li>{@code unsafeReplacement == null}</li>
-	 * </ul>
-	 * <p>
-	 * For performance reasons escapers created by this builder are not Unicode
-	 * aware and will not validate the well-formedness of their input.
-	 */
-	public static Builder builder() {
-		return new Builder();
-	}
-
 	/**
 	 * A builder for simple, fast escapers.
 	 *
@@ -106,35 +58,6 @@ public final class Escapers {
 
 		// The constructor is exposed via the builder() method above.
 		private Builder() {
-		}
-
-		/**
-		 * Sets the safe range of characters for the escaper. Characters in this range
-		 * that have no explicit replacement are considered 'safe' and remain unescaped
-		 * in the output. If {@code safeMax < safeMin} then the safe range is empty.
-		 *
-		 * @param safeMin the lowest 'safe' character
-		 * @param safeMax the highest 'safe' character
-		 * @return the builder instance
-		 */
-		public Builder setSafeRange(char safeMin, char safeMax) {
-			this.safeMin = safeMin;
-			this.safeMax = safeMax;
-			return this;
-		}
-
-		/**
-		 * Sets the replacement string for any characters outside the 'safe' range that
-		 * have no explicit replacement. If {@code unsafeReplacement} is {@code null}
-		 * then no replacement will occur, if it is {@code ""} then the unsafe
-		 * characters are removed from the output.
-		 *
-		 * @param unsafeReplacement the string to replace unsafe chracters
-		 * @return the builder instance
-		 */
-		public Builder setUnsafeReplacement(@Nullable String unsafeReplacement) {
-			this.unsafeReplacement = unsafeReplacement;
-			return this;
 		}
 
 		/**
@@ -168,7 +91,51 @@ public final class Escapers {
 				}
 			};
 		}
+
+		/**
+		 * Sets the safe range of characters for the escaper. Characters in this range
+		 * that have no explicit replacement are considered 'safe' and remain unescaped
+		 * in the output. If {@code safeMax < safeMin} then the safe range is empty.
+		 *
+		 * @param safeMin the lowest 'safe' character
+		 * @param safeMax the highest 'safe' character
+		 * @return the builder instance
+		 */
+		public Builder setSafeRange(char safeMin, char safeMax) {
+			this.safeMin = safeMin;
+			this.safeMax = safeMax;
+			return this;
+		}
+
+		/**
+		 * Sets the replacement string for any characters outside the 'safe' range that
+		 * have no explicit replacement. If {@code unsafeReplacement} is {@code null}
+		 * then no replacement will occur, if it is {@code ""} then the unsafe
+		 * characters are removed from the output.
+		 *
+		 * @param unsafeReplacement the string to replace unsafe chracters
+		 * @return the builder instance
+		 */
+		public Builder setUnsafeReplacement(@Nullable String unsafeReplacement) {
+			this.unsafeReplacement = unsafeReplacement;
+			return this;
+		}
 	}
+
+	// An Escaper that efficiently performs no escaping.
+	// Extending CharEscaper (instead of Escaper) makes Escapers.compose() easier.
+	private static final Escaper NULL_ESCAPER = new CharEscaper() {
+		@Override
+		protected char[] escape(char c) {
+			// TODO: Fix tests not to call this directly and make it throw an error.
+			return null;
+		}
+
+		@Override
+		public String escape(String string) {
+			return checkNotNull(string);
+		}
+	};
 
 	/**
 	 * Returns a {@link UnicodeEscaper} equivalent to the given escaper instance. If
@@ -200,6 +167,28 @@ public final class Escapers {
 	}
 
 	/**
+	 * Returns a builder for creating simple, fast escapers. A builder instance can
+	 * be reused and each escaper that is created will be a snapshot of the current
+	 * builder state. Builders are not thread safe.
+	 *
+	 * <p>
+	 * The initial state of the builder is such that:
+	 * <ul>
+	 * <li>There are no replacement mappings
+	 * <li>
+	 * <li>{@code safeMin == Character.MIN_VALUE}</li>
+	 * <li>{@code safeMax == Character.MAX_VALUE}</li>
+	 * <li>{@code unsafeReplacement == null}</li>
+	 * </ul>
+	 * <p>
+	 * For performance reasons escapers created by this builder are not Unicode
+	 * aware and will not validate the well-formedness of their input.
+	 */
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	/**
 	 * Returns a string that would replace the given character in the specified
 	 * escaper, or {@code null} if no replacement should be made. This method is
 	 * intended for use in tests through the {@code EscaperAsserts} class;
@@ -225,6 +214,14 @@ public final class Escapers {
 	 */
 	public static String computeReplacement(UnicodeEscaper escaper, int cp) {
 		return stringOrNull(escaper.escape(cp));
+	}
+
+	/**
+	 * Returns an {@link Escaper} that does no escaping, passing all character data
+	 * through unchanged.
+	 */
+	public static Escaper nullEscaper() {
+		return NULL_ESCAPER;
 	}
 
 	private static String stringOrNull(char[] in) {
@@ -279,5 +276,8 @@ public final class Escapers {
 				return output;
 			}
 		};
+	}
+
+	private Escapers() {
 	}
 }

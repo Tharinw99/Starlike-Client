@@ -33,14 +33,14 @@ class SingletonImmutableTable<R, C, V> extends ImmutableTable<R, C, V> {
 	final C singleColumnKey;
 	final V singleValue;
 
+	SingletonImmutableTable(Cell<R, C, V> cell) {
+		this(cell.getRowKey(), cell.getColumnKey(), cell.getValue());
+	}
+
 	SingletonImmutableTable(R rowKey, C columnKey, V value) {
 		this.singleRowKey = checkNotNull(rowKey);
 		this.singleColumnKey = checkNotNull(columnKey);
 		this.singleValue = checkNotNull(value);
-	}
-
-	SingletonImmutableTable(Cell<R, C, V> cell) {
-		this(cell.getRowKey(), cell.getColumnKey(), cell.getValue());
 	}
 
 	@Override
@@ -55,16 +55,6 @@ class SingletonImmutableTable<R, C, V> extends ImmutableTable<R, C, V> {
 	}
 
 	@Override
-	public ImmutableMap<R, Map<C, V>> rowMap() {
-		return ImmutableMap.of(singleRowKey, (Map<C, V>) ImmutableMap.of(singleColumnKey, singleValue));
-	}
-
-	@Override
-	public int size() {
-		return 1;
-	}
-
-	@Override
 	ImmutableSet<Cell<R, C, V>> createCellSet() {
 		return ImmutableSet.of(cellOf(singleRowKey, singleColumnKey, singleValue));
 	}
@@ -72,5 +62,15 @@ class SingletonImmutableTable<R, C, V> extends ImmutableTable<R, C, V> {
 	@Override
 	ImmutableCollection<V> createValues() {
 		return ImmutableSet.of(singleValue);
+	}
+
+	@Override
+	public ImmutableMap<R, Map<C, V>> rowMap() {
+		return ImmutableMap.of(singleRowKey, (Map<C, V>) ImmutableMap.of(singleColumnKey, singleValue));
+	}
+
+	@Override
+	public int size() {
+		return 1;
 	}
 }

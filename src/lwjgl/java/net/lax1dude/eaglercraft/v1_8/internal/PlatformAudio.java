@@ -15,51 +15,66 @@ import paulscode.sound.codecs.CodecWav;
 /**
  * Copyright (c) 2022-2023 lax1dude, ayunami2000. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class PlatformAudio {
-	
-	protected static class PaulscodeAudioResource implements IAudioResource {
-		
-		protected final URL resourceLoc;
-		
-		protected PaulscodeAudioResource(URL resourceLoc) {
-			this.resourceLoc = resourceLoc;
-		}
-		
+
+	public static interface IAudioCacheLoader {
+		byte[] loadFile(String filename);
 	}
-	
+
 	protected static class PaulscodeAudioHandle implements IAudioHandle {
-		
+
 		protected final String sourceName;
 		protected long stall;
-		
+
 		protected PaulscodeAudioHandle(String sourceName) {
 			this.sourceName = sourceName;
 			this.stall = PlatformRuntime.steadyTimeMillis();
 		}
 
 		@Override
+		public void end() {
+			sndSystem.stop(sourceName);
+		}
+
+		@Override
+		public void gain(float f) {
+			sndSystem.setVolume(sourceName, f);
+		}
+
+		@Override
+		public void move(float x, float y, float z) {
+			sndSystem.setPosition(sourceName, x, y, z);
+		}
+
+		@Override
 		public void pause(boolean setPaused) {
-			if(setPaused) {
-				if(sndSystem.playing(sourceName)) {
+			if (setPaused) {
+				if (sndSystem.playing(sourceName)) {
 					sndSystem.pause(sourceName);
 				}
-			}else {
-				if(!sndSystem.playing(sourceName)) {
+			} else {
+				if (!sndSystem.playing(sourceName)) {
 					sndSystem.play(sourceName);
 				}
 			}
+		}
+
+		@Override
+		public void pitch(float f) {
+			sndSystem.setPitch(sourceName, f);
 		}
 
 		@Override
@@ -70,60 +85,94 @@ public class PlatformAudio {
 		}
 
 		@Override
-		public void move(float x, float y, float z) {
-			sndSystem.setPosition(sourceName, x, y, z);
-		}
-
-		@Override
-		public void pitch(float f) {
-			sndSystem.setPitch(sourceName, f);
-		}
-
-		@Override
-		public void gain(float f) {
-			sndSystem.setVolume(sourceName, f);
-		}
-
-		@Override
-		public void end() {
-			sndSystem.stop(sourceName);
-		}
-
-		@Override
 		public boolean shouldFree() {
-			return !sndSystem.playing(sourceName) && PlatformRuntime.steadyTimeMillis() - this.stall > 250l; //TODO: I hate this hack
+			return !sndSystem.playing(sourceName) && PlatformRuntime.steadyTimeMillis() - this.stall > 250l; // TODO: I
+																												// hate
+																												// this
+																												// hack
 		}
-		
+
 	}
-	
-	public static IAudioResource loadAudioData(String filename, boolean holdInCache) {
-		URL ret = PlatformAssets.getDesktopResourceURL(filename);
-		if(ret != null) {
-			return new PaulscodeAudioResource(ret);
-		}else {
+
+	protected static class PaulscodeAudioResource implements IAudioResource {
+
+		protected final URL resourceLoc;
+
+		protected PaulscodeAudioResource(URL resourceLoc) {
+			this.resourceLoc = resourceLoc;
+		}
+
+	}
+
+	private static final Logger logger = LogManager.getLogger("EaglercraftPlatformAudio");
+
+	private static SoundSystem sndSystem = null;
+
+	private static int sourceCounter = 0;
+
+	public static boolean available() {
+		return sndSystem != null;
+	}
+
+	public static IAudioHandle beginPlayback(IAudioResource track, float x, float y, float z, float volume,
+			float pitch) {
+		if (sndSystem == null) {
 			return null;
 		}
+
+		float f1 = 16.0F;
+		if (volume > 1.0F) {
+			f1 *= volume;
+		}
+
+		String srcName = "src" + ++sourceCounter;
+		sndSystem.newSource(false, srcName, ((PaulscodeAudioResource) track).resourceLoc,
+				((PaulscodeAudioResource) track).resourceLoc.getPath(), false, x, y, z, 2, f1);
+		sndSystem.setTemporary(srcName, true);
+		sndSystem.setPitch(srcName, pitch);
+		sndSystem.setVolume(srcName, volume);
+		sndSystem.play(srcName);
+
+		return new PaulscodeAudioHandle(srcName);
 	}
-	
+
+	public static IAudioHandle beginPlaybackStatic(IAudioResource track, float volume, float pitch) {
+		if (sndSystem == null) {
+			return null;
+		}
+
+		String srcName = "src" + ++sourceCounter;
+		sndSystem.newSource(false, srcName, ((PaulscodeAudioResource) track).resourceLoc,
+				((PaulscodeAudioResource) track).resourceLoc.getPath(), false, 0.0f, 0.0f, 0.0f, 0, 0.0f);
+		sndSystem.setTemporary(srcName, true);
+		sndSystem.setPitch(srcName, pitch);
+		sndSystem.setVolume(srcName, volume);
+		sndSystem.play(srcName);
+
+		return new PaulscodeAudioHandle(srcName);
+	}
+
 	public static void clearAudioCache() {
 		// browser only
 	}
 
 	public static void flushAudioCache() {
-		
+
 	}
 
-	public static interface IAudioCacheLoader {
-		byte[] loadFile(String filename);
+	public static IAudioResource loadAudioData(String filename, boolean holdInCache) {
+		URL ret = PlatformAssets.getDesktopResourceURL(filename);
+		if (ret != null) {
+			return new PaulscodeAudioResource(ret);
+		} else {
+			return null;
+		}
 	}
 
 	public static IAudioResource loadAudioDataNew(String filename, boolean holdInCache, IAudioCacheLoader loader) {
 		throw new UnsupportedOperationException("Browser only!");
 	}
-	
-	private static final Logger logger = LogManager.getLogger("EaglercraftPlatformAudio");
-	private static SoundSystem sndSystem = null;
-	
+
 	static void platformInitialize() {
 		logger.info("Eaglercraft uses Paul Lamb's SoundSystem (with LWJGL3)");
 		logger.info("    \"Author: Paul Lamb, www.paulscode.com\"");
@@ -132,84 +181,42 @@ public class PlatformAudio {
 			SoundSystemConfig.setCodec("ogg", CodecJOrbis.class);
 			SoundSystemConfig.setCodec("wav", CodecWav.class);
 			SoundSystemConfig.setLogger(new SoundSystemLogger() {
-				public void message(String parString1, int parInt1) {
-					if (!parString1.isEmpty()) {
-						logger.info(parString1);
-					}
-				}
-				public void importantMessage(String parString1, int parInt1) {
-					if (!parString1.isEmpty()) {
-						logger.warn(parString1);
-					}
-				}
 				public void errorMessage(String parString1, String parString2, int parInt1) {
 					if (!parString2.isEmpty()) {
 						logger.error("Error in class \"{}\"!", parString1);
 						logger.error(parString2);
 					}
 				}
+
+				public void importantMessage(String parString1, int parInt1) {
+					if (!parString1.isEmpty()) {
+						logger.warn(parString1);
+					}
+				}
+
+				public void message(String parString1, int parInt1) {
+					if (!parString1.isEmpty()) {
+						logger.info(parString1);
+					}
+				}
 			});
 			sndSystem = new SoundSystem();
-		}catch(Throwable t) {
+		} catch (Throwable t) {
 			logger.error("Could not initialize Paulscode SoundSystem! Is this system's OpenAL installed correctly?");
 			logger.error(t);
 			sndSystem = null;
 		}
 	}
-	
+
 	static void platformShutdown() {
-		if(sndSystem != null) {
+		if (sndSystem != null) {
 			sndSystem.cleanup();
 			sndSystem = null;
 		}
 	}
-	
-	public static boolean available() {
-		return sndSystem != null;
-	}
-	
-	private static int sourceCounter = 0;
-	
-	public static IAudioHandle beginPlayback(IAudioResource track, float x, float y, float z,
-			float volume, float pitch) {
-		if(sndSystem == null) {
-			return null;
-		}
-		
-		float f1 = 16.0F;
-		if (volume > 1.0F) {
-			f1 *= volume;
-		}
-		
-		String srcName = "src" + ++sourceCounter;
-		sndSystem.newSource(false, srcName, ((PaulscodeAudioResource)track).resourceLoc,
-				((PaulscodeAudioResource)track).resourceLoc.getPath(), false, x, y, z, 2, f1);
-		sndSystem.setTemporary(srcName, true);
-		sndSystem.setPitch(srcName, pitch);
-		sndSystem.setVolume(srcName, volume);
-		sndSystem.play(srcName);
-		
-		return new PaulscodeAudioHandle(srcName);
-	}
-	
-	public static IAudioHandle beginPlaybackStatic(IAudioResource track, float volume, float pitch) {
-		if(sndSystem == null) {
-			return null;
-		}
-		
-		String srcName = "src" + ++sourceCounter;
-		sndSystem.newSource(false, srcName, ((PaulscodeAudioResource)track).resourceLoc,
-				((PaulscodeAudioResource)track).resourceLoc.getPath(), false, 0.0f, 0.0f, 0.0f, 0, 0.0f);
-		sndSystem.setTemporary(srcName, true);
-		sndSystem.setPitch(srcName, pitch);
-		sndSystem.setVolume(srcName, volume);
-		sndSystem.play(srcName);
-		
-		return new PaulscodeAudioHandle(srcName);
-	}
-	
+
 	public static void setListener(float x, float y, float z, float pitchDegrees, float yawDegrees) {
-		if(sndSystem == null) {
+		if (sndSystem == null) {
 			return;
 		}
 		float f2 = MathHelper.cos((yawDegrees + 90.0F) * 0.017453292F);

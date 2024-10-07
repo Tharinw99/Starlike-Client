@@ -50,6 +50,11 @@ public final class CharEscaperBuilder {
 			this.replaceLength = replacements.length;
 		}
 
+		@Override
+		protected char[] escape(char c) {
+			return c < replaceLength ? replacements[c] : null;
+		}
+
 		/*
 		 * Overriding escape method to be slightly faster for this decorator. We test
 		 * the replacements array directly, saving a method call.
@@ -64,11 +69,6 @@ public final class CharEscaperBuilder {
 				}
 			}
 			return s;
-		}
-
-		@Override
-		protected char[] escape(char c) {
-			return c < replaceLength ? replacements[c] : null;
 		}
 	}
 

@@ -21,22 +21,25 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -64,20 +67,99 @@ public class EntityChicken extends EntityAnimal {
 		this.tasks.addTask(7, new EntityAILookIdle(this));
 	}
 
-	public float getEyeHeight() {
-		return this.height;
-	}
-
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(4.0D);
 		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.25D);
 	}
 
-	/**+
-	 * Called frequently so the entity can update its state every
-	 * tick as required. For example, zombies and skeletons use this
-	 * to react to sunlight and start to burn.
+	/**
+	 * + Determines if an entity can be despawned, used on idle far away entities
+	 */
+	protected boolean canDespawn() {
+		return this.isChickenJockey() && this.riddenByEntity == null;
+	}
+
+	public EntityChicken createChild(EntityAgeable var1) {
+		return new EntityChicken(this.worldObj);
+	}
+
+	/**
+	 * + Drop 0-2 items of this living's type
+	 */
+	protected void dropFewItems(boolean var1, int i) {
+		int j = this.rand.nextInt(3) + this.rand.nextInt(1 + i);
+
+		for (int k = 0; k < j; ++k) {
+			this.dropItem(Items.feather, 1);
+		}
+
+		if (this.isBurning()) {
+			this.dropItem(Items.cooked_chicken, 1);
+		} else {
+			this.dropItem(Items.chicken, 1);
+		}
+
+	}
+
+	public void fall(float var1, float var2) {
+	}
+
+	/**
+	 * + Returns the sound this mob makes on death.
+	 */
+	protected String getDeathSound() {
+		return "mob.chicken.hurt";
+	}
+
+	protected Item getDropItem() {
+		return Items.feather;
+	}
+
+	/**
+	 * + Get the experience points the entity currently has.
+	 */
+	protected int getExperiencePoints(EntityPlayer entityplayer) {
+		return this.isChickenJockey() ? 10 : super.getExperiencePoints(entityplayer);
+	}
+
+	public float getEyeHeight() {
+		return this.height;
+	}
+
+	/**
+	 * + Returns the sound this mob makes when it is hurt.
+	 */
+	protected String getHurtSound() {
+		return "mob.chicken.hurt";
+	}
+
+	/**
+	 * + Returns the sound this mob makes while it's alive.
+	 */
+	protected String getLivingSound() {
+		return "mob.chicken.say";
+	}
+
+	/**
+	 * + Checks if the parameter is an item which this animal can be fed to breed it
+	 * (wheat, carrots or seeds depending on the animal type)
+	 */
+	public boolean isBreedingItem(ItemStack itemstack) {
+		return itemstack != null && itemstack.getItem() == Items.wheat_seeds;
+	}
+
+	/**
+	 * + Determines if this chicken is a jokey with a zombie riding it.
+	 */
+	public boolean isChickenJockey() {
+		return this.chickenJockey;
+	}
+
+	/**
+	 * + Called frequently so the entity can update its state every tick as
+	 * required. For example, zombies and skeletons use this to react to sunlight
+	 * and start to burn.
 	 */
 	public void onLivingUpdate() {
 		super.onLivingUpdate();
@@ -103,72 +185,12 @@ public class EntityChicken extends EntityAnimal {
 
 	}
 
-	public void fall(float var1, float var2) {
-	}
-
-	/**+
-	 * Returns the sound this mob makes while it's alive.
-	 */
-	protected String getLivingSound() {
-		return "mob.chicken.say";
-	}
-
-	/**+
-	 * Returns the sound this mob makes when it is hurt.
-	 */
-	protected String getHurtSound() {
-		return "mob.chicken.hurt";
-	}
-
-	/**+
-	 * Returns the sound this mob makes on death.
-	 */
-	protected String getDeathSound() {
-		return "mob.chicken.hurt";
-	}
-
 	protected void playStepSound(BlockPos var1, Block var2) {
 		this.playSound("mob.chicken.step", 0.15F, 1.0F);
 	}
 
-	protected Item getDropItem() {
-		return Items.feather;
-	}
-
-	/**+
-	 * Drop 0-2 items of this living's type
-	 */
-	protected void dropFewItems(boolean var1, int i) {
-		int j = this.rand.nextInt(3) + this.rand.nextInt(1 + i);
-
-		for (int k = 0; k < j; ++k) {
-			this.dropItem(Items.feather, 1);
-		}
-
-		if (this.isBurning()) {
-			this.dropItem(Items.cooked_chicken, 1);
-		} else {
-			this.dropItem(Items.chicken, 1);
-		}
-
-	}
-
-	public EntityChicken createChild(EntityAgeable var1) {
-		return new EntityChicken(this.worldObj);
-	}
-
-	/**+
-	 * Checks if the parameter is an item which this animal can be
-	 * fed to breed it (wheat, carrots or seeds depending on the
-	 * animal type)
-	 */
-	public boolean isBreedingItem(ItemStack itemstack) {
-		return itemstack != null && itemstack.getItem() == Items.wheat_seeds;
-	}
-
-	/**+
-	 * (abstract) Protected helper method to read subclass entity
-	 * data from NBT.
+	/**
+	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
@@ -179,29 +201,11 @@ public class EntityChicken extends EntityAnimal {
 
 	}
 
-	/**+
-	 * Get the experience points the entity currently has.
+	/**
+	 * + Sets whether this chicken is a jockey or not.
 	 */
-	protected int getExperiencePoints(EntityPlayer entityplayer) {
-		return this.isChickenJockey() ? 10 : super.getExperiencePoints(entityplayer);
-	}
-
-	/**+
-	 * (abstract) Protected helper method to write subclass entity
-	 * data to NBT.
-	 */
-	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
-		super.writeEntityToNBT(nbttagcompound);
-		nbttagcompound.setBoolean("IsChickenJockey", this.chickenJockey);
-		nbttagcompound.setInteger("EggLayTime", this.timeUntilNextEgg);
-	}
-
-	/**+
-	 * Determines if an entity can be despawned, used on idle far
-	 * away entities
-	 */
-	protected boolean canDespawn() {
-		return this.isChickenJockey() && this.riddenByEntity == null;
+	public void setChickenJockey(boolean jockey) {
+		this.chickenJockey = jockey;
 	}
 
 	public void updateRiderPosition() {
@@ -219,18 +223,12 @@ public class EntityChicken extends EntityAnimal {
 
 	}
 
-	/**+
-	 * Determines if this chicken is a jokey with a zombie riding
-	 * it.
+	/**
+	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
-	public boolean isChickenJockey() {
-		return this.chickenJockey;
-	}
-
-	/**+
-	 * Sets whether this chicken is a jockey or not.
-	 */
-	public void setChickenJockey(boolean jockey) {
-		this.chickenJockey = jockey;
+	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
+		super.writeEntityToNBT(nbttagcompound);
+		nbttagcompound.setBoolean("IsChickenJockey", this.chickenJockey);
+		nbttagcompound.setInteger("EggLayTime", this.timeUntilNextEgg);
 	}
 }

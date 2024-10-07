@@ -18,22 +18,25 @@ import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 import net.minecraft.client.resources.data.IMetadataSerializer;
 import net.minecraft.util.ResourceLocation;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -48,6 +51,47 @@ public class SimpleReloadableResourceManager implements IReloadableResourceManag
 
 	public SimpleReloadableResourceManager(IMetadataSerializer rmMetadataSerializerIn) {
 		this.rmMetadataSerializer = rmMetadataSerializerIn;
+	}
+
+	private void clearResources() {
+		this.domainResourceManagers.clear();
+		this.setResourceDomains.clear();
+	}
+
+	public List<IResource> getAllResources(ResourceLocation parResourceLocation) throws IOException {
+		IResourceManager iresourcemanager = (IResourceManager) this.domainResourceManagers
+				.get(parResourceLocation.getResourceDomain());
+		if (iresourcemanager != null) {
+			return iresourcemanager.getAllResources(parResourceLocation);
+		} else {
+			throw new FileNotFoundException(parResourceLocation.toString());
+		}
+	}
+
+	public IResource getResource(ResourceLocation parResourceLocation) throws IOException {
+		IResourceManager iresourcemanager = (IResourceManager) this.domainResourceManagers
+				.get(parResourceLocation.getResourceDomain());
+		if (iresourcemanager != null) {
+			return iresourcemanager.getResource(parResourceLocation);
+		} else {
+			throw new FileNotFoundException(parResourceLocation.toString());
+		}
+	}
+
+	public Set<String> getResourceDomains() {
+		return this.setResourceDomains;
+	}
+
+	private void notifyReloadListeners() {
+		for (IResourceManagerReloadListener iresourcemanagerreloadlistener : this.reloadListeners) {
+			iresourcemanagerreloadlistener.onResourceManagerReload(this);
+		}
+
+	}
+
+	public void registerReloadListener(IResourceManagerReloadListener iresourcemanagerreloadlistener) {
+		this.reloadListeners.add(iresourcemanagerreloadlistener);
+		iresourcemanagerreloadlistener.onResourceManagerReload(this);
 	}
 
 	public void reloadResourcePack(IResourcePack resourcePack) {
@@ -65,35 +109,6 @@ public class SimpleReloadableResourceManager implements IReloadableResourceManag
 
 	}
 
-	public Set<String> getResourceDomains() {
-		return this.setResourceDomains;
-	}
-
-	public IResource getResource(ResourceLocation parResourceLocation) throws IOException {
-		IResourceManager iresourcemanager = (IResourceManager) this.domainResourceManagers
-				.get(parResourceLocation.getResourceDomain());
-		if (iresourcemanager != null) {
-			return iresourcemanager.getResource(parResourceLocation);
-		} else {
-			throw new FileNotFoundException(parResourceLocation.toString());
-		}
-	}
-
-	public List<IResource> getAllResources(ResourceLocation parResourceLocation) throws IOException {
-		IResourceManager iresourcemanager = (IResourceManager) this.domainResourceManagers
-				.get(parResourceLocation.getResourceDomain());
-		if (iresourcemanager != null) {
-			return iresourcemanager.getAllResources(parResourceLocation);
-		} else {
-			throw new FileNotFoundException(parResourceLocation.toString());
-		}
-	}
-
-	private void clearResources() {
-		this.domainResourceManagers.clear();
-		this.setResourceDomains.clear();
-	}
-
 	public void reloadResources(List<IResourcePack> list) {
 		this.clearResources();
 		logger.info("Reloading ResourceManager: "
@@ -108,17 +123,5 @@ public class SimpleReloadableResourceManager implements IReloadableResourceManag
 		}
 
 		this.notifyReloadListeners();
-	}
-
-	public void registerReloadListener(IResourceManagerReloadListener iresourcemanagerreloadlistener) {
-		this.reloadListeners.add(iresourcemanagerreloadlistener);
-		iresourcemanagerreloadlistener.onResourceManagerReload(this);
-	}
-
-	private void notifyReloadListeners() {
-		for (IResourceManagerReloadListener iresourcemanagerreloadlistener : this.reloadListeners) {
-			iresourcemanagerreloadlistener.onResourceManagerReload(this);
-		}
-
 	}
 }

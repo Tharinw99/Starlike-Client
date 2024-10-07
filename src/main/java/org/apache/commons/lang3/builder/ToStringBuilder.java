@@ -1059,6 +1059,21 @@ public class ToStringBuilder implements Builder<String> {
 	}
 
 	/**
+	 * Returns the String that was build as an object representation. The default
+	 * implementation utilizes the {@link #toString()} implementation.
+	 *
+	 * @return the String {@code toString}
+	 *
+	 * @see #toString()
+	 *
+	 * @since 3.0
+	 */
+	@Override
+	public String build() {
+		return toString();
+	}
+
+	/**
 	 * <p>
 	 * Returns the {@code Object} being output.
 	 * </p>
@@ -1070,6 +1085,8 @@ public class ToStringBuilder implements Builder<String> {
 		return object;
 	}
 
+	// ----------------------------------------------------------------------------
+
 	/**
 	 * <p>
 	 * Gets the {@code StringBuffer} being populated.
@@ -1080,8 +1097,6 @@ public class ToStringBuilder implements Builder<String> {
 	public StringBuffer getStringBuffer() {
 		return buffer;
 	}
-
-	// ----------------------------------------------------------------------------
 
 	/**
 	 * <p>
@@ -1119,20 +1134,5 @@ public class ToStringBuilder implements Builder<String> {
 			style.appendEnd(this.getStringBuffer(), this.getObject());
 		}
 		return this.getStringBuffer().toString();
-	}
-
-	/**
-	 * Returns the String that was build as an object representation. The default
-	 * implementation utilizes the {@link #toString()} implementation.
-	 *
-	 * @return the String {@code toString}
-	 *
-	 * @see #toString()
-	 *
-	 * @since 3.0
-	 */
-	@Override
-	public String build() {
-		return toString();
 	}
 }

@@ -12,28 +12,39 @@ import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class EntityDiggingFX extends EntityFX {
+	public static class Factory implements IParticleFactory {
+		public EntityFX getEntityFX(int var1, World world, double d0, double d1, double d2, double d3, double d4,
+				double d5, int... aint) {
+			return (new EntityDiggingFX(world, d0, d1, d2, d3, d4, d5, Block.getStateById(aint[0]))).func_174845_l();
+		}
+	}
+
 	private IBlockState field_174847_a;
+
 	private BlockPos field_181019_az;
 
 	protected EntityDiggingFX(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn,
@@ -46,19 +57,6 @@ public class EntityDiggingFX extends EntityFX {
 		this.particleRed = this.particleGreen = this.particleBlue = 0.6F;
 		this.particleScale /= 2.0F;
 		this.particleAlpha = state.getBlock().getBlockLayer() == EnumWorldBlockLayer.TRANSLUCENT ? 0.999f : 1.0f;
-	}
-
-	public EntityDiggingFX func_174846_a(BlockPos pos) {
-		this.field_181019_az = pos;
-		if (this.field_174847_a.getBlock() == Blocks.grass) {
-			return this;
-		} else {
-			int i = this.field_174847_a.getBlock().colorMultiplier(this.worldObj, pos);
-			this.particleRed *= (float) (i >> 16 & 255) / 255.0F;
-			this.particleGreen *= (float) (i >> 8 & 255) / 255.0F;
-			this.particleBlue *= (float) (i & 255) / 255.0F;
-			return this;
-		}
 	}
 
 	public EntityDiggingFX func_174845_l() {
@@ -75,12 +73,48 @@ public class EntityDiggingFX extends EntityFX {
 		}
 	}
 
+	public EntityDiggingFX func_174846_a(BlockPos pos) {
+		this.field_181019_az = pos;
+		if (this.field_174847_a.getBlock() == Blocks.grass) {
+			return this;
+		} else {
+			int i = this.field_174847_a.getBlock().colorMultiplier(this.worldObj, pos);
+			this.particleRed *= (float) (i >> 16 & 255) / 255.0F;
+			this.particleGreen *= (float) (i >> 8 & 255) / 255.0F;
+			this.particleBlue *= (float) (i & 255) / 255.0F;
+			return this;
+		}
+	}
+
+	public int getBrightnessForRender(float f) {
+		int i = super.getBrightnessForRender(f);
+		int j = 0;
+		if (this.worldObj.isBlockLoaded(this.field_181019_az)) {
+			j = this.worldObj.getCombinedLight(this.field_181019_az, 0);
+		}
+
+		return i == 0 ? j : i;
+	}
+
 	public int getFXLayer() {
 		return 1;
 	}
 
-	/**+
-	 * Renders the particle
+	public boolean renderAccelerated(IAcceleratedParticleEngine accelerator, Entity var2, float f, float f1, float f2,
+			float f3, float f4, float f5) {
+		int w = this.particleIcon.getIconWidth();
+		int h = this.particleIcon.getIconHeight();
+		int xOffset = MathHelper.floor_float(w * this.particleTextureJitterX * 4.0f * 0.0625f);
+		int yOffset = MathHelper.floor_float(h * this.particleTextureJitterY * 4.0f * 0.0625f);
+		int texSize = Math.min(w, h) / 4;
+		accelerator.drawParticle(this, this.particleIcon.getOriginX() + xOffset,
+				this.particleIcon.getOriginY() + yOffset, getBrightnessForRender(f), texSize, particleScale * 0.1f,
+				this.particleRed, this.particleGreen, this.particleBlue, 1.0f);
+		return true;
+	}
+
+	/**
+	 * + Renders the particle
 	 */
 	public void renderParticle(WorldRenderer worldrenderer, Entity var2, float f, float f1, float f2, float f3,
 			float f4, float f5) {
@@ -122,35 +156,5 @@ public class EntityDiggingFX extends EntityFX {
 						(double) (f13 + f3 * f10 - f5 * f10))
 				.tex((double) f7, (double) f9).color(this.particleRed, this.particleGreen, this.particleBlue, 1.0F)
 				.lightmap(j, k).endVertex();
-	}
-
-	public boolean renderAccelerated(IAcceleratedParticleEngine accelerator, Entity var2, float f, float f1, float f2,
-			float f3, float f4, float f5) {
-		int w = this.particleIcon.getIconWidth();
-		int h = this.particleIcon.getIconHeight();
-		int xOffset = MathHelper.floor_float(w * this.particleTextureJitterX * 4.0f * 0.0625f);
-		int yOffset = MathHelper.floor_float(h * this.particleTextureJitterY * 4.0f * 0.0625f);
-		int texSize = Math.min(w, h) / 4;
-		accelerator.drawParticle(this, this.particleIcon.getOriginX() + xOffset,
-				this.particleIcon.getOriginY() + yOffset, getBrightnessForRender(f), texSize, particleScale * 0.1f,
-				this.particleRed, this.particleGreen, this.particleBlue, 1.0f);
-		return true;
-	}
-
-	public int getBrightnessForRender(float f) {
-		int i = super.getBrightnessForRender(f);
-		int j = 0;
-		if (this.worldObj.isBlockLoaded(this.field_181019_az)) {
-			j = this.worldObj.getCombinedLight(this.field_181019_az, 0);
-		}
-
-		return i == 0 ? j : i;
-	}
-
-	public static class Factory implements IParticleFactory {
-		public EntityFX getEntityFX(int var1, World world, double d0, double d1, double d2, double d3, double d4,
-				double d5, int... aint) {
-			return (new EntityDiggingFX(world, d0, d1, d2, d3, d4, d5, Block.getStateById(aint[0]))).func_174845_l();
-		}
 	}
 }

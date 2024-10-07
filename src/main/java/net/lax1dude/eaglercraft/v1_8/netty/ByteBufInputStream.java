@@ -50,6 +50,8 @@ public class ByteBufInputStream extends InputStream implements DataInput {
 	 */
 	private boolean releaseOnClose;
 
+	private final StringBuilder lineBuf = new StringBuilder();
+
 	/**
 	 * Creates a new stream which reads data from the specified {@code buffer}
 	 * starting at the current {@code readerIndex} and ending at the current
@@ -60,21 +62,6 @@ public class ByteBufInputStream extends InputStream implements DataInput {
 	 */
 	public ByteBufInputStream(ByteBuf buffer) {
 		this(buffer, buffer.readableBytes());
-	}
-
-	/**
-	 * Creates a new stream which reads data from the specified {@code buffer}
-	 * starting at the current {@code readerIndex} and ending at
-	 * {@code readerIndex + length}.
-	 * 
-	 * @param buffer The buffer which provides the content for this
-	 *               {@link InputStream}.
-	 * @param length The length of the buffer to use for this {@link InputStream}.
-	 * @throws IndexOutOfBoundsException if {@code readerIndex + length} is greater
-	 *                                   than {@code writerIndex}
-	 */
-	public ByteBufInputStream(ByteBuf buffer, int length) {
-		this(buffer, length, false);
 	}
 
 	/**
@@ -90,6 +77,21 @@ public class ByteBufInputStream extends InputStream implements DataInput {
 	 */
 	public ByteBufInputStream(ByteBuf buffer, boolean releaseOnClose) {
 		this(buffer, buffer.readableBytes(), releaseOnClose);
+	}
+
+	/**
+	 * Creates a new stream which reads data from the specified {@code buffer}
+	 * starting at the current {@code readerIndex} and ending at
+	 * {@code readerIndex + length}.
+	 * 
+	 * @param buffer The buffer which provides the content for this
+	 *               {@link InputStream}.
+	 * @param length The length of the buffer to use for this {@link InputStream}.
+	 * @throws IndexOutOfBoundsException if {@code readerIndex + length} is greater
+	 *                                   than {@code writerIndex}
+	 */
+	public ByteBufInputStream(ByteBuf buffer, int length) {
+		this(buffer, length, false);
 	}
 
 	/**
@@ -126,16 +128,18 @@ public class ByteBufInputStream extends InputStream implements DataInput {
 		buffer.markReaderIndex();
 	}
 
-	/**
-	 * Returns the number of read bytes by this stream so far.
-	 */
-	public int readBytes() {
-		return buffer.readerIndex() - startIndex;
-	}
-
 	@Override
 	public int available() throws IOException {
 		return endIndex - buffer.readerIndex();
+	}
+
+	private void checkAvailable(int fieldSize) throws IOException {
+		if (fieldSize < 0) {
+			throw new IndexOutOfBoundsException("fieldSize cannot be a negative number");
+		}
+		if (fieldSize > available()) {
+			throw new EOFException("fieldSize is too long! Length is " + fieldSize + ", but maximum is " + available());
+		}
 	}
 
 	@Override
@@ -169,20 +173,6 @@ public class ByteBufInputStream extends InputStream implements DataInput {
 	}
 
 	@Override
-	public void reset() throws IOException {
-		buffer.resetReaderIndex();
-	}
-
-	@Override
-	public long skip(long n) throws IOException {
-		if (n > Integer.MAX_VALUE) {
-			return skipBytes(Integer.MAX_VALUE);
-		} else {
-			return skipBytes((int) n);
-		}
-	}
-
-	@Override
 	public boolean readBoolean() throws IOException {
 		checkAvailable(1);
 		return read() != 0;
@@ -194,6 +184,13 @@ public class ByteBufInputStream extends InputStream implements DataInput {
 			throw new EOFException();
 		}
 		return buffer.readByte();
+	}
+
+	/**
+	 * Returns the number of read bytes by this stream so far.
+	 */
+	public int readBytes() {
+		return buffer.readerIndex() - startIndex;
 	}
 
 	@Override
@@ -227,8 +224,6 @@ public class ByteBufInputStream extends InputStream implements DataInput {
 		checkAvailable(4);
 		return buffer.readInt();
 	}
-
-	private final StringBuilder lineBuf = new StringBuilder();
 
 	@Override
 	public String readLine() throws IOException {
@@ -271,11 +266,6 @@ public class ByteBufInputStream extends InputStream implements DataInput {
 	}
 
 	@Override
-	public String readUTF() throws IOException {
-		return DataInputStream.readUTF(this);
-	}
-
-	@Override
 	public int readUnsignedByte() throws IOException {
 		return readByte() & 0xff;
 	}
@@ -286,18 +276,28 @@ public class ByteBufInputStream extends InputStream implements DataInput {
 	}
 
 	@Override
+	public String readUTF() throws IOException {
+		return DataInputStream.readUTF(this);
+	}
+
+	@Override
+	public void reset() throws IOException {
+		buffer.resetReaderIndex();
+	}
+
+	@Override
+	public long skip(long n) throws IOException {
+		if (n > Integer.MAX_VALUE) {
+			return skipBytes(Integer.MAX_VALUE);
+		} else {
+			return skipBytes((int) n);
+		}
+	}
+
+	@Override
 	public int skipBytes(int n) throws IOException {
 		int nBytes = Math.min(available(), n);
 		buffer.skipBytes(nBytes);
 		return nBytes;
-	}
-
-	private void checkAvailable(int fieldSize) throws IOException {
-		if (fieldSize < 0) {
-			throw new IndexOutOfBoundsException("fieldSize cannot be a negative number");
-		}
-		if (fieldSize > available()) {
-			throw new EOFException("fieldSize is too long! Length is " + fieldSize + ", but maximum is " + available());
-		}
 	}
 }

@@ -43,8 +43,8 @@ final class FilteredMultimapValues<K, V> extends AbstractCollection<V> {
 	}
 
 	@Override
-	public Iterator<V> iterator() {
-		return Maps.valueIterator(multimap.entries().iterator());
+	public void clear() {
+		multimap.clear();
 	}
 
 	@Override
@@ -53,8 +53,8 @@ final class FilteredMultimapValues<K, V> extends AbstractCollection<V> {
 	}
 
 	@Override
-	public int size() {
-		return multimap.size();
+	public Iterator<V> iterator() {
+		return Maps.valueIterator(multimap.entries().iterator());
 	}
 
 	@Override
@@ -88,7 +88,7 @@ final class FilteredMultimapValues<K, V> extends AbstractCollection<V> {
 	}
 
 	@Override
-	public void clear() {
-		multimap.clear();
+	public int size() {
+		return multimap.size();
 	}
 }

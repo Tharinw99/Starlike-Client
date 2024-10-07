@@ -33,9 +33,6 @@ import com.google.common.annotations.Beta;
 public final class Flushables {
 	private static final Logger logger = Logger.getLogger(Flushables.class.getName());
 
-	private Flushables() {
-	}
-
 	/**
 	 * Flush a {@link Flushable}, with control over whether an {@code IOException}
 	 * may be thrown.
@@ -75,5 +72,8 @@ public final class Flushables {
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, "IOException should not have been thrown.", e);
 		}
+	}
+
+	private Flushables() {
 	}
 }

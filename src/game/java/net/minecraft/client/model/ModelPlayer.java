@@ -1,26 +1,30 @@
 package net.minecraft.client.model;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_MODELVIEW;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE;
 
 import net.lax1dude.eaglercraft.v1_8.opengl.GlStateManager;
 import net.minecraft.entity.Entity;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -82,9 +86,19 @@ public class ModelPlayer extends ModelBiped {
 		this.bipedBodyWear.setRotationPoint(0.0F, 0.0F, 0.0F);
 	}
 
-	/**+
-	 * Sets the models various rotation angles then renders the
-	 * model.
+	public void postRenderArm(float f) {
+		if (this.smallArms) {
+			++this.bipedRightArm.rotationPointX;
+			this.bipedRightArm.postRender(f);
+			--this.bipedRightArm.rotationPointX;
+		} else {
+			this.bipedRightArm.postRender(f);
+		}
+
+	}
+
+	/**
+	 * + Sets the models various rotation angles then renders the model.
 	 */
 	public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
 		super.render(entity, f, f1, f2, f3, f4, f5);
@@ -113,13 +127,6 @@ public class ModelPlayer extends ModelBiped {
 		GlStateManager.popMatrix();
 	}
 
-	public void renderDeadmau5Head(float parFloat1) {
-		copyModelAngles(this.bipedHead, this.bipedDeadmau5Head);
-		this.bipedDeadmau5Head.rotationPointX = 0.0F;
-		this.bipedDeadmau5Head.rotationPointY = 0.0F;
-		this.bipedDeadmau5Head.render(parFloat1);
-	}
-
 	public void renderCape(float parFloat1) {
 		GlStateManager.matrixMode(GL_TEXTURE);
 		GlStateManager.pushMatrix();
@@ -131,36 +138,21 @@ public class ModelPlayer extends ModelBiped {
 		GlStateManager.matrixMode(GL_MODELVIEW);
 	}
 
-	/**+
-	 * Sets the model's various rotation angles. For bipeds, par1
-	 * and par2 are used for animating the movement of arms and
-	 * legs, where par1 represents the time(so that arms and legs
-	 * swing back and forth) and par2 represents how "far" arms and
-	 * legs can swing at most.
-	 */
-	public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5, Entity entity) {
-		super.setRotationAngles(f, f1, f2, f3, f4, f5, entity);
-		copyModelAngles(this.bipedLeftLeg, this.bipedLeftLegwear);
-		copyModelAngles(this.bipedRightLeg, this.bipedRightLegwear);
-		copyModelAngles(this.bipedLeftArm, this.bipedLeftArmwear);
-		copyModelAngles(this.bipedRightArm, this.bipedRightArmwear);
-		copyModelAngles(this.bipedBody, this.bipedBodyWear);
-		if (entity != null && entity.isSneaking()) {
-			this.bipedCape.rotationPointY = 2.0F;
-		} else {
-			this.bipedCape.rotationPointY = 0.0F;
-		}
-
-	}
-
-	public void renderRightArm() {
-		this.bipedRightArm.render(0.0625F);
-		this.bipedRightArmwear.render(0.0625F);
+	public void renderDeadmau5Head(float parFloat1) {
+		copyModelAngles(this.bipedHead, this.bipedDeadmau5Head);
+		this.bipedDeadmau5Head.rotationPointX = 0.0F;
+		this.bipedDeadmau5Head.rotationPointY = 0.0F;
+		this.bipedDeadmau5Head.render(parFloat1);
 	}
 
 	public void renderLeftArm() {
 		this.bipedLeftArm.render(0.0625F);
 		this.bipedLeftArmwear.render(0.0625F);
+	}
+
+	public void renderRightArm() {
+		this.bipedRightArm.render(0.0625F);
+		this.bipedRightArmwear.render(0.0625F);
 	}
 
 	public void setInvisible(boolean flag) {
@@ -174,13 +166,23 @@ public class ModelPlayer extends ModelBiped {
 		this.bipedDeadmau5Head.showModel = flag;
 	}
 
-	public void postRenderArm(float f) {
-		if (this.smallArms) {
-			++this.bipedRightArm.rotationPointX;
-			this.bipedRightArm.postRender(f);
-			--this.bipedRightArm.rotationPointX;
+	/**
+	 * + Sets the model's various rotation angles. For bipeds, par1 and par2 are
+	 * used for animating the movement of arms and legs, where par1 represents the
+	 * time(so that arms and legs swing back and forth) and par2 represents how
+	 * "far" arms and legs can swing at most.
+	 */
+	public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5, Entity entity) {
+		super.setRotationAngles(f, f1, f2, f3, f4, f5, entity);
+		copyModelAngles(this.bipedLeftLeg, this.bipedLeftLegwear);
+		copyModelAngles(this.bipedRightLeg, this.bipedRightLegwear);
+		copyModelAngles(this.bipedLeftArm, this.bipedLeftArmwear);
+		copyModelAngles(this.bipedRightArm, this.bipedRightArmwear);
+		copyModelAngles(this.bipedBody, this.bipedBodyWear);
+		if (entity != null && entity.isSneaking()) {
+			this.bipedCape.rotationPointY = 2.0F;
 		} else {
-			this.bipedRightArm.postRender(f);
+			this.bipedCape.rotationPointY = 0.0F;
 		}
 
 	}

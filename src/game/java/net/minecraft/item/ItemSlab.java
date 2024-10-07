@@ -9,22 +9,25 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -41,26 +44,46 @@ public class ItemSlab extends ItemBlock {
 		this.setHasSubtypes(true);
 	}
 
-	/**+
-	 * Converts the given ItemStack damage value into a metadata
-	 * value to be placed in the world when this Item is placed as a
-	 * Block (mostly used with ItemBlocks).
+	public boolean canPlaceBlockOnSide(World worldIn, BlockPos pos, EnumFacing side, EntityPlayer player,
+			ItemStack stack) {
+		BlockPos blockpos = pos;
+		IProperty iproperty = this.singleSlab.getVariantProperty();
+		Object object = this.singleSlab.getVariant(stack);
+		IBlockState iblockstate = worldIn.getBlockState(pos);
+		if (iblockstate.getBlock() == this.singleSlab) {
+			boolean flag = iblockstate.getValue(BlockSlab.HALF) == BlockSlab.EnumBlockHalf.TOP;
+			if ((side == EnumFacing.UP && !flag || side == EnumFacing.DOWN && flag)
+					&& object == iblockstate.getValue(iproperty)) {
+				return true;
+			}
+		}
+
+		pos = pos.offset(side);
+		IBlockState iblockstate1 = worldIn.getBlockState(pos);
+		return iblockstate1.getBlock() == this.singleSlab && object == iblockstate1.getValue(iproperty) ? true
+				: super.canPlaceBlockOnSide(worldIn, blockpos, side, player, stack);
+	}
+
+	/**
+	 * + Converts the given ItemStack damage value into a metadata value to be
+	 * placed in the world when this Item is placed as a Block (mostly used with
+	 * ItemBlocks).
 	 */
 	public int getMetadata(int i) {
 		return i;
 	}
 
-	/**+
-	 * Returns the unlocalized name of this item. This version
-	 * accepts an ItemStack so different stacks can have different
-	 * names based on their damage or NBT.
+	/**
+	 * + Returns the unlocalized name of this item. This version accepts an
+	 * ItemStack so different stacks can have different names based on their damage
+	 * or NBT.
 	 */
 	public String getUnlocalizedName(ItemStack itemstack) {
 		return this.singleSlab.getUnlocalizedName(itemstack.getMetadata());
 	}
 
-	/**+
-	 * Called when a Block is right-clicked with this Item
+	/**
+	 * + Called when a Block is right-clicked with this Item
 	 */
 	public boolean onItemUse(ItemStack itemstack, EntityPlayer entityplayer, World world, BlockPos blockpos,
 			EnumFacing enumfacing, float f, float f1, float f2) {
@@ -98,26 +121,6 @@ public class ItemSlab extends ItemBlock {
 			return this.tryPlace(itemstack, world, blockpos.offset(enumfacing), object) ? true
 					: super.onItemUse(itemstack, entityplayer, world, blockpos, enumfacing, f, f1, f2);
 		}
-	}
-
-	public boolean canPlaceBlockOnSide(World worldIn, BlockPos pos, EnumFacing side, EntityPlayer player,
-			ItemStack stack) {
-		BlockPos blockpos = pos;
-		IProperty iproperty = this.singleSlab.getVariantProperty();
-		Object object = this.singleSlab.getVariant(stack);
-		IBlockState iblockstate = worldIn.getBlockState(pos);
-		if (iblockstate.getBlock() == this.singleSlab) {
-			boolean flag = iblockstate.getValue(BlockSlab.HALF) == BlockSlab.EnumBlockHalf.TOP;
-			if ((side == EnumFacing.UP && !flag || side == EnumFacing.DOWN && flag)
-					&& object == iblockstate.getValue(iproperty)) {
-				return true;
-			}
-		}
-
-		pos = pos.offset(side);
-		IBlockState iblockstate1 = worldIn.getBlockState(pos);
-		return iblockstate1.getBlock() == this.singleSlab && object == iblockstate1.getValue(iproperty) ? true
-				: super.canPlaceBlockOnSide(worldIn, blockpos, side, player, stack);
 	}
 
 	private boolean tryPlace(ItemStack stack, World worldIn, BlockPos pos, Object variantInStack) {

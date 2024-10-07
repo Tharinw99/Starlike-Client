@@ -31,16 +31,11 @@ import java.util.Set;
  * @since 1.0
  */
 public final class Primitives {
-	private Primitives() {
-	}
-
 	/** A map from primitive types to their corresponding wrapper types. */
 	private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER_TYPE;
 
 	/** A map from wrapper types to their corresponding primitive types. */
 	private static final Map<Class<?>, Class<?>> WRAPPER_TO_PRIMITIVE_TYPE;
-
-	// Sad that we can't use a BiMap. :(
 
 	static {
 		Map<Class<?>, Class<?>> primToWrap = new HashMap<Class<?>, Class<?>>(16);
@@ -59,6 +54,8 @@ public final class Primitives {
 		PRIMITIVE_TO_WRAPPER_TYPE = Collections.unmodifiableMap(primToWrap);
 		WRAPPER_TO_PRIMITIVE_TYPE = Collections.unmodifiableMap(wrapToPrim);
 	}
+
+	// Sad that we can't use a BiMap. :(
 
 	private static void add(Map<Class<?>, Class<?>> forward, Map<Class<?>, Class<?>> backward, Class<?> key,
 			Class<?> value) {
@@ -98,6 +95,25 @@ public final class Primitives {
 	}
 
 	/**
+	 * Returns the corresponding primitive type of {@code type} if it is a wrapper
+	 * type; otherwise returns {@code type} itself. Idempotent.
+	 * 
+	 * <pre>
+	 *     unwrap(Integer.class) == int.class
+	 *     unwrap(int.class) == int.class
+	 *     unwrap(String.class) == String.class
+	 * </pre>
+	 */
+	public static <T> Class<T> unwrap(Class<T> type) {
+		checkNotNull(type);
+
+		// cast is safe: long.class and Long.class are both of type Class<Long>
+		@SuppressWarnings("unchecked")
+		Class<T> unwrapped = (Class<T>) WRAPPER_TO_PRIMITIVE_TYPE.get(type);
+		return (unwrapped == null) ? type : unwrapped;
+	}
+
+	/**
 	 * Returns the corresponding wrapper type of {@code type} if it is a primitive
 	 * type; otherwise returns {@code type} itself. Idempotent.
 	 * 
@@ -116,22 +132,6 @@ public final class Primitives {
 		return (wrapped == null) ? type : wrapped;
 	}
 
-	/**
-	 * Returns the corresponding primitive type of {@code type} if it is a wrapper
-	 * type; otherwise returns {@code type} itself. Idempotent.
-	 * 
-	 * <pre>
-	 *     unwrap(Integer.class) == int.class
-	 *     unwrap(int.class) == int.class
-	 *     unwrap(String.class) == String.class
-	 * </pre>
-	 */
-	public static <T> Class<T> unwrap(Class<T> type) {
-		checkNotNull(type);
-
-		// cast is safe: long.class and Long.class are both of type Class<Long>
-		@SuppressWarnings("unchecked")
-		Class<T> unwrapped = (Class<T>) WRAPPER_TO_PRIMITIVE_TYPE.get(type);
-		return (unwrapped == null) ? type : unwrapped;
+	private Primitives() {
 	}
 }

@@ -1,6 +1,6 @@
 package net.lax1dude.eaglercraft.v1_8.voice;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_GREATER;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -17,14 +17,15 @@ import net.minecraft.util.ResourceLocation;
 /**
  * Copyright (c) 2022-2024 lax1dude. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -35,10 +36,14 @@ public class VoiceTagRenderer {
 
 	private static final Set<EaglercraftUUID> voiceTagsDrawnThisFrame = new HashSet<>();
 
+	public static void clearTagsDrawnSet() {
+		voiceTagsDrawnThisFrame.clear();
+	}
+
 	public static void renderVoiceNameTag(Minecraft mc, EntityOtherPlayerMP player, int offset) {
 		EaglercraftUUID uuid = player.getUniqueID();
 		boolean mute = VoiceClientController.getVoiceMuted().contains(uuid);
-		if((mute || VoiceClientController.getVoiceSpeaking().contains(uuid)) && voiceTagsDrawnThisFrame.add(uuid)) {
+		if ((mute || VoiceClientController.getVoiceSpeaking().contains(uuid)) && voiceTagsDrawnThisFrame.add(uuid)) {
 			GlStateManager.disableLighting();
 			GlStateManager.disableTexture2D();
 			GlStateManager.enableAlpha();
@@ -73,34 +78,44 @@ public class VoiceTagRenderer {
 			float var7 = 0.00390625F;
 			float var8 = 0.00390625F;
 
-			if(mute) {
+			if (mute) {
 				GlStateManager.color(0.9F, 0.3F, 0.3F, 0.125F);
-			}else {
+			} else {
 				GlStateManager.color(1.0F, 1.0F, 1.0F, 0.125F);
 			}
 
 			worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
-			worldrenderer.pos(0, 1.0, 0).tex((double) ((float) (u + 0.2f) * var7), (double) ((float) (v + 32 - 0.2f) * var8)).endVertex();
-			worldrenderer.pos(1.0, 1.0, 0).tex((double) ((float) (u + 32 - 0.2f) * var7), (double) ((float) (v + 32 - 0.2f) * var8)).endVertex();
-			worldrenderer.pos(1.0, 0, 0).tex((double) ((float) (u + 32 - 0.2f) * var7), (double) ((float) (v + 0.2f) * var8)).endVertex();
-			worldrenderer.pos(0, 0, 0).tex((double) ((float) (u + 0.2f) * var7), (double) ((float) (v + 0.2f) * var8)).endVertex();
+			worldrenderer.pos(0, 1.0, 0)
+					.tex((double) ((float) (u + 0.2f) * var7), (double) ((float) (v + 32 - 0.2f) * var8)).endVertex();
+			worldrenderer.pos(1.0, 1.0, 0)
+					.tex((double) ((float) (u + 32 - 0.2f) * var7), (double) ((float) (v + 32 - 0.2f) * var8))
+					.endVertex();
+			worldrenderer.pos(1.0, 0, 0)
+					.tex((double) ((float) (u + 32 - 0.2f) * var7), (double) ((float) (v + 0.2f) * var8)).endVertex();
+			worldrenderer.pos(0, 0, 0).tex((double) ((float) (u + 0.2f) * var7), (double) ((float) (v + 0.2f) * var8))
+					.endVertex();
 			tessellator.draw();
 
 			GlStateManager.alphaFunc(GL_GREATER, 0.1f);
 			GlStateManager.enableDepth();
 			GlStateManager.depthMask(true);
 
-			if(mute) {
+			if (mute) {
 				GlStateManager.color(0.9F, 0.3F, 0.3F, 1.0F);
-			}else {
+			} else {
 				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 			}
 
 			worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
-			worldrenderer.pos(0, 1.0, 0).tex((double) ((float) (u + 0.2f) * var7), (double) ((float) (v + 32 - 0.2f) * var8)).endVertex();
-			worldrenderer.pos(1.0, 1.0, 0).tex((double) ((float) (u + 32 - 0.2f) * var7), (double) ((float) (v + 32 - 0.2f) * var8)).endVertex();
-			worldrenderer.pos(1.0, 0, 0).tex((double) ((float) (u + 32 - 0.2f) * var7), (double) ((float) (v + 0.2f) * var8)).endVertex();
-			worldrenderer.pos(0, 0, 0).tex((double) ((float) (u + 0.2f) * var7), (double) ((float) (v + 0.2f) * var8)).endVertex();
+			worldrenderer.pos(0, 1.0, 0)
+					.tex((double) ((float) (u + 0.2f) * var7), (double) ((float) (v + 32 - 0.2f) * var8)).endVertex();
+			worldrenderer.pos(1.0, 1.0, 0)
+					.tex((double) ((float) (u + 32 - 0.2f) * var7), (double) ((float) (v + 32 - 0.2f) * var8))
+					.endVertex();
+			worldrenderer.pos(1.0, 0, 0)
+					.tex((double) ((float) (u + 32 - 0.2f) * var7), (double) ((float) (v + 0.2f) * var8)).endVertex();
+			worldrenderer.pos(0, 0, 0).tex((double) ((float) (u + 0.2f) * var7), (double) ((float) (v + 0.2f) * var8))
+					.endVertex();
 			tessellator.draw();
 
 			GlStateManager.enableLighting();
@@ -109,10 +124,6 @@ public class VoiceTagRenderer {
 
 			GlStateManager.popMatrix();
 		}
-	}
-
-	public static void clearTagsDrawnSet() {
-		voiceTagsDrawnThisFrame.clear();
 	}
 
 }

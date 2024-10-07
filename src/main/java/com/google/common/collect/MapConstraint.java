@@ -30,11 +30,12 @@ import com.google.common.annotations.GwtCompatible;
  * <pre>
  *    {@code
  *
- *   public void checkKeyValue(Object key, Object value) {
- *     if (key == null || value == null) {
- *       throw new NullPointerException();
- *     }
- *   }}
+ * public void checkKeyValue(Object key, Object value) {
+ * 	if (key == null || value == null) {
+ * 		throw new NullPointerException();
+ * 	}
+ * }
+ * }
  * </pre>
  *
  * <p>

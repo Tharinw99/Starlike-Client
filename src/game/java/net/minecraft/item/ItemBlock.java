@@ -1,6 +1,7 @@
 package net.minecraft.item;
 
 import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -14,44 +15,121 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class ItemBlock extends Item {
+	public static boolean setTileEntityNBT(World worldIn, EntityPlayer pos, BlockPos stack, ItemStack parItemStack) {
+		MinecraftServer minecraftserver = MinecraftServer.getServer();
+		if (minecraftserver == null) {
+			return false;
+		} else {
+			if (parItemStack.hasTagCompound() && parItemStack.getTagCompound().hasKey("BlockEntityTag", 10)) {
+				TileEntity tileentity = worldIn.getTileEntity(stack);
+				if (tileentity != null) {
+					if (!worldIn.isRemote && tileentity.func_183000_F()
+							&& !minecraftserver.getConfigurationManager().canSendCommands(pos.getGameProfile())) {
+						return false;
+					}
+
+					NBTTagCompound nbttagcompound = new NBTTagCompound();
+					NBTTagCompound nbttagcompound1 = (NBTTagCompound) nbttagcompound.copy();
+					tileentity.writeToNBT(nbttagcompound);
+					NBTTagCompound nbttagcompound2 = (NBTTagCompound) parItemStack.getTagCompound()
+							.getTag("BlockEntityTag");
+					nbttagcompound.merge(nbttagcompound2);
+					nbttagcompound.setInteger("x", stack.getX());
+					nbttagcompound.setInteger("y", stack.getY());
+					nbttagcompound.setInteger("z", stack.getZ());
+					if (!nbttagcompound.equals(nbttagcompound1)) {
+						tileentity.readFromNBT(nbttagcompound);
+						tileentity.markDirty();
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}
+	}
+
 	protected final Block block;
 
 	public ItemBlock(Block block) {
 		this.block = block;
 	}
 
-	/**+
-	 * Sets the unlocalized name of this item to the string passed
-	 * as the parameter, prefixed by "item."
-	 */
-	public ItemBlock setUnlocalizedName(String unlocalizedName) {
-		super.setUnlocalizedName(unlocalizedName);
-		return this;
+	public boolean canPlaceBlockOnSide(World world, BlockPos blockpos, EnumFacing enumfacing, EntityPlayer var4,
+			ItemStack itemstack) {
+		Block blockx = world.getBlockState(blockpos).getBlock();
+		if (blockx == Blocks.snow_layer) {
+			enumfacing = EnumFacing.UP;
+		} else if (!blockx.isReplaceable(world, blockpos)) {
+			blockpos = blockpos.offset(enumfacing);
+		}
+
+		return world.canBlockBePlaced(this.block, blockpos, false, enumfacing, (Entity) null, itemstack);
 	}
 
-	/**+
-	 * Called when a Block is right-clicked with this Item
+	public Block getBlock() {
+		return this.block;
+	}
+
+	/**
+	 * + gets the CreativeTab this item is displayed on
+	 */
+	public CreativeTabs getCreativeTab() {
+		return this.block.getCreativeTabToDisplayOn();
+	}
+
+	public float getHeldItemBrightnessEagler(ItemStack itemStack) {
+		return this.block.getLightValue() * 0.06667f;
+	}
+
+	/**
+	 * + returns a list of items with the same ID, but different meta (eg: dye
+	 * returns 16 items)
+	 */
+	public void getSubItems(Item item, CreativeTabs creativetabs, List<ItemStack> list) {
+		this.block.getSubBlocks(item, creativetabs, list);
+	}
+
+	/**
+	 * + Returns the unlocalized name of this item.
+	 */
+	public String getUnlocalizedName() {
+		return this.block.getUnlocalizedName();
+	}
+
+	/**
+	 * + Returns the unlocalized name of this item.
+	 */
+	public String getUnlocalizedName(ItemStack var1) {
+		return this.block.getUnlocalizedName();
+	}
+
+	/**
+	 * + Called when a Block is right-clicked with this Item
 	 */
 	public boolean onItemUse(ItemStack itemstack, EntityPlayer entityplayer, World world, BlockPos blockpos,
 			EnumFacing enumfacing, float f, float f1, float f2) {
@@ -89,86 +167,12 @@ public class ItemBlock extends Item {
 		}
 	}
 
-	public static boolean setTileEntityNBT(World worldIn, EntityPlayer pos, BlockPos stack, ItemStack parItemStack) {
-		MinecraftServer minecraftserver = MinecraftServer.getServer();
-		if (minecraftserver == null) {
-			return false;
-		} else {
-			if (parItemStack.hasTagCompound() && parItemStack.getTagCompound().hasKey("BlockEntityTag", 10)) {
-				TileEntity tileentity = worldIn.getTileEntity(stack);
-				if (tileentity != null) {
-					if (!worldIn.isRemote && tileentity.func_183000_F()
-							&& !minecraftserver.getConfigurationManager().canSendCommands(pos.getGameProfile())) {
-						return false;
-					}
-
-					NBTTagCompound nbttagcompound = new NBTTagCompound();
-					NBTTagCompound nbttagcompound1 = (NBTTagCompound) nbttagcompound.copy();
-					tileentity.writeToNBT(nbttagcompound);
-					NBTTagCompound nbttagcompound2 = (NBTTagCompound) parItemStack.getTagCompound()
-							.getTag("BlockEntityTag");
-					nbttagcompound.merge(nbttagcompound2);
-					nbttagcompound.setInteger("x", stack.getX());
-					nbttagcompound.setInteger("y", stack.getY());
-					nbttagcompound.setInteger("z", stack.getZ());
-					if (!nbttagcompound.equals(nbttagcompound1)) {
-						tileentity.readFromNBT(nbttagcompound);
-						tileentity.markDirty();
-						return true;
-					}
-				}
-			}
-
-			return false;
-		}
-	}
-
-	public boolean canPlaceBlockOnSide(World world, BlockPos blockpos, EnumFacing enumfacing, EntityPlayer var4,
-			ItemStack itemstack) {
-		Block blockx = world.getBlockState(blockpos).getBlock();
-		if (blockx == Blocks.snow_layer) {
-			enumfacing = EnumFacing.UP;
-		} else if (!blockx.isReplaceable(world, blockpos)) {
-			blockpos = blockpos.offset(enumfacing);
-		}
-
-		return world.canBlockBePlaced(this.block, blockpos, false, enumfacing, (Entity) null, itemstack);
-	}
-
-	/**+
-	 * Returns the unlocalized name of this item.
+	/**
+	 * + Sets the unlocalized name of this item to the string passed as the
+	 * parameter, prefixed by "item."
 	 */
-	public String getUnlocalizedName(ItemStack var1) {
-		return this.block.getUnlocalizedName();
-	}
-
-	/**+
-	 * Returns the unlocalized name of this item.
-	 */
-	public String getUnlocalizedName() {
-		return this.block.getUnlocalizedName();
-	}
-
-	/**+
-	 * gets the CreativeTab this item is displayed on
-	 */
-	public CreativeTabs getCreativeTab() {
-		return this.block.getCreativeTabToDisplayOn();
-	}
-
-	/**+
-	 * returns a list of items with the same ID, but different meta
-	 * (eg: dye returns 16 items)
-	 */
-	public void getSubItems(Item item, CreativeTabs creativetabs, List<ItemStack> list) {
-		this.block.getSubBlocks(item, creativetabs, list);
-	}
-
-	public Block getBlock() {
-		return this.block;
-	}
-
-	public float getHeldItemBrightnessEagler(ItemStack itemStack) {
-		return this.block.getLightValue() * 0.06667f;
+	public ItemBlock setUnlocalizedName(String unlocalizedName) {
+		super.setUnlocalizedName(unlocalizedName);
+		return this;
 	}
 }

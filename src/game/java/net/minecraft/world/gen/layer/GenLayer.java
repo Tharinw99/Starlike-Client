@@ -1,6 +1,7 @@
 package net.minecraft.world.gen.layer;
 
 import java.util.concurrent.Callable;
+
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.util.ReportedException;
@@ -8,31 +9,60 @@ import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.gen.ChunkProviderSettings;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public abstract class GenLayer {
-	private long worldGenSeed;
-	protected GenLayer parent;
-	private long chunkSeed;
-	protected long baseSeed;
+	protected static boolean biomesEqualOrMesaPlateau(int biomeIDA, int biomeIDB) {
+		if (biomeIDA == biomeIDB) {
+			return true;
+		} else if (biomeIDA != BiomeGenBase.mesaPlateau_F.biomeID && biomeIDA != BiomeGenBase.mesaPlateau.biomeID) {
+			final BiomeGenBase biomegenbase = BiomeGenBase.getBiome(biomeIDA);
+			final BiomeGenBase biomegenbase1 = BiomeGenBase.getBiome(biomeIDB);
+
+			try {
+				return biomegenbase != null && biomegenbase1 != null ? biomegenbase.isEqualTo(biomegenbase1) : false;
+			} catch (Throwable throwable) {
+				CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Comparing biomes");
+				CrashReportCategory crashreportcategory = crashreport.makeCategory("Biomes being compared");
+				crashreportcategory.addCrashSection("Biome A ID", Integer.valueOf(biomeIDA));
+				crashreportcategory.addCrashSection("Biome B ID", Integer.valueOf(biomeIDB));
+				crashreportcategory.addCrashSectionCallable("Biome A", new Callable<String>() {
+					public String call() throws Exception {
+						return String.valueOf(biomegenbase);
+					}
+				});
+				crashreportcategory.addCrashSectionCallable("Biome B", new Callable<String>() {
+					public String call() throws Exception {
+						return String.valueOf(biomegenbase1);
+					}
+				});
+				throw new ReportedException(crashreport);
+			}
+		} else {
+			return biomeIDB == BiomeGenBase.mesaPlateau_F.biomeID || biomeIDB == BiomeGenBase.mesaPlateau.biomeID;
+		}
+	}
 
 	public static GenLayer[] initializeAllBiomeGenerators(long seed, WorldType parWorldType, String parString1) {
 		GenLayerIsland genlayerisland = new GenLayerIsland(1L);
@@ -99,6 +129,22 @@ public abstract class GenLayer {
 		return new GenLayer[] { genlayerrivermix, genlayervoronoizoom, genlayerrivermix };
 	}
 
+	/**
+	 * + returns true if the biomeId is one of the various ocean biomes.
+	 */
+	protected static boolean isBiomeOceanic(int parInt1) {
+		return parInt1 == BiomeGenBase.ocean.biomeID || parInt1 == BiomeGenBase.deepOcean.biomeID
+				|| parInt1 == BiomeGenBase.frozenOcean.biomeID;
+	}
+
+	private long worldGenSeed;
+
+	protected GenLayer parent;
+
+	private long chunkSeed;
+
+	protected long baseSeed;
+
 	public GenLayer(long parLong1) {
 		this.baseSeed = parLong1;
 		this.baseSeed *= this.baseSeed * 6364136223846793005L + 1442695040888963407L;
@@ -109,10 +155,27 @@ public abstract class GenLayer {
 		this.baseSeed += parLong1;
 	}
 
-	/**+
-	 * Initialize layer's local worldGenSeed based on its own
-	 * baseSeed and the world's global seed (passed in as an
-	 * argument).
+	public abstract int[] getInts(int var1, int var2, int var3, int var4);
+
+	/**
+	 * + Initialize layer's current chunkSeed based on the local worldGenSeed and
+	 * the (x,z) chunk coordinates.
+	 */
+	public void initChunkSeed(long parLong1, long parLong2) {
+		this.chunkSeed = this.worldGenSeed;
+		this.chunkSeed *= this.chunkSeed * 6364136223846793005L + 1442695040888963407L;
+		this.chunkSeed += parLong1;
+		this.chunkSeed *= this.chunkSeed * 6364136223846793005L + 1442695040888963407L;
+		this.chunkSeed += parLong2;
+		this.chunkSeed *= this.chunkSeed * 6364136223846793005L + 1442695040888963407L;
+		this.chunkSeed += parLong1;
+		this.chunkSeed *= this.chunkSeed * 6364136223846793005L + 1442695040888963407L;
+		this.chunkSeed += parLong2;
+	}
+
+	/**
+	 * + Initialize layer's local worldGenSeed based on its own baseSeed and the
+	 * world's global seed (passed in as an argument).
 	 */
 	public void initWorldGenSeed(long seed) {
 		this.worldGenSeed = seed;
@@ -128,24 +191,8 @@ public abstract class GenLayer {
 		this.worldGenSeed += this.baseSeed;
 	}
 
-	/**+
-	 * Initialize layer's current chunkSeed based on the local
-	 * worldGenSeed and the (x,z) chunk coordinates.
-	 */
-	public void initChunkSeed(long parLong1, long parLong2) {
-		this.chunkSeed = this.worldGenSeed;
-		this.chunkSeed *= this.chunkSeed * 6364136223846793005L + 1442695040888963407L;
-		this.chunkSeed += parLong1;
-		this.chunkSeed *= this.chunkSeed * 6364136223846793005L + 1442695040888963407L;
-		this.chunkSeed += parLong2;
-		this.chunkSeed *= this.chunkSeed * 6364136223846793005L + 1442695040888963407L;
-		this.chunkSeed += parLong1;
-		this.chunkSeed *= this.chunkSeed * 6364136223846793005L + 1442695040888963407L;
-		this.chunkSeed += parLong2;
-	}
-
-	/**+
-	 * returns a LCG pseudo random number from [0, x). Args: int x
+	/**
+	 * + returns a LCG pseudo random number from [0, x). Args: int x
 	 */
 	protected int nextInt(int parInt1) {
 		int i = (int) ((this.chunkSeed >> 24) % (long) parInt1);
@@ -158,58 +205,9 @@ public abstract class GenLayer {
 		return i;
 	}
 
-	public abstract int[] getInts(int var1, int var2, int var3, int var4);
-
-	protected static boolean biomesEqualOrMesaPlateau(int biomeIDA, int biomeIDB) {
-		if (biomeIDA == biomeIDB) {
-			return true;
-		} else if (biomeIDA != BiomeGenBase.mesaPlateau_F.biomeID && biomeIDA != BiomeGenBase.mesaPlateau.biomeID) {
-			final BiomeGenBase biomegenbase = BiomeGenBase.getBiome(biomeIDA);
-			final BiomeGenBase biomegenbase1 = BiomeGenBase.getBiome(biomeIDB);
-
-			try {
-				return biomegenbase != null && biomegenbase1 != null ? biomegenbase.isEqualTo(biomegenbase1) : false;
-			} catch (Throwable throwable) {
-				CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Comparing biomes");
-				CrashReportCategory crashreportcategory = crashreport.makeCategory("Biomes being compared");
-				crashreportcategory.addCrashSection("Biome A ID", Integer.valueOf(biomeIDA));
-				crashreportcategory.addCrashSection("Biome B ID", Integer.valueOf(biomeIDB));
-				crashreportcategory.addCrashSectionCallable("Biome A", new Callable<String>() {
-					public String call() throws Exception {
-						return String.valueOf(biomegenbase);
-					}
-				});
-				crashreportcategory.addCrashSectionCallable("Biome B", new Callable<String>() {
-					public String call() throws Exception {
-						return String.valueOf(biomegenbase1);
-					}
-				});
-				throw new ReportedException(crashreport);
-			}
-		} else {
-			return biomeIDB == BiomeGenBase.mesaPlateau_F.biomeID || biomeIDB == BiomeGenBase.mesaPlateau.biomeID;
-		}
-	}
-
-	/**+
-	 * returns true if the biomeId is one of the various ocean
-	 * biomes.
-	 */
-	protected static boolean isBiomeOceanic(int parInt1) {
-		return parInt1 == BiomeGenBase.ocean.biomeID || parInt1 == BiomeGenBase.deepOcean.biomeID
-				|| parInt1 == BiomeGenBase.frozenOcean.biomeID;
-	}
-
-	/**+
-	 * selects a random integer from a set of provided integers
-	 */
-	protected int selectRandom(int... parArrayOfInt) {
-		return parArrayOfInt[this.nextInt(parArrayOfInt.length)];
-	}
-
-	/**+
-	 * returns the most frequently occurring number of the set, or a
-	 * random number from those provided
+	/**
+	 * + returns the most frequently occurring number of the set, or a random number
+	 * from those provided
 	 */
 	protected int selectModeOrRandom(int i, int j, int k, int l) {
 		return j == k && k == l ? j
@@ -224,5 +222,12 @@ public abstract class GenLayer {
 																				: (k == l && i != j ? k
 																						: this.selectRandom(new int[] {
 																								i, j, k, l }))))))))));
+	}
+
+	/**
+	 * + selects a random integer from a set of provided integers
+	 */
+	protected int selectRandom(int... parArrayOfInt) {
+		return parArrayOfInt[this.nextInt(parArrayOfInt.length)];
 	}
 }

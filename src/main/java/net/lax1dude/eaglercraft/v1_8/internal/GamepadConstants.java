@@ -3,14 +3,15 @@ package net.lax1dude.eaglercraft.v1_8.internal;
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -53,20 +54,6 @@ public class GamepadConstants {
 			GLFW_GAMEPAD_BUTTON_LEFT_THUMB = 9, GLFW_GAMEPAD_BUTTON_RIGHT_THUMB = 10, GLFW_GAMEPAD_BUTTON_DPAD_UP = 11,
 			GLFW_GAMEPAD_BUTTON_DPAD_RIGHT = 12, GLFW_GAMEPAD_BUTTON_DPAD_DOWN = 13, GLFW_GAMEPAD_BUTTON_DPAD_LEFT = 14;
 
-	private static void registerBtn(int eaglerBtn, int glfwBtn, String name) {
-		if(eaglerButtonsToGLFW[eaglerBtn] != 0) throw new IllegalArgumentException("Duplicate eaglerButtonsToGLFW entry: " + eaglerBtn + " -> " + glfwBtn);
-		if(glfwBtn != -1 && glfwButtonsToEagler[glfwBtn] != 0) throw new IllegalArgumentException("Duplicate glfwButtonsToEAGLER entry: " + glfwBtn + " -> " + eaglerBtn);
-		eaglerButtonsToGLFW[eaglerBtn] = glfwBtn;
-		if(glfwBtn != -1) glfwButtonsToEagler[glfwBtn] = eaglerBtn;
-		if(buttonNames[eaglerBtn] != null) throw new IllegalArgumentException("Duplicate buttonNames entry: " + eaglerBtn);
-		buttonNames[eaglerBtn] = name;
-	}
-
-	private static void registerAxis(int eaglerAxis, String name) {
-		if(axisNames[eaglerAxis] != null) throw new IllegalArgumentException("Duplicate axisNames entry: " + eaglerAxis);
-		axisNames[eaglerAxis] = name;
-	}
-
 	static {
 		registerBtn(GAMEPAD_A, GLFW_GAMEPAD_BUTTON_A, "A");
 		registerBtn(GAMEPAD_B, GLFW_GAMEPAD_BUTTON_B, "B");
@@ -91,44 +78,63 @@ public class GamepadConstants {
 		registerAxis(GAMEPAD_AXIS_RIGHT_STICK_Y, "Right Stick Y");
 	}
 
-	public static int getEaglerButtonFromBrowser(int button) {
-		return button;
+	public static String getAxisName(int button) {
+		if (button >= 0 && button < axisNames.length) {
+			return axisNames[button];
+		} else {
+			return "Axis " + button;
+		}
 	}
 
 	public static int getBrowserButtonFromEagler(int button) {
 		return button;
 	}
 
+	public static String getButtonName(int button) {
+		if (button >= 0 && button < buttonNames.length) {
+			return buttonNames[button];
+		} else {
+			return "Button " + button;
+		}
+	}
+
+	public static int getEaglerButtonFromBrowser(int button) {
+		return button;
+	}
+
 	public static int getEaglerButtonFromGLFW(int button) {
-		if(button >= 0 && button < glfwButtonsToEagler.length) {
+		if (button >= 0 && button < glfwButtonsToEagler.length) {
 			return glfwButtonsToEagler[button];
-		}else {
+		} else {
 			return -1;
 		}
 	}
 
 	public static int getGLFWButtonFromEagler(int button) {
-		if(button >= 0 && button < eaglerButtonsToGLFW.length) {
+		if (button >= 0 && button < eaglerButtonsToGLFW.length) {
 			return eaglerButtonsToGLFW[button];
-		}else {
+		} else {
 			return -1;
 		}
 	}
 
-	public static String getButtonName(int button) {
-		if(button >= 0 && button < buttonNames.length) {
-			return buttonNames[button];
-		}else {
-			return "Button " + button;
-		}
+	private static void registerAxis(int eaglerAxis, String name) {
+		if (axisNames[eaglerAxis] != null)
+			throw new IllegalArgumentException("Duplicate axisNames entry: " + eaglerAxis);
+		axisNames[eaglerAxis] = name;
 	}
 
-	public static String getAxisName(int button) {
-		if(button >= 0 && button < axisNames.length) {
-			return axisNames[button];
-		}else {
-			return "Axis " + button;
-		}
+	private static void registerBtn(int eaglerBtn, int glfwBtn, String name) {
+		if (eaglerButtonsToGLFW[eaglerBtn] != 0)
+			throw new IllegalArgumentException("Duplicate eaglerButtonsToGLFW entry: " + eaglerBtn + " -> " + glfwBtn);
+		if (glfwBtn != -1 && glfwButtonsToEagler[glfwBtn] != 0)
+			throw new IllegalArgumentException("Duplicate glfwButtonsToEAGLER entry: " + glfwBtn + " -> " + eaglerBtn);
+		eaglerButtonsToGLFW[eaglerBtn] = glfwBtn;
+		if (glfwBtn != -1)
+			glfwButtonsToEagler[glfwBtn] = eaglerBtn;
+		if (buttonNames[eaglerBtn] != null)
+			throw new IllegalArgumentException("Duplicate buttonNames entry: " + eaglerBtn);
+		buttonNames[eaglerBtn] = name;
 	}
 
 }

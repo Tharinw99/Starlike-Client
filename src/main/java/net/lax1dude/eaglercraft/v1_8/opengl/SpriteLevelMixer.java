@@ -1,7 +1,27 @@
 package net.lax1dude.eaglercraft.v1_8.opengl;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
-import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL.*;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglAttachShader;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglCompileShader;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglCreateProgram;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglCreateShader;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDeleteProgram;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDeleteShader;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDetachShader;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetProgramInfoLog;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetProgrami;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetShaderInfoLog;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetShaderi;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetUniformLocation;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglLinkProgram;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglShaderSource;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniform1f;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniform1i;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniform4f;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniformMatrix3fv;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_COMPILE_STATUS;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_FRAGMENT_SHADER;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_LINK_STATUS;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TRUE;
 
 import net.lax1dude.eaglercraft.v1_8.EagRuntime;
 import net.lax1dude.eaglercraft.v1_8.internal.IProgramGL;
@@ -15,14 +35,15 @@ import net.lax1dude.eaglercraft.v1_8.vector.Matrix3f;
 /**
  * Copyright (c) 2022-2023 lax1dude. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -60,6 +81,54 @@ public class SpriteLevelMixer {
 
 	private static final Matrix3f identityMatrix = new Matrix3f();
 
+	public static void destroy() {
+		if (matrixCopyBuffer != null) {
+			EagRuntime.freeFloatBuffer(matrixCopyBuffer);
+			matrixCopyBuffer = null;
+		}
+		if (shaderProgram != null) {
+			_wglDeleteProgram(shaderProgram);
+			shaderProgram = null;
+		}
+		u_textureLod1f = null;
+		u_blendFactor4f = null;
+		u_blendBias4f = null;
+		u_matrixTransform = null;
+	}
+
+	public static void drawSprite(float level) {
+		EaglercraftGPU.bindGLShaderProgram(shaderProgram);
+
+		if (EaglercraftGPU.checkTextureLODCapable()) {
+			_wglUniform1f(u_textureLod1f, level);
+		} else {
+			if (level != 0.0f) {
+				LOGGER.error("Tried to copy from mipmap level {}, but this GPU does not support textureLod!", level);
+			}
+			_wglUniform1f(u_textureLod1f, 0.0f);
+		}
+
+		if (blendColorChanged) {
+			_wglUniform4f(u_blendFactor4f, blendColorR, blendColorG, blendColorB, blendColorA);
+			blendColorChanged = false;
+		}
+
+		if (biasColorChanged) {
+			_wglUniform4f(u_blendBias4f, biasColorR, biasColorG, biasColorB, biasColorA);
+			biasColorChanged = false;
+		}
+
+		if (matrixChanged) {
+			matrixCopyBuffer.clear();
+			transformMatrix.store(matrixCopyBuffer);
+			matrixCopyBuffer.flip();
+			_wglUniformMatrix3fv(u_matrixTransform, false, matrixCopyBuffer);
+			matrixChanged = false;
+		}
+
+		DrawUtils.drawStandardQuad2D();
+	}
+
 	static void initialize() {
 		String fragmentSource = EagRuntime.getRequiredResourceString(fragmentShaderPath);
 
@@ -68,12 +137,12 @@ public class SpriteLevelMixer {
 		_wglShaderSource(frag, GLSLHeader.getFragmentHeaderCompat(fragmentSource, fragmentShaderPrecision));
 		_wglCompileShader(frag);
 
-		if(_wglGetShaderi(frag, GL_COMPILE_STATUS) != GL_TRUE) {
+		if (_wglGetShaderi(frag, GL_COMPILE_STATUS) != GL_TRUE) {
 			LOGGER.error("Failed to compile GL_FRAGMENT_SHADER \"" + fragmentShaderPath + "\" for SpriteLevelMixer!");
 			String log = _wglGetShaderInfoLog(frag);
-			if(log != null) {
+			if (log != null) {
 				String[] lines = log.split("(\\r\\n|\\r|\\n)");
-				for(int i = 0; i < lines.length; ++i) {
+				for (int i = 0; i < lines.length; ++i) {
 					LOGGER.error("[FRAG] {}", lines[i]);
 				}
 			}
@@ -85,7 +154,7 @@ public class SpriteLevelMixer {
 		_wglAttachShader(shaderProgram, DrawUtils.vshLocal);
 		_wglAttachShader(shaderProgram, frag);
 
-		if(EaglercraftGPU.checkOpenGLESVersion() == 200) {
+		if (EaglercraftGPU.checkOpenGLESVersion() == 200) {
 			VSHInputLayoutParser.applyLayout(shaderProgram, DrawUtils.vshLocalLayout);
 		}
 
@@ -96,12 +165,12 @@ public class SpriteLevelMixer {
 
 		_wglDeleteShader(frag);
 
-		if(_wglGetProgrami(shaderProgram, GL_LINK_STATUS) != GL_TRUE) {
+		if (_wglGetProgrami(shaderProgram, GL_LINK_STATUS) != GL_TRUE) {
 			LOGGER.error("Failed to link shader program for SpriteLevelMixer!");
 			String log = _wglGetProgramInfoLog(shaderProgram);
-			if(log != null) {
+			if (log != null) {
 				String[] lines = log.split("(\\r\\n|\\r|\\n)");
-				for(int i = 0; i < lines.length; ++i) {
+				for (int i = 0; i < lines.length; ++i) {
 					LOGGER.error("[LINK] {}", lines[i]);
 				}
 			}
@@ -121,18 +190,8 @@ public class SpriteLevelMixer {
 
 	}
 
-	public static void setBlendColor(float r, float g, float b, float a) {
-		if(r != blendColorR || g != blendColorG || b != blendColorB || a != blendColorA) {
-			blendColorChanged = true;
-			blendColorR = r;
-			blendColorG = g;
-			blendColorB = b;
-			blendColorA = a;
-		}
-	}
-
 	public static void setBiasColor(float r, float g, float b, float a) {
-		if(r != biasColorR || g != biasColorG || b != biasColorB || a != biasColorA) {
+		if (r != biasColorR || g != biasColorG || b != biasColorB || a != biasColorA) {
 			biasColorChanged = true;
 			biasColorR = r;
 			biasColorG = g;
@@ -141,63 +200,25 @@ public class SpriteLevelMixer {
 		}
 	}
 
+	public static void setBlendColor(float r, float g, float b, float a) {
+		if (r != blendColorR || g != blendColorG || b != blendColorB || a != blendColorA) {
+			blendColorChanged = true;
+			blendColorR = r;
+			blendColorG = g;
+			blendColorB = b;
+			blendColorA = a;
+		}
+	}
+
 	public static void setIdentityMatrix() {
 		setMatrix3f(identityMatrix);
 	}
 
 	public static void setMatrix3f(Matrix3f matrix) {
-		if(!matrix.equals(transformMatrix)) {
+		if (!matrix.equals(transformMatrix)) {
 			matrixChanged = true;
 			transformMatrix.load(matrix);
 		}
-	}
-
-	public static void drawSprite(float level) {
-		EaglercraftGPU.bindGLShaderProgram(shaderProgram);
-		
-		if(EaglercraftGPU.checkTextureLODCapable()) {
-			_wglUniform1f(u_textureLod1f, level);
-		}else {
-			if(level != 0.0f) {
-				LOGGER.error("Tried to copy from mipmap level {}, but this GPU does not support textureLod!", level);
-			}
-			_wglUniform1f(u_textureLod1f, 0.0f);
-		}
-		
-		if(blendColorChanged) {
-			_wglUniform4f(u_blendFactor4f, blendColorR, blendColorG, blendColorB, blendColorA);
-			blendColorChanged = false;
-		}
-		
-		if(biasColorChanged) {
-			_wglUniform4f(u_blendBias4f, biasColorR, biasColorG, biasColorB, biasColorA);
-			biasColorChanged = false;
-		}
-		
-		if(matrixChanged) {
-			matrixCopyBuffer.clear();
-			transformMatrix.store(matrixCopyBuffer);
-			matrixCopyBuffer.flip();
-			_wglUniformMatrix3fv(u_matrixTransform, false, matrixCopyBuffer);
-			matrixChanged = false;
-		}
-		
-		DrawUtils.drawStandardQuad2D();
-	}
-
-	public static void destroy() {
-		if(matrixCopyBuffer != null) {
-			EagRuntime.freeFloatBuffer(matrixCopyBuffer);
-			matrixCopyBuffer = null;
-		}
-		if(shaderProgram != null) {
-			_wglDeleteProgram(shaderProgram);
-			shaderProgram = null;
-		}
-		u_textureLod1f = null;
-		u_blendFactor4f = null;
-		u_blendBias4f = null;
-		u_matrixTransform = null;
 	}
 
 }

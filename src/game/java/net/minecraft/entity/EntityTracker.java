@@ -1,10 +1,14 @@
 package net.minecraft.entity;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.Callable;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
+import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
+import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.boss.EntityDragon;
@@ -37,25 +41,26 @@ import net.minecraft.util.IntHashMap;
 import net.minecraft.util.ReportedException;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
-import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
-import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -63,13 +68,13 @@ import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 public class EntityTracker {
 	private static final Logger logger = LogManager.getLogger();
 	private final WorldServer theWorld;
-	/**+
-	 * List of tracked entities, used for iteration operations on
-	 * tracked entities.
+	/**
+	 * + List of tracked entities, used for iteration operations on tracked
+	 * entities.
 	 */
 	private Set<EntityTrackerEntry> trackedEntities = Sets.newHashSet();
-	/**+
-	 * Used for identity lookup of tracked entities.
+	/**
+	 * + Used for identity lookup of tracked entities.
 	 */
 	private IntHashMap<EntityTrackerEntry> trackedEntityHashTable = new IntHashMap();
 	private int maxTrackingDistanceThreshold;
@@ -78,6 +83,100 @@ public class EntityTracker {
 		this.theWorld = theWorldIn;
 		this.maxTrackingDistanceThreshold = theWorldIn.getMinecraftServer().getConfigurationManager()
 				.getEntityViewDistance();
+	}
+
+	/**
+	 * + Args : Entity, trackingRange, updateFrequency, sendVelocityUpdates
+	 */
+	public void addEntityToTracker(Entity entityIn, int trackingRange, final int updateFrequency,
+			boolean sendVelocityUpdates) {
+		if (trackingRange > this.maxTrackingDistanceThreshold) {
+			trackingRange = this.maxTrackingDistanceThreshold;
+		}
+
+		try {
+			if (this.trackedEntityHashTable.containsItem(entityIn.getEntityId())) {
+				throw new IllegalStateException("Entity is already tracked!");
+			}
+
+			EntityTrackerEntry entitytrackerentry = new EntityTrackerEntry(entityIn, trackingRange, updateFrequency,
+					sendVelocityUpdates);
+			this.trackedEntities.add(entitytrackerentry);
+			this.trackedEntityHashTable.addKey(entityIn.getEntityId(), entitytrackerentry);
+			entitytrackerentry.updatePlayerEntities(this.theWorld.playerEntities);
+		} catch (Throwable throwable) {
+			CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Adding entity to track");
+			CrashReportCategory crashreportcategory = crashreport.makeCategory("Entity To Track");
+			crashreportcategory.addCrashSection("Tracking range", trackingRange + " blocks");
+			crashreportcategory.addCrashSectionCallable("Update interval", new Callable<String>() {
+				public String call() throws Exception {
+					String s = "Once per " + updateFrequency + " ticks";
+					if (updateFrequency == Integer.MAX_VALUE) {
+						s = "Maximum (" + s + ")";
+					}
+
+					return s;
+				}
+			});
+			entityIn.addEntityCrashInfo(crashreportcategory);
+			CrashReportCategory crashreportcategory1 = crashreport.makeCategory("Entity That Is Already Tracked");
+			((EntityTrackerEntry) this.trackedEntityHashTable.lookup(entityIn.getEntityId())).trackedEntity
+					.addEntityCrashInfo(crashreportcategory1);
+
+			try {
+				throw new ReportedException(crashreport);
+			} catch (ReportedException reportedexception) {
+				logger.error("\"Silently\" catching entity tracking error.", reportedexception);
+			}
+		}
+
+	}
+
+	public void func_151248_b(Entity entityIn, Packet parPacket) {
+		EntityTrackerEntry entitytrackerentry = (EntityTrackerEntry) this.trackedEntityHashTable
+				.lookup(entityIn.getEntityId());
+		if (entitytrackerentry != null) {
+			entitytrackerentry.func_151261_b(parPacket);
+		}
+
+	}
+
+	public void func_180245_a(EntityPlayerMP parEntityPlayerMP) {
+		for (EntityTrackerEntry entitytrackerentry : this.trackedEntities) {
+			if (entitytrackerentry.trackedEntity == parEntityPlayerMP) {
+				entitytrackerentry.updatePlayerEntities(this.theWorld.playerEntities);
+			} else {
+				entitytrackerentry.updatePlayerEntity(parEntityPlayerMP);
+			}
+		}
+
+	}
+
+	public void func_85172_a(EntityPlayerMP parEntityPlayerMP, Chunk parChunk) {
+		for (EntityTrackerEntry entitytrackerentry : this.trackedEntities) {
+			if (entitytrackerentry.trackedEntity != parEntityPlayerMP
+					&& entitytrackerentry.trackedEntity.chunkCoordX == parChunk.xPosition
+					&& entitytrackerentry.trackedEntity.chunkCoordZ == parChunk.zPosition) {
+				entitytrackerentry.updatePlayerEntity(parEntityPlayerMP);
+			}
+		}
+
+	}
+
+	public void removePlayerFromTrackers(EntityPlayerMP parEntityPlayerMP) {
+		for (EntityTrackerEntry entitytrackerentry : this.trackedEntities) {
+			entitytrackerentry.removeTrackedPlayerSymmetric(parEntityPlayerMP);
+		}
+
+	}
+
+	public void sendToAllTrackingEntity(Entity entityIn, Packet parPacket) {
+		EntityTrackerEntry entitytrackerentry = (EntityTrackerEntry) this.trackedEntityHashTable
+				.lookup(entityIn.getEntityId());
+		if (entitytrackerentry != null) {
+			entitytrackerentry.sendPacketToTrackedPlayers(parPacket);
+		}
+
 	}
 
 	public void trackEntity(Entity parEntity) {
@@ -148,54 +247,6 @@ public class EntityTracker {
 		this.addEntityToTracker(entityIn, trackingRange, updateFrequency, false);
 	}
 
-	/**+
-	 * Args : Entity, trackingRange, updateFrequency,
-	 * sendVelocityUpdates
-	 */
-	public void addEntityToTracker(Entity entityIn, int trackingRange, final int updateFrequency,
-			boolean sendVelocityUpdates) {
-		if (trackingRange > this.maxTrackingDistanceThreshold) {
-			trackingRange = this.maxTrackingDistanceThreshold;
-		}
-
-		try {
-			if (this.trackedEntityHashTable.containsItem(entityIn.getEntityId())) {
-				throw new IllegalStateException("Entity is already tracked!");
-			}
-
-			EntityTrackerEntry entitytrackerentry = new EntityTrackerEntry(entityIn, trackingRange, updateFrequency,
-					sendVelocityUpdates);
-			this.trackedEntities.add(entitytrackerentry);
-			this.trackedEntityHashTable.addKey(entityIn.getEntityId(), entitytrackerentry);
-			entitytrackerentry.updatePlayerEntities(this.theWorld.playerEntities);
-		} catch (Throwable throwable) {
-			CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Adding entity to track");
-			CrashReportCategory crashreportcategory = crashreport.makeCategory("Entity To Track");
-			crashreportcategory.addCrashSection("Tracking range", trackingRange + " blocks");
-			crashreportcategory.addCrashSectionCallable("Update interval", new Callable<String>() {
-				public String call() throws Exception {
-					String s = "Once per " + updateFrequency + " ticks";
-					if (updateFrequency == Integer.MAX_VALUE) {
-						s = "Maximum (" + s + ")";
-					}
-
-					return s;
-				}
-			});
-			entityIn.addEntityCrashInfo(crashreportcategory);
-			CrashReportCategory crashreportcategory1 = crashreport.makeCategory("Entity That Is Already Tracked");
-			((EntityTrackerEntry) this.trackedEntityHashTable.lookup(entityIn.getEntityId())).trackedEntity
-					.addEntityCrashInfo(crashreportcategory1);
-
-			try {
-				throw new ReportedException(crashreport);
-			} catch (ReportedException reportedexception) {
-				logger.error("\"Silently\" catching entity tracking error.", reportedexception);
-			}
-		}
-
-	}
-
 	public void untrackEntity(Entity entityIn) {
 		if (entityIn instanceof EntityPlayerMP) {
 			EntityPlayerMP entityplayermp = (EntityPlayerMP) entityIn;
@@ -232,53 +283,6 @@ public class EntityTracker {
 				if (entitytrackerentry1.trackedEntity != entityplayermp) {
 					entitytrackerentry1.updatePlayerEntity(entityplayermp);
 				}
-			}
-		}
-
-	}
-
-	public void func_180245_a(EntityPlayerMP parEntityPlayerMP) {
-		for (EntityTrackerEntry entitytrackerentry : this.trackedEntities) {
-			if (entitytrackerentry.trackedEntity == parEntityPlayerMP) {
-				entitytrackerentry.updatePlayerEntities(this.theWorld.playerEntities);
-			} else {
-				entitytrackerentry.updatePlayerEntity(parEntityPlayerMP);
-			}
-		}
-
-	}
-
-	public void sendToAllTrackingEntity(Entity entityIn, Packet parPacket) {
-		EntityTrackerEntry entitytrackerentry = (EntityTrackerEntry) this.trackedEntityHashTable
-				.lookup(entityIn.getEntityId());
-		if (entitytrackerentry != null) {
-			entitytrackerentry.sendPacketToTrackedPlayers(parPacket);
-		}
-
-	}
-
-	public void func_151248_b(Entity entityIn, Packet parPacket) {
-		EntityTrackerEntry entitytrackerentry = (EntityTrackerEntry) this.trackedEntityHashTable
-				.lookup(entityIn.getEntityId());
-		if (entitytrackerentry != null) {
-			entitytrackerentry.func_151261_b(parPacket);
-		}
-
-	}
-
-	public void removePlayerFromTrackers(EntityPlayerMP parEntityPlayerMP) {
-		for (EntityTrackerEntry entitytrackerentry : this.trackedEntities) {
-			entitytrackerentry.removeTrackedPlayerSymmetric(parEntityPlayerMP);
-		}
-
-	}
-
-	public void func_85172_a(EntityPlayerMP parEntityPlayerMP, Chunk parChunk) {
-		for (EntityTrackerEntry entitytrackerentry : this.trackedEntities) {
-			if (entitytrackerentry.trackedEntity != parEntityPlayerMP
-					&& entitytrackerentry.trackedEntity.chunkCoordX == parChunk.xPosition
-					&& entitytrackerentry.trackedEntity.chunkCoordZ == parChunk.zPosition) {
-				entitytrackerentry.updatePlayerEntity(parEntityPlayerMP);
 			}
 		}
 

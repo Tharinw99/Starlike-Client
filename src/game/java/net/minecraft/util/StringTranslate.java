@@ -1,14 +1,5 @@
 package net.minecraft.util;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
-
-import net.lax1dude.eaglercraft.v1_8.EagRuntime;
-import net.lax1dude.eaglercraft.v1_8.HString;
-import net.lax1dude.eaglercraft.v1_8.IOUtils;
-import net.lax1dude.eaglercraft.v1_8.sp.SingleplayerServerController;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -19,46 +10,68 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+
+import net.lax1dude.eaglercraft.v1_8.EagRuntime;
+import net.lax1dude.eaglercraft.v1_8.HString;
+import net.lax1dude.eaglercraft.v1_8.IOUtils;
+import net.lax1dude.eaglercraft.v1_8.sp.SingleplayerServerController;
+
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class StringTranslate {
-	/**+
-	 * Pattern that matches numeric variable placeholders in a
-	 * resource string, such as "%d", "%3$d", "%.2f"
+	/**
+	 * + Pattern that matches numeric variable placeholders in a resource string,
+	 * such as "%d", "%3$d", "%.2f"
 	 */
 	private static final Pattern numericVariablePattern = Pattern.compile("%(\\d+\\$)?[\\d\\.]*[df]");
-	/**+
-	 * A Splitter that splits a string on the first "=". For
-	 * example, "a=b=c" would split into ["a", "b=c"].
+	/**
+	 * + A Splitter that splits a string on the first "=". For example, "a=b=c"
+	 * would split into ["a", "b=c"].
 	 */
 	private static final Splitter equalSignSplitter = Splitter.on('=').limit(2);
-	/**+
-	 * Is the private singleton instance of StringTranslate.
+	/**
+	 * + Is the private singleton instance of StringTranslate.
 	 */
 	private static StringTranslate instance = new StringTranslate();
 	static StringTranslate fallbackInstance = null;
-	private final Map<String, String> languageList = Maps.newHashMap();
-	private long lastUpdateTimeInMilliseconds;
 
-	private StringTranslate() {
+	public static List<String> dump() {
+		List<String> ret = new ArrayList(instance.languageList.size());
+		for (Entry<String, String> etr : instance.languageList.entrySet()) {
+			ret.add(etr.getKey() + "=" + etr.getValue());
+		}
+		return ret;
+	}
+
+	/**
+	 * + Return the StringTranslate singleton instance
+	 */
+	static StringTranslate getInstance() {
+		return instance;
 	}
 
 	public static void initClient() {
@@ -92,16 +105,9 @@ public class StringTranslate {
 		instance.lastUpdateTimeInMilliseconds = EagRuntime.steadyTimeMillis();
 	}
 
-	/**+
-	 * Return the StringTranslate singleton instance
-	 */
-	static StringTranslate getInstance() {
-		return instance;
-	}
-
-	/**+
-	 * Replaces all the current instance's translations with the
-	 * ones that are passed in.
+	/**
+	 * + Replaces all the current instance's translations with the ones that are
+	 * passed in.
 	 */
 	public static void replaceWith(Map<String, String> parMap) {
 		instance.languageList.clear();
@@ -109,15 +115,37 @@ public class StringTranslate {
 		instance.lastUpdateTimeInMilliseconds = EagRuntime.steadyTimeMillis();
 	}
 
-	/**+
-	 * Translate a key to current language.
+	private final Map<String, String> languageList = Maps.newHashMap();
+
+	private long lastUpdateTimeInMilliseconds;
+
+	private StringTranslate() {
+	}
+
+	/**
+	 * + Gets the time, in milliseconds since epoch, that this instance was last
+	 * updated
+	 */
+	public long getLastUpdateTimeInMilliseconds() {
+		return this.lastUpdateTimeInMilliseconds;
+	}
+
+	/**
+	 * + Returns true if the passed key is in the translation table.
+	 */
+	public boolean isKeyTranslated(String key) {
+		return this.languageList.containsKey(key);
+	}
+
+	/**
+	 * + Translate a key to current language.
 	 */
 	public String translateKey(String key) {
 		return this.tryTranslateKey(key);
 	}
 
-	/**+
-	 * Translate a key to current language applying String.format()
+	/**
+	 * + Translate a key to current language applying String.format()
 	 */
 	public String translateKeyFormat(String key, Object... format) {
 		String s = this.tryTranslateKey(key);
@@ -129,35 +157,12 @@ public class StringTranslate {
 		}
 	}
 
-	/**+
-	 * Tries to look up a translation for the given key; spits back
-	 * the key if no result was found.
+	/**
+	 * + Tries to look up a translation for the given key; spits back the key if no
+	 * result was found.
 	 */
 	private String tryTranslateKey(String key) {
 		String s = (String) this.languageList.get(key);
 		return s == null ? key : s;
-	}
-
-	/**+
-	 * Returns true if the passed key is in the translation table.
-	 */
-	public boolean isKeyTranslated(String key) {
-		return this.languageList.containsKey(key);
-	}
-
-	/**+
-	 * Gets the time, in milliseconds since epoch, that this
-	 * instance was last updated
-	 */
-	public long getLastUpdateTimeInMilliseconds() {
-		return this.lastUpdateTimeInMilliseconds;
-	}
-
-	public static List<String> dump() {
-		List<String> ret = new ArrayList(instance.languageList.size());
-		for (Entry<String, String> etr : instance.languageList.entrySet()) {
-			ret.add(etr.getKey() + "=" + etr.getValue());
-		}
-		return ret;
 	}
 }

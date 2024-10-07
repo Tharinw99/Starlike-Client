@@ -32,14 +32,15 @@ import com.google.common.annotations.Beta;
  * 
  * <pre>
  *    {@code
- *   public enum PersonFunnel implements Funnel<Person> {
- *     INSTANCE;
- *     public void funnel(Person person, PrimitiveSink into) {
- *       into.putUnencodedChars(person.getFirstName())
- *           .putUnencodedChars(person.getLastName())
- *           .putInt(person.getAge());
- *     }
- *   }}
+ * public enum PersonFunnel implements Funnel<Person> {
+ * 	INSTANCE;
+ * 
+ * 	public void funnel(Person person, PrimitiveSink into) {
+ * 		into.putUnencodedChars(person.getFirstName()).putUnencodedChars(person.getLastName())
+ * 				.putInt(person.getAge());
+ * 	}
+ * }
+ * }
  * </pre>
  *
  * @author Dimitris Andreou

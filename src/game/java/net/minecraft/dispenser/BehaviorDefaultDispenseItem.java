@@ -6,49 +6,30 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class BehaviorDefaultDispenseItem implements IBehaviorDispenseItem {
-	/**+
-	 * Dispenses the specified ItemStack from a dispenser.
-	 */
-	public final ItemStack dispense(IBlockSource source, ItemStack stack) {
-		ItemStack itemstack = this.dispenseStack(source, stack);
-		this.playDispenseSound(source);
-		this.spawnDispenseParticles(source, BlockDispenser.getFacing(source.getBlockMetadata()));
-		return itemstack;
-	}
-
-	/**+
-	 * Dispense the specified stack, play the dispense sound and
-	 * spawn particles.
-	 */
-	protected ItemStack dispenseStack(IBlockSource iblocksource, ItemStack itemstack) {
-		EnumFacing enumfacing = BlockDispenser.getFacing(iblocksource.getBlockMetadata());
-		IPosition iposition = BlockDispenser.getDispensePosition(iblocksource);
-		ItemStack itemstack1 = itemstack.splitStack(1);
-		doDispense(iblocksource.getWorld(), itemstack1, 6, enumfacing, iposition);
-		return itemstack;
-	}
-
 	public static void doDispense(World worldIn, ItemStack stack, int speed, EnumFacing facing, IPosition position) {
 		double d0 = position.getX();
 		double d1 = position.getY();
@@ -70,22 +51,43 @@ public class BehaviorDefaultDispenseItem implements IBehaviorDispenseItem {
 		worldIn.spawnEntityInWorld(entityitem);
 	}
 
-	/**+
-	 * Play the dispense sound from the specified block.
+	/**
+	 * + Dispenses the specified ItemStack from a dispenser.
+	 */
+	public final ItemStack dispense(IBlockSource source, ItemStack stack) {
+		ItemStack itemstack = this.dispenseStack(source, stack);
+		this.playDispenseSound(source);
+		this.spawnDispenseParticles(source, BlockDispenser.getFacing(source.getBlockMetadata()));
+		return itemstack;
+	}
+
+	/**
+	 * + Dispense the specified stack, play the dispense sound and spawn particles.
+	 */
+	protected ItemStack dispenseStack(IBlockSource iblocksource, ItemStack itemstack) {
+		EnumFacing enumfacing = BlockDispenser.getFacing(iblocksource.getBlockMetadata());
+		IPosition iposition = BlockDispenser.getDispensePosition(iblocksource);
+		ItemStack itemstack1 = itemstack.splitStack(1);
+		doDispense(iblocksource.getWorld(), itemstack1, 6, enumfacing, iposition);
+		return itemstack;
+	}
+
+	private int func_82488_a(EnumFacing facingIn) {
+		return facingIn.getFrontOffsetX() + 1 + (facingIn.getFrontOffsetZ() + 1) * 3;
+	}
+
+	/**
+	 * + Play the dispense sound from the specified block.
 	 */
 	protected void playDispenseSound(IBlockSource iblocksource) {
 		iblocksource.getWorld().playAuxSFX(1000, iblocksource.getBlockPos(), 0);
 	}
 
-	/**+
-	 * Order clients to display dispense particles from the
-	 * specified block and facing.
+	/**
+	 * + Order clients to display dispense particles from the specified block and
+	 * facing.
 	 */
 	protected void spawnDispenseParticles(IBlockSource source, EnumFacing facingIn) {
 		source.getWorld().playAuxSFX(2000, source.getBlockPos(), this.func_82488_a(facingIn));
-	}
-
-	private int func_82488_a(EnumFacing facingIn) {
-		return facingIn.getFrontOffsetX() + 1 + (facingIn.getFrontOffsetZ() + 1) * 3;
 	}
 }

@@ -1,7 +1,9 @@
 package net.minecraft.world.biome;
 
-import com.google.common.collect.Lists;
 import java.util.List;
+
+import com.google.common.collect.Lists;
+
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
@@ -12,22 +14,25 @@ import net.minecraft.world.WorldType;
 import net.minecraft.world.gen.layer.GenLayer;
 import net.minecraft.world.gen.layer.IntCache;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -64,30 +69,152 @@ public class WorldChunkManager {
 		this(worldIn.getSeed(), worldIn.getWorldInfo().getTerrainType(), worldIn.getWorldInfo().getGeneratorOptions());
 	}
 
-	/**+
-	 * Gets the list of valid biomes for the player to spawn in.
+	/**
+	 * + checks given Chunk's Biomes against List of allowed ones
 	 */
-	public List<BiomeGenBase> getBiomesToSpawnIn() {
-		return this.biomesToSpawnIn;
+	public boolean areBiomesViable(int parInt1, int parInt2, int parInt3, List<BiomeGenBase> parList) {
+		IntCache.resetIntCache();
+		int i = parInt1 - parInt3 >> 2;
+		int j = parInt2 - parInt3 >> 2;
+		int k = parInt1 + parInt3 >> 2;
+		int l = parInt2 + parInt3 >> 2;
+		int i1 = k - i + 1;
+		int j1 = l - j + 1;
+		int[] aint = this.genBiomes.getInts(i, j, i1, j1);
+
+		try {
+			for (int k1 = 0; k1 < i1 * j1; ++k1) {
+				BiomeGenBase biomegenbase = BiomeGenBase.getBiome(aint[k1]);
+				if (!parList.contains(biomegenbase)) {
+					return false;
+				}
+			}
+
+			return true;
+		} catch (Throwable throwable) {
+			CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Invalid Biome id");
+			CrashReportCategory crashreportcategory = crashreport.makeCategory("Layer");
+			crashreportcategory.addCrashSection("Layer", this.genBiomes.toString());
+			crashreportcategory.addCrashSection("x", Integer.valueOf(parInt1));
+			crashreportcategory.addCrashSection("z", Integer.valueOf(parInt2));
+			crashreportcategory.addCrashSection("radius", Integer.valueOf(parInt3));
+			crashreportcategory.addCrashSection("allowed", parList);
+			throw new ReportedException(crashreport);
+		}
 	}
 
-	/**+
-	 * Returns the biome generator
+	/**
+	 * + Calls the WorldChunkManager's biomeCache.cleanupCache()
+	 */
+	public void cleanupCache() {
+		this.biomeCache.cleanupCache();
+	}
+
+	public BlockPos findBiomePosition(int x, int z, int range, List<BiomeGenBase> biomes, EaglercraftRandom random) {
+		IntCache.resetIntCache();
+		int i = x - range >> 2;
+		int j = z - range >> 2;
+		int k = x + range >> 2;
+		int l = z + range >> 2;
+		int i1 = k - i + 1;
+		int j1 = l - j + 1;
+		int[] aint = this.genBiomes.getInts(i, j, i1, j1);
+		BlockPos blockpos = null;
+		int k1 = 0;
+
+		for (int l1 = 0; l1 < i1 * j1; ++l1) {
+			int i2 = i + l1 % i1 << 2;
+			int j2 = j + l1 / i1 << 2;
+			BiomeGenBase biomegenbase = BiomeGenBase.getBiome(aint[l1]);
+			if (biomes.contains(biomegenbase) && (blockpos == null || random.nextInt(k1 + 1) == 0)) {
+				blockpos = new BlockPos(i2, 0, j2);
+				++k1;
+			}
+		}
+
+		return blockpos;
+	}
+
+	/**
+	 * + Return a list of biomes for the specified blocks. Args: listToReuse, x, y,
+	 * width, length, cacheFlag (if false, don't check biomeCache to avoid infinite
+	 * loop in BiomeCacheBlock)
+	 */
+	public BiomeGenBase[] getBiomeGenAt(BiomeGenBase[] listToReuse, int x, int z, int width, int length,
+			boolean cacheFlag) {
+		IntCache.resetIntCache();
+		if (listToReuse == null || listToReuse.length < width * length) {
+			listToReuse = new BiomeGenBase[width * length];
+		}
+
+		if (cacheFlag && width == 16 && length == 16 && (x & 15) == 0 && (z & 15) == 0) {
+			BiomeGenBase[] abiomegenbase = this.biomeCache.getCachedBiomes(x, z);
+			System.arraycopy(abiomegenbase, 0, listToReuse, 0, width * length);
+			return listToReuse;
+		} else {
+			int[] aint = this.biomeIndexLayer.getInts(x, z, width, length);
+
+			for (int i = 0; i < width * length; ++i) {
+				listToReuse[i] = BiomeGenBase.getBiomeFromBiomeList(aint[i], BiomeGenBase.field_180279_ad);
+			}
+
+			return listToReuse;
+		}
+	}
+
+	/**
+	 * + Returns the biome generator
 	 */
 	public BiomeGenBase getBiomeGenerator(BlockPos pos) {
 		return this.getBiomeGenerator(pos, (BiomeGenBase) null);
 	}
 
-	/**+
-	 * Returns the biome generator
+	/**
+	 * + Returns the biome generator
 	 */
 	public BiomeGenBase getBiomeGenerator(BlockPos pos, BiomeGenBase biomeGenBaseIn) {
 		return this.biomeCache.func_180284_a(pos.getX(), pos.getZ(), biomeGenBaseIn);
 	}
 
-	/**+
-	 * Returns a list of rainfall values for the specified blocks.
-	 * Args: listToReuse, x, z, width, length.
+	/**
+	 * + Returns an array of biomes for the location input.
+	 */
+	public BiomeGenBase[] getBiomesForGeneration(BiomeGenBase[] biomes, int x, int z, int width, int height) {
+		IntCache.resetIntCache();
+		if (biomes == null || biomes.length < width * height) {
+			biomes = new BiomeGenBase[width * height];
+		}
+
+		int[] aint = this.genBiomes.getInts(x, z, width, height);
+
+		try {
+			for (int i = 0; i < width * height; ++i) {
+				biomes[i] = BiomeGenBase.getBiomeFromBiomeList(aint[i], BiomeGenBase.field_180279_ad);
+			}
+
+			return biomes;
+		} catch (Throwable throwable) {
+			CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Invalid Biome id");
+			CrashReportCategory crashreportcategory = crashreport.makeCategory("RawBiomeBlock");
+			crashreportcategory.addCrashSection("biomes[] size", Integer.valueOf(biomes.length));
+			crashreportcategory.addCrashSection("x", Integer.valueOf(x));
+			crashreportcategory.addCrashSection("z", Integer.valueOf(z));
+			crashreportcategory.addCrashSection("w", Integer.valueOf(width));
+			crashreportcategory.addCrashSection("h", Integer.valueOf(height));
+			throw new ReportedException(crashreport);
+		}
+	}
+
+	/**
+	 * + Gets the list of valid biomes for the player to spawn in.
+	 */
+	public List<BiomeGenBase> getBiomesToSpawnIn() {
+		return this.biomesToSpawnIn;
+	}
+
+	/**
+	 * + Returns a list of rainfall values for the specified blocks. Args:
+	 * listToReuse, x, z, width, length.
 	 */
 	public float[] getRainfall(float[] listToReuse, int x, int z, int width, int length) {
 		IntCache.resetIntCache();
@@ -122,142 +249,19 @@ public class WorldChunkManager {
 		return listToReuse;
 	}
 
-	/**+
-	 * Return an adjusted version of a given temperature based on
-	 * the y height
+	/**
+	 * + Return an adjusted version of a given temperature based on the y height
 	 */
 	public float getTemperatureAtHeight(float parFloat1, int parInt1) {
 		return parFloat1;
 	}
 
-	/**+
-	 * Returns an array of biomes for the location input.
-	 */
-	public BiomeGenBase[] getBiomesForGeneration(BiomeGenBase[] biomes, int x, int z, int width, int height) {
-		IntCache.resetIntCache();
-		if (biomes == null || biomes.length < width * height) {
-			biomes = new BiomeGenBase[width * height];
-		}
-
-		int[] aint = this.genBiomes.getInts(x, z, width, height);
-
-		try {
-			for (int i = 0; i < width * height; ++i) {
-				biomes[i] = BiomeGenBase.getBiomeFromBiomeList(aint[i], BiomeGenBase.field_180279_ad);
-			}
-
-			return biomes;
-		} catch (Throwable throwable) {
-			CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Invalid Biome id");
-			CrashReportCategory crashreportcategory = crashreport.makeCategory("RawBiomeBlock");
-			crashreportcategory.addCrashSection("biomes[] size", Integer.valueOf(biomes.length));
-			crashreportcategory.addCrashSection("x", Integer.valueOf(x));
-			crashreportcategory.addCrashSection("z", Integer.valueOf(z));
-			crashreportcategory.addCrashSection("w", Integer.valueOf(width));
-			crashreportcategory.addCrashSection("h", Integer.valueOf(height));
-			throw new ReportedException(crashreport);
-		}
-	}
-
-	/**+
-	 * Returns biomes to use for the blocks and loads the other data
-	 * like temperature and humidity onto the WorldChunkManager
-	 * Args: oldBiomeList, x, z, width, depth
+	/**
+	 * + Returns biomes to use for the blocks and loads the other data like
+	 * temperature and humidity onto the WorldChunkManager Args: oldBiomeList, x, z,
+	 * width, depth
 	 */
 	public BiomeGenBase[] loadBlockGeneratorData(BiomeGenBase[] oldBiomeList, int x, int z, int width, int depth) {
 		return this.getBiomeGenAt(oldBiomeList, x, z, width, depth, true);
-	}
-
-	/**+
-	 * Return a list of biomes for the specified blocks. Args:
-	 * listToReuse, x, y, width, length, cacheFlag (if false, don't
-	 * check biomeCache to avoid infinite loop in BiomeCacheBlock)
-	 */
-	public BiomeGenBase[] getBiomeGenAt(BiomeGenBase[] listToReuse, int x, int z, int width, int length,
-			boolean cacheFlag) {
-		IntCache.resetIntCache();
-		if (listToReuse == null || listToReuse.length < width * length) {
-			listToReuse = new BiomeGenBase[width * length];
-		}
-
-		if (cacheFlag && width == 16 && length == 16 && (x & 15) == 0 && (z & 15) == 0) {
-			BiomeGenBase[] abiomegenbase = this.biomeCache.getCachedBiomes(x, z);
-			System.arraycopy(abiomegenbase, 0, listToReuse, 0, width * length);
-			return listToReuse;
-		} else {
-			int[] aint = this.biomeIndexLayer.getInts(x, z, width, length);
-
-			for (int i = 0; i < width * length; ++i) {
-				listToReuse[i] = BiomeGenBase.getBiomeFromBiomeList(aint[i], BiomeGenBase.field_180279_ad);
-			}
-
-			return listToReuse;
-		}
-	}
-
-	/**+
-	 * checks given Chunk's Biomes against List of allowed ones
-	 */
-	public boolean areBiomesViable(int parInt1, int parInt2, int parInt3, List<BiomeGenBase> parList) {
-		IntCache.resetIntCache();
-		int i = parInt1 - parInt3 >> 2;
-		int j = parInt2 - parInt3 >> 2;
-		int k = parInt1 + parInt3 >> 2;
-		int l = parInt2 + parInt3 >> 2;
-		int i1 = k - i + 1;
-		int j1 = l - j + 1;
-		int[] aint = this.genBiomes.getInts(i, j, i1, j1);
-
-		try {
-			for (int k1 = 0; k1 < i1 * j1; ++k1) {
-				BiomeGenBase biomegenbase = BiomeGenBase.getBiome(aint[k1]);
-				if (!parList.contains(biomegenbase)) {
-					return false;
-				}
-			}
-
-			return true;
-		} catch (Throwable throwable) {
-			CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Invalid Biome id");
-			CrashReportCategory crashreportcategory = crashreport.makeCategory("Layer");
-			crashreportcategory.addCrashSection("Layer", this.genBiomes.toString());
-			crashreportcategory.addCrashSection("x", Integer.valueOf(parInt1));
-			crashreportcategory.addCrashSection("z", Integer.valueOf(parInt2));
-			crashreportcategory.addCrashSection("radius", Integer.valueOf(parInt3));
-			crashreportcategory.addCrashSection("allowed", parList);
-			throw new ReportedException(crashreport);
-		}
-	}
-
-	public BlockPos findBiomePosition(int x, int z, int range, List<BiomeGenBase> biomes, EaglercraftRandom random) {
-		IntCache.resetIntCache();
-		int i = x - range >> 2;
-		int j = z - range >> 2;
-		int k = x + range >> 2;
-		int l = z + range >> 2;
-		int i1 = k - i + 1;
-		int j1 = l - j + 1;
-		int[] aint = this.genBiomes.getInts(i, j, i1, j1);
-		BlockPos blockpos = null;
-		int k1 = 0;
-
-		for (int l1 = 0; l1 < i1 * j1; ++l1) {
-			int i2 = i + l1 % i1 << 2;
-			int j2 = j + l1 / i1 << 2;
-			BiomeGenBase biomegenbase = BiomeGenBase.getBiome(aint[l1]);
-			if (biomes.contains(biomegenbase) && (blockpos == null || random.nextInt(k1 + 1) == 0)) {
-				blockpos = new BlockPos(i2, 0, j2);
-				++k1;
-			}
-		}
-
-		return blockpos;
-	}
-
-	/**+
-	 * Calls the WorldChunkManager's biomeCache.cleanupCache()
-	 */
-	public void cleanupCache() {
-		this.biomeCache.cleanupCache();
 	}
 }

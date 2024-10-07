@@ -3,25 +3,38 @@ package net.lax1dude.eaglercraft.v1_8.internal.buffer;
 /**
  * Copyright (c) 2022 lax1dude. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public interface Buffer {
 
+	static IndexOutOfBoundsException makeIOOBE(int idx) {
+		return new IndexOutOfBoundsException("Index out of range: " + idx);
+	}
+
+	Object array();
+
 	int capacity();
 
-	int position();
+	Buffer clear();
 
-	Buffer position(int newPosition);
+	Buffer flip();
+
+	boolean hasArray();
+
+	boolean hasRemaining();
+
+	boolean isDirect();
 
 	int limit();
 
@@ -29,26 +42,14 @@ public interface Buffer {
 
 	Buffer mark();
 
-	Buffer reset();
+	int position();
 
-	Buffer clear();
-
-	Buffer flip();
-
-	Buffer rewind();
+	Buffer position(int newPosition);
 
 	int remaining();
 
-	boolean hasRemaining();
+	Buffer reset();
 
-	boolean hasArray();
-
-	Object array();
-
-	boolean isDirect();
-
-	static IndexOutOfBoundsException makeIOOBE(int idx) {
-		return new IndexOutOfBoundsException("Index out of range: " + idx);
-	}
+	Buffer rewind();
 
 }

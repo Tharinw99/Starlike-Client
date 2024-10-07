@@ -83,16 +83,6 @@ final class SparseImmutableTable<R, C, V> extends RegularImmutableTable<R, C, V>
 	}
 
 	@Override
-	public ImmutableMap<R, Map<C, V>> rowMap() {
-		return rowMap;
-	}
-
-	@Override
-	public int size() {
-		return iterationOrderRow.length;
-	}
-
-	@Override
 	Cell<R, C, V> getCell(int index) {
 		int rowIndex = iterationOrderRow[index];
 		Map.Entry<R, Map<C, V>> rowEntry = rowMap.entrySet().asList().get(rowIndex);
@@ -108,5 +98,15 @@ final class SparseImmutableTable<R, C, V> extends RegularImmutableTable<R, C, V>
 		ImmutableMap<C, V> row = (ImmutableMap<C, V>) rowMap.values().asList().get(rowIndex);
 		int columnIndex = iterationOrderColumn[index];
 		return row.values().asList().get(columnIndex);
+	}
+
+	@Override
+	public ImmutableMap<R, Map<C, V>> rowMap() {
+		return rowMap;
+	}
+
+	@Override
+	public int size() {
+		return iterationOrderRow.length;
 	}
 }

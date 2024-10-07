@@ -1,7 +1,11 @@
 package net.lax1dude.eaglercraft.v1_8.opengl.ext.dynamiclights.program;
 
-import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL.*;
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetUniformBlockIndex;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetUniformLocation;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniform1i;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniformBlockBinding;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_FRAGMENT_SHADER;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_VERTEX_SHADER;
 
 import net.lax1dude.eaglercraft.v1_8.internal.IProgramGL;
 import net.lax1dude.eaglercraft.v1_8.internal.IShaderGL;
@@ -14,42 +18,20 @@ import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.program.ShaderSource;
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class DynamicLightsAccelParticleShader extends ShaderProgram<DynamicLightsAccelParticleShader.Uniforms> {
-
-	public static DynamicLightsAccelParticleShader compile() {
-		IShaderGL accelParticleVSH = ShaderCompiler.compileShader("accel_particle_dynamiclights", GL_VERTEX_SHADER,
-				ShaderSource.accel_particle_dynamiclights_vsh);
-		IShaderGL accelParticleFSH = null;
-		try {
-			accelParticleFSH = ShaderCompiler.compileShader("accel_particle_dynamiclights", GL_FRAGMENT_SHADER,
-					ShaderSource.accel_particle_dynamiclights_fsh);
-			IProgramGL prog = ShaderCompiler.linkProgram("accel_particle_dynamiclights", accelParticleVSH, accelParticleFSH);
-			return new DynamicLightsAccelParticleShader(prog);
-		}finally {
-			if(accelParticleVSH != null) {
-				accelParticleVSH.free();
-			}
-			if(accelParticleFSH != null) {
-				accelParticleFSH.free();
-			}
-		}
-	}
-
-	private DynamicLightsAccelParticleShader(IProgramGL prog) {
-		super(prog, new Uniforms());
-	}
 
 	public static class Uniforms implements IProgramUniforms {
 
@@ -78,14 +60,38 @@ public class DynamicLightsAccelParticleShader extends ShaderProgram<DynamicLight
 			_wglUniform1i(_wglGetUniformLocation(prog, "u_inputTexture"), 0);
 			_wglUniform1i(_wglGetUniformLocation(prog, "u_lightmapTexture"), 1);
 			int blockIndex = _wglGetUniformBlockIndex(prog, "u_chunkLightingData");
-			if(blockIndex != -1) {
+			if (blockIndex != -1) {
 				_wglUniformBlockBinding(prog, blockIndex, 0);
 				u_chunkLightingDataBlockBinding = 0;
-			}else {
+			} else {
 				u_chunkLightingDataBlockBinding = -1;
 			}
 		}
 
+	}
+
+	public static DynamicLightsAccelParticleShader compile() {
+		IShaderGL accelParticleVSH = ShaderCompiler.compileShader("accel_particle_dynamiclights", GL_VERTEX_SHADER,
+				ShaderSource.accel_particle_dynamiclights_vsh);
+		IShaderGL accelParticleFSH = null;
+		try {
+			accelParticleFSH = ShaderCompiler.compileShader("accel_particle_dynamiclights", GL_FRAGMENT_SHADER,
+					ShaderSource.accel_particle_dynamiclights_fsh);
+			IProgramGL prog = ShaderCompiler.linkProgram("accel_particle_dynamiclights", accelParticleVSH,
+					accelParticleFSH);
+			return new DynamicLightsAccelParticleShader(prog);
+		} finally {
+			if (accelParticleVSH != null) {
+				accelParticleVSH.free();
+			}
+			if (accelParticleFSH != null) {
+				accelParticleFSH.free();
+			}
+		}
+	}
+
+	private DynamicLightsAccelParticleShader(IProgramGL prog) {
+		super(prog, new Uniforms());
 	}
 
 }

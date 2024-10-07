@@ -25,14 +25,15 @@ import net.minecraft.util.ResourceLocation;
 /**
  * Copyright (c) 2022 lax1dude. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -41,28 +42,21 @@ public class EaglerTextureAtlasSprite {
 
 	private static final Logger logger = LogManager.getLogger("EaglerTextureAtlasSprite");
 
-	protected final String iconName;
-	protected List<int[][]> framesTextureData = Lists.newArrayList();
-	protected int[][] interpolatedFrameData;
-	protected AnimationMetadataSection animationMetadata;
-	protected boolean rotated;
-	protected int originX;
-	protected int originY;
-	protected int width;
-	protected int height;
-	protected float minU;
-	protected float maxU;
-	protected float minV;
-	protected float maxV;
-	protected int frameCounter;
-	protected int tickCounter;
 	protected static String locationNameClock = "builtin/clock";
 	protected static String locationNameCompass = "builtin/compass";
 
-	protected TextureAnimationCache animationCache = null;
+	protected static int[][] getFrameTextureData(int[][] data, int rows, int columns, int parInt3) {
+		int[][] aint = new int[data.length][];
 
-	public EaglerTextureAtlasSprite(String spriteName) {
-		this.iconName = spriteName;
+		for (int i = 0; i < data.length; ++i) {
+			int[] aint1 = data[i];
+			if (aint1 != null) {
+				aint[i] = new int[(rows >> i) * (columns >> i)];
+				System.arraycopy(aint1, parInt3 * aint[i].length, aint[i], 0, aint[i].length);
+			}
+		}
+
+		return aint;
 	}
 
 	public static EaglerTextureAtlasSprite makeAtlasSprite(ResourceLocation spriteResourceLocation) {
@@ -79,16 +73,56 @@ public class EaglerTextureAtlasSprite {
 		locationNameCompass = compassName;
 	}
 
-	public void initSprite(int inX, int inY, int originInX, int originInY, boolean rotatedIn) {
-		this.originX = originInX;
-		this.originY = originInY;
-		this.rotated = rotatedIn;
-		float f = (float) (0.009999999776482582D / (double) inX);
-		float f1 = (float) (0.009999999776482582D / (double) inY);
-		this.minU = (float) originInX / (float) ((double) inX) + f;
-		this.maxU = (float) (originInX + this.width) / (float) ((double) inX) - f;
-		this.minV = (float) originInY / (float) inY + f1;
-		this.maxV = (float) (originInY + this.height) / (float) inY - f1;
+	protected final String iconName;
+	protected List<int[][]> framesTextureData = Lists.newArrayList();
+	protected int[][] interpolatedFrameData;
+	protected AnimationMetadataSection animationMetadata;
+	protected boolean rotated;
+	protected int originX;
+	protected int originY;
+	protected int width;
+	protected int height;
+	protected float minU;
+	protected float maxU;
+
+	protected float minV;
+
+	protected float maxV;
+
+	protected int frameCounter;
+
+	protected int tickCounter;
+
+	protected TextureAnimationCache animationCache = null;
+
+	public EaglerTextureAtlasSprite(String spriteName) {
+		this.iconName = spriteName;
+	}
+
+	protected void allocateFrameTextureData(int index) {
+		if (this.framesTextureData.size() <= index) {
+			for (int i = this.framesTextureData.size(); i <= index; ++i) {
+				this.framesTextureData.add((int[][]) null);
+			}
+		}
+	}
+
+	public void bakeAnimationCache() {
+		if (animationMetadata != null) {
+			int mipLevels = framesTextureData.get(0).length;
+			if (animationCache == null) {
+				animationCache = new TextureAnimationCache(width, height, mipLevels);
+			}
+			animationCache.initialize(framesTextureData);
+		}
+	}
+
+	public void clearFramesTextureData() {
+		this.framesTextureData.clear();
+		if (this.animationCache != null) {
+			this.animationCache.free();
+			this.animationCache = null;
+		}
 	}
 
 	public void copyFrom(EaglerTextureAtlasSprite atlasSpirit) {
@@ -103,6 +137,89 @@ public class EaglerTextureAtlasSprite {
 		this.maxV = atlasSpirit.maxV;
 	}
 
+	public void generateMipmaps(int level) {
+		List<int[][]> arraylist = Lists.newArrayList();
+
+		for (int i = 0; i < this.framesTextureData.size(); ++i) {
+			final int[][] aint = this.framesTextureData.get(i);
+			if (aint != null) {
+				try {
+					arraylist.add(TextureUtil.generateMipmapData(level, this.width, aint));
+				} catch (Throwable throwable) {
+					CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Generating mipmaps for frame");
+					CrashReportCategory crashreportcategory = crashreport.makeCategory("Frame being iterated");
+					crashreportcategory.addCrashSection("Frame index", Integer.valueOf(i));
+					crashreportcategory.addCrashSectionCallable("Frame sizes", new Callable<String>() {
+						public String call() throws Exception {
+							StringBuilder stringbuilder = new StringBuilder();
+
+							for (int j = 0; j < aint.length; ++j) {
+								int[] aint1 = aint[j];
+								if (stringbuilder.length() > 0) {
+									stringbuilder.append(", ");
+								}
+
+								stringbuilder.append(aint1 == null ? "null" : Integer.valueOf(aint1.length));
+							}
+
+							return stringbuilder.toString();
+						}
+					});
+					throw new ReportedException(crashreport);
+				}
+			}
+		}
+
+		this.setFramesTextureData(arraylist);
+		this.bakeAnimationCache();
+	}
+
+	public int getFrameCount() {
+		return this.framesTextureData.size();
+	}
+
+	public int[][] getFrameTextureData(int index) {
+		return (int[][]) this.framesTextureData.get(index);
+	}
+
+	public int getIconHeight() {
+		return this.height;
+	}
+
+	public String getIconName() {
+		return this.iconName;
+	}
+
+	public int getIconWidth() {
+		return this.width;
+	}
+
+	public float getInterpolatedU(double u) {
+		float f = this.maxU - this.minU;
+		return this.minU + f * (float) u / 16.0F;
+	}
+
+	public float getInterpolatedV(double v) {
+		float f = this.maxV - this.minV;
+		return this.minV + f * ((float) v / 16.0F);
+	}
+
+	public float getMaxU() {
+		return this.maxU;
+	}
+
+	public float getMaxV() {
+		return this.maxV;
+	}
+
+	public float getMinU() {
+		return this.minU;
+	}
+
+	public float getMinV() {
+		return this.minV;
+	}
+
 	public int getOriginX() {
 		return this.originX;
 	}
@@ -111,85 +228,20 @@ public class EaglerTextureAtlasSprite {
 		return this.originY;
 	}
 
-	public int getIconWidth() {
-		return this.width;
+	public boolean hasAnimationMetadata() {
+		return this.animationMetadata != null;
 	}
 
-	public int getIconHeight() {
-		return this.height;
-	}
-
-	public float getMinU() {
-		return this.minU;
-	}
-
-	public float getMaxU() {
-		return this.maxU;
-	}
-
-	public float getInterpolatedU(double u) {
-		float f = this.maxU - this.minU;
-		return this.minU + f * (float) u / 16.0F;
-	}
-
-	public float getMinV() {
-		return this.minV;
-	}
-
-	public float getMaxV() {
-		return this.maxV;
-	}
-
-	public float getInterpolatedV(double v) {
-		float f = this.maxV - this.minV;
-		return this.minV + f * ((float) v / 16.0F);
-	}
-
-	public String getIconName() {
-		return this.iconName;
-	}
-
-	public void updateAnimation(IFramebufferGL[] copyColorFramebuffer) {
-		if(animationCache == null) {
-			throw new IllegalStateException("Animation cache for '" + this.iconName + "' was never baked!");
-		}
-		++this.tickCounter;
-		if (this.tickCounter >= this.animationMetadata.getFrameTimeSingle(this.frameCounter)) {
-			int i = this.animationMetadata.getFrameIndex(this.frameCounter);
-			int j = this.animationMetadata.getFrameCount() == 0 ? this.framesTextureData.size()
-					: this.animationMetadata.getFrameCount();
-			this.frameCounter = (this.frameCounter + 1) % j;
-			this.tickCounter = 0;
-			int k = this.animationMetadata.getFrameIndex(this.frameCounter);
-			if (i != k && k >= 0 && k < this.framesTextureData.size()) {
-				animationCache.copyFrameLevelsToTex2D(k, this.originX, this.originY, this.width, this.height, copyColorFramebuffer);
-			}
-		} else if (this.animationMetadata.isInterpolate()) {
-			float f = 1.0f - (float) this.tickCounter / (float) this.animationMetadata.getFrameTimeSingle(this.frameCounter);
-			int i = this.animationMetadata.getFrameIndex(this.frameCounter);
-			int j = this.animationMetadata.getFrameCount() == 0 ? this.framesTextureData.size()
-					: this.animationMetadata.getFrameCount();
-			int k = this.animationMetadata.getFrameIndex((this.frameCounter + 1) % j);
-			if (i != k && k >= 0 && k < this.framesTextureData.size()) {
-				animationCache.copyInterpolatedFrameLevelsToTex2D(i, k, f, this.originX, this.originY, this.width, this.height, copyColorFramebuffer);
-			}
-		}
-	}
-
-	public int[][] getFrameTextureData(int index) {
-		return (int[][]) this.framesTextureData.get(index);
-	}
-
-	public int getFrameCount() {
-		return this.framesTextureData.size();
-	}
-
-	public void setIconWidth(int newWidth) {
-		this.width = newWidth;
-	}
-
-	public void setIconHeight(int newHeight) {
-		this.height = newHeight;
+	public void initSprite(int inX, int inY, int originInX, int originInY, boolean rotatedIn) {
+		this.originX = originInX;
+		this.originY = originInY;
+		this.rotated = rotatedIn;
+		float f = (float) (0.009999999776482582D / (double) inX);
+		float f1 = (float) (0.009999999776482582D / (double) inY);
+		this.minU = (float) originInX / (float) ((double) inX) + f;
+		this.maxU = (float) (originInX + this.width) / (float) ((double) inX) - f;
+		this.minV = (float) originInY / (float) inY + f1;
+		this.maxV = (float) (originInY + this.height) / (float) inY - f1;
 	}
 
 	public void loadSprite(ImageData[] images, AnimationMetadataSection meta) throws IOException {
@@ -256,89 +308,14 @@ public class EaglerTextureAtlasSprite {
 
 	}
 
-	public void generateMipmaps(int level) {
-		List<int[][]> arraylist = Lists.newArrayList();
-
-		for (int i = 0; i < this.framesTextureData.size(); ++i) {
-			final int[][] aint = this.framesTextureData.get(i);
-			if (aint != null) {
-				try {
-					arraylist.add(TextureUtil.generateMipmapData(level, this.width, aint));
-				} catch (Throwable throwable) {
-					CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Generating mipmaps for frame");
-					CrashReportCategory crashreportcategory = crashreport.makeCategory("Frame being iterated");
-					crashreportcategory.addCrashSection("Frame index", Integer.valueOf(i));
-					crashreportcategory.addCrashSectionCallable("Frame sizes", new Callable<String>() {
-						public String call() throws Exception {
-							StringBuilder stringbuilder = new StringBuilder();
-
-							for (int j = 0; j < aint.length; ++j) {
-								int[] aint1 = aint[j];
-								if (stringbuilder.length() > 0) {
-									stringbuilder.append(", ");
-								}
-
-								stringbuilder.append(aint1 == null ? "null" : Integer.valueOf(aint1.length));
-							}
-
-							return stringbuilder.toString();
-						}
-					});
-					throw new ReportedException(crashreport);
-				}
-			}
+	public void loadSpritePBR(ImageData[][] imageDatas, AnimationMetadataSection animationmetadatasection,
+			boolean dontAnimateNormals, boolean dontAnimateMaterial) {
+		Throwable t = new UnsupportedOperationException("PBR is not enabled");
+		try {
+			throw t;
+		} catch (Throwable tt) {
+			logger.error(t);
 		}
-
-		this.setFramesTextureData(arraylist);
-		this.bakeAnimationCache();
-	}
-
-	public void bakeAnimationCache() {
-		if(animationMetadata != null) {
-			int mipLevels = framesTextureData.get(0).length;
-			if(animationCache == null) {
-				animationCache = new TextureAnimationCache(width, height, mipLevels);
-			}
-			animationCache.initialize(framesTextureData);
-		}
-	}
-
-	protected void allocateFrameTextureData(int index) {
-		if (this.framesTextureData.size() <= index) {
-			for (int i = this.framesTextureData.size(); i <= index; ++i) {
-				this.framesTextureData.add((int[][]) null);
-			}
-		}
-	}
-
-	protected static int[][] getFrameTextureData(int[][] data, int rows, int columns, int parInt3) {
-		int[][] aint = new int[data.length][];
-
-		for (int i = 0; i < data.length; ++i) {
-			int[] aint1 = data[i];
-			if (aint1 != null) {
-				aint[i] = new int[(rows >> i) * (columns >> i)];
-				System.arraycopy(aint1, parInt3 * aint[i].length, aint[i], 0, aint[i].length);
-			}
-		}
-
-		return aint;
-	}
-
-	public void clearFramesTextureData() {
-		this.framesTextureData.clear();
-		if(this.animationCache != null) {
-			this.animationCache.free();
-			this.animationCache = null;
-		}
-	}
-
-	public boolean hasAnimationMetadata() {
-		return this.animationMetadata != null;
-	}
-
-	public void setFramesTextureData(List<int[][]> newFramesTextureData) {
-		this.framesTextureData = newFramesTextureData;
 	}
 
 	protected void resetSprite() {
@@ -346,10 +323,22 @@ public class EaglerTextureAtlasSprite {
 		this.setFramesTextureData(Lists.newArrayList());
 		this.frameCounter = 0;
 		this.tickCounter = 0;
-		if(this.animationCache != null) {
+		if (this.animationCache != null) {
 			this.animationCache.free();
 			this.animationCache = null;
 		}
+	}
+
+	public void setFramesTextureData(List<int[][]> newFramesTextureData) {
+		this.framesTextureData = newFramesTextureData;
+	}
+
+	public void setIconHeight(int newHeight) {
+		this.height = newHeight;
+	}
+
+	public void setIconWidth(int newWidth) {
+		this.width = newWidth;
 	}
 
 	public String toString() {
@@ -359,21 +348,42 @@ public class EaglerTextureAtlasSprite {
 				+ this.minV + ", v1=" + this.maxV + '}';
 	}
 
-	public void loadSpritePBR(ImageData[][] imageDatas, AnimationMetadataSection animationmetadatasection,
-			boolean dontAnimateNormals, boolean dontAnimateMaterial) {
-		Throwable t = new UnsupportedOperationException("PBR is not enabled");
-		try {
-			throw t;
-		}catch(Throwable tt) {
-			logger.error(t);
+	public void updateAnimation(IFramebufferGL[] copyColorFramebuffer) {
+		if (animationCache == null) {
+			throw new IllegalStateException("Animation cache for '" + this.iconName + "' was never baked!");
+		}
+		++this.tickCounter;
+		if (this.tickCounter >= this.animationMetadata.getFrameTimeSingle(this.frameCounter)) {
+			int i = this.animationMetadata.getFrameIndex(this.frameCounter);
+			int j = this.animationMetadata.getFrameCount() == 0 ? this.framesTextureData.size()
+					: this.animationMetadata.getFrameCount();
+			this.frameCounter = (this.frameCounter + 1) % j;
+			this.tickCounter = 0;
+			int k = this.animationMetadata.getFrameIndex(this.frameCounter);
+			if (i != k && k >= 0 && k < this.framesTextureData.size()) {
+				animationCache.copyFrameLevelsToTex2D(k, this.originX, this.originY, this.width, this.height,
+						copyColorFramebuffer);
+			}
+		} else if (this.animationMetadata.isInterpolate()) {
+			float f = 1.0f
+					- (float) this.tickCounter / (float) this.animationMetadata.getFrameTimeSingle(this.frameCounter);
+			int i = this.animationMetadata.getFrameIndex(this.frameCounter);
+			int j = this.animationMetadata.getFrameCount() == 0 ? this.framesTextureData.size()
+					: this.animationMetadata.getFrameCount();
+			int k = this.animationMetadata.getFrameIndex((this.frameCounter + 1) % j);
+			if (i != k && k >= 0 && k < this.framesTextureData.size()) {
+				animationCache.copyInterpolatedFrameLevelsToTex2D(i, k, f, this.originX, this.originY, this.width,
+						this.height, copyColorFramebuffer);
+			}
 		}
 	}
 
-	public void updateAnimationPBR(IFramebufferGL[] copyColorFramebuffer, IFramebufferGL[] copyMaterialFramebuffer, int materialTexOffset) {
+	public void updateAnimationPBR(IFramebufferGL[] copyColorFramebuffer, IFramebufferGL[] copyMaterialFramebuffer,
+			int materialTexOffset) {
 		Throwable t = new UnsupportedOperationException("PBR is not enabled");
 		try {
 			throw t;
-		}catch(Throwable tt) {
+		} catch (Throwable tt) {
 			logger.error(t);
 		}
 	}

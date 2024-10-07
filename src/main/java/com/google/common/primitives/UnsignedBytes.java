@@ -40,9 +40,6 @@ import com.google.common.annotations.Beta;
  * @since 1.0
  */
 public final class UnsignedBytes {
-	private UnsignedBytes() {
-	}
-
 	/**
 	 * The largest power of two that can be represented as an unsigned {@code
 	 * byte}.
@@ -61,17 +58,6 @@ public final class UnsignedBytes {
 	private static final int UNSIGNED_MASK = 0xFF;
 
 	/**
-	 * Returns the value of the given byte as an integer, when treated as unsigned.
-	 * That is, returns {@code value + 256} if {@code value} is negative;
-	 * {@code value} itself otherwise.
-	 *
-	 * @since 6.0
-	 */
-	public static int toInt(byte value) {
-		return value & UNSIGNED_MASK;
-	}
-
-	/**
 	 * Returns the {@code byte} value that, when treated as unsigned, is equal to
 	 * {@code value}, if possible.
 	 *
@@ -85,24 +71,6 @@ public final class UnsignedBytes {
 		if ((value >> Byte.SIZE) != 0) {
 			// don't use checkArgument here, to avoid boxing
 			throw new IllegalArgumentException("Out of range: " + value);
-		}
-		return (byte) value;
-	}
-
-	/**
-	 * Returns the {@code byte} value that, when treated as unsigned, is nearest in
-	 * value to {@code value}.
-	 *
-	 * @param value any {@code long} value
-	 * @return {@code (byte) 255} if {@code value >= 255}, {@code (byte) 0} if
-	 *         {@code value <= 0}, and {@code value} cast to {@code byte} otherwise
-	 */
-	public static byte saturatedCast(long value) {
-		if (value > toInt(MAX_VALUE)) {
-			return MAX_VALUE; // -1
-		}
-		if (value < 0) {
-			return (byte) 0;
 		}
 		return (byte) value;
 	}
@@ -124,23 +92,27 @@ public final class UnsignedBytes {
 	}
 
 	/**
-	 * Returns the least value present in {@code array}.
+	 * Returns a string containing the supplied {@code byte} values separated by
+	 * {@code separator}. For example, {@code join(":", (byte) 1, (byte) 2,
+	 * (byte) 255)} returns the string {@code "1:2:255"}.
 	 *
-	 * @param array a <i>nonempty</i> array of {@code byte} values
-	 * @return the value present in {@code array} that is less than or equal to
-	 *         every other value in the array
-	 * @throws IllegalArgumentException if {@code array} is empty
+	 * @param separator the text that should appear between consecutive values in
+	 *                  the resulting string (but not at the start or end)
+	 * @param array     an array of {@code byte} values, possibly empty
 	 */
-	public static byte min(byte... array) {
-		checkArgument(array.length > 0);
-		int min = toInt(array[0]);
-		for (int i = 1; i < array.length; i++) {
-			int next = toInt(array[i]);
-			if (next < min) {
-				min = next;
-			}
+	public static String join(String separator, byte... array) {
+		checkNotNull(separator);
+		if (array.length == 0) {
+			return "";
 		}
-		return (byte) min;
+
+		// For pre-sizing a builder, just get the right order of magnitude
+		StringBuilder builder = new StringBuilder(array.length * (3 + separator.length()));
+		builder.append(toInt(array[0]));
+		for (int i = 1; i < array.length; i++) {
+			builder.append(separator).append(toString(array[i]));
+		}
+		return builder.toString();
 	}
 
 	/**
@@ -164,32 +136,23 @@ public final class UnsignedBytes {
 	}
 
 	/**
-	 * Returns a string representation of x, where x is treated as unsigned.
+	 * Returns the least value present in {@code array}.
 	 *
-	 * @since 13.0
+	 * @param array a <i>nonempty</i> array of {@code byte} values
+	 * @return the value present in {@code array} that is less than or equal to
+	 *         every other value in the array
+	 * @throws IllegalArgumentException if {@code array} is empty
 	 */
-	@Beta
-	public static String toString(byte x) {
-		return toString(x, 10);
-	}
-
-	/**
-	 * Returns a string representation of {@code x} for the given radix, where
-	 * {@code x} is treated as unsigned.
-	 *
-	 * @param x     the value to convert to a string.
-	 * @param radix the radix to use while working with {@code x}
-	 * @throws IllegalArgumentException if {@code radix} is not between
-	 *                                  {@link Character#MIN_RADIX} and
-	 *                                  {@link Character#MAX_RADIX}.
-	 * @since 13.0
-	 */
-	@Beta
-	public static String toString(byte x, int radix) {
-		checkArgument(radix >= Character.MIN_RADIX && radix <= Character.MAX_RADIX,
-				"radix (%s) must be between Character.MIN_RADIX and Character.MAX_RADIX", radix);
-		// Benchmarks indicate this is probably not worth optimizing.
-		return Integer.toString(toInt(x), radix);
+	public static byte min(byte... array) {
+		checkArgument(array.length > 0);
+		int min = toInt(array[0]);
+		for (int i = 1; i < array.length; i++) {
+			int next = toInt(array[i]);
+			if (next < min) {
+				min = next;
+			}
+		}
+		return (byte) min;
 	}
 
 	/**
@@ -236,27 +199,64 @@ public final class UnsignedBytes {
 	}
 
 	/**
-	 * Returns a string containing the supplied {@code byte} values separated by
-	 * {@code separator}. For example, {@code join(":", (byte) 1, (byte) 2,
-	 * (byte) 255)} returns the string {@code "1:2:255"}.
+	 * Returns the {@code byte} value that, when treated as unsigned, is nearest in
+	 * value to {@code value}.
 	 *
-	 * @param separator the text that should appear between consecutive values in
-	 *                  the resulting string (but not at the start or end)
-	 * @param array     an array of {@code byte} values, possibly empty
+	 * @param value any {@code long} value
+	 * @return {@code (byte) 255} if {@code value >= 255}, {@code (byte) 0} if
+	 *         {@code value <= 0}, and {@code value} cast to {@code byte} otherwise
 	 */
-	public static String join(String separator, byte... array) {
-		checkNotNull(separator);
-		if (array.length == 0) {
-			return "";
+	public static byte saturatedCast(long value) {
+		if (value > toInt(MAX_VALUE)) {
+			return MAX_VALUE; // -1
 		}
+		if (value < 0) {
+			return (byte) 0;
+		}
+		return (byte) value;
+	}
 
-		// For pre-sizing a builder, just get the right order of magnitude
-		StringBuilder builder = new StringBuilder(array.length * (3 + separator.length()));
-		builder.append(toInt(array[0]));
-		for (int i = 1; i < array.length; i++) {
-			builder.append(separator).append(toString(array[i]));
-		}
-		return builder.toString();
+	/**
+	 * Returns the value of the given byte as an integer, when treated as unsigned.
+	 * That is, returns {@code value + 256} if {@code value} is negative;
+	 * {@code value} itself otherwise.
+	 *
+	 * @since 6.0
+	 */
+	public static int toInt(byte value) {
+		return value & UNSIGNED_MASK;
+	}
+
+	/**
+	 * Returns a string representation of x, where x is treated as unsigned.
+	 *
+	 * @since 13.0
+	 */
+	@Beta
+	public static String toString(byte x) {
+		return toString(x, 10);
+	}
+
+	/**
+	 * Returns a string representation of {@code x} for the given radix, where
+	 * {@code x} is treated as unsigned.
+	 *
+	 * @param x     the value to convert to a string.
+	 * @param radix the radix to use while working with {@code x}
+	 * @throws IllegalArgumentException if {@code radix} is not between
+	 *                                  {@link Character#MIN_RADIX} and
+	 *                                  {@link Character#MAX_RADIX}.
+	 * @since 13.0
+	 */
+	@Beta
+	public static String toString(byte x, int radix) {
+		checkArgument(radix >= Character.MIN_RADIX && radix <= Character.MAX_RADIX,
+				"radix (%s) must be between Character.MIN_RADIX and Character.MAX_RADIX", radix);
+		// Benchmarks indicate this is probably not worth optimizing.
+		return Integer.toString(toInt(x), radix);
+	}
+
+	private UnsignedBytes() {
 	}
 
 }

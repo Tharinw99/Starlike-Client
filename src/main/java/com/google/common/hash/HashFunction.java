@@ -152,6 +152,75 @@ import com.google.common.primitives.Ints;
 @Beta
 public interface HashFunction {
 	/**
+	 * Returns the number of bits (a multiple of 32) that each hash code produced by
+	 * this hash function has.
+	 */
+	int bits();
+
+	/**
+	 * Shortcut for {@code newHasher().putBytes(input).hash()}. The implementation
+	 * <i>might</i> perform better than its longhand equivalent, but should not
+	 * perform worse.
+	 */
+	HashCode hashBytes(byte[] input);
+
+	/**
+	 * Shortcut for {@code newHasher().putBytes(input, off, len).hash()}. The
+	 * implementation <i>might</i> perform better than its longhand equivalent, but
+	 * should not perform worse.
+	 *
+	 * @throws IndexOutOfBoundsException if {@code off < 0} or
+	 *                                   {@code off + len > bytes.length} or
+	 *                                   {@code len < 0}
+	 */
+	HashCode hashBytes(byte[] input, int off, int len);
+
+	/**
+	 * Shortcut for {@code newHasher().putInt(input).hash()}; returns the hash code
+	 * for the given {@code int} value, interpreted in little-endian byte order. The
+	 * implementation <i>might</i> perform better than its longhand equivalent, but
+	 * should not perform worse.
+	 *
+	 * @since 12.0
+	 */
+	HashCode hashInt(int input);
+
+	/**
+	 * Shortcut for {@code newHasher().putLong(input).hash()}; returns the hash code
+	 * for the given {@code long} value, interpreted in little-endian byte order.
+	 * The implementation <i>might</i> perform better than its longhand equivalent,
+	 * but should not perform worse.
+	 */
+	HashCode hashLong(long input);
+
+	/**
+	 * Shortcut for {@code newHasher().putObject(instance, funnel).hash()}. The
+	 * implementation <i>might</i> perform better than its longhand equivalent, but
+	 * should not perform worse.
+	 *
+	 * @since 14.0
+	 */
+	<T> HashCode hashObject(T instance, Funnel<? super T> funnel);
+
+	/**
+	 * Shortcut for {@code newHasher().putString(input, charset).hash()}. Characters
+	 * are encoded using the given {@link Charset}. The implementation <i>might</i>
+	 * perform better than its longhand equivalent, but should not perform worse.
+	 */
+	HashCode hashString(CharSequence input, Charset charset);
+
+	/**
+	 * Shortcut for {@code newHasher().putUnencodedChars(input).hash()}. The
+	 * implementation <i>might</i> perform better than its longhand equivalent, but
+	 * should not perform worse. Note that no character encoding is performed; the
+	 * low byte and high byte of each {@code char} are hashed directly (in that
+	 * order).
+	 *
+	 * @since 15.0 (since 11.0 as hashString(CharSequence)).
+	 */
+	HashCode hashUnencodedChars(CharSequence input);
+
+	/**
 	 * Begins a new hash code computation by returning an initialized, stateful
 	 * {@code
 	 * Hasher} instance that is ready to receive data. Example:
@@ -174,73 +243,4 @@ public interface HashFunction {
 	 * input before processing any of it).
 	 */
 	Hasher newHasher(int expectedInputSize);
-
-	/**
-	 * Shortcut for {@code newHasher().putInt(input).hash()}; returns the hash code
-	 * for the given {@code int} value, interpreted in little-endian byte order. The
-	 * implementation <i>might</i> perform better than its longhand equivalent, but
-	 * should not perform worse.
-	 *
-	 * @since 12.0
-	 */
-	HashCode hashInt(int input);
-
-	/**
-	 * Shortcut for {@code newHasher().putLong(input).hash()}; returns the hash code
-	 * for the given {@code long} value, interpreted in little-endian byte order.
-	 * The implementation <i>might</i> perform better than its longhand equivalent,
-	 * but should not perform worse.
-	 */
-	HashCode hashLong(long input);
-
-	/**
-	 * Shortcut for {@code newHasher().putBytes(input).hash()}. The implementation
-	 * <i>might</i> perform better than its longhand equivalent, but should not
-	 * perform worse.
-	 */
-	HashCode hashBytes(byte[] input);
-
-	/**
-	 * Shortcut for {@code newHasher().putBytes(input, off, len).hash()}. The
-	 * implementation <i>might</i> perform better than its longhand equivalent, but
-	 * should not perform worse.
-	 *
-	 * @throws IndexOutOfBoundsException if {@code off < 0} or
-	 *                                   {@code off + len > bytes.length} or
-	 *                                   {@code len < 0}
-	 */
-	HashCode hashBytes(byte[] input, int off, int len);
-
-	/**
-	 * Shortcut for {@code newHasher().putUnencodedChars(input).hash()}. The
-	 * implementation <i>might</i> perform better than its longhand equivalent, but
-	 * should not perform worse. Note that no character encoding is performed; the
-	 * low byte and high byte of each {@code char} are hashed directly (in that
-	 * order).
-	 *
-	 * @since 15.0 (since 11.0 as hashString(CharSequence)).
-	 */
-	HashCode hashUnencodedChars(CharSequence input);
-
-	/**
-	 * Shortcut for {@code newHasher().putString(input, charset).hash()}. Characters
-	 * are encoded using the given {@link Charset}. The implementation <i>might</i>
-	 * perform better than its longhand equivalent, but should not perform worse.
-	 */
-	HashCode hashString(CharSequence input, Charset charset);
-
-	/**
-	 * Shortcut for {@code newHasher().putObject(instance, funnel).hash()}. The
-	 * implementation <i>might</i> perform better than its longhand equivalent, but
-	 * should not perform worse.
-	 *
-	 * @since 14.0
-	 */
-	<T> HashCode hashObject(T instance, Funnel<? super T> funnel);
-
-	/**
-	 * Returns the number of bits (a multiple of 32) that each hash code produced by
-	 * this hash function has.
-	 */
-	int bits();
 }

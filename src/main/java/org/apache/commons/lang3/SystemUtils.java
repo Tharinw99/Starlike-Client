@@ -16,6 +16,8 @@
  */
 package org.apache.commons.lang3;
 
+import java.io.File;
+
 /**
  * <p>
  * Helpers for {@code java.lang.System}.

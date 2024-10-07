@@ -27,7 +27,13 @@ import com.google.common.annotations.GwtCompatible;
  */
 @GwtCompatible(emulated = true)
 final class Platform {
-	private Platform() {
+	static <T extends Enum<T>> Optional<T> getEnumIfPresent(Class<T> enumClass, String value) {
+		WeakReference<? extends Enum<?>> ref = Enums.getEnumConstants(enumClass).get(value);
+		return ref == null ? Optional.<T>absent() : Optional.of(enumClass.cast(ref.get()));
+	}
+
+	static CharMatcher precomputeCharMatcher(CharMatcher matcher) {
+		return matcher.precomputedInternal();
 	}
 
 	/** Calls {@link System#nanoTime()}. */
@@ -35,12 +41,6 @@ final class Platform {
 		return System.nanoTime();
 	}
 
-	static CharMatcher precomputeCharMatcher(CharMatcher matcher) {
-		return matcher.precomputedInternal();
-	}
-
-	static <T extends Enum<T>> Optional<T> getEnumIfPresent(Class<T> enumClass, String value) {
-		WeakReference<? extends Enum<?>> ref = Enums.getEnumConstants(enumClass).get(value);
-		return ref == null ? Optional.<T>absent() : Optional.of(enumClass.cast(ref.get()));
+	private Platform() {
 	}
 }

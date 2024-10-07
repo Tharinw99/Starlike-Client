@@ -5,28 +5,32 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import net.lax1dude.eaglercraft.v1_8.EaglercraftUUID;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+import net.lax1dude.eaglercraft.v1_8.EaglercraftUUID;
+
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -52,49 +56,6 @@ public class ModifiableAttributeInstance implements IAttributeInstance {
 
 	}
 
-	/**+
-	 * Get the Attribute this is an instance of
-	 */
-	public IAttribute getAttribute() {
-		return this.genericAttribute;
-	}
-
-	public double getBaseValue() {
-		return this.baseValue;
-	}
-
-	public void setBaseValue(double d0) {
-		if (d0 != this.getBaseValue()) {
-			this.baseValue = d0;
-			this.flagForUpdate();
-		}
-	}
-
-	public Collection<AttributeModifier> getModifiersByOperation(int i) {
-		return (Collection) this.mapByOperation.get(Integer.valueOf(i));
-	}
-
-	public Collection<AttributeModifier> func_111122_c() {
-		HashSet hashset = Sets.newHashSet();
-
-		for (int i = 0; i < 3; ++i) {
-			hashset.addAll(this.getModifiersByOperation(i));
-		}
-
-		return hashset;
-	}
-
-	/**+
-	 * Returns attribute modifier, if any, by the given UUID
-	 */
-	public AttributeModifier getModifier(EaglercraftUUID uuid) {
-		return (AttributeModifier) this.mapByUUID.get(uuid);
-	}
-
-	public boolean hasModifier(AttributeModifier attributemodifier) {
-		return this.mapByUUID.get(attributemodifier.getID()) != null;
-	}
-
 	public void applyModifier(AttributeModifier attributemodifier) {
 		if (this.getModifier(attributemodifier.getID()) != null) {
 			throw new IllegalArgumentException("Modifier is already applied on this attribute!");
@@ -110,48 +71,6 @@ public class ModifiableAttributeInstance implements IAttributeInstance {
 			this.mapByUUID.put(attributemodifier.getID(), attributemodifier);
 			this.flagForUpdate();
 		}
-	}
-
-	protected void flagForUpdate() {
-		this.needsUpdate = true;
-		this.attributeMap.func_180794_a(this);
-	}
-
-	public void removeModifier(AttributeModifier attributemodifier) {
-		for (int i = 0; i < 3; ++i) {
-			Set set = (Set) this.mapByOperation.get(Integer.valueOf(i));
-			set.remove(attributemodifier);
-		}
-
-		Set set1 = (Set) this.mapByName.get(attributemodifier.getName());
-		if (set1 != null) {
-			set1.remove(attributemodifier);
-			if (set1.isEmpty()) {
-				this.mapByName.remove(attributemodifier.getName());
-			}
-		}
-
-		this.mapByUUID.remove(attributemodifier.getID());
-		this.flagForUpdate();
-	}
-
-	public void removeAllModifiers() {
-		Collection collection = this.func_111122_c();
-		if (collection != null) {
-			for (AttributeModifier attributemodifier : (List<AttributeModifier>) Lists.newArrayList(collection)) {
-				this.removeModifier(attributemodifier);
-			}
-
-		}
-	}
-
-	public double getAttributeValue() {
-		if (this.needsUpdate) {
-			this.cachedValue = this.computeValue();
-			this.needsUpdate = false;
-		}
-
-		return this.cachedValue;
 	}
 
 	private double computeValue() {
@@ -174,6 +93,21 @@ public class ModifiableAttributeInstance implements IAttributeInstance {
 		return this.genericAttribute.clampValue(d1);
 	}
 
+	protected void flagForUpdate() {
+		this.needsUpdate = true;
+		this.attributeMap.func_180794_a(this);
+	}
+
+	public Collection<AttributeModifier> func_111122_c() {
+		HashSet hashset = Sets.newHashSet();
+
+		for (int i = 0; i < 3; ++i) {
+			hashset.addAll(this.getModifiersByOperation(i));
+		}
+
+		return hashset;
+	}
+
 	private Collection<AttributeModifier> func_180375_b(int parInt1) {
 		HashSet hashset = Sets.newHashSet(this.getModifiersByOperation(parInt1));
 
@@ -186,5 +120,75 @@ public class ModifiableAttributeInstance implements IAttributeInstance {
 		}
 
 		return hashset;
+	}
+
+	/**
+	 * + Get the Attribute this is an instance of
+	 */
+	public IAttribute getAttribute() {
+		return this.genericAttribute;
+	}
+
+	public double getAttributeValue() {
+		if (this.needsUpdate) {
+			this.cachedValue = this.computeValue();
+			this.needsUpdate = false;
+		}
+
+		return this.cachedValue;
+	}
+
+	public double getBaseValue() {
+		return this.baseValue;
+	}
+
+	/**
+	 * + Returns attribute modifier, if any, by the given UUID
+	 */
+	public AttributeModifier getModifier(EaglercraftUUID uuid) {
+		return (AttributeModifier) this.mapByUUID.get(uuid);
+	}
+
+	public Collection<AttributeModifier> getModifiersByOperation(int i) {
+		return (Collection) this.mapByOperation.get(Integer.valueOf(i));
+	}
+
+	public boolean hasModifier(AttributeModifier attributemodifier) {
+		return this.mapByUUID.get(attributemodifier.getID()) != null;
+	}
+
+	public void removeAllModifiers() {
+		Collection collection = this.func_111122_c();
+		if (collection != null) {
+			for (AttributeModifier attributemodifier : (List<AttributeModifier>) Lists.newArrayList(collection)) {
+				this.removeModifier(attributemodifier);
+			}
+
+		}
+	}
+
+	public void removeModifier(AttributeModifier attributemodifier) {
+		for (int i = 0; i < 3; ++i) {
+			Set set = (Set) this.mapByOperation.get(Integer.valueOf(i));
+			set.remove(attributemodifier);
+		}
+
+		Set set1 = (Set) this.mapByName.get(attributemodifier.getName());
+		if (set1 != null) {
+			set1.remove(attributemodifier);
+			if (set1.isEmpty()) {
+				this.mapByName.remove(attributemodifier.getName());
+			}
+		}
+
+		this.mapByUUID.remove(attributemodifier.getID());
+		this.flagForUpdate();
+	}
+
+	public void setBaseValue(double d0) {
+		if (d0 != this.getBaseValue()) {
+			this.baseValue = d0;
+			this.flagForUpdate();
+		}
 	}
 }

@@ -51,14 +51,6 @@ public final class UnsignedInteger extends Number implements Comparable<Unsigned
 	public static final UnsignedInteger ONE = fromIntBits(1);
 	public static final UnsignedInteger MAX_VALUE = fromIntBits(-1);
 
-	private final int value;
-
-	private UnsignedInteger(int value) {
-		// GWT doesn't consistently overflow values to make them 32-bit, so we need to
-		// force it.
-		this.value = value & 0xffffffff;
-	}
-
 	/**
 	 * Returns an {@code UnsignedInteger} corresponding to a given bit
 	 * representation. The argument is interpreted as an unsigned 32-bit value.
@@ -80,16 +72,6 @@ public final class UnsignedInteger extends Number implements Comparable<Unsigned
 	}
 
 	/**
-	 * Returns an {@code UnsignedInteger} that is equal to {@code value}, if
-	 * possible. The inverse operation of {@link #longValue()}.
-	 */
-	public static UnsignedInteger valueOf(long value) {
-		checkArgument((value & INT_MASK) == value, "value (%s) is outside the range for an unsigned integer value",
-				value);
-		return fromIntBits((int) value);
-	}
-
-	/**
 	 * Returns a {@code UnsignedInteger} representing the same value as the
 	 * specified {@link BigInteger}. This is the inverse operation of
 	 * {@link #bigIntegerValue()}.
@@ -102,6 +84,16 @@ public final class UnsignedInteger extends Number implements Comparable<Unsigned
 		checkArgument(value.signum() >= 0 && value.bitLength() <= Integer.SIZE,
 				"value (%s) is outside the range for an unsigned integer value", value);
 		return fromIntBits(value.intValue());
+	}
+
+	/**
+	 * Returns an {@code UnsignedInteger} that is equal to {@code value}, if
+	 * possible. The inverse operation of {@link #longValue()}.
+	 */
+	public static UnsignedInteger valueOf(long value) {
+		checkArgument((value & INT_MASK) == value, "value (%s) is outside the range for an unsigned integer value",
+				value);
+		return fromIntBits((int) value);
 	}
 
 	/**
@@ -127,39 +119,30 @@ public final class UnsignedInteger extends Number implements Comparable<Unsigned
 		return fromIntBits(UnsignedInts.parseUnsignedInt(string, radix));
 	}
 
-	/**
-	 * Returns the result of adding this and {@code val}. If the result would have
-	 * more than 32 bits, returns the low 32 bits of the result.
-	 *
-	 * @since 14.0
-	 */
-	@CheckReturnValue
-	public UnsignedInteger plus(UnsignedInteger val) {
-		return fromIntBits(this.value + checkNotNull(val).value);
+	private final int value;
+
+	private UnsignedInteger(int value) {
+		// GWT doesn't consistently overflow values to make them 32-bit, so we need to
+		// force it.
+		this.value = value & 0xffffffff;
 	}
 
 	/**
-	 * Returns the result of subtracting this and {@code val}. If the result would
-	 * be negative, returns the low 32 bits of the result.
-	 *
-	 * @since 14.0
+	 * Returns the value of this {@code UnsignedInteger} as a {@link BigInteger}.
 	 */
-	@CheckReturnValue
-	public UnsignedInteger minus(UnsignedInteger val) {
-		return fromIntBits(value - checkNotNull(val).value);
+	public BigInteger bigIntegerValue() {
+		return BigInteger.valueOf(longValue());
 	}
 
 	/**
-	 * Returns the result of multiplying this and {@code val}. If the result would
-	 * have more than 32 bits, returns the low 32 bits of the result.
-	 *
-	 * @since 14.0
+	 * Compares this unsigned integer to another unsigned integer. Returns {@code 0}
+	 * if they are equal, a negative number if {@code this < other}, and a positive
+	 * number if {@code this > other}.
 	 */
-	@CheckReturnValue
-	@GwtIncompatible("Does not truncate correctly")
-	public UnsignedInteger times(UnsignedInteger val) {
-		// TODO(user): make this GWT-compatible
-		return fromIntBits(value * checkNotNull(val).value);
+	@Override
+	public int compareTo(UnsignedInteger other) {
+		checkNotNull(other);
+		return compare(value, other.value);
 	}
 
 	/**
@@ -174,14 +157,37 @@ public final class UnsignedInteger extends Number implements Comparable<Unsigned
 	}
 
 	/**
-	 * Returns this mod {@code val}.
-	 *
-	 * @throws ArithmeticException if {@code val} is zero
-	 * @since 14.0
+	 * Returns the value of this {@code UnsignedInteger} as a {@code float},
+	 * analogous to a widening primitive conversion from {@code int} to
+	 * {@code double}, and correctly rounded.
 	 */
-	@CheckReturnValue
-	public UnsignedInteger mod(UnsignedInteger val) {
-		return fromIntBits(UnsignedInts.remainder(value, checkNotNull(val).value));
+	@Override
+	public double doubleValue() {
+		return longValue();
+	}
+
+	@Override
+	public boolean equals(@Nullable Object obj) {
+		if (obj instanceof UnsignedInteger) {
+			UnsignedInteger other = (UnsignedInteger) obj;
+			return value == other.value;
+		}
+		return false;
+	}
+
+	/**
+	 * Returns the value of this {@code UnsignedInteger} as a {@code float},
+	 * analogous to a widening primitive conversion from {@code int} to
+	 * {@code float}, and correctly rounded.
+	 */
+	@Override
+	public float floatValue() {
+		return longValue();
+	}
+
+	@Override
+	public int hashCode() {
+		return value;
 	}
 
 	/**
@@ -206,55 +212,49 @@ public final class UnsignedInteger extends Number implements Comparable<Unsigned
 	}
 
 	/**
-	 * Returns the value of this {@code UnsignedInteger} as a {@code float},
-	 * analogous to a widening primitive conversion from {@code int} to
-	 * {@code float}, and correctly rounded.
+	 * Returns the result of subtracting this and {@code val}. If the result would
+	 * be negative, returns the low 32 bits of the result.
+	 *
+	 * @since 14.0
 	 */
-	@Override
-	public float floatValue() {
-		return longValue();
+	@CheckReturnValue
+	public UnsignedInteger minus(UnsignedInteger val) {
+		return fromIntBits(value - checkNotNull(val).value);
 	}
 
 	/**
-	 * Returns the value of this {@code UnsignedInteger} as a {@code float},
-	 * analogous to a widening primitive conversion from {@code int} to
-	 * {@code double}, and correctly rounded.
+	 * Returns this mod {@code val}.
+	 *
+	 * @throws ArithmeticException if {@code val} is zero
+	 * @since 14.0
 	 */
-	@Override
-	public double doubleValue() {
-		return longValue();
+	@CheckReturnValue
+	public UnsignedInteger mod(UnsignedInteger val) {
+		return fromIntBits(UnsignedInts.remainder(value, checkNotNull(val).value));
 	}
 
 	/**
-	 * Returns the value of this {@code UnsignedInteger} as a {@link BigInteger}.
+	 * Returns the result of adding this and {@code val}. If the result would have
+	 * more than 32 bits, returns the low 32 bits of the result.
+	 *
+	 * @since 14.0
 	 */
-	public BigInteger bigIntegerValue() {
-		return BigInteger.valueOf(longValue());
+	@CheckReturnValue
+	public UnsignedInteger plus(UnsignedInteger val) {
+		return fromIntBits(this.value + checkNotNull(val).value);
 	}
 
 	/**
-	 * Compares this unsigned integer to another unsigned integer. Returns {@code 0}
-	 * if they are equal, a negative number if {@code this < other}, and a positive
-	 * number if {@code this > other}.
+	 * Returns the result of multiplying this and {@code val}. If the result would
+	 * have more than 32 bits, returns the low 32 bits of the result.
+	 *
+	 * @since 14.0
 	 */
-	@Override
-	public int compareTo(UnsignedInteger other) {
-		checkNotNull(other);
-		return compare(value, other.value);
-	}
-
-	@Override
-	public int hashCode() {
-		return value;
-	}
-
-	@Override
-	public boolean equals(@Nullable Object obj) {
-		if (obj instanceof UnsignedInteger) {
-			UnsignedInteger other = (UnsignedInteger) obj;
-			return value == other.value;
-		}
-		return false;
+	@CheckReturnValue
+	@GwtIncompatible("Does not truncate correctly")
+	public UnsignedInteger times(UnsignedInteger val) {
+		// TODO(user): make this GWT-compatible
+		return fromIntBits(value * checkNotNull(val).value);
 	}
 
 	/**

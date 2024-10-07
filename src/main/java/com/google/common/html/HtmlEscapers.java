@@ -41,6 +41,13 @@ import com.google.common.escape.Escapers;
 @Beta
 @GwtCompatible
 public final class HtmlEscapers {
+	private static final Escaper HTML_ESCAPER = Escapers.builder().addEscape('"', "&quot;")
+			// Note: "&apos;" is not defined in HTML 4.01.
+			.addEscape('\'', "&#39;").addEscape('&', "&amp;").addEscape('<', "&lt;").addEscape('>', "&gt;").build();
+
+	// For each xxxEscaper() method, please add links to external reference pages
+	// that are considered authoritative for the behavior of that escaper.
+
 	/**
 	 * Returns an {@link Escaper} instance that escapes HTML metacharacters as
 	 * specified by <a href="http://www.w3.org/TR/html4/">HTML 4.01</a>. The
@@ -60,13 +67,6 @@ public final class HtmlEscapers {
 	public static Escaper htmlEscaper() {
 		return HTML_ESCAPER;
 	}
-
-	// For each xxxEscaper() method, please add links to external reference pages
-	// that are considered authoritative for the behavior of that escaper.
-
-	private static final Escaper HTML_ESCAPER = Escapers.builder().addEscape('"', "&quot;")
-			// Note: "&apos;" is not defined in HTML 4.01.
-			.addEscape('\'', "&#39;").addEscape('&', "&amp;").addEscape('<', "&lt;").addEscape('>', "&gt;").build();
 
 	private HtmlEscapers() {
 	}

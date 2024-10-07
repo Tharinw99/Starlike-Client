@@ -106,6 +106,74 @@ import com.google.common.base.Throwables;
 public final class Closer implements Closeable {
 
 	/**
+	 * Suppresses exceptions by logging them.
+	 */
+	@VisibleForTesting
+	static final class LoggingSuppressor implements Suppressor {
+
+		static final LoggingSuppressor INSTANCE = new LoggingSuppressor();
+
+		@Override
+		public void suppress(Closeable closeable, Throwable thrown, Throwable suppressed) {
+			// log to the same place as Closeables
+			Closeables.logger.log(Level.WARNING, "Suppressing exception thrown when closing " + closeable, suppressed);
+		}
+	}
+
+	/**
+	 * Suppresses exceptions by adding them to the exception that will be thrown
+	 * using JDK7's addSuppressed(Throwable) mechanism.
+	 */
+	@VisibleForTesting
+	static final class SuppressingSuppressor implements Suppressor {
+
+		static final SuppressingSuppressor INSTANCE = new SuppressingSuppressor();
+
+		static final Method addSuppressed = getAddSuppressed();
+
+		private static Method getAddSuppressed() {
+			try {
+				return Throwable.class.getMethod("addSuppressed", Throwable.class);
+			} catch (Throwable e) {
+				return null;
+			}
+		}
+
+		static boolean isAvailable() {
+			return addSuppressed != null;
+		}
+
+		@Override
+		public void suppress(Closeable closeable, Throwable thrown, Throwable suppressed) {
+			// ensure no exceptions from addSuppressed
+			if (thrown == suppressed) {
+				return;
+			}
+			try {
+				addSuppressed.invoke(thrown, suppressed);
+			} catch (Throwable e) {
+				// if, somehow, IllegalAccessException or another exception is thrown, fall back
+				// to logging
+				LoggingSuppressor.INSTANCE.suppress(closeable, thrown, suppressed);
+			}
+		}
+	}
+
+	/**
+	 * Suppression strategy interface.
+	 */
+	@VisibleForTesting
+	interface Suppressor {
+		/**
+		 * Suppresses the given exception ({@code suppressed}) which was thrown when
+		 * attempting to close the given closeable. {@code thrown} is the exception that
+		 * is actually being thrown from the method. Implementations of this method
+		 * should not throw under any circumstances.
+		 */
+		void suppress(Closeable closeable, Throwable thrown, Throwable suppressed);
+	}
+
+	/**
 	 * The suppressor implementation to use for the current Java version.
 	 */
 	private static final Suppressor SUPPRESSOR = SuppressingSuppressor.isAvailable() ? SuppressingSuppressor.INSTANCE
@@ -124,11 +192,44 @@ public final class Closer implements Closeable {
 	// only need space for 2 elements in most cases, so try to use the smallest
 	// array possible
 	private final Deque<Closeable> stack = new ArrayDeque<Closeable>(4);
+
 	private Throwable thrown;
 
 	@VisibleForTesting
 	Closer(Suppressor suppressor) {
 		this.suppressor = checkNotNull(suppressor); // checkNotNull to satisfy null tests
+	}
+
+	/**
+	 * Closes all {@code Closeable} instances that have been added to this
+	 * {@code Closer}. If an exception was thrown in the try block and passed to one
+	 * of the {@code exceptionThrown} methods, any exceptions thrown when attempting
+	 * to close a closeable will be suppressed. Otherwise, the <i>first</i>
+	 * exception to be thrown from an attempt to close a closeable will be thrown
+	 * and any additional exceptions that are thrown after that will be suppressed.
+	 */
+	@Override
+	public void close() throws IOException {
+		Throwable throwable = thrown;
+
+		// close closeables in LIFO order
+		while (!stack.isEmpty()) {
+			Closeable closeable = stack.removeFirst();
+			try {
+				closeable.close();
+			} catch (Throwable e) {
+				if (throwable == null) {
+					throwable = e;
+				} else {
+					suppressor.suppress(closeable, throwable, e);
+				}
+			}
+		}
+
+		if (thrown == null && throwable != null) {
+			Throwables.propagateIfPossible(throwable, IOException.class);
+			throw new AssertionError(throwable); // not possible
+		}
 	}
 
 	/**
@@ -220,105 +321,5 @@ public final class Closer implements Closeable {
 		Throwables.propagateIfPossible(e, IOException.class);
 		Throwables.propagateIfPossible(e, declaredType1, declaredType2);
 		throw new RuntimeException(e);
-	}
-
-	/**
-	 * Closes all {@code Closeable} instances that have been added to this
-	 * {@code Closer}. If an exception was thrown in the try block and passed to one
-	 * of the {@code exceptionThrown} methods, any exceptions thrown when attempting
-	 * to close a closeable will be suppressed. Otherwise, the <i>first</i>
-	 * exception to be thrown from an attempt to close a closeable will be thrown
-	 * and any additional exceptions that are thrown after that will be suppressed.
-	 */
-	@Override
-	public void close() throws IOException {
-		Throwable throwable = thrown;
-
-		// close closeables in LIFO order
-		while (!stack.isEmpty()) {
-			Closeable closeable = stack.removeFirst();
-			try {
-				closeable.close();
-			} catch (Throwable e) {
-				if (throwable == null) {
-					throwable = e;
-				} else {
-					suppressor.suppress(closeable, throwable, e);
-				}
-			}
-		}
-
-		if (thrown == null && throwable != null) {
-			Throwables.propagateIfPossible(throwable, IOException.class);
-			throw new AssertionError(throwable); // not possible
-		}
-	}
-
-	/**
-	 * Suppression strategy interface.
-	 */
-	@VisibleForTesting
-	interface Suppressor {
-		/**
-		 * Suppresses the given exception ({@code suppressed}) which was thrown when
-		 * attempting to close the given closeable. {@code thrown} is the exception that
-		 * is actually being thrown from the method. Implementations of this method
-		 * should not throw under any circumstances.
-		 */
-		void suppress(Closeable closeable, Throwable thrown, Throwable suppressed);
-	}
-
-	/**
-	 * Suppresses exceptions by logging them.
-	 */
-	@VisibleForTesting
-	static final class LoggingSuppressor implements Suppressor {
-
-		static final LoggingSuppressor INSTANCE = new LoggingSuppressor();
-
-		@Override
-		public void suppress(Closeable closeable, Throwable thrown, Throwable suppressed) {
-			// log to the same place as Closeables
-			Closeables.logger.log(Level.WARNING, "Suppressing exception thrown when closing " + closeable, suppressed);
-		}
-	}
-
-	/**
-	 * Suppresses exceptions by adding them to the exception that will be thrown
-	 * using JDK7's addSuppressed(Throwable) mechanism.
-	 */
-	@VisibleForTesting
-	static final class SuppressingSuppressor implements Suppressor {
-
-		static final SuppressingSuppressor INSTANCE = new SuppressingSuppressor();
-
-		static boolean isAvailable() {
-			return addSuppressed != null;
-		}
-
-		static final Method addSuppressed = getAddSuppressed();
-
-		private static Method getAddSuppressed() {
-			try {
-				return Throwable.class.getMethod("addSuppressed", Throwable.class);
-			} catch (Throwable e) {
-				return null;
-			}
-		}
-
-		@Override
-		public void suppress(Closeable closeable, Throwable thrown, Throwable suppressed) {
-			// ensure no exceptions from addSuppressed
-			if (thrown == suppressed) {
-				return;
-			}
-			try {
-				addSuppressed.invoke(thrown, suppressed);
-			} catch (Throwable e) {
-				// if, somehow, IllegalAccessException or another exception is thrown, fall back
-				// to logging
-				LoggingSuppressor.INSTANCE.suppress(closeable, thrown, suppressed);
-			}
-		}
 	}
 }

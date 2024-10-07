@@ -8,100 +8,30 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class S14PacketEntity implements Packet<INetHandlerPlayClient> {
-	protected int entityId;
-	protected byte posX;
-	protected byte posY;
-	protected byte posZ;
-	protected byte yaw;
-	protected byte pitch;
-	protected boolean onGround;
-	protected boolean field_149069_g;
-
-	public S14PacketEntity() {
-	}
-
-	public S14PacketEntity(int entityIdIn) {
-		this.entityId = entityIdIn;
-	}
-
-	/**+
-	 * Reads the raw packet data from the data stream.
-	 */
-	public void readPacketData(PacketBuffer parPacketBuffer) throws IOException {
-		this.entityId = parPacketBuffer.readVarIntFromBuffer();
-	}
-
-	/**+
-	 * Writes the raw packet data to the data stream.
-	 */
-	public void writePacketData(PacketBuffer parPacketBuffer) throws IOException {
-		parPacketBuffer.writeVarIntToBuffer(this.entityId);
-	}
-
-	/**+
-	 * Passes this Packet on to the NetHandler for processing.
-	 */
-	public void processPacket(INetHandlerPlayClient inethandlerplayclient) {
-		inethandlerplayclient.handleEntityMovement(this);
-	}
-
-	public String toString() {
-		return "Entity_" + super.toString();
-	}
-
-	public Entity getEntity(World worldIn) {
-		return worldIn.getEntityByID(this.entityId);
-	}
-
-	public byte func_149062_c() {
-		return this.posX;
-	}
-
-	public byte func_149061_d() {
-		return this.posY;
-	}
-
-	public byte func_149064_e() {
-		return this.posZ;
-	}
-
-	public byte func_149066_f() {
-		return this.yaw;
-	}
-
-	public byte func_149063_g() {
-		return this.pitch;
-	}
-
-	public boolean func_149060_h() {
-		return this.field_149069_g;
-	}
-
-	public boolean getOnGround() {
-		return this.onGround;
-	}
-
 	public static class S15PacketEntityRelMove extends S14PacketEntity {
 		public S15PacketEntityRelMove() {
 		}
@@ -114,8 +44,8 @@ public class S14PacketEntity implements Packet<INetHandlerPlayClient> {
 			this.onGround = onGroundIn;
 		}
 
-		/**+
-		 * Reads the raw packet data from the data stream.
+		/**
+		 * + Reads the raw packet data from the data stream.
 		 */
 		public void readPacketData(PacketBuffer parPacketBuffer) throws IOException {
 			super.readPacketData(parPacketBuffer);
@@ -125,8 +55,8 @@ public class S14PacketEntity implements Packet<INetHandlerPlayClient> {
 			this.onGround = parPacketBuffer.readBoolean();
 		}
 
-		/**+
-		 * Writes the raw packet data to the data stream.
+		/**
+		 * + Writes the raw packet data to the data stream.
 		 */
 		public void writePacketData(PacketBuffer parPacketBuffer) throws IOException {
 			super.writePacketData(parPacketBuffer);
@@ -150,8 +80,8 @@ public class S14PacketEntity implements Packet<INetHandlerPlayClient> {
 			this.onGround = onGroundIn;
 		}
 
-		/**+
-		 * Reads the raw packet data from the data stream.
+		/**
+		 * + Reads the raw packet data from the data stream.
 		 */
 		public void readPacketData(PacketBuffer parPacketBuffer) throws IOException {
 			super.readPacketData(parPacketBuffer);
@@ -160,8 +90,8 @@ public class S14PacketEntity implements Packet<INetHandlerPlayClient> {
 			this.onGround = parPacketBuffer.readBoolean();
 		}
 
-		/**+
-		 * Writes the raw packet data to the data stream.
+		/**
+		 * + Writes the raw packet data to the data stream.
 		 */
 		public void writePacketData(PacketBuffer parPacketBuffer) throws IOException {
 			super.writePacketData(parPacketBuffer);
@@ -188,8 +118,8 @@ public class S14PacketEntity implements Packet<INetHandlerPlayClient> {
 			this.field_149069_g = true;
 		}
 
-		/**+
-		 * Reads the raw packet data from the data stream.
+		/**
+		 * + Reads the raw packet data from the data stream.
 		 */
 		public void readPacketData(PacketBuffer parPacketBuffer) throws IOException {
 			super.readPacketData(parPacketBuffer);
@@ -201,8 +131,8 @@ public class S14PacketEntity implements Packet<INetHandlerPlayClient> {
 			this.onGround = parPacketBuffer.readBoolean();
 		}
 
-		/**+
-		 * Writes the raw packet data to the data stream.
+		/**
+		 * + Writes the raw packet data to the data stream.
 		 */
 		public void writePacketData(PacketBuffer parPacketBuffer) throws IOException {
 			super.writePacketData(parPacketBuffer);
@@ -213,5 +143,81 @@ public class S14PacketEntity implements Packet<INetHandlerPlayClient> {
 			parPacketBuffer.writeByte(this.pitch);
 			parPacketBuffer.writeBoolean(this.onGround);
 		}
+	}
+
+	protected int entityId;
+	protected byte posX;
+	protected byte posY;
+	protected byte posZ;
+	protected byte yaw;
+
+	protected byte pitch;
+
+	protected boolean onGround;
+
+	protected boolean field_149069_g;
+
+	public S14PacketEntity() {
+	}
+
+	public S14PacketEntity(int entityIdIn) {
+		this.entityId = entityIdIn;
+	}
+
+	public boolean func_149060_h() {
+		return this.field_149069_g;
+	}
+
+	public byte func_149061_d() {
+		return this.posY;
+	}
+
+	public byte func_149062_c() {
+		return this.posX;
+	}
+
+	public byte func_149063_g() {
+		return this.pitch;
+	}
+
+	public byte func_149064_e() {
+		return this.posZ;
+	}
+
+	public byte func_149066_f() {
+		return this.yaw;
+	}
+
+	public Entity getEntity(World worldIn) {
+		return worldIn.getEntityByID(this.entityId);
+	}
+
+	public boolean getOnGround() {
+		return this.onGround;
+	}
+
+	/**
+	 * + Passes this Packet on to the NetHandler for processing.
+	 */
+	public void processPacket(INetHandlerPlayClient inethandlerplayclient) {
+		inethandlerplayclient.handleEntityMovement(this);
+	}
+
+	/**
+	 * + Reads the raw packet data from the data stream.
+	 */
+	public void readPacketData(PacketBuffer parPacketBuffer) throws IOException {
+		this.entityId = parPacketBuffer.readVarIntFromBuffer();
+	}
+
+	public String toString() {
+		return "Entity_" + super.toString();
+	}
+
+	/**
+	 * + Writes the raw packet data to the data stream.
+	 */
+	public void writePacketData(PacketBuffer parPacketBuffer) throws IOException {
+		parPacketBuffer.writeVarIntToBuffer(this.entityId);
 	}
 }

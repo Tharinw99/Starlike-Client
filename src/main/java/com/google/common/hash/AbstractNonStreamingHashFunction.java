@@ -31,61 +31,20 @@ import com.google.common.base.Preconditions;
  * @author Dimitris Andreou
  */
 abstract class AbstractNonStreamingHashFunction implements HashFunction {
-	@Override
-	public Hasher newHasher() {
-		return new BufferingHasher(32);
-	}
-
-	@Override
-	public Hasher newHasher(int expectedInputSize) {
-		Preconditions.checkArgument(expectedInputSize >= 0);
-		return new BufferingHasher(expectedInputSize);
-	}
-
-	@Override
-	public <T> HashCode hashObject(T instance, Funnel<? super T> funnel) {
-		return newHasher().putObject(instance, funnel).hash();
-	}
-
-	@Override
-	public HashCode hashUnencodedChars(CharSequence input) {
-		int len = input.length();
-		Hasher hasher = newHasher(len * 2);
-		for (int i = 0; i < len; i++) {
-			hasher.putChar(input.charAt(i));
-		}
-		return hasher.hash();
-	}
-
-	@Override
-	public HashCode hashString(CharSequence input, Charset charset) {
-		return hashBytes(input.toString().getBytes(charset));
-	}
-
-	@Override
-	public HashCode hashInt(int input) {
-		return newHasher(4).putInt(input).hash();
-	}
-
-	@Override
-	public HashCode hashLong(long input) {
-		return newHasher(8).putLong(input).hash();
-	}
-
-	@Override
-	public HashCode hashBytes(byte[] input) {
-		return hashBytes(input, 0, input.length);
-	}
-
 	/**
 	 * In-memory stream-based implementation of Hasher.
 	 */
 	private final class BufferingHasher extends AbstractHasher {
-		final ExposedByteArrayOutputStream stream;
 		static final int BOTTOM_BYTE = 0xFF;
+		final ExposedByteArrayOutputStream stream;
 
 		BufferingHasher(int expectedInputSize) {
 			this.stream = new ExposedByteArrayOutputStream(expectedInputSize);
+		}
+
+		@Override
+		public HashCode hash() {
+			return hashBytes(stream.byteArray(), 0, stream.length());
 		}
 
 		@Override
@@ -111,9 +70,9 @@ abstract class AbstractNonStreamingHashFunction implements HashFunction {
 		}
 
 		@Override
-		public Hasher putShort(short s) {
-			stream.write(s & BOTTOM_BYTE);
-			stream.write((s >>> 8) & BOTTOM_BYTE);
+		public Hasher putChar(char c) {
+			stream.write(c & BOTTOM_BYTE);
+			stream.write((c >>> 8) & BOTTOM_BYTE);
 			return this;
 		}
 
@@ -135,21 +94,16 @@ abstract class AbstractNonStreamingHashFunction implements HashFunction {
 		}
 
 		@Override
-		public Hasher putChar(char c) {
-			stream.write(c & BOTTOM_BYTE);
-			stream.write((c >>> 8) & BOTTOM_BYTE);
-			return this;
-		}
-
-		@Override
 		public <T> Hasher putObject(T instance, Funnel<? super T> funnel) {
 			funnel.funnel(instance, this);
 			return this;
 		}
 
 		@Override
-		public HashCode hash() {
-			return hashBytes(stream.byteArray(), 0, stream.length());
+		public Hasher putShort(short s) {
+			stream.write(s & BOTTOM_BYTE);
+			stream.write((s >>> 8) & BOTTOM_BYTE);
+			return this;
 		}
 	}
 
@@ -166,5 +120,51 @@ abstract class AbstractNonStreamingHashFunction implements HashFunction {
 		int length() {
 			return count;
 		}
+	}
+
+	@Override
+	public HashCode hashBytes(byte[] input) {
+		return hashBytes(input, 0, input.length);
+	}
+
+	@Override
+	public HashCode hashInt(int input) {
+		return newHasher(4).putInt(input).hash();
+	}
+
+	@Override
+	public HashCode hashLong(long input) {
+		return newHasher(8).putLong(input).hash();
+	}
+
+	@Override
+	public <T> HashCode hashObject(T instance, Funnel<? super T> funnel) {
+		return newHasher().putObject(instance, funnel).hash();
+	}
+
+	@Override
+	public HashCode hashString(CharSequence input, Charset charset) {
+		return hashBytes(input.toString().getBytes(charset));
+	}
+
+	@Override
+	public HashCode hashUnencodedChars(CharSequence input) {
+		int len = input.length();
+		Hasher hasher = newHasher(len * 2);
+		for (int i = 0; i < len; i++) {
+			hasher.putChar(input.charAt(i));
+		}
+		return hasher.hash();
+	}
+
+	@Override
+	public Hasher newHasher() {
+		return new BufferingHasher(32);
+	}
+
+	@Override
+	public Hasher newHasher(int expectedInputSize) {
+		Preconditions.checkArgument(expectedInputSize >= 0);
+		return new BufferingHasher(expectedInputSize);
 	}
 }

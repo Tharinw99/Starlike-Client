@@ -1,6 +1,7 @@
 package net.minecraft.entity.projectile;
 
 import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -25,22 +26,25 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -59,6 +63,8 @@ public class EntityArrow extends Entity implements IProjectile {
 	private int ticksInAir;
 	private double damage = 2.0D;
 	private int knockbackStrength;
+
+	public boolean isChair = false;
 
 	public EntityArrow(World worldIn) {
 		super(worldIn);
@@ -122,69 +128,65 @@ public class EntityArrow extends Entity implements IProjectile {
 		this.setThrowableHeading(this.motionX, this.motionY, this.motionZ, velocity * 1.5F, 1.0F);
 	}
 
+	/**
+	 * + If returns false, the item will not inflict any damage against entities.
+	 */
+	public boolean canAttackWithItem() {
+		return false;
+	}
+
+	/**
+	 * + returns if this entity triggers Block.onEntityWalking on the blocks they
+	 * walk on. used for spiders and wolves to prevent them from trampling crops
+	 */
+	protected boolean canTriggerWalking() {
+		return false;
+	}
+
 	protected void entityInit() {
 		this.dataWatcher.addObject(16, Byte.valueOf((byte) 0));
 	}
 
-	/**+
-	 * Similar to setArrowHeading, it's point the throwable entity
-	 * to a x, y, z direction.
-	 */
-	public void setThrowableHeading(double x, double y, double z, float velocity, float inaccuracy) {
-		float f = MathHelper.sqrt_double(x * x + y * y + z * z);
-		x = x / (double) f;
-		y = y / (double) f;
-		z = z / (double) f;
-		x = x + this.rand.nextGaussian() * (double) (this.rand.nextBoolean() ? -1 : 1) * 0.007499999832361937D
-				* (double) inaccuracy;
-		y = y + this.rand.nextGaussian() * (double) (this.rand.nextBoolean() ? -1 : 1) * 0.007499999832361937D
-				* (double) inaccuracy;
-		z = z + this.rand.nextGaussian() * (double) (this.rand.nextBoolean() ? -1 : 1) * 0.007499999832361937D
-				* (double) inaccuracy;
-		x = x * (double) velocity;
-		y = y * (double) velocity;
-		z = z * (double) velocity;
-		this.motionX = x;
-		this.motionY = y;
-		this.motionZ = z;
-		float f1 = MathHelper.sqrt_double(x * x + z * z);
-		this.prevRotationYaw = this.rotationYaw = (float) (MathHelper.func_181159_b(x, z) * 180.0D
-				/ 3.1415927410125732D);
-		this.prevRotationPitch = this.rotationPitch = (float) (MathHelper.func_181159_b(y, (double) f1) * 180.0D
-				/ 3.1415927410125732D);
-		this.ticksInGround = 0;
+	public double getDamage() {
+		return this.damage;
 	}
 
-	public void setPositionAndRotation2(double d0, double d1, double d2, float f, float f1, int var9, boolean var10) {
-		this.setPosition(d0, d1, d2);
-		this.setRotation(f, f1);
+	public float getEyeHeight() {
+		return 0.0F;
 	}
 
-	/**+
-	 * Sets the velocity to the args. Args: x, y, z
+	/**
+	 * + Whether the arrow has a stream of critical hit particles flying behind it.
 	 */
-	public void setVelocity(double d0, double d1, double d2) {
-		this.motionX = d0;
-		this.motionY = d1;
-		this.motionZ = d2;
-		if (this.prevRotationPitch == 0.0F && this.prevRotationYaw == 0.0F) {
-			float f = MathHelper.sqrt_double(d0 * d0 + d2 * d2);
-			this.prevRotationYaw = this.rotationYaw = (float) (MathHelper.func_181159_b(d0, d2) * 180.0D
-					/ 3.1415927410125732D);
-			this.prevRotationPitch = this.rotationPitch = (float) (MathHelper.func_181159_b(d1, (double) f) * 180.0D
-					/ 3.1415927410125732D);
-			this.prevRotationPitch = this.rotationPitch;
-			this.prevRotationYaw = this.rotationYaw;
-			this.setLocationAndAngles(this.posX, this.posY, this.posZ, this.rotationYaw, this.rotationPitch);
-			this.ticksInGround = 0;
+	public boolean getIsCritical() {
+		byte b0 = this.dataWatcher.getWatchableObjectByte(16);
+		return (b0 & 1) != 0;
+	}
+
+	/**
+	 * + Called by a player entity when they collide with an entity
+	 */
+	public void onCollideWithPlayer(EntityPlayer entityplayer) {
+		if (!this.worldObj.isRemote && this.inGround && this.arrowShake <= 0) {
+			boolean flag = this.canBePickedUp == 1
+					|| this.canBePickedUp == 2 && entityplayer.capabilities.isCreativeMode;
+			if (this.canBePickedUp == 1
+					&& !entityplayer.inventory.addItemStackToInventory(new ItemStack(Items.arrow, 1))) {
+				flag = false;
+			}
+
+			if (flag) {
+				this.playSound("random.pop", 0.2F,
+						((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
+				entityplayer.onItemPickup(this, 1);
+				this.setDead();
+			}
+
 		}
-
 	}
 
-	public boolean isChair = false;
-
-	/**+
-	 * Called to update the entity's position/logic.
+	/**
+	 * + Called to update the entity's position/logic.
 	 */
 	public void onUpdate() {
 		super.onUpdate();
@@ -433,27 +435,8 @@ public class EntityArrow extends Entity implements IProjectile {
 		}
 	}
 
-	/**+
-	 * (abstract) Protected helper method to write subclass entity
-	 * data to NBT.
-	 */
-	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
-		nbttagcompound.setShort("xTile", (short) this.xTile);
-		nbttagcompound.setShort("yTile", (short) this.yTile);
-		nbttagcompound.setShort("zTile", (short) this.zTile);
-		nbttagcompound.setShort("life", (short) this.ticksInGround);
-		ResourceLocation resourcelocation = (ResourceLocation) Block.blockRegistry.getNameForObject(this.inTile);
-		nbttagcompound.setString("inTile", resourcelocation == null ? "" : resourcelocation.toString());
-		nbttagcompound.setByte("inData", (byte) this.inData);
-		nbttagcompound.setByte("shake", (byte) this.arrowShake);
-		nbttagcompound.setByte("inGround", (byte) (this.inGround ? 1 : 0));
-		nbttagcompound.setByte("pickup", (byte) this.canBePickedUp);
-		nbttagcompound.setDouble("damage", this.damage);
-	}
-
-	/**+
-	 * (abstract) Protected helper method to read subclass entity
-	 * data from NBT.
+	/**
+	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		this.xTile = nbttagcompound.getShort("xTile");
@@ -481,68 +464,12 @@ public class EntityArrow extends Entity implements IProjectile {
 
 	}
 
-	/**+
-	 * Called by a player entity when they collide with an entity
-	 */
-	public void onCollideWithPlayer(EntityPlayer entityplayer) {
-		if (!this.worldObj.isRemote && this.inGround && this.arrowShake <= 0) {
-			boolean flag = this.canBePickedUp == 1
-					|| this.canBePickedUp == 2 && entityplayer.capabilities.isCreativeMode;
-			if (this.canBePickedUp == 1
-					&& !entityplayer.inventory.addItemStackToInventory(new ItemStack(Items.arrow, 1))) {
-				flag = false;
-			}
-
-			if (flag) {
-				this.playSound("random.pop", 0.2F,
-						((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
-				entityplayer.onItemPickup(this, 1);
-				this.setDead();
-			}
-
-		}
-	}
-
-	/**+
-	 * returns if this entity triggers Block.onEntityWalking on the
-	 * blocks they walk on. used for spiders and wolves to prevent
-	 * them from trampling crops
-	 */
-	protected boolean canTriggerWalking() {
-		return false;
-	}
-
 	public void setDamage(double damageIn) {
 		this.damage = damageIn;
 	}
 
-	public double getDamage() {
-		return this.damage;
-	}
-
-	/**+
-	 * Sets the amount of knockback the arrow applies when it hits a
-	 * mob.
-	 */
-	public void setKnockbackStrength(int knockbackStrengthIn) {
-		this.knockbackStrength = knockbackStrengthIn;
-	}
-
-	/**+
-	 * If returns false, the item will not inflict any damage
-	 * against entities.
-	 */
-	public boolean canAttackWithItem() {
-		return false;
-	}
-
-	public float getEyeHeight() {
-		return 0.0F;
-	}
-
-	/**+
-	 * Whether the arrow has a stream of critical hit particles
-	 * flying behind it.
+	/**
+	 * + Whether the arrow has a stream of critical hit particles flying behind it.
 	 */
 	public void setIsCritical(boolean critical) {
 		byte b0 = this.dataWatcher.getWatchableObjectByte(16);
@@ -554,12 +481,82 @@ public class EntityArrow extends Entity implements IProjectile {
 
 	}
 
-	/**+
-	 * Whether the arrow has a stream of critical hit particles
-	 * flying behind it.
+	/**
+	 * + Sets the amount of knockback the arrow applies when it hits a mob.
 	 */
-	public boolean getIsCritical() {
-		byte b0 = this.dataWatcher.getWatchableObjectByte(16);
-		return (b0 & 1) != 0;
+	public void setKnockbackStrength(int knockbackStrengthIn) {
+		this.knockbackStrength = knockbackStrengthIn;
+	}
+
+	public void setPositionAndRotation2(double d0, double d1, double d2, float f, float f1, int var9, boolean var10) {
+		this.setPosition(d0, d1, d2);
+		this.setRotation(f, f1);
+	}
+
+	/**
+	 * + Similar to setArrowHeading, it's point the throwable entity to a x, y, z
+	 * direction.
+	 */
+	public void setThrowableHeading(double x, double y, double z, float velocity, float inaccuracy) {
+		float f = MathHelper.sqrt_double(x * x + y * y + z * z);
+		x = x / (double) f;
+		y = y / (double) f;
+		z = z / (double) f;
+		x = x + this.rand.nextGaussian() * (double) (this.rand.nextBoolean() ? -1 : 1) * 0.007499999832361937D
+				* (double) inaccuracy;
+		y = y + this.rand.nextGaussian() * (double) (this.rand.nextBoolean() ? -1 : 1) * 0.007499999832361937D
+				* (double) inaccuracy;
+		z = z + this.rand.nextGaussian() * (double) (this.rand.nextBoolean() ? -1 : 1) * 0.007499999832361937D
+				* (double) inaccuracy;
+		x = x * (double) velocity;
+		y = y * (double) velocity;
+		z = z * (double) velocity;
+		this.motionX = x;
+		this.motionY = y;
+		this.motionZ = z;
+		float f1 = MathHelper.sqrt_double(x * x + z * z);
+		this.prevRotationYaw = this.rotationYaw = (float) (MathHelper.func_181159_b(x, z) * 180.0D
+				/ 3.1415927410125732D);
+		this.prevRotationPitch = this.rotationPitch = (float) (MathHelper.func_181159_b(y, (double) f1) * 180.0D
+				/ 3.1415927410125732D);
+		this.ticksInGround = 0;
+	}
+
+	/**
+	 * + Sets the velocity to the args. Args: x, y, z
+	 */
+	public void setVelocity(double d0, double d1, double d2) {
+		this.motionX = d0;
+		this.motionY = d1;
+		this.motionZ = d2;
+		if (this.prevRotationPitch == 0.0F && this.prevRotationYaw == 0.0F) {
+			float f = MathHelper.sqrt_double(d0 * d0 + d2 * d2);
+			this.prevRotationYaw = this.rotationYaw = (float) (MathHelper.func_181159_b(d0, d2) * 180.0D
+					/ 3.1415927410125732D);
+			this.prevRotationPitch = this.rotationPitch = (float) (MathHelper.func_181159_b(d1, (double) f) * 180.0D
+					/ 3.1415927410125732D);
+			this.prevRotationPitch = this.rotationPitch;
+			this.prevRotationYaw = this.rotationYaw;
+			this.setLocationAndAngles(this.posX, this.posY, this.posZ, this.rotationYaw, this.rotationPitch);
+			this.ticksInGround = 0;
+		}
+
+	}
+
+	/**
+	 * + (abstract) Protected helper method to write subclass entity data to NBT.
+	 */
+	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
+		nbttagcompound.setShort("xTile", (short) this.xTile);
+		nbttagcompound.setShort("yTile", (short) this.yTile);
+		nbttagcompound.setShort("zTile", (short) this.zTile);
+		nbttagcompound.setShort("life", (short) this.ticksInGround);
+		ResourceLocation resourcelocation = (ResourceLocation) Block.blockRegistry.getNameForObject(this.inTile);
+		nbttagcompound.setString("inTile", resourcelocation == null ? "" : resourcelocation.toString());
+		nbttagcompound.setByte("inData", (byte) this.inData);
+		nbttagcompound.setByte("shake", (byte) this.arrowShake);
+		nbttagcompound.setByte("inGround", (byte) (this.inGround ? 1 : 0));
+		nbttagcompound.setByte("pickup", (byte) this.canBePickedUp);
+		nbttagcompound.setDouble("damage", this.damage);
 	}
 }

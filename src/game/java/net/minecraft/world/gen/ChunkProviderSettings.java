@@ -7,195 +7,43 @@ import net.lax1dude.eaglercraft.v1_8.json.JSONTypeCodec;
 import net.lax1dude.eaglercraft.v1_8.json.JSONTypeProvider;
 import net.minecraft.world.biome.BiomeGenBase;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class ChunkProviderSettings {
-	public final float coordinateScale;
-	public final float heightScale;
-	public final float upperLimitScale;
-	public final float lowerLimitScale;
-	public final float depthNoiseScaleX;
-	public final float depthNoiseScaleZ;
-	public final float depthNoiseScaleExponent;
-	public final float mainNoiseScaleX;
-	public final float mainNoiseScaleY;
-	public final float mainNoiseScaleZ;
-	public final float baseSize;
-	public final float stretchY;
-	public final float biomeDepthWeight;
-	public final float biomeDepthOffSet;
-	public final float biomeScaleWeight;
-	public final float biomeScaleOffset;
-	public final int seaLevel;
-	public final boolean useCaves;
-	public final boolean useDungeons;
-	public final int dungeonChance;
-	public final boolean useStrongholds;
-	public final boolean useVillages;
-	public final boolean useMineShafts;
-	public final boolean useTemples;
-	public final boolean useMonuments;
-	public final boolean useRavines;
-	public final boolean useWaterLakes;
-	public final int waterLakeChance;
-	public final boolean useLavaLakes;
-	public final int lavaLakeChance;
-	public final boolean useLavaOceans;
-	public final int fixedBiome;
-	public final int biomeSize;
-	public final int riverSize;
-	public final int dirtSize;
-	public final int dirtCount;
-	public final int dirtMinHeight;
-	public final int dirtMaxHeight;
-	public final int gravelSize;
-	public final int gravelCount;
-	public final int gravelMinHeight;
-	public final int gravelMaxHeight;
-	public final int graniteSize;
-	public final int graniteCount;
-	public final int graniteMinHeight;
-	public final int graniteMaxHeight;
-	public final int dioriteSize;
-	public final int dioriteCount;
-	public final int dioriteMinHeight;
-	public final int dioriteMaxHeight;
-	public final int andesiteSize;
-	public final int andesiteCount;
-	public final int andesiteMinHeight;
-	public final int andesiteMaxHeight;
-	public final int coalSize;
-	public final int coalCount;
-	public final int coalMinHeight;
-	public final int coalMaxHeight;
-	public final int ironSize;
-	public final int ironCount;
-	public final int ironMinHeight;
-	public final int ironMaxHeight;
-	public final int goldSize;
-	public final int goldCount;
-	public final int goldMinHeight;
-	public final int goldMaxHeight;
-	public final int redstoneSize;
-	public final int redstoneCount;
-	public final int redstoneMinHeight;
-	public final int redstoneMaxHeight;
-	public final int diamondSize;
-	public final int diamondCount;
-	public final int diamondMinHeight;
-	public final int diamondMaxHeight;
-	public final int lapisSize;
-	public final int lapisCount;
-	public final int lapisCenterHeight;
-	public final int lapisSpread;
-	public final int platinumSize;
-	public final int platinumCount;
-	public final int platinumMinHeight;
-	public final int platinumMaxHeight;
-	private ChunkProviderSettings(ChunkProviderSettings.Factory settingsFactory) {
-		this.coordinateScale = settingsFactory.coordinateScale;
-		this.heightScale = settingsFactory.heightScale;
-		this.upperLimitScale = settingsFactory.upperLimitScale;
-		this.lowerLimitScale = settingsFactory.lowerLimitScale;
-		this.depthNoiseScaleX = settingsFactory.depthNoiseScaleX;
-		this.depthNoiseScaleZ = settingsFactory.depthNoiseScaleZ;
-		this.depthNoiseScaleExponent = settingsFactory.depthNoiseScaleExponent;
-		this.mainNoiseScaleX = settingsFactory.mainNoiseScaleX;
-		this.mainNoiseScaleY = settingsFactory.mainNoiseScaleY;
-		this.mainNoiseScaleZ = settingsFactory.mainNoiseScaleZ;
-		this.baseSize = settingsFactory.baseSize;
-		this.stretchY = settingsFactory.stretchY;
-		this.biomeDepthWeight = settingsFactory.biomeDepthWeight;
-		this.biomeDepthOffSet = settingsFactory.biomeDepthOffset;
-		this.biomeScaleWeight = settingsFactory.biomeScaleWeight;
-		this.biomeScaleOffset = settingsFactory.biomeScaleOffset;
-		this.seaLevel = settingsFactory.seaLevel;
-		this.useCaves = settingsFactory.useCaves;
-		this.useDungeons = settingsFactory.useDungeons;
-		this.dungeonChance = settingsFactory.dungeonChance;
-		this.useStrongholds = settingsFactory.useStrongholds;
-		this.useVillages = settingsFactory.useVillages;
-		this.useMineShafts = settingsFactory.useMineShafts;
-		this.useTemples = settingsFactory.useTemples;
-		this.useMonuments = settingsFactory.useMonuments;
-		this.useRavines = settingsFactory.useRavines;
-		this.useWaterLakes = settingsFactory.useWaterLakes;
-		this.waterLakeChance = settingsFactory.waterLakeChance;
-		this.useLavaLakes = settingsFactory.useLavaLakes;
-		this.lavaLakeChance = settingsFactory.lavaLakeChance;
-		this.useLavaOceans = settingsFactory.useLavaOceans;
-		this.fixedBiome = settingsFactory.fixedBiome;
-		this.biomeSize = settingsFactory.biomeSize;
-		this.riverSize = settingsFactory.riverSize;
-		this.dirtSize = settingsFactory.dirtSize;
-		this.dirtCount = settingsFactory.dirtCount;
-		this.dirtMinHeight = settingsFactory.dirtMinHeight;
-		this.dirtMaxHeight = settingsFactory.dirtMaxHeight;
-		this.gravelSize = settingsFactory.gravelSize;
-		this.gravelCount = settingsFactory.gravelCount;
-		this.gravelMinHeight = settingsFactory.gravelMinHeight;
-		this.gravelMaxHeight = settingsFactory.gravelMaxHeight;
-		this.graniteSize = settingsFactory.graniteSize;
-		this.graniteCount = settingsFactory.graniteCount;
-		this.graniteMinHeight = settingsFactory.graniteMinHeight;
-		this.graniteMaxHeight = settingsFactory.graniteMaxHeight;
-		this.dioriteSize = settingsFactory.dioriteSize;
-		this.dioriteCount = settingsFactory.dioriteCount;
-		this.dioriteMinHeight = settingsFactory.dioriteMinHeight;
-		this.dioriteMaxHeight = settingsFactory.dioriteMaxHeight;
-		this.andesiteSize = settingsFactory.andesiteSize;
-		this.andesiteCount = settingsFactory.andesiteCount;
-		this.andesiteMinHeight = settingsFactory.andesiteMinHeight;
-		this.andesiteMaxHeight = settingsFactory.andesiteMaxHeight;
-		this.coalSize = settingsFactory.coalSize;
-		this.coalCount = settingsFactory.coalCount;
-		this.coalMinHeight = settingsFactory.coalMinHeight;
-		this.coalMaxHeight = settingsFactory.coalMaxHeight;
-		this.ironSize = settingsFactory.ironSize;
-		this.ironCount = settingsFactory.ironCount;
-		this.ironMinHeight = settingsFactory.ironMinHeight;
-		this.ironMaxHeight = settingsFactory.ironMaxHeight;
-		this.goldSize = settingsFactory.goldSize;
-		this.goldCount = settingsFactory.goldCount;
-		this.goldMinHeight = settingsFactory.goldMinHeight;
-		this.goldMaxHeight = settingsFactory.goldMaxHeight;
-		this.redstoneSize = settingsFactory.redstoneSize;
-		this.redstoneCount = settingsFactory.redstoneCount;
-		this.redstoneMinHeight = settingsFactory.redstoneMinHeight;
-		this.redstoneMaxHeight = settingsFactory.redstoneMaxHeight;
-		this.diamondSize = settingsFactory.diamondSize;
-		this.diamondCount = settingsFactory.diamondCount;
-		this.diamondMinHeight = settingsFactory.diamondMinHeight;
-		this.diamondMaxHeight = settingsFactory.diamondMaxHeight;
-		this.lapisSize = settingsFactory.lapisSize;
-		this.lapisCount = settingsFactory.lapisCount;
-		this.lapisCenterHeight = settingsFactory.lapisCenterHeight;
-		this.lapisSpread = settingsFactory.lapisSpread;
-		this.platinumSize = settingsFactory.platinumSize;
-		this.platinumCount = settingsFactory.platinumCount;
-		this.platinumMinHeight = settingsFactory.platinumMinHeight;
-		this.platinumMaxHeight = settingsFactory.platinumMaxHeight;
-	}
-
 	public static class Factory {
+		public static ChunkProviderSettings.Factory jsonToFactory(String parString1) {
+			if (parString1.length() == 0) {
+				return new ChunkProviderSettings.Factory();
+			} else {
+				try {
+					return JSONTypeProvider.deserialize(parString1, ChunkProviderSettings.Factory.class);
+				} catch (Exception var2) {
+					return new ChunkProviderSettings.Factory();
+				}
+			}
+		}
+
 		public float coordinateScale = 684.412F;
 		public float heightScale = 684.412F;
 		public float upperLimitScale = 512.0F;
@@ -256,8 +104,8 @@ public class ChunkProviderSettings {
 		public int coalMaxHeight = 128;
 		public int ironSize = 9;
 		public int ironCount = 20;
-		public int ironMinHeight = 0;
-		public int ironMaxHeight = 64;
+		public int ironMinHeight = 30;
+		public int ironMaxHeight = 128;
 		public int goldSize = 9;
 		public int goldCount = 2;
 		public int goldMinHeight = 0;
@@ -265,7 +113,7 @@ public class ChunkProviderSettings {
 		public int redstoneSize = 8;
 		public int redstoneCount = 8;
 		public int redstoneMinHeight = 0;
-		public int redstoneMaxHeight = 16;
+		public int redstoneMaxHeight = 32;
 		public int diamondSize = 8;
 		public int diamondCount = 1;
 		public int diamondMinHeight = 0;
@@ -274,113 +122,17 @@ public class ChunkProviderSettings {
 		public int lapisCount = 1;
 		public int lapisCenterHeight = 16;
 		public int lapisSpread = 16;
-		public int platinumSize = 3;
-		public int platinumCount = 1;
+		public int platinumSize = 4;
+		public int platinumCount = 3;
 		public int platinumMinHeight = 0;
-		public int platinumMaxHeight = 10;
-		public static ChunkProviderSettings.Factory jsonToFactory(String parString1) {
-			if (parString1.length() == 0) {
-				return new ChunkProviderSettings.Factory();
-			} else {
-				try {
-					return JSONTypeProvider.deserialize(parString1, ChunkProviderSettings.Factory.class);
-				} catch (Exception var2) {
-					return new ChunkProviderSettings.Factory();
-				}
-			}
-		}
-
-		public String toString() {
-			return JSONTypeProvider.serialize(this).toString();
-		}
+		public int platinumMaxHeight = 17;
+		public int titaniumSize = 2;
+		public int titaniumCount = 1;
+		public int titaniumMinHeight = 0;
+		public int titaniumMaxHeight = 10;
 
 		public Factory() {
 			this.func_177863_a();
-		}
-
-		public void func_177863_a() {
-			this.coordinateScale = 684.412F;
-			this.heightScale = 684.412F;
-			this.upperLimitScale = 512.0F;
-			this.lowerLimitScale = 512.0F;
-			this.depthNoiseScaleX = 200.0F;
-			this.depthNoiseScaleZ = 200.0F;
-			this.depthNoiseScaleExponent = 0.5F;
-			this.mainNoiseScaleX = 80.0F;
-			this.mainNoiseScaleY = 160.0F;
-			this.mainNoiseScaleZ = 80.0F;
-			this.baseSize = 8.5F;
-			this.stretchY = 12.0F;
-			this.biomeDepthWeight = 1.0F;
-			this.biomeDepthOffset = 0.0F;
-			this.biomeScaleWeight = 1.0F;
-			this.biomeScaleOffset = 0.0F;
-			this.seaLevel = 63;
-			this.useCaves = true;
-			this.useDungeons = true;
-			this.dungeonChance = 8;
-			this.useStrongholds = true;
-			this.useVillages = true;
-			this.useMineShafts = true;
-			this.useTemples = true;
-			this.useMonuments = true;
-			this.useRavines = true;
-			this.useWaterLakes = true;
-			this.waterLakeChance = 4;
-			this.useLavaLakes = true;
-			this.lavaLakeChance = 80;
-			this.useLavaOceans = false;
-			this.fixedBiome = -1;
-			this.biomeSize = 4;
-			this.riverSize = 4;
-			this.dirtSize = 33;
-			this.dirtCount = 10;
-			this.dirtMinHeight = 0;
-			this.dirtMaxHeight = 256;
-			this.gravelSize = 33;
-			this.gravelCount = 8;
-			this.gravelMinHeight = 0;
-			this.gravelMaxHeight = 256;
-			this.graniteSize = 33;
-			this.graniteCount = 10;
-			this.graniteMinHeight = 0;
-			this.graniteMaxHeight = 80;
-			this.dioriteSize = 33;
-			this.dioriteCount = 10;
-			this.dioriteMinHeight = 0;
-			this.dioriteMaxHeight = 80;
-			this.andesiteSize = 33;
-			this.andesiteCount = 10;
-			this.andesiteMinHeight = 0;
-			this.andesiteMaxHeight = 80;
-			this.coalSize = 17;
-			this.coalCount = 20;
-			this.coalMinHeight = 0;
-			this.coalMaxHeight = 128;
-			this.ironSize = 9;
-			this.ironCount = 20;
-			this.ironMinHeight = 0;
-			this.ironMaxHeight = 64;
-			this.goldSize = 9;
-			this.goldCount = 2;
-			this.goldMinHeight = 0;
-			this.goldMaxHeight = 32;
-			this.redstoneSize = 8;
-			this.redstoneCount = 8;
-			this.redstoneMinHeight = 0;
-			this.redstoneMaxHeight = 16;
-			this.diamondSize = 8;
-			this.diamondCount = 1;
-			this.diamondMinHeight = 0;
-			this.diamondMaxHeight = 16;
-			this.lapisSize = 7;
-			this.lapisCount = 1;
-			this.lapisCenterHeight = 16;
-			this.lapisSpread = 16;
-			this.platinumSize = 3;
-			this.platinumCount = 1;
-			this.platinumMinHeight = 0;
-			this.platinumMaxHeight = 10;
 		}
 
 		public boolean equals(Object object) {
@@ -573,6 +325,99 @@ public class ChunkProviderSettings {
 			}
 		}
 
+		public void func_177863_a() {
+			this.coordinateScale = 684.412F;
+			this.heightScale = 684.412F;
+			this.upperLimitScale = 512.0F;
+			this.lowerLimitScale = 512.0F;
+			this.depthNoiseScaleX = 200.0F;
+			this.depthNoiseScaleZ = 200.0F;
+			this.depthNoiseScaleExponent = 0.5F;
+			this.mainNoiseScaleX = 80.0F;
+			this.mainNoiseScaleY = 160.0F;
+			this.mainNoiseScaleZ = 80.0F;
+			this.baseSize = 8.5F;
+			this.stretchY = 12.0F;
+			this.biomeDepthWeight = 1.0F;
+			this.biomeDepthOffset = 0.0F;
+			this.biomeScaleWeight = 1.0F;
+			this.biomeScaleOffset = 0.0F;
+			this.seaLevel = 63;
+			this.useCaves = true;
+			this.useDungeons = true;
+			this.dungeonChance = 8;
+			this.useStrongholds = true;
+			this.useVillages = true;
+			this.useMineShafts = true;
+			this.useTemples = true;
+			this.useMonuments = true;
+			this.useRavines = true;
+			this.useWaterLakes = true;
+			this.waterLakeChance = 4;
+			this.useLavaLakes = true;
+			this.lavaLakeChance = 80;
+			this.useLavaOceans = false;
+			this.fixedBiome = -1;
+			this.biomeSize = 4;
+			this.riverSize = 4;
+			this.dirtSize = 33;
+			this.dirtCount = 10;
+			this.dirtMinHeight = 0;
+			this.dirtMaxHeight = 256;
+			this.gravelSize = 33;
+			this.gravelCount = 8;
+			this.gravelMinHeight = 0;
+			this.gravelMaxHeight = 256;
+			this.graniteSize = 33;
+			this.graniteCount = 10;
+			this.graniteMinHeight = 0;
+			this.graniteMaxHeight = 80;
+			this.dioriteSize = 33;
+			this.dioriteCount = 10;
+			this.dioriteMinHeight = 0;
+			this.dioriteMaxHeight = 80;
+			this.andesiteSize = 33;
+			this.andesiteCount = 10;
+			this.andesiteMinHeight = 0;
+			this.andesiteMaxHeight = 80;
+			this.coalSize = 17;
+			this.coalCount = 20;
+			this.coalMinHeight = 0;
+			this.coalMaxHeight = 128;
+			this.ironSize = 9;
+			this.ironCount = 20;
+			this.ironMinHeight = 30;
+			this.ironMaxHeight = 128;
+			this.goldSize = 9;
+			this.goldCount = 2;
+			this.goldMinHeight = 0;
+			this.goldMaxHeight = 32;
+			this.redstoneSize = 8;
+			this.redstoneCount = 8;
+			this.redstoneMinHeight = 0;
+			this.redstoneMaxHeight = 32;
+			this.diamondSize = 8;
+			this.diamondCount = 1;
+			this.diamondMinHeight = 0;
+			this.diamondMaxHeight = 16;
+			this.lapisSize = 7;
+			this.lapisCount = 1;
+			this.lapisCenterHeight = 16;
+			this.lapisSpread = 16;
+			this.platinumSize = 4;
+			this.platinumCount = 8;
+			this.platinumMinHeight = 0;
+			this.platinumMaxHeight = 17;
+			this.titaniumSize = 2;
+			this.titaniumCount = 4;
+			this.titaniumMinHeight = 0;
+			this.titaniumMaxHeight = 10;
+		}
+
+		public ChunkProviderSettings func_177864_b() {
+			return new ChunkProviderSettings(this);
+		}
+
 		public int hashCode() {
 			int i = this.coordinateScale != 0.0F ? Float.floatToIntBits(this.coordinateScale) : 0;
 			i = 31 * i + (this.heightScale != 0.0F ? Float.floatToIntBits(this.heightScale) : 0);
@@ -656,8 +501,8 @@ public class ChunkProviderSettings {
 			return i;
 		}
 
-		public ChunkProviderSettings func_177864_b() {
-			return new ChunkProviderSettings(this);
+		public String toString() {
+			return JSONTypeProvider.serialize(this).toString();
 		}
 	}
 
@@ -917,11 +762,191 @@ public class ChunkProviderSettings {
 			jsonobject.put("lapisCount", Integer.valueOf(parFactory.lapisCount));
 			jsonobject.put("lapisCenterHeight", Integer.valueOf(parFactory.lapisCenterHeight));
 			jsonobject.put("lapisSpread", Integer.valueOf(parFactory.lapisSpread));
-			jsonobject.put("diamondSize", Integer.valueOf(parFactory.platinumSize));
+			jsonobject.put("platinumSize", Integer.valueOf(parFactory.platinumSize));
 			jsonobject.put("platinumCount", Integer.valueOf(parFactory.platinumCount));
 			jsonobject.put("platinumMinHeight", Integer.valueOf(parFactory.platinumMinHeight));
 			jsonobject.put("platinumMaxHeight", Integer.valueOf(parFactory.platinumMaxHeight));
+			jsonobject.put("titaniumSize", Integer.valueOf(parFactory.titaniumSize));
+			jsonobject.put("titaniumCount", Integer.valueOf(parFactory.titaniumCount));
+			jsonobject.put("titaniumMinHeight", Integer.valueOf(parFactory.titaniumMinHeight));
+			jsonobject.put("titaniumMaxHeight", Integer.valueOf(parFactory.titaniumMaxHeight));
 			return jsonobject;
 		}
+	}
+
+	public final float coordinateScale;
+	public final float heightScale;
+	public final float upperLimitScale;
+	public final float lowerLimitScale;
+	public final float depthNoiseScaleX;
+	public final float depthNoiseScaleZ;
+	public final float depthNoiseScaleExponent;
+	public final float mainNoiseScaleX;
+	public final float mainNoiseScaleY;
+	public final float mainNoiseScaleZ;
+	public final float baseSize;
+	public final float stretchY;
+	public final float biomeDepthWeight;
+	public final float biomeDepthOffSet;
+	public final float biomeScaleWeight;
+	public final float biomeScaleOffset;
+	public final int seaLevel;
+	public final boolean useCaves;
+	public final boolean useDungeons;
+	public final int dungeonChance;
+	public final boolean useStrongholds;
+	public final boolean useVillages;
+	public final boolean useMineShafts;
+	public final boolean useTemples;
+	public final boolean useMonuments;
+	public final boolean useRavines;
+	public final boolean useWaterLakes;
+	public final int waterLakeChance;
+	public final boolean useLavaLakes;
+	public final int lavaLakeChance;
+	public final boolean useLavaOceans;
+	public final int fixedBiome;
+	public final int biomeSize;
+	public final int riverSize;
+	public final int dirtSize;
+	public final int dirtCount;
+	public final int dirtMinHeight;
+	public final int dirtMaxHeight;
+	public final int gravelSize;
+	public final int gravelCount;
+	public final int gravelMinHeight;
+	public final int gravelMaxHeight;
+	public final int graniteSize;
+	public final int graniteCount;
+	public final int graniteMinHeight;
+	public final int graniteMaxHeight;
+	public final int dioriteSize;
+	public final int dioriteCount;
+	public final int dioriteMinHeight;
+	public final int dioriteMaxHeight;
+	public final int andesiteSize;
+	public final int andesiteCount;
+	public final int andesiteMinHeight;
+	public final int andesiteMaxHeight;
+	public final int coalSize;
+	public final int coalCount;
+	public final int coalMinHeight;
+	public final int coalMaxHeight;
+	public final int ironSize;
+	public final int ironCount;
+	public final int ironMinHeight;
+	public final int ironMaxHeight;
+	public final int goldSize;
+	public final int goldCount;
+	public final int goldMinHeight;
+	public final int goldMaxHeight;
+	public final int redstoneSize;
+	public final int redstoneCount;
+	public final int redstoneMinHeight;
+	public final int redstoneMaxHeight;
+	public final int diamondSize;
+	public final int diamondCount;
+	public final int diamondMinHeight;
+	public final int diamondMaxHeight;
+	public final int lapisSize;
+	public final int lapisCount;
+	public final int lapisCenterHeight;
+	public final int lapisSpread;
+	public final int platinumSize;
+	public final int platinumCount;
+	public final int platinumMinHeight;
+	public final int platinumMaxHeight;
+	public final int titaniumSize;
+	public final int titaniumCount;
+	public final int titaniumMinHeight;
+	public final int titaniumMaxHeight;
+
+	private ChunkProviderSettings(ChunkProviderSettings.Factory settingsFactory) {
+		this.coordinateScale = settingsFactory.coordinateScale;
+		this.heightScale = settingsFactory.heightScale;
+		this.upperLimitScale = settingsFactory.upperLimitScale;
+		this.lowerLimitScale = settingsFactory.lowerLimitScale;
+		this.depthNoiseScaleX = settingsFactory.depthNoiseScaleX;
+		this.depthNoiseScaleZ = settingsFactory.depthNoiseScaleZ;
+		this.depthNoiseScaleExponent = settingsFactory.depthNoiseScaleExponent;
+		this.mainNoiseScaleX = settingsFactory.mainNoiseScaleX;
+		this.mainNoiseScaleY = settingsFactory.mainNoiseScaleY;
+		this.mainNoiseScaleZ = settingsFactory.mainNoiseScaleZ;
+		this.baseSize = settingsFactory.baseSize;
+		this.stretchY = settingsFactory.stretchY;
+		this.biomeDepthWeight = settingsFactory.biomeDepthWeight;
+		this.biomeDepthOffSet = settingsFactory.biomeDepthOffset;
+		this.biomeScaleWeight = settingsFactory.biomeScaleWeight;
+		this.biomeScaleOffset = settingsFactory.biomeScaleOffset;
+		this.seaLevel = settingsFactory.seaLevel;
+		this.useCaves = settingsFactory.useCaves;
+		this.useDungeons = settingsFactory.useDungeons;
+		this.dungeonChance = settingsFactory.dungeonChance;
+		this.useStrongholds = settingsFactory.useStrongholds;
+		this.useVillages = settingsFactory.useVillages;
+		this.useMineShafts = settingsFactory.useMineShafts;
+		this.useTemples = settingsFactory.useTemples;
+		this.useMonuments = settingsFactory.useMonuments;
+		this.useRavines = settingsFactory.useRavines;
+		this.useWaterLakes = settingsFactory.useWaterLakes;
+		this.waterLakeChance = settingsFactory.waterLakeChance;
+		this.useLavaLakes = settingsFactory.useLavaLakes;
+		this.lavaLakeChance = settingsFactory.lavaLakeChance;
+		this.useLavaOceans = settingsFactory.useLavaOceans;
+		this.fixedBiome = settingsFactory.fixedBiome;
+		this.biomeSize = settingsFactory.biomeSize;
+		this.riverSize = settingsFactory.riverSize;
+		this.dirtSize = settingsFactory.dirtSize;
+		this.dirtCount = settingsFactory.dirtCount;
+		this.dirtMinHeight = settingsFactory.dirtMinHeight;
+		this.dirtMaxHeight = settingsFactory.dirtMaxHeight;
+		this.gravelSize = settingsFactory.gravelSize;
+		this.gravelCount = settingsFactory.gravelCount;
+		this.gravelMinHeight = settingsFactory.gravelMinHeight;
+		this.gravelMaxHeight = settingsFactory.gravelMaxHeight;
+		this.graniteSize = settingsFactory.graniteSize;
+		this.graniteCount = settingsFactory.graniteCount;
+		this.graniteMinHeight = settingsFactory.graniteMinHeight;
+		this.graniteMaxHeight = settingsFactory.graniteMaxHeight;
+		this.dioriteSize = settingsFactory.dioriteSize;
+		this.dioriteCount = settingsFactory.dioriteCount;
+		this.dioriteMinHeight = settingsFactory.dioriteMinHeight;
+		this.dioriteMaxHeight = settingsFactory.dioriteMaxHeight;
+		this.andesiteSize = settingsFactory.andesiteSize;
+		this.andesiteCount = settingsFactory.andesiteCount;
+		this.andesiteMinHeight = settingsFactory.andesiteMinHeight;
+		this.andesiteMaxHeight = settingsFactory.andesiteMaxHeight;
+		this.coalSize = settingsFactory.coalSize;
+		this.coalCount = settingsFactory.coalCount;
+		this.coalMinHeight = settingsFactory.coalMinHeight;
+		this.coalMaxHeight = settingsFactory.coalMaxHeight;
+		this.ironSize = settingsFactory.ironSize;
+		this.ironCount = settingsFactory.ironCount;
+		this.ironMinHeight = settingsFactory.ironMinHeight;
+		this.ironMaxHeight = settingsFactory.ironMaxHeight;
+		this.goldSize = settingsFactory.goldSize;
+		this.goldCount = settingsFactory.goldCount;
+		this.goldMinHeight = settingsFactory.goldMinHeight;
+		this.goldMaxHeight = settingsFactory.goldMaxHeight;
+		this.redstoneSize = settingsFactory.redstoneSize;
+		this.redstoneCount = settingsFactory.redstoneCount;
+		this.redstoneMinHeight = settingsFactory.redstoneMinHeight;
+		this.redstoneMaxHeight = settingsFactory.redstoneMaxHeight;
+		this.diamondSize = settingsFactory.diamondSize;
+		this.diamondCount = settingsFactory.diamondCount;
+		this.diamondMinHeight = settingsFactory.diamondMinHeight;
+		this.diamondMaxHeight = settingsFactory.diamondMaxHeight;
+		this.lapisSize = settingsFactory.lapisSize;
+		this.lapisCount = settingsFactory.lapisCount;
+		this.lapisCenterHeight = settingsFactory.lapisCenterHeight;
+		this.lapisSpread = settingsFactory.lapisSpread;
+		this.platinumSize = settingsFactory.platinumSize;
+		this.platinumCount = settingsFactory.platinumCount;
+		this.platinumMinHeight = settingsFactory.platinumMinHeight;
+		this.platinumMaxHeight = settingsFactory.platinumMaxHeight;
+		this.titaniumSize = settingsFactory.titaniumSize;
+		this.titaniumCount = settingsFactory.titaniumCount;
+		this.titaniumMinHeight = settingsFactory.titaniumMinHeight;
+		this.titaniumMaxHeight = settingsFactory.titaniumMaxHeight;
 	}
 }

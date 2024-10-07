@@ -46,6 +46,9 @@ import com.google.common.annotations.VisibleForTesting;
 @Beta
 @GwtCompatible
 public final class ArrayBasedEscaperMap {
+	// Immutable empty array for when there are no replacements.
+	private static final char[][] EMPTY_REPLACEMENT_ARRAY = new char[0][0];
+
 	/**
 	 * Returns a new ArrayBasedEscaperMap for creating ArrayBasedCharEscaper or
 	 * ArrayBasedUnicodeEscaper instances.
@@ -54,19 +57,6 @@ public final class ArrayBasedEscaperMap {
 	 */
 	public static ArrayBasedEscaperMap create(Map<Character, String> replacements) {
 		return new ArrayBasedEscaperMap(createReplacementArray(replacements));
-	}
-
-	// The underlying replacement array we can share between multiple escaper
-	// instances.
-	private final char[][] replacementArray;
-
-	private ArrayBasedEscaperMap(char[][] replacementArray) {
-		this.replacementArray = replacementArray;
-	}
-
-	// Returns the non-null array of replacements for fast lookup.
-	char[][] getReplacementArray() {
-		return replacementArray;
 	}
 
 	// Creates a replacement array from the given map. The returned array is a
@@ -86,6 +76,16 @@ public final class ArrayBasedEscaperMap {
 		return replacements;
 	}
 
-	// Immutable empty array for when there are no replacements.
-	private static final char[][] EMPTY_REPLACEMENT_ARRAY = new char[0][0];
+	// The underlying replacement array we can share between multiple escaper
+	// instances.
+	private final char[][] replacementArray;
+
+	private ArrayBasedEscaperMap(char[][] replacementArray) {
+		this.replacementArray = replacementArray;
+	}
+
+	// Returns the non-null array of replacements for fast lookup.
+	char[][] getReplacementArray() {
+		return replacementArray;
+	}
 }

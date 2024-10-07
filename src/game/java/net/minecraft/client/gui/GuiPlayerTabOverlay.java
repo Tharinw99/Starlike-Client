@@ -1,6 +1,7 @@
 package net.minecraft.client.gui;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ONE_MINUS_SRC_ALPHA;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_SRC_ALPHA;
 
 import java.util.Comparator;
 import java.util.List;
@@ -24,27 +25,48 @@ import net.minecraft.util.IChatComponent;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.WorldSettings;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class GuiPlayerTabOverlay extends Gui {
+	static class PlayerComparator implements Comparator<NetworkPlayerInfo> {
+		private PlayerComparator() {
+		}
+
+		public int compare(NetworkPlayerInfo networkplayerinfo, NetworkPlayerInfo networkplayerinfo1) {
+			ScorePlayerTeam scoreplayerteam = networkplayerinfo.getPlayerTeam();
+			ScorePlayerTeam scoreplayerteam1 = networkplayerinfo1.getPlayerTeam();
+			return ComparisonChain.start()
+					.compareTrueFirst(networkplayerinfo.getGameType() != WorldSettings.GameType.SPECTATOR,
+							networkplayerinfo1.getGameType() != WorldSettings.GameType.SPECTATOR)
+					.compare(scoreplayerteam != null ? scoreplayerteam.getRegisteredName() : "",
+							scoreplayerteam1 != null ? scoreplayerteam1.getRegisteredName() : "")
+					.compare(networkplayerinfo.getGameProfile().getName(),
+							networkplayerinfo1.getGameProfile().getName())
+					.result();
+		}
+	}
+
 	private static final Ordering<NetworkPlayerInfo> field_175252_a = Ordering
 			.from(new GuiPlayerTabOverlay.PlayerComparator());
 	private final Minecraft mc;
@@ -52,6 +74,7 @@ public class GuiPlayerTabOverlay extends Gui {
 	private IChatComponent footer;
 	private IChatComponent header;
 	private long lastTimeOpened;
+
 	private boolean isBeingRendered;
 
 	public GuiPlayerTabOverlay(Minecraft mcIn, GuiIngame guiIngameIn) {
@@ -59,9 +82,121 @@ public class GuiPlayerTabOverlay extends Gui {
 		this.guiIngame = guiIngameIn;
 	}
 
-	/**+
-	 * Returns the name that should be renderd for the player
-	 * supplied
+	protected void drawPing(int networkPlayerInfoIn, int parInt2, int parInt3, NetworkPlayerInfo parNetworkPlayerInfo) {
+		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+		this.mc.getTextureManager().bindTexture(icons);
+		byte b0 = 0;
+		byte b1 = 0;
+		if (parNetworkPlayerInfo.getResponseTime() < 0) {
+			b1 = 5;
+		} else if (parNetworkPlayerInfo.getResponseTime() < 150) {
+			b1 = 0;
+		} else if (parNetworkPlayerInfo.getResponseTime() < 300) {
+			b1 = 1;
+		} else if (parNetworkPlayerInfo.getResponseTime() < 600) {
+			b1 = 2;
+		} else if (parNetworkPlayerInfo.getResponseTime() < 1000) {
+			b1 = 3;
+		} else {
+			b1 = 4;
+		}
+
+		this.zLevel += 100.0F;
+		this.drawTexturedModalRect(parInt2 + networkPlayerInfoIn - 11, parInt3, 0 + b0 * 10, 176 + b1 * 8, 10, 8);
+		this.zLevel -= 100.0F;
+	}
+
+	private void drawScoreboardValues(ScoreObjective parScoreObjective, int parInt1, String parString1, int parInt2,
+			int parInt3, NetworkPlayerInfo parNetworkPlayerInfo) {
+		int i = parScoreObjective.getScoreboard().getValueFromObjective(parString1, parScoreObjective).getScorePoints();
+		if (parScoreObjective.getRenderType() == IScoreObjectiveCriteria.EnumRenderType.HEARTS) {
+			this.mc.getTextureManager().bindTexture(icons);
+			if (this.lastTimeOpened == parNetworkPlayerInfo.func_178855_p()) {
+				if (i < parNetworkPlayerInfo.func_178835_l()) {
+					parNetworkPlayerInfo.func_178846_a(Minecraft.getSystemTime());
+					parNetworkPlayerInfo.func_178844_b((long) (this.guiIngame.getUpdateCounter() + 20));
+				} else if (i > parNetworkPlayerInfo.func_178835_l()) {
+					parNetworkPlayerInfo.func_178846_a(Minecraft.getSystemTime());
+					parNetworkPlayerInfo.func_178844_b((long) (this.guiIngame.getUpdateCounter() + 10));
+				}
+			}
+
+			if (Minecraft.getSystemTime() - parNetworkPlayerInfo.func_178847_n() > 1000L
+					|| this.lastTimeOpened != parNetworkPlayerInfo.func_178855_p()) {
+				parNetworkPlayerInfo.func_178836_b(i);
+				parNetworkPlayerInfo.func_178857_c(i);
+				parNetworkPlayerInfo.func_178846_a(Minecraft.getSystemTime());
+			}
+
+			parNetworkPlayerInfo.func_178843_c(this.lastTimeOpened);
+			parNetworkPlayerInfo.func_178836_b(i);
+			int j = MathHelper.ceiling_float_int((float) Math.max(i, parNetworkPlayerInfo.func_178860_m()) / 2.0F);
+			int k = Math.max(MathHelper.ceiling_float_int((float) (i / 2)),
+					Math.max(MathHelper.ceiling_float_int((float) (parNetworkPlayerInfo.func_178860_m() / 2)), 10));
+			boolean flag = parNetworkPlayerInfo.func_178858_o() > (long) this.guiIngame.getUpdateCounter()
+					&& (parNetworkPlayerInfo.func_178858_o() - (long) this.guiIngame.getUpdateCounter()) / 3L
+							% 2L == 1L;
+			if (j > 0) {
+				float f = Math.min((float) (parInt3 - parInt2 - 4) / (float) k, 9.0F);
+				if (f > 3.0F) {
+					for (int l = j; l < k; ++l) {
+						this.drawTexturedModalRect((float) parInt2 + (float) l * f, (float) parInt1, flag ? 25 : 16, 0,
+								9, 9);
+					}
+
+					for (int j1 = 0; j1 < j; ++j1) {
+						this.drawTexturedModalRect((float) parInt2 + (float) j1 * f, (float) parInt1, flag ? 25 : 16, 0,
+								9, 9);
+						if (flag) {
+							if (j1 * 2 + 1 < parNetworkPlayerInfo.func_178860_m()) {
+								this.drawTexturedModalRect((float) parInt2 + (float) j1 * f, (float) parInt1, 70, 0, 9,
+										9);
+							}
+
+							if (j1 * 2 + 1 == parNetworkPlayerInfo.func_178860_m()) {
+								this.drawTexturedModalRect((float) parInt2 + (float) j1 * f, (float) parInt1, 79, 0, 9,
+										9);
+							}
+						}
+
+						if (j1 * 2 + 1 < i) {
+							this.drawTexturedModalRect((float) parInt2 + (float) j1 * f, (float) parInt1,
+									j1 >= 10 ? 160 : 52, 0, 9, 9);
+						}
+
+						if (j1 * 2 + 1 == i) {
+							this.drawTexturedModalRect((float) parInt2 + (float) j1 * f, (float) parInt1,
+									j1 >= 10 ? 169 : 61, 0, 9, 9);
+						}
+					}
+				} else {
+					float f1 = MathHelper.clamp_float((float) i / 20.0F, 0.0F, 1.0F);
+					int i1 = (int) ((1.0F - f1) * 255.0F) << 16 | (int) (f1 * 255.0F) << 8;
+					String s = "" + (float) i / 2.0F;
+					if (parInt3 - this.mc.fontRendererObj.getStringWidth(s + "hp") >= parInt2) {
+						s = s + "hp";
+					}
+
+					this.mc.fontRendererObj.drawStringWithShadow(s,
+							(float) ((parInt3 + parInt2) / 2 - this.mc.fontRendererObj.getStringWidth(s) / 2),
+							(float) parInt1, i1);
+				}
+			}
+		} else {
+			String s1 = EnumChatFormatting.YELLOW + "" + i;
+			this.mc.fontRendererObj.drawStringWithShadow(s1,
+					(float) (parInt3 - this.mc.fontRendererObj.getStringWidth(s1)), (float) parInt1, 16777215);
+		}
+
+	}
+
+	public void func_181030_a() {
+		this.header = null;
+		this.footer = null;
+	}
+
+	/**
+	 * + Returns the name that should be renderd for the player supplied
 	 */
 	public String getPlayerName(NetworkPlayerInfo networkPlayerInfoIn) {
 		IChatComponent dname = networkPlayerInfoIn.getDisplayNameProfanityFilter();
@@ -70,20 +205,8 @@ public class GuiPlayerTabOverlay extends Gui {
 						networkPlayerInfoIn.getGameProfileNameProfanityFilter());
 	}
 
-	/**+
-	 * Called by GuiIngame to update the information stored in the
-	 * playerlist, does not actually render the list, however.
-	 */
-	public void updatePlayerList(boolean willBeRendered) {
-		if (willBeRendered && !this.isBeingRendered) {
-			this.lastTimeOpened = Minecraft.getSystemTime();
-		}
-
-		this.isBeingRendered = willBeRendered;
-	}
-
-	/**+
-	 * Renders the playerlist, its background, headers and footers.
+	/**
+	 * + Renders the playerlist, its background, headers and footers.
 	 */
 	public void renderPlayerlist(int width, Scoreboard scoreboardIn, ScoreObjective scoreObjectiveIn) {
 		NetHandlerPlayClient nethandlerplayclient = this.mc.thePlayer.sendQueue;
@@ -229,114 +352,6 @@ public class GuiPlayerTabOverlay extends Gui {
 
 	}
 
-	protected void drawPing(int networkPlayerInfoIn, int parInt2, int parInt3, NetworkPlayerInfo parNetworkPlayerInfo) {
-		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-		this.mc.getTextureManager().bindTexture(icons);
-		byte b0 = 0;
-		byte b1 = 0;
-		if (parNetworkPlayerInfo.getResponseTime() < 0) {
-			b1 = 5;
-		} else if (parNetworkPlayerInfo.getResponseTime() < 150) {
-			b1 = 0;
-		} else if (parNetworkPlayerInfo.getResponseTime() < 300) {
-			b1 = 1;
-		} else if (parNetworkPlayerInfo.getResponseTime() < 600) {
-			b1 = 2;
-		} else if (parNetworkPlayerInfo.getResponseTime() < 1000) {
-			b1 = 3;
-		} else {
-			b1 = 4;
-		}
-
-		this.zLevel += 100.0F;
-		this.drawTexturedModalRect(parInt2 + networkPlayerInfoIn - 11, parInt3, 0 + b0 * 10, 176 + b1 * 8, 10, 8);
-		this.zLevel -= 100.0F;
-	}
-
-	private void drawScoreboardValues(ScoreObjective parScoreObjective, int parInt1, String parString1, int parInt2,
-			int parInt3, NetworkPlayerInfo parNetworkPlayerInfo) {
-		int i = parScoreObjective.getScoreboard().getValueFromObjective(parString1, parScoreObjective).getScorePoints();
-		if (parScoreObjective.getRenderType() == IScoreObjectiveCriteria.EnumRenderType.HEARTS) {
-			this.mc.getTextureManager().bindTexture(icons);
-			if (this.lastTimeOpened == parNetworkPlayerInfo.func_178855_p()) {
-				if (i < parNetworkPlayerInfo.func_178835_l()) {
-					parNetworkPlayerInfo.func_178846_a(Minecraft.getSystemTime());
-					parNetworkPlayerInfo.func_178844_b((long) (this.guiIngame.getUpdateCounter() + 20));
-				} else if (i > parNetworkPlayerInfo.func_178835_l()) {
-					parNetworkPlayerInfo.func_178846_a(Minecraft.getSystemTime());
-					parNetworkPlayerInfo.func_178844_b((long) (this.guiIngame.getUpdateCounter() + 10));
-				}
-			}
-
-			if (Minecraft.getSystemTime() - parNetworkPlayerInfo.func_178847_n() > 1000L
-					|| this.lastTimeOpened != parNetworkPlayerInfo.func_178855_p()) {
-				parNetworkPlayerInfo.func_178836_b(i);
-				parNetworkPlayerInfo.func_178857_c(i);
-				parNetworkPlayerInfo.func_178846_a(Minecraft.getSystemTime());
-			}
-
-			parNetworkPlayerInfo.func_178843_c(this.lastTimeOpened);
-			parNetworkPlayerInfo.func_178836_b(i);
-			int j = MathHelper.ceiling_float_int((float) Math.max(i, parNetworkPlayerInfo.func_178860_m()) / 2.0F);
-			int k = Math.max(MathHelper.ceiling_float_int((float) (i / 2)),
-					Math.max(MathHelper.ceiling_float_int((float) (parNetworkPlayerInfo.func_178860_m() / 2)), 10));
-			boolean flag = parNetworkPlayerInfo.func_178858_o() > (long) this.guiIngame.getUpdateCounter()
-					&& (parNetworkPlayerInfo.func_178858_o() - (long) this.guiIngame.getUpdateCounter()) / 3L
-							% 2L == 1L;
-			if (j > 0) {
-				float f = Math.min((float) (parInt3 - parInt2 - 4) / (float) k, 9.0F);
-				if (f > 3.0F) {
-					for (int l = j; l < k; ++l) {
-						this.drawTexturedModalRect((float) parInt2 + (float) l * f, (float) parInt1, flag ? 25 : 16, 0,
-								9, 9);
-					}
-
-					for (int j1 = 0; j1 < j; ++j1) {
-						this.drawTexturedModalRect((float) parInt2 + (float) j1 * f, (float) parInt1, flag ? 25 : 16, 0,
-								9, 9);
-						if (flag) {
-							if (j1 * 2 + 1 < parNetworkPlayerInfo.func_178860_m()) {
-								this.drawTexturedModalRect((float) parInt2 + (float) j1 * f, (float) parInt1, 70, 0, 9,
-										9);
-							}
-
-							if (j1 * 2 + 1 == parNetworkPlayerInfo.func_178860_m()) {
-								this.drawTexturedModalRect((float) parInt2 + (float) j1 * f, (float) parInt1, 79, 0, 9,
-										9);
-							}
-						}
-
-						if (j1 * 2 + 1 < i) {
-							this.drawTexturedModalRect((float) parInt2 + (float) j1 * f, (float) parInt1,
-									j1 >= 10 ? 160 : 52, 0, 9, 9);
-						}
-
-						if (j1 * 2 + 1 == i) {
-							this.drawTexturedModalRect((float) parInt2 + (float) j1 * f, (float) parInt1,
-									j1 >= 10 ? 169 : 61, 0, 9, 9);
-						}
-					}
-				} else {
-					float f1 = MathHelper.clamp_float((float) i / 20.0F, 0.0F, 1.0F);
-					int i1 = (int) ((1.0F - f1) * 255.0F) << 16 | (int) (f1 * 255.0F) << 8;
-					String s = "" + (float) i / 2.0F;
-					if (parInt3 - this.mc.fontRendererObj.getStringWidth(s + "hp") >= parInt2) {
-						s = s + "hp";
-					}
-
-					this.mc.fontRendererObj.drawStringWithShadow(s,
-							(float) ((parInt3 + parInt2) / 2 - this.mc.fontRendererObj.getStringWidth(s) / 2),
-							(float) parInt1, i1);
-				}
-			}
-		} else {
-			String s1 = EnumChatFormatting.YELLOW + "" + i;
-			this.mc.fontRendererObj.drawStringWithShadow(s1,
-					(float) (parInt3 - this.mc.fontRendererObj.getStringWidth(s1)), (float) parInt1, 16777215);
-		}
-
-	}
-
 	public void setFooter(IChatComponent footerIn) {
 		this.footer = footerIn;
 	}
@@ -345,26 +360,15 @@ public class GuiPlayerTabOverlay extends Gui {
 		this.header = headerIn;
 	}
 
-	public void func_181030_a() {
-		this.header = null;
-		this.footer = null;
-	}
-
-	static class PlayerComparator implements Comparator<NetworkPlayerInfo> {
-		private PlayerComparator() {
+	/**
+	 * + Called by GuiIngame to update the information stored in the playerlist,
+	 * does not actually render the list, however.
+	 */
+	public void updatePlayerList(boolean willBeRendered) {
+		if (willBeRendered && !this.isBeingRendered) {
+			this.lastTimeOpened = Minecraft.getSystemTime();
 		}
 
-		public int compare(NetworkPlayerInfo networkplayerinfo, NetworkPlayerInfo networkplayerinfo1) {
-			ScorePlayerTeam scoreplayerteam = networkplayerinfo.getPlayerTeam();
-			ScorePlayerTeam scoreplayerteam1 = networkplayerinfo1.getPlayerTeam();
-			return ComparisonChain.start()
-					.compareTrueFirst(networkplayerinfo.getGameType() != WorldSettings.GameType.SPECTATOR,
-							networkplayerinfo1.getGameType() != WorldSettings.GameType.SPECTATOR)
-					.compare(scoreplayerteam != null ? scoreplayerteam.getRegisteredName() : "",
-							scoreplayerteam1 != null ? scoreplayerteam1.getRegisteredName() : "")
-					.compare(networkplayerinfo.getGameProfile().getName(),
-							networkplayerinfo1.getGameProfile().getName())
-					.result();
-		}
+		this.isBeingRendered = willBeRendered;
 	}
 }

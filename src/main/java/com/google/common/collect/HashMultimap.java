@@ -53,8 +53,8 @@ import com.google.common.base.Preconditions;
 public final class HashMultimap<K, V> extends AbstractSetMultimap<K, V> {
 	private static final int DEFAULT_VALUES_PER_KEY = 2;
 
-	@VisibleForTesting
-	transient int expectedValuesPerKey = DEFAULT_VALUES_PER_KEY;
+	@GwtIncompatible("Not needed in emulated source")
+	private static final long serialVersionUID = 0;
 
 	/**
 	 * Creates a new, empty {@code HashMultimap} with the default initial
@@ -88,6 +88,9 @@ public final class HashMultimap<K, V> extends AbstractSetMultimap<K, V> {
 		return new HashMultimap<K, V>(multimap);
 	}
 
+	@VisibleForTesting
+	transient int expectedValuesPerKey = DEFAULT_VALUES_PER_KEY;
+
 	private HashMultimap() {
 		super(new HashMap<K, Collection<V>>());
 	}
@@ -116,6 +119,16 @@ public final class HashMultimap<K, V> extends AbstractSetMultimap<K, V> {
 		return Sets.<V>newHashSetWithExpectedSize(expectedValuesPerKey);
 	}
 
+	@GwtIncompatible("java.io.ObjectInputStream")
+	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+		stream.defaultReadObject();
+		expectedValuesPerKey = stream.readInt();
+		int distinctKeys = Serialization.readCount(stream);
+		Map<K, Collection<V>> map = Maps.newHashMapWithExpectedSize(distinctKeys);
+		setMap(map);
+		Serialization.populateMultimap(this, stream, distinctKeys);
+	}
+
 	/**
 	 * @serialData expectedValuesPerKey, number of distinct keys, and then for each
 	 *             distinct key: the key, number of values for that key, and the
@@ -127,17 +140,4 @@ public final class HashMultimap<K, V> extends AbstractSetMultimap<K, V> {
 		stream.writeInt(expectedValuesPerKey);
 		Serialization.writeMultimap(this, stream);
 	}
-
-	@GwtIncompatible("java.io.ObjectInputStream")
-	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
-		stream.defaultReadObject();
-		expectedValuesPerKey = stream.readInt();
-		int distinctKeys = Serialization.readCount(stream);
-		Map<K, Collection<V>> map = Maps.newHashMapWithExpectedSize(distinctKeys);
-		setMap(map);
-		Serialization.populateMultimap(this, stream, distinctKeys);
-	}
-
-	@GwtIncompatible("Not needed in emulated source")
-	private static final long serialVersionUID = 0;
 }

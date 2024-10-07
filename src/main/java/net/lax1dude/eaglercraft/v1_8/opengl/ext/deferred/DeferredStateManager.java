@@ -1,5 +1,12 @@
 package net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred;
 
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_MODELVIEW_MATRIX;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ONE;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ONE_MINUS_SRC_ALPHA;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_PROJECTION_MATRIX;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ZERO;
+
+import net.lax1dude.eaglercraft.v1_8.opengl.EaglercraftGPU;
 import net.lax1dude.eaglercraft.v1_8.opengl.GlStateManager;
 import net.lax1dude.eaglercraft.v1_8.vector.Matrix4f;
 import net.lax1dude.eaglercraft.v1_8.vector.Vector3f;
@@ -8,21 +15,18 @@ import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
-
-import net.lax1dude.eaglercraft.v1_8.opengl.EaglercraftGPU;
-
 /**
  * Copyright (c) 2023 lax1dude, ayunami2000. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -102,352 +106,117 @@ public class DeferredStateManager {
 
 	public static boolean doCheckErrors = false;
 
-	public static final boolean isDeferredRenderer() {
-		return EaglerDeferredPipeline.instance != null;
-	}
+	static int fogLinearExp = 0;
 
-	public static final boolean isInDeferredPass() {
-		return EaglerDeferredPipeline.instance != null && GlStateManager.isExtensionPipeline();
-	}
+	static float fogNear = 0.0f;
 
-	public static final boolean isInForwardPass() {
-		return enableForwardRender && !enableShadowRender;
-	}
+	static float fogFar = 100.0f;
 
-	public static final boolean isInParaboloidPass() {
-		return enableParaboloidRender;
-	}
+	static float fogDensity = 0.0f;
 
-	public static final boolean isRenderingRealisticWater() {
-		return EaglerDeferredPipeline.instance != null && EaglerDeferredPipeline.instance.config.is_rendering_realisticWater;
-	}
+	static float fogColorLightR = 1.0f;
 
-	public static final boolean isRenderingGlassHighlights() {
-		return EaglerDeferredPipeline.instance != null && EaglerDeferredPipeline.instance.config.is_rendering_useEnvMap;
-	}
+	static float fogColorLightG = 1.0f;
 
-	public static final void setDefaultMaterialConstants() {
-		materialConstantsRoughness = 0.5f;
-		materialConstantsMetalness = 0.02f;
-		materialConstantsEmission = 0.0f;
-		++materialConstantsSerial;
-	}
+	static float fogColorLightB = 1.0f;
 
-	public static final void startUsingEnvMap() {
-		materialConstantsUseEnvMap = true;
-	}
+	static float fogColorLightA = 1.0f;
 
-	public static final void endUsingEnvMap() {
-		materialConstantsUseEnvMap = false;
-	}
+	static float fogColorDarkR = 1.0f;
 
-	public static final void reportForwardRenderObjectPosition(int centerX, int centerY, int centerZ) {
-		EaglerDeferredPipeline instance = EaglerDeferredPipeline.instance;
-		if(instance != null && enableForwardRender) {
-			EaglerDeferredConfig cfg = instance.config;
-			if(!cfg.is_rendering_dynamicLights || !cfg.shaderPackInfo.DYNAMIC_LIGHTS) {
-				return;
-			}
-			instance.bindLightSourceBucket(centerX, centerY, centerZ, 1);
+	static float fogColorDarkG = 1.0f;
+
+	static float fogColorDarkB = 1.0f;
+
+	static float fogColorDarkA = 1.0f;
+
+	public static void checkGLError(String section) {
+		if (!doCheckErrors) {
+			return;
+		}
+		int i = EaglercraftGPU.glGetError();
+		if (i != 0) {
+			EaglerDeferredPipeline.logger.error("########## GL ERROR ##########");
+			EaglerDeferredPipeline.logger.error("@ {}", section);
+			do {
+				EaglerDeferredPipeline.logger.error("#{} - {}", i, EaglercraftGPU.gluErrorString(i));
+			} while ((i = EaglercraftGPU.glGetError()) != 0);
+			EaglerDeferredPipeline.logger.error("##############################");
 		}
 	}
 
-	public static final void reportForwardRenderObjectPosition2(float x, float y, float z) {
-		EaglerDeferredPipeline instance = EaglerDeferredPipeline.instance;
-		if(instance != null && enableForwardRender) {
-			EaglerDeferredConfig cfg = instance.config;
-			if(!cfg.is_rendering_dynamicLights || !cfg.shaderPackInfo.DYNAMIC_LIGHTS) {
-				return;
-			}
-			float posX = (float)((x + TileEntityRendererDispatcher.staticPlayerX) - (MathHelper.floor_double(TileEntityRendererDispatcher.staticPlayerX / 16.0) << 4));
-			float posY = (float)((y + TileEntityRendererDispatcher.staticPlayerY) - (MathHelper.floor_double(TileEntityRendererDispatcher.staticPlayerY / 16.0) << 4));
-			float posZ = (float)((z + TileEntityRendererDispatcher.staticPlayerZ) - (MathHelper.floor_double(TileEntityRendererDispatcher.staticPlayerZ / 16.0) << 4));
-			instance.bindLightSourceBucket((int)posX, (int)posY, (int)posZ, 1);
-		}
-	}
-
-	public static final void setHDRTranslucentPassBlendFunc() {
-		GlStateManager.tryBlendFuncSeparate(GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_ZERO, GL_ZERO);
-	}
-
-	public static final void enableMaterialTexture() {
-		enableMaterialMapTexture = true;
-	}
-
-	public static final void disableMaterialTexture() {
+	public static final void disableAll() {
 		enableMaterialMapTexture = false;
-	}
-
-	public static final void enableForwardRender() {
-		enableForwardRender = true;
-	}
-
-	public static final void disableForwardRender() {
+		materialConstantsUseEnvMap = false;
 		enableForwardRender = false;
-	}
-
-	public static final void enableParaboloidRender() {
-		enableParaboloidRender = true;
-	}
-
-	public static final void disableParaboloidRender() {
 		enableParaboloidRender = false;
-	}
-
-	public static final void enableShadowRender() {
-		enableShadowRender = true;
-	}
-
-	public static final void disableShadowRender() {
 		enableShadowRender = false;
-	}
-
-	public static final boolean isEnableShadowRender() {
-		return enableShadowRender;
-	}
-
-	public static final void enableClipPlane() {
-		enableClipPlane = true;
+		enableClipPlane = false;
+		enableDrawWavingBlocks = false;
+		fogLinearExp = 0;
+		fogNear = 0.0f;
+		fogFar = 100.0f;
+		forwardCallbackHandler = null;
 	}
 
 	public static final void disableClipPlane() {
 		enableClipPlane = false;
 	}
 
-	public static final void setClipPlaneY(float yValue) {
-		clipPlaneY = yValue;
-	}
-
-	public static final void enableDrawWavingBlocks() {
-		enableDrawWavingBlocks = true;
-	}
-
-	public static final void disableDrawWavingBlocks() {
-		enableDrawWavingBlocks = false;
-	}
-
-	public static final boolean isEnableDrawWavingBlocks() {
-		return enableDrawWavingBlocks;
-	}
-
-	public static final void enableDrawRealisticWaterMask() {
-		enableDrawRealisticWaterMask = true;
+	public static final void disableDrawGlassHighlightsRender() {
+		enableDrawGlassHighlightsRender = false;
 	}
 
 	public static final void disableDrawRealisticWaterMask() {
 		enableDrawRealisticWaterMask = false;
 	}
 
-	public static final boolean isDrawRealisticWaterMask() {
-		return enableDrawRealisticWaterMask;
-	}
-
-	public static final void enableDrawRealisticWaterRender() {
-		enableDrawRealisticWaterRender = true;
-	}
-
 	public static final void disableDrawRealisticWaterRender() {
 		enableDrawRealisticWaterRender = false;
 	}
 
-	public static final boolean isDrawRealisticWaterRender() {
-		return enableDrawRealisticWaterRender;
+	public static final void disableDrawWavingBlocks() {
+		enableDrawWavingBlocks = false;
+	}
+
+	public static final void disableFog() {
+		fogLinearExp = 0;
+	}
+
+	public static final void disableForwardRender() {
+		enableForwardRender = false;
+	}
+
+	public static final void disableMaterialTexture() {
+		enableMaterialMapTexture = false;
+	}
+
+	public static final void disableParaboloidRender() {
+		enableParaboloidRender = false;
+	}
+
+	public static final void disableShadowRender() {
+		enableShadowRender = false;
+	}
+
+	public static final void enableClipPlane() {
+		enableClipPlane = true;
 	}
 
 	public static final void enableDrawGlassHighlightsRender() {
 		enableDrawGlassHighlightsRender = true;
 	}
 
-	public static final void disableDrawGlassHighlightsRender() {
-		enableDrawGlassHighlightsRender = false;
+	public static final void enableDrawRealisticWaterMask() {
+		enableDrawRealisticWaterMask = true;
 	}
 
-	public static final boolean isDrawGlassHighlightsRender() {
-		return enableDrawGlassHighlightsRender;
+	public static final void enableDrawRealisticWaterRender() {
+		enableDrawRealisticWaterRender = true;
 	}
 
-	public static final void setWavingBlockOffset(float x, float y, float z) {
-		wavingBlockOffsetX = x;
-		wavingBlockOffsetY = y;
-		wavingBlockOffsetZ = z;
-		++wavingBlockOffsetSerial;
-	}
-
-	public static final void setWavingBlockParams(float x, float y, float z, float w) {
-		wavingBlockParamX = x;
-		wavingBlockParamY = y;
-		wavingBlockParamZ = z;
-		wavingBlockParamW = w;
-		++wavingBlockParamSerial;
-	}
-
-	public static final void setRoughnessConstant(float roughness) {
-		materialConstantsRoughness = roughness;
-		++materialConstantsSerial;
-	}
-
-	public static final void setMetalnessConstant(float metalness) {
-		materialConstantsMetalness = metalness;
-		++materialConstantsSerial;
-	}
-
-	public static final void setEmissionConstant(float emission) {
-		materialConstantsEmission = emission;
-		++materialConstantsSerial;
-	}
-
-	public static final void setBlockConstant(int blockId) {
-		constantBlock = blockId;
-	}
-
-	public static final AxisAlignedBB getShadowMapBounds() {
-		return shadowMapBounds;
-	}
-
-	public static final void setShadowMapBounds(AxisAlignedBB newShadowMapBounds) {
-		shadowMapBounds = newShadowMapBounds;
-	}
-
-	public static final void loadGBufferViewMatrix() {
-		loadPassViewMatrix();
-		viewMatrix.load(passViewMatrix);
-		inverseViewMatrix.load(passInverseViewMatrix);
-		viewMatrixSerial = passViewMatrixSerial;
-	}
-
-	public static void loadGBufferProjectionMatrix() {
-		loadPassProjectionMatrix();
-		projMatrix.load(passProjMatrix);
-		inverseProjMatrix.load(passInverseProjMatrix);
-		projMatrixSerial = passProjMatrixSerial;
-	}
-
-	public static final void loadPassViewMatrix() {
-		GlStateManager.getFloat(GL_MODELVIEW_MATRIX, matrixCopyBuffer);
-		passViewMatrix.load(matrixCopyBuffer);
-		Matrix4f.invert(passViewMatrix, passInverseViewMatrix);
-		++passViewMatrixSerial;
-		isShadowPassMatrixLoaded = false;
-	}
-
-	public static void loadPassProjectionMatrix() {
-		GlStateManager.getFloat(GL_PROJECTION_MATRIX, matrixCopyBuffer);
-		passProjMatrix.load(matrixCopyBuffer);
-		Matrix4f.invert(passProjMatrix, passInverseProjMatrix);
-		++passProjMatrixSerial;
-	}
-
-	public static final void loadShadowPassViewMatrix() {
-		GlStateManager.getFloat(GL_PROJECTION_MATRIX, matrixCopyBuffer);
-		passViewMatrix.load(matrixCopyBuffer);
-		Matrix4f.invert(passViewMatrix, passInverseViewMatrix);
-		passProjMatrix.setIdentity();
-		++passViewMatrixSerial;
-		isShadowPassMatrixLoaded = true;
-	}
-
-	public static final void setPassMatrixToGBuffer() {
-		passViewMatrix.load(viewMatrix);
-		passInverseViewMatrix.load(inverseViewMatrix);
-		passProjMatrix.load(projMatrix);
-		passInverseProjMatrix.load(inverseProjMatrix);
-		++passViewMatrixSerial;
-		++passProjMatrixSerial;
-	}
-
-	public static void setCurrentSunAngle(Vector3f vec) {
-		currentSunAngle.set(vec);
-		if(vec.y > 0.05f) {
-			currentSunLightAngle.x = -vec.x;
-			currentSunLightAngle.y = -vec.y;
-			currentSunLightAngle.z = -vec.z;
-		}else {
-			currentSunLightAngle.set(vec);
-		}
-	}
-
-	public static void setCurrentSunAngle(Vector4f vec) {
-		currentSunAngle.set(vec);
-		if(vec.y > 0.05f) {
-			currentSunLightAngle.x = -vec.x;
-			currentSunLightAngle.y = -vec.y;
-			currentSunLightAngle.z = -vec.z;
-		}else {
-			currentSunLightAngle.set(vec);
-		}
-	}
-
-	public static final void loadSunShadowMatrixLOD0() {
-		GlStateManager.getFloat(GL_PROJECTION_MATRIX, matrixCopyBuffer);
-		sunShadowMatrix0.load(matrixCopyBuffer);
-	}
-
-	public static final void loadSunShadowMatrixLOD1() {
-		GlStateManager.getFloat(GL_PROJECTION_MATRIX, matrixCopyBuffer);
-		sunShadowMatrix1.load(matrixCopyBuffer);
-	}
-
-	public static final void loadSunShadowMatrixLOD2() {
-		GlStateManager.getFloat(GL_PROJECTION_MATRIX, matrixCopyBuffer);
-		sunShadowMatrix2.load(matrixCopyBuffer);
-	}
-
-	public static final Matrix4f getSunShadowMatrixLOD0() {
-		return sunShadowMatrix0;
-	}
-
-	public static final Matrix4f getSunShadowMatrixLOD1() {
-		return sunShadowMatrix1;
-	}
-
-	public static final Matrix4f getSunShadowMatrixLOD2() {
-		return sunShadowMatrix2;
-	}
-
-	public static final void setGBufferNearFarPlanes(float zNear, float zFar) {
-		gbufferNearPlane = zNear;
-		gbufferFarPlane = zFar;
-	}
-
-	public static final void setWaterWindOffset(float sx, float sy, float fx, float fy) {
-		++waterWindOffsetSerial;
-		u_waterWindOffset4f.x = sx;
-		u_waterWindOffset4f.y = sy;
-		u_waterWindOffset4f.z = fx;
-		u_waterWindOffset4f.w = fy;
-	}
-
-	static int fogLinearExp = 0;
-
-	static float fogNear = 0.0f;
-	static float fogFar = 100.0f;
-
-	static float fogDensity = 0.0f;
-
-	static float fogColorLightR = 1.0f;
-	static float fogColorLightG = 1.0f;
-	static float fogColorLightB = 1.0f;
-	static float fogColorLightA = 1.0f;
-
-	static float fogColorDarkR = 1.0f;
-	static float fogColorDarkG = 1.0f;
-	static float fogColorDarkB = 1.0f;
-	static float fogColorDarkA = 1.0f;
-
-	public static final void enableFogLinear(float near, float far, boolean atmosphere, float colorLightR,
-			float colorLightG, float colorLightB, float colorLightA, float colorDarkR, float colorDarkG,
-			float colorDarkB, float colorDarkA) {
-		fogLinearExp = atmosphere ? 5 : 1;
-		fogNear = near;
-		fogFar = far;
-		fogColorLightR = colorLightR;
-		fogColorLightG = colorLightG;
-		fogColorLightB = colorLightB;
-		fogColorLightA = colorLightA;
-		fogColorDarkR = colorDarkR;
-		fogColorDarkG = colorDarkG;
-		fogColorDarkB = colorDarkB;
-		fogColorDarkA = colorDarkA;
+	public static final void enableDrawWavingBlocks() {
+		enableDrawWavingBlocks = true;
 	}
 
 	public static final void enableFogExp(float density, boolean atmosphere, float colorLightR, float colorLightG,
@@ -465,41 +234,287 @@ public class DeferredStateManager {
 		fogColorDarkA = colorDarkA;
 	}
 
-	public static final void disableFog() {
-		fogLinearExp = 0;
+	public static final void enableFogLinear(float near, float far, boolean atmosphere, float colorLightR,
+			float colorLightG, float colorLightB, float colorLightA, float colorDarkR, float colorDarkG,
+			float colorDarkB, float colorDarkA) {
+		fogLinearExp = atmosphere ? 5 : 1;
+		fogNear = near;
+		fogFar = far;
+		fogColorLightR = colorLightR;
+		fogColorLightG = colorLightG;
+		fogColorLightB = colorLightB;
+		fogColorLightA = colorLightA;
+		fogColorDarkR = colorDarkR;
+		fogColorDarkG = colorDarkG;
+		fogColorDarkB = colorDarkB;
+		fogColorDarkA = colorDarkA;
 	}
 
-	public static final void disableAll() {
-		enableMaterialMapTexture = false;
+	public static final void enableForwardRender() {
+		enableForwardRender = true;
+	}
+
+	public static final void enableMaterialTexture() {
+		enableMaterialMapTexture = true;
+	}
+
+	public static final void enableParaboloidRender() {
+		enableParaboloidRender = true;
+	}
+
+	public static final void enableShadowRender() {
+		enableShadowRender = true;
+	}
+
+	public static final void endUsingEnvMap() {
 		materialConstantsUseEnvMap = false;
-		enableForwardRender = false;
-		enableParaboloidRender = false;
-		enableShadowRender = false;
-		enableClipPlane = false;
-		enableDrawWavingBlocks = false;
-		fogLinearExp = 0;
-		fogNear = 0.0f;
-		fogFar = 100.0f;
-		forwardCallbackHandler = null;
+	}
+
+	public static final AxisAlignedBB getShadowMapBounds() {
+		return shadowMapBounds;
 	}
 
 	public static float getSunHeight() {
 		return -currentSunAngle.y;
 	}
 
-	public static void checkGLError(String section) {
-		if(!doCheckErrors) {
-			return;
+	public static final Matrix4f getSunShadowMatrixLOD0() {
+		return sunShadowMatrix0;
+	}
+
+	public static final Matrix4f getSunShadowMatrixLOD1() {
+		return sunShadowMatrix1;
+	}
+
+	public static final Matrix4f getSunShadowMatrixLOD2() {
+		return sunShadowMatrix2;
+	}
+
+	public static final boolean isDeferredRenderer() {
+		return EaglerDeferredPipeline.instance != null;
+	}
+
+	public static final boolean isDrawGlassHighlightsRender() {
+		return enableDrawGlassHighlightsRender;
+	}
+
+	public static final boolean isDrawRealisticWaterMask() {
+		return enableDrawRealisticWaterMask;
+	}
+
+	public static final boolean isDrawRealisticWaterRender() {
+		return enableDrawRealisticWaterRender;
+	}
+
+	public static final boolean isEnableDrawWavingBlocks() {
+		return enableDrawWavingBlocks;
+	}
+
+	public static final boolean isEnableShadowRender() {
+		return enableShadowRender;
+	}
+
+	public static final boolean isInDeferredPass() {
+		return EaglerDeferredPipeline.instance != null && GlStateManager.isExtensionPipeline();
+	}
+
+	public static final boolean isInForwardPass() {
+		return enableForwardRender && !enableShadowRender;
+	}
+
+	public static final boolean isInParaboloidPass() {
+		return enableParaboloidRender;
+	}
+
+	public static final boolean isRenderingGlassHighlights() {
+		return EaglerDeferredPipeline.instance != null && EaglerDeferredPipeline.instance.config.is_rendering_useEnvMap;
+	}
+
+	public static final boolean isRenderingRealisticWater() {
+		return EaglerDeferredPipeline.instance != null
+				&& EaglerDeferredPipeline.instance.config.is_rendering_realisticWater;
+	}
+
+	public static void loadGBufferProjectionMatrix() {
+		loadPassProjectionMatrix();
+		projMatrix.load(passProjMatrix);
+		inverseProjMatrix.load(passInverseProjMatrix);
+		projMatrixSerial = passProjMatrixSerial;
+	}
+
+	public static final void loadGBufferViewMatrix() {
+		loadPassViewMatrix();
+		viewMatrix.load(passViewMatrix);
+		inverseViewMatrix.load(passInverseViewMatrix);
+		viewMatrixSerial = passViewMatrixSerial;
+	}
+
+	public static void loadPassProjectionMatrix() {
+		GlStateManager.getFloat(GL_PROJECTION_MATRIX, matrixCopyBuffer);
+		passProjMatrix.load(matrixCopyBuffer);
+		Matrix4f.invert(passProjMatrix, passInverseProjMatrix);
+		++passProjMatrixSerial;
+	}
+
+	public static final void loadPassViewMatrix() {
+		GlStateManager.getFloat(GL_MODELVIEW_MATRIX, matrixCopyBuffer);
+		passViewMatrix.load(matrixCopyBuffer);
+		Matrix4f.invert(passViewMatrix, passInverseViewMatrix);
+		++passViewMatrixSerial;
+		isShadowPassMatrixLoaded = false;
+	}
+
+	public static final void loadShadowPassViewMatrix() {
+		GlStateManager.getFloat(GL_PROJECTION_MATRIX, matrixCopyBuffer);
+		passViewMatrix.load(matrixCopyBuffer);
+		Matrix4f.invert(passViewMatrix, passInverseViewMatrix);
+		passProjMatrix.setIdentity();
+		++passViewMatrixSerial;
+		isShadowPassMatrixLoaded = true;
+	}
+
+	public static final void loadSunShadowMatrixLOD0() {
+		GlStateManager.getFloat(GL_PROJECTION_MATRIX, matrixCopyBuffer);
+		sunShadowMatrix0.load(matrixCopyBuffer);
+	}
+
+	public static final void loadSunShadowMatrixLOD1() {
+		GlStateManager.getFloat(GL_PROJECTION_MATRIX, matrixCopyBuffer);
+		sunShadowMatrix1.load(matrixCopyBuffer);
+	}
+
+	public static final void loadSunShadowMatrixLOD2() {
+		GlStateManager.getFloat(GL_PROJECTION_MATRIX, matrixCopyBuffer);
+		sunShadowMatrix2.load(matrixCopyBuffer);
+	}
+
+	public static final void reportForwardRenderObjectPosition(int centerX, int centerY, int centerZ) {
+		EaglerDeferredPipeline instance = EaglerDeferredPipeline.instance;
+		if (instance != null && enableForwardRender) {
+			EaglerDeferredConfig cfg = instance.config;
+			if (!cfg.is_rendering_dynamicLights || !cfg.shaderPackInfo.DYNAMIC_LIGHTS) {
+				return;
+			}
+			instance.bindLightSourceBucket(centerX, centerY, centerZ, 1);
 		}
-		int i = EaglercraftGPU.glGetError();
-		if(i != 0) {
-			EaglerDeferredPipeline.logger.error("########## GL ERROR ##########");
-			EaglerDeferredPipeline.logger.error("@ {}", section);
-			do {
-				EaglerDeferredPipeline.logger.error("#{} - {}", i, EaglercraftGPU.gluErrorString(i));
-			}while((i = EaglercraftGPU.glGetError()) != 0);
-			EaglerDeferredPipeline.logger.error("##############################");
+	}
+
+	public static final void reportForwardRenderObjectPosition2(float x, float y, float z) {
+		EaglerDeferredPipeline instance = EaglerDeferredPipeline.instance;
+		if (instance != null && enableForwardRender) {
+			EaglerDeferredConfig cfg = instance.config;
+			if (!cfg.is_rendering_dynamicLights || !cfg.shaderPackInfo.DYNAMIC_LIGHTS) {
+				return;
+			}
+			float posX = (float) ((x + TileEntityRendererDispatcher.staticPlayerX)
+					- (MathHelper.floor_double(TileEntityRendererDispatcher.staticPlayerX / 16.0) << 4));
+			float posY = (float) ((y + TileEntityRendererDispatcher.staticPlayerY)
+					- (MathHelper.floor_double(TileEntityRendererDispatcher.staticPlayerY / 16.0) << 4));
+			float posZ = (float) ((z + TileEntityRendererDispatcher.staticPlayerZ)
+					- (MathHelper.floor_double(TileEntityRendererDispatcher.staticPlayerZ / 16.0) << 4));
+			instance.bindLightSourceBucket((int) posX, (int) posY, (int) posZ, 1);
 		}
+	}
+
+	public static final void setBlockConstant(int blockId) {
+		constantBlock = blockId;
+	}
+
+	public static final void setClipPlaneY(float yValue) {
+		clipPlaneY = yValue;
+	}
+
+	public static void setCurrentSunAngle(Vector3f vec) {
+		currentSunAngle.set(vec);
+		if (vec.y > 0.05f) {
+			currentSunLightAngle.x = -vec.x;
+			currentSunLightAngle.y = -vec.y;
+			currentSunLightAngle.z = -vec.z;
+		} else {
+			currentSunLightAngle.set(vec);
+		}
+	}
+
+	public static void setCurrentSunAngle(Vector4f vec) {
+		currentSunAngle.set(vec);
+		if (vec.y > 0.05f) {
+			currentSunLightAngle.x = -vec.x;
+			currentSunLightAngle.y = -vec.y;
+			currentSunLightAngle.z = -vec.z;
+		} else {
+			currentSunLightAngle.set(vec);
+		}
+	}
+
+	public static final void setDefaultMaterialConstants() {
+		materialConstantsRoughness = 0.5f;
+		materialConstantsMetalness = 0.02f;
+		materialConstantsEmission = 0.0f;
+		++materialConstantsSerial;
+	}
+
+	public static final void setEmissionConstant(float emission) {
+		materialConstantsEmission = emission;
+		++materialConstantsSerial;
+	}
+
+	public static final void setGBufferNearFarPlanes(float zNear, float zFar) {
+		gbufferNearPlane = zNear;
+		gbufferFarPlane = zFar;
+	}
+
+	public static final void setHDRTranslucentPassBlendFunc() {
+		GlStateManager.tryBlendFuncSeparate(GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_ZERO, GL_ZERO);
+	}
+
+	public static final void setMetalnessConstant(float metalness) {
+		materialConstantsMetalness = metalness;
+		++materialConstantsSerial;
+	}
+
+	public static final void setPassMatrixToGBuffer() {
+		passViewMatrix.load(viewMatrix);
+		passInverseViewMatrix.load(inverseViewMatrix);
+		passProjMatrix.load(projMatrix);
+		passInverseProjMatrix.load(inverseProjMatrix);
+		++passViewMatrixSerial;
+		++passProjMatrixSerial;
+	}
+
+	public static final void setRoughnessConstant(float roughness) {
+		materialConstantsRoughness = roughness;
+		++materialConstantsSerial;
+	}
+
+	public static final void setShadowMapBounds(AxisAlignedBB newShadowMapBounds) {
+		shadowMapBounds = newShadowMapBounds;
+	}
+
+	public static final void setWaterWindOffset(float sx, float sy, float fx, float fy) {
+		++waterWindOffsetSerial;
+		u_waterWindOffset4f.x = sx;
+		u_waterWindOffset4f.y = sy;
+		u_waterWindOffset4f.z = fx;
+		u_waterWindOffset4f.w = fy;
+	}
+
+	public static final void setWavingBlockOffset(float x, float y, float z) {
+		wavingBlockOffsetX = x;
+		wavingBlockOffsetY = y;
+		wavingBlockOffsetZ = z;
+		++wavingBlockOffsetSerial;
+	}
+
+	public static final void setWavingBlockParams(float x, float y, float z, float w) {
+		wavingBlockParamX = x;
+		wavingBlockParamY = y;
+		wavingBlockParamZ = z;
+		wavingBlockParamW = w;
+		++wavingBlockParamSerial;
+	}
+
+	public static final void startUsingEnvMap() {
+		materialConstantsUseEnvMap = true;
 	}
 
 }

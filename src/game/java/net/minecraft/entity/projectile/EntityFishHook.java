@@ -2,6 +2,7 @@ package net.minecraft.entity.projectile;
 
 import java.util.Arrays;
 import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -29,22 +30,25 @@ import net.minecraft.util.WeightedRandomFishable;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -76,6 +80,11 @@ public class EntityFishHook extends Entity {
 			new WeightedRandomFishable(new ItemStack(Items.fish, 1, ItemFishFood.FishType.CLOWNFISH.getMetadata()), 2),
 			new WeightedRandomFishable(new ItemStack(Items.fish, 1, ItemFishFood.FishType.PUFFERFISH.getMetadata()),
 					13) });
+
+	public static List<WeightedRandomFishable> func_174855_j() {
+		return FISH;
+	}
+
 	private int xTile;
 	private int yTile;
 	private int zTile;
@@ -98,11 +107,8 @@ public class EntityFishHook extends Entity {
 	private double fishPitch;
 	private double clientMotionX;
 	private double clientMotionY;
-	private double clientMotionZ;
 
-	public static List<WeightedRandomFishable> func_174855_j() {
-		return FISH;
-	}
+	private double clientMotionZ;
 
 	public EntityFishHook(World worldIn) {
 		super(worldIn);
@@ -148,19 +154,29 @@ public class EntityFishHook extends Entity {
 	protected void entityInit() {
 	}
 
-	/**+
-	 * Checks if the entity is in range to render by using the past
-	 * in distance and comparing it to its average edge length * 64
-	 * * renderDistanceWeight Args: distance
-	 */
-	public boolean isInRangeToRenderDist(double d0) {
-		double d1 = this.getEntityBoundingBox().getAverageEdgeLength() * 4.0D;
-		if (Double.isNaN(d1)) {
-			d1 = 4.0D;
+	private ItemStack getFishingResult() {
+		float f = this.worldObj.rand.nextFloat();
+		int i = EnchantmentHelper.getLuckOfSeaModifier(this.angler);
+		int j = EnchantmentHelper.getLureModifier(this.angler);
+		float f1 = 0.1F - (float) i * 0.025F - (float) j * 0.01F;
+		float f2 = 0.05F + (float) i * 0.01F - (float) j * 0.01F;
+		f1 = MathHelper.clamp_float(f1, 0.0F, 1.0F);
+		f2 = MathHelper.clamp_float(f2, 0.0F, 1.0F);
+		if (f < f1) {
+			this.angler.triggerAchievement(StatList.junkFishedStat);
+			return ((WeightedRandomFishable) WeightedRandom.getRandomItem(this.rand, JUNK)).getItemStack(this.rand);
+		} else {
+			f = f - f1;
+			if (f < f2) {
+				this.angler.triggerAchievement(StatList.treasureFishedStat);
+				return ((WeightedRandomFishable) WeightedRandom.getRandomItem(this.rand, TREASURE))
+						.getItemStack(this.rand);
+			} else {
+				float f3 = f - f2;
+				this.angler.triggerAchievement(StatList.fishCaughtStat);
+				return ((WeightedRandomFishable) WeightedRandom.getRandomItem(this.rand, FISH)).getItemStack(this.rand);
+			}
 		}
-
-		d1 = d1 * 64.0D;
-		return d0 < d1 * d1;
 	}
 
 	public void handleHookCasting(double parDouble1, double parDouble2, double parDouble3, float parFloat1,
@@ -186,29 +202,65 @@ public class EntityFishHook extends Entity {
 		this.ticksInGround = 0;
 	}
 
-	public void setPositionAndRotation2(double d0, double d1, double d2, float f, float f1, int i, boolean var10) {
-		this.fishX = d0;
-		this.fishY = d1;
-		this.fishZ = d2;
-		this.fishYaw = (double) f;
-		this.fishPitch = (double) f1;
-		this.fishPosRotationIncrements = i;
-		this.motionX = this.clientMotionX;
-		this.motionY = this.clientMotionY;
-		this.motionZ = this.clientMotionZ;
+	public int handleHookRetraction() {
+		if (this.worldObj.isRemote) {
+			return 0;
+		} else {
+			byte b0 = 0;
+			if (this.caughtEntity != null) {
+				double d0 = this.angler.posX - this.posX;
+				double d2 = this.angler.posY - this.posY;
+				double d4 = this.angler.posZ - this.posZ;
+				double d6 = (double) MathHelper.sqrt_double(d0 * d0 + d2 * d2 + d4 * d4);
+				double d8 = 0.1D;
+				this.caughtEntity.motionX += d0 * d8;
+				this.caughtEntity.motionY += d2 * d8 + (double) MathHelper.sqrt_double(d6) * 0.08D;
+				this.caughtEntity.motionZ += d4 * d8;
+				b0 = 3;
+			} else if (this.ticksCatchable > 0) {
+				EntityItem entityitem = new EntityItem(this.worldObj, this.posX, this.posY, this.posZ,
+						this.getFishingResult());
+				double d1 = this.angler.posX - this.posX;
+				double d3 = this.angler.posY - this.posY;
+				double d5 = this.angler.posZ - this.posZ;
+				double d7 = (double) MathHelper.sqrt_double(d1 * d1 + d3 * d3 + d5 * d5);
+				double d9 = 0.1D;
+				entityitem.motionX = d1 * d9;
+				entityitem.motionY = d3 * d9 + (double) MathHelper.sqrt_double(d7) * 0.08D;
+				entityitem.motionZ = d5 * d9;
+				this.worldObj.spawnEntityInWorld(entityitem);
+				this.angler.worldObj.spawnEntityInWorld(new EntityXPOrb(this.angler.worldObj, this.angler.posX,
+						this.angler.posY + 0.5D, this.angler.posZ + 0.5D, this.rand.nextInt(6) + 1));
+				b0 = 1;
+			}
+
+			if (this.inGround) {
+				b0 = 2;
+			}
+
+			this.setDead();
+			this.angler.fishEntity = null;
+			return b0;
+		}
 	}
 
-	/**+
-	 * Sets the velocity to the args. Args: x, y, z
+	/**
+	 * + Checks if the entity is in range to render by using the past in distance
+	 * and comparing it to its average edge length * 64 * renderDistanceWeight Args:
+	 * distance
 	 */
-	public void setVelocity(double d0, double d1, double d2) {
-		this.clientMotionX = this.motionX = d0;
-		this.clientMotionY = this.motionY = d1;
-		this.clientMotionZ = this.motionZ = d2;
+	public boolean isInRangeToRenderDist(double d0) {
+		double d1 = this.getEntityBoundingBox().getAverageEdgeLength() * 4.0D;
+		if (Double.isNaN(d1)) {
+			d1 = 4.0D;
+		}
+
+		d1 = d1 * 64.0D;
+		return d0 < d1 * d1;
 	}
 
-	/**+
-	 * Called to update the entity's position/logic.
+	/**
+	 * + Called to update the entity's position/logic.
 	 */
 	public void onUpdate() {
 		super.onUpdate();
@@ -481,23 +533,8 @@ public class EntityFishHook extends Entity {
 		}
 	}
 
-	/**+
-	 * (abstract) Protected helper method to write subclass entity
-	 * data to NBT.
-	 */
-	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
-		nbttagcompound.setShort("xTile", (short) this.xTile);
-		nbttagcompound.setShort("yTile", (short) this.yTile);
-		nbttagcompound.setShort("zTile", (short) this.zTile);
-		ResourceLocation resourcelocation = (ResourceLocation) Block.blockRegistry.getNameForObject(this.inTile);
-		nbttagcompound.setString("inTile", resourcelocation == null ? "" : resourcelocation.toString());
-		nbttagcompound.setByte("shake", (byte) this.shake);
-		nbttagcompound.setByte("inGround", (byte) (this.inGround ? 1 : 0));
-	}
-
-	/**+
-	 * (abstract) Protected helper method to read subclass entity
-	 * data from NBT.
+	/**
+	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		this.xTile = nbttagcompound.getShort("xTile");
@@ -513,75 +550,8 @@ public class EntityFishHook extends Entity {
 		this.inGround = nbttagcompound.getByte("inGround") == 1;
 	}
 
-	public int handleHookRetraction() {
-		if (this.worldObj.isRemote) {
-			return 0;
-		} else {
-			byte b0 = 0;
-			if (this.caughtEntity != null) {
-				double d0 = this.angler.posX - this.posX;
-				double d2 = this.angler.posY - this.posY;
-				double d4 = this.angler.posZ - this.posZ;
-				double d6 = (double) MathHelper.sqrt_double(d0 * d0 + d2 * d2 + d4 * d4);
-				double d8 = 0.1D;
-				this.caughtEntity.motionX += d0 * d8;
-				this.caughtEntity.motionY += d2 * d8 + (double) MathHelper.sqrt_double(d6) * 0.08D;
-				this.caughtEntity.motionZ += d4 * d8;
-				b0 = 3;
-			} else if (this.ticksCatchable > 0) {
-				EntityItem entityitem = new EntityItem(this.worldObj, this.posX, this.posY, this.posZ,
-						this.getFishingResult());
-				double d1 = this.angler.posX - this.posX;
-				double d3 = this.angler.posY - this.posY;
-				double d5 = this.angler.posZ - this.posZ;
-				double d7 = (double) MathHelper.sqrt_double(d1 * d1 + d3 * d3 + d5 * d5);
-				double d9 = 0.1D;
-				entityitem.motionX = d1 * d9;
-				entityitem.motionY = d3 * d9 + (double) MathHelper.sqrt_double(d7) * 0.08D;
-				entityitem.motionZ = d5 * d9;
-				this.worldObj.spawnEntityInWorld(entityitem);
-				this.angler.worldObj.spawnEntityInWorld(new EntityXPOrb(this.angler.worldObj, this.angler.posX,
-						this.angler.posY + 0.5D, this.angler.posZ + 0.5D, this.rand.nextInt(6) + 1));
-				b0 = 1;
-			}
-
-			if (this.inGround) {
-				b0 = 2;
-			}
-
-			this.setDead();
-			this.angler.fishEntity = null;
-			return b0;
-		}
-	}
-
-	private ItemStack getFishingResult() {
-		float f = this.worldObj.rand.nextFloat();
-		int i = EnchantmentHelper.getLuckOfSeaModifier(this.angler);
-		int j = EnchantmentHelper.getLureModifier(this.angler);
-		float f1 = 0.1F - (float) i * 0.025F - (float) j * 0.01F;
-		float f2 = 0.05F + (float) i * 0.01F - (float) j * 0.01F;
-		f1 = MathHelper.clamp_float(f1, 0.0F, 1.0F);
-		f2 = MathHelper.clamp_float(f2, 0.0F, 1.0F);
-		if (f < f1) {
-			this.angler.triggerAchievement(StatList.junkFishedStat);
-			return ((WeightedRandomFishable) WeightedRandom.getRandomItem(this.rand, JUNK)).getItemStack(this.rand);
-		} else {
-			f = f - f1;
-			if (f < f2) {
-				this.angler.triggerAchievement(StatList.treasureFishedStat);
-				return ((WeightedRandomFishable) WeightedRandom.getRandomItem(this.rand, TREASURE))
-						.getItemStack(this.rand);
-			} else {
-				float f3 = f - f2;
-				this.angler.triggerAchievement(StatList.fishCaughtStat);
-				return ((WeightedRandomFishable) WeightedRandom.getRandomItem(this.rand, FISH)).getItemStack(this.rand);
-			}
-		}
-	}
-
-	/**+
-	 * Will get destroyed next tick.
+	/**
+	 * + Will get destroyed next tick.
 	 */
 	public void setDead() {
 		super.setDead();
@@ -589,5 +559,39 @@ public class EntityFishHook extends Entity {
 			this.angler.fishEntity = null;
 		}
 
+	}
+
+	public void setPositionAndRotation2(double d0, double d1, double d2, float f, float f1, int i, boolean var10) {
+		this.fishX = d0;
+		this.fishY = d1;
+		this.fishZ = d2;
+		this.fishYaw = (double) f;
+		this.fishPitch = (double) f1;
+		this.fishPosRotationIncrements = i;
+		this.motionX = this.clientMotionX;
+		this.motionY = this.clientMotionY;
+		this.motionZ = this.clientMotionZ;
+	}
+
+	/**
+	 * + Sets the velocity to the args. Args: x, y, z
+	 */
+	public void setVelocity(double d0, double d1, double d2) {
+		this.clientMotionX = this.motionX = d0;
+		this.clientMotionY = this.motionY = d1;
+		this.clientMotionZ = this.motionZ = d2;
+	}
+
+	/**
+	 * + (abstract) Protected helper method to write subclass entity data to NBT.
+	 */
+	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
+		nbttagcompound.setShort("xTile", (short) this.xTile);
+		nbttagcompound.setShort("yTile", (short) this.yTile);
+		nbttagcompound.setShort("zTile", (short) this.zTile);
+		ResourceLocation resourcelocation = (ResourceLocation) Block.blockRegistry.getNameForObject(this.inTile);
+		nbttagcompound.setString("inTile", resourcelocation == null ? "" : resourcelocation.toString());
+		nbttagcompound.setByte("shake", (byte) this.shake);
+		nbttagcompound.setByte("inGround", (byte) (this.inGround ? 1 : 0));
 	}
 }

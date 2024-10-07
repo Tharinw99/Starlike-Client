@@ -51,7 +51,177 @@ import com.google.common.base.Converter;
  */
 @GwtCompatible(emulated = true)
 public final class Ints {
-	private Ints() {
+	@GwtCompatible
+	private static class IntArrayAsList extends AbstractList<Integer> implements RandomAccess, Serializable {
+		private static final long serialVersionUID = 0;
+		final int[] array;
+		final int start;
+
+		final int end;
+
+		IntArrayAsList(int[] array) {
+			this(array, 0, array.length);
+		}
+
+		IntArrayAsList(int[] array, int start, int end) {
+			this.array = array;
+			this.start = start;
+			this.end = end;
+		}
+
+		@Override
+		public boolean contains(Object target) {
+			// Overridden to prevent a ton of boxing
+			return (target instanceof Integer) && Ints.indexOf(array, (Integer) target, start, end) != -1;
+		}
+
+		@Override
+		public boolean equals(Object object) {
+			if (object == this) {
+				return true;
+			}
+			if (object instanceof IntArrayAsList) {
+				IntArrayAsList that = (IntArrayAsList) object;
+				int size = size();
+				if (that.size() != size) {
+					return false;
+				}
+				for (int i = 0; i < size; i++) {
+					if (array[start + i] != that.array[that.start + i]) {
+						return false;
+					}
+				}
+				return true;
+			}
+			return super.equals(object);
+		}
+
+		@Override
+		public Integer get(int index) {
+			checkElementIndex(index, size());
+			return array[start + index];
+		}
+
+		@Override
+		public int hashCode() {
+			int result = 1;
+			for (int i = start; i < end; i++) {
+				result = 31 * result + Ints.hashCode(array[i]);
+			}
+			return result;
+		}
+
+		@Override
+		public int indexOf(Object target) {
+			// Overridden to prevent a ton of boxing
+			if (target instanceof Integer) {
+				int i = Ints.indexOf(array, (Integer) target, start, end);
+				if (i >= 0) {
+					return i - start;
+				}
+			}
+			return -1;
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return false;
+		}
+
+		@Override
+		public int lastIndexOf(Object target) {
+			// Overridden to prevent a ton of boxing
+			if (target instanceof Integer) {
+				int i = Ints.lastIndexOf(array, (Integer) target, start, end);
+				if (i >= 0) {
+					return i - start;
+				}
+			}
+			return -1;
+		}
+
+		@Override
+		public Integer set(int index, Integer element) {
+			checkElementIndex(index, size());
+			int oldValue = array[start + index];
+			// checkNotNull for GWT (do not optimize)
+			array[start + index] = checkNotNull(element);
+			return oldValue;
+		}
+
+		@Override
+		public int size() {
+			return end - start;
+		}
+
+		@Override
+		public List<Integer> subList(int fromIndex, int toIndex) {
+			int size = size();
+			checkPositionIndexes(fromIndex, toIndex, size);
+			if (fromIndex == toIndex) {
+				return Collections.emptyList();
+			}
+			return new IntArrayAsList(array, start + fromIndex, start + toIndex);
+		}
+
+		int[] toIntArray() {
+			// Arrays.copyOfRange() is not available under GWT
+			int size = size();
+			int[] result = new int[size];
+			System.arraycopy(array, start, result, 0, size);
+			return result;
+		}
+
+		@Override
+		public String toString() {
+			StringBuilder builder = new StringBuilder(size() * 5);
+			builder.append('[').append(array[start]);
+			for (int i = start + 1; i < end; i++) {
+				builder.append(", ").append(array[i]);
+			}
+			return builder.append(']').toString();
+		}
+	}
+
+	private static final class IntConverter extends Converter<String, Integer> implements Serializable {
+		static final IntConverter INSTANCE = new IntConverter();
+
+		private static final long serialVersionUID = 1;
+
+		@Override
+		protected String doBackward(Integer value) {
+			return value.toString();
+		}
+
+		@Override
+		protected Integer doForward(String value) {
+			return Integer.decode(value);
+		}
+
+		private Object readResolve() {
+			return INSTANCE;
+		}
+
+		@Override
+		public String toString() {
+			return "Ints.stringConverter()";
+		}
+	}
+
+	private enum LexicographicalComparator implements Comparator<int[]> {
+		INSTANCE;
+
+		@Override
+		public int compare(int[] left, int[] right) {
+			int minLength = Math.min(left.length, right.length);
+			for (int i = 0; i < minLength; i++) {
+				int result = Ints.compare(left[i], right[i]);
+				if (result != 0) {
+					return result;
+				}
+			}
+			return left.length - right.length;
+		}
 	}
 
 	/**
@@ -66,15 +236,39 @@ public final class Ints {
 	 */
 	public static final int MAX_POWER_OF_TWO = 1 << (Integer.SIZE - 2);
 
+	private static final byte[] asciiDigits = new byte[128];
+
+	static {
+		Arrays.fill(asciiDigits, (byte) -1);
+		for (int i = 0; i <= 9; i++) {
+			asciiDigits['0' + i] = (byte) i;
+		}
+		for (int i = 0; i <= 26; i++) {
+			asciiDigits['A' + i] = (byte) (10 + i);
+			asciiDigits['a' + i] = (byte) (10 + i);
+		}
+	}
+
 	/**
-	 * Returns a hash code for {@code value}; equal to the result of invoking
-	 * {@code ((Integer) value).hashCode()}.
+	 * Returns a fixed-size list backed by the specified array, similar to
+	 * {@link Arrays#asList(Object[])}. The list supports
+	 * {@link List#set(int, Object)}, but any attempt to set a value to {@code null}
+	 * will result in a {@link NullPointerException}.
 	 *
-	 * @param value a primitive {@code int} value
-	 * @return a hash code for the value
+	 * <p>
+	 * The returned list maintains the values, but not the identities, of
+	 * {@code Integer} objects written to or read from it. For example, whether
+	 * {@code list.get(0) == list.get(0)} is true for the returned list is
+	 * unspecified.
+	 *
+	 * @param backingArray the array to back the list
+	 * @return a list view of the array
 	 */
-	public static int hashCode(int value) {
-		return value;
+	public static List<Integer> asList(int... backingArray) {
+		if (backingArray.length == 0) {
+			return Collections.emptyList();
+		}
+		return new IntArrayAsList(backingArray);
 	}
 
 	/**
@@ -96,24 +290,6 @@ public final class Ints {
 	}
 
 	/**
-	 * Returns the {@code int} nearest in value to {@code value}.
-	 *
-	 * @param value any {@code long} value
-	 * @return the same value cast to {@code int} if it is in the range of the
-	 *         {@code int} type, {@link Integer#MAX_VALUE} if it is too large, or
-	 *         {@link Integer#MIN_VALUE} if it is too small
-	 */
-	public static int saturatedCast(long value) {
-		if (value > Integer.MAX_VALUE) {
-			return Integer.MAX_VALUE;
-		}
-		if (value < Integer.MIN_VALUE) {
-			return Integer.MIN_VALUE;
-		}
-		return (int) value;
-	}
-
-	/**
 	 * Compares the two specified {@code int} values. The sign of the value returned
 	 * is the same as that of {@code ((Integer) a).compareTo(b)}.
 	 *
@@ -132,6 +308,29 @@ public final class Ints {
 	}
 
 	/**
+	 * Returns the values from each provided array combined into a single array. For
+	 * example, {@code concat(new int[] {a, b}, new int[] {}, new int[] {c}} returns
+	 * the array {@code {a, b, c}}.
+	 *
+	 * @param arrays zero or more {@code int} arrays
+	 * @return a single array containing all the values from the source arrays, in
+	 *         order
+	 */
+	public static int[] concat(int[]... arrays) {
+		int length = 0;
+		for (int[] array : arrays) {
+			length += array.length;
+		}
+		int[] result = new int[length];
+		int pos = 0;
+		for (int[] array : arrays) {
+			System.arraycopy(array, 0, result, pos, array.length);
+			pos += array.length;
+		}
+		return result;
+	}
+
+	/**
 	 * Returns {@code true} if {@code target} is present as an element anywhere in
 	 * {@code array}.
 	 *
@@ -147,6 +346,82 @@ public final class Ints {
 			}
 		}
 		return false;
+	}
+
+	// Arrays.copyOf() requires Java 6
+	private static int[] copyOf(int[] original, int length) {
+		int[] copy = new int[length];
+		System.arraycopy(original, 0, copy, 0, Math.min(original.length, length));
+		return copy;
+	}
+
+	private static int digit(char c) {
+		return (c < 128) ? asciiDigits[c] : -1;
+	}
+
+	/**
+	 * Returns an array containing the same values as {@code array}, but guaranteed
+	 * to be of a specified minimum length. If {@code array} already has a length of
+	 * at least {@code minLength}, it is returned directly. Otherwise, a new array
+	 * of size {@code minLength + padding} is returned, containing the values of
+	 * {@code array}, and zeroes in the remaining places.
+	 *
+	 * @param array     the source array
+	 * @param minLength the minimum length the returned array must guarantee
+	 * @param padding   an extra amount to "grow" the array by if growth is
+	 *                  necessary
+	 * @throws IllegalArgumentException if {@code minLength} or {@code padding} is
+	 *                                  negative
+	 * @return an array containing the values of {@code array}, with guaranteed
+	 *         minimum length {@code minLength}
+	 */
+	public static int[] ensureCapacity(int[] array, int minLength, int padding) {
+		checkArgument(minLength >= 0, "Invalid minLength: %s", minLength);
+		checkArgument(padding >= 0, "Invalid padding: %s", padding);
+		return (array.length < minLength) ? copyOf(array, minLength + padding) : array;
+	}
+
+	/**
+	 * Returns the {@code int} value whose big-endian representation is stored in
+	 * the first 4 bytes of {@code bytes}; equivalent to {@code
+	 * ByteBuffer.wrap(bytes).getInt()}. For example, the input byte array
+	 * {@code {0x12, 0x13, 0x14, 0x15, 0x33}} would yield the {@code int} value
+	 * {@code
+	 * 0x12131415}.
+	 *
+	 * <p>
+	 * Arguably, it's preferable to use {@link java.nio.ByteBuffer}; that library
+	 * exposes much more flexibility at little cost in readability.
+	 *
+	 * @throws IllegalArgumentException if {@code bytes} has fewer than 4 elements
+	 */
+	@GwtIncompatible("doesn't work")
+	public static int fromByteArray(byte[] bytes) {
+		checkArgument(bytes.length >= BYTES, "array too small: %s < %s", bytes.length, BYTES);
+		return fromBytes(bytes[0], bytes[1], bytes[2], bytes[3]);
+	}
+
+	/**
+	 * Returns the {@code int} value whose byte representation is the given 4 bytes,
+	 * in big-endian order; equivalent to {@code Ints.fromByteArray(new byte[] {b1,
+	 * b2, b3, b4})}.
+	 *
+	 * @since 7.0
+	 */
+	@GwtIncompatible("doesn't work")
+	public static int fromBytes(byte b1, byte b2, byte b3, byte b4) {
+		return b1 << 24 | (b2 & 0xFF) << 16 | (b3 & 0xFF) << 8 | (b4 & 0xFF);
+	}
+
+	/**
+	 * Returns a hash code for {@code value}; equal to the result of invoking
+	 * {@code ((Integer) value).hashCode()}.
+	 *
+	 * @param value a primitive {@code int} value
+	 * @return a hash code for the value
+	 */
+	public static int hashCode(int value) {
+		return value;
 	}
 
 	/**
@@ -203,204 +478,6 @@ public final class Ints {
 	}
 
 	/**
-	 * Returns the index of the last appearance of the value {@code target} in
-	 * {@code array}.
-	 *
-	 * @param array  an array of {@code int} values, possibly empty
-	 * @param target a primitive {@code int} value
-	 * @return the greatest index {@code i} for which {@code array[i] == target}, or
-	 *         {@code -1} if no such index exists.
-	 */
-	public static int lastIndexOf(int[] array, int target) {
-		return lastIndexOf(array, target, 0, array.length);
-	}
-
-	// TODO(kevinb): consider making this public
-	private static int lastIndexOf(int[] array, int target, int start, int end) {
-		for (int i = end - 1; i >= start; i--) {
-			if (array[i] == target) {
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	/**
-	 * Returns the least value present in {@code array}.
-	 *
-	 * @param array a <i>nonempty</i> array of {@code int} values
-	 * @return the value present in {@code array} that is less than or equal to
-	 *         every other value in the array
-	 * @throws IllegalArgumentException if {@code array} is empty
-	 */
-	public static int min(int... array) {
-		checkArgument(array.length > 0);
-		int min = array[0];
-		for (int i = 1; i < array.length; i++) {
-			if (array[i] < min) {
-				min = array[i];
-			}
-		}
-		return min;
-	}
-
-	/**
-	 * Returns the greatest value present in {@code array}.
-	 *
-	 * @param array a <i>nonempty</i> array of {@code int} values
-	 * @return the value present in {@code array} that is greater than or equal to
-	 *         every other value in the array
-	 * @throws IllegalArgumentException if {@code array} is empty
-	 */
-	public static int max(int... array) {
-		checkArgument(array.length > 0);
-		int max = array[0];
-		for (int i = 1; i < array.length; i++) {
-			if (array[i] > max) {
-				max = array[i];
-			}
-		}
-		return max;
-	}
-
-	/**
-	 * Returns the values from each provided array combined into a single array. For
-	 * example, {@code concat(new int[] {a, b}, new int[] {}, new int[] {c}} returns
-	 * the array {@code {a, b, c}}.
-	 *
-	 * @param arrays zero or more {@code int} arrays
-	 * @return a single array containing all the values from the source arrays, in
-	 *         order
-	 */
-	public static int[] concat(int[]... arrays) {
-		int length = 0;
-		for (int[] array : arrays) {
-			length += array.length;
-		}
-		int[] result = new int[length];
-		int pos = 0;
-		for (int[] array : arrays) {
-			System.arraycopy(array, 0, result, pos, array.length);
-			pos += array.length;
-		}
-		return result;
-	}
-
-	/**
-	 * Returns a big-endian representation of {@code value} in a 4-element byte
-	 * array; equivalent to {@code ByteBuffer.allocate(4).putInt(value).array()}.
-	 * For example, the input value {@code 0x12131415} would yield the byte array
-	 * {@code {0x12, 0x13, 0x14, 0x15}}.
-	 *
-	 * <p>
-	 * If you need to convert and concatenate several values (possibly even of
-	 * different types), use a shared {@link java.nio.ByteBuffer} instance, or use
-	 * {@link com.google.common.io.ByteStreams#newDataOutput()} to get a growable
-	 * buffer.
-	 */
-	@GwtIncompatible("doesn't work")
-	public static byte[] toByteArray(int value) {
-		return new byte[] { (byte) (value >> 24), (byte) (value >> 16), (byte) (value >> 8), (byte) value };
-	}
-
-	/**
-	 * Returns the {@code int} value whose big-endian representation is stored in
-	 * the first 4 bytes of {@code bytes}; equivalent to {@code
-	 * ByteBuffer.wrap(bytes).getInt()}. For example, the input byte array
-	 * {@code {0x12, 0x13, 0x14, 0x15, 0x33}} would yield the {@code int} value
-	 * {@code
-	 * 0x12131415}.
-	 *
-	 * <p>
-	 * Arguably, it's preferable to use {@link java.nio.ByteBuffer}; that library
-	 * exposes much more flexibility at little cost in readability.
-	 *
-	 * @throws IllegalArgumentException if {@code bytes} has fewer than 4 elements
-	 */
-	@GwtIncompatible("doesn't work")
-	public static int fromByteArray(byte[] bytes) {
-		checkArgument(bytes.length >= BYTES, "array too small: %s < %s", bytes.length, BYTES);
-		return fromBytes(bytes[0], bytes[1], bytes[2], bytes[3]);
-	}
-
-	/**
-	 * Returns the {@code int} value whose byte representation is the given 4 bytes,
-	 * in big-endian order; equivalent to {@code Ints.fromByteArray(new byte[] {b1,
-	 * b2, b3, b4})}.
-	 *
-	 * @since 7.0
-	 */
-	@GwtIncompatible("doesn't work")
-	public static int fromBytes(byte b1, byte b2, byte b3, byte b4) {
-		return b1 << 24 | (b2 & 0xFF) << 16 | (b3 & 0xFF) << 8 | (b4 & 0xFF);
-	}
-
-	private static final class IntConverter extends Converter<String, Integer> implements Serializable {
-		static final IntConverter INSTANCE = new IntConverter();
-
-		@Override
-		protected Integer doForward(String value) {
-			return Integer.decode(value);
-		}
-
-		@Override
-		protected String doBackward(Integer value) {
-			return value.toString();
-		}
-
-		@Override
-		public String toString() {
-			return "Ints.stringConverter()";
-		}
-
-		private Object readResolve() {
-			return INSTANCE;
-		}
-
-		private static final long serialVersionUID = 1;
-	}
-
-	/**
-	 * Returns a serializable converter object that converts between strings and
-	 * integers using {@link Integer#decode} and {@link Integer#toString()}.
-	 *
-	 * @since 16.0
-	 */
-	@Beta
-	public static Converter<String, Integer> stringConverter() {
-		return IntConverter.INSTANCE;
-	}
-
-	/**
-	 * Returns an array containing the same values as {@code array}, but guaranteed
-	 * to be of a specified minimum length. If {@code array} already has a length of
-	 * at least {@code minLength}, it is returned directly. Otherwise, a new array
-	 * of size {@code minLength + padding} is returned, containing the values of
-	 * {@code array}, and zeroes in the remaining places.
-	 *
-	 * @param array     the source array
-	 * @param minLength the minimum length the returned array must guarantee
-	 * @param padding   an extra amount to "grow" the array by if growth is
-	 *                  necessary
-	 * @throws IllegalArgumentException if {@code minLength} or {@code padding} is
-	 *                                  negative
-	 * @return an array containing the values of {@code array}, with guaranteed
-	 *         minimum length {@code minLength}
-	 */
-	public static int[] ensureCapacity(int[] array, int minLength, int padding) {
-		checkArgument(minLength >= 0, "Invalid minLength: %s", minLength);
-		checkArgument(padding >= 0, "Invalid padding: %s", padding);
-		return (array.length < minLength) ? copyOf(array, minLength + padding) : array;
-	}
-
-	// Arrays.copyOf() requires Java 6
-	private static int[] copyOf(int[] original, int length) {
-		int[] copy = new int[length];
-		System.arraycopy(original, 0, copy, 0, Math.min(original.length, length));
-		return copy;
-	}
-
-	/**
 	 * Returns a string containing the supplied {@code int} values separated by
 	 * {@code separator}. For example, {@code join("-", 1, 2, 3)} returns the string
 	 * {@code "1-2-3"}.
@@ -425,6 +502,29 @@ public final class Ints {
 	}
 
 	/**
+	 * Returns the index of the last appearance of the value {@code target} in
+	 * {@code array}.
+	 *
+	 * @param array  an array of {@code int} values, possibly empty
+	 * @param target a primitive {@code int} value
+	 * @return the greatest index {@code i} for which {@code array[i] == target}, or
+	 *         {@code -1} if no such index exists.
+	 */
+	public static int lastIndexOf(int[] array, int target) {
+		return lastIndexOf(array, target, 0, array.length);
+	}
+
+	// TODO(kevinb): consider making this public
+	private static int lastIndexOf(int[] array, int target, int start, int end) {
+		for (int i = end - 1; i >= start; i--) {
+			if (array[i] == target) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	/**
 	 * Returns a comparator that compares two {@code int} arrays lexicographically.
 	 * That is, it compares, using {@link #compare(int, int)}), the first pair of
 	 * values that follow any common prefix, or when one array is a prefix of the
@@ -444,20 +544,71 @@ public final class Ints {
 		return LexicographicalComparator.INSTANCE;
 	}
 
-	private enum LexicographicalComparator implements Comparator<int[]> {
-		INSTANCE;
-
-		@Override
-		public int compare(int[] left, int[] right) {
-			int minLength = Math.min(left.length, right.length);
-			for (int i = 0; i < minLength; i++) {
-				int result = Ints.compare(left[i], right[i]);
-				if (result != 0) {
-					return result;
-				}
+	/**
+	 * Returns the greatest value present in {@code array}.
+	 *
+	 * @param array a <i>nonempty</i> array of {@code int} values
+	 * @return the value present in {@code array} that is greater than or equal to
+	 *         every other value in the array
+	 * @throws IllegalArgumentException if {@code array} is empty
+	 */
+	public static int max(int... array) {
+		checkArgument(array.length > 0);
+		int max = array[0];
+		for (int i = 1; i < array.length; i++) {
+			if (array[i] > max) {
+				max = array[i];
 			}
-			return left.length - right.length;
 		}
+		return max;
+	}
+
+	/**
+	 * Returns the least value present in {@code array}.
+	 *
+	 * @param array a <i>nonempty</i> array of {@code int} values
+	 * @return the value present in {@code array} that is less than or equal to
+	 *         every other value in the array
+	 * @throws IllegalArgumentException if {@code array} is empty
+	 */
+	public static int min(int... array) {
+		checkArgument(array.length > 0);
+		int min = array[0];
+		for (int i = 1; i < array.length; i++) {
+			if (array[i] < min) {
+				min = array[i];
+			}
+		}
+		return min;
+	}
+
+	/**
+	 * Returns the {@code int} nearest in value to {@code value}.
+	 *
+	 * @param value any {@code long} value
+	 * @return the same value cast to {@code int} if it is in the range of the
+	 *         {@code int} type, {@link Integer#MAX_VALUE} if it is too large, or
+	 *         {@link Integer#MIN_VALUE} if it is too small
+	 */
+	public static int saturatedCast(long value) {
+		if (value > Integer.MAX_VALUE) {
+			return Integer.MAX_VALUE;
+		}
+		if (value < Integer.MIN_VALUE) {
+			return Integer.MIN_VALUE;
+		}
+		return (int) value;
+	}
+
+	/**
+	 * Returns a serializable converter object that converts between strings and
+	 * integers using {@link Integer#decode} and {@link Integer#toString()}.
+	 *
+	 * @since 16.0
+	 */
+	@Beta
+	public static Converter<String, Integer> stringConverter() {
+		return IntConverter.INSTANCE;
 	}
 
 	/**
@@ -492,174 +643,20 @@ public final class Ints {
 	}
 
 	/**
-	 * Returns a fixed-size list backed by the specified array, similar to
-	 * {@link Arrays#asList(Object[])}. The list supports
-	 * {@link List#set(int, Object)}, but any attempt to set a value to {@code null}
-	 * will result in a {@link NullPointerException}.
+	 * Returns a big-endian representation of {@code value} in a 4-element byte
+	 * array; equivalent to {@code ByteBuffer.allocate(4).putInt(value).array()}.
+	 * For example, the input value {@code 0x12131415} would yield the byte array
+	 * {@code {0x12, 0x13, 0x14, 0x15}}.
 	 *
 	 * <p>
-	 * The returned list maintains the values, but not the identities, of
-	 * {@code Integer} objects written to or read from it. For example, whether
-	 * {@code list.get(0) == list.get(0)} is true for the returned list is
-	 * unspecified.
-	 *
-	 * @param backingArray the array to back the list
-	 * @return a list view of the array
+	 * If you need to convert and concatenate several values (possibly even of
+	 * different types), use a shared {@link java.nio.ByteBuffer} instance, or use
+	 * {@link com.google.common.io.ByteStreams#newDataOutput()} to get a growable
+	 * buffer.
 	 */
-	public static List<Integer> asList(int... backingArray) {
-		if (backingArray.length == 0) {
-			return Collections.emptyList();
-		}
-		return new IntArrayAsList(backingArray);
-	}
-
-	@GwtCompatible
-	private static class IntArrayAsList extends AbstractList<Integer> implements RandomAccess, Serializable {
-		final int[] array;
-		final int start;
-		final int end;
-
-		IntArrayAsList(int[] array) {
-			this(array, 0, array.length);
-		}
-
-		IntArrayAsList(int[] array, int start, int end) {
-			this.array = array;
-			this.start = start;
-			this.end = end;
-		}
-
-		@Override
-		public int size() {
-			return end - start;
-		}
-
-		@Override
-		public boolean isEmpty() {
-			return false;
-		}
-
-		@Override
-		public Integer get(int index) {
-			checkElementIndex(index, size());
-			return array[start + index];
-		}
-
-		@Override
-		public boolean contains(Object target) {
-			// Overridden to prevent a ton of boxing
-			return (target instanceof Integer) && Ints.indexOf(array, (Integer) target, start, end) != -1;
-		}
-
-		@Override
-		public int indexOf(Object target) {
-			// Overridden to prevent a ton of boxing
-			if (target instanceof Integer) {
-				int i = Ints.indexOf(array, (Integer) target, start, end);
-				if (i >= 0) {
-					return i - start;
-				}
-			}
-			return -1;
-		}
-
-		@Override
-		public int lastIndexOf(Object target) {
-			// Overridden to prevent a ton of boxing
-			if (target instanceof Integer) {
-				int i = Ints.lastIndexOf(array, (Integer) target, start, end);
-				if (i >= 0) {
-					return i - start;
-				}
-			}
-			return -1;
-		}
-
-		@Override
-		public Integer set(int index, Integer element) {
-			checkElementIndex(index, size());
-			int oldValue = array[start + index];
-			// checkNotNull for GWT (do not optimize)
-			array[start + index] = checkNotNull(element);
-			return oldValue;
-		}
-
-		@Override
-		public List<Integer> subList(int fromIndex, int toIndex) {
-			int size = size();
-			checkPositionIndexes(fromIndex, toIndex, size);
-			if (fromIndex == toIndex) {
-				return Collections.emptyList();
-			}
-			return new IntArrayAsList(array, start + fromIndex, start + toIndex);
-		}
-
-		@Override
-		public boolean equals(Object object) {
-			if (object == this) {
-				return true;
-			}
-			if (object instanceof IntArrayAsList) {
-				IntArrayAsList that = (IntArrayAsList) object;
-				int size = size();
-				if (that.size() != size) {
-					return false;
-				}
-				for (int i = 0; i < size; i++) {
-					if (array[start + i] != that.array[that.start + i]) {
-						return false;
-					}
-				}
-				return true;
-			}
-			return super.equals(object);
-		}
-
-		@Override
-		public int hashCode() {
-			int result = 1;
-			for (int i = start; i < end; i++) {
-				result = 31 * result + Ints.hashCode(array[i]);
-			}
-			return result;
-		}
-
-		@Override
-		public String toString() {
-			StringBuilder builder = new StringBuilder(size() * 5);
-			builder.append('[').append(array[start]);
-			for (int i = start + 1; i < end; i++) {
-				builder.append(", ").append(array[i]);
-			}
-			return builder.append(']').toString();
-		}
-
-		int[] toIntArray() {
-			// Arrays.copyOfRange() is not available under GWT
-			int size = size();
-			int[] result = new int[size];
-			System.arraycopy(array, start, result, 0, size);
-			return result;
-		}
-
-		private static final long serialVersionUID = 0;
-	}
-
-	private static final byte[] asciiDigits = new byte[128];
-
-	static {
-		Arrays.fill(asciiDigits, (byte) -1);
-		for (int i = 0; i <= 9; i++) {
-			asciiDigits['0' + i] = (byte) i;
-		}
-		for (int i = 0; i <= 26; i++) {
-			asciiDigits['A' + i] = (byte) (10 + i);
-			asciiDigits['a' + i] = (byte) (10 + i);
-		}
-	}
-
-	private static int digit(char c) {
-		return (c < 128) ? asciiDigits[c] : -1;
+	@GwtIncompatible("doesn't work")
+	public static byte[] toByteArray(int value) {
+		return new byte[] { (byte) (value >> 24), (byte) (value >> 16), (byte) (value >> 8), (byte) value };
 	}
 
 	/**
@@ -756,5 +753,8 @@ public final class Ints {
 		} else {
 			return -accum;
 		}
+	}
+
+	private Ints() {
 	}
 }

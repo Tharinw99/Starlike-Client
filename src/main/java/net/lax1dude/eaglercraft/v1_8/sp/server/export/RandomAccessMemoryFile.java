@@ -8,14 +8,15 @@ import java.io.IOException;
 /**
  * Copyright (c) 2023-2024 lax1dude. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -32,6 +33,16 @@ public class RandomAccessMemoryFile implements DataInput, DataOutput {
 		this.pos = 0;
 	}
 
+	public byte[] getByteArray() {
+		byte[] b = new byte[length];
+		System.arraycopy(buffer, 0, b, 0, length);
+		return b;
+	}
+
+	public int getLength() {
+		return length;
+	}
+
 	private void grow(int newMaxSize) {
 		if (length < newMaxSize) {
 			if (buffer.length < newMaxSize) {
@@ -43,14 +54,30 @@ public class RandomAccessMemoryFile implements DataInput, DataOutput {
 		}
 	}
 
-	public byte[] getByteArray() {
-		byte[] b = new byte[length];
-		System.arraycopy(buffer, 0, b, 0, length);
-		return b;
-	}
-
 	public int read() throws IOException {
 		return (pos < length) ? (buffer[pos++] & 0xff) : -1;
+	}
+
+	public int read(byte b[]) throws IOException {
+		return readBytes(b, 0, b.length);
+	}
+
+	public int read(byte b[], int off, int len) throws IOException {
+		return readBytes(b, off, len);
+	}
+
+	public final boolean readBoolean() throws IOException {
+		int ch = this.read();
+		if (ch < 0)
+			throw new EOFException();
+		return (ch != 0);
+	}
+
+	public final byte readByte() throws IOException {
+		int ch = this.read();
+		if (ch < 0)
+			throw new EOFException();
+		return (byte) (ch);
 	}
 
 	private int readBytes(byte b[], int off, int len) throws IOException {
@@ -70,12 +97,20 @@ public class RandomAccessMemoryFile implements DataInput, DataOutput {
 		return len;
 	}
 
-	public int read(byte b[], int off, int len) throws IOException {
-		return readBytes(b, off, len);
+	public final char readChar() throws IOException {
+		int ch1 = this.read();
+		int ch2 = this.read();
+		if ((ch1 | ch2) < 0)
+			throw new EOFException();
+		return (char) ((ch1 << 8) + (ch2 << 0));
 	}
 
-	public int read(byte b[]) throws IOException {
-		return readBytes(b, 0, b.length);
+	public final double readDouble() throws IOException {
+		return Double.longBitsToDouble(readLong());
+	}
+
+	public final float readFloat() throws IOException {
+		return Float.intBitsToFloat(readInt());
 	}
 
 	public final void readFully(byte b[]) throws IOException {
@@ -92,98 +127,6 @@ public class RandomAccessMemoryFile implements DataInput, DataOutput {
 		} while (n < len);
 	}
 
-	public int skipBytes(int n) throws IOException {
-		int newpos;
-
-		if (n <= 0) {
-			return 0;
-		}
-		newpos = pos + n;
-		if (newpos > length) {
-			newpos = length;
-		}
-		seek(newpos);
-
-		return (int) (newpos - pos);
-	}
-
-	public void write(int b) throws IOException {
-		grow(pos + 1);
-		buffer[pos] = (byte) b;
-		pos += 1;
-	}
-
-	private void writeBytes(byte b[], int off, int len) throws IOException {
-		grow(pos + len);
-		System.arraycopy(b, off, buffer, pos, len);
-		pos += len;
-	}
-
-	public void write(byte b[]) throws IOException {
-		writeBytes(b, 0, b.length);
-	}
-
-	public void write(byte b[], int off, int len) throws IOException {
-		writeBytes(b, off, len);
-	}
-
-	public void seek(int pos) {
-		this.pos = pos;
-	}
-
-	public int getLength() {
-		return length;
-	}
-
-	public void setLength(int newLength) {
-		grow(newLength);
-	}
-
-	public final boolean readBoolean() throws IOException {
-		int ch = this.read();
-		if (ch < 0)
-			throw new EOFException();
-		return (ch != 0);
-	}
-
-	public final byte readByte() throws IOException {
-		int ch = this.read();
-		if (ch < 0)
-			throw new EOFException();
-		return (byte) (ch);
-	}
-
-	public final int readUnsignedByte() throws IOException {
-		int ch = this.read();
-		if (ch < 0)
-			throw new EOFException();
-		return ch;
-	}
-
-	public final short readShort() throws IOException {
-		int ch1 = this.read();
-		int ch2 = this.read();
-		if ((ch1 | ch2) < 0)
-			throw new EOFException();
-		return (short) ((ch1 << 8) + (ch2 << 0));
-	}
-
-	public final int readUnsignedShort() throws IOException {
-		int ch1 = this.read();
-		int ch2 = this.read();
-		if ((ch1 | ch2) < 0)
-			throw new EOFException();
-		return (ch1 << 8) + (ch2 << 0);
-	}
-
-	public final char readChar() throws IOException {
-		int ch1 = this.read();
-		int ch2 = this.read();
-		if ((ch1 | ch2) < 0)
-			throw new EOFException();
-		return (char) ((ch1 << 8) + (ch2 << 0));
-	}
-
 	public final int readInt() throws IOException {
 		int ch1 = this.read();
 		int ch2 = this.read();
@@ -192,18 +135,6 @@ public class RandomAccessMemoryFile implements DataInput, DataOutput {
 		if ((ch1 | ch2 | ch3 | ch4) < 0)
 			throw new EOFException();
 		return ((ch1 << 24) + (ch2 << 16) + (ch3 << 8) + (ch4 << 0));
-	}
-
-	public final long readLong() throws IOException {
-		return ((long) (readInt()) << 32) + (readInt() & 0xFFFFFFFFL);
-	}
-
-	public final float readFloat() throws IOException {
-		return Float.intBitsToFloat(readInt());
-	}
-
-	public final double readDouble() throws IOException {
-		return Double.longBitsToDouble(readLong());
 	}
 
 	public final String readLine() throws IOException {
@@ -236,8 +167,72 @@ public class RandomAccessMemoryFile implements DataInput, DataOutput {
 		return input.toString();
 	}
 
+	public final long readLong() throws IOException {
+		return ((long) (readInt()) << 32) + (readInt() & 0xFFFFFFFFL);
+	}
+
+	public final short readShort() throws IOException {
+		int ch1 = this.read();
+		int ch2 = this.read();
+		if ((ch1 | ch2) < 0)
+			throw new EOFException();
+		return (short) ((ch1 << 8) + (ch2 << 0));
+	}
+
+	public final int readUnsignedByte() throws IOException {
+		int ch = this.read();
+		if (ch < 0)
+			throw new EOFException();
+		return ch;
+	}
+
+	public final int readUnsignedShort() throws IOException {
+		int ch1 = this.read();
+		int ch2 = this.read();
+		if ((ch1 | ch2) < 0)
+			throw new EOFException();
+		return (ch1 << 8) + (ch2 << 0);
+	}
+
 	public final String readUTF() throws IOException {
 		throw new IOException("TODO");
+	}
+
+	public void seek(int pos) {
+		this.pos = pos;
+	}
+
+	public void setLength(int newLength) {
+		grow(newLength);
+	}
+
+	public int skipBytes(int n) throws IOException {
+		int newpos;
+
+		if (n <= 0) {
+			return 0;
+		}
+		newpos = pos + n;
+		if (newpos > length) {
+			newpos = length;
+		}
+		seek(newpos);
+
+		return (int) (newpos - pos);
+	}
+
+	public void write(byte b[]) throws IOException {
+		writeBytes(b, 0, b.length);
+	}
+
+	public void write(byte b[], int off, int len) throws IOException {
+		writeBytes(b, off, len);
+	}
+
+	public void write(int b) throws IOException {
+		grow(pos + 1);
+		buffer[pos] = (byte) b;
+		pos += 1;
 	}
 
 	public final void writeBoolean(boolean v) throws IOException {
@@ -248,14 +243,43 @@ public class RandomAccessMemoryFile implements DataInput, DataOutput {
 		write(v);
 	}
 
-	public final void writeShort(int v) throws IOException {
-		write((v >>> 8) & 0xFF);
-		write((v >>> 0) & 0xFF);
+	private void writeBytes(byte b[], int off, int len) throws IOException {
+		grow(pos + len);
+		System.arraycopy(b, off, buffer, pos, len);
+		pos += len;
+	}
+
+	public final void writeBytes(String s) throws IOException {
+		int len = s.length();
+		byte[] b = new byte[len];
+		s.getBytes(0, len, b, 0);
+		writeBytes(b, 0, len);
 	}
 
 	public final void writeChar(int v) throws IOException {
 		write((v >>> 8) & 0xFF);
 		write((v >>> 0) & 0xFF);
+	}
+
+	public final void writeChars(String s) throws IOException {
+		int clen = s.length();
+		int blen = 2 * clen;
+		byte[] b = new byte[blen];
+		char[] c = new char[clen];
+		s.getChars(0, clen, c, 0);
+		for (int i = 0, j = 0; i < clen; i++) {
+			b[j++] = (byte) (c[i] >>> 8);
+			b[j++] = (byte) (c[i] >>> 0);
+		}
+		writeBytes(b, 0, blen);
+	}
+
+	public final void writeDouble(double v) throws IOException {
+		writeLong(Double.doubleToLongBits(v));
+	}
+
+	public final void writeFloat(float v) throws IOException {
+		writeInt(Float.floatToIntBits(v));
 	}
 
 	public final void writeInt(int v) throws IOException {
@@ -276,32 +300,9 @@ public class RandomAccessMemoryFile implements DataInput, DataOutput {
 		write((int) (v >>> 0) & 0xFF);
 	}
 
-	public final void writeFloat(float v) throws IOException {
-		writeInt(Float.floatToIntBits(v));
-	}
-
-	public final void writeDouble(double v) throws IOException {
-		writeLong(Double.doubleToLongBits(v));
-	}
-
-	public final void writeBytes(String s) throws IOException {
-		int len = s.length();
-		byte[] b = new byte[len];
-		s.getBytes(0, len, b, 0);
-		writeBytes(b, 0, len);
-	}
-
-	public final void writeChars(String s) throws IOException {
-		int clen = s.length();
-		int blen = 2 * clen;
-		byte[] b = new byte[blen];
-		char[] c = new char[clen];
-		s.getChars(0, clen, c, 0);
-		for (int i = 0, j = 0; i < clen; i++) {
-			b[j++] = (byte) (c[i] >>> 8);
-			b[j++] = (byte) (c[i] >>> 0);
-		}
-		writeBytes(b, 0, blen);
+	public final void writeShort(int v) throws IOException {
+		write((v >>> 8) & 0xFF);
+		write((v >>> 0) & 0xFF);
 	}
 
 	public final void writeUTF(String str) throws IOException {

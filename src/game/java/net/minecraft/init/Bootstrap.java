@@ -1,9 +1,12 @@
 package net.minecraft.init;
 
-import net.lax1dude.eaglercraft.v1_8.mojang.authlib.GameProfile;
 import java.io.PrintStream;
+
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import net.lax1dude.eaglercraft.v1_8.EaglercraftUUID;
+import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
+import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
+import net.lax1dude.eaglercraft.v1_8.mojang.authlib.GameProfile;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDispenser;
 import net.minecraft.block.BlockFire;
@@ -45,52 +48,91 @@ import net.minecraft.item.ItemSpade;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.LoggingPrintStream;
 import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityDispenser;
 import net.minecraft.tileentity.TileEntitySkull;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.LoggingPrintStream;
 import net.minecraft.util.StringUtils;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
-import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
-import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class Bootstrap {
 	private static final PrintStream SYSOUT = System.out;
-	/**+
-	 * Whether the blocks, items, etc have already been registered
+	/**
+	 * + Whether the blocks, items, etc have already been registered
 	 */
 	private static boolean alreadyRegistered = false;
 	private static final Logger LOGGER = LogManager.getLogger();
 
-	/**+
-	 * Is Bootstrap registration already done?
+	/**
+	 * + Is Bootstrap registration already done?
 	 */
 	public static boolean isRegistered() {
 		return alreadyRegistered;
+	}
+
+	public static void printToSYSOUT(String parString1) {
+		SYSOUT.println(parString1);
+	}
+
+	/**
+	 * + redirect standard streams to logger
+	 */
+	private static void redirectOutputToLog() {
+		System.setErr(new LoggingPrintStream("STDERR", true, System.err));
+		System.setOut(new LoggingPrintStream("STDOUT", false, SYSOUT));
+	}
+
+	/**
+	 * + Registers blocks, items, stats, etc.
+	 */
+	public static void register() {
+		if (!alreadyRegistered) {
+			alreadyRegistered = true;
+			if (LOGGER.isDebugEnabled()) {
+				redirectOutputToLog();
+			}
+
+			Block.registerBlocks();
+			Blocks.doBootstrap();
+			BiomeGenBase.doBootstrap();
+			BlockFire.init();
+			EntityEnderman.bootstrap();
+			ItemAxe.bootstrap();
+			ItemPickaxe.bootstrap();
+			ItemSpade.bootstrap();
+			Item.registerItems();
+			Items.doBootstrap();
+			EntityVillager.bootstrap();
+			StatList.init();
+			registerDispenserBehaviors();
+		}
 	}
 
 	static void registerDispenserBehaviors() {
@@ -112,10 +154,6 @@ public class Bootstrap {
 			}
 		});
 		BlockDispenser.dispenseBehaviorRegistry.putObject(Items.experience_bottle, new BehaviorProjectileDispense() {
-			protected IProjectile getProjectileEntity(World world, IPosition iposition) {
-				return new EntityExpBottle(world, iposition.getX(), iposition.getY(), iposition.getZ());
-			}
-
 			protected float func_82498_a() {
 				return super.func_82498_a() * 0.5F;
 			}
@@ -123,23 +161,27 @@ public class Bootstrap {
 			protected float func_82500_b() {
 				return super.func_82500_b() * 1.25F;
 			}
+
+			protected IProjectile getProjectileEntity(World world, IPosition iposition) {
+				return new EntityExpBottle(world, iposition.getX(), iposition.getY(), iposition.getZ());
+			}
 		});
 		BlockDispenser.dispenseBehaviorRegistry.putObject(Items.potionitem, new IBehaviorDispenseItem() {
 			private final BehaviorDefaultDispenseItem field_150843_b = new BehaviorDefaultDispenseItem();
 
 			public ItemStack dispense(IBlockSource iblocksource, final ItemStack itemstack) {
 				return ItemPotion.isSplash(itemstack.getMetadata()) ? (new BehaviorProjectileDispense() {
-					protected IProjectile getProjectileEntity(World world, IPosition iposition) {
-						return new EntityPotion(world, iposition.getX(), iposition.getY(), iposition.getZ(),
-								itemstack.copy());
-					}
-
 					protected float func_82498_a() {
 						return super.func_82498_a() * 0.5F;
 					}
 
 					protected float func_82500_b() {
 						return super.func_82500_b() * 1.25F;
+					}
+
+					protected IProjectile getProjectileEntity(World world, IPosition iposition) {
+						return new EntityPotion(world, iposition.getX(), iposition.getY(), iposition.getZ(),
+								itemstack.copy());
 					}
 				}).dispense(iblocksource, itemstack) : this.field_150843_b.dispense(iblocksource, itemstack);
 			}
@@ -444,43 +486,5 @@ public class Bootstrap {
 
 					}
 				});
-	}
-
-	/**+
-	 * Registers blocks, items, stats, etc.
-	 */
-	public static void register() {
-		if (!alreadyRegistered) {
-			alreadyRegistered = true;
-			if (LOGGER.isDebugEnabled()) {
-				redirectOutputToLog();
-			}
-
-			Block.registerBlocks();
-			Blocks.doBootstrap();
-			BiomeGenBase.doBootstrap();
-			BlockFire.init();
-			EntityEnderman.bootstrap();
-			ItemAxe.bootstrap();
-			ItemPickaxe.bootstrap();
-			ItemSpade.bootstrap();
-			Item.registerItems();
-			Items.doBootstrap();
-			EntityVillager.bootstrap();
-			StatList.init();
-			registerDispenserBehaviors();
-		}
-	}
-
-	/**+
-	 * redirect standard streams to logger
-	 */
-	private static void redirectOutputToLog() {
-		System.setErr(new LoggingPrintStream("STDERR", true, System.err));
-		System.setOut(new LoggingPrintStream("STDOUT", false, SYSOUT));
-	}
-
-	public static void printToSYSOUT(String parString1) {
-		SYSOUT.println(parString1);
 	}
 }

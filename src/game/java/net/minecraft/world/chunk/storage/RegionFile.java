@@ -13,32 +13,54 @@ import net.lax1dude.eaglercraft.v1_8.EaglerOutputStream;
 import net.lax1dude.eaglercraft.v1_8.EaglerZLIB;
 import net.lax1dude.eaglercraft.v1_8.sp.server.export.RandomAccessMemoryFile;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class RegionFile {
+	class ChunkBuffer extends EaglerOutputStream {
+		private int chunkX;
+		private int chunkZ;
+
+		public ChunkBuffer(int x, int z) {
+			super(8096);
+			this.chunkX = x;
+			this.chunkZ = z;
+		}
+
+		/**
+		 * + close this RegionFile and prevent further writes
+		 */
+		public void close() throws IOException {
+			RegionFile.this.write(this.chunkX, this.chunkZ, this.buf, this.count);
+		}
+	}
+
 	private static final byte[] emptySector = new byte[4096];
 	private RandomAccessMemoryFile dataFile;
 	private final int[] offsets = new int[1024];
 	private final int[] chunkTimestamps = new int[1024];
 	private List<Boolean> sectorFree;
+
 	private int sizeDelta;
 
 	public RegionFile(RandomAccessMemoryFile dataFile) {
@@ -95,8 +117,8 @@ public class RegionFile {
 
 	}
 
-	/**+
-	 * Returns an uncompressed chunk stream from the region file.
+	/**
+	 * + Returns an uncompressed chunk stream from the region file.
 	 */
 	public synchronized DataInputStream getChunkDataInputStream(int x, int z) {
 		if (this.outOfBounds(x, z)) {
@@ -142,17 +164,70 @@ public class RegionFile {
 		}
 	}
 
-	/**+
-	 * Returns an output stream used to write chunk data. Data is on
-	 * disk when the returned stream is closed.
+	/**
+	 * + Returns an output stream used to write chunk data. Data is on disk when the
+	 * returned stream is closed.
 	 */
 	public DataOutputStream getChunkDataOutputStream(int x, int z) throws IOException {
 		return this.outOfBounds(x, z) ? null
 				: new DataOutputStream(EaglerZLIB.newDeflaterOutputStream(new RegionFile.ChunkBuffer(x, z)));
 	}
 
-	/**+
-	 * args: x, z, data, length - write chunk data at (x, z) to disk
+	public RandomAccessMemoryFile getFile() {
+		return dataFile;
+	}
+
+	/**
+	 * + args: x, z - get chunk's offset in region file
+	 */
+	private int getOffset(int x, int z) {
+		return this.offsets[x + z * 32];
+	}
+
+	/**
+	 * + args: x, z, - true if chunk has been saved / converted
+	 */
+	public boolean isChunkSaved(int x, int z) {
+		return this.getOffset(x, z) != 0;
+	}
+
+	/**
+	 * + args: x, z - check region bounds
+	 */
+	private boolean outOfBounds(int x, int z) {
+		return x < 0 || x >= 32 || z < 0 || z >= 32;
+	}
+
+	/**
+	 * + args: x, z, timestamp - sets the chunk's write timestamp
+	 */
+	private void setChunkTimestamp(int x, int z, int timestamp) throws IOException {
+		this.chunkTimestamps[x + z * 32] = timestamp;
+		this.dataFile.seek(4096 + (x + z * 32) * 4);
+		this.dataFile.writeInt(timestamp);
+	}
+
+	/**
+	 * + args: x, z, offset - sets the chunk's offset in the region file
+	 */
+	private void setOffset(int x, int z, int offset) throws IOException {
+		this.offsets[x + z * 32] = offset;
+		this.dataFile.seek((x + z * 32) * 4);
+		this.dataFile.writeInt(offset);
+	}
+
+	/**
+	 * + args: x, z, data, length - write chunk data at (x, z) to disk
+	 */
+	private void write(int sectorNumber, byte[] data, int length) throws IOException {
+		this.dataFile.seek(sectorNumber * 4096);
+		this.dataFile.writeInt(length + 1);
+		this.dataFile.writeByte(2);
+		this.dataFile.write(data, 0, length);
+	}
+
+	/**
+	 * + args: x, z, data, length - write chunk data at (x, z) to disk
 	 */
 	protected synchronized void write(int x, int z, byte[] data, int length) {
 		try {
@@ -221,77 +296,5 @@ public class RegionFile {
 			throw new RuntimeException("Could not write chunk to RegionFile!", ioexception);
 		}
 
-	}
-
-	/**+
-	 * args: x, z, data, length - write chunk data at (x, z) to disk
-	 */
-	private void write(int sectorNumber, byte[] data, int length) throws IOException {
-		this.dataFile.seek(sectorNumber * 4096);
-		this.dataFile.writeInt(length + 1);
-		this.dataFile.writeByte(2);
-		this.dataFile.write(data, 0, length);
-	}
-
-	/**+
-	 * args: x, z - check region bounds
-	 */
-	private boolean outOfBounds(int x, int z) {
-		return x < 0 || x >= 32 || z < 0 || z >= 32;
-	}
-
-	/**+
-	 * args: x, z - get chunk's offset in region file
-	 */
-	private int getOffset(int x, int z) {
-		return this.offsets[x + z * 32];
-	}
-
-	/**+
-	 * args: x, z, - true if chunk has been saved / converted
-	 */
-	public boolean isChunkSaved(int x, int z) {
-		return this.getOffset(x, z) != 0;
-	}
-
-	/**+
-	 * args: x, z, offset - sets the chunk's offset in the region
-	 * file
-	 */
-	private void setOffset(int x, int z, int offset) throws IOException {
-		this.offsets[x + z * 32] = offset;
-		this.dataFile.seek((x + z * 32) * 4);
-		this.dataFile.writeInt(offset);
-	}
-
-	/**+
-	 * args: x, z, timestamp - sets the chunk's write timestamp
-	 */
-	private void setChunkTimestamp(int x, int z, int timestamp) throws IOException {
-		this.chunkTimestamps[x + z * 32] = timestamp;
-		this.dataFile.seek(4096 + (x + z * 32) * 4);
-		this.dataFile.writeInt(timestamp);
-	}
-
-	public RandomAccessMemoryFile getFile() {
-		return dataFile;
-	}
-
-	class ChunkBuffer extends EaglerOutputStream {
-		private int chunkX;
-		private int chunkZ;
-
-		public ChunkBuffer(int x, int z) {
-			super(8096);
-			this.chunkX = x;
-			this.chunkZ = z;
-		}
-
-		/**+
-		 * close this RegionFile and prevent further writes
-		 */
-		public void close() throws IOException {
-			RegionFile.this.write(this.chunkX, this.chunkZ, this.buf, this.count);
-		}
 	}
 }

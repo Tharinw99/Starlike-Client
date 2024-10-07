@@ -1,36 +1,41 @@
 package net.minecraft.command;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+
+import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
+import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumChatFormatting;
-import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
-import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -38,9 +43,21 @@ import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 public class CommandHandler implements ICommandManager {
 
 	private static final Logger logger = LogManager.getLogger();
+
+	/**
+	 * + creates a new array and sets elements 0..n-2 to be 0..n-1 of the input (n
+	 * elements)
+	 */
+	private static String[] dropFirstString(String[] input) {
+		String[] astring = new String[input.length - 1];
+		System.arraycopy(input, 1, astring, 0, input.length - 1);
+		return astring;
+	}
+
 	private final Map<String, ICommand> commandMap = Maps.newHashMap();
-	/**+
-	 * The set of ICommand objects currently loaded.
+
+	/**
+	 * + The set of ICommand objects currently loaded.
 	 */
 	private final Set<ICommand> commandSet = Sets.newHashSet();
 
@@ -92,58 +109,23 @@ public class CommandHandler implements ICommandManager {
 		return j;
 	}
 
-	protected boolean tryExecute(ICommandSender sender, String[] args, ICommand command, String input) {
-		try {
-			command.processCommand(sender, args);
-			return true;
-		} catch (WrongUsageException wrongusageexception) {
-			ChatComponentTranslation chatcomponenttranslation2 = new ChatComponentTranslation("commands.generic.usage",
-					new Object[] { new ChatComponentTranslation(wrongusageexception.getMessage(),
-							wrongusageexception.getErrorObjects()) });
-			chatcomponenttranslation2.getChatStyle().setColor(EnumChatFormatting.RED);
-			sender.addChatMessage(chatcomponenttranslation2);
-		} catch (CommandException commandexception) {
-			ChatComponentTranslation chatcomponenttranslation1 = new ChatComponentTranslation(
-					commandexception.getMessage(), commandexception.getErrorObjects());
-			chatcomponenttranslation1.getChatStyle().setColor(EnumChatFormatting.RED);
-			sender.addChatMessage(chatcomponenttranslation1);
-		} catch (Throwable var9) {
-			ChatComponentTranslation chatcomponenttranslation = new ChatComponentTranslation(
-					"commands.generic.exception", new Object[0]);
-			chatcomponenttranslation.getChatStyle().setColor(EnumChatFormatting.RED);
-			sender.addChatMessage(chatcomponenttranslation);
-			logger.warn("Couldn\'t process command: \'" + input + "\'");
-		}
-
-		return false;
+	public Map<String, ICommand> getCommands() {
+		return this.commandMap;
 	}
 
-	/**+
-	 * adds the command and any aliases it has to the internal map
-	 * of available commands
+	/**
+	 * + returns all commands that the commandSender can use
 	 */
-	public ICommand registerCommand(ICommand command) {
-		this.commandMap.put(command.getCommandName(), command);
-		this.commandSet.add(command);
+	public List<ICommand> getPossibleCommands(ICommandSender sender) {
+		ArrayList arraylist = Lists.newArrayList();
 
-		for (String s : command.getCommandAliases()) {
-			ICommand icommand = (ICommand) this.commandMap.get(s);
-			if (icommand == null || !icommand.getCommandName().equals(s)) {
-				this.commandMap.put(s, command);
+		for (ICommand icommand : this.commandSet) {
+			if (icommand.canCommandSenderUseCommand(sender)) {
+				arraylist.add(icommand);
 			}
 		}
 
-		return command;
-	}
-
-	/**+
-	 * creates a new array and sets elements 0..n-2 to be 0..n-1 of
-	 * the input (n elements)
-	 */
-	private static String[] dropFirstString(String[] input) {
-		String[] astring = new String[input.length - 1];
-		System.arraycopy(input, 1, astring, 0, input.length - 1);
-		return astring;
+		return arraylist;
 	}
 
 	public List<String> getTabCompletionOptions(ICommandSender sender, String input, BlockPos pos) {
@@ -172,28 +154,8 @@ public class CommandHandler implements ICommandManager {
 		}
 	}
 
-	/**+
-	 * returns all commands that the commandSender can use
-	 */
-	public List<ICommand> getPossibleCommands(ICommandSender sender) {
-		ArrayList arraylist = Lists.newArrayList();
-
-		for (ICommand icommand : this.commandSet) {
-			if (icommand.canCommandSenderUseCommand(sender)) {
-				arraylist.add(icommand);
-			}
-		}
-
-		return arraylist;
-	}
-
-	public Map<String, ICommand> getCommands() {
-		return this.commandMap;
-	}
-
-	/**+
-	 * Return a command's first parameter index containing a valid
-	 * username.
+	/**
+	 * + Return a command's first parameter index containing a valid username.
 	 */
 	private int getUsernameIndex(ICommand command, String[] args) {
 		if (command == null) {
@@ -207,5 +169,49 @@ public class CommandHandler implements ICommandManager {
 
 			return -1;
 		}
+	}
+
+	/**
+	 * + adds the command and any aliases it has to the internal map of available
+	 * commands
+	 */
+	public ICommand registerCommand(ICommand command) {
+		this.commandMap.put(command.getCommandName(), command);
+		this.commandSet.add(command);
+
+		for (String s : command.getCommandAliases()) {
+			ICommand icommand = (ICommand) this.commandMap.get(s);
+			if (icommand == null || !icommand.getCommandName().equals(s)) {
+				this.commandMap.put(s, command);
+			}
+		}
+
+		return command;
+	}
+
+	protected boolean tryExecute(ICommandSender sender, String[] args, ICommand command, String input) {
+		try {
+			command.processCommand(sender, args);
+			return true;
+		} catch (WrongUsageException wrongusageexception) {
+			ChatComponentTranslation chatcomponenttranslation2 = new ChatComponentTranslation("commands.generic.usage",
+					new Object[] { new ChatComponentTranslation(wrongusageexception.getMessage(),
+							wrongusageexception.getErrorObjects()) });
+			chatcomponenttranslation2.getChatStyle().setColor(EnumChatFormatting.RED);
+			sender.addChatMessage(chatcomponenttranslation2);
+		} catch (CommandException commandexception) {
+			ChatComponentTranslation chatcomponenttranslation1 = new ChatComponentTranslation(
+					commandexception.getMessage(), commandexception.getErrorObjects());
+			chatcomponenttranslation1.getChatStyle().setColor(EnumChatFormatting.RED);
+			sender.addChatMessage(chatcomponenttranslation1);
+		} catch (Throwable var9) {
+			ChatComponentTranslation chatcomponenttranslation = new ChatComponentTranslation(
+					"commands.generic.exception", new Object[0]);
+			chatcomponenttranslation.getChatStyle().setColor(EnumChatFormatting.RED);
+			sender.addChatMessage(chatcomponenttranslation);
+			logger.warn("Couldn\'t process command: \'" + input + "\'");
+		}
+
+		return false;
 	}
 }

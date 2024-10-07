@@ -10,22 +10,25 @@ import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.WorldSettings;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -56,59 +59,44 @@ public class NetworkPlayerInfo {
 		this.displayNameProfanityFilter = null;
 	}
 
-	/**+
-	 * Returns the GameProfile for the player represented by this
-	 * NetworkPlayerInfo instance
-	 */
-	public GameProfile getGameProfile() {
-		return this.gameProfile;
+	public int func_178835_l() {
+		return this.field_178873_i;
 	}
 
-	public WorldSettings.GameType getGameType() {
-		return this.gameType;
+	public void func_178836_b(int parInt1) {
+		this.field_178873_i = parInt1;
 	}
 
-	public int getResponseTime() {
-		return this.responseTime;
+	public void func_178843_c(long parLong1) {
+		this.field_178869_m = parLong1;
 	}
 
-	protected void setGameType(WorldSettings.GameType parGameType) {
-		this.gameType = parGameType;
+	public void func_178844_b(long parLong1) {
+		this.field_178868_l = parLong1;
 	}
 
-	protected void setResponseTime(int parInt1) {
-		this.responseTime = parInt1;
+	public void func_178846_a(long parLong1) {
+		this.field_178871_k = parLong1;
 	}
 
-	public boolean hasLocationSkin() {
-		return true;
+	public long func_178847_n() {
+		return this.field_178871_k;
 	}
 
-	public String getSkinType() {
-		return Minecraft.getMinecraft().getNetHandler().getSkinCache().getSkin(this.gameProfile)
-				.getSkinModel().profileSkinType;
+	public long func_178855_p() {
+		return this.field_178869_m;
 	}
 
-	public SkinModel getEaglerSkinModel() {
-		return Minecraft.getMinecraft().getNetHandler().getSkinCache().getSkin(this.gameProfile).getSkinModel();
+	public void func_178857_c(int parInt1) {
+		this.field_178870_j = parInt1;
 	}
 
-	public ResourceLocation getLocationSkin() {
-		return Minecraft.getMinecraft().getNetHandler().getSkinCache().getSkin(this.gameProfile).getResourceLocation();
+	public long func_178858_o() {
+		return this.field_178868_l;
 	}
 
-	public ResourceLocation getLocationCape() {
-		return Minecraft.getMinecraft().getNetHandler().getCapeCache().getCape(this.gameProfile.getId())
-				.getResourceLocation();
-	}
-
-	public ScorePlayerTeam getPlayerTeam() {
-		return Minecraft.getMinecraft().theWorld.getScoreboard().getPlayersTeam(this.getGameProfile().getName());
-	}
-
-	public void setDisplayName(IChatComponent displayNameIn) {
-		this.displayName = displayNameIn;
-		this.displayNameProfanityFilter = null;
+	public int func_178860_m() {
+		return this.field_178870_j;
 	}
 
 	public IChatComponent getDisplayName() {
@@ -131,6 +119,18 @@ public class NetworkPlayerInfo {
 		}
 	}
 
+	public SkinModel getEaglerSkinModel() {
+		return Minecraft.getMinecraft().getNetHandler().getSkinCache().getSkin(this.gameProfile).getSkinModel();
+	}
+
+	/**
+	 * + Returns the GameProfile for the player represented by this
+	 * NetworkPlayerInfo instance
+	 */
+	public GameProfile getGameProfile() {
+		return this.gameProfile;
+	}
+
 	public String getGameProfileNameProfanityFilter() {
 		if (Minecraft.getMinecraft().isEnableProfanityFilter()) {
 			if (this.gameProfileProfanityFilter == null) {
@@ -143,43 +143,46 @@ public class NetworkPlayerInfo {
 		}
 	}
 
-	public int func_178835_l() {
-		return this.field_178873_i;
+	public WorldSettings.GameType getGameType() {
+		return this.gameType;
 	}
 
-	public void func_178836_b(int parInt1) {
-		this.field_178873_i = parInt1;
+	public ResourceLocation getLocationCape() {
+		return Minecraft.getMinecraft().getNetHandler().getCapeCache().getCape(this.gameProfile.getId())
+				.getResourceLocation();
 	}
 
-	public int func_178860_m() {
-		return this.field_178870_j;
+	public ResourceLocation getLocationSkin() {
+		return Minecraft.getMinecraft().getNetHandler().getSkinCache().getSkin(this.gameProfile).getResourceLocation();
 	}
 
-	public void func_178857_c(int parInt1) {
-		this.field_178870_j = parInt1;
+	public ScorePlayerTeam getPlayerTeam() {
+		return Minecraft.getMinecraft().theWorld.getScoreboard().getPlayersTeam(this.getGameProfile().getName());
 	}
 
-	public long func_178847_n() {
-		return this.field_178871_k;
+	public int getResponseTime() {
+		return this.responseTime;
 	}
 
-	public void func_178846_a(long parLong1) {
-		this.field_178871_k = parLong1;
+	public String getSkinType() {
+		return Minecraft.getMinecraft().getNetHandler().getSkinCache().getSkin(this.gameProfile)
+				.getSkinModel().profileSkinType;
 	}
 
-	public long func_178858_o() {
-		return this.field_178868_l;
+	public boolean hasLocationSkin() {
+		return true;
 	}
 
-	public void func_178844_b(long parLong1) {
-		this.field_178868_l = parLong1;
+	public void setDisplayName(IChatComponent displayNameIn) {
+		this.displayName = displayNameIn;
+		this.displayNameProfanityFilter = null;
 	}
 
-	public long func_178855_p() {
-		return this.field_178869_m;
+	protected void setGameType(WorldSettings.GameType parGameType) {
+		this.gameType = parGameType;
 	}
 
-	public void func_178843_c(long parLong1) {
-		this.field_178869_m = parLong1;
+	protected void setResponseTime(int parInt1) {
+		this.responseTime = parInt1;
 	}
 }

@@ -35,8 +35,13 @@ final class FilteredEntrySetMultimap<K, V> extends FilteredEntryMultimap<K, V> i
 	}
 
 	@Override
-	public SetMultimap<K, V> unfiltered() {
-		return (SetMultimap<K, V>) unfiltered;
+	Set<Entry<K, V>> createEntries() {
+		return Sets.filter(unfiltered().entries(), entryPredicate());
+	}
+
+	@Override
+	public Set<Entry<K, V>> entries() {
+		return (Set<Entry<K, V>>) super.entries();
 	}
 
 	@Override
@@ -55,12 +60,7 @@ final class FilteredEntrySetMultimap<K, V> extends FilteredEntryMultimap<K, V> i
 	}
 
 	@Override
-	Set<Entry<K, V>> createEntries() {
-		return Sets.filter(unfiltered().entries(), entryPredicate());
-	}
-
-	@Override
-	public Set<Entry<K, V>> entries() {
-		return (Set<Entry<K, V>>) super.entries();
+	public SetMultimap<K, V> unfiltered() {
+		return (SetMultimap<K, V>) unfiltered;
 	}
 }

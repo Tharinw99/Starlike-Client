@@ -1,8 +1,43 @@
 package net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred;
 
-import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL.*;
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
-import static net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.ExtGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglBufferData;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDeleteBuffers;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDeleteVertexArrays;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDrawArraysInstanced;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDrawElements;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglEnableVertexAttribArray;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGenBuffers;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGenVertexArrays;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglPixelStorei;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglTexImage2D;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglTexParameteri;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniform1f;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniform2f;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniform3f;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglVertexAttribDivisor;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglVertexAttribPointer;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ARRAY_BUFFER;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_FLOAT;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_LINEAR;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_LINEAR_MIPMAP_NEAREST;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ONE;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_RED;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_REPEAT;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_STATIC_DRAW;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE0;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE1;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE2;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE_2D;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE_MAG_FILTER;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE_MAX_LEVEL;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE_MIN_FILTER;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE_WRAP_S;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE_WRAP_T;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TRIANGLES;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_UNPACK_ALIGNMENT;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_UNSIGNED_BYTE;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_UNSIGNED_SHORT;
+import static net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.ExtGLEnums._GL_R8;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -24,22 +59,25 @@ import net.minecraft.util.ResourceLocation;
 /**
  * Copyright (c) 2023 lax1dude. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class LensFlareMeshRenderer {
 
-	public static final ResourceLocation streaksTextureLocation = new ResourceLocation("eagler:glsl/deferred/lens_streaks.bmp");
-	public static final ResourceLocation ghostsTextureLocation = new ResourceLocation("eagler:glsl/deferred/lens_ghosts.bmp");
+	public static final ResourceLocation streaksTextureLocation = new ResourceLocation(
+			"eagler:glsl/deferred/lens_streaks.bmp");
+	public static final ResourceLocation ghostsTextureLocation = new ResourceLocation(
+			"eagler:glsl/deferred/lens_ghosts.bmp");
 	public static final int ghostsSpriteCount = 4;
 
 	static IBufferArrayGL streaksVertexArray = null;
@@ -61,18 +99,120 @@ public class LensFlareMeshRenderer {
 	static final Matrix3f tmpMat2 = new Matrix3f();
 	static final Vector3f tmpVec = new Vector3f();
 
+	static void destroy() {
+		if (streaksVertexArray != null) {
+			_wglDeleteVertexArrays(streaksVertexArray);
+			streaksVertexArray = null;
+		}
+		if (streaksVertexBuffer != null) {
+			_wglDeleteBuffers(streaksVertexBuffer);
+			streaksVertexBuffer = null;
+		}
+		if (ghostsVertexArray != null) {
+			_wglDeleteVertexArrays(ghostsVertexArray);
+			ghostsVertexArray = null;
+		}
+		if (ghostsVertexBuffer != null) {
+			_wglDeleteBuffers(ghostsVertexBuffer);
+			ghostsVertexBuffer = null;
+		}
+		if (streaksTexture != -1) {
+			GlStateManager.deleteTexture(streaksTexture);
+			streaksTexture = -1;
+		}
+		if (ghostsTexture != -1) {
+			GlStateManager.deleteTexture(ghostsTexture);
+			ghostsTexture = -1;
+		}
+		if (streaksProgram != null) {
+			streaksProgram.destroy();
+			streaksProgram = null;
+		}
+		if (ghostsProgram != null) {
+			ghostsProgram.destroy();
+			ghostsProgram = null;
+		}
+	}
+
+	static void drawLensFlares(float sunScreenX, float sunScreenY) {
+		GlStateManager.enableBlend();
+		GlStateManager.blendFunc(GL_ONE, GL_ONE);
+
+		GlStateManager.setActiveTexture(GL_TEXTURE2);
+		GlStateManager.bindTexture(EaglerDeferredPipeline.instance.sunOcclusionValueTexture);
+		GlStateManager.setActiveTexture(GL_TEXTURE1);
+		GlStateManager.bindTexture(EaglerDeferredPipeline.instance.exposureBlendTexture);
+		GlStateManager.setActiveTexture(GL_TEXTURE0);
+		GlStateManager.bindTexture(streaksTexture);
+
+		streaksProgram.useProgram();
+
+		Minecraft mc = Minecraft.getMinecraft();
+		float aspectRatio = (float) mc.displayHeight / (float) mc.displayWidth;
+
+		float fov = 90.0f / mc.entityRenderer.getFOVModifier(EaglerDeferredPipeline.instance.getPartialTicks(), true);
+		float size = 0.075f * fov * (1.0f + MathHelper.sqrt_float(sunScreenX * sunScreenX + sunScreenY * sunScreenY));
+
+		tmpMat.setIdentity();
+		tmpMat.m00 = aspectRatio * 2.0f * size;
+		tmpMat.m11 = size;
+		tmpMat.m20 = sunScreenX;
+		tmpMat.m21 = sunScreenY;
+
+		float rotation = sunScreenX * sunScreenX * Math.signum(sunScreenX)
+				+ sunScreenY * sunScreenY * Math.signum(sunScreenY);
+
+		tmpMat2.setIdentity();
+		tmpMat2.m00 = MathHelper.cos(rotation);
+		tmpMat2.m01 = MathHelper.sin(rotation);
+		tmpMat2.m10 = -tmpMat2.m01;
+		tmpMat2.m11 = tmpMat2.m00;
+		Matrix3f.mul(tmpMat, tmpMat2, tmpMat);
+
+		EaglerDeferredPipeline.uniformMatrixHelper(streaksProgram.uniforms.u_sunFlareMatrix3f, tmpMat);
+
+		Vector3f v = DeferredStateManager.currentSunLightColor;
+		float mag = 1.0f + DeferredStateManager.currentSunAngle.y * 0.8f;
+		if (mag > 1.0f) {
+			mag = 1.0f - (mag - 1.0f) * 20.0f;
+			if (mag < 0.0f) {
+				mag = 0.0f;
+			}
+		}
+		mag = 0.003f * (1.0f + mag * mag * mag * 4.0f);
+		_wglUniform3f(streaksProgram.uniforms.u_flareColor3f, v.x * mag * 0.5f, v.y * mag * 0.5f, v.z * mag * 0.5f);
+
+		EaglercraftGPU.bindGLBufferArray(streaksVertexArray);
+		_wglDrawElements(GL_TRIANGLES, streaksVertexCount + (streaksVertexCount >> 1), GL_UNSIGNED_SHORT, 0);
+
+		ghostsProgram.useProgram();
+
+		GlStateManager.setActiveTexture(GL_TEXTURE0);
+		GlStateManager.bindTexture(ghostsTexture);
+
+		_wglUniform3f(ghostsProgram.uniforms.u_flareColor3f, v.x * mag, v.y * mag, v.z * mag);
+		_wglUniform1f(ghostsProgram.uniforms.u_aspectRatio1f, aspectRatio);
+		_wglUniform2f(ghostsProgram.uniforms.u_sunPosition2f, sunScreenX, sunScreenY);
+		_wglUniform1f(ghostsProgram.uniforms.u_baseScale1f, fov);
+
+		EaglercraftGPU.bindGLBufferArray(ghostsVertexArray);
+		_wglDrawArraysInstanced(GL_TRIANGLES, 0, 6, ghostsInstanceCount);
+
+		GlStateManager.disableBlend();
+	}
+
 	static void initialize() {
 		destroy();
-		
+
 		streaksProgram = PipelineShaderLensFlares.compileStreaks();
 		streaksProgram.loadUniforms();
-		
+
 		ghostsProgram = PipelineShaderLensFlares.compileGhosts();
 		ghostsProgram.loadUniforms();
-		
+
 		ByteBuffer copyBuffer = EagRuntime.allocateByteBuffer(16384);
 
-		for(int i = 0; i < 4; ++i) {
+		for (int i = 0; i < 4; ++i) {
 			pushStreakQuad(copyBuffer, 0.0f, 0.0f, 1.0f, 10.0f, 0.0f, 0.0f, 1.0f, 1.0f, (i * 3.14159f / 4.0f));
 			pushStreakQuad(copyBuffer, 0.0f, 0.0f, 1.5f, 5.0f, 0.0f, 0.0f, 1.0f, 1.0f, ((i + 0.25f) * 3.14159f / 4.0f));
 			pushStreakQuad(copyBuffer, 0.0f, 0.0f, 0.5f, 7.0f, 0.0f, 0.0f, 1.0f, 1.0f, ((i + 0.5f) * 3.14159f / 4.0f));
@@ -160,7 +300,7 @@ public class LensFlareMeshRenderer {
 		try (DataInputStream dis = new DataInputStream(
 				Minecraft.getMinecraft().getResourceManager().getResource(streaksTextureLocation).getInputStream())) {
 			loadFlareTexture(copyBuffer, dis);
-		}catch(IOException ex) {
+		} catch (IOException ex) {
 			EagRuntime.freeByteBuffer(copyBuffer);
 			throw new RuntimeException("Could not load: " + streaksTextureLocation, ex);
 		}
@@ -170,7 +310,7 @@ public class LensFlareMeshRenderer {
 		try (DataInputStream dis = new DataInputStream(
 				Minecraft.getMinecraft().getResourceManager().getResource(ghostsTextureLocation).getInputStream())) {
 			loadFlareTexture(copyBuffer, dis);
-		}catch(IOException ex) {
+		} catch (IOException ex) {
 			EagRuntime.freeByteBuffer(copyBuffer);
 			throw new RuntimeException("Could not load: " + ghostsTextureLocation, ex);
 		}
@@ -185,18 +325,38 @@ public class LensFlareMeshRenderer {
 		_wglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		_wglPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		int mip = 0;
-		while(dis.read() == 'E') {
+		while (dis.read() == 'E') {
 			int w = dis.readShort();
 			int h = dis.readShort();
 			copyBuffer.clear();
-			for(int i = 0, l = w * h; i < l; ++i) {
-				copyBuffer.put((byte)dis.read());
+			for (int i = 0, l = w * h; i < l; ++i) {
+				copyBuffer.put((byte) dis.read());
 			}
 			copyBuffer.flip();
 			_wglTexImage2D(GL_TEXTURE_2D, mip++, _GL_R8, w, h, 0, GL_RED, GL_UNSIGNED_BYTE, copyBuffer);
 		}
 		_wglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, mip - 1);
 		_wglPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+	}
+
+	static void pushGhostQuad(ByteBuffer copyBuffer, float offset, float scale, int sprite, float r, float g, float b,
+			float a) {
+		copyBuffer.putFloat(offset);
+		copyBuffer.putFloat(scale);
+		copyBuffer.putFloat(0.0f);
+		copyBuffer.putFloat((float) sprite / ghostsSpriteCount);
+		copyBuffer.putFloat(1.0f);
+		copyBuffer.putFloat(1.0f / ghostsSpriteCount);
+		copyBuffer.putFloat(r * a);
+		copyBuffer.putFloat(g * a);
+		copyBuffer.putFloat(b * a);
+		++ghostsInstanceCount;
+	}
+
+	static void pushGhostQuadAbberated(ByteBuffer copyBuffer, float offset, float scale, int sprite, float r, float g,
+			float b, float a) {
+		pushGhostQuad(copyBuffer, offset, scale, sprite, 0.0f, g, b, a);
+		pushGhostQuad(copyBuffer, offset + 0.005f, scale, sprite, r, 0.0f, 0.0f, a);
 	}
 
 	static void pushStreakQuad(ByteBuffer copyBuffer, float x, float y, float w, float h, float tx, float ty, float tw,
@@ -207,164 +367,45 @@ public class LensFlareMeshRenderer {
 		tmpMat.m11 = tmpMat.m00;
 		tmpMat.m20 = x;
 		tmpMat.m21 = y;
-		
+
 		tmpVec.x = -w;
 		tmpVec.y = -h;
 		tmpVec.z = 1.0f;
 		Matrix3f.transform(tmpMat, tmpVec, tmpVec);
-		
+
 		copyBuffer.putFloat(tmpVec.x);
 		copyBuffer.putFloat(tmpVec.y);
 		copyBuffer.putFloat(tx);
 		copyBuffer.putFloat(ty);
-		
+
 		tmpVec.x = w;
 		tmpVec.y = -h;
 		tmpVec.z = 1.0f;
 		Matrix3f.transform(tmpMat, tmpVec, tmpVec);
-		
+
 		copyBuffer.putFloat(tmpVec.x);
 		copyBuffer.putFloat(tmpVec.y);
 		copyBuffer.putFloat(tx + tw);
 		copyBuffer.putFloat(ty);
-		
+
 		tmpVec.x = w;
 		tmpVec.y = h;
 		tmpVec.z = 1.0f;
 		Matrix3f.transform(tmpMat, tmpVec, tmpVec);
-		
+
 		copyBuffer.putFloat(tmpVec.x);
 		copyBuffer.putFloat(tmpVec.y);
 		copyBuffer.putFloat(tx + tw);
 		copyBuffer.putFloat(ty + th);
-		
+
 		tmpVec.x = -w;
 		tmpVec.y = h;
 		tmpVec.z = 1.0f;
 		Matrix3f.transform(tmpMat, tmpVec, tmpVec);
-		
+
 		copyBuffer.putFloat(tmpVec.x);
 		copyBuffer.putFloat(tmpVec.y);
 		copyBuffer.putFloat(tx);
 		copyBuffer.putFloat(ty + th);
-	}
-
-	static void pushGhostQuadAbberated(ByteBuffer copyBuffer, float offset, float scale, int sprite, float r, float g, float b, float a) {
-		pushGhostQuad(copyBuffer, offset, scale, sprite, 0.0f, g, b, a);
-		pushGhostQuad(copyBuffer, offset + 0.005f, scale, sprite, r, 0.0f, 0.0f, a);
-	}
-
-	static void pushGhostQuad(ByteBuffer copyBuffer, float offset, float scale, int sprite, float r, float g, float b, float a) {
-		copyBuffer.putFloat(offset);
-		copyBuffer.putFloat(scale);
-		copyBuffer.putFloat(0.0f);
-		copyBuffer.putFloat((float)sprite / ghostsSpriteCount);
-		copyBuffer.putFloat(1.0f);
-		copyBuffer.putFloat(1.0f / ghostsSpriteCount);
-		copyBuffer.putFloat(r * a);
-		copyBuffer.putFloat(g * a);
-		copyBuffer.putFloat(b * a);
-		++ghostsInstanceCount;
-	}
-
-	static void drawLensFlares(float sunScreenX, float sunScreenY) {
-		GlStateManager.enableBlend();
-		GlStateManager.blendFunc(GL_ONE, GL_ONE);
-
-		GlStateManager.setActiveTexture(GL_TEXTURE2);
-		GlStateManager.bindTexture(EaglerDeferredPipeline.instance.sunOcclusionValueTexture);
-		GlStateManager.setActiveTexture(GL_TEXTURE1);
-		GlStateManager.bindTexture(EaglerDeferredPipeline.instance.exposureBlendTexture);
-		GlStateManager.setActiveTexture(GL_TEXTURE0);
-		GlStateManager.bindTexture(streaksTexture);
-
-		streaksProgram.useProgram();
-
-		Minecraft mc = Minecraft.getMinecraft();
-		float aspectRatio = (float)mc.displayHeight / (float)mc.displayWidth;
-
-		float fov = 90.0f / mc.entityRenderer.getFOVModifier(EaglerDeferredPipeline.instance.getPartialTicks(), true);
-		float size = 0.075f * fov * (1.0f + MathHelper.sqrt_float(sunScreenX * sunScreenX + sunScreenY * sunScreenY));
-
-		tmpMat.setIdentity();
-		tmpMat.m00 = aspectRatio * 2.0f * size;
-		tmpMat.m11 = size;
-		tmpMat.m20 = sunScreenX;
-		tmpMat.m21 = sunScreenY;
-
-		float rotation = sunScreenX * sunScreenX * Math.signum(sunScreenX) + sunScreenY * sunScreenY * Math.signum(sunScreenY);
-
-		tmpMat2.setIdentity();
-		tmpMat2.m00 = MathHelper.cos(rotation);
-		tmpMat2.m01 = MathHelper.sin(rotation);
-		tmpMat2.m10 = -tmpMat2.m01;
-		tmpMat2.m11 = tmpMat2.m00;
-		Matrix3f.mul(tmpMat, tmpMat2, tmpMat);
-
-		EaglerDeferredPipeline.uniformMatrixHelper(streaksProgram.uniforms.u_sunFlareMatrix3f, tmpMat);
-
-		Vector3f v = DeferredStateManager.currentSunLightColor;
-		float mag = 1.0f + DeferredStateManager.currentSunAngle.y * 0.8f;
-		if(mag > 1.0f) {
-			mag = 1.0f - (mag - 1.0f) * 20.0f;
-			if(mag < 0.0f) {
-				mag = 0.0f;
-			}
-		}
-		mag = 0.003f * (1.0f + mag * mag * mag * 4.0f);
-		_wglUniform3f(streaksProgram.uniforms.u_flareColor3f, v.x * mag * 0.5f, v.y * mag * 0.5f, v.z * mag * 0.5f);
-
-		EaglercraftGPU.bindGLBufferArray(streaksVertexArray);
-		_wglDrawElements(GL_TRIANGLES, streaksVertexCount + (streaksVertexCount >> 1), GL_UNSIGNED_SHORT, 0);
-
-		ghostsProgram.useProgram();
-
-		GlStateManager.setActiveTexture(GL_TEXTURE0);
-		GlStateManager.bindTexture(ghostsTexture);
-
-		_wglUniform3f(ghostsProgram.uniforms.u_flareColor3f, v.x * mag, v.y * mag, v.z * mag);
-		_wglUniform1f(ghostsProgram.uniforms.u_aspectRatio1f, aspectRatio);
-		_wglUniform2f(ghostsProgram.uniforms.u_sunPosition2f, sunScreenX, sunScreenY);
-		_wglUniform1f(ghostsProgram.uniforms.u_baseScale1f, fov);
-
-		EaglercraftGPU.bindGLBufferArray(ghostsVertexArray);
-		_wglDrawArraysInstanced(GL_TRIANGLES, 0, 6, ghostsInstanceCount);
-
-		GlStateManager.disableBlend();
-	}
-
-	static void destroy() {
-		if(streaksVertexArray != null) {
-			_wglDeleteVertexArrays(streaksVertexArray);
-			streaksVertexArray = null;
-		}
-		if(streaksVertexBuffer != null) {
-			_wglDeleteBuffers(streaksVertexBuffer);
-			streaksVertexBuffer = null;
-		}
-		if(ghostsVertexArray != null) {
-			_wglDeleteVertexArrays(ghostsVertexArray);
-			ghostsVertexArray = null;
-		}
-		if(ghostsVertexBuffer != null) {
-			_wglDeleteBuffers(ghostsVertexBuffer);
-			ghostsVertexBuffer = null;
-		}
-		if(streaksTexture != -1) {
-			GlStateManager.deleteTexture(streaksTexture);
-			streaksTexture = -1;
-		}
-		if(ghostsTexture != -1) {
-			GlStateManager.deleteTexture(ghostsTexture);
-			ghostsTexture = -1;
-		}
-		if(streaksProgram != null) {
-			streaksProgram.destroy();
-			streaksProgram = null;
-		}
-		if(ghostsProgram != null) {
-			ghostsProgram.destroy();
-			ghostsProgram = null;
-		}
 	}
 }

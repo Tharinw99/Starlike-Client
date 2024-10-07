@@ -1,6 +1,6 @@
 package net.minecraft.client.gui;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ONE_MINUS_SRC_ALPHA;
 
 import java.util.Map;
 
@@ -17,74 +17,30 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec4b;
 import net.minecraft.world.storage.MapData;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class MapItemRenderer {
-	private static final ResourceLocation mapIcons = new ResourceLocation("textures/map/map_icons.png");
-	private final TextureManager textureManager;
-	private final Map<String, MapItemRenderer.Instance> loadedMaps = Maps.newHashMap();
-
-	public MapItemRenderer(TextureManager textureManagerIn) {
-		this.textureManager = textureManagerIn;
-	}
-
-	/**+
-	 * Updates a map texture
-	 */
-	public void updateMapTexture(MapData mapdataIn) {
-		this.getMapRendererInstance(mapdataIn).updateMapTexture();
-	}
-
-	public void renderMap(MapData mapdataIn, boolean parFlag) {
-		this.getMapRendererInstance(mapdataIn).render(parFlag);
-	}
-
-	/**+
-	 * Returns {@link
-	 * net.minecraft.client.gui.MapItemRenderer.Instance
-	 * MapItemRenderer.Instance} with given map data
-	 */
-	private MapItemRenderer.Instance getMapRendererInstance(MapData mapdataIn) {
-		MapItemRenderer.Instance mapitemrenderer$instance = (MapItemRenderer.Instance) this.loadedMaps
-				.get(mapdataIn.mapName);
-		if (mapitemrenderer$instance == null) {
-			mapitemrenderer$instance = new MapItemRenderer.Instance(mapdataIn);
-			this.loadedMaps.put(mapdataIn.mapName, mapitemrenderer$instance);
-		}
-
-		return mapitemrenderer$instance;
-	}
-
-	/**+
-	 * Clears the currently loaded maps and removes their
-	 * corresponding textures
-	 */
-	public void clearLoadedMaps() {
-		for (MapItemRenderer.Instance mapitemrenderer$instance : this.loadedMaps.values()) {
-			this.textureManager.deleteTexture(mapitemrenderer$instance.location);
-		}
-
-		this.loadedMaps.clear();
-	}
-
 	class Instance {
 		private final MapData mapData;
 		private final DynamicTexture mapTexture;
@@ -102,24 +58,6 @@ public class MapItemRenderer {
 				this.mapTextureData[i] = 0;
 			}
 
-		}
-
-		/**+
-		 * Updates a map texture
-		 */
-		private void updateMapTexture() {
-			for (int i = 0; i < 16384; ++i) {
-				int j = this.mapData.colors[i] & 255;
-				int c;
-				if (j / 4 == 0) {
-					c = (i + i / 128 & 1) * 8 + 16 << 24;
-				} else {
-					c = MapColor.mapColorArray[j / 4].func_151643_b(j & 3);
-				}
-				this.mapTextureData[i] = (c & 0xFF00FF00) | ((c & 0x00FF0000) >>> 16) | ((c & 0x000000FF) << 16);
-			}
-
-			this.mapTexture.updateDynamicTexture();
 		}
 
 		private void render(boolean noOverlayRendering) {
@@ -184,5 +122,69 @@ public class MapItemRenderer {
 			GlStateManager.scale(1.0F, 1.0F, 1.0F);
 			GlStateManager.popMatrix();
 		}
+
+		/**
+		 * + Updates a map texture
+		 */
+		private void updateMapTexture() {
+			for (int i = 0; i < 16384; ++i) {
+				int j = this.mapData.colors[i] & 255;
+				int c;
+				if (j / 4 == 0) {
+					c = (i + i / 128 & 1) * 8 + 16 << 24;
+				} else {
+					c = MapColor.mapColorArray[j / 4].func_151643_b(j & 3);
+				}
+				this.mapTextureData[i] = (c & 0xFF00FF00) | ((c & 0x00FF0000) >>> 16) | ((c & 0x000000FF) << 16);
+			}
+
+			this.mapTexture.updateDynamicTexture();
+		}
+	}
+
+	private static final ResourceLocation mapIcons = new ResourceLocation("textures/map/map_icons.png");
+	private final TextureManager textureManager;
+
+	private final Map<String, MapItemRenderer.Instance> loadedMaps = Maps.newHashMap();
+
+	public MapItemRenderer(TextureManager textureManagerIn) {
+		this.textureManager = textureManagerIn;
+	}
+
+	/**
+	 * + Clears the currently loaded maps and removes their corresponding textures
+	 */
+	public void clearLoadedMaps() {
+		for (MapItemRenderer.Instance mapitemrenderer$instance : this.loadedMaps.values()) {
+			this.textureManager.deleteTexture(mapitemrenderer$instance.location);
+		}
+
+		this.loadedMaps.clear();
+	}
+
+	/**
+	 * + Returns {@link net.minecraft.client.gui.MapItemRenderer.Instance
+	 * MapItemRenderer.Instance} with given map data
+	 */
+	private MapItemRenderer.Instance getMapRendererInstance(MapData mapdataIn) {
+		MapItemRenderer.Instance mapitemrenderer$instance = (MapItemRenderer.Instance) this.loadedMaps
+				.get(mapdataIn.mapName);
+		if (mapitemrenderer$instance == null) {
+			mapitemrenderer$instance = new MapItemRenderer.Instance(mapdataIn);
+			this.loadedMaps.put(mapdataIn.mapName, mapitemrenderer$instance);
+		}
+
+		return mapitemrenderer$instance;
+	}
+
+	public void renderMap(MapData mapdataIn, boolean parFlag) {
+		this.getMapRendererInstance(mapdataIn).render(parFlag);
+	}
+
+	/**
+	 * + Updates a map texture
+	 */
+	public void updateMapTexture(MapData mapdataIn) {
+		this.getMapRendererInstance(mapdataIn).updateMapTexture();
 	}
 }

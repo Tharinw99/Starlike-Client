@@ -20,22 +20,25 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -57,57 +60,14 @@ public abstract class AbstractClientPlayer extends EntityPlayer {
 		super(worldIn, playerProfile);
 	}
 
-	/**+
-	 * Returns true if the player is in spectator mode.
-	 */
-	public boolean isSpectator() {
-		NetworkPlayerInfo networkplayerinfo = Minecraft.getMinecraft().getNetHandler()
-				.getPlayerInfo(this.getGameProfile().getId());
-		return networkplayerinfo != null && networkplayerinfo.getGameType() == WorldSettings.GameType.SPECTATOR;
-	}
-
-	/**+
-	 * Checks if this instance of AbstractClientPlayer has any
-	 * associated player data.
-	 */
-	public boolean hasPlayerInfo() {
-		return this.getPlayerInfo() != null;
-	}
-
-	protected NetworkPlayerInfo getPlayerInfo() {
-		if (this.playerInfo == null) {
-			this.playerInfo = Minecraft.getMinecraft().getNetHandler().getPlayerInfo(this.getUniqueID());
-		}
-
-		return this.playerInfo;
-	}
-
-	/**+
-	 * Returns true if the player has an associated skin.
-	 */
-	public boolean hasSkin() {
-		NetworkPlayerInfo networkplayerinfo = this.getPlayerInfo();
-		return networkplayerinfo != null && networkplayerinfo.hasLocationSkin();
-	}
-
-	/**+
-	 * Returns true if the username has an associated skin.
-	 */
-	public ResourceLocation getLocationSkin() {
-		NetworkPlayerInfo networkplayerinfo = this.getPlayerInfo();
-		return networkplayerinfo == null ? DefaultPlayerSkin.getDefaultSkin(this.getUniqueID())
-				: networkplayerinfo.getLocationSkin();
-	}
-
-	public ResourceLocation getLocationCape() {
-		NetworkPlayerInfo networkplayerinfo = this.getPlayerInfo();
-		return networkplayerinfo == null ? null : networkplayerinfo.getLocationCape();
-	}
-
-	public String getSkinType() {
-		NetworkPlayerInfo networkplayerinfo = this.getPlayerInfo();
-		return networkplayerinfo == null ? DefaultPlayerSkin.getSkinType(this.getUniqueID())
-				: networkplayerinfo.getSkinType();
+	public IChatComponent getDisplayNameProfanityFilter() {
+		ChatComponentText chatcomponenttext = new ChatComponentText(
+				ScorePlayerTeam.formatPlayerName(this.getTeam(), this.getNameProfanityFilter()));
+		chatcomponenttext.getChatStyle()
+				.setChatClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + this.getName() + " "));
+		chatcomponenttext.getChatStyle().setChatHoverEvent(this.getHoverEvent());
+		chatcomponenttext.getChatStyle().setInsertion(this.getName());
+		return chatcomponenttext;
 	}
 
 	public SkinModel getEaglerSkinModel() {
@@ -143,6 +103,20 @@ public abstract class AbstractClientPlayer extends EntityPlayer {
 		return f;
 	}
 
+	public ResourceLocation getLocationCape() {
+		NetworkPlayerInfo networkplayerinfo = this.getPlayerInfo();
+		return networkplayerinfo == null ? null : networkplayerinfo.getLocationCape();
+	}
+
+	/**
+	 * + Returns true if the username has an associated skin.
+	 */
+	public ResourceLocation getLocationSkin() {
+		NetworkPlayerInfo networkplayerinfo = this.getPlayerInfo();
+		return networkplayerinfo == null ? DefaultPlayerSkin.getDefaultSkin(this.getUniqueID())
+				: networkplayerinfo.getLocationSkin();
+	}
+
 	public String getNameProfanityFilter() {
 		if (Minecraft.getMinecraft().isEnableProfanityFilter()) {
 			if (nameProfanityFilter == null) {
@@ -155,13 +129,42 @@ public abstract class AbstractClientPlayer extends EntityPlayer {
 		}
 	}
 
-	public IChatComponent getDisplayNameProfanityFilter() {
-		ChatComponentText chatcomponenttext = new ChatComponentText(
-				ScorePlayerTeam.formatPlayerName(this.getTeam(), this.getNameProfanityFilter()));
-		chatcomponenttext.getChatStyle()
-				.setChatClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + this.getName() + " "));
-		chatcomponenttext.getChatStyle().setChatHoverEvent(this.getHoverEvent());
-		chatcomponenttext.getChatStyle().setInsertion(this.getName());
-		return chatcomponenttext;
+	protected NetworkPlayerInfo getPlayerInfo() {
+		if (this.playerInfo == null) {
+			this.playerInfo = Minecraft.getMinecraft().getNetHandler().getPlayerInfo(this.getUniqueID());
+		}
+
+		return this.playerInfo;
+	}
+
+	public String getSkinType() {
+		NetworkPlayerInfo networkplayerinfo = this.getPlayerInfo();
+		return networkplayerinfo == null ? DefaultPlayerSkin.getSkinType(this.getUniqueID())
+				: networkplayerinfo.getSkinType();
+	}
+
+	/**
+	 * + Checks if this instance of AbstractClientPlayer has any associated player
+	 * data.
+	 */
+	public boolean hasPlayerInfo() {
+		return this.getPlayerInfo() != null;
+	}
+
+	/**
+	 * + Returns true if the player has an associated skin.
+	 */
+	public boolean hasSkin() {
+		NetworkPlayerInfo networkplayerinfo = this.getPlayerInfo();
+		return networkplayerinfo != null && networkplayerinfo.hasLocationSkin();
+	}
+
+	/**
+	 * + Returns true if the player is in spectator mode.
+	 */
+	public boolean isSpectator() {
+		NetworkPlayerInfo networkplayerinfo = Minecraft.getMinecraft().getNetHandler()
+				.getPlayerInfo(this.getGameProfile().getId());
+		return networkplayerinfo != null && networkplayerinfo.getGameType() == WorldSettings.GameType.SPECTATOR;
 	}
 }

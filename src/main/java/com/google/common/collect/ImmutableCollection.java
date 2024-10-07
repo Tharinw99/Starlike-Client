@@ -49,166 +49,53 @@ import com.google.common.annotations.GwtCompatible;
 @SuppressWarnings("serial") // we're overriding default serialization
 public abstract class ImmutableCollection<E> extends AbstractCollection<E> implements Serializable {
 
-	ImmutableCollection() {
-	}
+	abstract static class ArrayBasedBuilder<E> extends ImmutableCollection.Builder<E> {
+		Object[] contents;
+		int size;
 
-	/**
-	 * Returns an unmodifiable iterator across the elements in this collection.
-	 */
-	@Override
-	public abstract UnmodifiableIterator<E> iterator();
-
-	@Override
-	public final Object[] toArray() {
-		int size = size();
-		if (size == 0) {
-			return ObjectArrays.EMPTY_ARRAY;
+		ArrayBasedBuilder(int initialCapacity) {
+			checkNonnegative(initialCapacity, "initialCapacity");
+			this.contents = new Object[initialCapacity];
+			this.size = 0;
 		}
-		Object[] result = new Object[size()];
-		copyIntoArray(result, 0);
-		return result;
-	}
 
-	@Override
-	public final <T> T[] toArray(T[] other) {
-		checkNotNull(other);
-		int size = size();
-		if (other.length < size) {
-			other = ObjectArrays.newArray(other, size);
-		} else if (other.length > size) {
-			other[size] = null;
+		@Override
+		public ArrayBasedBuilder<E> add(E element) {
+			checkNotNull(element);
+			ensureCapacity(size + 1);
+			contents[size++] = element;
+			return this;
 		}
-		copyIntoArray(other, 0);
-		return other;
-	}
 
-	@Override
-	public boolean contains(@Nullable Object object) {
-		return object != null && super.contains(object);
-	}
-
-	/**
-	 * Guaranteed to throw an exception and leave the collection unmodified.
-	 *
-	 * @throws UnsupportedOperationException always
-	 * @deprecated Unsupported operation.
-	 */
-	@Deprecated
-	@Override
-	public final boolean add(E e) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Guaranteed to throw an exception and leave the collection unmodified.
-	 *
-	 * @throws UnsupportedOperationException always
-	 * @deprecated Unsupported operation.
-	 */
-	@Deprecated
-	@Override
-	public final boolean remove(Object object) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Guaranteed to throw an exception and leave the collection unmodified.
-	 *
-	 * @throws UnsupportedOperationException always
-	 * @deprecated Unsupported operation.
-	 */
-	@Deprecated
-	@Override
-	public final boolean addAll(Collection<? extends E> newElements) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Guaranteed to throw an exception and leave the collection unmodified.
-	 *
-	 * @throws UnsupportedOperationException always
-	 * @deprecated Unsupported operation.
-	 */
-	@Deprecated
-	@Override
-	public final boolean removeAll(Collection<?> oldElements) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Guaranteed to throw an exception and leave the collection unmodified.
-	 *
-	 * @throws UnsupportedOperationException always
-	 * @deprecated Unsupported operation.
-	 */
-	@Deprecated
-	@Override
-	public final boolean retainAll(Collection<?> elementsToKeep) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Guaranteed to throw an exception and leave the collection unmodified.
-	 *
-	 * @throws UnsupportedOperationException always
-	 * @deprecated Unsupported operation.
-	 */
-	@Deprecated
-	@Override
-	public final void clear() {
-		throw new UnsupportedOperationException();
-	}
-
-	/*
-	 * TODO(kevinb): Restructure code so ImmutableList doesn't contain this
-	 * variable, which it doesn't use.
-	 */
-	private transient ImmutableList<E> asList;
-
-	/**
-	 * Returns a list view of the collection.
-	 *
-	 * @since 2.0
-	 */
-	public ImmutableList<E> asList() {
-		ImmutableList<E> list = asList;
-		return (list == null) ? (asList = createAsList()) : list;
-	}
-
-	ImmutableList<E> createAsList() {
-		switch (size()) {
-		case 0:
-			return ImmutableList.of();
-		case 1:
-			return ImmutableList.of(iterator().next());
-		default:
-			return new RegularImmutableAsList<E>(this, toArray());
+		@Override
+		public Builder<E> add(E... elements) {
+			checkElementsNotNull(elements);
+			ensureCapacity(size + elements.length);
+			System.arraycopy(elements, 0, contents, size, elements.length);
+			size += elements.length;
+			return this;
 		}
-	}
 
-	/**
-	 * Returns {@code true} if this immutable collection's implementation contains
-	 * references to user-created objects that aren't accessible via this
-	 * collection's methods. This is generally used to determine whether
-	 * {@code copyOf} implementations should make an explicit copy to avoid memory
-	 * leaks.
-	 */
-	abstract boolean isPartialView();
-
-	/**
-	 * Copies the contents of this immutable collection into the specified array at
-	 * the specified offset. Returns {@code offset + size()}.
-	 */
-	int copyIntoArray(Object[] dst, int offset) {
-		for (E e : this) {
-			dst[offset++] = e;
+		@Override
+		public Builder<E> addAll(Iterable<? extends E> elements) {
+			if (elements instanceof Collection) {
+				Collection<?> collection = (Collection<?>) elements;
+				ensureCapacity(size + collection.size());
+			}
+			super.addAll(elements);
+			return this;
 		}
-		return offset;
-	}
 
-	Object writeReplace() {
-		// We serialize by default to ImmutableList, the simplest thing that works.
-		return new ImmutableList.SerializedForm(toArray());
+		/**
+		 * Expand the absolute capacity of the builder so it can accept at least the
+		 * specified number of elements without being resized.
+		 */
+		private void ensureCapacity(int minCapacity) {
+			if (contents.length < minCapacity) {
+				this.contents = ObjectArrays.arraysCopyOf(this.contents,
+						expandedCapacity(contents.length, minCapacity));
+			}
+		}
 	}
 
 	/**
@@ -322,52 +209,165 @@ public abstract class ImmutableCollection<E> extends AbstractCollection<E> imple
 		public abstract ImmutableCollection<E> build();
 	}
 
-	abstract static class ArrayBasedBuilder<E> extends ImmutableCollection.Builder<E> {
-		Object[] contents;
-		int size;
+	/*
+	 * TODO(kevinb): Restructure code so ImmutableList doesn't contain this
+	 * variable, which it doesn't use.
+	 */
+	private transient ImmutableList<E> asList;
 
-		ArrayBasedBuilder(int initialCapacity) {
-			checkNonnegative(initialCapacity, "initialCapacity");
-			this.contents = new Object[initialCapacity];
-			this.size = 0;
-		}
+	ImmutableCollection() {
+	}
 
-		/**
-		 * Expand the absolute capacity of the builder so it can accept at least the
-		 * specified number of elements without being resized.
-		 */
-		private void ensureCapacity(int minCapacity) {
-			if (contents.length < minCapacity) {
-				this.contents = ObjectArrays.arraysCopyOf(this.contents,
-						expandedCapacity(contents.length, minCapacity));
-			}
-		}
+	/**
+	 * Guaranteed to throw an exception and leave the collection unmodified.
+	 *
+	 * @throws UnsupportedOperationException always
+	 * @deprecated Unsupported operation.
+	 */
+	@Deprecated
+	@Override
+	public final boolean add(E e) {
+		throw new UnsupportedOperationException();
+	}
 
-		@Override
-		public ArrayBasedBuilder<E> add(E element) {
-			checkNotNull(element);
-			ensureCapacity(size + 1);
-			contents[size++] = element;
-			return this;
-		}
+	/**
+	 * Guaranteed to throw an exception and leave the collection unmodified.
+	 *
+	 * @throws UnsupportedOperationException always
+	 * @deprecated Unsupported operation.
+	 */
+	@Deprecated
+	@Override
+	public final boolean addAll(Collection<? extends E> newElements) {
+		throw new UnsupportedOperationException();
+	}
 
-		@Override
-		public Builder<E> add(E... elements) {
-			checkElementsNotNull(elements);
-			ensureCapacity(size + elements.length);
-			System.arraycopy(elements, 0, contents, size, elements.length);
-			size += elements.length;
-			return this;
-		}
+	/**
+	 * Returns a list view of the collection.
+	 *
+	 * @since 2.0
+	 */
+	public ImmutableList<E> asList() {
+		ImmutableList<E> list = asList;
+		return (list == null) ? (asList = createAsList()) : list;
+	}
 
-		@Override
-		public Builder<E> addAll(Iterable<? extends E> elements) {
-			if (elements instanceof Collection) {
-				Collection<?> collection = (Collection<?>) elements;
-				ensureCapacity(size + collection.size());
-			}
-			super.addAll(elements);
-			return this;
+	/**
+	 * Guaranteed to throw an exception and leave the collection unmodified.
+	 *
+	 * @throws UnsupportedOperationException always
+	 * @deprecated Unsupported operation.
+	 */
+	@Deprecated
+	@Override
+	public final void clear() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public boolean contains(@Nullable Object object) {
+		return object != null && super.contains(object);
+	}
+
+	/**
+	 * Copies the contents of this immutable collection into the specified array at
+	 * the specified offset. Returns {@code offset + size()}.
+	 */
+	int copyIntoArray(Object[] dst, int offset) {
+		for (E e : this) {
+			dst[offset++] = e;
 		}
+		return offset;
+	}
+
+	ImmutableList<E> createAsList() {
+		switch (size()) {
+		case 0:
+			return ImmutableList.of();
+		case 1:
+			return ImmutableList.of(iterator().next());
+		default:
+			return new RegularImmutableAsList<E>(this, toArray());
+		}
+	}
+
+	/**
+	 * Returns {@code true} if this immutable collection's implementation contains
+	 * references to user-created objects that aren't accessible via this
+	 * collection's methods. This is generally used to determine whether
+	 * {@code copyOf} implementations should make an explicit copy to avoid memory
+	 * leaks.
+	 */
+	abstract boolean isPartialView();
+
+	/**
+	 * Returns an unmodifiable iterator across the elements in this collection.
+	 */
+	@Override
+	public abstract UnmodifiableIterator<E> iterator();
+
+	/**
+	 * Guaranteed to throw an exception and leave the collection unmodified.
+	 *
+	 * @throws UnsupportedOperationException always
+	 * @deprecated Unsupported operation.
+	 */
+	@Deprecated
+	@Override
+	public final boolean remove(Object object) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Guaranteed to throw an exception and leave the collection unmodified.
+	 *
+	 * @throws UnsupportedOperationException always
+	 * @deprecated Unsupported operation.
+	 */
+	@Deprecated
+	@Override
+	public final boolean removeAll(Collection<?> oldElements) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Guaranteed to throw an exception and leave the collection unmodified.
+	 *
+	 * @throws UnsupportedOperationException always
+	 * @deprecated Unsupported operation.
+	 */
+	@Deprecated
+	@Override
+	public final boolean retainAll(Collection<?> elementsToKeep) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public final Object[] toArray() {
+		int size = size();
+		if (size == 0) {
+			return ObjectArrays.EMPTY_ARRAY;
+		}
+		Object[] result = new Object[size()];
+		copyIntoArray(result, 0);
+		return result;
+	}
+
+	@Override
+	public final <T> T[] toArray(T[] other) {
+		checkNotNull(other);
+		int size = size();
+		if (other.length < size) {
+			other = ObjectArrays.newArray(other, size);
+		} else if (other.length > size) {
+			other[size] = null;
+		}
+		copyIntoArray(other, 0);
+		return other;
+	}
+
+	Object writeReplace() {
+		// We serialize by default to ImmutableList, the simplest thing that works.
+		return new ImmutableList.SerializedForm(toArray());
 	}
 }

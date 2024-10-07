@@ -11,22 +11,25 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -42,8 +45,22 @@ public class EntityAIHarvestFarmland extends EntityAIMoveToBlock {
 		this.theVillager = theVillagerIn;
 	}
 
-	/**+
-	 * Returns whether the EntityAIBase should begin execution.
+	/**
+	 * + Returns whether an in-progress EntityAIBase should continue executing
+	 */
+	public boolean continueExecuting() {
+		return this.field_179501_f >= 0 && super.continueExecuting();
+	}
+
+	/**
+	 * + Resets the task
+	 */
+	public void resetTask() {
+		super.resetTask();
+	}
+
+	/**
+	 * + Returns whether the EntityAIBase should begin execution.
 	 */
 	public boolean shouldExecute() {
 		if (this.runDelay <= 0) {
@@ -59,30 +76,39 @@ public class EntityAIHarvestFarmland extends EntityAIMoveToBlock {
 		return super.shouldExecute();
 	}
 
-	/**+
-	 * Returns whether an in-progress EntityAIBase should continue
-	 * executing
+	/**
+	 * + Return true to set given position as destination
 	 */
-	public boolean continueExecuting() {
-		return this.field_179501_f >= 0 && super.continueExecuting();
+	protected boolean shouldMoveTo(World worldIn, BlockPos pos) {
+		Block block = worldIn.getBlockState(pos).getBlock();
+		if (block == Blocks.farmland) {
+			pos = pos.up();
+			IBlockState iblockstate = worldIn.getBlockState(pos);
+			block = iblockstate.getBlock();
+			if (block instanceof BlockCrops && ((Integer) iblockstate.getValue(BlockCrops.AGE)).intValue() == 7
+					&& this.field_179503_e && (this.field_179501_f == 0 || this.field_179501_f < 0)) {
+				this.field_179501_f = 0;
+				return true;
+			}
+
+			if (block == Blocks.air && this.hasFarmItem && (this.field_179501_f == 1 || this.field_179501_f < 0)) {
+				this.field_179501_f = 1;
+				return true;
+			}
+		}
+
+		return false;
 	}
 
-	/**+
-	 * Execute a one shot task or start executing a continuous task
+	/**
+	 * + Execute a one shot task or start executing a continuous task
 	 */
 	public void startExecuting() {
 		super.startExecuting();
 	}
 
-	/**+
-	 * Resets the task
-	 */
-	public void resetTask() {
-		super.resetTask();
-	}
-
-	/**+
-	 * Updates the task
+	/**
+	 * + Updates the task
 	 */
 	public void updateTask() {
 		super.updateTask();
@@ -130,29 +156,5 @@ public class EntityAIHarvestFarmland extends EntityAIMoveToBlock {
 			this.runDelay = 10;
 		}
 
-	}
-
-	/**+
-	 * Return true to set given position as destination
-	 */
-	protected boolean shouldMoveTo(World worldIn, BlockPos pos) {
-		Block block = worldIn.getBlockState(pos).getBlock();
-		if (block == Blocks.farmland) {
-			pos = pos.up();
-			IBlockState iblockstate = worldIn.getBlockState(pos);
-			block = iblockstate.getBlock();
-			if (block instanceof BlockCrops && ((Integer) iblockstate.getValue(BlockCrops.AGE)).intValue() == 7
-					&& this.field_179503_e && (this.field_179501_f == 0 || this.field_179501_f < 0)) {
-				this.field_179501_f = 0;
-				return true;
-			}
-
-			if (block == Blocks.air && this.hasFarmItem && (this.field_179501_f == 1 || this.field_179501_f < 0)) {
-				this.field_179501_f = 1;
-				return true;
-			}
-		}
-
-		return false;
 	}
 }

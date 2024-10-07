@@ -1,6 +1,7 @@
 package net.minecraft.client.gui;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ONE_MINUS_SRC_ALPHA;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_SRC_ALPHA;
 
 import net.lax1dude.eaglercraft.v1_8.Mouse;
 import net.lax1dude.eaglercraft.v1_8.internal.EnumCursorType;
@@ -10,22 +11,25 @@ import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.util.ResourceLocation;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -43,10 +47,6 @@ public class GuiButton extends Gui {
 	protected boolean hovered;
 	public float fontScale = 1.0f;
 
-	public GuiButton(int buttonId, int x, int y, String buttonText) {
-		this(buttonId, x, y, 200, 20, buttonText);
-	}
-
 	public GuiButton(int buttonId, int x, int y, int widthIn, int heightIn, String buttonText) {
 		this.width = 200;
 		this.height = 20;
@@ -60,24 +60,12 @@ public class GuiButton extends Gui {
 		this.displayString = buttonText;
 	}
 
-	/**+
-	 * Returns 0 if the button is disabled, 1 if the mouse is NOT
-	 * hovering over this button and 2 if it IS hovering over this
-	 * button.
-	 */
-	protected int getHoverState(boolean mouseOver) {
-		byte b0 = 1;
-		if (!this.enabled) {
-			b0 = 0;
-		} else if (mouseOver) {
-			b0 = 2;
-		}
-
-		return b0;
+	public GuiButton(int buttonId, int x, int y, String buttonText) {
+		this(buttonId, x, y, 200, 20, buttonText);
 	}
 
-	/**+
-	 * Draws this button to the screen.
+	/**
+	 * + Draws this button to the screen.
 	 */
 	public void drawButton(Minecraft mc, int mouseX, int mouseY) {
 		if (this.visible) {
@@ -122,53 +110,68 @@ public class GuiButton extends Gui {
 		}
 	}
 
-	/**+
-	 * Fired when the mouse button is dragged. Equivalent of
-	 * MouseListener.mouseDragged(MouseEvent e).
-	 */
-	protected void mouseDragged(Minecraft mc, int mouseX, int mouseY) {
-	}
-
-	/**+
-	 * Fired when the mouse button is released. Equivalent of
-	 * MouseListener.mouseReleased(MouseEvent e).
-	 */
-	public void mouseReleased(int mouseX, int mouseY) {
-	}
-
-	/**+
-	 * Returns true if the mouse has been pressed on this control.
-	 * Equivalent of MouseListener.mousePressed(MouseEvent e).
-	 */
-	public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
-		return this.enabled && this.visible && mouseX >= this.xPosition && mouseY >= this.yPosition
-				&& mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
-	}
-
-	/**+
-	 * Whether the mouse cursor is currently over the button.
-	 */
-	public boolean isMouseOver() {
-		return this.hovered;
-	}
-
 	public void drawButtonForegroundLayer(int mouseX, int mouseY) {
-	}
-
-	public void playPressSound(SoundHandler soundHandlerIn) {
-		soundHandlerIn.playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
 	}
 
 	public int getButtonWidth() {
 		return this.width;
 	}
 
-	public void setWidth(int width) {
-		this.width = width;
+	/**
+	 * + Returns 0 if the button is disabled, 1 if the mouse is NOT hovering over
+	 * this button and 2 if it IS hovering over this button.
+	 */
+	protected int getHoverState(boolean mouseOver) {
+		byte b0 = 1;
+		if (!this.enabled) {
+			b0 = 0;
+		} else if (mouseOver) {
+			b0 = 2;
+		}
+
+		return b0;
+	}
+
+	/**
+	 * + Whether the mouse cursor is currently over the button.
+	 */
+	public boolean isMouseOver() {
+		return this.hovered;
 	}
 
 	public boolean isSliderTouchEvents() {
 		return false;
+	}
+
+	/**
+	 * + Fired when the mouse button is dragged. Equivalent of
+	 * MouseListener.mouseDragged(MouseEvent e).
+	 */
+	protected void mouseDragged(Minecraft mc, int mouseX, int mouseY) {
+	}
+
+	/**
+	 * + Returns true if the mouse has been pressed on this control. Equivalent of
+	 * MouseListener.mousePressed(MouseEvent e).
+	 */
+	public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
+		return this.enabled && this.visible && mouseX >= this.xPosition && mouseY >= this.yPosition
+				&& mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
+	}
+
+	/**
+	 * + Fired when the mouse button is released. Equivalent of
+	 * MouseListener.mouseReleased(MouseEvent e).
+	 */
+	public void mouseReleased(int mouseX, int mouseY) {
+	}
+
+	public void playPressSound(SoundHandler soundHandlerIn) {
+		soundHandlerIn.playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
 	}
 
 }

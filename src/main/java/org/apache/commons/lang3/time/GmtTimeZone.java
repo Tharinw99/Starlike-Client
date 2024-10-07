@@ -33,7 +33,12 @@ class GmtTimeZone extends TimeZone {
 	// Serializable!
 	static final long serialVersionUID = 1L;
 
+	private static StringBuilder twoDigits(final StringBuilder sb, final int n) {
+		return sb.append((char) ('0' + (n / 10))).append((char) ('0' + (n % 10)));
+	}
+
 	private final int offset;
+
 	private final String zoneId;
 
 	GmtTimeZone(final boolean negate, final int hours, final int minutes) {
@@ -50,8 +55,17 @@ class GmtTimeZone extends TimeZone {
 
 	}
 
-	private static StringBuilder twoDigits(final StringBuilder sb, final int n) {
-		return sb.append((char) ('0' + (n / 10))).append((char) ('0' + (n % 10)));
+	@Override
+	public boolean equals(final Object other) {
+		if (!(other instanceof GmtTimeZone)) {
+			return false;
+		}
+		return zoneId == ((GmtTimeZone) other).zoneId;
+	}
+
+	@Override
+	public String getID() {
+		return zoneId;
 	}
 
 	@Override
@@ -61,33 +75,8 @@ class GmtTimeZone extends TimeZone {
 	}
 
 	@Override
-	public void setRawOffset(final int offsetMillis) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public int getRawOffset() {
 		return offset;
-	}
-
-	@Override
-	public String getID() {
-		return zoneId;
-	}
-
-	@Override
-	public boolean useDaylightTime() {
-		return false;
-	}
-
-	@Override
-	public boolean inDaylightTime(final Date date) {
-		return false;
-	}
-
-	@Override
-	public String toString() {
-		return "[GmtTimeZone id=\"" + zoneId + "\",offset=" + offset + ']';
 	}
 
 	@Override
@@ -96,10 +85,22 @@ class GmtTimeZone extends TimeZone {
 	}
 
 	@Override
-	public boolean equals(final Object other) {
-		if (!(other instanceof GmtTimeZone)) {
-			return false;
-		}
-		return zoneId == ((GmtTimeZone) other).zoneId;
+	public boolean inDaylightTime(final Date date) {
+		return false;
+	}
+
+	@Override
+	public void setRawOffset(final int offsetMillis) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public String toString() {
+		return "[GmtTimeZone id=\"" + zoneId + "\",offset=" + offset + ']';
+	}
+
+	@Override
+	public boolean useDaylightTime() {
+		return false;
 	}
 }

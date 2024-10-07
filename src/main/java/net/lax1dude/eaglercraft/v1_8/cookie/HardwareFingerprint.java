@@ -1,5 +1,64 @@
 package net.lax1dude.eaglercraft.v1_8.cookie;
 
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglAttachShader;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglBindFramebuffer;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglCompileShader;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglCreateFramebuffer;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglCreateProgram;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglCreateShader;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDeleteFramebuffer;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDeleteProgram;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDeleteShader;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDetachShader;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDrawBuffers;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglFramebufferTexture2D;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetInteger;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetProgrami;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetShaderi;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetUniformLocation;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglLinkProgram;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglShaderSource;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglTexParameterf;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglTexParameteri;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniform1i;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniformMatrix4fv;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL.checkAnisotropicFilteringSupport;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL.getAllExtensions;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_COMPILE_STATUS;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_FLOAT;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_FRAGMENT_SHADER;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_LINK_STATUS;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_NEAREST;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_RENDERER;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_REPEAT;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_RGBA;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_RGBA8;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE_2D;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE_MAG_FILTER;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE_MAX_ANISOTROPY;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE_MIN_FILTER;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE_WRAP_S;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE_WRAP_T;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TRUE;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_UNSIGNED_BYTE;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_VENDOR;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_VERTEX_SHADER;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_VIEWPORT;
+import static net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.ExtGLEnums._GL_COLOR_ATTACHMENT0;
+import static net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.ExtGLEnums._GL_FRAMEBUFFER;
+import static net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.ExtGLEnums._GL_HALF_FLOAT;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
+import net.lax1dude.eaglercraft.v1_8.Base64;
+import net.lax1dude.eaglercraft.v1_8.EagRuntime;
+import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
+import net.lax1dude.eaglercraft.v1_8.crypto.GeneralDigest;
+import net.lax1dude.eaglercraft.v1_8.crypto.SHA256Digest;
 import net.lax1dude.eaglercraft.v1_8.internal.IFramebufferGL;
 import net.lax1dude.eaglercraft.v1_8.internal.IProgramGL;
 import net.lax1dude.eaglercraft.v1_8.internal.IShaderGL;
@@ -16,39 +75,24 @@ import net.lax1dude.eaglercraft.v1_8.opengl.ImageData;
 import net.lax1dude.eaglercraft.v1_8.opengl.VSHInputLayoutParser;
 import net.minecraft.client.renderer.texture.TextureUtil;
 
-import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL.*;
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
-import static net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.ExtGLEnums.*;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.List;
-
-import com.google.common.collect.Lists;
-
-import net.lax1dude.eaglercraft.v1_8.Base64;
-import net.lax1dude.eaglercraft.v1_8.EagRuntime;
-import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
-import net.lax1dude.eaglercraft.v1_8.crypto.GeneralDigest;
-import net.lax1dude.eaglercraft.v1_8.crypto.SHA256Digest;
-
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class HardwareFingerprint {
-	
+
 	// This is used for generating encryption keys for storing cookies,
 	// its supposed to make session hijacking more difficult for skids
 
@@ -60,30 +104,36 @@ public class HardwareFingerprint {
 
 	public static final Logger logger = LogManager.getLogger("HardwareFingerprint");
 
-	public static byte[] getFingerprint() {
-		if(fingerprint == null) {
-			try {
-				fingerprint = generateFingerprint();
-			}catch(Throwable t) {
-				fingerprint = new byte[0];
-			}
-			if(fingerprint.length == 0) {
-				logger.error("Failed to calculate hardware fingerprint, server cookies will not be encrypted!");
-			}
-		}
-		return fingerprint;
+	private static void digestInts(GeneralDigest digest, int i1, int i2, int i3, int i4, byte[] tmpBuffer) {
+		tmpBuffer[0] = (byte) (i1 >>> 24);
+		tmpBuffer[1] = (byte) (i1 >>> 16);
+		tmpBuffer[2] = (byte) (i1 >>> 8);
+		tmpBuffer[3] = (byte) (i1 & 0xFF);
+		tmpBuffer[4] = (byte) (i2 >>> 24);
+		tmpBuffer[5] = (byte) (i2 >>> 16);
+		tmpBuffer[6] = (byte) (i2 >>> 8);
+		tmpBuffer[7] = (byte) (i2 & 0xFF);
+		tmpBuffer[8] = (byte) (i3 >>> 24);
+		tmpBuffer[9] = (byte) (i3 >>> 16);
+		tmpBuffer[10] = (byte) (i3 >>> 8);
+		tmpBuffer[11] = (byte) (i3 & 0xFF);
+		tmpBuffer[12] = (byte) (i4 >>> 24);
+		tmpBuffer[13] = (byte) (i4 >>> 16);
+		tmpBuffer[14] = (byte) (i4 >>> 8);
+		tmpBuffer[15] = (byte) (i4 & 0xFF);
+		digest.update(tmpBuffer, 0, 16);
 	}
 
 	private static byte[] generateFingerprint() {
 		ImageData img = PlatformAssets.loadImageFile(Base64.decodeBase64(fingerprintIMG), "image/jpeg");
-		if(img == null) {
+		if (img == null) {
 			logger.error("Input image data is corrupt!");
 			return new byte[0];
 		}
-		
+
 		int[][] mipmapLevels = TextureUtil.generateMipmapData(7, 128,
 				new int[][] { img.pixels, null, null, null, null, null, null, null });
-		
+
 		int helperTexture = GlStateManager.generateTexture();
 		GlStateManager.bindTexture(helperTexture);
 		_wglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -91,64 +141,65 @@ public class HardwareFingerprint {
 		_wglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		TextureUtil.allocateTextureImpl(helperTexture, 7, 128, 128);
 		TextureUtil.uploadTextureMipmap(mipmapLevels, 128, 128, 0, 0, false, false);
-		if(checkAnisotropicFilteringSupport()) {
+		if (checkAnisotropicFilteringSupport()) {
 			_wglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, 16.0f);
 		}
-		
+
 		IShaderGL vert;
 		List<VSHInputLayoutParser.ShaderInput> vertLayout;
-		if(DrawUtils.vshLocal != null) {
+		if (DrawUtils.vshLocal != null) {
 			vert = DrawUtils.vshLocal;
 			vertLayout = DrawUtils.vshLocalLayout;
-		}else {
+		} else {
 			String vshLocalSrc = EagRuntime.getRequiredResourceString("/assets/eagler/glsl/local.vsh");
 			vertLayout = VSHInputLayoutParser.getShaderInputs(vshLocalSrc);
 			vert = _wglCreateShader(GL_VERTEX_SHADER);
 			_wglShaderSource(vert, GLSLHeader.getVertexHeaderCompat(vshLocalSrc, DrawUtils.vertexShaderPrecision));
 			_wglCompileShader(vert);
-			if(_wglGetShaderi(vert, GL_COMPILE_STATUS) != GL_TRUE) {
+			if (_wglGetShaderi(vert, GL_COMPILE_STATUS) != GL_TRUE) {
 				_wglDeleteShader(vert);
 				GlStateManager.deleteTexture(helperTexture);
 				return new byte[0];
 			}
 		}
-		
+
 		IShaderGL frag = _wglCreateShader(GL_FRAGMENT_SHADER);
-		_wglShaderSource(frag, GLSLHeader.getFragmentHeaderCompat(EagRuntime.getRequiredResourceString("/assets/eagler/glsl/hw_fingerprint.fsh"), shaderPrecision));
+		_wglShaderSource(frag, GLSLHeader.getFragmentHeaderCompat(
+				EagRuntime.getRequiredResourceString("/assets/eagler/glsl/hw_fingerprint.fsh"), shaderPrecision));
 		_wglCompileShader(frag);
-		if(_wglGetShaderi(frag, GL_COMPILE_STATUS) != GL_TRUE) {
+		if (_wglGetShaderi(frag, GL_COMPILE_STATUS) != GL_TRUE) {
 			_wglDeleteShader(vert);
 			_wglDeleteShader(frag);
 			GlStateManager.deleteTexture(helperTexture);
 			return new byte[0];
 		}
-		
+
 		IProgramGL program = _wglCreateProgram();
-		
+
 		_wglAttachShader(program, vert);
 		_wglAttachShader(program, frag);
 
-		if(EaglercraftGPU.checkOpenGLESVersion() == 200) {
+		if (EaglercraftGPU.checkOpenGLESVersion() == 200) {
 			VSHInputLayoutParser.applyLayout(program, vertLayout);
 		}
 
 		_wglLinkProgram(program);
 		_wglDetachShader(program, vert);
 		_wglDetachShader(program, frag);
-		if(DrawUtils.vshLocal == null) {
+		if (DrawUtils.vshLocal == null) {
 			_wglDeleteShader(vert);
 		}
 		_wglDeleteShader(frag);
-		
-		if(_wglGetProgrami(program, GL_LINK_STATUS) != GL_TRUE) {
+
+		if (_wglGetProgrami(program, GL_LINK_STATUS) != GL_TRUE) {
 			_wglDeleteProgram(program);
 			GlStateManager.deleteTexture(helperTexture);
 			return new byte[0];
 		}
-		
+
 		EaglercraftGPU.bindGLShaderProgram(program);
 		_wglUniform1i(_wglGetUniformLocation(program, "u_inputTexture"), 0);
-		
+
 		float fovy = 90.0f;
 		float aspect = 1.0f;
 		float zNear = 0.01f;
@@ -156,7 +207,7 @@ public class HardwareFingerprint {
 		FloatBuffer matrixUploadBuffer = EagRuntime.allocateFloatBuffer(16);
 		float toRad = 0.0174532925f;
 		float cotangent = (float) Math.cos(fovy * toRad * 0.5f) / (float) Math.sin(fovy * toRad * 0.5f);
-		
+
 		matrixUploadBuffer.put(cotangent / aspect);
 		matrixUploadBuffer.put(0.0f);
 		matrixUploadBuffer.put(0.0f);
@@ -173,11 +224,11 @@ public class HardwareFingerprint {
 		matrixUploadBuffer.put(0.0f);
 		matrixUploadBuffer.put(-1.0f);
 		matrixUploadBuffer.put(0.0f);
-		
+
 		matrixUploadBuffer.flip();
 		_wglUniformMatrix4fv(_wglGetUniformLocation(program, "u_textureMatrix"), false, matrixUploadBuffer);
 		EagRuntime.freeFloatBuffer(matrixUploadBuffer);
-		
+
 		int[] oldViewport = new int[4];
 		EaglercraftGPU.glGetInteger(GL_VIEWPORT, oldViewport);
 		IFramebufferGL framebuffer = _wglCreateFramebuffer();
@@ -187,63 +238,73 @@ public class HardwareFingerprint {
 		_wglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		_wglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		_wglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		
+
 		int dataLength;
 		int type;
-		if(EaglercraftGPU.checkHDRFramebufferSupport(32)) {
+		if (EaglercraftGPU.checkHDRFramebufferSupport(32)) {
 			dataLength = 256 * 256 * 4 * 4;
 			type = GL_FLOAT;
 			EaglercraftGPU.createFramebufferHDR32FTexture(GL_TEXTURE_2D, 0, 256, 256, GL_RGBA, false);
-		}else if(EaglercraftGPU.checkHDRFramebufferSupport(16)) {
+		} else if (EaglercraftGPU.checkHDRFramebufferSupport(16)) {
 			dataLength = 256 * 256 * 4 * 2;
 			type = _GL_HALF_FLOAT;
 			EaglercraftGPU.createFramebufferHDR16FTexture(GL_TEXTURE_2D, 0, 256, 256, GL_RGBA, false);
-		}else {
+		} else {
 			dataLength = 256 * 256 * 4;
 			type = GL_UNSIGNED_BYTE;
-			EaglercraftGPU.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, (ByteBuffer)null);
+			EaglercraftGPU.glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+					(ByteBuffer) null);
 		}
-		
+
 		_wglBindFramebuffer(_GL_FRAMEBUFFER, framebuffer);
-		_wglFramebufferTexture2D(_GL_FRAMEBUFFER, _GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, EaglercraftGPU.getNativeTexture(renderTexture), 0);
+		_wglFramebufferTexture2D(_GL_FRAMEBUFFER, _GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+				EaglercraftGPU.getNativeTexture(renderTexture), 0);
 		_wglDrawBuffers(_GL_COLOR_ATTACHMENT0);
-		
+
 		GlStateManager.viewport(0, 0, 256, 256);
 		GlStateManager.disableBlend();
 		GlStateManager.bindTexture(helperTexture);
-		
+
 		DrawUtils.drawStandardQuad2D();
-		
+
 		_wglDeleteProgram(program);
 		GlStateManager.deleteTexture(helperTexture);
-		
+
 		ByteBuffer readBuffer = EagRuntime.allocateByteBuffer(dataLength);
 		EaglercraftGPU.glReadPixels(0, 0, 256, 256, GL_RGBA, type, readBuffer);
-		
+
 		_wglBindFramebuffer(_GL_FRAMEBUFFER, null);
 		_wglDeleteFramebuffer(framebuffer);
 		GlStateManager.deleteTexture(renderTexture);
 		GlStateManager.viewport(oldViewport[0], oldViewport[1], oldViewport[2], oldViewport[3]);
-		
+
 		SHA256Digest digest = new SHA256Digest();
 		byte[] copyBuffer = new byte[1024];
-		
-		byte[] b = ("eag" + EaglercraftGPU.glGetString(GL_VENDOR) + "; eag " + EaglercraftGPU.glGetString(GL_RENDERER)).getBytes(StandardCharsets.UTF_8);
+
+		byte[] b = ("eag" + EaglercraftGPU.glGetString(GL_VENDOR) + "; eag " + EaglercraftGPU.glGetString(GL_RENDERER))
+				.getBytes(StandardCharsets.UTF_8);
 		digest.update(b, 0, b.length);
-		
-		digestInts(digest, _wglGetInteger(0x8869), _wglGetInteger(0x8DFB), _wglGetInteger(0x8B4C), _wglGetInteger(0x8DFC), copyBuffer);
+
+		digestInts(digest, _wglGetInteger(0x8869), _wglGetInteger(0x8DFB), _wglGetInteger(0x8B4C),
+				_wglGetInteger(0x8DFC), copyBuffer);
 		digestInts(digest, _wglGetInteger(0x8DFD), _wglGetInteger(0x8872), _wglGetInteger(0x84E8), 69, copyBuffer);
 		digestInts(digest, _wglGetInteger(0x0D33), _wglGetInteger(0x851C), _wglGetInteger(0x8B4D), 69, copyBuffer);
-		
-		if(EaglercraftGPU.checkOpenGLESVersion() >= 300) {
-			digestInts(digest, _wglGetInteger(0x8B4A), _wglGetInteger(0x8A2B), _wglGetInteger(0x9122), _wglGetInteger(0x8B4B), copyBuffer);
-			digestInts(digest, _wglGetInteger(0x8C8A), _wglGetInteger(0x8C8B), _wglGetInteger(0x8C80), _wglGetInteger(0x8B49), copyBuffer);
-			digestInts(digest, _wglGetInteger(0x8A2D), _wglGetInteger(0x9125), _wglGetInteger(0x8904), _wglGetInteger(0x8905), copyBuffer);
-			digestInts(digest, _wglGetInteger(0x8824), _wglGetInteger(0x8073), _wglGetInteger(0x88FF), _wglGetInteger(0x84FD), copyBuffer);
-			digestInts(digest, _wglGetInteger(0x8CDF), _wglGetInteger(0x8A2F), _wglGetInteger(0x8A30), _wglGetInteger(0x8A34), copyBuffer);
-			digestInts(digest, _wglGetInteger(0x8A2E),  _wglGetInteger(0x8A31), _wglGetInteger(0x8A33), _wglGetInteger(0x8D57), copyBuffer);
+
+		if (EaglercraftGPU.checkOpenGLESVersion() >= 300) {
+			digestInts(digest, _wglGetInteger(0x8B4A), _wglGetInteger(0x8A2B), _wglGetInteger(0x9122),
+					_wglGetInteger(0x8B4B), copyBuffer);
+			digestInts(digest, _wglGetInteger(0x8C8A), _wglGetInteger(0x8C8B), _wglGetInteger(0x8C80),
+					_wglGetInteger(0x8B49), copyBuffer);
+			digestInts(digest, _wglGetInteger(0x8A2D), _wglGetInteger(0x9125), _wglGetInteger(0x8904),
+					_wglGetInteger(0x8905), copyBuffer);
+			digestInts(digest, _wglGetInteger(0x8824), _wglGetInteger(0x8073), _wglGetInteger(0x88FF),
+					_wglGetInteger(0x84FD), copyBuffer);
+			digestInts(digest, _wglGetInteger(0x8CDF), _wglGetInteger(0x8A2F), _wglGetInteger(0x8A30),
+					_wglGetInteger(0x8A34), copyBuffer);
+			digestInts(digest, _wglGetInteger(0x8A2E), _wglGetInteger(0x8A31), _wglGetInteger(0x8A33),
+					_wglGetInteger(0x8D57), copyBuffer);
 		}
-		
+
 		try {
 			List<String> exts = Lists.newArrayList(getAllExtensions());
 			Collections.sort(exts);
@@ -254,41 +315,35 @@ public class HardwareFingerprint {
 			}
 			b = String.join(":>", exts).getBytes(StandardCharsets.UTF_8);
 			digest.update(b, 0, b.length);
-		}catch(Throwable t) {
+		} catch (Throwable t) {
 		}
-		
+
 		int i;
-		while(readBuffer.hasRemaining()) {
+		while (readBuffer.hasRemaining()) {
 			i = Math.min(readBuffer.remaining(), copyBuffer.length);
 			readBuffer.get(copyBuffer, 0, i);
 			digest.update(copyBuffer, 0, i);
 		}
-		
+
 		EagRuntime.freeByteBuffer(readBuffer);
-		
+
 		byte[] hashOut = new byte[32];
 		digest.doFinal(hashOut, 0);
-		
+
 		return hashOut;
 	}
 
-	private static void digestInts(GeneralDigest digest, int i1, int i2, int i3, int i4, byte[] tmpBuffer) {
-		tmpBuffer[0] = (byte)(i1 >>> 24);
-		tmpBuffer[1] = (byte)(i1 >>> 16);
-		tmpBuffer[2] = (byte)(i1 >>> 8);
-		tmpBuffer[3] = (byte)(i1 & 0xFF);
-		tmpBuffer[4] = (byte)(i2 >>> 24);
-		tmpBuffer[5] = (byte)(i2 >>> 16);
-		tmpBuffer[6] = (byte)(i2 >>> 8);
-		tmpBuffer[7] = (byte)(i2 & 0xFF);
-		tmpBuffer[8] = (byte)(i3 >>> 24);
-		tmpBuffer[9] = (byte)(i3 >>> 16);
-		tmpBuffer[10] = (byte)(i3 >>> 8);
-		tmpBuffer[11] = (byte)(i3 & 0xFF);
-		tmpBuffer[12] = (byte)(i4 >>> 24);
-		tmpBuffer[13] = (byte)(i4 >>> 16);
-		tmpBuffer[14] = (byte)(i4 >>> 8);
-		tmpBuffer[15] = (byte)(i4 & 0xFF);
-		digest.update(tmpBuffer, 0, 16);
+	public static byte[] getFingerprint() {
+		if (fingerprint == null) {
+			try {
+				fingerprint = generateFingerprint();
+			} catch (Throwable t) {
+				fingerprint = new byte[0];
+			}
+			if (fingerprint.length == 0) {
+				logger.error("Failed to calculate hardware fingerprint, server cookies will not be encrypted!");
+			}
+		}
+		return fingerprint;
 	}
 }

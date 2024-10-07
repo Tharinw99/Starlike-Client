@@ -1,6 +1,6 @@
 package net.minecraft.client.renderer.chunk;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_MODELVIEW_MATRIX;
 
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -30,22 +30,25 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -55,9 +58,9 @@ public class RenderChunk {
 		OUTSIDE, OUTSIDE_BB, INTERSECT, INSIDE
 	}
 
+	public static int renderChunksUpdated;
 	private World world;
 	private final RenderGlobal renderGlobal;
-	public static int renderChunksUpdated;
 	private BlockPos position;
 	public CompiledChunk compiledChunk = CompiledChunk.DUMMY;
 	private ChunkCompileTaskGenerator compileTask = null;
@@ -85,49 +88,84 @@ public class RenderChunk {
 
 	}
 
-	public boolean setFrameIndex(int frameIndexIn) {
-		if (this.frameIndex == frameIndexIn) {
-			return false;
-		} else {
-			this.frameIndex = frameIndexIn;
-			return true;
-		}
-	}
-
-	public void setPosition(BlockPos pos) {
+	public void deleteGlResources() {
 		this.stopCompileTask();
-		this.position = pos;
-		this.boundingBox = new AxisAlignedBB(pos, pos.add(16, 16, 16));
-
-		EnumFacing[] facings = EnumFacing._VALUES;
-		for (int i = 0; i < facings.length; ++i) {
-			this.field_181702_p.put(facings[i], pos.offset(facings[i], 16));
-		}
-
-		this.initModelviewMatrix();
+		this.world = null;
 	}
 
-	public void resortTransparency(float x, float y, float z, ChunkCompileTaskGenerator generator) {
-		CompiledChunk compiledchunk = generator.getCompiledChunk();
-		if (compiledchunk.getState() != null && !compiledchunk.isLayerEmpty(EnumWorldBlockLayer.TRANSLUCENT)) {
-			this.preRenderBlocks(
-					generator.getRegionRenderCacheBuilder().getWorldRendererByLayer(EnumWorldBlockLayer.TRANSLUCENT),
-					this.position);
-			generator.getRegionRenderCacheBuilder().getWorldRendererByLayer(EnumWorldBlockLayer.TRANSLUCENT)
-					.setVertexState(compiledchunk.getState());
-			this.postRenderBlocks(EnumWorldBlockLayer.TRANSLUCENT, x, y, z,
-					generator.getRegionRenderCacheBuilder().getWorldRendererByLayer(EnumWorldBlockLayer.TRANSLUCENT),
-					compiledchunk);
+	protected void finishCompileTask() {
+		if (this.compileTask != null && this.compileTask.getStatus() != ChunkCompileTaskGenerator.Status.DONE) {
+			this.compileTask.finish();
+			this.compileTask = null;
 		}
-		if (DeferredStateManager.isRenderingRealisticWater() && compiledchunk.getStateRealisticWater() != null
-				&& !compiledchunk.isLayerEmpty(EnumWorldBlockLayer.REALISTIC_WATER)) {
-			this.preRenderBlocks(generator.getRegionRenderCacheBuilder()
-					.getWorldRendererByLayer(EnumWorldBlockLayer.REALISTIC_WATER), this.position);
-			generator.getRegionRenderCacheBuilder().getWorldRendererByLayer(EnumWorldBlockLayer.REALISTIC_WATER)
-					.setVertexState(compiledchunk.getStateRealisticWater());
-			this.postRenderBlocks(EnumWorldBlockLayer.REALISTIC_WATER, x, y, z, generator.getRegionRenderCacheBuilder()
-					.getWorldRendererByLayer(EnumWorldBlockLayer.REALISTIC_WATER), compiledchunk);
+	}
+
+	public BlockPos func_181701_a(EnumFacing parEnumFacing) {
+		return (BlockPos) this.field_181702_p.get(parEnumFacing);
+	}
+
+	public CompiledChunk getCompiledChunk() {
+		return this.compiledChunk;
+	}
+
+	public BlockPos getPosition() {
+		return this.position;
+	}
+
+	private void initModelviewMatrix() {
+		GlStateManager.pushMatrix();
+		GlStateManager.loadIdentity();
+		float f = 1.000001F;
+		GlStateManager.translate(-8.0F, -8.0F, -8.0F);
+		GlStateManager.scale(f, f, f);
+		GlStateManager.translate(8.0F, 8.0F, 8.0F);
+		GlStateManager.getFloat(GL_MODELVIEW_MATRIX, this.modelviewMatrix);
+		GlStateManager.popMatrix();
+	}
+
+	public boolean isNeedsUpdate() {
+		return this.needsUpdate;
+	}
+
+	public ChunkCompileTaskGenerator makeCompileTaskChunk() {
+		ChunkCompileTaskGenerator chunkcompiletaskgenerator;
+		this.finishCompileTask();
+		this.compileTask = new ChunkCompileTaskGenerator(this, ChunkCompileTaskGenerator.Type.REBUILD_CHUNK);
+		chunkcompiletaskgenerator = this.compileTask;
+		return chunkcompiletaskgenerator;
+	}
+
+	public ChunkCompileTaskGenerator makeCompileTaskTransparency() {
+		this.compileTask = new ChunkCompileTaskGenerator(this, ChunkCompileTaskGenerator.Type.RESORT_TRANSPARENCY);
+		this.compileTask.setCompiledChunk(this.compiledChunk);
+		return this.compileTask;
+	}
+
+	public void multModelviewMatrix() {
+		GlStateManager.multMatrix(this.modelviewMatrix);
+	}
+
+	private void postRenderBlocks(EnumWorldBlockLayer layer, float x, float y, float z, WorldRenderer worldRendererIn,
+			CompiledChunk compiledChunkIn) {
+		if ((layer == EnumWorldBlockLayer.TRANSLUCENT || layer == EnumWorldBlockLayer.REALISTIC_WATER)
+				&& !compiledChunkIn.isLayerEmpty(layer)) {
+			worldRendererIn.func_181674_a(x, y, z);
+			if (layer == EnumWorldBlockLayer.REALISTIC_WATER) {
+				compiledChunkIn.setStateRealisticWater(worldRendererIn.func_181672_a());
+			} else {
+				compiledChunkIn.setState(worldRendererIn.func_181672_a());
+			}
 		}
+
+		worldRendererIn.finishDrawing();
+	}
+
+	private void preRenderBlocks(WorldRenderer worldRendererIn, BlockPos pos) {
+		worldRendererIn.begin(7,
+				(DeferredStateManager.isDeferredRenderer() || DynamicLightsStateManager.isDynamicLightsRender())
+						? VertexFormat.BLOCK_SHADERS
+						: DefaultVertexFormats.BLOCK);
+		worldRendererIn.setTranslation((double) (-pos.getX()), (double) (-pos.getY()), (double) (-pos.getZ()));
 	}
 
 	public void rebuildChunk(float x, float y, float z, ChunkCompileTaskGenerator generator) {
@@ -224,96 +262,61 @@ public class RenderChunk {
 
 	}
 
-	protected void finishCompileTask() {
-		if (this.compileTask != null && this.compileTask.getStatus() != ChunkCompileTaskGenerator.Status.DONE) {
-			this.compileTask.finish();
-			this.compileTask = null;
+	public void resortTransparency(float x, float y, float z, ChunkCompileTaskGenerator generator) {
+		CompiledChunk compiledchunk = generator.getCompiledChunk();
+		if (compiledchunk.getState() != null && !compiledchunk.isLayerEmpty(EnumWorldBlockLayer.TRANSLUCENT)) {
+			this.preRenderBlocks(
+					generator.getRegionRenderCacheBuilder().getWorldRendererByLayer(EnumWorldBlockLayer.TRANSLUCENT),
+					this.position);
+			generator.getRegionRenderCacheBuilder().getWorldRendererByLayer(EnumWorldBlockLayer.TRANSLUCENT)
+					.setVertexState(compiledchunk.getState());
+			this.postRenderBlocks(EnumWorldBlockLayer.TRANSLUCENT, x, y, z,
+					generator.getRegionRenderCacheBuilder().getWorldRendererByLayer(EnumWorldBlockLayer.TRANSLUCENT),
+					compiledchunk);
 		}
-	}
-
-	public ChunkCompileTaskGenerator makeCompileTaskChunk() {
-		ChunkCompileTaskGenerator chunkcompiletaskgenerator;
-		this.finishCompileTask();
-		this.compileTask = new ChunkCompileTaskGenerator(this, ChunkCompileTaskGenerator.Type.REBUILD_CHUNK);
-		chunkcompiletaskgenerator = this.compileTask;
-		return chunkcompiletaskgenerator;
-	}
-
-	public ChunkCompileTaskGenerator makeCompileTaskTransparency() {
-		this.compileTask = new ChunkCompileTaskGenerator(this, ChunkCompileTaskGenerator.Type.RESORT_TRANSPARENCY);
-		this.compileTask.setCompiledChunk(this.compiledChunk);
-		return this.compileTask;
-	}
-
-	private void preRenderBlocks(WorldRenderer worldRendererIn, BlockPos pos) {
-		worldRendererIn.begin(7,
-				(DeferredStateManager.isDeferredRenderer() || DynamicLightsStateManager.isDynamicLightsRender())
-						? VertexFormat.BLOCK_SHADERS
-						: DefaultVertexFormats.BLOCK);
-		worldRendererIn.setTranslation((double) (-pos.getX()), (double) (-pos.getY()), (double) (-pos.getZ()));
-	}
-
-	private void postRenderBlocks(EnumWorldBlockLayer layer, float x, float y, float z, WorldRenderer worldRendererIn,
-			CompiledChunk compiledChunkIn) {
-		if ((layer == EnumWorldBlockLayer.TRANSLUCENT || layer == EnumWorldBlockLayer.REALISTIC_WATER)
-				&& !compiledChunkIn.isLayerEmpty(layer)) {
-			worldRendererIn.func_181674_a(x, y, z);
-			if (layer == EnumWorldBlockLayer.REALISTIC_WATER) {
-				compiledChunkIn.setStateRealisticWater(worldRendererIn.func_181672_a());
-			} else {
-				compiledChunkIn.setState(worldRendererIn.func_181672_a());
-			}
+		if (DeferredStateManager.isRenderingRealisticWater() && compiledchunk.getStateRealisticWater() != null
+				&& !compiledchunk.isLayerEmpty(EnumWorldBlockLayer.REALISTIC_WATER)) {
+			this.preRenderBlocks(generator.getRegionRenderCacheBuilder()
+					.getWorldRendererByLayer(EnumWorldBlockLayer.REALISTIC_WATER), this.position);
+			generator.getRegionRenderCacheBuilder().getWorldRendererByLayer(EnumWorldBlockLayer.REALISTIC_WATER)
+					.setVertexState(compiledchunk.getStateRealisticWater());
+			this.postRenderBlocks(EnumWorldBlockLayer.REALISTIC_WATER, x, y, z, generator.getRegionRenderCacheBuilder()
+					.getWorldRendererByLayer(EnumWorldBlockLayer.REALISTIC_WATER), compiledchunk);
 		}
-
-		worldRendererIn.finishDrawing();
-	}
-
-	private void initModelviewMatrix() {
-		GlStateManager.pushMatrix();
-		GlStateManager.loadIdentity();
-		float f = 1.000001F;
-		GlStateManager.translate(-8.0F, -8.0F, -8.0F);
-		GlStateManager.scale(f, f, f);
-		GlStateManager.translate(8.0F, 8.0F, 8.0F);
-		GlStateManager.getFloat(GL_MODELVIEW_MATRIX, this.modelviewMatrix);
-		GlStateManager.popMatrix();
-	}
-
-	public void multModelviewMatrix() {
-		GlStateManager.multMatrix(this.modelviewMatrix);
-	}
-
-	public CompiledChunk getCompiledChunk() {
-		return this.compiledChunk;
 	}
 
 	public void setCompiledChunk(CompiledChunk compiledChunkIn) {
 		this.compiledChunk = compiledChunkIn;
 	}
 
-	public void stopCompileTask() {
-		this.finishCompileTask();
-		this.compiledChunk = CompiledChunk.DUMMY;
-	}
-
-	public void deleteGlResources() {
-		this.stopCompileTask();
-		this.world = null;
-	}
-
-	public BlockPos getPosition() {
-		return this.position;
+	public boolean setFrameIndex(int frameIndexIn) {
+		if (this.frameIndex == frameIndexIn) {
+			return false;
+		} else {
+			this.frameIndex = frameIndexIn;
+			return true;
+		}
 	}
 
 	public void setNeedsUpdate(boolean needsUpdateIn) {
 		this.needsUpdate = needsUpdateIn;
 	}
 
-	public boolean isNeedsUpdate() {
-		return this.needsUpdate;
+	public void setPosition(BlockPos pos) {
+		this.stopCompileTask();
+		this.position = pos;
+		this.boundingBox = new AxisAlignedBB(pos, pos.add(16, 16, 16));
+
+		EnumFacing[] facings = EnumFacing._VALUES;
+		for (int i = 0; i < facings.length; ++i) {
+			this.field_181702_p.put(facings[i], pos.offset(facings[i], 16));
+		}
+
+		this.initModelviewMatrix();
 	}
 
-	public BlockPos func_181701_a(EnumFacing parEnumFacing) {
-		return (BlockPos) this.field_181702_p.get(parEnumFacing);
+	public void stopCompileTask() {
+		this.finishCompileTask();
+		this.compiledChunk = CompiledChunk.DUMMY;
 	}
 }

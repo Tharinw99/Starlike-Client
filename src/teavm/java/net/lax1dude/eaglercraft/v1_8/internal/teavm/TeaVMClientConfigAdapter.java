@@ -44,22 +44,22 @@ public class TeaVMClientConfigAdapter implements IClientConfigAdapter, IBootMenu
 	private List<DefaultServer> defaultServers = new ArrayList<>();
 	private List<RelayEntry> relays = new ArrayList<>();
 	private String serverToJoin = null;   
-	private String worldsDB = "worlds";
-	private String resourcePacksDB = "resourcePacks";
+	private String worldsDB = "worlds_starlike";
+	private String resourcePacksDB = "resourcePacks_starlike";
 	private JSONObject integratedServerOpts;
 	private boolean checkShaderGLErrors = false;
 	private boolean demoMode = EaglercraftVersion.forceDemoMode;
 	private boolean isAllowUpdateSvc = EaglercraftVersion.enableUpdateService;
 	private boolean isAllowUpdateDL = EaglercraftVersion.enableUpdateService;
 	private boolean isEnableDownloadOfflineButton = true;
-	private String downloadOfflineButtonLink = null;
-	private boolean useSpecialCursors = false;
-	private boolean logInvalidCerts = false;
-	private boolean checkRelaysForUpdates = false;
-	private boolean enableSignatureBadge = false;
+	private String downloadOfflineButtonLink = "https://starlike.orionzleon.me/offline.html";
+	private boolean useSpecialCursors = true;
+	private boolean logInvalidCerts = true;
+	private boolean checkRelaysForUpdates = true;
+	private boolean enableSignatureBadge = true;
 	private boolean allowVoiceClient = true;
 	private boolean allowFNAWSkins = true;
-	private String localStorageNamespace = "_eaglercraftX";
+	private String localStorageNamespace = "_eaglercraftX_starlike";
 	private final TeaVMClientConfigAdapterHooks hooks = new TeaVMClientConfigAdapterHooks();
 	private boolean enableMinceraft = true;
 	private boolean enableServerCookies = true;
@@ -69,7 +69,7 @@ public class TeaVMClientConfigAdapter implements IClientConfigAdapter, IBootMenu
 	private boolean fixDebugConsoleUnloadListener = false;
 	private boolean forceWebViewSupport = false;
 	private boolean enableWebViewCSP = false;
-	private boolean autoFixLegacyStyleAttr = false;
+	private boolean autoFixLegacyStyleAttr = true;
 	private boolean showBootMenuOnLaunch = false;
 	private boolean bootMenuBlocksUnsignedClients = false;
 	private boolean allowBootMenu = true;
@@ -87,6 +87,7 @@ public class TeaVMClientConfigAdapter implements IClientConfigAdapter, IBootMenu
 	private boolean eaglerNoDelay = false;
 	private boolean ramdiskMode = false;
 	private boolean singleThreadMode = false;
+	private boolean enableEPKVersionCheck = true;
 
 	public void loadNative(JSObject jsObject) {
 		integratedServerOpts = new JSONObject();
@@ -94,17 +95,17 @@ public class TeaVMClientConfigAdapter implements IClientConfigAdapter, IBootMenu
 		
 		defaultLocale = eaglercraftXOpts.getLang("en_US");
 		serverToJoin = eaglercraftXOpts.getJoinServer(null);
-		worldsDB = eaglercraftXOpts.getWorldsDB("worlds");
-		resourcePacksDB = eaglercraftXOpts.getResourcePacksDB("resourcePacks");
+		worldsDB = eaglercraftXOpts.getWorldsDB("worlds_starlike");
+		resourcePacksDB = eaglercraftXOpts.getResourcePacksDB("resourcePacks_starlike");
 		checkShaderGLErrors = eaglercraftXOpts.getCheckShaderGLErrors(false);
 		demoMode = EaglercraftVersion.forceDemoMode || eaglercraftXOpts.getDemoMode(false);
 		isAllowUpdateSvc = EaglercraftVersion.enableUpdateService && !demoMode && eaglercraftXOpts.getAllowUpdateSvc(true);
 		isAllowUpdateDL = EaglercraftVersion.enableUpdateService && !demoMode && eaglercraftXOpts.getAllowUpdateDL(true);
 		isEnableDownloadOfflineButton = eaglercraftXOpts.getEnableDownloadOfflineButton(true);
-		downloadOfflineButtonLink = eaglercraftXOpts.getDownloadOfflineButtonLink(null);
-		useSpecialCursors = eaglercraftXOpts.getHtml5CursorSupport(false);
-		logInvalidCerts = EaglercraftVersion.enableUpdateService && !demoMode && eaglercraftXOpts.getLogInvalidCerts(false);
-		enableSignatureBadge = eaglercraftXOpts.getEnableSignatureBadge(false);
+		downloadOfflineButtonLink = eaglercraftXOpts.getDownloadOfflineButtonLink("https://starlike.orionzleon.me/offline.html");
+		useSpecialCursors = eaglercraftXOpts.getHtml5CursorSupport(true);
+		logInvalidCerts = EaglercraftVersion.enableUpdateService && !demoMode && eaglercraftXOpts.getLogInvalidCerts(true);
+		enableSignatureBadge = eaglercraftXOpts.getEnableSignatureBadge(true);
 		allowVoiceClient = eaglercraftXOpts.getAllowVoiceClient(true);
 		allowFNAWSkins = !demoMode && eaglercraftXOpts.getAllowFNAWSkins(true);
 		localStorageNamespace = eaglercraftXOpts.getLocalStorageNamespace(EaglercraftVersion.localStorageNamespace);
@@ -134,6 +135,7 @@ public class TeaVMClientConfigAdapter implements IClientConfigAdapter, IBootMenu
 		eaglerNoDelay = eaglercraftXOpts.getEaglerNoDelay(false);
 		ramdiskMode = eaglercraftXOpts.getRamdiskMode(false);
 		singleThreadMode = eaglercraftXOpts.getSingleThreadMode(false);
+		enableEPKVersionCheck = eaglercraftXOpts.getEnableEPKVersionCheck(true);
 		JSEaglercraftXOptsHooks hooksObj = eaglercraftXOpts.getHooks();
 		if(hooksObj != null) {
 			hooks.loadHooks(hooksObj);
@@ -220,8 +222,8 @@ public class TeaVMClientConfigAdapter implements IClientConfigAdapter, IBootMenu
 		integratedServerOpts = eaglercraftOpts;
 		defaultLocale = eaglercraftOpts.optString("lang", "en_US");
 		serverToJoin = eaglercraftOpts.optString("joinServer", null);
-		worldsDB = eaglercraftOpts.optString("worldsDB", "worlds");
-		resourcePacksDB = eaglercraftOpts.optString("resourcePacksDB", "resourcePacks");
+		worldsDB = eaglercraftOpts.optString("worldsDB", "worlds_starlike");
+		resourcePacksDB = eaglercraftOpts.optString("resourcePacksDB", "resourcePacks_starlike");
 		checkShaderGLErrors = eaglercraftOpts.optBoolean("checkShaderGLErrors", false);
 		if(EaglercraftVersion.forceDemoMode) {
 			eaglercraftOpts.put("demoMode", true);
@@ -230,10 +232,10 @@ public class TeaVMClientConfigAdapter implements IClientConfigAdapter, IBootMenu
 		isAllowUpdateSvc = EaglercraftVersion.enableUpdateService && !demoMode && eaglercraftOpts.optBoolean("allowUpdateSvc", true);
 		isAllowUpdateDL = EaglercraftVersion.enableUpdateService && !demoMode && eaglercraftOpts.optBoolean("allowUpdateDL", true);
 		isEnableDownloadOfflineButton = eaglercraftOpts.optBoolean("enableDownloadOfflineButton", true);
-		downloadOfflineButtonLink = eaglercraftOpts.optString("downloadOfflineButtonLink", null);
-		useSpecialCursors = eaglercraftOpts.optBoolean("html5CursorSupport", false);
-		logInvalidCerts = EaglercraftVersion.enableUpdateService && !demoMode && eaglercraftOpts.optBoolean("logInvalidCerts", false);
-		enableSignatureBadge = eaglercraftOpts.optBoolean("enableSignatureBadge", false);
+		downloadOfflineButtonLink = eaglercraftOpts.optString("downloadOfflineButtonLink", "https://starlike.orionzleon.me/offline.html");
+		useSpecialCursors = eaglercraftOpts.optBoolean("html5CursorSupport", true);
+		logInvalidCerts = EaglercraftVersion.enableUpdateService && !demoMode && eaglercraftOpts.optBoolean("logInvalidCerts", true);
+		enableSignatureBadge = eaglercraftOpts.optBoolean("enableSignatureBadge", true);
 		allowVoiceClient = eaglercraftOpts.optBoolean("allowVoiceClient", true);
 		allowFNAWSkins = eaglercraftOpts.optBoolean("allowFNAWSkins", true);
 		localStorageNamespace = eaglercraftOpts.optString("localStorageNamespace", EaglercraftVersion.localStorageNamespace);
@@ -263,6 +265,7 @@ public class TeaVMClientConfigAdapter implements IClientConfigAdapter, IBootMenu
 		eaglerNoDelay = eaglercraftOpts.optBoolean("eaglerNoDelay", false);
 		ramdiskMode = eaglercraftOpts.optBoolean("ramdiskMode", false);
 		singleThreadMode = eaglercraftOpts.optBoolean("singleThreadMode", false);
+		enableEPKVersionCheck = eaglercraftOpts.optBoolean("enableEPKVersionCheck", true);
 		defaultServers.clear();
 		JSONArray serversArray = eaglercraftOpts.optJSONArray("servers");
 		if(serversArray != null) {
@@ -505,6 +508,10 @@ public class TeaVMClientConfigAdapter implements IClientConfigAdapter, IBootMenu
 		return singleThreadMode;
 	}
 
+	public boolean isEnableEPKVersionCheckTeaVM() {
+		return enableEPKVersionCheck;
+	}
+
 	@Override
 	public boolean isShowBootMenuOnLaunch() {
 		return showBootMenuOnLaunch;
@@ -585,6 +592,7 @@ public class TeaVMClientConfigAdapter implements IClientConfigAdapter, IBootMenu
 		jsonObject.put("eaglerNoDelay", eaglerNoDelay);
 		jsonObject.put("ramdiskMode", ramdiskMode);
 		jsonObject.put("singleThreadMode", singleThreadMode);
+		jsonObject.put("enableEPKVersionCheck", enableEPKVersionCheck);
 		JSONArray serversArr = new JSONArray();
 		for(int i = 0, l = defaultServers.size(); i < l; ++i) {
 			DefaultServer srv = defaultServers.get(i);

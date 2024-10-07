@@ -63,26 +63,67 @@ import com.google.common.base.Objects;
 public abstract class ForwardingMap<K, V> extends ForwardingObject implements Map<K, V> {
 	// TODO(user): identify places where thread safety is actually lost
 
+	/**
+	 * A sensible implementation of {@link Map#entrySet} in terms of the following
+	 * methods: {@link ForwardingMap#clear}, {@link ForwardingMap#containsKey},
+	 * {@link ForwardingMap#get}, {@link ForwardingMap#isEmpty},
+	 * {@link ForwardingMap#remove}, and {@link ForwardingMap#size}. In many cases,
+	 * you may wish to override {@link #entrySet} to forward to this implementation
+	 * or a subclass thereof.
+	 *
+	 * @since 10.0
+	 */
+	@Beta
+	protected abstract class StandardEntrySet extends Maps.EntrySet<K, V> {
+		/** Constructor for use by subclasses. */
+		public StandardEntrySet() {
+		}
+
+		@Override
+		Map<K, V> map() {
+			return ForwardingMap.this;
+		}
+	}
+
+	/**
+	 * A sensible implementation of {@link Map#keySet} in terms of the following
+	 * methods: {@link ForwardingMap#clear}, {@link ForwardingMap#containsKey},
+	 * {@link ForwardingMap#isEmpty}, {@link ForwardingMap#remove},
+	 * {@link ForwardingMap#size}, and the {@link Set#iterator} method of
+	 * {@link ForwardingMap#entrySet}. In many cases, you may wish to override
+	 * {@link ForwardingMap#keySet} to forward to this implementation or a subclass
+	 * thereof.
+	 *
+	 * @since 10.0
+	 */
+	@Beta
+	protected class StandardKeySet extends Maps.KeySet<K, V> {
+		/** Constructor for use by subclasses. */
+		public StandardKeySet() {
+			super(ForwardingMap.this);
+		}
+	}
+
+	/**
+	 * A sensible implementation of {@link Map#values} in terms of the following
+	 * methods: {@link ForwardingMap#clear}, {@link ForwardingMap#containsValue},
+	 * {@link ForwardingMap#isEmpty}, {@link ForwardingMap#size}, and the
+	 * {@link Set#iterator} method of {@link ForwardingMap#entrySet}. In many cases,
+	 * you may wish to override {@link ForwardingMap#values} to forward to this
+	 * implementation or a subclass thereof.
+	 *
+	 * @since 10.0
+	 */
+	@Beta
+	protected class StandardValues extends Maps.Values<K, V> {
+		/** Constructor for use by subclasses. */
+		public StandardValues() {
+			super(ForwardingMap.this);
+		}
+	}
+
 	/** Constructor for use by subclasses. */
 	protected ForwardingMap() {
-	}
-
-	@Override
-	protected abstract Map<K, V> delegate();
-
-	@Override
-	public int size() {
-		return delegate().size();
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return delegate().isEmpty();
-	}
-
-	@Override
-	public V remove(Object object) {
-		return delegate().remove(object);
 	}
 
 	@Override
@@ -101,8 +142,36 @@ public abstract class ForwardingMap<K, V> extends ForwardingObject implements Ma
 	}
 
 	@Override
+	protected abstract Map<K, V> delegate();
+
+	@Override
+	public Set<Entry<K, V>> entrySet() {
+		return delegate().entrySet();
+	}
+
+	@Override
+	public boolean equals(@Nullable Object object) {
+		return object == this || delegate().equals(object);
+	}
+
+	@Override
 	public V get(@Nullable Object key) {
 		return delegate().get(key);
+	}
+
+	@Override
+	public int hashCode() {
+		return delegate().hashCode();
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return delegate().isEmpty();
+	}
+
+	@Override
+	public Set<K> keySet() {
+		return delegate().keySet();
 	}
 
 	@Override
@@ -116,28 +185,82 @@ public abstract class ForwardingMap<K, V> extends ForwardingObject implements Ma
 	}
 
 	@Override
-	public Set<K> keySet() {
-		return delegate().keySet();
+	public V remove(Object object) {
+		return delegate().remove(object);
 	}
 
 	@Override
-	public Collection<V> values() {
-		return delegate().values();
+	public int size() {
+		return delegate().size();
 	}
 
-	@Override
-	public Set<Entry<K, V>> entrySet() {
-		return delegate().entrySet();
+	/**
+	 * A sensible definition of {@link #clear} in terms of the {@code iterator}
+	 * method of {@link #entrySet}. In many cases, you may wish to override
+	 * {@link #clear} to forward to this implementation.
+	 *
+	 * @since 7.0
+	 */
+	protected void standardClear() {
+		Iterators.clear(entrySet().iterator());
 	}
 
-	@Override
-	public boolean equals(@Nullable Object object) {
-		return object == this || delegate().equals(object);
+	/**
+	 * A sensible, albeit inefficient, definition of {@link #containsKey} in terms
+	 * of the {@code iterator} method of {@link #entrySet}. If you override
+	 * {@link #entrySet}, you may wish to override {@link #containsKey} to forward
+	 * to this implementation.
+	 *
+	 * @since 7.0
+	 */
+	@Beta
+	protected boolean standardContainsKey(@Nullable Object key) {
+		return Maps.containsKeyImpl(this, key);
 	}
 
-	@Override
-	public int hashCode() {
-		return delegate().hashCode();
+	/**
+	 * A sensible definition of {@link #containsValue} in terms of the {@code
+	 * iterator} method of {@link #entrySet}. If you override {@link #entrySet}, you
+	 * may wish to override {@link #containsValue} to forward to this
+	 * implementation.
+	 *
+	 * @since 7.0
+	 */
+	protected boolean standardContainsValue(@Nullable Object value) {
+		return Maps.containsValueImpl(this, value);
+	}
+
+	/**
+	 * A sensible definition of {@link #equals} in terms of the {@code equals}
+	 * method of {@link #entrySet}. If you override {@link #entrySet}, you may wish
+	 * to override {@link #equals} to forward to this implementation.
+	 *
+	 * @since 7.0
+	 */
+	protected boolean standardEquals(@Nullable Object object) {
+		return Maps.equalsImpl(this, object);
+	}
+
+	/**
+	 * A sensible definition of {@link #hashCode} in terms of the {@code iterator}
+	 * method of {@link #entrySet}. If you override {@link #entrySet}, you may wish
+	 * to override {@link #hashCode} to forward to this implementation.
+	 *
+	 * @since 7.0
+	 */
+	protected int standardHashCode() {
+		return Sets.hashCodeImpl(entrySet());
+	}
+
+	/**
+	 * A sensible definition of {@link #isEmpty} in terms of the {@code iterator}
+	 * method of {@link #entrySet}. If you override {@link #entrySet}, you may wish
+	 * to override {@link #isEmpty} to forward to this implementation.
+	 *
+	 * @since 7.0
+	 */
+	protected boolean standardIsEmpty() {
+		return !entrySet().iterator().hasNext();
 	}
 
 	/**
@@ -179,134 +302,6 @@ public abstract class ForwardingMap<K, V> extends ForwardingObject implements Ma
 	}
 
 	/**
-	 * A sensible definition of {@link #clear} in terms of the {@code iterator}
-	 * method of {@link #entrySet}. In many cases, you may wish to override
-	 * {@link #clear} to forward to this implementation.
-	 *
-	 * @since 7.0
-	 */
-	protected void standardClear() {
-		Iterators.clear(entrySet().iterator());
-	}
-
-	/**
-	 * A sensible implementation of {@link Map#keySet} in terms of the following
-	 * methods: {@link ForwardingMap#clear}, {@link ForwardingMap#containsKey},
-	 * {@link ForwardingMap#isEmpty}, {@link ForwardingMap#remove},
-	 * {@link ForwardingMap#size}, and the {@link Set#iterator} method of
-	 * {@link ForwardingMap#entrySet}. In many cases, you may wish to override
-	 * {@link ForwardingMap#keySet} to forward to this implementation or a subclass
-	 * thereof.
-	 *
-	 * @since 10.0
-	 */
-	@Beta
-	protected class StandardKeySet extends Maps.KeySet<K, V> {
-		/** Constructor for use by subclasses. */
-		public StandardKeySet() {
-			super(ForwardingMap.this);
-		}
-	}
-
-	/**
-	 * A sensible, albeit inefficient, definition of {@link #containsKey} in terms
-	 * of the {@code iterator} method of {@link #entrySet}. If you override
-	 * {@link #entrySet}, you may wish to override {@link #containsKey} to forward
-	 * to this implementation.
-	 *
-	 * @since 7.0
-	 */
-	@Beta
-	protected boolean standardContainsKey(@Nullable Object key) {
-		return Maps.containsKeyImpl(this, key);
-	}
-
-	/**
-	 * A sensible implementation of {@link Map#values} in terms of the following
-	 * methods: {@link ForwardingMap#clear}, {@link ForwardingMap#containsValue},
-	 * {@link ForwardingMap#isEmpty}, {@link ForwardingMap#size}, and the
-	 * {@link Set#iterator} method of {@link ForwardingMap#entrySet}. In many cases,
-	 * you may wish to override {@link ForwardingMap#values} to forward to this
-	 * implementation or a subclass thereof.
-	 *
-	 * @since 10.0
-	 */
-	@Beta
-	protected class StandardValues extends Maps.Values<K, V> {
-		/** Constructor for use by subclasses. */
-		public StandardValues() {
-			super(ForwardingMap.this);
-		}
-	}
-
-	/**
-	 * A sensible definition of {@link #containsValue} in terms of the {@code
-	 * iterator} method of {@link #entrySet}. If you override {@link #entrySet}, you
-	 * may wish to override {@link #containsValue} to forward to this
-	 * implementation.
-	 *
-	 * @since 7.0
-	 */
-	protected boolean standardContainsValue(@Nullable Object value) {
-		return Maps.containsValueImpl(this, value);
-	}
-
-	/**
-	 * A sensible implementation of {@link Map#entrySet} in terms of the following
-	 * methods: {@link ForwardingMap#clear}, {@link ForwardingMap#containsKey},
-	 * {@link ForwardingMap#get}, {@link ForwardingMap#isEmpty},
-	 * {@link ForwardingMap#remove}, and {@link ForwardingMap#size}. In many cases,
-	 * you may wish to override {@link #entrySet} to forward to this implementation
-	 * or a subclass thereof.
-	 *
-	 * @since 10.0
-	 */
-	@Beta
-	protected abstract class StandardEntrySet extends Maps.EntrySet<K, V> {
-		/** Constructor for use by subclasses. */
-		public StandardEntrySet() {
-		}
-
-		@Override
-		Map<K, V> map() {
-			return ForwardingMap.this;
-		}
-	}
-
-	/**
-	 * A sensible definition of {@link #isEmpty} in terms of the {@code iterator}
-	 * method of {@link #entrySet}. If you override {@link #entrySet}, you may wish
-	 * to override {@link #isEmpty} to forward to this implementation.
-	 *
-	 * @since 7.0
-	 */
-	protected boolean standardIsEmpty() {
-		return !entrySet().iterator().hasNext();
-	}
-
-	/**
-	 * A sensible definition of {@link #equals} in terms of the {@code equals}
-	 * method of {@link #entrySet}. If you override {@link #entrySet}, you may wish
-	 * to override {@link #equals} to forward to this implementation.
-	 *
-	 * @since 7.0
-	 */
-	protected boolean standardEquals(@Nullable Object object) {
-		return Maps.equalsImpl(this, object);
-	}
-
-	/**
-	 * A sensible definition of {@link #hashCode} in terms of the {@code iterator}
-	 * method of {@link #entrySet}. If you override {@link #entrySet}, you may wish
-	 * to override {@link #hashCode} to forward to this implementation.
-	 *
-	 * @since 7.0
-	 */
-	protected int standardHashCode() {
-		return Sets.hashCodeImpl(entrySet());
-	}
-
-	/**
 	 * A sensible definition of {@link #toString} in terms of the {@code iterator}
 	 * method of {@link #entrySet}. If you override {@link #entrySet}, you may wish
 	 * to override {@link #toString} to forward to this implementation.
@@ -315,5 +310,10 @@ public abstract class ForwardingMap<K, V> extends ForwardingObject implements Ma
 	 */
 	protected String standardToString() {
 		return Maps.toStringImpl(this);
+	}
+
+	@Override
+	public Collection<V> values() {
+		return delegate().values();
 	}
 }

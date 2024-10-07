@@ -43,8 +43,8 @@ import com.google.common.annotations.GwtIncompatible;
  */
 @GwtCompatible(emulated = true)
 public final class EnumBiMap<K extends Enum<K>, V extends Enum<V>> extends AbstractBiMap<K, V> {
-	private transient Class<K> keyType;
-	private transient Class<V> valueType;
+	@GwtIncompatible("not needed in emulated source.")
+	private static final long serialVersionUID = 0;
 
 	/**
 	 * Returns a new, empty {@code EnumBiMap} using the specified key and value
@@ -73,12 +73,6 @@ public final class EnumBiMap<K extends Enum<K>, V extends Enum<V>> extends Abstr
 		return bimap;
 	}
 
-	private EnumBiMap(Class<K> keyType, Class<V> valueType) {
-		super(WellBehavedMap.wrap(new EnumMap<K, V>(keyType)), WellBehavedMap.wrap(new EnumMap<V, K>(valueType)));
-		this.keyType = keyType;
-		this.valueType = valueType;
-	}
-
 	static <K extends Enum<K>> Class<K> inferKeyType(Map<K, ?> map) {
 		if (map instanceof EnumBiMap) {
 			return ((EnumBiMap<K, ?>) map).keyType();
@@ -98,14 +92,14 @@ public final class EnumBiMap<K extends Enum<K>, V extends Enum<V>> extends Abstr
 		return map.values().iterator().next().getDeclaringClass();
 	}
 
-	/** Returns the associated key type. */
-	public Class<K> keyType() {
-		return keyType;
-	}
+	private transient Class<K> keyType;
 
-	/** Returns the associated value type. */
-	public Class<V> valueType() {
-		return valueType;
+	private transient Class<V> valueType;
+
+	private EnumBiMap(Class<K> keyType, Class<V> valueType) {
+		super(WellBehavedMap.wrap(new EnumMap<K, V>(keyType)), WellBehavedMap.wrap(new EnumMap<V, K>(valueType)));
+		this.keyType = keyType;
+		this.valueType = valueType;
 	}
 
 	@Override
@@ -118,16 +112,9 @@ public final class EnumBiMap<K extends Enum<K>, V extends Enum<V>> extends Abstr
 		return checkNotNull(value);
 	}
 
-	/**
-	 * @serialData the key class, value class, number of entries, first key, first
-	 *             value, second key, second value, and so on.
-	 */
-	@GwtIncompatible("java.io.ObjectOutputStream")
-	private void writeObject(ObjectOutputStream stream) throws IOException {
-		stream.defaultWriteObject();
-		stream.writeObject(keyType);
-		stream.writeObject(valueType);
-		Serialization.writeMap(this, stream);
+	/** Returns the associated key type. */
+	public Class<K> keyType() {
+		return keyType;
 	}
 
 	@SuppressWarnings("unchecked") // reading fields populated by writeObject
@@ -141,6 +128,20 @@ public final class EnumBiMap<K extends Enum<K>, V extends Enum<V>> extends Abstr
 		Serialization.populateMap(this, stream);
 	}
 
-	@GwtIncompatible("not needed in emulated source.")
-	private static final long serialVersionUID = 0;
+	/** Returns the associated value type. */
+	public Class<V> valueType() {
+		return valueType;
+	}
+
+	/**
+	 * @serialData the key class, value class, number of entries, first key, first
+	 *             value, second key, second value, and so on.
+	 */
+	@GwtIncompatible("java.io.ObjectOutputStream")
+	private void writeObject(ObjectOutputStream stream) throws IOException {
+		stream.defaultWriteObject();
+		stream.writeObject(keyType);
+		stream.writeObject(valueType);
+		Serialization.writeMap(this, stream);
+	}
 }

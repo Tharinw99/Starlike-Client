@@ -10,81 +10,31 @@ import net.lax1dude.eaglercraft.v1_8.json.JSONTypeProvider;
 import net.lax1dude.eaglercraft.v1_8.mojang.authlib.GameProfile;
 import net.minecraft.util.IChatComponent;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class ServerStatusResponse {
-	private IChatComponent serverMotd;
-	private ServerStatusResponse.PlayerCountData playerCount;
-	private ServerStatusResponse.MinecraftProtocolVersionIdentifier protocolVersion;
-	private String favicon;
-
-	public IChatComponent getServerDescription() {
-		return this.serverMotd;
-	}
-
-	public void setServerDescription(IChatComponent motd) {
-		this.serverMotd = motd;
-	}
-
-	public ServerStatusResponse.PlayerCountData getPlayerCountData() {
-		return this.playerCount;
-	}
-
-	public void setPlayerCountData(ServerStatusResponse.PlayerCountData countData) {
-		this.playerCount = countData;
-	}
-
-	public ServerStatusResponse.MinecraftProtocolVersionIdentifier getProtocolVersionInfo() {
-		return this.protocolVersion;
-	}
-
-	public void setProtocolVersionInfo(ServerStatusResponse.MinecraftProtocolVersionIdentifier protocolVersionData) {
-		this.protocolVersion = protocolVersionData;
-	}
-
-	public void setFavicon(String faviconBlob) {
-		this.favicon = faviconBlob;
-	}
-
-	public String getFavicon() {
-		return this.favicon;
-	}
-
 	public static class MinecraftProtocolVersionIdentifier {
-		private final String name;
-		private final int protocol;
-
-		public MinecraftProtocolVersionIdentifier(String nameIn, int protocolIn) {
-			this.name = nameIn;
-			this.protocol = protocolIn;
-		}
-
-		public String getName() {
-			return this.name;
-		}
-
-		public int getProtocol() {
-			return this.protocol;
-		}
-
 		public static class Serializer
 				implements JSONTypeCodec<ServerStatusResponse.MinecraftProtocolVersionIdentifier, JSONObject> {
 			public ServerStatusResponse.MinecraftProtocolVersionIdentifier deserialize(JSONObject jsonobject)
@@ -102,34 +52,26 @@ public class ServerStatusResponse {
 				return jsonobject;
 			}
 		}
+
+		private final String name;
+
+		private final int protocol;
+
+		public MinecraftProtocolVersionIdentifier(String nameIn, int protocolIn) {
+			this.name = nameIn;
+			this.protocol = protocolIn;
+		}
+
+		public String getName() {
+			return this.name;
+		}
+
+		public int getProtocol() {
+			return this.protocol;
+		}
 	}
 
 	public static class PlayerCountData {
-		private final int maxPlayers;
-		private final int onlinePlayerCount;
-		private GameProfile[] players;
-
-		public PlayerCountData(int maxOnlinePlayers, int onlinePlayers) {
-			this.maxPlayers = maxOnlinePlayers;
-			this.onlinePlayerCount = onlinePlayers;
-		}
-
-		public int getMaxPlayers() {
-			return this.maxPlayers;
-		}
-
-		public int getOnlinePlayerCount() {
-			return this.onlinePlayerCount;
-		}
-
-		public GameProfile[] getPlayers() {
-			return this.players;
-		}
-
-		public void setPlayers(GameProfile[] playersIn) {
-			this.players = playersIn;
-		}
-
 		public static class Serializer implements JSONTypeCodec<ServerStatusResponse.PlayerCountData, JSONObject> {
 			public ServerStatusResponse.PlayerCountData deserialize(JSONObject jsonobject) throws JSONException {
 				ServerStatusResponse.PlayerCountData serverstatusresponse$playercountdata = new ServerStatusResponse.PlayerCountData(
@@ -175,6 +117,32 @@ public class ServerStatusResponse {
 
 				return jsonobject;
 			}
+		}
+
+		private final int maxPlayers;
+		private final int onlinePlayerCount;
+
+		private GameProfile[] players;
+
+		public PlayerCountData(int maxOnlinePlayers, int onlinePlayers) {
+			this.maxPlayers = maxOnlinePlayers;
+			this.onlinePlayerCount = onlinePlayers;
+		}
+
+		public int getMaxPlayers() {
+			return this.maxPlayers;
+		}
+
+		public int getOnlinePlayerCount() {
+			return this.onlinePlayerCount;
+		}
+
+		public GameProfile[] getPlayers() {
+			return this.players;
+		}
+
+		public void setPlayers(GameProfile[] playersIn) {
+			this.players = playersIn;
 		}
 	}
 
@@ -228,5 +196,45 @@ public class ServerStatusResponse {
 
 			return jsonobject;
 		}
+	}
+
+	private IChatComponent serverMotd;
+
+	private ServerStatusResponse.PlayerCountData playerCount;
+
+	private ServerStatusResponse.MinecraftProtocolVersionIdentifier protocolVersion;
+
+	private String favicon;
+
+	public String getFavicon() {
+		return this.favicon;
+	}
+
+	public ServerStatusResponse.PlayerCountData getPlayerCountData() {
+		return this.playerCount;
+	}
+
+	public ServerStatusResponse.MinecraftProtocolVersionIdentifier getProtocolVersionInfo() {
+		return this.protocolVersion;
+	}
+
+	public IChatComponent getServerDescription() {
+		return this.serverMotd;
+	}
+
+	public void setFavicon(String faviconBlob) {
+		this.favicon = faviconBlob;
+	}
+
+	public void setPlayerCountData(ServerStatusResponse.PlayerCountData countData) {
+		this.playerCount = countData;
+	}
+
+	public void setProtocolVersionInfo(ServerStatusResponse.MinecraftProtocolVersionIdentifier protocolVersionData) {
+		this.protocolVersion = protocolVersionData;
+	}
+
+	public void setServerDescription(IChatComponent motd) {
+		this.serverMotd = motd;
 	}
 }

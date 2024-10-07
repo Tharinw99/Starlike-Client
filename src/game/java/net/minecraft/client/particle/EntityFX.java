@@ -9,27 +9,33 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class EntityFX extends Entity {
+	public static double interpPosX;
+	public static double interpPosY;
+	public static double interpPosZ;
 	protected int particleTextureIndexX;
 	protected int particleTextureIndexY;
 	protected float particleTextureJitterX;
@@ -43,9 +49,6 @@ public class EntityFX extends Entity {
 	protected float particleBlue;
 	protected float particleAlpha;
 	protected EaglerTextureAtlasSprite particleIcon;
-	public static double interpPosX;
-	public static double interpPosY;
-	public static double interpPosZ;
 
 	protected EntityFX(World worldIn, double posXIn, double posYIn, double posZIn) {
 		super(worldIn);
@@ -77,58 +80,16 @@ public class EntityFX extends Entity {
 		this.motionZ = this.motionZ / (double) f1 * (double) f * 0.4000000059604645D;
 	}
 
-	public EntityFX multiplyVelocity(float multiplier) {
-		this.motionX *= (double) multiplier;
-		this.motionY = (this.motionY - 0.10000000149011612D) * (double) multiplier + 0.10000000149011612D;
-		this.motionZ *= (double) multiplier;
-		return this;
-	}
-
-	public EntityFX multipleParticleScaleBy(float parFloat1) {
-		this.setSize(0.2F * parFloat1, 0.2F * parFloat1);
-		this.particleScale *= parFloat1;
-		return this;
-	}
-
-	public void setRBGColorF(float particleRedIn, float particleGreenIn, float particleBlueIn) {
-		this.particleRed = particleRedIn;
-		this.particleGreen = particleGreenIn;
-		this.particleBlue = particleBlueIn;
-	}
-
-	/**+
-	 * Sets the particle alpha (float)
+	/**
+	 * + If returns false, the item will not inflict any damage against entities.
 	 */
-	public void setAlphaF(float alpha) {
-		if (this.particleAlpha == 1.0F && alpha < 1.0F) {
-			Minecraft.getMinecraft().effectRenderer.moveToAlphaLayer(this);
-		} else if (this.particleAlpha < 1.0F && alpha == 1.0F) {
-			Minecraft.getMinecraft().effectRenderer.moveToNoAlphaLayer(this);
-		}
-
-		this.particleAlpha = alpha;
+	public boolean canAttackWithItem() {
+		return false;
 	}
 
-	public float getRedColorF() {
-		return this.particleRed;
-	}
-
-	public float getGreenColorF() {
-		return this.particleGreen;
-	}
-
-	public float getBlueColorF() {
-		return this.particleBlue;
-	}
-
-	public float getAlpha() {
-		return this.particleAlpha;
-	}
-
-	/**+
-	 * returns if this entity triggers Block.onEntityWalking on the
-	 * blocks they walk on. used for spiders and wolves to prevent
-	 * them from trampling crops
+	/**
+	 * + returns if this entity triggers Block.onEntityWalking on the blocks they
+	 * walk on. used for spiders and wolves to prevent them from trampling crops
 	 */
 	protected boolean canTriggerWalking() {
 		return false;
@@ -137,8 +98,49 @@ public class EntityFX extends Entity {
 	protected void entityInit() {
 	}
 
-	/**+
-	 * Called to update the entity's position/logic.
+	public float getAlpha() {
+		return this.particleAlpha;
+	}
+
+	public float getBlueColorF() {
+		return this.particleBlue;
+	}
+
+	protected float getEaglerDynamicLightsValueSimple(float partialTicks) {
+		return 0.0f;
+	}
+
+	public int getFXLayer() {
+		return 0;
+	}
+
+	public float getGreenColorF() {
+		return this.particleGreen;
+	}
+
+	public float getRedColorF() {
+		return this.particleRed;
+	}
+
+	public EntityFX multipleParticleScaleBy(float parFloat1) {
+		this.setSize(0.2F * parFloat1, 0.2F * parFloat1);
+		this.particleScale *= parFloat1;
+		return this;
+	}
+
+	public EntityFX multiplyVelocity(float multiplier) {
+		this.motionX *= (double) multiplier;
+		this.motionY = (this.motionY - 0.10000000149011612D) * (double) multiplier + 0.10000000149011612D;
+		this.motionZ *= (double) multiplier;
+		return this;
+	}
+
+	public void nextTextureIndexX() {
+		++this.particleTextureIndexX;
+	}
+
+	/**
+	 * + Called to update the entity's position/logic.
 	 */
 	public void onUpdate() {
 		this.prevPosX = this.posX;
@@ -160,8 +162,26 @@ public class EntityFX extends Entity {
 
 	}
 
-	/**+
-	 * Renders the particle
+	/**
+	 * + (abstract) Protected helper method to read subclass entity data from NBT.
+	 */
+	public void readEntityFromNBT(NBTTagCompound tagCompund) {
+	}
+
+	public boolean renderAccelerated(IAcceleratedParticleEngine accelerator, Entity var2, float f, float f1, float f2,
+			float f3, float f4, float f5) {
+		if (getFXLayer() == 3) {
+			return false;
+		} else {
+			accelerator.drawParticle(this, particleTextureIndexX * 16, particleTextureIndexY * 16,
+					getBrightnessForRender(f), 16, particleScale * 0.1f, this.particleRed, this.particleGreen,
+					this.particleBlue, this.particleAlpha);
+			return true;
+		}
+	}
+
+	/**
+	 * + Renders the particle
 	 */
 	public void renderParticle(WorldRenderer worldrenderer, Entity var2, float f, float f1, float f2, float f3,
 			float f4, float f5) {
@@ -209,38 +229,21 @@ public class EntityFX extends Entity {
 				.endVertex();
 	}
 
-	public boolean renderAccelerated(IAcceleratedParticleEngine accelerator, Entity var2, float f, float f1, float f2,
-			float f3, float f4, float f5) {
-		if (getFXLayer() == 3) {
-			return false;
-		} else {
-			accelerator.drawParticle(this, particleTextureIndexX * 16, particleTextureIndexY * 16,
-					getBrightnessForRender(f), 16, particleScale * 0.1f, this.particleRed, this.particleGreen,
-					this.particleBlue, this.particleAlpha);
-			return true;
+	/**
+	 * + Sets the particle alpha (float)
+	 */
+	public void setAlphaF(float alpha) {
+		if (this.particleAlpha == 1.0F && alpha < 1.0F) {
+			Minecraft.getMinecraft().effectRenderer.moveToAlphaLayer(this);
+		} else if (this.particleAlpha < 1.0F && alpha == 1.0F) {
+			Minecraft.getMinecraft().effectRenderer.moveToNoAlphaLayer(this);
 		}
+
+		this.particleAlpha = alpha;
 	}
 
-	public int getFXLayer() {
-		return 0;
-	}
-
-	/**+
-	 * (abstract) Protected helper method to write subclass entity
-	 * data to NBT.
-	 */
-	public void writeEntityToNBT(NBTTagCompound tagCompound) {
-	}
-
-	/**+
-	 * (abstract) Protected helper method to read subclass entity
-	 * data from NBT.
-	 */
-	public void readEntityFromNBT(NBTTagCompound tagCompund) {
-	}
-
-	/**+
-	 * Sets the particle's icon.
+	/**
+	 * + Sets the particle's icon.
 	 */
 	public void setParticleIcon(EaglerTextureAtlasSprite icon) {
 		int i = this.getFXLayer();
@@ -251,8 +254,8 @@ public class EntityFX extends Entity {
 		}
 	}
 
-	/**+
-	 * Public method to set private field particleTextureIndex.
+	/**
+	 * + Public method to set private field particleTextureIndex.
 	 */
 	public void setParticleTextureIndex(int particleTextureIndex) {
 		if (this.getFXLayer() != 0) {
@@ -263,16 +266,10 @@ public class EntityFX extends Entity {
 		}
 	}
 
-	public void nextTextureIndexX() {
-		++this.particleTextureIndexX;
-	}
-
-	/**+
-	 * If returns false, the item will not inflict any damage
-	 * against entities.
-	 */
-	public boolean canAttackWithItem() {
-		return false;
+	public void setRBGColorF(float particleRedIn, float particleGreenIn, float particleBlueIn) {
+		this.particleRed = particleRedIn;
+		this.particleGreen = particleGreenIn;
+		this.particleBlue = particleBlueIn;
 	}
 
 	public String toString() {
@@ -281,7 +278,9 @@ public class EntityFX extends Entity {
 				+ "), Age " + this.particleAge;
 	}
 
-	protected float getEaglerDynamicLightsValueSimple(float partialTicks) {
-		return 0.0f;
+	/**
+	 * + (abstract) Protected helper method to write subclass entity data to NBT.
+	 */
+	public void writeEntityToNBT(NBTTagCompound tagCompound) {
 	}
 }

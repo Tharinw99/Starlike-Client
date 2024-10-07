@@ -56,24 +56,9 @@ final class RegularImmutableSortedSet<E> extends ImmutableSortedSet<E> {
 	}
 
 	@Override
-	public UnmodifiableIterator<E> iterator() {
-		return elements.iterator();
-	}
-
-	@GwtIncompatible("NavigableSet")
-	@Override
-	public UnmodifiableIterator<E> descendingIterator() {
-		return elements.reverse().iterator();
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return false;
-	}
-
-	@Override
-	public int size() {
-		return elements.size();
+	public E ceiling(E element) {
+		int index = tailIndex(element, true);
+		return (index == size()) ? null : elements.get(index);
 	}
 
 	@Override
@@ -136,18 +121,25 @@ final class RegularImmutableSortedSet<E> extends ImmutableSortedSet<E> {
 		return false;
 	}
 
-	private int unsafeBinarySearch(Object key) throws ClassCastException {
-		return Collections.binarySearch(elements, key, unsafeComparator());
-	}
-
-	@Override
-	boolean isPartialView() {
-		return elements.isPartialView();
-	}
-
 	@Override
 	int copyIntoArray(Object[] dst, int offset) {
 		return elements.copyIntoArray(dst, offset);
+	}
+
+	@Override
+	ImmutableList<E> createAsList() {
+		return new ImmutableSortedAsList<E>(this, elements);
+	}
+
+	@Override
+	ImmutableSortedSet<E> createDescendingSet() {
+		return new RegularImmutableSortedSet<E>(elements.reverse(), Ordering.from(comparator).reverse());
+	}
+
+	@GwtIncompatible("NavigableSet")
+	@Override
+	public UnmodifiableIterator<E> descendingIterator() {
+		return elements.reverse().iterator();
 	}
 
 	@Override
@@ -191,65 +183,9 @@ final class RegularImmutableSortedSet<E> extends ImmutableSortedSet<E> {
 	}
 
 	@Override
-	public E last() {
-		return elements.get(size() - 1);
-	}
-
-	@Override
-	public E lower(E element) {
-		int index = headIndex(element, false) - 1;
-		return (index == -1) ? null : elements.get(index);
-	}
-
-	@Override
 	public E floor(E element) {
 		int index = headIndex(element, true) - 1;
 		return (index == -1) ? null : elements.get(index);
-	}
-
-	@Override
-	public E ceiling(E element) {
-		int index = tailIndex(element, true);
-		return (index == size()) ? null : elements.get(index);
-	}
-
-	@Override
-	public E higher(E element) {
-		int index = tailIndex(element, false);
-		return (index == size()) ? null : elements.get(index);
-	}
-
-	@Override
-	ImmutableSortedSet<E> headSetImpl(E toElement, boolean inclusive) {
-		return getSubSet(0, headIndex(toElement, inclusive));
-	}
-
-	int headIndex(E toElement, boolean inclusive) {
-		return SortedLists.binarySearch(elements, checkNotNull(toElement), comparator(),
-				inclusive ? FIRST_AFTER : FIRST_PRESENT, NEXT_HIGHER);
-	}
-
-	@Override
-	ImmutableSortedSet<E> subSetImpl(E fromElement, boolean fromInclusive, E toElement, boolean toInclusive) {
-		return tailSetImpl(fromElement, fromInclusive).headSetImpl(toElement, toInclusive);
-	}
-
-	@Override
-	ImmutableSortedSet<E> tailSetImpl(E fromElement, boolean inclusive) {
-		return getSubSet(tailIndex(fromElement, inclusive), size());
-	}
-
-	int tailIndex(E fromElement, boolean inclusive) {
-		return SortedLists.binarySearch(elements, checkNotNull(fromElement), comparator(),
-				inclusive ? FIRST_PRESENT : FIRST_AFTER, NEXT_HIGHER);
-	}
-
-	// Pretend the comparator can compare anything. If it turns out it can't
-	// compare two elements, it'll throw a CCE. Only methods that are specified to
-	// throw CCE should call this.
-	@SuppressWarnings("unchecked")
-	Comparator<Object> unsafeComparator() {
-		return (Comparator<Object>) comparator;
 	}
 
 	ImmutableSortedSet<E> getSubSet(int newFromIndex, int newToIndex) {
@@ -260,6 +196,22 @@ final class RegularImmutableSortedSet<E> extends ImmutableSortedSet<E> {
 		} else {
 			return emptySet(comparator);
 		}
+	}
+
+	int headIndex(E toElement, boolean inclusive) {
+		return SortedLists.binarySearch(elements, checkNotNull(toElement), comparator(),
+				inclusive ? FIRST_AFTER : FIRST_PRESENT, NEXT_HIGHER);
+	}
+
+	@Override
+	ImmutableSortedSet<E> headSetImpl(E toElement, boolean inclusive) {
+		return getSubSet(0, headIndex(toElement, inclusive));
+	}
+
+	@Override
+	public E higher(E element) {
+		int index = tailIndex(element, false);
+		return (index == size()) ? null : elements.get(index);
 	}
 
 	@Override
@@ -278,12 +230,60 @@ final class RegularImmutableSortedSet<E> extends ImmutableSortedSet<E> {
 	}
 
 	@Override
-	ImmutableList<E> createAsList() {
-		return new ImmutableSortedAsList<E>(this, elements);
+	public boolean isEmpty() {
+		return false;
 	}
 
 	@Override
-	ImmutableSortedSet<E> createDescendingSet() {
-		return new RegularImmutableSortedSet<E>(elements.reverse(), Ordering.from(comparator).reverse());
+	boolean isPartialView() {
+		return elements.isPartialView();
+	}
+
+	@Override
+	public UnmodifiableIterator<E> iterator() {
+		return elements.iterator();
+	}
+
+	@Override
+	public E last() {
+		return elements.get(size() - 1);
+	}
+
+	@Override
+	public E lower(E element) {
+		int index = headIndex(element, false) - 1;
+		return (index == -1) ? null : elements.get(index);
+	}
+
+	@Override
+	public int size() {
+		return elements.size();
+	}
+
+	@Override
+	ImmutableSortedSet<E> subSetImpl(E fromElement, boolean fromInclusive, E toElement, boolean toInclusive) {
+		return tailSetImpl(fromElement, fromInclusive).headSetImpl(toElement, toInclusive);
+	}
+
+	int tailIndex(E fromElement, boolean inclusive) {
+		return SortedLists.binarySearch(elements, checkNotNull(fromElement), comparator(),
+				inclusive ? FIRST_PRESENT : FIRST_AFTER, NEXT_HIGHER);
+	}
+
+	@Override
+	ImmutableSortedSet<E> tailSetImpl(E fromElement, boolean inclusive) {
+		return getSubSet(tailIndex(fromElement, inclusive), size());
+	}
+
+	private int unsafeBinarySearch(Object key) throws ClassCastException {
+		return Collections.binarySearch(elements, key, unsafeComparator());
+	}
+
+	// Pretend the comparator can compare anything. If it turns out it can't
+	// compare two elements, it'll throw a CCE. Only methods that are specified to
+	// throw CCE should call this.
+	@SuppressWarnings("unchecked")
+	Comparator<Object> unsafeComparator() {
+		return (Comparator<Object>) comparator;
 	}
 }

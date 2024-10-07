@@ -1,9 +1,11 @@
 package net.minecraft.entity.boss;
 
-import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import com.google.common.collect.Lists;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockTorch;
 import net.minecraft.block.material.Material;
@@ -28,22 +30,25 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -52,14 +57,14 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
 	public double targetX;
 	public double targetY;
 	public double targetZ;
-	/**+
-	 * Ring buffer array for the last 64 Y-positions and yaw
-	 * rotations. Used to calculate offsets for the animations.
+	/**
+	 * + Ring buffer array for the last 64 Y-positions and yaw rotations. Used to
+	 * calculate offsets for the animations.
 	 */
 	public double[][] ringBuffer = new double[64][3];
-	/**+
-	 * Index into the ring buffer. Incremented once per tick and
-	 * restarts at 0 once it reaches the end of the buffer.
+	/**
+	 * + Index into the ring buffer. Incremented once per tick and restarts at 0
+	 * once it reaches the end of the buffer.
 	 */
 	public int ringBufferIndex = -1;
 	public EntityDragonPart[] dragonPartArray;
@@ -101,15 +106,205 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
 		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(200.0D);
 	}
 
+	/**
+	 * + Provides a way to cause damage to an ender dragon.
+	 */
+	protected boolean attackDragonFrom(DamageSource source, float amount) {
+		return super.attackEntityFrom(source, amount);
+	}
+
+	/**
+	 * + Attacks all entities inside this list, dealing 5 hearts of damage.
+	 */
+	private void attackEntitiesInList(List<Entity> parList) {
+		for (int i = 0, l = parList.size(); i < l; ++i) {
+			Entity entity = (Entity) parList.get(i);
+			if (entity instanceof EntityLivingBase) {
+				entity.attackEntityFrom(DamageSource.causeMobDamage(this), 10.0F);
+				this.applyEnchantments(this, entity);
+			}
+		}
+
+	}
+
+	/**
+	 * + Called when the entity is attacked.
+	 */
+	public boolean attackEntityFrom(DamageSource damagesource, float f) {
+		if (damagesource instanceof EntityDamageSource && ((EntityDamageSource) damagesource).getIsThornsDamage()) {
+			this.attackDragonFrom(damagesource, f);
+		}
+
+		return false;
+	}
+
+	public boolean attackEntityFromPart(EntityDragonPart entitydragonpart, DamageSource damagesource, float f) {
+		if (entitydragonpart != this.dragonPartHead) {
+			f = f / 4.0F + 1.0F;
+		}
+
+		float f1 = this.rotationYaw * 3.1415927F / 180.0F;
+		float f2 = MathHelper.sin(f1);
+		float f3 = MathHelper.cos(f1);
+		this.targetX = this.posX + (double) (f2 * 5.0F) + (double) ((this.rand.nextFloat() - 0.5F) * 2.0F);
+		this.targetY = this.posY + (double) (this.rand.nextFloat() * 3.0F) + 1.0D;
+		this.targetZ = this.posZ - (double) (f3 * 5.0F) + (double) ((this.rand.nextFloat() - 0.5F) * 2.0F);
+		this.target = null;
+		if (damagesource.getEntity() instanceof EntityPlayer || damagesource.isExplosion()) {
+			this.attackDragonFrom(damagesource, f);
+		}
+
+		return true;
+	}
+
+	/**
+	 * + Returns true if other Entities should be prevented from moving through this
+	 * Entity.
+	 */
+	public boolean canBeCollidedWith() {
+		return false;
+	}
+
+	/**
+	 * + Pushes all entities inside the list away from the enderdragon.
+	 */
+	private void collideWithEntities(List<Entity> parList) {
+		double d0 = (this.dragonPartBody.getEntityBoundingBox().minX + this.dragonPartBody.getEntityBoundingBox().maxX)
+				/ 2.0D;
+		double d1 = (this.dragonPartBody.getEntityBoundingBox().minZ + this.dragonPartBody.getEntityBoundingBox().maxZ)
+				/ 2.0D;
+
+		for (int i = 0, l = parList.size(); i < l; ++i) {
+			Entity entity = parList.get(i);
+			if (entity instanceof EntityLivingBase) {
+				double d2 = entity.posX - d0;
+				double d3 = entity.posZ - d1;
+				double d4 = d2 * d2 + d3 * d3;
+				entity.addVelocity(d2 / d4 * 4.0D, 0.20000000298023224D, d3 / d4 * 4.0D);
+			}
+		}
+
+	}
+
+	/**
+	 * + Makes the entity despawn if requirements are reached
+	 */
+	protected void despawnEntity() {
+	}
+
+	/**
+	 * + Destroys all blocks that aren't associated with 'The End' inside the given
+	 * bounding box.
+	 */
+	private boolean destroyBlocksInAABB(AxisAlignedBB parAxisAlignedBB) {
+		int i = MathHelper.floor_double(parAxisAlignedBB.minX);
+		int j = MathHelper.floor_double(parAxisAlignedBB.minY);
+		int k = MathHelper.floor_double(parAxisAlignedBB.minZ);
+		int l = MathHelper.floor_double(parAxisAlignedBB.maxX);
+		int i1 = MathHelper.floor_double(parAxisAlignedBB.maxY);
+		int j1 = MathHelper.floor_double(parAxisAlignedBB.maxZ);
+		boolean flag = false;
+		boolean flag1 = false;
+
+		for (int k1 = i; k1 <= l; ++k1) {
+			for (int l1 = j; l1 <= i1; ++l1) {
+				for (int i2 = k; i2 <= j1; ++i2) {
+					BlockPos blockpos = new BlockPos(k1, l1, i2);
+					Block block = this.worldObj.getBlockState(blockpos).getBlock();
+					if (block.getMaterial() != Material.air) {
+						if (block != Blocks.barrier && block != Blocks.obsidian && block != Blocks.end_stone
+								&& block != Blocks.bedrock && block != Blocks.command_block
+								&& this.worldObj.getGameRules().getBoolean("mobGriefing")) {
+							flag1 = this.worldObj.setBlockToAir(blockpos) || flag1;
+						} else {
+							flag = true;
+						}
+					}
+				}
+			}
+		}
+
+		if (flag1) {
+			double d0 = parAxisAlignedBB.minX
+					+ (parAxisAlignedBB.maxX - parAxisAlignedBB.minX) * (double) this.rand.nextFloat();
+			double d1 = parAxisAlignedBB.minY
+					+ (parAxisAlignedBB.maxY - parAxisAlignedBB.minY) * (double) this.rand.nextFloat();
+			double d2 = parAxisAlignedBB.minZ
+					+ (parAxisAlignedBB.maxZ - parAxisAlignedBB.minZ) * (double) this.rand.nextFloat();
+			this.worldObj.spawnParticle(EnumParticleTypes.EXPLOSION_LARGE, d0, d1, d2, 0.0D, 0.0D, 0.0D, new int[0]);
+		}
+
+		return flag;
+	}
+
 	protected void entityInit() {
 		super.entityInit();
 	}
 
-	/**+
-	 * Returns a double[3] array with movement offsets, used to
-	 * calculate trailing tail/neck positions. [0] = yaw offset, [1]
-	 * = y offset, [2] = unused, always 0. Parameters: buffer index
-	 * offset, partial ticks.
+	/**
+	 * + Generate the portal when the dragon dies
+	 */
+	private void generatePortal(BlockPos pos) {
+		boolean flag = true;
+		double d0 = 12.25D;
+		double d1 = 6.25D;
+
+		for (int i = -1; i <= 32; ++i) {
+			for (int j = -4; j <= 4; ++j) {
+				for (int k = -4; k <= 4; ++k) {
+					double d2 = (double) (j * j + k * k);
+					if (d2 <= 12.25D) {
+						BlockPos blockpos = pos.add(j, i, k);
+						if (i < 0) {
+							if (d2 <= 6.25D) {
+								this.worldObj.setBlockState(blockpos, Blocks.bedrock.getDefaultState());
+							}
+						} else if (i > 0) {
+							this.worldObj.setBlockState(blockpos, Blocks.air.getDefaultState());
+						} else if (d2 > 6.25D) {
+							this.worldObj.setBlockState(blockpos, Blocks.bedrock.getDefaultState());
+						} else {
+							this.worldObj.setBlockState(blockpos, Blocks.end_portal.getDefaultState());
+						}
+					}
+				}
+			}
+		}
+
+		this.worldObj.setBlockState(pos, Blocks.bedrock.getDefaultState());
+		this.worldObj.setBlockState(pos.up(), Blocks.bedrock.getDefaultState());
+		BlockPos blockpos1 = pos.up(2);
+		this.worldObj.setBlockState(blockpos1, Blocks.bedrock.getDefaultState());
+		this.worldObj.setBlockState(blockpos1.west(),
+				Blocks.torch.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.EAST));
+		this.worldObj.setBlockState(blockpos1.east(),
+				Blocks.torch.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.WEST));
+		this.worldObj.setBlockState(blockpos1.north(),
+				Blocks.torch.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.SOUTH));
+		this.worldObj.setBlockState(blockpos1.south(),
+				Blocks.torch.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.NORTH));
+		this.worldObj.setBlockState(pos.up(3), Blocks.bedrock.getDefaultState());
+		this.worldObj.setBlockState(pos.up(4), Blocks.dragon_egg.getDefaultState());
+	}
+
+	/**
+	 * + Returns the sound this mob makes when it is hurt.
+	 */
+	protected String getHurtSound() {
+		return "mob.enderdragon.hit";
+	}
+
+	/**
+	 * + Returns the sound this mob makes while it's alive.
+	 */
+	protected String getLivingSound() {
+		return "mob.enderdragon.growl";
+	}
+
+	/**
+	 * + Returns a double[3] array with movement offsets, used to calculate trailing
+	 * tail/neck positions. [0] = yaw offset, [1] = y offset, [2] = unused, always
+	 * 0. Parameters: buffer index offset, partial ticks.
 	 */
 	public double[] getMovementOffsets(int parInt1, float parFloat1) {
 		if (this.getHealth() <= 0.0F) {
@@ -130,10 +325,86 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
 		return adouble;
 	}
 
-	/**+
-	 * Called frequently so the entity can update its state every
-	 * tick as required. For example, zombies and skeletons use this
-	 * to react to sunlight and start to burn.
+	/**
+	 * + Return the Entity parts making up this Entity (currently only for dragons)
+	 */
+	public Entity[] getParts() {
+		return this.dragonPartArray;
+	}
+
+	/**
+	 * + Returns the volume for the sounds this mob makes.
+	 */
+	protected float getSoundVolume() {
+		return 5.0F;
+	}
+
+	public World getWorld() {
+		return this.worldObj;
+	}
+
+	/**
+	 * + handles entity death timer, experience orb and particle creation
+	 */
+	protected void onDeathUpdate() {
+		++this.deathTicks;
+		if (this.deathTicks >= 180 && this.deathTicks <= 200) {
+			float f = (this.rand.nextFloat() - 0.5F) * 8.0F;
+			float f1 = (this.rand.nextFloat() - 0.5F) * 4.0F;
+			float f2 = (this.rand.nextFloat() - 0.5F) * 8.0F;
+			this.worldObj.spawnParticle(EnumParticleTypes.EXPLOSION_HUGE, this.posX + (double) f,
+					this.posY + 2.0D + (double) f1, this.posZ + (double) f2, 0.0D, 0.0D, 0.0D, new int[0]);
+		}
+
+		boolean flag = this.worldObj.getGameRules().getBoolean("doMobLoot");
+		if (!this.worldObj.isRemote) {
+			if (this.deathTicks > 150 && this.deathTicks % 5 == 0 && flag) {
+				int i = 1000;
+
+				while (i > 0) {
+					int k = EntityXPOrb.getXPSplit(i);
+					i -= k;
+					this.worldObj
+							.spawnEntityInWorld(new EntityXPOrb(this.worldObj, this.posX, this.posY, this.posZ, k));
+				}
+			}
+
+			if (this.deathTicks == 1) {
+				this.worldObj.playBroadcastSound(1018, new BlockPos(this), 0);
+			}
+		}
+
+		this.moveEntity(0.0D, 0.10000000149011612D, 0.0D);
+		this.renderYawOffset = this.rotationYaw += 20.0F;
+		if (this.deathTicks == 200 && !this.worldObj.isRemote) {
+			if (flag) {
+				int j = 2000;
+
+				while (j > 0) {
+					int l = EntityXPOrb.getXPSplit(j);
+					j -= l;
+					this.worldObj
+							.spawnEntityInWorld(new EntityXPOrb(this.worldObj, this.posX, this.posY, this.posZ, l));
+				}
+			}
+
+			this.generatePortal(new BlockPos(this.posX, 64.0D, this.posZ));
+			this.setDead();
+		}
+
+	}
+
+	/**
+	 * + Called by the /kill command.
+	 */
+	public void onKillCommand() {
+		this.setDead();
+	}
+
+	/**
+	 * + Called frequently so the entity can update its state every tick as
+	 * required. For example, zombies and skeletons use this to react to sunlight
+	 * and start to burn.
 	 */
 	public void onLivingUpdate() {
 		if (this.worldObj.isRemote) {
@@ -360,84 +631,9 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
 		}
 	}
 
-	/**+
-	 * Updates the state of the enderdragon's current endercrystal.
-	 */
-	private void updateDragonEnderCrystal() {
-		if (this.healingEnderCrystal != null) {
-			if (this.healingEnderCrystal.isDead) {
-				if (!this.worldObj.isRemote) {
-					this.attackEntityFromPart(this.dragonPartHead, DamageSource.setExplosionSource((Explosion) null),
-							10.0F);
-				}
-
-				this.healingEnderCrystal = null;
-			} else if (this.ticksExisted % 10 == 0 && this.getHealth() < this.getMaxHealth()) {
-				this.setHealth(this.getHealth() + 1.0F);
-			}
-		}
-
-		if (this.rand.nextInt(10) == 0) {
-			float f = 32.0F;
-			List<EntityEnderCrystal> list = this.worldObj.getEntitiesWithinAABB(EntityEnderCrystal.class,
-					this.getEntityBoundingBox().expand((double) f, (double) f, (double) f));
-			EntityEnderCrystal entityendercrystal = null;
-			double d0 = Double.MAX_VALUE;
-
-			for (int i = 0, l = list.size(); i < l; ++i) {
-				EntityEnderCrystal entityendercrystal1 = list.get(i);
-				double d1 = entityendercrystal1.getDistanceSqToEntity(this);
-				if (d1 < d0) {
-					d0 = d1;
-					entityendercrystal = entityendercrystal1;
-				}
-			}
-
-			this.healingEnderCrystal = entityendercrystal;
-		}
-
-	}
-
-	/**+
-	 * Pushes all entities inside the list away from the
-	 * enderdragon.
-	 */
-	private void collideWithEntities(List<Entity> parList) {
-		double d0 = (this.dragonPartBody.getEntityBoundingBox().minX + this.dragonPartBody.getEntityBoundingBox().maxX)
-				/ 2.0D;
-		double d1 = (this.dragonPartBody.getEntityBoundingBox().minZ + this.dragonPartBody.getEntityBoundingBox().maxZ)
-				/ 2.0D;
-
-		for (int i = 0, l = parList.size(); i < l; ++i) {
-			Entity entity = parList.get(i);
-			if (entity instanceof EntityLivingBase) {
-				double d2 = entity.posX - d0;
-				double d3 = entity.posZ - d1;
-				double d4 = d2 * d2 + d3 * d3;
-				entity.addVelocity(d2 / d4 * 4.0D, 0.20000000298023224D, d3 / d4 * 4.0D);
-			}
-		}
-
-	}
-
-	/**+
-	 * Attacks all entities inside this list, dealing 5 hearts of
-	 * damage.
-	 */
-	private void attackEntitiesInList(List<Entity> parList) {
-		for (int i = 0, l = parList.size(); i < l; ++i) {
-			Entity entity = (Entity) parList.get(i);
-			if (entity instanceof EntityLivingBase) {
-				entity.attackEntityFrom(DamageSource.causeMobDamage(this), 10.0F);
-				this.applyEnchantments(this, entity);
-			}
-		}
-
-	}
-
-	/**+
-	 * Sets a new target for the flight AI. It can be a random
-	 * coordinate or a nearby player.
+	/**
+	 * + Sets a new target for the flight AI. It can be a random coordinate or a
+	 * nearby player.
 	 */
 	private void setNewTarget() {
 		this.forceNewTarget = false;
@@ -473,245 +669,49 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
 
 	}
 
-	/**+
-	 * Simplifies the value of a number by adding/subtracting 180 to
-	 * the point that the number is between -180 and 180.
+	/**
+	 * + Simplifies the value of a number by adding/subtracting 180 to the point
+	 * that the number is between -180 and 180.
 	 */
 	private float simplifyAngle(double parDouble1) {
 		return (float) MathHelper.wrapAngleTo180_double(parDouble1);
 	}
 
-	/**+
-	 * Destroys all blocks that aren't associated with 'The End'
-	 * inside the given bounding box.
+	/**
+	 * + Updates the state of the enderdragon's current endercrystal.
 	 */
-	private boolean destroyBlocksInAABB(AxisAlignedBB parAxisAlignedBB) {
-		int i = MathHelper.floor_double(parAxisAlignedBB.minX);
-		int j = MathHelper.floor_double(parAxisAlignedBB.minY);
-		int k = MathHelper.floor_double(parAxisAlignedBB.minZ);
-		int l = MathHelper.floor_double(parAxisAlignedBB.maxX);
-		int i1 = MathHelper.floor_double(parAxisAlignedBB.maxY);
-		int j1 = MathHelper.floor_double(parAxisAlignedBB.maxZ);
-		boolean flag = false;
-		boolean flag1 = false;
-
-		for (int k1 = i; k1 <= l; ++k1) {
-			for (int l1 = j; l1 <= i1; ++l1) {
-				for (int i2 = k; i2 <= j1; ++i2) {
-					BlockPos blockpos = new BlockPos(k1, l1, i2);
-					Block block = this.worldObj.getBlockState(blockpos).getBlock();
-					if (block.getMaterial() != Material.air) {
-						if (block != Blocks.barrier && block != Blocks.obsidian && block != Blocks.end_stone
-								&& block != Blocks.bedrock && block != Blocks.command_block
-								&& this.worldObj.getGameRules().getBoolean("mobGriefing")) {
-							flag1 = this.worldObj.setBlockToAir(blockpos) || flag1;
-						} else {
-							flag = true;
-						}
-					}
+	private void updateDragonEnderCrystal() {
+		if (this.healingEnderCrystal != null) {
+			if (this.healingEnderCrystal.isDead) {
+				if (!this.worldObj.isRemote) {
+					this.attackEntityFromPart(this.dragonPartHead, DamageSource.setExplosionSource((Explosion) null),
+							10.0F);
 				}
+
+				this.healingEnderCrystal = null;
+			} else if (this.ticksExisted % 10 == 0 && this.getHealth() < this.getMaxHealth()) {
+				this.setHealth(this.getHealth() + 1.0F);
 			}
 		}
 
-		if (flag1) {
-			double d0 = parAxisAlignedBB.minX
-					+ (parAxisAlignedBB.maxX - parAxisAlignedBB.minX) * (double) this.rand.nextFloat();
-			double d1 = parAxisAlignedBB.minY
-					+ (parAxisAlignedBB.maxY - parAxisAlignedBB.minY) * (double) this.rand.nextFloat();
-			double d2 = parAxisAlignedBB.minZ
-					+ (parAxisAlignedBB.maxZ - parAxisAlignedBB.minZ) * (double) this.rand.nextFloat();
-			this.worldObj.spawnParticle(EnumParticleTypes.EXPLOSION_LARGE, d0, d1, d2, 0.0D, 0.0D, 0.0D, new int[0]);
-		}
+		if (this.rand.nextInt(10) == 0) {
+			float f = 32.0F;
+			List<EntityEnderCrystal> list = this.worldObj.getEntitiesWithinAABB(EntityEnderCrystal.class,
+					this.getEntityBoundingBox().expand((double) f, (double) f, (double) f));
+			EntityEnderCrystal entityendercrystal = null;
+			double d0 = Double.MAX_VALUE;
 
-		return flag;
-	}
-
-	public boolean attackEntityFromPart(EntityDragonPart entitydragonpart, DamageSource damagesource, float f) {
-		if (entitydragonpart != this.dragonPartHead) {
-			f = f / 4.0F + 1.0F;
-		}
-
-		float f1 = this.rotationYaw * 3.1415927F / 180.0F;
-		float f2 = MathHelper.sin(f1);
-		float f3 = MathHelper.cos(f1);
-		this.targetX = this.posX + (double) (f2 * 5.0F) + (double) ((this.rand.nextFloat() - 0.5F) * 2.0F);
-		this.targetY = this.posY + (double) (this.rand.nextFloat() * 3.0F) + 1.0D;
-		this.targetZ = this.posZ - (double) (f3 * 5.0F) + (double) ((this.rand.nextFloat() - 0.5F) * 2.0F);
-		this.target = null;
-		if (damagesource.getEntity() instanceof EntityPlayer || damagesource.isExplosion()) {
-			this.attackDragonFrom(damagesource, f);
-		}
-
-		return true;
-	}
-
-	/**+
-	 * Called when the entity is attacked.
-	 */
-	public boolean attackEntityFrom(DamageSource damagesource, float f) {
-		if (damagesource instanceof EntityDamageSource && ((EntityDamageSource) damagesource).getIsThornsDamage()) {
-			this.attackDragonFrom(damagesource, f);
-		}
-
-		return false;
-	}
-
-	/**+
-	 * Provides a way to cause damage to an ender dragon.
-	 */
-	protected boolean attackDragonFrom(DamageSource source, float amount) {
-		return super.attackEntityFrom(source, amount);
-	}
-
-	/**+
-	 * Called by the /kill command.
-	 */
-	public void onKillCommand() {
-		this.setDead();
-	}
-
-	/**+
-	 * handles entity death timer, experience orb and particle
-	 * creation
-	 */
-	protected void onDeathUpdate() {
-		++this.deathTicks;
-		if (this.deathTicks >= 180 && this.deathTicks <= 200) {
-			float f = (this.rand.nextFloat() - 0.5F) * 8.0F;
-			float f1 = (this.rand.nextFloat() - 0.5F) * 4.0F;
-			float f2 = (this.rand.nextFloat() - 0.5F) * 8.0F;
-			this.worldObj.spawnParticle(EnumParticleTypes.EXPLOSION_HUGE, this.posX + (double) f,
-					this.posY + 2.0D + (double) f1, this.posZ + (double) f2, 0.0D, 0.0D, 0.0D, new int[0]);
-		}
-
-		boolean flag = this.worldObj.getGameRules().getBoolean("doMobLoot");
-		if (!this.worldObj.isRemote) {
-			if (this.deathTicks > 150 && this.deathTicks % 5 == 0 && flag) {
-				int i = 1000;
-
-				while (i > 0) {
-					int k = EntityXPOrb.getXPSplit(i);
-					i -= k;
-					this.worldObj
-							.spawnEntityInWorld(new EntityXPOrb(this.worldObj, this.posX, this.posY, this.posZ, k));
+			for (int i = 0, l = list.size(); i < l; ++i) {
+				EntityEnderCrystal entityendercrystal1 = list.get(i);
+				double d1 = entityendercrystal1.getDistanceSqToEntity(this);
+				if (d1 < d0) {
+					d0 = d1;
+					entityendercrystal = entityendercrystal1;
 				}
 			}
 
-			if (this.deathTicks == 1) {
-				this.worldObj.playBroadcastSound(1018, new BlockPos(this), 0);
-			}
+			this.healingEnderCrystal = entityendercrystal;
 		}
 
-		this.moveEntity(0.0D, 0.10000000149011612D, 0.0D);
-		this.renderYawOffset = this.rotationYaw += 20.0F;
-		if (this.deathTicks == 200 && !this.worldObj.isRemote) {
-			if (flag) {
-				int j = 2000;
-
-				while (j > 0) {
-					int l = EntityXPOrb.getXPSplit(j);
-					j -= l;
-					this.worldObj
-							.spawnEntityInWorld(new EntityXPOrb(this.worldObj, this.posX, this.posY, this.posZ, l));
-				}
-			}
-
-			this.generatePortal(new BlockPos(this.posX, 64.0D, this.posZ));
-			this.setDead();
-		}
-
-	}
-
-	/**+
-	 * Generate the portal when the dragon dies
-	 */
-	private void generatePortal(BlockPos pos) {
-		boolean flag = true;
-		double d0 = 12.25D;
-		double d1 = 6.25D;
-
-		for (int i = -1; i <= 32; ++i) {
-			for (int j = -4; j <= 4; ++j) {
-				for (int k = -4; k <= 4; ++k) {
-					double d2 = (double) (j * j + k * k);
-					if (d2 <= 12.25D) {
-						BlockPos blockpos = pos.add(j, i, k);
-						if (i < 0) {
-							if (d2 <= 6.25D) {
-								this.worldObj.setBlockState(blockpos, Blocks.bedrock.getDefaultState());
-							}
-						} else if (i > 0) {
-							this.worldObj.setBlockState(blockpos, Blocks.air.getDefaultState());
-						} else if (d2 > 6.25D) {
-							this.worldObj.setBlockState(blockpos, Blocks.bedrock.getDefaultState());
-						} else {
-							this.worldObj.setBlockState(blockpos, Blocks.end_portal.getDefaultState());
-						}
-					}
-				}
-			}
-		}
-
-		this.worldObj.setBlockState(pos, Blocks.bedrock.getDefaultState());
-		this.worldObj.setBlockState(pos.up(), Blocks.bedrock.getDefaultState());
-		BlockPos blockpos1 = pos.up(2);
-		this.worldObj.setBlockState(blockpos1, Blocks.bedrock.getDefaultState());
-		this.worldObj.setBlockState(blockpos1.west(),
-				Blocks.torch.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.EAST));
-		this.worldObj.setBlockState(blockpos1.east(),
-				Blocks.torch.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.WEST));
-		this.worldObj.setBlockState(blockpos1.north(),
-				Blocks.torch.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.SOUTH));
-		this.worldObj.setBlockState(blockpos1.south(),
-				Blocks.torch.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.NORTH));
-		this.worldObj.setBlockState(pos.up(3), Blocks.bedrock.getDefaultState());
-		this.worldObj.setBlockState(pos.up(4), Blocks.dragon_egg.getDefaultState());
-	}
-
-	/**+
-	 * Makes the entity despawn if requirements are reached
-	 */
-	protected void despawnEntity() {
-	}
-
-	/**+
-	 * Return the Entity parts making up this Entity (currently only
-	 * for dragons)
-	 */
-	public Entity[] getParts() {
-		return this.dragonPartArray;
-	}
-
-	/**+
-	 * Returns true if other Entities should be prevented from
-	 * moving through this Entity.
-	 */
-	public boolean canBeCollidedWith() {
-		return false;
-	}
-
-	public World getWorld() {
-		return this.worldObj;
-	}
-
-	/**+
-	 * Returns the sound this mob makes while it's alive.
-	 */
-	protected String getLivingSound() {
-		return "mob.enderdragon.growl";
-	}
-
-	/**+
-	 * Returns the sound this mob makes when it is hurt.
-	 */
-	protected String getHurtSound() {
-		return "mob.enderdragon.hit";
-	}
-
-	/**+
-	 * Returns the volume for the sounds this mob makes.
-	 */
-	protected float getSoundVolume() {
-		return 5.0F;
 	}
 }

@@ -36,43 +36,7 @@ import com.google.common.annotations.GwtCompatible;
  */
 @GwtCompatible
 final class WellBehavedMap<K, V> extends ForwardingMap<K, V> {
-	private final Map<K, V> delegate;
-	private Set<Entry<K, V>> entrySet;
-
-	private WellBehavedMap(Map<K, V> delegate) {
-		this.delegate = delegate;
-	}
-
-	/**
-	 * Wraps the given map into a {@code WellBehavedEntriesMap}, which intercepts
-	 * its {@code entrySet()} method by taking the {@code Set<K> keySet()} and
-	 * transforming it to {@code Set<Entry<K, V>>}. All other invocations are
-	 * delegated as-is.
-	 */
-	static <K, V> WellBehavedMap<K, V> wrap(Map<K, V> delegate) {
-		return new WellBehavedMap<K, V>(delegate);
-	}
-
-	@Override
-	protected Map<K, V> delegate() {
-		return delegate;
-	}
-
-	@Override
-	public Set<Entry<K, V>> entrySet() {
-		Set<Entry<K, V>> es = entrySet;
-		if (es != null) {
-			return es;
-		}
-		return entrySet = new EntrySet();
-	}
-
 	private final class EntrySet extends Maps.EntrySet<K, V> {
-		@Override
-		Map<K, V> map() {
-			return WellBehavedMap.this;
-		}
-
 		@Override
 		public Iterator<Entry<K, V>> iterator() {
 			return new TransformedIterator<K, Entry<K, V>>(keySet().iterator()) {
@@ -97,5 +61,42 @@ final class WellBehavedMap<K, V> extends ForwardingMap<K, V> {
 				}
 			};
 		}
+
+		@Override
+		Map<K, V> map() {
+			return WellBehavedMap.this;
+		}
+	}
+
+	/**
+	 * Wraps the given map into a {@code WellBehavedEntriesMap}, which intercepts
+	 * its {@code entrySet()} method by taking the {@code Set<K> keySet()} and
+	 * transforming it to {@code Set<Entry<K, V>>}. All other invocations are
+	 * delegated as-is.
+	 */
+	static <K, V> WellBehavedMap<K, V> wrap(Map<K, V> delegate) {
+		return new WellBehavedMap<K, V>(delegate);
+	}
+
+	private final Map<K, V> delegate;
+
+	private Set<Entry<K, V>> entrySet;
+
+	private WellBehavedMap(Map<K, V> delegate) {
+		this.delegate = delegate;
+	}
+
+	@Override
+	protected Map<K, V> delegate() {
+		return delegate;
+	}
+
+	@Override
+	public Set<Entry<K, V>> entrySet() {
+		Set<Entry<K, V>> es = entrySet;
+		if (es != null) {
+			return es;
+		}
+		return entrySet = new EntrySet();
 	}
 }

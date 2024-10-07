@@ -38,6 +38,56 @@ abstract class AbstractByteHasher extends AbstractHasher {
 
 	private final ByteBuffer scratch = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN);
 
+	@Override
+	public Hasher putByte(byte b) {
+		update(b);
+		return this;
+	}
+
+	@Override
+	public Hasher putBytes(byte[] bytes) {
+		checkNotNull(bytes);
+		update(bytes);
+		return this;
+	}
+
+	@Override
+	public Hasher putBytes(byte[] bytes, int off, int len) {
+		checkPositionIndexes(off, off + len, bytes.length);
+		update(bytes, off, len);
+		return this;
+	}
+
+	@Override
+	public Hasher putChar(char c) {
+		scratch.putChar(c);
+		return update(Chars.BYTES);
+	}
+
+	@Override
+	public Hasher putInt(int i) {
+		scratch.putInt(i);
+		return update(Ints.BYTES);
+	}
+
+	@Override
+	public Hasher putLong(long l) {
+		scratch.putLong(l);
+		return update(Longs.BYTES);
+	}
+
+	@Override
+	public <T> Hasher putObject(T instance, Funnel<? super T> funnel) {
+		funnel.funnel(instance, this);
+		return this;
+	}
+
+	@Override
+	public Hasher putShort(short s) {
+		scratch.putShort(s);
+		return update(Shorts.BYTES);
+	}
+
 	/**
 	 * Updates this hasher with the given byte.
 	 */
@@ -60,26 +110,6 @@ abstract class AbstractByteHasher extends AbstractHasher {
 		}
 	}
 
-	@Override
-	public Hasher putByte(byte b) {
-		update(b);
-		return this;
-	}
-
-	@Override
-	public Hasher putBytes(byte[] bytes) {
-		checkNotNull(bytes);
-		update(bytes);
-		return this;
-	}
-
-	@Override
-	public Hasher putBytes(byte[] bytes, int off, int len) {
-		checkPositionIndexes(off, off + len, bytes.length);
-		update(bytes, off, len);
-		return this;
-	}
-
 	/**
 	 * Updates the sink with the given number of bytes from the buffer.
 	 */
@@ -89,36 +119,6 @@ abstract class AbstractByteHasher extends AbstractHasher {
 		} finally {
 			scratch.clear();
 		}
-		return this;
-	}
-
-	@Override
-	public Hasher putShort(short s) {
-		scratch.putShort(s);
-		return update(Shorts.BYTES);
-	}
-
-	@Override
-	public Hasher putInt(int i) {
-		scratch.putInt(i);
-		return update(Ints.BYTES);
-	}
-
-	@Override
-	public Hasher putLong(long l) {
-		scratch.putLong(l);
-		return update(Longs.BYTES);
-	}
-
-	@Override
-	public Hasher putChar(char c) {
-		scratch.putChar(c);
-		return update(Chars.BYTES);
-	}
-
-	@Override
-	public <T> Hasher putObject(T instance, Funnel<? super T> funnel) {
-		funnel.funnel(instance, this);
 		return this;
 	}
 }

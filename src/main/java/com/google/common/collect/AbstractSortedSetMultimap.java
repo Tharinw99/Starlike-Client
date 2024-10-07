@@ -36,6 +36,8 @@ import com.google.common.annotations.GwtCompatible;
  */
 @GwtCompatible
 abstract class AbstractSortedSetMultimap<K, V> extends AbstractSetMultimap<K, V> implements SortedSetMultimap<K, V> {
+	private static final long serialVersionUID = 430848587173315748L;
+
 	/**
 	 * Creates a new multimap that uses the provided map.
 	 *
@@ -45,6 +47,29 @@ abstract class AbstractSortedSetMultimap<K, V> extends AbstractSetMultimap<K, V>
 	protected AbstractSortedSetMultimap(Map<K, Collection<V>> map) {
 		super(map);
 	}
+
+	/**
+	 * Returns a map view that associates each key with the corresponding values in
+	 * the multimap. Changes to the returned map, such as element removal, will
+	 * update the underlying multimap. The map does not support {@code setValue} on
+	 * its entries, {@code put}, or {@code putAll}.
+	 *
+	 * <p>
+	 * When passed a key that is present in the map, {@code
+	 * asMap().get(Object)} has the same behavior as {@link #get}, returning a live
+	 * collection. When passed a key that is not present, however, {@code
+	 * asMap().get(Object)} returns {@code null} instead of an empty collection.
+	 *
+	 * <p>
+	 * Though the method signature doesn't say so explicitly, the returned map has
+	 * {@link SortedSet} values.
+	 */
+	@Override
+	public Map<K, Collection<V>> asMap() {
+		return super.asMap();
+	}
+
+	// Following Javadoc copied from Multimap and SortedSetMultimap.
 
 	@Override
 	abstract SortedSet<V> createCollection();
@@ -58,8 +83,6 @@ abstract class AbstractSortedSetMultimap<K, V> extends AbstractSetMultimap<K, V>
 			return ImmutableSortedSet.emptySet(valueComparator());
 		}
 	}
-
-	// Following Javadoc copied from Multimap and SortedSetMultimap.
 
 	/**
 	 * Returns a collection view of all values associated with a key. If no mappings
@@ -111,27 +134,6 @@ abstract class AbstractSortedSetMultimap<K, V> extends AbstractSetMultimap<K, V>
 	}
 
 	/**
-	 * Returns a map view that associates each key with the corresponding values in
-	 * the multimap. Changes to the returned map, such as element removal, will
-	 * update the underlying multimap. The map does not support {@code setValue} on
-	 * its entries, {@code put}, or {@code putAll}.
-	 *
-	 * <p>
-	 * When passed a key that is present in the map, {@code
-	 * asMap().get(Object)} has the same behavior as {@link #get}, returning a live
-	 * collection. When passed a key that is not present, however, {@code
-	 * asMap().get(Object)} returns {@code null} instead of an empty collection.
-	 *
-	 * <p>
-	 * Though the method signature doesn't say so explicitly, the returned map has
-	 * {@link SortedSet} values.
-	 */
-	@Override
-	public Map<K, Collection<V>> asMap() {
-		return super.asMap();
-	}
-
-	/**
 	 * {@inheritDoc}
 	 *
 	 * Consequently, the values do not follow their natural ordering or the ordering
@@ -141,6 +143,4 @@ abstract class AbstractSortedSetMultimap<K, V> extends AbstractSetMultimap<K, V>
 	public Collection<V> values() {
 		return super.values();
 	}
-
-	private static final long serialVersionUID = 430848587173315748L;
 }

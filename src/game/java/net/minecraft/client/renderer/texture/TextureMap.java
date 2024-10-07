@@ -1,6 +1,12 @@
 package net.minecraft.client.renderer.texture;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.*;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglBindFramebuffer;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglCreateFramebuffer;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglDeleteFramebuffer;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglFramebufferTexture2D;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE0;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE2;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE_2D;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -36,24 +42,25 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.ReportedException;
 import net.minecraft.util.ResourceLocation;
 
-import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL.*;
-
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -62,6 +69,8 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
 	private static final Logger logger = LogManager.getLogger();
 	public static final ResourceLocation LOCATION_MISSING_TEXTURE = new ResourceLocation("missingno");
 	public static final ResourceLocation locationBlocksTexture = new ResourceLocation("textures/atlas/blocks.png");
+	public static final int _GL_FRAMEBUFFER = 0x8D40;
+	public static final int _GL_COLOR_ATTACHMENT0 = 0x8CE0;
 	private final List<EaglerTextureAtlasSprite> listAnimatedSprites;
 	private final Map<String, EaglerTextureAtlasSprite> mapRegisteredSprites;
 	private final Map<String, EaglerTextureAtlasSprite> mapUploadedSprites;
@@ -74,11 +83,9 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
 	private int height;
 	private boolean isEaglerPBRMode = false;
 	public int eaglerPBRMaterialTexture = -1;
+
 	private boolean hasAllocatedEaglerPBRMaterialTexture = false;
 	private boolean isGLES2 = false;
-
-	public static final int _GL_FRAMEBUFFER = 0x8D40;
-	public static final int _GL_COLOR_ATTACHMENT0 = 0x8CE0;
 
 	private IFramebufferGL[] copyColorFramebuffer = null;
 	private IFramebufferGL[] copyMaterialFramebuffer = null;
@@ -96,6 +103,61 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
 		this.basePath = parString1;
 		this.iconCreator = iconCreatorIn;
 		this.isGLES2 = EaglercraftGPU.checkOpenGLESVersion() == 200;
+	}
+
+	private ResourceLocation completeResourceLocation(ResourceLocation location, int parInt1) {
+		return parInt1 == 0
+				? new ResourceLocation(location.getResourceDomain(),
+						HString.format("%s/%s%s", new Object[] { this.basePath, location.getResourcePath(), ".png" }))
+				: new ResourceLocation(location.getResourceDomain(), HString.format("%s/mipmaps/%s.%d%s",
+						new Object[] { this.basePath, location.getResourcePath(), Integer.valueOf(parInt1), ".png" }));
+	}
+
+	public void deleteGlTexture() {
+		super.deleteGlTexture();
+		if (eaglerPBRMaterialTexture != -1) {
+			GlStateManager.deleteTexture(eaglerPBRMaterialTexture);
+			eaglerPBRMaterialTexture = -1;
+		}
+		if (copyColorFramebuffer != null) {
+			for (int i = 0; i < copyColorFramebuffer.length; ++i) {
+				_wglDeleteFramebuffer(copyColorFramebuffer[i]);
+			}
+			copyColorFramebuffer = null;
+		}
+		if (copyMaterialFramebuffer != null) {
+			for (int i = 0; i < copyMaterialFramebuffer.length; ++i) {
+				_wglDeleteFramebuffer(copyMaterialFramebuffer[i]);
+			}
+			copyMaterialFramebuffer = null;
+		}
+	}
+
+	private void destroyAnimationCaches() {
+		for (int i = 0, l = this.listAnimatedSprites.size(); i < l; ++i) {
+			this.listAnimatedSprites.get(i).clearFramesTextureData();
+		}
+	}
+
+	public EaglerTextureAtlasSprite getAtlasSprite(String iconName) {
+		EaglerTextureAtlasSprite textureatlassprite = (EaglerTextureAtlasSprite) this.mapUploadedSprites.get(iconName);
+		if (textureatlassprite == null) {
+			textureatlassprite = isEaglerPBRMode ? missingImagePBR : missingImage;
+		}
+
+		return textureatlassprite;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public EaglerTextureAtlasSprite getMissingSprite() {
+		return isEaglerPBRMode ? missingImagePBR : missingImage;
+	}
+
+	public int getWidth() {
+		return width;
 	}
 
 	private void initMissingImage() {
@@ -123,12 +185,6 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
 				Lists.newArrayList(new int[][][] { aint2[1] }), Lists.newArrayList(new int[][][] { aint2[2] }) });
 	}
 
-	public void loadTexture(IResourceManager parIResourceManager) throws IOException {
-		if (this.iconCreator != null) {
-			this.loadSprites(parIResourceManager, this.iconCreator);
-		}
-	}
-
 	public void loadSprites(IResourceManager resourceManager, IIconCreator parIIconCreator) {
 		destroyAnimationCaches();
 		this.mapRegisteredSprites.clear();
@@ -138,23 +194,9 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
 		this.loadTextureAtlas(resourceManager);
 	}
 
-	public void deleteGlTexture() {
-		super.deleteGlTexture();
-		if (eaglerPBRMaterialTexture != -1) {
-			GlStateManager.deleteTexture(eaglerPBRMaterialTexture);
-			eaglerPBRMaterialTexture = -1;
-		}
-		if (copyColorFramebuffer != null) {
-			for (int i = 0; i < copyColorFramebuffer.length; ++i) {
-				_wglDeleteFramebuffer(copyColorFramebuffer[i]);
-			}
-			copyColorFramebuffer = null;
-		}
-		if (copyMaterialFramebuffer != null) {
-			for (int i = 0; i < copyMaterialFramebuffer.length; ++i) {
-				_wglDeleteFramebuffer(copyMaterialFramebuffer[i]);
-			}
-			copyMaterialFramebuffer = null;
+	public void loadTexture(IResourceManager parIResourceManager) throws IOException {
+		if (this.iconCreator != null) {
+			this.loadSprites(parIResourceManager, this.iconCreator);
 		}
 	}
 
@@ -498,46 +540,6 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
 		_wglBindFramebuffer(_GL_FRAMEBUFFER, null);
 	}
 
-	private ResourceLocation completeResourceLocation(ResourceLocation location, int parInt1) {
-		return parInt1 == 0
-				? new ResourceLocation(location.getResourceDomain(),
-						HString.format("%s/%s%s", new Object[] { this.basePath, location.getResourcePath(), ".png" }))
-				: new ResourceLocation(location.getResourceDomain(), HString.format("%s/mipmaps/%s.%d%s",
-						new Object[] { this.basePath, location.getResourcePath(), Integer.valueOf(parInt1), ".png" }));
-	}
-
-	public EaglerTextureAtlasSprite getAtlasSprite(String iconName) {
-		EaglerTextureAtlasSprite textureatlassprite = (EaglerTextureAtlasSprite) this.mapUploadedSprites.get(iconName);
-		if (textureatlassprite == null) {
-			textureatlassprite = isEaglerPBRMode ? missingImagePBR : missingImage;
-		}
-
-		return textureatlassprite;
-	}
-
-	public void updateAnimations() {
-		if (isEaglerPBRMode) {
-			for (int i = 0, l = this.listAnimatedSprites.size(); i < l; ++i) {
-				this.listAnimatedSprites.get(i).updateAnimationPBR(copyColorFramebuffer, copyMaterialFramebuffer,
-						height);
-			}
-			_wglBindFramebuffer(_GL_FRAMEBUFFER, null);
-			return;
-		}
-
-		for (int i = 0, l = this.listAnimatedSprites.size(); i < l; ++i) {
-			this.listAnimatedSprites.get(i).updateAnimation(copyColorFramebuffer);
-		}
-
-		_wglBindFramebuffer(_GL_FRAMEBUFFER, null);
-	}
-
-	private void destroyAnimationCaches() {
-		for (int i = 0, l = this.listAnimatedSprites.size(); i < l; ++i) {
-			this.listAnimatedSprites.get(i).clearFramesTextureData();
-		}
-	}
-
 	public EaglerTextureAtlasSprite registerSprite(ResourceLocation location) {
 		if (location == null) {
 			throw new IllegalArgumentException("Location cannot be null!");
@@ -557,35 +559,6 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
 		}
 	}
 
-	public void tick() {
-		this.updateAnimations();
-	}
-
-	public void setMipmapLevels(int mipmapLevelsIn) {
-		if (!isGLES2) {
-			this.mipmapLevels = mipmapLevelsIn;
-		} else {
-			this.mipmapLevels = 0; // Due to limitations in OpenGL ES 2.0 texture completeness, its easier to just
-									// make this zero
-		}
-	}
-
-	public EaglerTextureAtlasSprite getMissingSprite() {
-		return isEaglerPBRMode ? missingImagePBR : missingImage;
-	}
-
-	public int getWidth() {
-		return width;
-	}
-
-	public int getHeight() {
-		return height;
-	}
-
-	public void setEnablePBREagler(boolean enable) {
-		isEaglerPBRMode = enable;
-	}
-
 	public void setBlurMipmapDirect0(boolean parFlag, boolean parFlag2) {
 		if (isGLES2) {
 			super.setBlurMipmapDirect0(parFlag, false);
@@ -598,5 +571,39 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
 				GlStateManager.setActiveTexture(GL_TEXTURE0);
 			}
 		}
+	}
+
+	public void setEnablePBREagler(boolean enable) {
+		isEaglerPBRMode = enable;
+	}
+
+	public void setMipmapLevels(int mipmapLevelsIn) {
+		if (!isGLES2) {
+			this.mipmapLevels = mipmapLevelsIn;
+		} else {
+			this.mipmapLevels = 0; // Due to limitations in OpenGL ES 2.0 texture completeness, its easier to just
+									// make this zero
+		}
+	}
+
+	public void tick() {
+		this.updateAnimations();
+	}
+
+	public void updateAnimations() {
+		if (isEaglerPBRMode) {
+			for (int i = 0, l = this.listAnimatedSprites.size(); i < l; ++i) {
+				this.listAnimatedSprites.get(i).updateAnimationPBR(copyColorFramebuffer, copyMaterialFramebuffer,
+						height);
+			}
+			_wglBindFramebuffer(_GL_FRAMEBUFFER, null);
+			return;
+		}
+
+		for (int i = 0, l = this.listAnimatedSprites.size(); i < l; ++i) {
+			this.listAnimatedSprites.get(i).updateAnimation(copyColorFramebuffer);
+		}
+
+		_wglBindFramebuffer(_GL_FRAMEBUFFER, null);
 	}
 }

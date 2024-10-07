@@ -11,22 +11,25 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -47,6 +50,20 @@ public class ClassInheritanceMultiMap<T> extends AbstractSet<T> {
 			this.createLookup(oclass);
 		}
 
+	}
+
+	public boolean add(T parObject) {
+		for (Class oclass : this.knownKeys) {
+			if (oclass.isAssignableFrom(parObject.getClass())) {
+				this.func_181743_a(parObject, oclass);
+			}
+		}
+
+		return true;
+	}
+
+	public boolean contains(Object parObject) {
+		return Iterators.contains(this.getByClass(parObject.getClass()).iterator(), parObject);
 	}
 
 	protected void createLookup(Class<?> clazz) {
@@ -74,16 +91,6 @@ public class ClassInheritanceMultiMap<T> extends AbstractSet<T> {
 		}
 	}
 
-	public boolean add(T parObject) {
-		for (Class oclass : this.knownKeys) {
-			if (oclass.isAssignableFrom(parObject.getClass())) {
-				this.func_181743_a(parObject, oclass);
-			}
-		}
-
-		return true;
-	}
-
 	private void func_181743_a(T parObject, Class<?> parClass1) {
 		List list = (List) this.map.get(parClass1);
 		if (list == null) {
@@ -92,26 +99,6 @@ public class ClassInheritanceMultiMap<T> extends AbstractSet<T> {
 			list.add(parObject);
 		}
 
-	}
-
-	public boolean remove(Object parObject) {
-		Object object = parObject;
-		boolean flag = false;
-
-		for (Class oclass : this.knownKeys) {
-			if (oclass.isAssignableFrom(object.getClass())) {
-				List list = (List) this.map.get(oclass);
-				if (list != null && list.remove(object)) {
-					flag = true;
-				}
-			}
-		}
-
-		return flag;
-	}
-
-	public boolean contains(Object parObject) {
-		return Iterators.contains(this.getByClass(parObject.getClass()).iterator(), parObject);
 	}
 
 	public <S> Iterable<S> getByClass(final Class<S> clazz) {
@@ -132,6 +119,22 @@ public class ClassInheritanceMultiMap<T> extends AbstractSet<T> {
 	public Iterator<T> iterator() {
 		return this.field_181745_e.isEmpty() ? Iterators.emptyIterator()
 				: Iterators.unmodifiableIterator(this.field_181745_e.iterator());
+	}
+
+	public boolean remove(Object parObject) {
+		Object object = parObject;
+		boolean flag = false;
+
+		for (Class oclass : this.knownKeys) {
+			if (oclass.isAssignableFrom(object.getClass())) {
+				List list = (List) this.map.get(oclass);
+				if (list != null && list.remove(object)) {
+					flag = true;
+				}
+			}
+		}
+
+		return flag;
 	}
 
 	public int size() {

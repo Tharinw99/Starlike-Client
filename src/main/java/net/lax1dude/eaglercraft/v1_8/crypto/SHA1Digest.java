@@ -31,9 +31,20 @@ package net.lax1dude.eaglercraft.v1_8.crypto;
 public class SHA1Digest extends GeneralDigest {
 	private static final int DIGEST_LENGTH = 20;
 
+	//
+	// Additive constants
+	//
+	private static final int Y1 = 0x5a827999;
+
+	private static final int Y2 = 0x6ed9eba1;
+	private static final int Y3 = 0x8f1bbcdc;
+
+	private static final int Y4 = 0xca62c1d6;
+
 	private int H1, H2, H3, H4, H5;
 
 	private int[] X = new int[80];
+
 	private int xOff;
 
 	/**
@@ -59,39 +70,6 @@ public class SHA1Digest extends GeneralDigest {
 		xOff = t.xOff;
 	}
 
-	public String getAlgorithmName() {
-		return "SHA-1";
-	}
-
-	public int getDigestSize() {
-		return DIGEST_LENGTH;
-	}
-
-	protected void processWord(byte[] in, int inOff) {
-		X[xOff++] = ((in[inOff] & 0xff) << 24) | ((in[inOff + 1] & 0xff) << 16) | ((in[inOff + 2] & 0xff) << 8)
-				| ((in[inOff + 3] & 0xff));
-
-		if (xOff == 16) {
-			processBlock();
-		}
-	}
-
-	private void unpackWord(int word, byte[] out, int outOff) {
-		out[outOff] = (byte) (word >>> 24);
-		out[outOff + 1] = (byte) (word >>> 16);
-		out[outOff + 2] = (byte) (word >>> 8);
-		out[outOff + 3] = (byte) word;
-	}
-
-	protected void processLength(long bitLength) {
-		if (xOff > 14) {
-			processBlock();
-		}
-
-		X[14] = (int) (bitLength >>> 32);
-		X[15] = (int) (bitLength & 0xffffffff);
-	}
-
 	public int doFinal(byte[] out, int outOff) {
 		finish();
 
@@ -106,46 +84,24 @@ public class SHA1Digest extends GeneralDigest {
 		return DIGEST_LENGTH;
 	}
 
-	/**
-	 * reset the chaining variables
-	 */
-	public void reset() {
-		super.reset();
-
-		H1 = 0x67452301;
-		H2 = 0xefcdab89;
-		H3 = 0x98badcfe;
-		H4 = 0x10325476;
-		H5 = 0xc3d2e1f0;
-
-		xOff = 0;
-		for (int i = 0; i != X.length; i++) {
-			X[i] = 0;
-		}
-	}
-
-	//
-	// Additive constants
-	//
-	private static final int Y1 = 0x5a827999;
-	private static final int Y2 = 0x6ed9eba1;
-	private static final int Y3 = 0x8f1bbcdc;
-	private static final int Y4 = 0xca62c1d6;
-
 	private int f(int u, int v, int w) {
 		return ((u & v) | ((~u) & w));
-	}
-
-	private int h(int u, int v, int w) {
-		return (u ^ v ^ w);
 	}
 
 	private int g(int u, int v, int w) {
 		return ((u & v) | (u & w) | (v & w));
 	}
 
-	private int rotateLeft(int x, int n) {
-		return (x << n) | (x >>> (32 - n));
+	public String getAlgorithmName() {
+		return "SHA-1";
+	}
+
+	public int getDigestSize() {
+		return DIGEST_LENGTH;
+	}
+
+	private int h(int u, int v, int w) {
+		return (u ^ v ^ w);
 	}
 
 	protected void processBlock() {
@@ -230,5 +186,52 @@ public class SHA1Digest extends GeneralDigest {
 		for (int i = 0; i != X.length; i++) {
 			X[i] = 0;
 		}
+	}
+
+	protected void processLength(long bitLength) {
+		if (xOff > 14) {
+			processBlock();
+		}
+
+		X[14] = (int) (bitLength >>> 32);
+		X[15] = (int) (bitLength & 0xffffffff);
+	}
+
+	protected void processWord(byte[] in, int inOff) {
+		X[xOff++] = ((in[inOff] & 0xff) << 24) | ((in[inOff + 1] & 0xff) << 16) | ((in[inOff + 2] & 0xff) << 8)
+				| ((in[inOff + 3] & 0xff));
+
+		if (xOff == 16) {
+			processBlock();
+		}
+	}
+
+	/**
+	 * reset the chaining variables
+	 */
+	public void reset() {
+		super.reset();
+
+		H1 = 0x67452301;
+		H2 = 0xefcdab89;
+		H3 = 0x98badcfe;
+		H4 = 0x10325476;
+		H5 = 0xc3d2e1f0;
+
+		xOff = 0;
+		for (int i = 0; i != X.length; i++) {
+			X[i] = 0;
+		}
+	}
+
+	private int rotateLeft(int x, int n) {
+		return (x << n) | (x >>> (32 - n));
+	}
+
+	private void unpackWord(int word, byte[] out, int outOff) {
+		out[outOff] = (byte) (word >>> 24);
+		out[outOff + 1] = (byte) (word >>> 16);
+		out[outOff + 2] = (byte) (word >>> 8);
+		out[outOff + 3] = (byte) word;
 	}
 }

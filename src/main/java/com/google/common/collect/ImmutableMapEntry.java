@@ -32,22 +32,6 @@ import com.google.common.annotations.GwtIncompatible;
  */
 @GwtIncompatible("unnecessary")
 abstract class ImmutableMapEntry<K, V> extends ImmutableEntry<K, V> {
-	ImmutableMapEntry(K key, V value) {
-		super(key, value);
-		checkEntryNotNull(key, value);
-	}
-
-	ImmutableMapEntry(ImmutableMapEntry<K, V> contents) {
-		super(contents.getKey(), contents.getValue());
-		// null check would be redundant
-	}
-
-	@Nullable
-	abstract ImmutableMapEntry<K, V> getNextInKeyBucket();
-
-	@Nullable
-	abstract ImmutableMapEntry<K, V> getNextInValueBucket();
-
 	static final class TerminalEntry<K, V> extends ImmutableMapEntry<K, V> {
 		TerminalEntry(ImmutableMapEntry<K, V> contents) {
 			super(contents);
@@ -69,4 +53,20 @@ abstract class ImmutableMapEntry<K, V> extends ImmutableEntry<K, V> {
 			return null;
 		}
 	}
+
+	ImmutableMapEntry(ImmutableMapEntry<K, V> contents) {
+		super(contents.getKey(), contents.getValue());
+		// null check would be redundant
+	}
+
+	ImmutableMapEntry(K key, V value) {
+		super(key, value);
+		checkEntryNotNull(key, value);
+	}
+
+	@Nullable
+	abstract ImmutableMapEntry<K, V> getNextInKeyBucket();
+
+	@Nullable
+	abstract ImmutableMapEntry<K, V> getNextInValueBucket();
 }

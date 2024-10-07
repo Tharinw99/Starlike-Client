@@ -34,91 +34,12 @@ import com.google.common.annotations.GwtCompatible;
 @GwtCompatible
 abstract class AbstractTable<R, C, V> implements Table<R, C, V> {
 
-	@Override
-	public boolean containsRow(@Nullable Object rowKey) {
-		return Maps.safeContainsKey(rowMap(), rowKey);
-	}
-
-	@Override
-	public boolean containsColumn(@Nullable Object columnKey) {
-		return Maps.safeContainsKey(columnMap(), columnKey);
-	}
-
-	@Override
-	public Set<R> rowKeySet() {
-		return rowMap().keySet();
-	}
-
-	@Override
-	public Set<C> columnKeySet() {
-		return columnMap().keySet();
-	}
-
-	@Override
-	public boolean containsValue(@Nullable Object value) {
-		for (Map<C, V> row : rowMap().values()) {
-			if (row.containsValue(value)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	@Override
-	public boolean contains(@Nullable Object rowKey, @Nullable Object columnKey) {
-		Map<C, V> row = Maps.safeGet(rowMap(), rowKey);
-		return row != null && Maps.safeContainsKey(row, columnKey);
-	}
-
-	@Override
-	public V get(@Nullable Object rowKey, @Nullable Object columnKey) {
-		Map<C, V> row = Maps.safeGet(rowMap(), rowKey);
-		return (row == null) ? null : Maps.safeGet(row, columnKey);
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return size() == 0;
-	}
-
-	@Override
-	public void clear() {
-		Iterators.clear(cellSet().iterator());
-	}
-
-	@Override
-	public V remove(@Nullable Object rowKey, @Nullable Object columnKey) {
-		Map<C, V> row = Maps.safeGet(rowMap(), rowKey);
-		return (row == null) ? null : Maps.safeRemove(row, columnKey);
-	}
-
-	@Override
-	public V put(R rowKey, C columnKey, V value) {
-		return row(rowKey).put(columnKey, value);
-	}
-
-	@Override
-	public void putAll(Table<? extends R, ? extends C, ? extends V> table) {
-		for (Table.Cell<? extends R, ? extends C, ? extends V> cell : table.cellSet()) {
-			put(cell.getRowKey(), cell.getColumnKey(), cell.getValue());
-		}
-	}
-
-	private transient Set<Cell<R, C, V>> cellSet;
-
-	@Override
-	public Set<Cell<R, C, V>> cellSet() {
-		Set<Cell<R, C, V>> result = cellSet;
-		return (result == null) ? cellSet = createCellSet() : result;
-	}
-
-	Set<Cell<R, C, V>> createCellSet() {
-		return new CellSet();
-	}
-
-	abstract Iterator<Table.Cell<R, C, V>> cellIterator();
-
 	class CellSet extends AbstractSet<Cell<R, C, V>> {
+		@Override
+		public void clear() {
+			AbstractTable.this.clear();
+		}
+
 		@Override
 		public boolean contains(Object o) {
 			if (o instanceof Cell) {
@@ -128,6 +49,11 @@ abstract class AbstractTable<R, C, V> implements Table<R, C, V> {
 						Maps.immutableEntry(cell.getColumnKey(), cell.getValue()));
 			}
 			return false;
+		}
+
+		@Override
+		public Iterator<Table.Cell<R, C, V>> iterator() {
+			return cellIterator();
 		}
 
 		@Override
@@ -142,13 +68,25 @@ abstract class AbstractTable<R, C, V> implements Table<R, C, V> {
 		}
 
 		@Override
+		public int size() {
+			return AbstractTable.this.size();
+		}
+	}
+
+	class Values extends AbstractCollection<V> {
+		@Override
 		public void clear() {
 			AbstractTable.this.clear();
 		}
 
 		@Override
-		public Iterator<Table.Cell<R, C, V>> iterator() {
-			return cellIterator();
+		public boolean contains(Object o) {
+			return containsValue(o);
+		}
+
+		@Override
+		public Iterator<V> iterator() {
+			return valuesIterator();
 		}
 
 		@Override
@@ -157,16 +95,118 @@ abstract class AbstractTable<R, C, V> implements Table<R, C, V> {
 		}
 	}
 
+	private transient Set<Cell<R, C, V>> cellSet;
+
 	private transient Collection<V> values;
+
+	abstract Iterator<Table.Cell<R, C, V>> cellIterator();
+
+	@Override
+	public Set<Cell<R, C, V>> cellSet() {
+		Set<Cell<R, C, V>> result = cellSet;
+		return (result == null) ? cellSet = createCellSet() : result;
+	}
+
+	@Override
+	public void clear() {
+		Iterators.clear(cellSet().iterator());
+	}
+
+	@Override
+	public Set<C> columnKeySet() {
+		return columnMap().keySet();
+	}
+
+	@Override
+	public boolean contains(@Nullable Object rowKey, @Nullable Object columnKey) {
+		Map<C, V> row = Maps.safeGet(rowMap(), rowKey);
+		return row != null && Maps.safeContainsKey(row, columnKey);
+	}
+
+	@Override
+	public boolean containsColumn(@Nullable Object columnKey) {
+		return Maps.safeContainsKey(columnMap(), columnKey);
+	}
+
+	@Override
+	public boolean containsRow(@Nullable Object rowKey) {
+		return Maps.safeContainsKey(rowMap(), rowKey);
+	}
+
+	@Override
+	public boolean containsValue(@Nullable Object value) {
+		for (Map<C, V> row : rowMap().values()) {
+			if (row.containsValue(value)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	Set<Cell<R, C, V>> createCellSet() {
+		return new CellSet();
+	}
+
+	Collection<V> createValues() {
+		return new Values();
+	}
+
+	@Override
+	public boolean equals(@Nullable Object obj) {
+		return Tables.equalsImpl(this, obj);
+	}
+
+	@Override
+	public V get(@Nullable Object rowKey, @Nullable Object columnKey) {
+		Map<C, V> row = Maps.safeGet(rowMap(), rowKey);
+		return (row == null) ? null : Maps.safeGet(row, columnKey);
+	}
+
+	@Override
+	public int hashCode() {
+		return cellSet().hashCode();
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return size() == 0;
+	}
+
+	@Override
+	public V put(R rowKey, C columnKey, V value) {
+		return row(rowKey).put(columnKey, value);
+	}
+
+	@Override
+	public void putAll(Table<? extends R, ? extends C, ? extends V> table) {
+		for (Table.Cell<? extends R, ? extends C, ? extends V> cell : table.cellSet()) {
+			put(cell.getRowKey(), cell.getColumnKey(), cell.getValue());
+		}
+	}
+
+	@Override
+	public V remove(@Nullable Object rowKey, @Nullable Object columnKey) {
+		Map<C, V> row = Maps.safeGet(rowMap(), rowKey);
+		return (row == null) ? null : Maps.safeRemove(row, columnKey);
+	}
+
+	@Override
+	public Set<R> rowKeySet() {
+		return rowMap().keySet();
+	}
+
+	/**
+	 * Returns the string representation {@code rowMap().toString()}.
+	 */
+	@Override
+	public String toString() {
+		return rowMap().toString();
+	}
 
 	@Override
 	public Collection<V> values() {
 		Collection<V> result = values;
 		return (result == null) ? values = createValues() : result;
-	}
-
-	Collection<V> createValues() {
-		return new Values();
 	}
 
 	Iterator<V> valuesIterator() {
@@ -176,45 +216,5 @@ abstract class AbstractTable<R, C, V> implements Table<R, C, V> {
 				return cell.getValue();
 			}
 		};
-	}
-
-	class Values extends AbstractCollection<V> {
-		@Override
-		public Iterator<V> iterator() {
-			return valuesIterator();
-		}
-
-		@Override
-		public boolean contains(Object o) {
-			return containsValue(o);
-		}
-
-		@Override
-		public void clear() {
-			AbstractTable.this.clear();
-		}
-
-		@Override
-		public int size() {
-			return AbstractTable.this.size();
-		}
-	}
-
-	@Override
-	public boolean equals(@Nullable Object obj) {
-		return Tables.equalsImpl(this, obj);
-	}
-
-	@Override
-	public int hashCode() {
-		return cellSet().hashCode();
-	}
-
-	/**
-	 * Returns the string representation {@code rowMap().toString()}.
-	 */
-	@Override
-	public String toString() {
-		return rowMap().toString();
 	}
 }

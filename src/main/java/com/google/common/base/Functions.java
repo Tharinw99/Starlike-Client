@@ -46,135 +46,44 @@ import com.google.common.annotations.GwtCompatible;
  */
 @GwtCompatible
 public final class Functions {
-	private Functions() {
-	}
+	private static class ConstantFunction<E> implements Function<Object, E>, Serializable {
+		private static final long serialVersionUID = 0;
 
-	/**
-	 * Returns a function that calls {@code toString()} on its argument. The
-	 * function does not accept nulls; it will throw a {@link NullPointerException}
-	 * when applied to {@code null}.
-	 *
-	 * <p>
-	 * <b>Warning:</b> The returned function may not be <i>consistent with
-	 * equals</i> (as documented at {@link Function#apply}). For example, this
-	 * function yields different results for the two equal instances
-	 * {@code ImmutableSet.of(1, 2)} and {@code ImmutableSet.of(2, 1)}.
-	 */
-	public static Function<Object, String> toStringFunction() {
-		return ToStringFunction.INSTANCE;
-	}
+		private final E value;
 
-	// enum singleton pattern
-	private enum ToStringFunction implements Function<Object, String> {
-		INSTANCE;
-
-		@Override
-		public String apply(Object o) {
-			checkNotNull(o); // eager for GWT.
-			return o.toString();
+		public ConstantFunction(@Nullable E value) {
+			this.value = value;
 		}
 
 		@Override
-		public String toString() {
-			return "toString";
-		}
-	}
-
-	/**
-	 * Returns the identity function.
-	 */
-	// implementation is "fully variant"; E has become a "pass-through" type
-	@SuppressWarnings("unchecked")
-	public static <E> Function<E, E> identity() {
-		return (Function<E, E>) IdentityFunction.INSTANCE;
-	}
-
-	// enum singleton pattern
-	private enum IdentityFunction implements Function<Object, Object> {
-		INSTANCE;
-
-		@Override
-		@Nullable
-		public Object apply(@Nullable Object o) {
-			return o;
+		public E apply(@Nullable Object from) {
+			return value;
 		}
 
 		@Override
-		public String toString() {
-			return "identity";
-		}
-	}
-
-	/**
-	 * Returns a function which performs a map lookup. The returned function throws
-	 * an {@link IllegalArgumentException} if given a key that does not exist in the
-	 * map. See also {@link #forMap(Map, Object)}, which returns a default value in
-	 * this case.
-	 *
-	 * <p>
-	 * Note: if {@code map} is a {@link com.google.common.collect.BiMap BiMap} (or
-	 * can be one), you can use {@link com.google.common.collect.Maps#asConverter
-	 * Maps.asConverter} instead to get a function that also supports reverse
-	 * conversion.
-	 */
-	public static <K, V> Function<K, V> forMap(Map<K, V> map) {
-		return new FunctionForMapNoDefault<K, V>(map);
-	}
-
-	private static class FunctionForMapNoDefault<K, V> implements Function<K, V>, Serializable {
-		final Map<K, V> map;
-
-		FunctionForMapNoDefault(Map<K, V> map) {
-			this.map = checkNotNull(map);
-		}
-
-		@Override
-		public V apply(@Nullable K key) {
-			V result = map.get(key);
-			checkArgument(result != null || map.containsKey(key), "Key '%s' not present in map", key);
-			return result;
-		}
-
-		@Override
-		public boolean equals(@Nullable Object o) {
-			if (o instanceof FunctionForMapNoDefault) {
-				FunctionForMapNoDefault<?, ?> that = (FunctionForMapNoDefault<?, ?>) o;
-				return map.equals(that.map);
+		public boolean equals(@Nullable Object obj) {
+			if (obj instanceof ConstantFunction) {
+				ConstantFunction<?> that = (ConstantFunction<?>) obj;
+				return Objects.equal(value, that.value);
 			}
 			return false;
 		}
 
 		@Override
 		public int hashCode() {
-			return map.hashCode();
+			return (value == null) ? 0 : value.hashCode();
 		}
 
 		@Override
 		public String toString() {
-			return "forMap(" + map + ")";
+			return "constant(" + value + ")";
 		}
-
-		private static final long serialVersionUID = 0;
-	}
-
-	/**
-	 * Returns a function which performs a map lookup with a default value. The
-	 * function created by this method returns {@code defaultValue} for all inputs
-	 * that do not belong to the map's key set. See also {@link #forMap(Map)}, which
-	 * throws an exception in this case.
-	 *
-	 * @param map          source map that determines the function behavior
-	 * @param defaultValue the value to return for inputs that aren't map keys
-	 * @return function that returns {@code map.get(a)} when {@code a} is a key, or
-	 *         {@code
-	 *         defaultValue} otherwise
-	 */
-	public static <K, V> Function<K, V> forMap(Map<K, ? extends V> map, @Nullable V defaultValue) {
-		return new ForMapWithDefault<K, V>(map, defaultValue);
 	}
 
 	private static class ForMapWithDefault<K, V> implements Function<K, V>, Serializable {
+		private static final long serialVersionUID = 0;
 		final Map<K, ? extends V> map;
+
 		final V defaultValue;
 
 		ForMapWithDefault(Map<K, ? extends V> map, @Nullable V defaultValue) {
@@ -206,27 +115,12 @@ public final class Functions {
 		public String toString() {
 			return "forMap(" + map + ", defaultValue=" + defaultValue + ")";
 		}
-
-		private static final long serialVersionUID = 0;
-	}
-
-	/**
-	 * Returns the composition of two functions. For {@code f: A->B} and
-	 * {@code g: B->C}, composition is defined as the function h such that
-	 * {@code h(a) == g(f(a))} for each {@code a}.
-	 *
-	 * @param g the second function to apply
-	 * @param f the first function to apply
-	 * @return the composition of {@code f} and {@code g}
-	 * @see <a href="//en.wikipedia.org/wiki/Function_composition">function
-	 *      composition</a>
-	 */
-	public static <A, B, C> Function<A, C> compose(Function<B, C> g, Function<A, ? extends B> f) {
-		return new FunctionComposition<A, B, C>(g, f);
 	}
 
 	private static class FunctionComposition<A, B, C> implements Function<A, C>, Serializable {
+		private static final long serialVersionUID = 0;
 		private final Function<B, C> g;
+
 		private final Function<A, ? extends B> f;
 
 		public FunctionComposition(Function<B, C> g, Function<A, ? extends B> f) {
@@ -257,25 +151,64 @@ public final class Functions {
 		public String toString() {
 			return g + "(" + f + ")";
 		}
-
-		private static final long serialVersionUID = 0;
 	}
 
-	/**
-	 * Creates a function that returns the same boolean output as the given
-	 * predicate for all inputs.
-	 *
-	 * <p>
-	 * The returned function is <i>consistent with equals</i> (as documented at
-	 * {@link Function#apply}) if and only if {@code predicate} is itself consistent
-	 * with equals.
-	 */
-	public static <T> Function<T, Boolean> forPredicate(Predicate<T> predicate) {
-		return new PredicateFunction<T>(predicate);
+	private static class FunctionForMapNoDefault<K, V> implements Function<K, V>, Serializable {
+		private static final long serialVersionUID = 0;
+
+		final Map<K, V> map;
+
+		FunctionForMapNoDefault(Map<K, V> map) {
+			this.map = checkNotNull(map);
+		}
+
+		@Override
+		public V apply(@Nullable K key) {
+			V result = map.get(key);
+			checkArgument(result != null || map.containsKey(key), "Key '%s' not present in map", key);
+			return result;
+		}
+
+		@Override
+		public boolean equals(@Nullable Object o) {
+			if (o instanceof FunctionForMapNoDefault) {
+				FunctionForMapNoDefault<?, ?> that = (FunctionForMapNoDefault<?, ?>) o;
+				return map.equals(that.map);
+			}
+			return false;
+		}
+
+		@Override
+		public int hashCode() {
+			return map.hashCode();
+		}
+
+		@Override
+		public String toString() {
+			return "forMap(" + map + ")";
+		}
+	}
+
+	// enum singleton pattern
+	private enum IdentityFunction implements Function<Object, Object> {
+		INSTANCE;
+
+		@Override
+		@Nullable
+		public Object apply(@Nullable Object o) {
+			return o;
+		}
+
+		@Override
+		public String toString() {
+			return "identity";
+		}
 	}
 
 	/** @see Functions#forPredicate */
 	private static class PredicateFunction<T> implements Function<T, Boolean>, Serializable {
+		private static final long serialVersionUID = 0;
+
 		private final Predicate<T> predicate;
 
 		private PredicateFunction(Predicate<T> predicate) {
@@ -305,68 +238,12 @@ public final class Functions {
 		public String toString() {
 			return "forPredicate(" + predicate + ")";
 		}
-
-		private static final long serialVersionUID = 0;
-	}
-
-	/**
-	 * Creates a function that returns {@code value} for any input.
-	 *
-	 * @param value the constant value for the function to return
-	 * @return a function that always returns {@code value}
-	 */
-	public static <E> Function<Object, E> constant(@Nullable E value) {
-		return new ConstantFunction<E>(value);
-	}
-
-	private static class ConstantFunction<E> implements Function<Object, E>, Serializable {
-		private final E value;
-
-		public ConstantFunction(@Nullable E value) {
-			this.value = value;
-		}
-
-		@Override
-		public E apply(@Nullable Object from) {
-			return value;
-		}
-
-		@Override
-		public boolean equals(@Nullable Object obj) {
-			if (obj instanceof ConstantFunction) {
-				ConstantFunction<?> that = (ConstantFunction<?>) obj;
-				return Objects.equal(value, that.value);
-			}
-			return false;
-		}
-
-		@Override
-		public int hashCode() {
-			return (value == null) ? 0 : value.hashCode();
-		}
-
-		@Override
-		public String toString() {
-			return "constant(" + value + ")";
-		}
-
-		private static final long serialVersionUID = 0;
-	}
-
-	/**
-	 * Returns a function that always returns the result of invoking
-	 * {@link Supplier#get} on {@code
-	 * supplier}, regardless of its input.
-	 * 
-	 * @since 10.0
-	 */
-	@Beta
-	public static <T> Function<Object, T> forSupplier(Supplier<T> supplier) {
-		return new SupplierFunction<T>(supplier);
 	}
 
 	/** @see Functions#forSupplier */
 	private static class SupplierFunction<T> implements Function<Object, T>, Serializable {
+
+		private static final long serialVersionUID = 0;
 
 		private final Supplier<T> supplier;
 
@@ -397,7 +274,130 @@ public final class Functions {
 		public String toString() {
 			return "forSupplier(" + supplier + ")";
 		}
+	}
 
-		private static final long serialVersionUID = 0;
+	// enum singleton pattern
+	private enum ToStringFunction implements Function<Object, String> {
+		INSTANCE;
+
+		@Override
+		public String apply(Object o) {
+			checkNotNull(o); // eager for GWT.
+			return o.toString();
+		}
+
+		@Override
+		public String toString() {
+			return "toString";
+		}
+	}
+
+	/**
+	 * Returns the composition of two functions. For {@code f: A->B} and
+	 * {@code g: B->C}, composition is defined as the function h such that
+	 * {@code h(a) == g(f(a))} for each {@code a}.
+	 *
+	 * @param g the second function to apply
+	 * @param f the first function to apply
+	 * @return the composition of {@code f} and {@code g}
+	 * @see <a href="//en.wikipedia.org/wiki/Function_composition">function
+	 *      composition</a>
+	 */
+	public static <A, B, C> Function<A, C> compose(Function<B, C> g, Function<A, ? extends B> f) {
+		return new FunctionComposition<A, B, C>(g, f);
+	}
+
+	/**
+	 * Creates a function that returns {@code value} for any input.
+	 *
+	 * @param value the constant value for the function to return
+	 * @return a function that always returns {@code value}
+	 */
+	public static <E> Function<Object, E> constant(@Nullable E value) {
+		return new ConstantFunction<E>(value);
+	}
+
+	/**
+	 * Returns a function which performs a map lookup with a default value. The
+	 * function created by this method returns {@code defaultValue} for all inputs
+	 * that do not belong to the map's key set. See also {@link #forMap(Map)}, which
+	 * throws an exception in this case.
+	 *
+	 * @param map          source map that determines the function behavior
+	 * @param defaultValue the value to return for inputs that aren't map keys
+	 * @return function that returns {@code map.get(a)} when {@code a} is a key, or
+	 *         {@code
+	 *         defaultValue} otherwise
+	 */
+	public static <K, V> Function<K, V> forMap(Map<K, ? extends V> map, @Nullable V defaultValue) {
+		return new ForMapWithDefault<K, V>(map, defaultValue);
+	}
+
+	/**
+	 * Returns a function which performs a map lookup. The returned function throws
+	 * an {@link IllegalArgumentException} if given a key that does not exist in the
+	 * map. See also {@link #forMap(Map, Object)}, which returns a default value in
+	 * this case.
+	 *
+	 * <p>
+	 * Note: if {@code map} is a {@link com.google.common.collect.BiMap BiMap} (or
+	 * can be one), you can use {@link com.google.common.collect.Maps#asConverter
+	 * Maps.asConverter} instead to get a function that also supports reverse
+	 * conversion.
+	 */
+	public static <K, V> Function<K, V> forMap(Map<K, V> map) {
+		return new FunctionForMapNoDefault<K, V>(map);
+	}
+
+	/**
+	 * Creates a function that returns the same boolean output as the given
+	 * predicate for all inputs.
+	 *
+	 * <p>
+	 * The returned function is <i>consistent with equals</i> (as documented at
+	 * {@link Function#apply}) if and only if {@code predicate} is itself consistent
+	 * with equals.
+	 */
+	public static <T> Function<T, Boolean> forPredicate(Predicate<T> predicate) {
+		return new PredicateFunction<T>(predicate);
+	}
+
+	/**
+	 * Returns a function that always returns the result of invoking
+	 * {@link Supplier#get} on {@code
+	 * supplier}, regardless of its input.
+	 * 
+	 * @since 10.0
+	 */
+	@Beta
+	public static <T> Function<Object, T> forSupplier(Supplier<T> supplier) {
+		return new SupplierFunction<T>(supplier);
+	}
+
+	/**
+	 * Returns the identity function.
+	 */
+	// implementation is "fully variant"; E has become a "pass-through" type
+	@SuppressWarnings("unchecked")
+	public static <E> Function<E, E> identity() {
+		return (Function<E, E>) IdentityFunction.INSTANCE;
+	}
+
+	/**
+	 * Returns a function that calls {@code toString()} on its argument. The
+	 * function does not accept nulls; it will throw a {@link NullPointerException}
+	 * when applied to {@code null}.
+	 *
+	 * <p>
+	 * <b>Warning:</b> The returned function may not be <i>consistent with
+	 * equals</i> (as documented at {@link Function#apply}). For example, this
+	 * function yields different results for the two equal instances
+	 * {@code ImmutableSet.of(1, 2)} and {@code ImmutableSet.of(2, 1)}.
+	 */
+	public static Function<Object, String> toStringFunction() {
+		return ToStringFunction.INSTANCE;
+	}
+
+	private Functions() {
 	}
 }

@@ -72,10 +72,25 @@ import com.google.common.base.Function;
 @Beta
 @GwtCompatible
 public abstract class Escaper {
+	private final Function<String, String> asFunction = new Function<String, String>() {
+		@Override
+		public String apply(String from) {
+			return escape(from);
+		}
+	};
+
 	// TODO(user): evaluate custom implementations, considering package private
 	// constructor.
 	/** Constructor for use by subclasses. */
 	protected Escaper() {
+	}
+
+	/**
+	 * Returns a {@link Function} that invokes {@link #escape(String)} on this
+	 * escaper.
+	 */
+	public final Function<String, String> asFunction() {
+		return asFunction;
 	}
 
 	/**
@@ -104,19 +119,4 @@ public abstract class Escaper {
 	 *                                  reason
 	 */
 	public abstract String escape(String string);
-
-	private final Function<String, String> asFunction = new Function<String, String>() {
-		@Override
-		public String apply(String from) {
-			return escape(from);
-		}
-	};
-
-	/**
-	 * Returns a {@link Function} that invokes {@link #escape(String)} on this
-	 * escaper.
-	 */
-	public final Function<String, String> asFunction() {
-		return asFunction;
-	}
 }

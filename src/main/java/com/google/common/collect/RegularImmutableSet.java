@@ -59,17 +59,6 @@ final class RegularImmutableSet<E> extends ImmutableSet<E> {
 	}
 
 	@Override
-	public int size() {
-		return elements.length;
-	}
-
-	@SuppressWarnings("unchecked") // all elements are E's
-	@Override
-	public UnmodifiableIterator<E> iterator() {
-		return (UnmodifiableIterator<E>) Iterators.forArray(elements);
-	}
-
-	@Override
 	int copyIntoArray(Object[] dst, int offset) {
 		System.arraycopy(elements, 0, dst, offset, elements.length);
 		return offset + elements.length;
@@ -81,11 +70,6 @@ final class RegularImmutableSet<E> extends ImmutableSet<E> {
 	}
 
 	@Override
-	boolean isPartialView() {
-		return false;
-	}
-
-	@Override
 	public int hashCode() {
 		return hashCode;
 	}
@@ -93,5 +77,21 @@ final class RegularImmutableSet<E> extends ImmutableSet<E> {
 	@Override
 	boolean isHashCodeFast() {
 		return true;
+	}
+
+	@Override
+	boolean isPartialView() {
+		return false;
+	}
+
+	@SuppressWarnings("unchecked") // all elements are E's
+	@Override
+	public UnmodifiableIterator<E> iterator() {
+		return (UnmodifiableIterator<E>) Iterators.forArray(elements);
+	}
+
+	@Override
+	public int size() {
+		return elements.length;
 	}
 }

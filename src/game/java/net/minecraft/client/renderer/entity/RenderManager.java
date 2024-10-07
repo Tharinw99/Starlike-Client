@@ -71,6 +71,7 @@ import net.minecraft.entity.monster.EntityGiantZombie;
 import net.minecraft.entity.monster.EntityGuardian;
 import net.minecraft.entity.monster.EntityIronGolem;
 import net.minecraft.entity.monster.EntityMagmaCube;
+import net.minecraft.entity.monster.EntityNetherCreeper;
 import net.minecraft.entity.monster.EntityPigZombie;
 import net.minecraft.entity.monster.EntitySilverfish;
 import net.minecraft.entity.monster.EntitySkeleton;
@@ -108,27 +109,41 @@ import net.minecraft.util.ReportedException;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class RenderManager {
+	public static void setupLightmapCoords(Entity entity, float partialTicks) {
+		int i = entity.getBrightnessForRender(partialTicks);
+		if (entity.isBurning()) {
+			DeferredStateManager.setEmissionConstant(1.0f);
+			i = 15728880;
+		}
+		int j = i % 65536;
+		int k = i / 65536;
+		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j / 1.0F, (float) k / 1.0F);
+	}
+
 	private Map<Class<? extends Entity>, Render<? extends Entity>> entityRenderMap = Maps.newHashMap();
 	private Map<String, RenderPlayer> skinMap = Maps.newHashMap();
 	private RenderPlayer playerRenderer;
@@ -149,8 +164,9 @@ public class RenderManager {
 	public double viewerPosZ;
 	private boolean renderOutlines = false;
 	private boolean renderShadow = true;
-	/**+
-	 * whether bounding box should be rendered or not
+
+	/**
+	 * + whether bounding box should be rendered or not
 	 */
 	private boolean debugBoundingBox = false;
 
@@ -216,6 +232,8 @@ public class RenderManager {
 		this.entityRenderMap.put(EntityFishHook.class, new RenderFish(this));
 		this.entityRenderMap.put(EntityHorse.class, new RenderHorse(this, new ModelHorse(), 0.75F));
 		this.entityRenderMap.put(EntityLightningBolt.class, new RenderLightningBolt(this));
+		this.entityRenderMap.put(EntityNetherCreeper.class, new RenderNetherCreeper(this));
+
 		this.playerRenderer = new RenderPlayer(this);
 		this.skinMap.put("default", this.playerRenderer);
 		this.skinMap.put("slim", new RenderPlayer(this, true, false));
@@ -228,36 +246,6 @@ public class RenderManager {
 		}
 		this.skinMap.put("eagler",
 				Minecraft.getMinecraft().gameSettings.enableFNAWSkins ? this.eaglerRenderer : this.playerRenderer);
-	}
-
-	public void setEnableFNAWSkins(boolean en) {
-		this.skinMap.put("eagler", en ? this.eaglerRenderer : this.playerRenderer);
-	}
-
-	public void setRenderPosition(double renderPosXIn, double renderPosYIn, double renderPosZIn) {
-		this.renderPosX = renderPosXIn;
-		this.renderPosY = renderPosYIn;
-		this.renderPosZ = renderPosZIn;
-	}
-
-	public <T extends Entity> Render<T> getEntityClassRenderObject(Class<? extends Entity> parClass1) {
-		Render render = (Render) this.entityRenderMap.get(parClass1);
-		if (render == null && parClass1 != Entity.class) {
-			render = this.getEntityClassRenderObject((Class<? extends Entity>) parClass1.getSuperclass());
-			this.entityRenderMap.put(parClass1, render);
-		}
-
-		return render;
-	}
-
-	public <T extends Entity> Render getEntityRenderObject(Entity entityIn) {
-		if (entityIn instanceof AbstractClientPlayer) {
-			String s = ((AbstractClientPlayer) entityIn).getSkinType();
-			RenderPlayer renderplayer = (RenderPlayer) this.skinMap.get(s);
-			return renderplayer != null ? renderplayer : this.playerRenderer;
-		} else {
-			return this.<T>getEntityClassRenderObject(entityIn.getClass());
-		}
 	}
 
 	public void cacheActiveRenderInfo(World worldIn, FontRenderer textRendererIn, Entity livingPlayerIn,
@@ -292,104 +280,6 @@ public class RenderManager {
 				+ (livingPlayerIn.posY - livingPlayerIn.lastTickPosY) * (double) partialTicks;
 		this.viewerPosZ = livingPlayerIn.lastTickPosZ
 				+ (livingPlayerIn.posZ - livingPlayerIn.lastTickPosZ) * (double) partialTicks;
-	}
-
-	public void setPlayerViewY(float playerViewYIn) {
-		this.playerViewY = playerViewYIn;
-	}
-
-	public boolean isRenderShadow() {
-		return this.renderShadow;
-	}
-
-	public void setRenderShadow(boolean renderShadowIn) {
-		this.renderShadow = renderShadowIn;
-	}
-
-	public void setDebugBoundingBox(boolean debugBoundingBoxIn) {
-		this.debugBoundingBox = debugBoundingBoxIn;
-	}
-
-	public boolean isDebugBoundingBox() {
-		return this.debugBoundingBox;
-	}
-
-	public boolean renderEntitySimple(Entity entityIn, float partialTicks) {
-		return this.renderEntityStatic(entityIn, partialTicks, false);
-	}
-
-	public boolean shouldRender(Entity entityIn, ICamera camera, double camX, double camY, double camZ) {
-		Render render = this.getEntityRenderObject(entityIn);
-		return render != null && render.shouldRender(entityIn, camera, camX, camY, camZ);
-	}
-
-	public boolean renderEntityStatic(Entity entity, float partialTicks, boolean parFlag) {
-		if (entity.ticksExisted == 0) {
-			entity.lastTickPosX = entity.posX;
-			entity.lastTickPosY = entity.posY;
-			entity.lastTickPosZ = entity.posZ;
-		}
-
-		double d0 = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * (double) partialTicks;
-		double d1 = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * (double) partialTicks;
-		double d2 = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * (double) partialTicks;
-		if (DynamicLightsStateManager.isInDynamicLightsPass()) {
-			DynamicLightsStateManager.reportForwardRenderObjectPosition2((float) (d0 - viewerPosX),
-					(float) (d1 - viewerPosY), (float) (d2 - viewerPosZ));
-		}
-		float f = entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks;
-		int i = entity.getBrightnessForRender(partialTicks);
-		if (entity.isBurning()) {
-			DeferredStateManager.setEmissionConstant(1.0f);
-			i = 15728880;
-		}
-
-		int j = i % 65536;
-		int k = i / 65536;
-		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j / 1.0F, (float) k / 1.0F);
-		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-		try {
-			return this.doRenderEntity(entity, d0 - this.renderPosX, d1 - this.renderPosY, d2 - this.renderPosZ, f,
-					partialTicks, parFlag);
-		} finally {
-			DeferredStateManager.setEmissionConstant(0.0f);
-		}
-	}
-
-	public static void setupLightmapCoords(Entity entity, float partialTicks) {
-		int i = entity.getBrightnessForRender(partialTicks);
-		if (entity.isBurning()) {
-			DeferredStateManager.setEmissionConstant(1.0f);
-			i = 15728880;
-		}
-		int j = i % 65536;
-		int k = i / 65536;
-		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j / 1.0F, (float) k / 1.0F);
-	}
-
-	public void renderWitherSkull(Entity entityIn, float partialTicks) {
-		double d0 = entityIn.lastTickPosX + (entityIn.posX - entityIn.lastTickPosX) * (double) partialTicks;
-		double d1 = entityIn.lastTickPosY + (entityIn.posY - entityIn.lastTickPosY) * (double) partialTicks;
-		double d2 = entityIn.lastTickPosZ + (entityIn.posZ - entityIn.lastTickPosZ) * (double) partialTicks;
-		Render render = this.getEntityRenderObject(entityIn);
-		if (render != null && this.renderEngine != null) {
-			int i = entityIn.getBrightnessForRender(partialTicks);
-			int j = i % 65536;
-			int k = i / 65536;
-			OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j / 1.0F, (float) k / 1.0F);
-			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-			render.renderName(entityIn, d0 - this.renderPosX, d1 - this.renderPosY, d2 - this.renderPosZ);
-		}
-
-	}
-
-	public boolean renderEntityWithPosYaw(Entity entityIn, double x, double y, double z, float entityYaw,
-			float partialTicks) {
-		try {
-			return this.doRenderEntity(entityIn, x, y, z, entityYaw, partialTicks, false);
-		} finally {
-			DeferredStateManager.setEmissionConstant(0.0f);
-		}
 	}
 
 	public boolean doRenderEntity(Entity entity, double x, double y, double z, float entityYaw, float partialTicks,
@@ -448,9 +338,50 @@ public class RenderManager {
 		}
 	}
 
-	/**+
-	 * Renders the bounding box around an entity when F3+B is
-	 * pressed
+	public double getDistanceToCamera(double parDouble1, double parDouble2, double parDouble3) {
+		double d0 = parDouble1 - this.viewerPosX;
+		double d1 = parDouble2 - this.viewerPosY;
+		double d2 = parDouble3 - this.viewerPosZ;
+		return d0 * d0 + d1 * d1 + d2 * d2;
+	}
+
+	public <T extends Entity> Render<T> getEntityClassRenderObject(Class<? extends Entity> parClass1) {
+		Render render = (Render) this.entityRenderMap.get(parClass1);
+		if (render == null && parClass1 != Entity.class) {
+			render = this.getEntityClassRenderObject((Class<? extends Entity>) parClass1.getSuperclass());
+			this.entityRenderMap.put(parClass1, render);
+		}
+
+		return render;
+	}
+
+	public <T extends Entity> Render getEntityRenderObject(Entity entityIn) {
+		if (entityIn instanceof AbstractClientPlayer) {
+			String s = ((AbstractClientPlayer) entityIn).getSkinType();
+			RenderPlayer renderplayer = (RenderPlayer) this.skinMap.get(s);
+			return renderplayer != null ? renderplayer : this.playerRenderer;
+		} else {
+			return this.<T>getEntityClassRenderObject(entityIn.getClass());
+		}
+	}
+
+	/**
+	 * + Returns the font renderer
+	 */
+	public FontRenderer getFontRenderer() {
+		return this.textRenderer;
+	}
+
+	public boolean isDebugBoundingBox() {
+		return this.debugBoundingBox;
+	}
+
+	public boolean isRenderShadow() {
+		return this.renderShadow;
+	}
+
+	/**
+	 * + Renders the bounding box around an entity when F3+B is pressed
 	 */
 	private void renderDebugBoundingBox(Entity entityIn, double parDouble1, double parDouble2, double parDouble3,
 			float parFloat1, float parFloat2) {
@@ -491,29 +422,103 @@ public class RenderManager {
 		GlStateManager.depthMask(true);
 	}
 
-	/**+
-	 * World sets this RenderManager's worldObj to the world
-	 * provided
+	public boolean renderEntitySimple(Entity entityIn, float partialTicks) {
+		return this.renderEntityStatic(entityIn, partialTicks, false);
+	}
+
+	public boolean renderEntityStatic(Entity entity, float partialTicks, boolean parFlag) {
+		if (entity.ticksExisted == 0) {
+			entity.lastTickPosX = entity.posX;
+			entity.lastTickPosY = entity.posY;
+			entity.lastTickPosZ = entity.posZ;
+		}
+
+		double d0 = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * (double) partialTicks;
+		double d1 = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * (double) partialTicks;
+		double d2 = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * (double) partialTicks;
+		if (DynamicLightsStateManager.isInDynamicLightsPass()) {
+			DynamicLightsStateManager.reportForwardRenderObjectPosition2((float) (d0 - viewerPosX),
+					(float) (d1 - viewerPosY), (float) (d2 - viewerPosZ));
+		}
+		float f = entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks;
+		int i = entity.getBrightnessForRender(partialTicks);
+		if (entity.isBurning()) {
+			DeferredStateManager.setEmissionConstant(1.0f);
+			i = 15728880;
+		}
+
+		int j = i % 65536;
+		int k = i / 65536;
+		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j / 1.0F, (float) k / 1.0F);
+		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+		try {
+			return this.doRenderEntity(entity, d0 - this.renderPosX, d1 - this.renderPosY, d2 - this.renderPosZ, f,
+					partialTicks, parFlag);
+		} finally {
+			DeferredStateManager.setEmissionConstant(0.0f);
+		}
+	}
+
+	public boolean renderEntityWithPosYaw(Entity entityIn, double x, double y, double z, float entityYaw,
+			float partialTicks) {
+		try {
+			return this.doRenderEntity(entityIn, x, y, z, entityYaw, partialTicks, false);
+		} finally {
+			DeferredStateManager.setEmissionConstant(0.0f);
+		}
+	}
+
+	public void renderWitherSkull(Entity entityIn, float partialTicks) {
+		double d0 = entityIn.lastTickPosX + (entityIn.posX - entityIn.lastTickPosX) * (double) partialTicks;
+		double d1 = entityIn.lastTickPosY + (entityIn.posY - entityIn.lastTickPosY) * (double) partialTicks;
+		double d2 = entityIn.lastTickPosZ + (entityIn.posZ - entityIn.lastTickPosZ) * (double) partialTicks;
+		Render render = this.getEntityRenderObject(entityIn);
+		if (render != null && this.renderEngine != null) {
+			int i = entityIn.getBrightnessForRender(partialTicks);
+			int j = i % 65536;
+			int k = i / 65536;
+			OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j / 1.0F, (float) k / 1.0F);
+			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+			render.renderName(entityIn, d0 - this.renderPosX, d1 - this.renderPosY, d2 - this.renderPosZ);
+		}
+
+	}
+
+	/**
+	 * + World sets this RenderManager's worldObj to the world provided
 	 */
 	public void set(World worldIn) {
 		this.worldObj = worldIn;
 	}
 
-	public double getDistanceToCamera(double parDouble1, double parDouble2, double parDouble3) {
-		double d0 = parDouble1 - this.viewerPosX;
-		double d1 = parDouble2 - this.viewerPosY;
-		double d2 = parDouble3 - this.viewerPosZ;
-		return d0 * d0 + d1 * d1 + d2 * d2;
+	public void setDebugBoundingBox(boolean debugBoundingBoxIn) {
+		this.debugBoundingBox = debugBoundingBoxIn;
 	}
 
-	/**+
-	 * Returns the font renderer
-	 */
-	public FontRenderer getFontRenderer() {
-		return this.textRenderer;
+	public void setEnableFNAWSkins(boolean en) {
+		this.skinMap.put("eagler", en ? this.eaglerRenderer : this.playerRenderer);
+	}
+
+	public void setPlayerViewY(float playerViewYIn) {
+		this.playerViewY = playerViewYIn;
 	}
 
 	public void setRenderOutlines(boolean renderOutlinesIn) {
 		this.renderOutlines = renderOutlinesIn;
+	}
+
+	public void setRenderPosition(double renderPosXIn, double renderPosYIn, double renderPosZIn) {
+		this.renderPosX = renderPosXIn;
+		this.renderPosY = renderPosYIn;
+		this.renderPosZ = renderPosZIn;
+	}
+
+	public void setRenderShadow(boolean renderShadowIn) {
+		this.renderShadow = renderShadowIn;
+	}
+
+	public boolean shouldRender(Entity entityIn, ICamera camera, double camX, double camY, double camZ) {
+		Render render = this.getEntityRenderObject(entityIn);
+		return render != null && render.shouldRender(entityIn, camera, camX, camY, camZ);
 	}
 }

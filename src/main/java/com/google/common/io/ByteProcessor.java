@@ -32,6 +32,9 @@ import com.google.common.annotations.Beta;
  */
 @Beta
 public interface ByteProcessor<T> {
+	/** Return the result of processing all the bytes. */
+	T getResult();
+
 	/**
 	 * This method will be called for each chunk of bytes in an input stream. The
 	 * implementation should process the bytes from {@code buf[off]} through
@@ -43,7 +46,4 @@ public interface ByteProcessor<T> {
 	 * @return true to continue processing, false to stop
 	 */
 	boolean processBytes(byte[] buf, int off, int len) throws IOException;
-
-	/** Return the result of processing all the bytes. */
-	T getResult();
 }

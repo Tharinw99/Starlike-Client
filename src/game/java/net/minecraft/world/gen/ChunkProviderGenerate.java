@@ -1,6 +1,7 @@
 package net.minecraft.world.gen;
 
 import java.util.List;
+
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
@@ -25,22 +26,25 @@ import net.minecraft.world.gen.structure.MapGenStronghold;
 import net.minecraft.world.gen.structure.MapGenVillage;
 import net.minecraft.world.gen.structure.StructureOceanMonument;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -113,137 +117,22 @@ public class ChunkProviderGenerate implements IChunkProvider {
 
 	}
 
-	public void setBlocksInChunk(int parInt1, int parInt2, ChunkPrimer parChunkPrimer) {
-		this.biomesForGeneration = this.worldObj.getWorldChunkManager().getBiomesForGeneration(this.biomesForGeneration,
-				parInt1 * 4 - 2, parInt2 * 4 - 2, 10, 10);
-		this.func_147423_a(parInt1 * 4, 0, parInt2 * 4);
-
-		for (int i = 0; i < 4; ++i) {
-			int j = i * 5;
-			int k = (i + 1) * 5;
-
-			for (int l = 0; l < 4; ++l) {
-				int i1 = (j + l) * 33;
-				int j1 = (j + l + 1) * 33;
-				int k1 = (k + l) * 33;
-				int l1 = (k + l + 1) * 33;
-
-				for (int i2 = 0; i2 < 32; ++i2) {
-					double d0 = 0.125D;
-					double d1 = this.field_147434_q[i1 + i2];
-					double d2 = this.field_147434_q[j1 + i2];
-					double d3 = this.field_147434_q[k1 + i2];
-					double d4 = this.field_147434_q[l1 + i2];
-					double d5 = (this.field_147434_q[i1 + i2 + 1] - d1) * d0;
-					double d6 = (this.field_147434_q[j1 + i2 + 1] - d2) * d0;
-					double d7 = (this.field_147434_q[k1 + i2 + 1] - d3) * d0;
-					double d8 = (this.field_147434_q[l1 + i2 + 1] - d4) * d0;
-
-					for (int j2 = 0; j2 < 8; ++j2) {
-						double d9 = 0.25D;
-						double d10 = d1;
-						double d11 = d2;
-						double d12 = (d3 - d1) * d9;
-						double d13 = (d4 - d2) * d9;
-
-						for (int k2 = 0; k2 < 4; ++k2) {
-							double d14 = 0.25D;
-							double d16 = (d11 - d10) * d14;
-							double d15 = d10 - d16;
-
-							for (int l2 = 0; l2 < 4; ++l2) {
-								if ((d15 += d16) > 0.0D) {
-									parChunkPrimer.setBlockState(i * 4 + k2, i2 * 8 + j2, l * 4 + l2,
-											Blocks.stone.getDefaultState());
-								} else if (i2 * 8 + j2 < this.settings.seaLevel) {
-									parChunkPrimer.setBlockState(i * 4 + k2, i2 * 8 + j2, l * 4 + l2,
-											this.field_177476_s.getDefaultState());
-								}
-							}
-
-							d10 += d12;
-							d11 += d13;
-						}
-
-						d1 += d5;
-						d2 += d6;
-						d3 += d7;
-						d4 += d8;
-					}
-				}
-			}
-		}
-
-	}
-
-	public void replaceBlocksForBiome(int parInt1, int parInt2, ChunkPrimer parChunkPrimer,
-			BiomeGenBase[] parArrayOfBiomeGenBase) {
-		double d0 = 0.03125D;
-		this.stoneNoise = this.field_147430_m.func_151599_a(this.stoneNoise, (double) (parInt1 * 16),
-				(double) (parInt2 * 16), 16, 16, d0 * 2.0D, d0 * 2.0D, 1.0D);
-
-		for (int i = 0; i < 16; ++i) {
-			for (int j = 0; j < 16; ++j) {
-				BiomeGenBase biomegenbase = parArrayOfBiomeGenBase[j + i * 16];
-				biomegenbase.genTerrainBlocks(this.worldObj, this.rand, parChunkPrimer, parInt1 * 16 + i,
-						parInt2 * 16 + j, this.stoneNoise[j + i * 16]);
-			}
-		}
-
-	}
-
-	/**+
-	 * Will return back a chunk, if it doesn't exist and its not a
-	 * MP client it will generates all the blocks for the specified
-	 * chunk from the map seed and chunk seed
+	/**
+	 * + Returns if the IChunkProvider supports saving.
 	 */
-	public Chunk provideChunk(int i, int j) {
-		this.rand.setSeed((long) i * 341873128712L + (long) j * 132897987541L);
-		ChunkPrimer chunkprimer = new ChunkPrimer();
-		this.setBlocksInChunk(i, j, chunkprimer);
-		this.biomesForGeneration = this.worldObj.getWorldChunkManager().loadBlockGeneratorData(this.biomesForGeneration,
-				i * 16, j * 16, 16, 16);
-		this.replaceBlocksForBiome(i, j, chunkprimer, this.biomesForGeneration);
-		if (this.settings.useCaves) {
-			this.caveGenerator.generate(this, this.worldObj, i, j, chunkprimer);
-		}
+	public boolean canSave() {
+		return true;
+	}
 
-		if (this.settings.useRavines) {
-			this.ravineGenerator.generate(this, this.worldObj, i, j, chunkprimer);
-		}
-
-		if (this.settings.useMineShafts && this.mapFeaturesEnabled) {
-			this.mineshaftGenerator.generate(this, this.worldObj, i, j, chunkprimer);
-		}
-
-		if (this.settings.useVillages && this.mapFeaturesEnabled) {
-			this.villageGenerator.generate(this, this.worldObj, i, j, chunkprimer);
-		}
-
-		if (this.settings.useStrongholds && this.mapFeaturesEnabled) {
-			this.strongholdGenerator.generate(this, this.worldObj, i, j, chunkprimer);
-		}
-
-		if (this.settings.useTemples && this.mapFeaturesEnabled) {
-			this.scatteredFeatureGenerator.generate(this, this.worldObj, i, j, chunkprimer);
-		}
-
-		if (this.settings.useMonuments && this.mapFeaturesEnabled) {
-			this.oceanMonumentGenerator.generate(this, this.worldObj, i, j, chunkprimer);
-		}
-
-		Chunk chunk = new Chunk(this.worldObj, chunkprimer, i, j);
-		byte[] abyte = chunk.getBiomeArray();
-
-		for (int k = 0; k < abyte.length; ++k) {
-			abyte[k] = (byte) this.biomesForGeneration[k].biomeID;
-		}
-
-		chunk.generateSkylightMap();
-		return chunk;
+	/**
+	 * + Checks to see if a chunk exists at x, z
+	 */
+	public boolean chunkExists(int var1, int var2) {
+		return true;
 	}
 
 	private void func_147423_a(int parInt1, int parInt2, int parInt3) {
+
 		this.field_147426_g = this.noiseGen6.generateNoiseOctaves(this.field_147426_g, parInt1, parInt3, 5, 5,
 				(double) this.settings.depthNoiseScaleX, (double) this.settings.depthNoiseScaleZ,
 				(double) this.settings.depthNoiseScaleExponent);
@@ -343,20 +232,60 @@ public class ChunkProviderGenerate implements IChunkProvider {
 					this.field_147434_q[i] = d5;
 					++i;
 				}
+
 			}
+
 		}
 
 	}
 
-	/**+
-	 * Checks to see if a chunk exists at x, z
-	 */
-	public boolean chunkExists(int var1, int var2) {
-		return true;
+	public boolean func_177460_a(IChunkProvider var1, Chunk chunk, int i, int j) {
+		boolean flag = false;
+		if (this.settings.useMonuments && this.mapFeaturesEnabled && chunk.getInhabitedTime() < 3600L) {
+			flag |= this.oceanMonumentGenerator.generateStructure(this.worldObj, this.rand,
+					new ChunkCoordIntPair(i, j));
+		}
+
+		return flag;
 	}
 
-	/**+
-	 * Populates chunk with ores etc etc
+	public int getLoadedChunkCount() {
+		return 0;
+	}
+
+	public List<BiomeGenBase.SpawnListEntry> getPossibleCreatures(EnumCreatureType enumcreaturetype,
+			BlockPos blockpos) {
+		BiomeGenBase biomegenbase = this.worldObj.getBiomeGenForCoords(blockpos);
+		if (this.mapFeaturesEnabled) {
+			if (enumcreaturetype == EnumCreatureType.MONSTER
+					&& this.scatteredFeatureGenerator.func_175798_a(blockpos)) {
+				return this.scatteredFeatureGenerator.getScatteredFeatureSpawnList();
+			}
+
+			if (enumcreaturetype == EnumCreatureType.MONSTER && this.settings.useMonuments
+					&& this.oceanMonumentGenerator.func_175796_a(this.worldObj, blockpos)) {
+				return this.oceanMonumentGenerator.func_175799_b();
+			}
+		}
+
+		return biomegenbase.getSpawnableList(enumcreaturetype);
+	}
+
+	public BlockPos getStrongholdGen(World world, String s, BlockPos blockpos) {
+		return "Stronghold".equals(s) && this.strongholdGenerator != null
+				? this.strongholdGenerator.getClosestStrongholdPos(world, blockpos)
+				: null;
+	}
+
+	/**
+	 * + Converts the instance data to a readable string.
+	 */
+	public String makeString() {
+		return "RandomLevelSource";
+	}
+
+	/**
+	 * + Populates chunk with ores etc etc
 	 */
 	public void populate(IChunkProvider var1, int i, int j) {
 		BlockFalling.fallInstantly = true;
@@ -437,81 +366,64 @@ public class ChunkProviderGenerate implements IChunkProvider {
 		BlockFalling.fallInstantly = false;
 	}
 
-	public boolean func_177460_a(IChunkProvider var1, Chunk chunk, int i, int j) {
-		boolean flag = false;
-		if (this.settings.useMonuments && this.mapFeaturesEnabled && chunk.getInhabitedTime() < 3600L) {
-			flag |= this.oceanMonumentGenerator.generateStructure(this.worldObj, this.rand,
-					new ChunkCoordIntPair(i, j));
+	/**
+	 * + Will return back a chunk, if it doesn't exist and its not a MP client it
+	 * will generates all the blocks for the specified chunk from the map seed and
+	 * chunk seed
+	 */
+	public Chunk provideChunk(BlockPos blockpos) {
+		return this.provideChunk(blockpos.getX() >> 4, blockpos.getZ() >> 4);
+	}
+
+	/**
+	 * + Will return back a chunk, if it doesn't exist and its not a MP client it
+	 * will generates all the blocks for the specified chunk from the map seed and
+	 * chunk seed
+	 */
+	public Chunk provideChunk(int i, int j) {
+		this.rand.setSeed((long) i * 341873128712L + (long) j * 132897987541L);
+		ChunkPrimer chunkprimer = new ChunkPrimer();
+		this.setBlocksInChunk(i, j, chunkprimer);
+		this.biomesForGeneration = this.worldObj.getWorldChunkManager().loadBlockGeneratorData(this.biomesForGeneration,
+				i * 16, j * 16, 16, 16);
+		this.replaceBlocksForBiome(i, j, chunkprimer, this.biomesForGeneration);
+		if (this.settings.useCaves) {
+			this.caveGenerator.generate(this, this.worldObj, i, j, chunkprimer);
 		}
 
-		return flag;
-	}
-
-	/**+
-	 * Two modes of operation: if passed true, save all Chunks in
-	 * one go. If passed false, save up to two chunks. Return true
-	 * if all chunks have been saved.
-	 */
-	public boolean saveChunks(boolean var1, IProgressUpdate var2) {
-		return true;
-	}
-
-	/**+
-	 * Save extra data not associated with any Chunk. Not saved
-	 * during autosave, only during world unload. Currently
-	 * unimplemented.
-	 */
-	public void saveExtraData() {
-	}
-
-	/**+
-	 * Unloads chunks that are marked to be unloaded. This is not
-	 * guaranteed to unload every such chunk.
-	 */
-	public boolean unloadQueuedChunks() {
-		return false;
-	}
-
-	/**+
-	 * Returns if the IChunkProvider supports saving.
-	 */
-	public boolean canSave() {
-		return true;
-	}
-
-	/**+
-	 * Converts the instance data to a readable string.
-	 */
-	public String makeString() {
-		return "RandomLevelSource";
-	}
-
-	public List<BiomeGenBase.SpawnListEntry> getPossibleCreatures(EnumCreatureType enumcreaturetype,
-			BlockPos blockpos) {
-		BiomeGenBase biomegenbase = this.worldObj.getBiomeGenForCoords(blockpos);
-		if (this.mapFeaturesEnabled) {
-			if (enumcreaturetype == EnumCreatureType.MONSTER
-					&& this.scatteredFeatureGenerator.func_175798_a(blockpos)) {
-				return this.scatteredFeatureGenerator.getScatteredFeatureSpawnList();
-			}
-
-			if (enumcreaturetype == EnumCreatureType.MONSTER && this.settings.useMonuments
-					&& this.oceanMonumentGenerator.func_175796_a(this.worldObj, blockpos)) {
-				return this.oceanMonumentGenerator.func_175799_b();
-			}
+		if (this.settings.useRavines) {
+			this.ravineGenerator.generate(this, this.worldObj, i, j, chunkprimer);
 		}
 
-		return biomegenbase.getSpawnableList(enumcreaturetype);
-	}
+		if (this.settings.useMineShafts && this.mapFeaturesEnabled) {
+			this.mineshaftGenerator.generate(this, this.worldObj, i, j, chunkprimer);
+		}
 
-	public BlockPos getStrongholdGen(World world, String s, BlockPos blockpos) {
-		return "Stronghold".equals(s) && this.strongholdGenerator != null
-				? this.strongholdGenerator.getClosestStrongholdPos(world, blockpos)
-				: null;
-	}
+		if (this.settings.useVillages && this.mapFeaturesEnabled) {
+			this.villageGenerator.generate(this, this.worldObj, i, j, chunkprimer);
+		}
 
-	public int getLoadedChunkCount() {
-		return 0;
+		if (this.settings.useStrongholds && this.mapFeaturesEnabled) {
+			this.strongholdGenerator.generate(this, this.worldObj, i, j, chunkprimer);
+		}
+
+		if (this.settings.useTemples && this.mapFeaturesEnabled) {
+			this.scatteredFeatureGenerator.generate(this, this.worldObj, i, j, chunkprimer);
+		}
+
+		if (this.settings.useMonuments && this.mapFeaturesEnabled) {
+			this.oceanMonumentGenerator.generate(this, this.worldObj, i, j, chunkprimer);
+		}
+
+		Chunk chunk = new Chunk(this.worldObj, chunkprimer, i, j);
+		byte[] abyte = chunk.getBiomeArray();
+
+		for (int k = 0; k < abyte.length; ++k) {
+			abyte[k] = (byte) this.biomesForGeneration[k].biomeID;
+		}
+
+		chunk.generateSkylightMap();
+		return chunk;
 	}
 
 	public void recreateStructures(Chunk var1, int i, int j) {
@@ -537,12 +449,124 @@ public class ChunkProviderGenerate implements IChunkProvider {
 
 	}
 
-	/**+
-	 * Will return back a chunk, if it doesn't exist and its not a
-	 * MP client it will generates all the blocks for the specified
-	 * chunk from the map seed and chunk seed
+	public void replaceBlocksForBiome(int parInt1, int parInt2, ChunkPrimer parChunkPrimer,
+			BiomeGenBase[] parArrayOfBiomeGenBase) {
+		double d0 = 0.03125D;
+		this.stoneNoise = this.field_147430_m.func_151599_a(this.stoneNoise, (double) (parInt1 * 16),
+				(double) (parInt2 * 16), 16, 16, d0 * 2.0D, d0 * 2.0D, 1.0D);
+
+		for (int i = 0; i < 16; ++i) {
+			for (int j = 0; j < 16; ++j) {
+				BiomeGenBase biomegenbase = parArrayOfBiomeGenBase[j + i * 16];
+				biomegenbase.genTerrainBlocks(this.worldObj, this.rand, parChunkPrimer, parInt1 * 16 + i,
+						parInt2 * 16 + j, this.stoneNoise[j + i * 16]);
+			}
+		}
+
+	}
+
+	/**
+	 * + Two modes of operation: if passed true, save all Chunks in one go. If
+	 * passed false, save up to two chunks. Return true if all chunks have been
+	 * saved.
 	 */
-	public Chunk provideChunk(BlockPos blockpos) {
-		return this.provideChunk(blockpos.getX() >> 4, blockpos.getZ() >> 4);
+	public boolean saveChunks(boolean var1, IProgressUpdate var2) {
+		return true;
+	}
+
+	/**
+	 * + Save extra data not associated with any Chunk. Not saved during autosave,
+	 * only during world unload. Currently unimplemented.
+	 */
+	public void saveExtraData() {
+	}
+
+	public void setBlocksInChunk(int parInt1, int parInt2, ChunkPrimer parChunkPrimer) {
+		this.biomesForGeneration = this.worldObj.getWorldChunkManager().getBiomesForGeneration(this.biomesForGeneration,
+				parInt1 * 4 - 2, parInt2 * 4 - 2, 10, 10);
+		this.func_147423_a(parInt1 * 4, 0, parInt2 * 4);
+
+		for (int i = 0; i < 4; ++i) {
+			int j = i * 5;
+			int k = (i + 1) * 5;
+
+			for (int l = 0; l < 4; ++l) {
+				int i1 = (j + l) * 33;
+				int j1 = (j + l + 1) * 33;
+				int k1 = (k + l) * 33;
+				int l1 = (k + l + 1) * 33;
+
+				for (int i2 = 0; i2 < 32; ++i2) {
+					double d0 = 0.125D;
+					double d1 = this.field_147434_q[i1 + i2];
+					double d2 = this.field_147434_q[j1 + i2];
+					double d3 = this.field_147434_q[k1 + i2];
+					double d4 = this.field_147434_q[l1 + i2];
+					double d5 = (this.field_147434_q[i1 + i2 + 1] - d1) * d0;
+					double d6 = (this.field_147434_q[j1 + i2 + 1] - d2) * d0;
+					double d7 = (this.field_147434_q[k1 + i2 + 1] - d3) * d0;
+					double d8 = (this.field_147434_q[l1 + i2 + 1] - d4) * d0;
+
+					for (int j2 = 0; j2 < 8; ++j2) {
+						double d9 = 0.25D;
+						double d10 = d1;
+						double d11 = d2;
+						double d12 = (d3 - d1) * d9;
+						double d13 = (d4 - d2) * d9;
+
+						for (int k2 = 0; k2 < 4; ++k2) {
+							double d14 = 0.25D;
+							double d16 = (d11 - d10) * d14;
+							double d15 = d10 - d16;
+
+							for (int l2 = 0; l2 < 4; ++l2) {
+								if ((d15 += d16) > 0.0D) {
+									if (i2 * 8 + j2 < 25) {
+										if (i2 * 8 + j2 > 22) {
+											EaglercraftRandom blend = new EaglercraftRandom();
+											int blendAmount = blend.nextInt(4);
+
+											if (blendAmount == 3) {
+												parChunkPrimer.setBlockState(i * 4 + k2, i2 * 8 + j2, l * 4 + l2,
+														Blocks.stone.getDefaultState());
+											} else {
+												parChunkPrimer.setBlockState(i * 4 + k2, i2 * 8 + j2, l * 4 + l2,
+														Blocks.deepstone.getDefaultState());
+											}
+										} else {
+											parChunkPrimer.setBlockState(i * 4 + k2, i2 * 8 + j2, l * 4 + l2,
+													Blocks.deepstone.getDefaultState());
+										}
+									} else {
+										parChunkPrimer.setBlockState(i * 4 + k2, i2 * 8 + j2, l * 4 + l2,
+												Blocks.stone.getDefaultState());
+									}
+								} else if (i2 * 8 + j2 < this.settings.seaLevel) {
+									parChunkPrimer.setBlockState(i * 4 + k2, i2 * 8 + j2, l * 4 + l2,
+											this.field_177476_s.getDefaultState());
+								}
+							}
+
+							d10 += d12;
+							d11 += d13;
+						}
+
+						d1 += d5;
+						d2 += d6;
+						d3 += d7;
+						d4 += d8;
+					}
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * + Unloads chunks that are marked to be unloaded. This is not guaranteed to
+	 * unload every such chunk.
+	 */
+	public boolean unloadQueuedChunks() {
+		return false;
 	}
 }

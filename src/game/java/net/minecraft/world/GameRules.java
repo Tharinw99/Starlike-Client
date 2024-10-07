@@ -5,27 +5,88 @@ import java.util.TreeMap;
 
 import net.minecraft.nbt.NBTTagCompound;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class GameRules {
+	static class Value {
+		private String valueString;
+		private boolean valueBoolean;
+		private int valueInteger;
+		private double valueDouble;
+		private final GameRules.ValueType type;
+
+		public Value(String value, GameRules.ValueType type) {
+			this.type = type;
+			this.setValue(value);
+		}
+
+		/**
+		 * + Gets the boolean Game Rule value.
+		 */
+		public boolean getBoolean() {
+			return this.valueBoolean;
+		}
+
+		public int getInt() {
+			return this.valueInteger;
+		}
+
+		/**
+		 * + Gets the string Game Rule value.
+		 */
+		public String getString() {
+			return this.valueString;
+		}
+
+		public GameRules.ValueType getType() {
+			return this.type;
+		}
+
+		public void setValue(String value) {
+			this.valueString = value;
+			this.valueBoolean = Boolean.parseBoolean(value);
+			this.valueInteger = this.valueBoolean ? 1 : 0;
+
+			try {
+				this.valueInteger = Integer.parseInt(value);
+			} catch (NumberFormatException var4) {
+				;
+			}
+
+			try {
+				this.valueDouble = Double.parseDouble(value);
+			} catch (NumberFormatException var3) {
+				;
+			}
+
+		}
+	}
+
+	public static enum ValueType {
+		ANY_VALUE, BOOLEAN_VALUE, NUMERICAL_VALUE;
+	}
+
 	private TreeMap<String, GameRules.Value> theGameRules = new TreeMap();
 
 	public GameRules() {
@@ -57,26 +118,14 @@ public class GameRules {
 		this.theGameRules.put(key, new GameRules.Value(value, type));
 	}
 
-	public void setOrCreateGameRule(String key, String ruleValue) {
+	public boolean areSameType(String key, GameRules.ValueType otherValue) {
 		GameRules.Value gamerules$value = (GameRules.Value) this.theGameRules.get(key);
-		if (gamerules$value != null) {
-			gamerules$value.setValue(ruleValue);
-		} else {
-			this.addGameRule(key, ruleValue, GameRules.ValueType.ANY_VALUE);
-		}
-
+		return gamerules$value != null
+				&& (gamerules$value.getType() == otherValue || otherValue == GameRules.ValueType.ANY_VALUE);
 	}
 
-	/**+
-	 * Gets the string Game Rule value.
-	 */
-	public String getString(String name) {
-		GameRules.Value gamerules$value = (GameRules.Value) this.theGameRules.get(name);
-		return gamerules$value != null ? gamerules$value.getString() : "";
-	}
-
-	/**+
-	 * Gets the boolean Game Rule value.
+	/**
+	 * + Gets the boolean Game Rule value.
 	 */
 	public boolean getBoolean(String name) {
 		GameRules.Value gamerules$value = (GameRules.Value) this.theGameRules.get(name);
@@ -88,8 +137,52 @@ public class GameRules {
 		return gamerules$value != null ? gamerules$value.getInt() : 0;
 	}
 
-	/**+
-	 * Return the defined game rules as NBT.
+	/**
+	 * + Return the defined game rules.
+	 */
+	public String[] getRules() {
+		Set set = this.theGameRules.keySet();
+		return (String[]) set.toArray(new String[set.size()]);
+	}
+
+	/**
+	 * + Gets the string Game Rule value.
+	 */
+	public String getString(String name) {
+		GameRules.Value gamerules$value = (GameRules.Value) this.theGameRules.get(name);
+		return gamerules$value != null ? gamerules$value.getString() : "";
+	}
+
+	/**
+	 * + Return whether the specified game rule is defined.
+	 */
+	public boolean hasRule(String name) {
+		return this.theGameRules.containsKey(name);
+	}
+
+	/**
+	 * + Set defined game rules from NBT.
+	 */
+	public void readFromNBT(NBTTagCompound nbt) {
+		for (String s : nbt.getKeySet()) {
+			String s1 = nbt.getString(s);
+			this.setOrCreateGameRule(s, s1);
+		}
+
+	}
+
+	public void setOrCreateGameRule(String key, String ruleValue) {
+		GameRules.Value gamerules$value = (GameRules.Value) this.theGameRules.get(key);
+		if (gamerules$value != null) {
+			gamerules$value.setValue(ruleValue);
+		} else {
+			this.addGameRule(key, ruleValue, GameRules.ValueType.ANY_VALUE);
+		}
+
+	}
+
+	/**
+	 * + Return the defined game rules as NBT.
 	 */
 	public NBTTagCompound writeToNBT() {
 		NBTTagCompound nbttagcompound = new NBTTagCompound();
@@ -100,95 +193,5 @@ public class GameRules {
 		}
 
 		return nbttagcompound;
-	}
-
-	/**+
-	 * Set defined game rules from NBT.
-	 */
-	public void readFromNBT(NBTTagCompound nbt) {
-		for (String s : nbt.getKeySet()) {
-			String s1 = nbt.getString(s);
-			this.setOrCreateGameRule(s, s1);
-		}
-
-	}
-
-	/**+
-	 * Return the defined game rules.
-	 */
-	public String[] getRules() {
-		Set set = this.theGameRules.keySet();
-		return (String[]) set.toArray(new String[set.size()]);
-	}
-
-	/**+
-	 * Return whether the specified game rule is defined.
-	 */
-	public boolean hasRule(String name) {
-		return this.theGameRules.containsKey(name);
-	}
-
-	public boolean areSameType(String key, GameRules.ValueType otherValue) {
-		GameRules.Value gamerules$value = (GameRules.Value) this.theGameRules.get(key);
-		return gamerules$value != null
-				&& (gamerules$value.getType() == otherValue || otherValue == GameRules.ValueType.ANY_VALUE);
-	}
-
-	static class Value {
-		private String valueString;
-		private boolean valueBoolean;
-		private int valueInteger;
-		private double valueDouble;
-		private final GameRules.ValueType type;
-
-		public Value(String value, GameRules.ValueType type) {
-			this.type = type;
-			this.setValue(value);
-		}
-
-		public void setValue(String value) {
-			this.valueString = value;
-			this.valueBoolean = Boolean.parseBoolean(value);
-			this.valueInteger = this.valueBoolean ? 1 : 0;
-
-			try {
-				this.valueInteger = Integer.parseInt(value);
-			} catch (NumberFormatException var4) {
-				;
-			}
-
-			try {
-				this.valueDouble = Double.parseDouble(value);
-			} catch (NumberFormatException var3) {
-				;
-			}
-
-		}
-
-		/**+
-		 * Gets the string Game Rule value.
-		 */
-		public String getString() {
-			return this.valueString;
-		}
-
-		/**+
-		 * Gets the boolean Game Rule value.
-		 */
-		public boolean getBoolean() {
-			return this.valueBoolean;
-		}
-
-		public int getInt() {
-			return this.valueInteger;
-		}
-
-		public GameRules.ValueType getType() {
-			return this.type;
-		}
-	}
-
-	public static enum ValueType {
-		ANY_VALUE, BOOLEAN_VALUE, NUMERICAL_VALUE;
 	}
 }

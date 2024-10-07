@@ -44,309 +44,159 @@ import com.google.common.annotations.GwtCompatible;
 @Beta
 @GwtCompatible
 public final class MapConstraints {
-	private MapConstraints() {
-	}
+	/** @see MapConstraints#constrainedAsMapEntries */
+	static class ConstrainedAsMapEntries<K, V> extends ForwardingSet<Entry<K, Collection<V>>> {
+		private final MapConstraint<? super K, ? super V> constraint;
+		private final Set<Entry<K, Collection<V>>> entries;
 
-	/**
-	 * Returns a constraint that verifies that neither the key nor the value is
-	 * null. If either is null, a {@link NullPointerException} is thrown.
-	 */
-	public static MapConstraint<Object, Object> notNull() {
-		return NotNullMapConstraint.INSTANCE;
-	}
-
-	// enum singleton pattern
-	private enum NotNullMapConstraint implements MapConstraint<Object, Object> {
-		INSTANCE;
-
-		@Override
-		public void checkKeyValue(Object key, Object value) {
-			checkNotNull(key);
-			checkNotNull(value);
+		ConstrainedAsMapEntries(Set<Entry<K, Collection<V>>> entries, MapConstraint<? super K, ? super V> constraint) {
+			this.entries = entries;
+			this.constraint = constraint;
 		}
 
 		@Override
-		public String toString() {
-			return "Not null";
-		}
-	}
-
-	/**
-	 * Returns a constrained view of the specified map, using the specified
-	 * constraint. Any operations that add new mappings will call the provided
-	 * constraint. However, this method does not verify that existing mappings
-	 * satisfy the constraint.
-	 *
-	 * <p>
-	 * The returned map is not serializable.
-	 *
-	 * @param map        the map to constrain
-	 * @param constraint the constraint that validates added entries
-	 * @return a constrained view of the specified map
-	 */
-	public static <K, V> Map<K, V> constrainedMap(Map<K, V> map, MapConstraint<? super K, ? super V> constraint) {
-		return new ConstrainedMap<K, V>(map, constraint);
-	}
-
-	/**
-	 * Returns a constrained view of the specified multimap, using the specified
-	 * constraint. Any operations that add new mappings will call the provided
-	 * constraint. However, this method does not verify that existing mappings
-	 * satisfy the constraint.
-	 *
-	 * <p>
-	 * Note that the generated multimap's {@link Multimap#removeAll} and
-	 * {@link Multimap#replaceValues} methods return collections that are not
-	 * constrained.
-	 *
-	 * <p>
-	 * The returned multimap is not serializable.
-	 *
-	 * @param multimap   the multimap to constrain
-	 * @param constraint the constraint that validates added entries
-	 * @return a constrained view of the multimap
-	 */
-	public static <K, V> Multimap<K, V> constrainedMultimap(Multimap<K, V> multimap,
-			MapConstraint<? super K, ? super V> constraint) {
-		return new ConstrainedMultimap<K, V>(multimap, constraint);
-	}
-
-	/**
-	 * Returns a constrained view of the specified list multimap, using the
-	 * specified constraint. Any operations that add new mappings will call the
-	 * provided constraint. However, this method does not verify that existing
-	 * mappings satisfy the constraint.
-	 *
-	 * <p>
-	 * Note that the generated multimap's {@link Multimap#removeAll} and
-	 * {@link Multimap#replaceValues} methods return collections that are not
-	 * constrained.
-	 *
-	 * <p>
-	 * The returned multimap is not serializable.
-	 *
-	 * @param multimap   the multimap to constrain
-	 * @param constraint the constraint that validates added entries
-	 * @return a constrained view of the specified multimap
-	 */
-	public static <K, V> ListMultimap<K, V> constrainedListMultimap(ListMultimap<K, V> multimap,
-			MapConstraint<? super K, ? super V> constraint) {
-		return new ConstrainedListMultimap<K, V>(multimap, constraint);
-	}
-
-	/**
-	 * Returns a constrained view of the specified set multimap, using the specified
-	 * constraint. Any operations that add new mappings will call the provided
-	 * constraint. However, this method does not verify that existing mappings
-	 * satisfy the constraint.
-	 *
-	 * <p>
-	 * Note that the generated multimap's {@link Multimap#removeAll} and
-	 * {@link Multimap#replaceValues} methods return collections that are not
-	 * constrained.
-	 * <p>
-	 * The returned multimap is not serializable.
-	 *
-	 * @param multimap   the multimap to constrain
-	 * @param constraint the constraint that validates added entries
-	 * @return a constrained view of the specified multimap
-	 */
-	public static <K, V> SetMultimap<K, V> constrainedSetMultimap(SetMultimap<K, V> multimap,
-			MapConstraint<? super K, ? super V> constraint) {
-		return new ConstrainedSetMultimap<K, V>(multimap, constraint);
-	}
-
-	/**
-	 * Returns a constrained view of the specified sorted-set multimap, using the
-	 * specified constraint. Any operations that add new mappings will call the
-	 * provided constraint. However, this method does not verify that existing
-	 * mappings satisfy the constraint.
-	 *
-	 * <p>
-	 * Note that the generated multimap's {@link Multimap#removeAll} and
-	 * {@link Multimap#replaceValues} methods return collections that are not
-	 * constrained.
-	 * <p>
-	 * The returned multimap is not serializable.
-	 *
-	 * @param multimap   the multimap to constrain
-	 * @param constraint the constraint that validates added entries
-	 * @return a constrained view of the specified multimap
-	 */
-	public static <K, V> SortedSetMultimap<K, V> constrainedSortedSetMultimap(SortedSetMultimap<K, V> multimap,
-			MapConstraint<? super K, ? super V> constraint) {
-		return new ConstrainedSortedSetMultimap<K, V>(multimap, constraint);
-	}
-
-	/**
-	 * Returns a constrained view of the specified entry, using the specified
-	 * constraint. The {@link Entry#setValue} operation will be verified with the
-	 * constraint.
-	 *
-	 * @param entry      the entry to constrain
-	 * @param constraint the constraint for the entry
-	 * @return a constrained view of the specified entry
-	 */
-	private static <K, V> Entry<K, V> constrainedEntry(final Entry<K, V> entry,
-			final MapConstraint<? super K, ? super V> constraint) {
-		checkNotNull(entry);
-		checkNotNull(constraint);
-		return new ForwardingMapEntry<K, V>() {
-			@Override
-			protected Entry<K, V> delegate() {
-				return entry;
-			}
-
-			@Override
-			public V setValue(V value) {
-				constraint.checkKeyValue(getKey(), value);
-				return entry.setValue(value);
-			}
-		};
-	}
-
-	/**
-	 * Returns a constrained view of the specified {@code asMap} entry, using the
-	 * specified constraint. The {@link Entry#setValue} operation will be verified
-	 * with the constraint, and the collection returned by {@link Entry#getValue}
-	 * will be similarly constrained.
-	 *
-	 * @param entry      the {@code asMap} entry to constrain
-	 * @param constraint the constraint for the entry
-	 * @return a constrained view of the specified entry
-	 */
-	private static <K, V> Entry<K, Collection<V>> constrainedAsMapEntry(final Entry<K, Collection<V>> entry,
-			final MapConstraint<? super K, ? super V> constraint) {
-		checkNotNull(entry);
-		checkNotNull(constraint);
-		return new ForwardingMapEntry<K, Collection<V>>() {
-			@Override
-			protected Entry<K, Collection<V>> delegate() {
-				return entry;
-			}
-
-			@Override
-			public Collection<V> getValue() {
-				return Constraints.constrainedTypePreservingCollection(entry.getValue(), new Constraint<V>() {
-					@Override
-					public V checkElement(V value) {
-						constraint.checkKeyValue(getKey(), value);
-						return value;
-					}
-				});
-			}
-		};
-	}
-
-	/**
-	 * Returns a constrained view of the specified set of {@code asMap} entries,
-	 * using the specified constraint. The {@link Entry#setValue} operation will be
-	 * verified with the constraint, and the collection returned by
-	 * {@link Entry#getValue} will be similarly constrained. The {@code add} and
-	 * {@code
-	 * addAll} operations simply forward to the underlying set, which throws an
-	 * {@link UnsupportedOperationException} per the multimap specification.
-	 *
-	 * @param entries    the entries to constrain
-	 * @param constraint the constraint for the entries
-	 * @return a constrained view of the entries
-	 */
-	private static <K, V> Set<Entry<K, Collection<V>>> constrainedAsMapEntries(Set<Entry<K, Collection<V>>> entries,
-			MapConstraint<? super K, ? super V> constraint) {
-		return new ConstrainedAsMapEntries<K, V>(entries, constraint);
-	}
-
-	/**
-	 * Returns a constrained view of the specified collection (or set) of entries,
-	 * using the specified constraint. The {@link Entry#setValue} operation will be
-	 * verified with the constraint, along with add operations on the returned
-	 * collection. The {@code add} and {@code addAll} operations simply forward to
-	 * the underlying collection, which throws an
-	 * {@link UnsupportedOperationException} per the map and multimap specification.
-	 *
-	 * @param entries    the entries to constrain
-	 * @param constraint the constraint for the entries
-	 * @return a constrained view of the specified entries
-	 */
-	private static <K, V> Collection<Entry<K, V>> constrainedEntries(Collection<Entry<K, V>> entries,
-			MapConstraint<? super K, ? super V> constraint) {
-		if (entries instanceof Set) {
-			return constrainedEntrySet((Set<Entry<K, V>>) entries, constraint);
-		}
-		return new ConstrainedEntries<K, V>(entries, constraint);
-	}
-
-	/**
-	 * Returns a constrained view of the specified set of entries, using the
-	 * specified constraint. The {@link Entry#setValue} operation will be verified
-	 * with the constraint, along with add operations on the returned set. The
-	 * {@code add} and {@code addAll} operations simply forward to the underlying
-	 * set, which throws an {@link UnsupportedOperationException} per the map and
-	 * multimap specification.
-	 *
-	 * <p>
-	 * The returned multimap is not serializable.
-	 *
-	 * @param entries    the entries to constrain
-	 * @param constraint the constraint for the entries
-	 * @return a constrained view of the specified entries
-	 */
-	private static <K, V> Set<Entry<K, V>> constrainedEntrySet(Set<Entry<K, V>> entries,
-			MapConstraint<? super K, ? super V> constraint) {
-		return new ConstrainedEntrySet<K, V>(entries, constraint);
-	}
-
-	/** @see MapConstraints#constrainedMap */
-	static class ConstrainedMap<K, V> extends ForwardingMap<K, V> {
-		private final Map<K, V> delegate;
-		final MapConstraint<? super K, ? super V> constraint;
-		private transient Set<Entry<K, V>> entrySet;
-
-		ConstrainedMap(Map<K, V> delegate, MapConstraint<? super K, ? super V> constraint) {
-			this.delegate = checkNotNull(delegate);
-			this.constraint = checkNotNull(constraint);
+		public boolean contains(Object o) {
+			return Maps.containsEntryImpl(delegate(), o);
 		}
 
 		@Override
-		protected Map<K, V> delegate() {
+		public boolean containsAll(Collection<?> c) {
+			return standardContainsAll(c);
+		}
+
+		// See Collections.CheckedMap.CheckedEntrySet for details on attacks.
+
+		@Override
+		protected Set<Entry<K, Collection<V>>> delegate() {
+			return entries;
+		}
+
+		@Override
+		public boolean equals(@Nullable Object object) {
+			return standardEquals(object);
+		}
+
+		@Override
+		public int hashCode() {
+			return standardHashCode();
+		}
+
+		@Override
+		public Iterator<Entry<K, Collection<V>>> iterator() {
+			final Iterator<Entry<K, Collection<V>>> iterator = entries.iterator();
+			return new ForwardingIterator<Entry<K, Collection<V>>>() {
+				@Override
+				protected Iterator<Entry<K, Collection<V>>> delegate() {
+					return iterator;
+				}
+
+				@Override
+				public Entry<K, Collection<V>> next() {
+					return constrainedAsMapEntry(iterator.next(), constraint);
+				}
+			};
+		}
+
+		@Override
+		public boolean remove(Object o) {
+			return Maps.removeEntryImpl(delegate(), o);
+		}
+
+		@Override
+		public boolean removeAll(Collection<?> c) {
+			return standardRemoveAll(c);
+		}
+
+		@Override
+		public boolean retainAll(Collection<?> c) {
+			return standardRetainAll(c);
+		}
+
+		@Override
+		public Object[] toArray() {
+			return standardToArray();
+		}
+
+		@Override
+		public <T> T[] toArray(T[] array) {
+			return standardToArray(array);
+		}
+	}
+
+	/** @see ConstrainedMultimap#asMap */
+	private static class ConstrainedAsMapValues<K, V> extends ForwardingCollection<Collection<V>> {
+		final Collection<Collection<V>> delegate;
+		final Set<Entry<K, Collection<V>>> entrySet;
+
+		/**
+		 * @param entrySet map entries, linking each key with its corresponding values,
+		 *                 that already enforce the constraint
+		 */
+		ConstrainedAsMapValues(Collection<Collection<V>> delegate, Set<Entry<K, Collection<V>>> entrySet) {
+			this.delegate = delegate;
+			this.entrySet = entrySet;
+		}
+
+		@Override
+		public boolean contains(Object o) {
+			return standardContains(o);
+		}
+
+		@Override
+		public boolean containsAll(Collection<?> c) {
+			return standardContainsAll(c);
+		}
+
+		@Override
+		protected Collection<Collection<V>> delegate() {
 			return delegate;
 		}
 
 		@Override
-		public Set<Entry<K, V>> entrySet() {
-			Set<Entry<K, V>> result = entrySet;
-			if (result == null) {
-				entrySet = result = constrainedEntrySet(delegate.entrySet(), constraint);
-			}
-			return result;
+		public Iterator<Collection<V>> iterator() {
+			final Iterator<Entry<K, Collection<V>>> iterator = entrySet.iterator();
+			return new Iterator<Collection<V>>() {
+				@Override
+				public boolean hasNext() {
+					return iterator.hasNext();
+				}
+
+				@Override
+				public Collection<V> next() {
+					return iterator.next().getValue();
+				}
+
+				@Override
+				public void remove() {
+					iterator.remove();
+				}
+			};
 		}
 
 		@Override
-		public V put(K key, V value) {
-			constraint.checkKeyValue(key, value);
-			return delegate.put(key, value);
+		public boolean remove(Object o) {
+			return standardRemove(o);
 		}
 
 		@Override
-		public void putAll(Map<? extends K, ? extends V> map) {
-			delegate.putAll(checkMap(map, constraint));
+		public boolean removeAll(Collection<?> c) {
+			return standardRemoveAll(c);
 		}
-	}
 
-	/**
-	 * Returns a constrained view of the specified bimap, using the specified
-	 * constraint. Any operations that modify the bimap will have the associated
-	 * keys and values verified with the constraint.
-	 *
-	 * <p>
-	 * The returned bimap is not serializable.
-	 *
-	 * @param map        the bimap to constrain
-	 * @param constraint the constraint that validates added entries
-	 * @return a constrained view of the specified bimap
-	 */
-	public static <K, V> BiMap<K, V> constrainedBiMap(BiMap<K, V> map, MapConstraint<? super K, ? super V> constraint) {
-		return new ConstrainedBiMap<K, V>(map, null, constraint);
+		@Override
+		public boolean retainAll(Collection<?> c) {
+			return standardRetainAll(c);
+		}
+
+		@Override
+		public Object[] toArray() {
+			return standardToArray();
+		}
+
+		@Override
+		public <T> T[] toArray(T[] array) {
+			return standardToArray(array);
+		}
 	}
 
 	/** @see MapConstraints#constrainedBiMap */
@@ -397,17 +247,149 @@ public final class MapConstraints {
 		}
 	}
 
-	/** @see MapConstraints#constrainedBiMap */
-	private static class InverseConstraint<K, V> implements MapConstraint<K, V> {
-		final MapConstraint<? super V, ? super K> constraint;
+	/** @see MapConstraints#constrainedEntries */
+	private static class ConstrainedEntries<K, V> extends ForwardingCollection<Entry<K, V>> {
+		final MapConstraint<? super K, ? super V> constraint;
+		final Collection<Entry<K, V>> entries;
 
-		public InverseConstraint(MapConstraint<? super V, ? super K> constraint) {
+		ConstrainedEntries(Collection<Entry<K, V>> entries, MapConstraint<? super K, ? super V> constraint) {
+			this.entries = entries;
+			this.constraint = constraint;
+		}
+
+		@Override
+		public boolean contains(Object o) {
+			return Maps.containsEntryImpl(delegate(), o);
+		}
+
+		@Override
+		public boolean containsAll(Collection<?> c) {
+			return standardContainsAll(c);
+		}
+
+		// See Collections.CheckedMap.CheckedEntrySet for details on attacks.
+
+		@Override
+		protected Collection<Entry<K, V>> delegate() {
+			return entries;
+		}
+
+		@Override
+		public Iterator<Entry<K, V>> iterator() {
+			final Iterator<Entry<K, V>> iterator = entries.iterator();
+			return new ForwardingIterator<Entry<K, V>>() {
+				@Override
+				protected Iterator<Entry<K, V>> delegate() {
+					return iterator;
+				}
+
+				@Override
+				public Entry<K, V> next() {
+					return constrainedEntry(iterator.next(), constraint);
+				}
+			};
+		}
+
+		@Override
+		public boolean remove(Object o) {
+			return Maps.removeEntryImpl(delegate(), o);
+		}
+
+		@Override
+		public boolean removeAll(Collection<?> c) {
+			return standardRemoveAll(c);
+		}
+
+		@Override
+		public boolean retainAll(Collection<?> c) {
+			return standardRetainAll(c);
+		}
+
+		@Override
+		public Object[] toArray() {
+			return standardToArray();
+		}
+
+		@Override
+		public <T> T[] toArray(T[] array) {
+			return standardToArray(array);
+		}
+	}
+
+	/** @see MapConstraints#constrainedEntrySet */
+	static class ConstrainedEntrySet<K, V> extends ConstrainedEntries<K, V> implements Set<Entry<K, V>> {
+		ConstrainedEntrySet(Set<Entry<K, V>> entries, MapConstraint<? super K, ? super V> constraint) {
+			super(entries, constraint);
+		}
+
+		// See Collections.CheckedMap.CheckedEntrySet for details on attacks.
+
+		@Override
+		public boolean equals(@Nullable Object object) {
+			return Sets.equalsImpl(this, object);
+		}
+
+		@Override
+		public int hashCode() {
+			return Sets.hashCodeImpl(this);
+		}
+	}
+
+	private static class ConstrainedListMultimap<K, V> extends ConstrainedMultimap<K, V> implements ListMultimap<K, V> {
+		ConstrainedListMultimap(ListMultimap<K, V> delegate, MapConstraint<? super K, ? super V> constraint) {
+			super(delegate, constraint);
+		}
+
+		@Override
+		public List<V> get(K key) {
+			return (List<V>) super.get(key);
+		}
+
+		@Override
+		public List<V> removeAll(Object key) {
+			return (List<V>) super.removeAll(key);
+		}
+
+		@Override
+		public List<V> replaceValues(K key, Iterable<? extends V> values) {
+			return (List<V>) super.replaceValues(key, values);
+		}
+	}
+
+	/** @see MapConstraints#constrainedMap */
+	static class ConstrainedMap<K, V> extends ForwardingMap<K, V> {
+		private final Map<K, V> delegate;
+		final MapConstraint<? super K, ? super V> constraint;
+		private transient Set<Entry<K, V>> entrySet;
+
+		ConstrainedMap(Map<K, V> delegate, MapConstraint<? super K, ? super V> constraint) {
+			this.delegate = checkNotNull(delegate);
 			this.constraint = checkNotNull(constraint);
 		}
 
 		@Override
-		public void checkKeyValue(K key, V value) {
-			constraint.checkKeyValue(value, key);
+		protected Map<K, V> delegate() {
+			return delegate;
+		}
+
+		@Override
+		public Set<Entry<K, V>> entrySet() {
+			Set<Entry<K, V>> result = entrySet;
+			if (result == null) {
+				entrySet = result = constrainedEntrySet(delegate.entrySet(), constraint);
+			}
+			return result;
+		}
+
+		@Override
+		public V put(K key, V value) {
+			constraint.checkKeyValue(key, value);
+			return delegate.put(key, value);
+		}
+
+		@Override
+		public void putAll(Map<? extends K, ? extends V> map) {
+			delegate.putAll(checkMap(map, constraint));
 		}
 	}
 
@@ -424,11 +406,6 @@ public final class MapConstraints {
 		}
 
 		@Override
-		protected Multimap<K, V> delegate() {
-			return delegate;
-		}
-
-		@Override
 		public Map<K, Collection<V>> asMap() {
 			Map<K, Collection<V>> result = asMap;
 			if (result == null) {
@@ -437,6 +414,11 @@ public final class MapConstraints {
 				asMap = result = new ForwardingMap<K, Collection<V>>() {
 					Set<Entry<K, Collection<V>>> entrySet;
 					Collection<Collection<V>> values;
+
+					@Override
+					public boolean containsValue(Object o) {
+						return values().contains(o);
+					}
 
 					@Override
 					protected Map<K, Collection<V>> delegate() {
@@ -471,14 +453,14 @@ public final class MapConstraints {
 						}
 						return result;
 					}
-
-					@Override
-					public boolean containsValue(Object o) {
-						return values().contains(o);
-					}
 				};
 			}
 			return result;
+		}
+
+		@Override
+		protected Multimap<K, V> delegate() {
+			return delegate;
 		}
 
 		@Override
@@ -527,283 +509,19 @@ public final class MapConstraints {
 		}
 	}
 
-	/** @see ConstrainedMultimap#asMap */
-	private static class ConstrainedAsMapValues<K, V> extends ForwardingCollection<Collection<V>> {
-		final Collection<Collection<V>> delegate;
-		final Set<Entry<K, Collection<V>>> entrySet;
-
-		/**
-		 * @param entrySet map entries, linking each key with its corresponding values,
-		 *                 that already enforce the constraint
-		 */
-		ConstrainedAsMapValues(Collection<Collection<V>> delegate, Set<Entry<K, Collection<V>>> entrySet) {
-			this.delegate = delegate;
-			this.entrySet = entrySet;
-		}
-
-		@Override
-		protected Collection<Collection<V>> delegate() {
-			return delegate;
-		}
-
-		@Override
-		public Iterator<Collection<V>> iterator() {
-			final Iterator<Entry<K, Collection<V>>> iterator = entrySet.iterator();
-			return new Iterator<Collection<V>>() {
-				@Override
-				public boolean hasNext() {
-					return iterator.hasNext();
-				}
-
-				@Override
-				public Collection<V> next() {
-					return iterator.next().getValue();
-				}
-
-				@Override
-				public void remove() {
-					iterator.remove();
-				}
-			};
-		}
-
-		@Override
-		public Object[] toArray() {
-			return standardToArray();
-		}
-
-		@Override
-		public <T> T[] toArray(T[] array) {
-			return standardToArray(array);
-		}
-
-		@Override
-		public boolean contains(Object o) {
-			return standardContains(o);
-		}
-
-		@Override
-		public boolean containsAll(Collection<?> c) {
-			return standardContainsAll(c);
-		}
-
-		@Override
-		public boolean remove(Object o) {
-			return standardRemove(o);
-		}
-
-		@Override
-		public boolean removeAll(Collection<?> c) {
-			return standardRemoveAll(c);
-		}
-
-		@Override
-		public boolean retainAll(Collection<?> c) {
-			return standardRetainAll(c);
-		}
-	}
-
-	/** @see MapConstraints#constrainedEntries */
-	private static class ConstrainedEntries<K, V> extends ForwardingCollection<Entry<K, V>> {
-		final MapConstraint<? super K, ? super V> constraint;
-		final Collection<Entry<K, V>> entries;
-
-		ConstrainedEntries(Collection<Entry<K, V>> entries, MapConstraint<? super K, ? super V> constraint) {
-			this.entries = entries;
-			this.constraint = constraint;
-		}
-
-		@Override
-		protected Collection<Entry<K, V>> delegate() {
-			return entries;
-		}
-
-		@Override
-		public Iterator<Entry<K, V>> iterator() {
-			final Iterator<Entry<K, V>> iterator = entries.iterator();
-			return new ForwardingIterator<Entry<K, V>>() {
-				@Override
-				public Entry<K, V> next() {
-					return constrainedEntry(iterator.next(), constraint);
-				}
-
-				@Override
-				protected Iterator<Entry<K, V>> delegate() {
-					return iterator;
-				}
-			};
-		}
-
-		// See Collections.CheckedMap.CheckedEntrySet for details on attacks.
-
-		@Override
-		public Object[] toArray() {
-			return standardToArray();
-		}
-
-		@Override
-		public <T> T[] toArray(T[] array) {
-			return standardToArray(array);
-		}
-
-		@Override
-		public boolean contains(Object o) {
-			return Maps.containsEntryImpl(delegate(), o);
-		}
-
-		@Override
-		public boolean containsAll(Collection<?> c) {
-			return standardContainsAll(c);
-		}
-
-		@Override
-		public boolean remove(Object o) {
-			return Maps.removeEntryImpl(delegate(), o);
-		}
-
-		@Override
-		public boolean removeAll(Collection<?> c) {
-			return standardRemoveAll(c);
-		}
-
-		@Override
-		public boolean retainAll(Collection<?> c) {
-			return standardRetainAll(c);
-		}
-	}
-
-	/** @see MapConstraints#constrainedEntrySet */
-	static class ConstrainedEntrySet<K, V> extends ConstrainedEntries<K, V> implements Set<Entry<K, V>> {
-		ConstrainedEntrySet(Set<Entry<K, V>> entries, MapConstraint<? super K, ? super V> constraint) {
-			super(entries, constraint);
-		}
-
-		// See Collections.CheckedMap.CheckedEntrySet for details on attacks.
-
-		@Override
-		public boolean equals(@Nullable Object object) {
-			return Sets.equalsImpl(this, object);
-		}
-
-		@Override
-		public int hashCode() {
-			return Sets.hashCodeImpl(this);
-		}
-	}
-
-	/** @see MapConstraints#constrainedAsMapEntries */
-	static class ConstrainedAsMapEntries<K, V> extends ForwardingSet<Entry<K, Collection<V>>> {
-		private final MapConstraint<? super K, ? super V> constraint;
-		private final Set<Entry<K, Collection<V>>> entries;
-
-		ConstrainedAsMapEntries(Set<Entry<K, Collection<V>>> entries, MapConstraint<? super K, ? super V> constraint) {
-			this.entries = entries;
-			this.constraint = constraint;
-		}
-
-		@Override
-		protected Set<Entry<K, Collection<V>>> delegate() {
-			return entries;
-		}
-
-		@Override
-		public Iterator<Entry<K, Collection<V>>> iterator() {
-			final Iterator<Entry<K, Collection<V>>> iterator = entries.iterator();
-			return new ForwardingIterator<Entry<K, Collection<V>>>() {
-				@Override
-				public Entry<K, Collection<V>> next() {
-					return constrainedAsMapEntry(iterator.next(), constraint);
-				}
-
-				@Override
-				protected Iterator<Entry<K, Collection<V>>> delegate() {
-					return iterator;
-				}
-			};
-		}
-
-		// See Collections.CheckedMap.CheckedEntrySet for details on attacks.
-
-		@Override
-		public Object[] toArray() {
-			return standardToArray();
-		}
-
-		@Override
-		public <T> T[] toArray(T[] array) {
-			return standardToArray(array);
-		}
-
-		@Override
-		public boolean contains(Object o) {
-			return Maps.containsEntryImpl(delegate(), o);
-		}
-
-		@Override
-		public boolean containsAll(Collection<?> c) {
-			return standardContainsAll(c);
-		}
-
-		@Override
-		public boolean equals(@Nullable Object object) {
-			return standardEquals(object);
-		}
-
-		@Override
-		public int hashCode() {
-			return standardHashCode();
-		}
-
-		@Override
-		public boolean remove(Object o) {
-			return Maps.removeEntryImpl(delegate(), o);
-		}
-
-		@Override
-		public boolean removeAll(Collection<?> c) {
-			return standardRemoveAll(c);
-		}
-
-		@Override
-		public boolean retainAll(Collection<?> c) {
-			return standardRetainAll(c);
-		}
-	}
-
-	private static class ConstrainedListMultimap<K, V> extends ConstrainedMultimap<K, V> implements ListMultimap<K, V> {
-		ConstrainedListMultimap(ListMultimap<K, V> delegate, MapConstraint<? super K, ? super V> constraint) {
-			super(delegate, constraint);
-		}
-
-		@Override
-		public List<V> get(K key) {
-			return (List<V>) super.get(key);
-		}
-
-		@Override
-		public List<V> removeAll(Object key) {
-			return (List<V>) super.removeAll(key);
-		}
-
-		@Override
-		public List<V> replaceValues(K key, Iterable<? extends V> values) {
-			return (List<V>) super.replaceValues(key, values);
-		}
-	}
-
 	private static class ConstrainedSetMultimap<K, V> extends ConstrainedMultimap<K, V> implements SetMultimap<K, V> {
 		ConstrainedSetMultimap(SetMultimap<K, V> delegate, MapConstraint<? super K, ? super V> constraint) {
 			super(delegate, constraint);
 		}
 
 		@Override
-		public Set<V> get(K key) {
-			return (Set<V>) super.get(key);
+		public Set<Map.Entry<K, V>> entries() {
+			return (Set<Map.Entry<K, V>>) super.entries();
 		}
 
 		@Override
-		public Set<Map.Entry<K, V>> entries() {
-			return (Set<Map.Entry<K, V>>) super.entries();
+		public Set<V> get(K key) {
+			return (Set<V>) super.get(key);
 		}
 
 		@Override
@@ -844,13 +562,34 @@ public final class MapConstraints {
 		}
 	}
 
-	private static <K, V> Collection<V> checkValues(K key, Iterable<? extends V> values,
-			MapConstraint<? super K, ? super V> constraint) {
-		Collection<V> copy = Lists.newArrayList(values);
-		for (V value : copy) {
-			constraint.checkKeyValue(key, value);
+	/** @see MapConstraints#constrainedBiMap */
+	private static class InverseConstraint<K, V> implements MapConstraint<K, V> {
+		final MapConstraint<? super V, ? super K> constraint;
+
+		public InverseConstraint(MapConstraint<? super V, ? super K> constraint) {
+			this.constraint = checkNotNull(constraint);
 		}
-		return copy;
+
+		@Override
+		public void checkKeyValue(K key, V value) {
+			constraint.checkKeyValue(value, key);
+		}
+	}
+
+	// enum singleton pattern
+	private enum NotNullMapConstraint implements MapConstraint<Object, Object> {
+		INSTANCE;
+
+		@Override
+		public void checkKeyValue(Object key, Object value) {
+			checkNotNull(key);
+			checkNotNull(value);
+		}
+
+		@Override
+		public String toString() {
+			return "Not null";
+		}
 	}
 
 	private static <K, V> Map<K, V> checkMap(Map<? extends K, ? extends V> map,
@@ -860,5 +599,266 @@ public final class MapConstraints {
 			constraint.checkKeyValue(entry.getKey(), entry.getValue());
 		}
 		return copy;
+	}
+
+	private static <K, V> Collection<V> checkValues(K key, Iterable<? extends V> values,
+			MapConstraint<? super K, ? super V> constraint) {
+		Collection<V> copy = Lists.newArrayList(values);
+		for (V value : copy) {
+			constraint.checkKeyValue(key, value);
+		}
+		return copy;
+	}
+
+	/**
+	 * Returns a constrained view of the specified set of {@code asMap} entries,
+	 * using the specified constraint. The {@link Entry#setValue} operation will be
+	 * verified with the constraint, and the collection returned by
+	 * {@link Entry#getValue} will be similarly constrained. The {@code add} and
+	 * {@code
+	 * addAll} operations simply forward to the underlying set, which throws an
+	 * {@link UnsupportedOperationException} per the multimap specification.
+	 *
+	 * @param entries    the entries to constrain
+	 * @param constraint the constraint for the entries
+	 * @return a constrained view of the entries
+	 */
+	private static <K, V> Set<Entry<K, Collection<V>>> constrainedAsMapEntries(Set<Entry<K, Collection<V>>> entries,
+			MapConstraint<? super K, ? super V> constraint) {
+		return new ConstrainedAsMapEntries<K, V>(entries, constraint);
+	}
+
+	/**
+	 * Returns a constrained view of the specified {@code asMap} entry, using the
+	 * specified constraint. The {@link Entry#setValue} operation will be verified
+	 * with the constraint, and the collection returned by {@link Entry#getValue}
+	 * will be similarly constrained.
+	 *
+	 * @param entry      the {@code asMap} entry to constrain
+	 * @param constraint the constraint for the entry
+	 * @return a constrained view of the specified entry
+	 */
+	private static <K, V> Entry<K, Collection<V>> constrainedAsMapEntry(final Entry<K, Collection<V>> entry,
+			final MapConstraint<? super K, ? super V> constraint) {
+		checkNotNull(entry);
+		checkNotNull(constraint);
+		return new ForwardingMapEntry<K, Collection<V>>() {
+			@Override
+			protected Entry<K, Collection<V>> delegate() {
+				return entry;
+			}
+
+			@Override
+			public Collection<V> getValue() {
+				return Constraints.constrainedTypePreservingCollection(entry.getValue(), new Constraint<V>() {
+					@Override
+					public V checkElement(V value) {
+						constraint.checkKeyValue(getKey(), value);
+						return value;
+					}
+				});
+			}
+		};
+	}
+
+	/**
+	 * Returns a constrained view of the specified bimap, using the specified
+	 * constraint. Any operations that modify the bimap will have the associated
+	 * keys and values verified with the constraint.
+	 *
+	 * <p>
+	 * The returned bimap is not serializable.
+	 *
+	 * @param map        the bimap to constrain
+	 * @param constraint the constraint that validates added entries
+	 * @return a constrained view of the specified bimap
+	 */
+	public static <K, V> BiMap<K, V> constrainedBiMap(BiMap<K, V> map, MapConstraint<? super K, ? super V> constraint) {
+		return new ConstrainedBiMap<K, V>(map, null, constraint);
+	}
+
+	/**
+	 * Returns a constrained view of the specified collection (or set) of entries,
+	 * using the specified constraint. The {@link Entry#setValue} operation will be
+	 * verified with the constraint, along with add operations on the returned
+	 * collection. The {@code add} and {@code addAll} operations simply forward to
+	 * the underlying collection, which throws an
+	 * {@link UnsupportedOperationException} per the map and multimap specification.
+	 *
+	 * @param entries    the entries to constrain
+	 * @param constraint the constraint for the entries
+	 * @return a constrained view of the specified entries
+	 */
+	private static <K, V> Collection<Entry<K, V>> constrainedEntries(Collection<Entry<K, V>> entries,
+			MapConstraint<? super K, ? super V> constraint) {
+		if (entries instanceof Set) {
+			return constrainedEntrySet((Set<Entry<K, V>>) entries, constraint);
+		}
+		return new ConstrainedEntries<K, V>(entries, constraint);
+	}
+
+	/**
+	 * Returns a constrained view of the specified entry, using the specified
+	 * constraint. The {@link Entry#setValue} operation will be verified with the
+	 * constraint.
+	 *
+	 * @param entry      the entry to constrain
+	 * @param constraint the constraint for the entry
+	 * @return a constrained view of the specified entry
+	 */
+	private static <K, V> Entry<K, V> constrainedEntry(final Entry<K, V> entry,
+			final MapConstraint<? super K, ? super V> constraint) {
+		checkNotNull(entry);
+		checkNotNull(constraint);
+		return new ForwardingMapEntry<K, V>() {
+			@Override
+			protected Entry<K, V> delegate() {
+				return entry;
+			}
+
+			@Override
+			public V setValue(V value) {
+				constraint.checkKeyValue(getKey(), value);
+				return entry.setValue(value);
+			}
+		};
+	}
+
+	/**
+	 * Returns a constrained view of the specified set of entries, using the
+	 * specified constraint. The {@link Entry#setValue} operation will be verified
+	 * with the constraint, along with add operations on the returned set. The
+	 * {@code add} and {@code addAll} operations simply forward to the underlying
+	 * set, which throws an {@link UnsupportedOperationException} per the map and
+	 * multimap specification.
+	 *
+	 * <p>
+	 * The returned multimap is not serializable.
+	 *
+	 * @param entries    the entries to constrain
+	 * @param constraint the constraint for the entries
+	 * @return a constrained view of the specified entries
+	 */
+	private static <K, V> Set<Entry<K, V>> constrainedEntrySet(Set<Entry<K, V>> entries,
+			MapConstraint<? super K, ? super V> constraint) {
+		return new ConstrainedEntrySet<K, V>(entries, constraint);
+	}
+
+	/**
+	 * Returns a constrained view of the specified list multimap, using the
+	 * specified constraint. Any operations that add new mappings will call the
+	 * provided constraint. However, this method does not verify that existing
+	 * mappings satisfy the constraint.
+	 *
+	 * <p>
+	 * Note that the generated multimap's {@link Multimap#removeAll} and
+	 * {@link Multimap#replaceValues} methods return collections that are not
+	 * constrained.
+	 *
+	 * <p>
+	 * The returned multimap is not serializable.
+	 *
+	 * @param multimap   the multimap to constrain
+	 * @param constraint the constraint that validates added entries
+	 * @return a constrained view of the specified multimap
+	 */
+	public static <K, V> ListMultimap<K, V> constrainedListMultimap(ListMultimap<K, V> multimap,
+			MapConstraint<? super K, ? super V> constraint) {
+		return new ConstrainedListMultimap<K, V>(multimap, constraint);
+	}
+
+	/**
+	 * Returns a constrained view of the specified map, using the specified
+	 * constraint. Any operations that add new mappings will call the provided
+	 * constraint. However, this method does not verify that existing mappings
+	 * satisfy the constraint.
+	 *
+	 * <p>
+	 * The returned map is not serializable.
+	 *
+	 * @param map        the map to constrain
+	 * @param constraint the constraint that validates added entries
+	 * @return a constrained view of the specified map
+	 */
+	public static <K, V> Map<K, V> constrainedMap(Map<K, V> map, MapConstraint<? super K, ? super V> constraint) {
+		return new ConstrainedMap<K, V>(map, constraint);
+	}
+
+	/**
+	 * Returns a constrained view of the specified multimap, using the specified
+	 * constraint. Any operations that add new mappings will call the provided
+	 * constraint. However, this method does not verify that existing mappings
+	 * satisfy the constraint.
+	 *
+	 * <p>
+	 * Note that the generated multimap's {@link Multimap#removeAll} and
+	 * {@link Multimap#replaceValues} methods return collections that are not
+	 * constrained.
+	 *
+	 * <p>
+	 * The returned multimap is not serializable.
+	 *
+	 * @param multimap   the multimap to constrain
+	 * @param constraint the constraint that validates added entries
+	 * @return a constrained view of the multimap
+	 */
+	public static <K, V> Multimap<K, V> constrainedMultimap(Multimap<K, V> multimap,
+			MapConstraint<? super K, ? super V> constraint) {
+		return new ConstrainedMultimap<K, V>(multimap, constraint);
+	}
+
+	/**
+	 * Returns a constrained view of the specified set multimap, using the specified
+	 * constraint. Any operations that add new mappings will call the provided
+	 * constraint. However, this method does not verify that existing mappings
+	 * satisfy the constraint.
+	 *
+	 * <p>
+	 * Note that the generated multimap's {@link Multimap#removeAll} and
+	 * {@link Multimap#replaceValues} methods return collections that are not
+	 * constrained.
+	 * <p>
+	 * The returned multimap is not serializable.
+	 *
+	 * @param multimap   the multimap to constrain
+	 * @param constraint the constraint that validates added entries
+	 * @return a constrained view of the specified multimap
+	 */
+	public static <K, V> SetMultimap<K, V> constrainedSetMultimap(SetMultimap<K, V> multimap,
+			MapConstraint<? super K, ? super V> constraint) {
+		return new ConstrainedSetMultimap<K, V>(multimap, constraint);
+	}
+
+	/**
+	 * Returns a constrained view of the specified sorted-set multimap, using the
+	 * specified constraint. Any operations that add new mappings will call the
+	 * provided constraint. However, this method does not verify that existing
+	 * mappings satisfy the constraint.
+	 *
+	 * <p>
+	 * Note that the generated multimap's {@link Multimap#removeAll} and
+	 * {@link Multimap#replaceValues} methods return collections that are not
+	 * constrained.
+	 * <p>
+	 * The returned multimap is not serializable.
+	 *
+	 * @param multimap   the multimap to constrain
+	 * @param constraint the constraint that validates added entries
+	 * @return a constrained view of the specified multimap
+	 */
+	public static <K, V> SortedSetMultimap<K, V> constrainedSortedSetMultimap(SortedSetMultimap<K, V> multimap,
+			MapConstraint<? super K, ? super V> constraint) {
+		return new ConstrainedSortedSetMultimap<K, V>(multimap, constraint);
+	}
+
+	/**
+	 * Returns a constraint that verifies that neither the key nor the value is
+	 * null. If either is null, a {@link NullPointerException} is thrown.
+	 */
+	public static MapConstraint<Object, Object> notNull() {
+		return NotNullMapConstraint.INSTANCE;
+	}
+
+	private MapConstraints() {
 	}
 }

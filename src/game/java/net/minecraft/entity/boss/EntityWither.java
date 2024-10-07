@@ -1,8 +1,10 @@
 package net.minecraft.entity.boss;
 
+import java.util.List;
+
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
@@ -37,37 +39,32 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
  */
 public class EntityWither extends EntityMob implements IBossDisplayData, IRangedAttackMob {
-	private float[] field_82220_d = new float[2];
-	private float[] field_82221_e = new float[2];
-	private float[] field_82217_f = new float[2];
-	private float[] field_82218_g = new float[2];
-	private int[] field_82223_h = new int[2];
-	private int[] field_82224_i = new int[2];
-	private int blockBreakCounter;
-	/**+
-	 * Selector used to determine the entities a wither boss should
-	 * attack.
+	/**
+	 * + Selector used to determine the entities a wither boss should attack.
 	 */
 	private static final Predicate<Entity> attackEntitySelector = new Predicate<Entity>() {
 		public boolean apply(Entity entity) {
@@ -75,6 +72,20 @@ public class EntityWither extends EntityMob implements IBossDisplayData, IRanged
 					&& ((EntityLivingBase) entity).getCreatureAttribute() != EnumCreatureAttribute.UNDEAD;
 		}
 	};
+
+	public static boolean func_181033_a(Block parBlock) {
+		return parBlock != Blocks.bedrock && parBlock != Blocks.end_portal && parBlock != Blocks.end_portal_frame
+				&& parBlock != Blocks.command_block && parBlock != Blocks.barrier;
+	}
+
+	private float[] field_82220_d = new float[2];
+	private float[] field_82221_e = new float[2];
+	private float[] field_82217_f = new float[2];
+	private float[] field_82218_g = new float[2];
+	private int[] field_82223_h = new int[2];
+	private int[] field_82224_i = new int[2];
+
+	private int blockBreakCounter;
 
 	public EntityWither(World worldIn) {
 		super(worldIn);
@@ -93,6 +104,90 @@ public class EntityWither extends EntityMob implements IBossDisplayData, IRanged
 		this.experienceValue = 50;
 	}
 
+	/**
+	 * + adds a PotionEffect to the entity
+	 */
+	public void addPotionEffect(PotionEffect var1) {
+	}
+
+	protected void applyEntityAttributes() {
+		super.applyEntityAttributes();
+		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(300.0D);
+		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.6000000238418579D);
+		this.getEntityAttribute(SharedMonsterAttributes.followRange).setBaseValue(40.0D);
+	}
+
+	/**
+	 * + Called when the entity is attacked.
+	 */
+	public boolean attackEntityFrom(DamageSource damagesource, float f) {
+		if (this.isEntityInvulnerable(damagesource)) {
+			return false;
+		} else if (damagesource != DamageSource.drown && !(damagesource.getEntity() instanceof EntityWither)) {
+			if (this.getInvulTime() > 0 && damagesource != DamageSource.outOfWorld) {
+				return false;
+			} else {
+				if (this.isArmored()) {
+					Entity entity = damagesource.getSourceOfDamage();
+					if (entity instanceof EntityArrow) {
+						return false;
+					}
+				}
+
+				Entity entity1 = damagesource.getEntity();
+				if (entity1 != null && !(entity1 instanceof EntityPlayer) && entity1 instanceof EntityLivingBase
+						&& ((EntityLivingBase) entity1).getCreatureAttribute() == this.getCreatureAttribute()) {
+					return false;
+				} else {
+					if (this.blockBreakCounter <= 0) {
+						this.blockBreakCounter = 20;
+					}
+
+					for (int i = 0; i < this.field_82224_i.length; ++i) {
+						this.field_82224_i[i] += 3;
+					}
+
+					return super.attackEntityFrom(damagesource, f);
+				}
+			}
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * + Attack the specified entity using a ranged attack.
+	 */
+	public void attackEntityWithRangedAttack(EntityLivingBase entitylivingbase, float var2) {
+		this.launchWitherSkullToEntity(0, entitylivingbase);
+	}
+
+	/**
+	 * + Makes the entity despawn if requirements are reached
+	 */
+	protected void despawnEntity() {
+		this.entityAge = 0;
+	}
+
+	/**
+	 * + Drop 0-2 items of this living's type
+	 */
+	protected void dropFewItems(boolean var1, int var2) {
+		EntityItem entityitem = this.dropItem(Items.nether_star, 1);
+		if (entityitem != null) {
+			entityitem.setNoDespawn();
+		}
+
+		if (!this.worldObj.isRemote) {
+			List<EntityPlayer> lst = this.worldObj.getEntitiesWithinAABB(EntityPlayer.class,
+					this.getEntityBoundingBox().expand(50.0D, 100.0D, 50.0D));
+			for (int i = 0, l = lst.size(); i < l; ++i) {
+				lst.get(i).triggerAchievement(AchievementList.killWither);
+			}
+		}
+
+	}
+
 	protected void entityInit() {
 		super.entityInit();
 		this.dataWatcher.addObject(17, Integer.valueOf(0));
@@ -101,49 +196,162 @@ public class EntityWither extends EntityMob implements IBossDisplayData, IRanged
 		this.dataWatcher.addObject(20, Integer.valueOf(0));
 	}
 
-	/**+
-	 * (abstract) Protected helper method to write subclass entity
-	 * data to NBT.
-	 */
-	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
-		super.writeEntityToNBT(nbttagcompound);
-		nbttagcompound.setInteger("Invul", this.getInvulTime());
+	public void fall(float var1, float var2) {
 	}
 
-	/**+
-	 * (abstract) Protected helper method to read subclass entity
-	 * data from NBT.
-	 */
-	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
-		super.readEntityFromNBT(nbttagcompound);
-		this.setInvulTime(nbttagcompound.getInteger("Invul"));
+	private float func_82204_b(float parFloat1, float parFloat2, float parFloat3) {
+		float f = MathHelper.wrapAngleTo180_float(parFloat2 - parFloat1);
+		if (f > parFloat3) {
+			f = parFloat3;
+		}
+
+		if (f < -parFloat3) {
+			f = -parFloat3;
+		}
+
+		return parFloat1 + f;
 	}
 
-	/**+
-	 * Returns the sound this mob makes while it's alive.
-	 */
-	protected String getLivingSound() {
-		return "mob.wither.idle";
+	public void func_82206_m() {
+		this.setInvulTime(220);
+		this.setHealth(this.getMaxHealth() / 3.0F);
 	}
 
-	/**+
-	 * Returns the sound this mob makes when it is hurt.
-	 */
-	protected String getHurtSound() {
-		return "mob.wither.hurt";
+	public float func_82207_a(int parInt1) {
+		return this.field_82221_e[parInt1];
 	}
 
-	/**+
-	 * Returns the sound this mob makes on death.
+	private double func_82208_v(int parInt1) {
+		return parInt1 <= 0 ? this.posY + 3.0D : this.posY + 2.2D;
+	}
+
+	public float func_82210_r(int parInt1) {
+		return this.field_82220_d[parInt1];
+	}
+
+	private double func_82213_w(int parInt1) {
+		if (parInt1 <= 0) {
+			return this.posZ;
+		} else {
+			float f = (this.renderYawOffset + (float) (180 * (parInt1 - 1))) / 180.0F * 3.1415927F;
+			float f1 = MathHelper.sin(f);
+			return this.posZ + (double) f1 * 1.3D;
+		}
+	}
+
+	private double func_82214_u(int parInt1) {
+		if (parInt1 <= 0) {
+			return this.posX;
+		} else {
+			float f = (this.renderYawOffset + (float) (180 * (parInt1 - 1))) / 180.0F * 3.1415927F;
+			float f1 = MathHelper.cos(f);
+			return this.posX + (double) f1 * 1.3D;
+		}
+	}
+
+	public int getBrightnessForRender(float var1) {
+		return 15728880;
+	}
+
+	/**
+	 * + Get this Entity's EnumCreatureAttribute
+	 */
+	public EnumCreatureAttribute getCreatureAttribute() {
+		return EnumCreatureAttribute.UNDEAD;
+	}
+
+	/**
+	 * + Returns the sound this mob makes on death.
 	 */
 	protected String getDeathSound() {
 		return "mob.wither.death";
 	}
 
-	/**+
-	 * Called frequently so the entity can update its state every
-	 * tick as required. For example, zombies and skeletons use this
-	 * to react to sunlight and start to burn.
+	protected float getEaglerDynamicLightsValueSimple(float partialTicks) {
+		return 1.0f;
+	}
+
+	/**
+	 * + Returns the sound this mob makes when it is hurt.
+	 */
+	protected String getHurtSound() {
+		return "mob.wither.hurt";
+	}
+
+	public int getInvulTime() {
+		return this.dataWatcher.getWatchableObjectInt(20);
+	}
+
+	/**
+	 * + Returns the sound this mob makes while it's alive.
+	 */
+	protected String getLivingSound() {
+		return "mob.wither.idle";
+	}
+
+	/**
+	 * + Returns the current armor value as determined by a call to
+	 * InventoryPlayer.getTotalArmorValue
+	 */
+	public int getTotalArmorValue() {
+		return 4;
+	}
+
+	/**
+	 * + Returns the target entity ID if present, or -1 if not @param par1 The
+	 * target offset, should be from 0-2
+	 */
+	public int getWatchedTargetId(int parInt1) {
+		return this.dataWatcher.getWatchableObjectInt(17 + parInt1);
+	}
+
+	/**
+	 * + Returns whether the wither is armored with its boss armor or not by
+	 * checking whether its health is below half of its maximum.
+	 */
+	public boolean isArmored() {
+		return this.getHealth() <= this.getMaxHealth() / 2.0F;
+	}
+
+	/**
+	 * + Launches a Wither skull toward (par2, par4, par6)
+	 */
+	private void launchWitherSkullToCoords(int x, double y, double z, double invulnerable, boolean parFlag) {
+		this.worldObj.playAuxSFXAtEntity((EntityPlayer) null, 1014, new BlockPos(this), 0);
+		double d0 = this.func_82214_u(x);
+		double d1 = this.func_82208_v(x);
+		double d2 = this.func_82213_w(x);
+		double d3 = y - d0;
+		double d4 = z - d1;
+		double d5 = invulnerable - d2;
+		EntityWitherSkull entitywitherskull = new EntityWitherSkull(this.worldObj, this, d3, d4, d5);
+		if (parFlag) {
+			entitywitherskull.setInvulnerable(true);
+		}
+
+		entitywitherskull.posY = d1;
+		entitywitherskull.posX = d0;
+		entitywitherskull.posZ = d2;
+		this.worldObj.spawnEntityInWorld(entitywitherskull);
+	}
+
+	private void launchWitherSkullToEntity(int parInt1, EntityLivingBase parEntityLivingBase) {
+		this.launchWitherSkullToCoords(parInt1, parEntityLivingBase.posX,
+				parEntityLivingBase.posY + (double) parEntityLivingBase.getEyeHeight() * 0.5D, parEntityLivingBase.posZ,
+				parInt1 == 0 && this.rand.nextFloat() < 0.001F);
+	}
+
+	/**
+	 * + Called when a player mounts an entity. e.g. mounts a pig, mounts a boat.
+	 */
+	public void mountEntity(Entity var1) {
+		this.ridingEntity = null;
+	}
+
+	/**
+	 * + Called frequently so the entity can update its state every tick as
+	 * required. For example, zombies and skeletons use this to react to sunlight
+	 * and start to burn.
 	 */
 	public void onLivingUpdate() {
 		this.motionY *= 0.6000000238418579D;
@@ -232,6 +440,24 @@ public class EntityWither extends EntityMob implements IBossDisplayData, IRanged
 			}
 		}
 
+	}
+
+	/**
+	 * + (abstract) Protected helper method to read subclass entity data from NBT.
+	 */
+	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
+		super.readEntityFromNBT(nbttagcompound);
+		this.setInvulTime(nbttagcompound.getInteger("Invul"));
+	}
+
+	public void setInvulTime(int parInt1) {
+		this.dataWatcher.updateObject(20, Integer.valueOf(parInt1));
+	}
+
+	/**
+	 * + Sets the Entity inside a web block.
+	 */
+	public void setInWeb() {
 	}
 
 	protected void updateAITasks() {
@@ -356,242 +582,18 @@ public class EntityWither extends EntityMob implements IBossDisplayData, IRanged
 		}
 	}
 
-	public static boolean func_181033_a(Block parBlock) {
-		return parBlock != Blocks.bedrock && parBlock != Blocks.end_portal && parBlock != Blocks.end_portal_frame
-				&& parBlock != Blocks.command_block && parBlock != Blocks.barrier;
-	}
-
-	public void func_82206_m() {
-		this.setInvulTime(220);
-		this.setHealth(this.getMaxHealth() / 3.0F);
-	}
-
-	/**+
-	 * Sets the Entity inside a web block.
-	 */
-	public void setInWeb() {
-	}
-
-	/**+
-	 * Returns the current armor value as determined by a call to
-	 * InventoryPlayer.getTotalArmorValue
-	 */
-	public int getTotalArmorValue() {
-		return 4;
-	}
-
-	private double func_82214_u(int parInt1) {
-		if (parInt1 <= 0) {
-			return this.posX;
-		} else {
-			float f = (this.renderYawOffset + (float) (180 * (parInt1 - 1))) / 180.0F * 3.1415927F;
-			float f1 = MathHelper.cos(f);
-			return this.posX + (double) f1 * 1.3D;
-		}
-	}
-
-	private double func_82208_v(int parInt1) {
-		return parInt1 <= 0 ? this.posY + 3.0D : this.posY + 2.2D;
-	}
-
-	private double func_82213_w(int parInt1) {
-		if (parInt1 <= 0) {
-			return this.posZ;
-		} else {
-			float f = (this.renderYawOffset + (float) (180 * (parInt1 - 1))) / 180.0F * 3.1415927F;
-			float f1 = MathHelper.sin(f);
-			return this.posZ + (double) f1 * 1.3D;
-		}
-	}
-
-	private float func_82204_b(float parFloat1, float parFloat2, float parFloat3) {
-		float f = MathHelper.wrapAngleTo180_float(parFloat2 - parFloat1);
-		if (f > parFloat3) {
-			f = parFloat3;
-		}
-
-		if (f < -parFloat3) {
-			f = -parFloat3;
-		}
-
-		return parFloat1 + f;
-	}
-
-	private void launchWitherSkullToEntity(int parInt1, EntityLivingBase parEntityLivingBase) {
-		this.launchWitherSkullToCoords(parInt1, parEntityLivingBase.posX,
-				parEntityLivingBase.posY + (double) parEntityLivingBase.getEyeHeight() * 0.5D, parEntityLivingBase.posZ,
-				parInt1 == 0 && this.rand.nextFloat() < 0.001F);
-	}
-
-	/**+
-	 * Launches a Wither skull toward (par2, par4, par6)
-	 */
-	private void launchWitherSkullToCoords(int x, double y, double z, double invulnerable, boolean parFlag) {
-		this.worldObj.playAuxSFXAtEntity((EntityPlayer) null, 1014, new BlockPos(this), 0);
-		double d0 = this.func_82214_u(x);
-		double d1 = this.func_82208_v(x);
-		double d2 = this.func_82213_w(x);
-		double d3 = y - d0;
-		double d4 = z - d1;
-		double d5 = invulnerable - d2;
-		EntityWitherSkull entitywitherskull = new EntityWitherSkull(this.worldObj, this, d3, d4, d5);
-		if (parFlag) {
-			entitywitherskull.setInvulnerable(true);
-		}
-
-		entitywitherskull.posY = d1;
-		entitywitherskull.posX = d0;
-		entitywitherskull.posZ = d2;
-		this.worldObj.spawnEntityInWorld(entitywitherskull);
-	}
-
-	/**+
-	 * Attack the specified entity using a ranged attack.
-	 */
-	public void attackEntityWithRangedAttack(EntityLivingBase entitylivingbase, float var2) {
-		this.launchWitherSkullToEntity(0, entitylivingbase);
-	}
-
-	/**+
-	 * Called when the entity is attacked.
-	 */
-	public boolean attackEntityFrom(DamageSource damagesource, float f) {
-		if (this.isEntityInvulnerable(damagesource)) {
-			return false;
-		} else if (damagesource != DamageSource.drown && !(damagesource.getEntity() instanceof EntityWither)) {
-			if (this.getInvulTime() > 0 && damagesource != DamageSource.outOfWorld) {
-				return false;
-			} else {
-				if (this.isArmored()) {
-					Entity entity = damagesource.getSourceOfDamage();
-					if (entity instanceof EntityArrow) {
-						return false;
-					}
-				}
-
-				Entity entity1 = damagesource.getEntity();
-				if (entity1 != null && !(entity1 instanceof EntityPlayer) && entity1 instanceof EntityLivingBase
-						&& ((EntityLivingBase) entity1).getCreatureAttribute() == this.getCreatureAttribute()) {
-					return false;
-				} else {
-					if (this.blockBreakCounter <= 0) {
-						this.blockBreakCounter = 20;
-					}
-
-					for (int i = 0; i < this.field_82224_i.length; ++i) {
-						this.field_82224_i[i] += 3;
-					}
-
-					return super.attackEntityFrom(damagesource, f);
-				}
-			}
-		} else {
-			return false;
-		}
-	}
-
-	/**+
-	 * Drop 0-2 items of this living's type
-	 */
-	protected void dropFewItems(boolean var1, int var2) {
-		EntityItem entityitem = this.dropItem(Items.nether_star, 1);
-		if (entityitem != null) {
-			entityitem.setNoDespawn();
-		}
-
-		if (!this.worldObj.isRemote) {
-			List<EntityPlayer> lst = this.worldObj.getEntitiesWithinAABB(EntityPlayer.class,
-					this.getEntityBoundingBox().expand(50.0D, 100.0D, 50.0D));
-			for (int i = 0, l = lst.size(); i < l; ++i) {
-				lst.get(i).triggerAchievement(AchievementList.killWither);
-			}
-		}
-
-	}
-
-	/**+
-	 * Makes the entity despawn if requirements are reached
-	 */
-	protected void despawnEntity() {
-		this.entityAge = 0;
-	}
-
-	public int getBrightnessForRender(float var1) {
-		return 15728880;
-	}
-
-	protected float getEaglerDynamicLightsValueSimple(float partialTicks) {
-		return 1.0f;
-	}
-
-	public void fall(float var1, float var2) {
-	}
-
-	/**+
-	 * adds a PotionEffect to the entity
-	 */
-	public void addPotionEffect(PotionEffect var1) {
-	}
-
-	protected void applyEntityAttributes() {
-		super.applyEntityAttributes();
-		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(300.0D);
-		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.6000000238418579D);
-		this.getEntityAttribute(SharedMonsterAttributes.followRange).setBaseValue(40.0D);
-	}
-
-	public float func_82207_a(int parInt1) {
-		return this.field_82221_e[parInt1];
-	}
-
-	public float func_82210_r(int parInt1) {
-		return this.field_82220_d[parInt1];
-	}
-
-	public int getInvulTime() {
-		return this.dataWatcher.getWatchableObjectInt(20);
-	}
-
-	public void setInvulTime(int parInt1) {
-		this.dataWatcher.updateObject(20, Integer.valueOf(parInt1));
-	}
-
-	/**+
-	 * Returns the target entity ID if present, or -1 if not @param
-	 * par1 The target offset, should be from 0-2
-	 */
-	public int getWatchedTargetId(int parInt1) {
-		return this.dataWatcher.getWatchableObjectInt(17 + parInt1);
-	}
-
-	/**+
-	 * Updates the target entity ID
+	/**
+	 * + Updates the target entity ID
 	 */
 	public void updateWatchedTargetId(int targetOffset, int newId) {
 		this.dataWatcher.updateObject(17 + targetOffset, Integer.valueOf(newId));
 	}
 
-	/**+
-	 * Returns whether the wither is armored with its boss armor or
-	 * not by checking whether its health is below half of its
-	 * maximum.
+	/**
+	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
-	public boolean isArmored() {
-		return this.getHealth() <= this.getMaxHealth() / 2.0F;
-	}
-
-	/**+
-	 * Get this Entity's EnumCreatureAttribute
-	 */
-	public EnumCreatureAttribute getCreatureAttribute() {
-		return EnumCreatureAttribute.UNDEAD;
-	}
-
-	/**+
-	 * Called when a player mounts an entity. e.g. mounts a pig,
-	 * mounts a boat.
-	 */
-	public void mountEntity(Entity var1) {
-		this.ridingEntity = null;
+	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
+		super.writeEntityToNBT(nbttagcompound);
+		nbttagcompound.setInteger("Invul", this.getInvulTime());
 	}
 }

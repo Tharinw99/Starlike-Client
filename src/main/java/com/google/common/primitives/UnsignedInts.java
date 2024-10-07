@@ -52,14 +52,22 @@ import com.google.common.annotations.GwtCompatible;
 @Beta
 @GwtCompatible
 public final class UnsignedInts {
+	enum LexicographicalComparator implements Comparator<int[]> {
+		INSTANCE;
+
+		@Override
+		public int compare(int[] left, int[] right) {
+			int minLength = Math.min(left.length, right.length);
+			for (int i = 0; i < minLength; i++) {
+				if (left[i] != right[i]) {
+					return UnsignedInts.compare(left[i], right[i]);
+				}
+			}
+			return left.length - right.length;
+		}
+	}
+
 	static final long INT_MASK = 0xffffffffL;
-
-	private UnsignedInts() {
-	}
-
-	static int flip(int value) {
-		return value ^ Integer.MIN_VALUE;
-	}
 
 	/**
 	 * Compares the two specified {@code int} values, treating them as unsigned
@@ -76,53 +84,48 @@ public final class UnsignedInts {
 	}
 
 	/**
-	 * Returns the value of the given {@code int} as a {@code long}, when treated as
-	 * unsigned.
+	 * Returns the unsigned {@code int} value represented by the given string.
+	 *
+	 * Accepts a decimal, hexadecimal, or octal number given by specifying the
+	 * following prefix:
+	 *
+	 * <ul>
+	 * <li>{@code 0x}<i>HexDigits</i>
+	 * <li>{@code 0X}<i>HexDigits</i>
+	 * <li>{@code #}<i>HexDigits</i>
+	 * <li>{@code 0}<i>OctalDigits</i>
+	 * </ul>
+	 *
+	 * @throws NumberFormatException if the string does not contain a valid unsigned
+	 *                               {@code int} value
+	 * @since 13.0
 	 */
-	public static long toLong(int value) {
-		return value & INT_MASK;
+	public static int decode(String stringValue) {
+		ParseRequest request = ParseRequest.fromString(stringValue);
+
+		try {
+			return parseUnsignedInt(request.rawValue, request.radix);
+		} catch (NumberFormatException e) {
+			NumberFormatException decodeException = new NumberFormatException("Error parsing value: " + stringValue);
+			decodeException.initCause(e);
+			throw decodeException;
+		}
 	}
 
 	/**
-	 * Returns the least value present in {@code array}, treating values as
-	 * unsigned.
+	 * Returns dividend / divisor, where the dividend and divisor are treated as
+	 * unsigned 32-bit quantities.
 	 *
-	 * @param array a <i>nonempty</i> array of unsigned {@code int} values
-	 * @return the value present in {@code array} that is less than or equal to
-	 *         every other value in the array according to {@link #compare}
-	 * @throws IllegalArgumentException if {@code array} is empty
+	 * @param dividend the dividend (numerator)
+	 * @param divisor  the divisor (denominator)
+	 * @throws ArithmeticException if divisor is 0
 	 */
-	public static int min(int... array) {
-		checkArgument(array.length > 0);
-		int min = flip(array[0]);
-		for (int i = 1; i < array.length; i++) {
-			int next = flip(array[i]);
-			if (next < min) {
-				min = next;
-			}
-		}
-		return flip(min);
+	public static int divide(int dividend, int divisor) {
+		return (int) (toLong(dividend) / toLong(divisor));
 	}
 
-	/**
-	 * Returns the greatest value present in {@code array}, treating values as
-	 * unsigned.
-	 *
-	 * @param array a <i>nonempty</i> array of unsigned {@code int} values
-	 * @return the value present in {@code array} that is greater than or equal to
-	 *         every other value in the array according to {@link #compare}
-	 * @throws IllegalArgumentException if {@code array} is empty
-	 */
-	public static int max(int... array) {
-		checkArgument(array.length > 0);
-		int max = flip(array[0]);
-		for (int i = 1; i < array.length; i++) {
-			int next = flip(array[i]);
-			if (next > max) {
-				max = next;
-			}
-		}
-		return flip(max);
+	static int flip(int value) {
+		return value ^ Integer.MIN_VALUE;
 	}
 
 	/**
@@ -168,72 +171,46 @@ public final class UnsignedInts {
 		return LexicographicalComparator.INSTANCE;
 	}
 
-	enum LexicographicalComparator implements Comparator<int[]> {
-		INSTANCE;
-
-		@Override
-		public int compare(int[] left, int[] right) {
-			int minLength = Math.min(left.length, right.length);
-			for (int i = 0; i < minLength; i++) {
-				if (left[i] != right[i]) {
-					return UnsignedInts.compare(left[i], right[i]);
-				}
+	/**
+	 * Returns the greatest value present in {@code array}, treating values as
+	 * unsigned.
+	 *
+	 * @param array a <i>nonempty</i> array of unsigned {@code int} values
+	 * @return the value present in {@code array} that is greater than or equal to
+	 *         every other value in the array according to {@link #compare}
+	 * @throws IllegalArgumentException if {@code array} is empty
+	 */
+	public static int max(int... array) {
+		checkArgument(array.length > 0);
+		int max = flip(array[0]);
+		for (int i = 1; i < array.length; i++) {
+			int next = flip(array[i]);
+			if (next > max) {
+				max = next;
 			}
-			return left.length - right.length;
 		}
+		return flip(max);
 	}
 
 	/**
-	 * Returns dividend / divisor, where the dividend and divisor are treated as
-	 * unsigned 32-bit quantities.
+	 * Returns the least value present in {@code array}, treating values as
+	 * unsigned.
 	 *
-	 * @param dividend the dividend (numerator)
-	 * @param divisor  the divisor (denominator)
-	 * @throws ArithmeticException if divisor is 0
+	 * @param array a <i>nonempty</i> array of unsigned {@code int} values
+	 * @return the value present in {@code array} that is less than or equal to
+	 *         every other value in the array according to {@link #compare}
+	 * @throws IllegalArgumentException if {@code array} is empty
 	 */
-	public static int divide(int dividend, int divisor) {
-		return (int) (toLong(dividend) / toLong(divisor));
-	}
-
-	/**
-	 * Returns dividend % divisor, where the dividend and divisor are treated as
-	 * unsigned 32-bit quantities.
-	 *
-	 * @param dividend the dividend (numerator)
-	 * @param divisor  the divisor (denominator)
-	 * @throws ArithmeticException if divisor is 0
-	 */
-	public static int remainder(int dividend, int divisor) {
-		return (int) (toLong(dividend) % toLong(divisor));
-	}
-
-	/**
-	 * Returns the unsigned {@code int} value represented by the given string.
-	 *
-	 * Accepts a decimal, hexadecimal, or octal number given by specifying the
-	 * following prefix:
-	 *
-	 * <ul>
-	 * <li>{@code 0x}<i>HexDigits</i>
-	 * <li>{@code 0X}<i>HexDigits</i>
-	 * <li>{@code #}<i>HexDigits</i>
-	 * <li>{@code 0}<i>OctalDigits</i>
-	 * </ul>
-	 *
-	 * @throws NumberFormatException if the string does not contain a valid unsigned
-	 *                               {@code int} value
-	 * @since 13.0
-	 */
-	public static int decode(String stringValue) {
-		ParseRequest request = ParseRequest.fromString(stringValue);
-
-		try {
-			return parseUnsignedInt(request.rawValue, request.radix);
-		} catch (NumberFormatException e) {
-			NumberFormatException decodeException = new NumberFormatException("Error parsing value: " + stringValue);
-			decodeException.initCause(e);
-			throw decodeException;
+	public static int min(int... array) {
+		checkArgument(array.length > 0);
+		int min = flip(array[0]);
+		for (int i = 1; i < array.length; i++) {
+			int next = flip(array[i]);
+			if (next < min) {
+				min = next;
+			}
 		}
+		return flip(min);
 	}
 
 	/**
@@ -273,6 +250,26 @@ public final class UnsignedInts {
 	}
 
 	/**
+	 * Returns dividend % divisor, where the dividend and divisor are treated as
+	 * unsigned 32-bit quantities.
+	 *
+	 * @param dividend the dividend (numerator)
+	 * @param divisor  the divisor (denominator)
+	 * @throws ArithmeticException if divisor is 0
+	 */
+	public static int remainder(int dividend, int divisor) {
+		return (int) (toLong(dividend) % toLong(divisor));
+	}
+
+	/**
+	 * Returns the value of the given {@code int} as a {@code long}, when treated as
+	 * unsigned.
+	 */
+	public static long toLong(int value) {
+		return value & INT_MASK;
+	}
+
+	/**
 	 * Returns a string representation of x, where x is treated as unsigned.
 	 */
 	public static String toString(int x) {
@@ -292,5 +289,8 @@ public final class UnsignedInts {
 	public static String toString(int x, int radix) {
 		long asLong = x & INT_MASK;
 		return Long.toString(asLong, radix);
+	}
+
+	private UnsignedInts() {
 	}
 }

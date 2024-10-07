@@ -24,22 +24,25 @@ import net.minecraft.stats.AchievementList;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -69,86 +72,22 @@ public class EntityPig extends EntityAnimal {
 		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.25D);
 	}
 
-	/**+
-	 * returns true if all the conditions for steering the entity
-	 * are met. For pigs, this is true if it is being ridden by a
-	 * player and the player is holding a carrot-on-a-stick
+	/**
+	 * + returns true if all the conditions for steering the entity are met. For
+	 * pigs, this is true if it is being ridden by a player and the player is
+	 * holding a carrot-on-a-stick
 	 */
 	public boolean canBeSteered() {
 		ItemStack itemstack = ((EntityPlayer) this.riddenByEntity).getHeldItem();
 		return itemstack != null && itemstack.getItem() == Items.carrot_on_a_stick;
 	}
 
-	protected void entityInit() {
-		super.entityInit();
-		this.dataWatcher.addObject(16, Byte.valueOf((byte) 0));
+	public EntityPig createChild(EntityAgeable var1) {
+		return new EntityPig(this.worldObj);
 	}
 
-	/**+
-	 * (abstract) Protected helper method to write subclass entity
-	 * data to NBT.
-	 */
-	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
-		super.writeEntityToNBT(nbttagcompound);
-		nbttagcompound.setBoolean("Saddle", this.getSaddled());
-	}
-
-	/**+
-	 * (abstract) Protected helper method to read subclass entity
-	 * data from NBT.
-	 */
-	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
-		super.readEntityFromNBT(nbttagcompound);
-		this.setSaddled(nbttagcompound.getBoolean("Saddle"));
-	}
-
-	/**+
-	 * Returns the sound this mob makes while it's alive.
-	 */
-	protected String getLivingSound() {
-		return "mob.pig.say";
-	}
-
-	/**+
-	 * Returns the sound this mob makes when it is hurt.
-	 */
-	protected String getHurtSound() {
-		return "mob.pig.say";
-	}
-
-	/**+
-	 * Returns the sound this mob makes on death.
-	 */
-	protected String getDeathSound() {
-		return "mob.pig.death";
-	}
-
-	protected void playStepSound(BlockPos var1, Block var2) {
-		this.playSound("mob.pig.step", 0.15F, 1.0F);
-	}
-
-	/**+
-	 * Called when a player interacts with a mob. e.g. gets milk
-	 * from a cow, gets into the saddle on a pig.
-	 */
-	public boolean interact(EntityPlayer entityplayer) {
-		if (super.interact(entityplayer)) {
-			return true;
-		} else if (!this.getSaddled() || this.worldObj.isRemote
-				|| this.riddenByEntity != null && this.riddenByEntity != entityplayer) {
-			return false;
-		} else {
-			entityplayer.mountEntity(this);
-			return true;
-		}
-	}
-
-	protected Item getDropItem() {
-		return this.isBurning() ? Items.cooked_porkchop : Items.porkchop;
-	}
-
-	/**+
-	 * Drop 0-2 items of this living's type
+	/**
+	 * + Drop 0-2 items of this living's type
 	 */
 	protected void dropFewItems(boolean var1, int i) {
 		int j = this.rand.nextInt(3) + 1 + this.rand.nextInt(1 + i);
@@ -167,27 +106,84 @@ public class EntityPig extends EntityAnimal {
 
 	}
 
-	/**+
-	 * Returns true if the pig is saddled.
+	protected void entityInit() {
+		super.entityInit();
+		this.dataWatcher.addObject(16, Byte.valueOf((byte) 0));
+	}
+
+	public void fall(float f, float f1) {
+		super.fall(f, f1);
+		if (f > 5.0F && this.riddenByEntity instanceof EntityPlayer) {
+			((EntityPlayer) this.riddenByEntity).triggerAchievement(AchievementList.flyPig);
+		}
+
+	}
+
+	/**
+	 * + Return the AI task for player control.
+	 */
+	public EntityAIControlledByPlayer getAIControlledByPlayer() {
+		return this.aiControlledByPlayer;
+	}
+
+	/**
+	 * + Returns the sound this mob makes on death.
+	 */
+	protected String getDeathSound() {
+		return "mob.pig.death";
+	}
+
+	protected Item getDropItem() {
+		return this.isBurning() ? Items.cooked_porkchop : Items.porkchop;
+	}
+
+	/**
+	 * + Returns the sound this mob makes when it is hurt.
+	 */
+	protected String getHurtSound() {
+		return "mob.pig.say";
+	}
+
+	/**
+	 * + Returns the sound this mob makes while it's alive.
+	 */
+	protected String getLivingSound() {
+		return "mob.pig.say";
+	}
+
+	/**
+	 * + Returns true if the pig is saddled.
 	 */
 	public boolean getSaddled() {
 		return (this.dataWatcher.getWatchableObjectByte(16) & 1) != 0;
 	}
 
-	/**+
-	 * Set or remove the saddle of the pig.
+	/**
+	 * + Called when a player interacts with a mob. e.g. gets milk from a cow, gets
+	 * into the saddle on a pig.
 	 */
-	public void setSaddled(boolean saddled) {
-		if (saddled) {
-			this.dataWatcher.updateObject(16, Byte.valueOf((byte) 1));
+	public boolean interact(EntityPlayer entityplayer) {
+		if (super.interact(entityplayer)) {
+			return true;
+		} else if (!this.getSaddled() || this.worldObj.isRemote
+				|| this.riddenByEntity != null && this.riddenByEntity != entityplayer) {
+			return false;
 		} else {
-			this.dataWatcher.updateObject(16, Byte.valueOf((byte) 0));
+			entityplayer.mountEntity(this);
+			return true;
 		}
-
 	}
 
-	/**+
-	 * Called when a lightning bolt hits the entity.
+	/**
+	 * + Checks if the parameter is an item which this animal can be fed to breed it
+	 * (wheat, carrots or seeds depending on the animal type)
+	 */
+	public boolean isBreedingItem(ItemStack itemstack) {
+		return itemstack != null && itemstack.getItem() == Items.carrot;
+	}
+
+	/**
+	 * + Called when a lightning bolt hits the entity.
 	 */
 	public void onStruckByLightning(EntityLightningBolt var1) {
 		if (!this.worldObj.isRemote && !this.isDead) {
@@ -205,31 +201,35 @@ public class EntityPig extends EntityAnimal {
 		}
 	}
 
-	public void fall(float f, float f1) {
-		super.fall(f, f1);
-		if (f > 5.0F && this.riddenByEntity instanceof EntityPlayer) {
-			((EntityPlayer) this.riddenByEntity).triggerAchievement(AchievementList.flyPig);
+	protected void playStepSound(BlockPos var1, Block var2) {
+		this.playSound("mob.pig.step", 0.15F, 1.0F);
+	}
+
+	/**
+	 * + (abstract) Protected helper method to read subclass entity data from NBT.
+	 */
+	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
+		super.readEntityFromNBT(nbttagcompound);
+		this.setSaddled(nbttagcompound.getBoolean("Saddle"));
+	}
+
+	/**
+	 * + Set or remove the saddle of the pig.
+	 */
+	public void setSaddled(boolean saddled) {
+		if (saddled) {
+			this.dataWatcher.updateObject(16, Byte.valueOf((byte) 1));
+		} else {
+			this.dataWatcher.updateObject(16, Byte.valueOf((byte) 0));
 		}
 
 	}
 
-	public EntityPig createChild(EntityAgeable var1) {
-		return new EntityPig(this.worldObj);
-	}
-
-	/**+
-	 * Checks if the parameter is an item which this animal can be
-	 * fed to breed it (wheat, carrots or seeds depending on the
-	 * animal type)
+	/**
+	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
-	public boolean isBreedingItem(ItemStack itemstack) {
-		return itemstack != null && itemstack.getItem() == Items.carrot;
-	}
-
-	/**+
-	 * Return the AI task for player control.
-	 */
-	public EntityAIControlledByPlayer getAIControlledByPlayer() {
-		return this.aiControlledByPlayer;
+	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
+		super.writeEntityToNBT(nbttagcompound);
+		nbttagcompound.setBoolean("Saddle", this.getSaddled());
 	}
 }

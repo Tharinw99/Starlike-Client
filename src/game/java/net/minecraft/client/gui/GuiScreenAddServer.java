@@ -6,22 +6,25 @@ import net.lax1dude.eaglercraft.v1_8.minecraft.EnumInputEvent;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.resources.I18n;
 
-/**+
- * This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source code.
+/**
+ * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
+ * code.
  * 
- * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!"
- * Mod Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
+ * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
+ * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  * 
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
+ * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -40,18 +43,73 @@ public class GuiScreenAddServer extends GuiScreen {
 		this.serverData = parServerData;
 	}
 
-	/**+
-	 * Called from the main game loop to update the screen.
+	/**
+	 * + Called by the controls from the buttonList when activated. (Mouse pressed
+	 * for buttons)
 	 */
-	public void updateScreen() {
-		this.serverNameField.updateCursorCounter();
-		this.serverIPField.updateCursorCounter();
+	protected void actionPerformed(GuiButton parGuiButton) {
+		if (parGuiButton.enabled) {
+			if (parGuiButton.id == 3) {
+				this.serverData.hideAddress = !this.serverData.hideAddress;
+				this.hideAddress.displayString = I18n
+						.format(EagRuntime.getConfiguration().isEnableServerCookies() ? "addServer.hideAddr"
+								: "addServer.hideAddress", new Object[0])
+						+ ": " + I18n.format(this.serverData.hideAddress ? "gui.yes" : "gui.no", new Object[0]);
+			} else if (parGuiButton.id == 4) {
+				this.serverData.enableCookies = !this.serverData.enableCookies;
+				this.enableCookies.displayString = I18n.format("addServer.enableCookies") + ": "
+						+ I18n.format(this.serverData.enableCookies ? "addServer.enableCookies.enabled"
+								: "addServer.enableCookies.disabled");
+			} else if (parGuiButton.id == 2) {
+				this.serverData.setResourceMode(
+						ServerData.ServerResourceMode._VALUES[(this.serverData.getResourceMode().ordinal() + 1)
+								% ServerData.ServerResourceMode._VALUES.length]);
+				this.serverResourcePacks.displayString = I18n.format("addServer.resourcePack", new Object[0]) + ": "
+						+ this.serverData.getResourceMode().getMotd().getFormattedText();
+			} else if (parGuiButton.id == 1) {
+				this.parentScreen.confirmClicked(false, 0);
+			} else if (parGuiButton.id == 0) {
+				this.serverData.serverName = this.serverNameField.getText().trim();
+				this.serverData.serverIP = this.serverIPField.getText().trim();
+				this.parentScreen.confirmClicked(true, 0);
+			}
+
+		}
 	}
 
-	/**+
-	 * Adds the buttons (and other controls) to the screen in
-	 * question. Called when the GUI is displayed and when the
-	 * window resizes, the buttonList is cleared beforehand.
+	/**
+	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
+	 * renderPartialTicks
+	 */
+	public void drawScreen(int i, int j, float f) {
+		this.drawDefaultBackground();
+		this.drawCenteredString(this.fontRendererObj, I18n.format("addServer.title", new Object[0]), this.width / 2, 17,
+				16777215);
+		this.drawString(this.fontRendererObj, I18n.format("addServer.enterName", new Object[0]), this.width / 2 - 100,
+				53, 10526880);
+		this.drawString(this.fontRendererObj, I18n.format("addServer.enterIp", new Object[0]), this.width / 2 - 100, 94,
+				10526880);
+		if (EagRuntime.requireSSL()) {
+			this.drawCenteredString(this.fontRendererObj, I18n.format("addServer.SSLWarn1"), this.width / 2, 184,
+					0xccccff);
+			this.drawCenteredString(this.fontRendererObj, I18n.format("addServer.SSLWarn2"), this.width / 2, 196,
+					0xccccff);
+		}
+		this.serverNameField.drawTextBox();
+		this.serverIPField.drawTextBox();
+		super.drawScreen(i, j, f);
+	}
+
+	@Override
+	public void fireInputEvent(EnumInputEvent event, String param) {
+		serverNameField.fireInputEvent(event, param);
+		serverIPField.fireInputEvent(event, param);
+	}
+
+	/**
+	 * + Adds the buttons (and other controls) to the screen in question. Called
+	 * when the GUI is displayed and when the window resizes, the buttonList is
+	 * cleared beforehand.
 	 */
 	public void initGui() {
 		Keyboard.enableRepeatEvents(true);
@@ -94,53 +152,10 @@ public class GuiScreenAddServer extends GuiScreen {
 		((GuiButton) this.buttonList.get(0)).enabled = this.serverIPField.getText().trim().length() > 0;
 	}
 
-	/**+
-	 * Called when the screen is unloaded. Used to disable keyboard
-	 * repeat events
-	 */
-	public void onGuiClosed() {
-		Keyboard.enableRepeatEvents(false);
-	}
-
-	/**+
-	 * Called by the controls from the buttonList when activated.
-	 * (Mouse pressed for buttons)
-	 */
-	protected void actionPerformed(GuiButton parGuiButton) {
-		if (parGuiButton.enabled) {
-			if (parGuiButton.id == 3) {
-				this.serverData.hideAddress = !this.serverData.hideAddress;
-				this.hideAddress.displayString = I18n
-						.format(EagRuntime.getConfiguration().isEnableServerCookies() ? "addServer.hideAddr"
-								: "addServer.hideAddress", new Object[0])
-						+ ": " + I18n.format(this.serverData.hideAddress ? "gui.yes" : "gui.no", new Object[0]);
-			} else if (parGuiButton.id == 4) {
-				this.serverData.enableCookies = !this.serverData.enableCookies;
-				this.enableCookies.displayString = I18n.format("addServer.enableCookies") + ": "
-						+ I18n.format(this.serverData.enableCookies ? "addServer.enableCookies.enabled"
-								: "addServer.enableCookies.disabled");
-			} else if (parGuiButton.id == 2) {
-				this.serverData.setResourceMode(
-						ServerData.ServerResourceMode._VALUES[(this.serverData.getResourceMode().ordinal() + 1)
-								% ServerData.ServerResourceMode._VALUES.length]);
-				this.serverResourcePacks.displayString = I18n.format("addServer.resourcePack", new Object[0]) + ": "
-						+ this.serverData.getResourceMode().getMotd().getFormattedText();
-			} else if (parGuiButton.id == 1) {
-				this.parentScreen.confirmClicked(false, 0);
-			} else if (parGuiButton.id == 0) {
-				this.serverData.serverName = this.serverNameField.getText().trim();
-				this.serverData.serverIP = this.serverIPField.getText().trim();
-				this.parentScreen.confirmClicked(true, 0);
-			}
-
-		}
-	}
-
-	/**+
-	 * Fired when a key is typed (except F11 which toggles full
-	 * screen). This is the equivalent of
-	 * KeyListener.keyTyped(KeyEvent e). Args : character (character
-	 * on the key), keyCode (lwjgl Keyboard key code)
+	/**
+	 * + Fired when a key is typed (except F11 which toggles full screen). This is
+	 * the equivalent of KeyListener.keyTyped(KeyEvent e). Args : character
+	 * (character on the key), keyCode (lwjgl Keyboard key code)
 	 */
 	protected void keyTyped(char parChar1, int parInt1) {
 		this.serverNameField.textboxKeyTyped(parChar1, parInt1);
@@ -157,9 +172,8 @@ public class GuiScreenAddServer extends GuiScreen {
 		((GuiButton) this.buttonList.get(0)).enabled = this.serverIPField.getText().trim().length() > 0;
 	}
 
-	/**+
-	 * Called when the mouse is clicked. Args : mouseX, mouseY,
-	 * clickedButton
+	/**
+	 * + Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
 	 */
 	protected void mouseClicked(int parInt1, int parInt2, int parInt3) {
 		super.mouseClicked(parInt1, parInt2, parInt3);
@@ -167,27 +181,11 @@ public class GuiScreenAddServer extends GuiScreen {
 		this.serverNameField.mouseClicked(parInt1, parInt2, parInt3);
 	}
 
-	/**+
-	 * Draws the screen and all the components in it. Args : mouseX,
-	 * mouseY, renderPartialTicks
+	/**
+	 * + Called when the screen is unloaded. Used to disable keyboard repeat events
 	 */
-	public void drawScreen(int i, int j, float f) {
-		this.drawDefaultBackground();
-		this.drawCenteredString(this.fontRendererObj, I18n.format("addServer.title", new Object[0]), this.width / 2, 17,
-				16777215);
-		this.drawString(this.fontRendererObj, I18n.format("addServer.enterName", new Object[0]), this.width / 2 - 100,
-				53, 10526880);
-		this.drawString(this.fontRendererObj, I18n.format("addServer.enterIp", new Object[0]), this.width / 2 - 100, 94,
-				10526880);
-		if (EagRuntime.requireSSL()) {
-			this.drawCenteredString(this.fontRendererObj, I18n.format("addServer.SSLWarn1"), this.width / 2, 184,
-					0xccccff);
-			this.drawCenteredString(this.fontRendererObj, I18n.format("addServer.SSLWarn2"), this.width / 2, 196,
-					0xccccff);
-		}
-		this.serverNameField.drawTextBox();
-		this.serverIPField.drawTextBox();
-		super.drawScreen(i, j, f);
+	public void onGuiClosed() {
+		Keyboard.enableRepeatEvents(false);
 	}
 
 	@Override
@@ -195,10 +193,12 @@ public class GuiScreenAddServer extends GuiScreen {
 		return serverNameField.isFocused() || serverIPField.isFocused();
 	}
 
-	@Override
-	public void fireInputEvent(EnumInputEvent event, String param) {
-		serverNameField.fireInputEvent(event, param);
-		serverIPField.fireInputEvent(event, param);
+	/**
+	 * + Called from the main game loop to update the screen.
+	 */
+	public void updateScreen() {
+		this.serverNameField.updateCursorCounter();
+		this.serverIPField.updateCursorCounter();
 	}
 
 }

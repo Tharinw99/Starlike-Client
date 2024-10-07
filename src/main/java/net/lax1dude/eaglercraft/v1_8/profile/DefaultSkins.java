@@ -5,14 +5,15 @@ import net.minecraft.util.ResourceLocation;
 /**
  * Copyright (c) 2022-2023 lax1dude, ayunami2000. All Rights Reserved.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
@@ -35,7 +36,8 @@ public enum DefaultSkins {
 	PRISONER_ALEX(13, "Prisoner Alex", new ResourceLocation("eagler:skins/14.prisoner_alex.png"), SkinModel.ALEX),
 	SCOTTISH_STEVE(14, "Scottish Steve", new ResourceLocation("eagler:skins/15.scottish_steve.png"), SkinModel.STEVE),
 	SCOTTISH_ALEX(15, "Scottish Alex", new ResourceLocation("eagler:skins/16.scottish_alex.png"), SkinModel.ALEX),
-	DEVELOPER_STEVE(16, "Developer Steve", new ResourceLocation("eagler:skins/17.developer_steve.png"), SkinModel.STEVE),
+	DEVELOPER_STEVE(16, "Developer Steve", new ResourceLocation("eagler:skins/17.developer_steve.png"),
+			SkinModel.STEVE),
 	DEVELOPER_ALEX(17, "Developer Alex", new ResourceLocation("eagler:skins/18.developer_alex.png"), SkinModel.ALEX),
 	HEROBRINE(18, "Herobrine", new ResourceLocation("eagler:skins/19.herobrine.png"), SkinModel.ZOMBIE),
 	NOTCH(19, "Notch", new ResourceLocation("eagler:skins/20.notch.png"), SkinModel.STEVE),
@@ -44,42 +46,46 @@ public enum DefaultSkins {
 	PIG(22, "Pig", new ResourceLocation("eagler:skins/23.pig.png"), SkinModel.STEVE),
 	MOOSHROOM(23, "Mooshroom", new ResourceLocation("eagler:skins/24.mooshroom.png"), SkinModel.STEVE),
 	LONG_ARMS(24, "Long Arms", new ResourceLocation("eagler:mesh/longarms.fallback.png"), SkinModel.LONG_ARMS),
-	WEIRD_CLIMBER_DUDE(25, "Weird Climber Dude", new ResourceLocation("eagler:mesh/weirdclimber.fallback.png"), SkinModel.WEIRD_CLIMBER_DUDE),
-	LAXATIVE_DUDE(26, "Laxative Dude", new ResourceLocation("eagler:mesh/laxativedude.fallback.png"), SkinModel.LAXATIVE_DUDE),
+	WEIRD_CLIMBER_DUDE(25, "Weird Climber Dude", new ResourceLocation("eagler:mesh/weirdclimber.fallback.png"),
+			SkinModel.WEIRD_CLIMBER_DUDE),
+	LAXATIVE_DUDE(26, "Laxative Dude", new ResourceLocation("eagler:mesh/laxativedude.fallback.png"),
+			SkinModel.LAXATIVE_DUDE),
 	BABY_CHARLES(27, "Baby Charles", new ResourceLocation("eagler:mesh/charles.fallback.png"), SkinModel.BABY_CHARLES),
 	BABY_WINSTON(28, "Baby Winston", new ResourceLocation("eagler:mesh/winston.fallback.png"), SkinModel.BABY_WINSTON);
-	
+
 	public static final DefaultSkins[] defaultSkinsMap = new DefaultSkins[29];
-	
+
+	static {
+		DefaultSkins[] skins = values();
+		for (int i = 0; i < skins.length; ++i) {
+			defaultSkinsMap[skins[i].id] = skins[i];
+		}
+	}
+
+	public static DefaultSkins getSkinFromId(int id) {
+		DefaultSkins e = null;
+		if (id >= 0 && id < defaultSkinsMap.length) {
+			e = defaultSkinsMap[id];
+		}
+		if (e != null) {
+			return e;
+		} else {
+			return DEFAULT_STEVE;
+		}
+	}
+
 	public final int id;
 	public final String name;
+
 	public final ResourceLocation location;
+
 	public final SkinModel model;
-	
+
 	private DefaultSkins(int id, String name, ResourceLocation location, SkinModel model) {
 		this.id = id;
 		this.name = name;
 		this.location = location;
 		this.model = model;
-	}
-	
-	public static DefaultSkins getSkinFromId(int id) {
-		DefaultSkins e = null;
-		if(id >= 0 && id < defaultSkinsMap.length) {
-			e = defaultSkinsMap[id];
-		}
-		if(e != null) {
-			return e;
-		}else {
-			return DEFAULT_STEVE;
-		}
-	}
-	
-	static {
-		DefaultSkins[] skins = values();
-		for(int i = 0; i < skins.length; ++i) {
-			defaultSkinsMap[skins[i].id] = skins[i];
-		}
 	}
 
 }

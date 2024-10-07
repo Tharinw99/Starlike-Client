@@ -52,6 +52,21 @@ abstract class ImmutableSortedMultisetFauxverideShim<E> extends ImmutableMultise
 	}
 
 	/**
+	 * Not supported. <b>You are attempting to create a multiset that may contain
+	 * non-{@code
+	 * Comparable} elements.</b> Proper calls will resolve to the version in {@code
+	 * ImmutableSortedMultiset}, not this dummy version.
+	 *
+	 * @throws UnsupportedOperationException always
+	 * @deprecated <b>Pass parameters of type {@code Comparable} to use
+	 *             {@link ImmutableSortedMultiset#copyOf(Comparable[])}.</b>
+	 */
+	@Deprecated
+	public static <E> ImmutableSortedMultiset<E> copyOf(E[] elements) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
 	 * Not supported. <b>You are attempting to create a multiset that may contain a
 	 * non-{@code
 	 * Comparable} element.</b> Proper calls will resolve to the version in {@code
@@ -141,21 +156,6 @@ abstract class ImmutableSortedMultisetFauxverideShim<E> extends ImmutableMultise
 	 */
 	@Deprecated
 	public static <E> ImmutableSortedMultiset<E> of(E e1, E e2, E e3, E e4, E e5, E e6, E... remaining) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Not supported. <b>You are attempting to create a multiset that may contain
-	 * non-{@code
-	 * Comparable} elements.</b> Proper calls will resolve to the version in {@code
-	 * ImmutableSortedMultiset}, not this dummy version.
-	 *
-	 * @throws UnsupportedOperationException always
-	 * @deprecated <b>Pass parameters of type {@code Comparable} to use
-	 *             {@link ImmutableSortedMultiset#copyOf(Comparable[])}.</b>
-	 */
-	@Deprecated
-	public static <E> ImmutableSortedMultiset<E> copyOf(E[] elements) {
 		throw new UnsupportedOperationException();
 	}
 

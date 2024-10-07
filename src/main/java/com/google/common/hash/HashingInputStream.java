@@ -45,6 +45,32 @@ public final class HashingInputStream extends FilterInputStream {
 	}
 
 	/**
+	 * Returns the {@link HashCode} based on the data read from this stream. The
+	 * result is unspecified if this method is called more than once on the same
+	 * instance.
+	 */
+	public HashCode hash() {
+		return hasher.hash();
+	}
+
+	/**
+	 * mark() is not supported for HashingInputStream
+	 */
+	@Override
+	public void mark(int readlimit) {
+	}
+
+	/**
+	 * mark() is not supported for HashingInputStream
+	 * 
+	 * @return {@code false} always
+	 */
+	@Override
+	public boolean markSupported() {
+		return false;
+	}
+
+	/**
 	 * Reads the next byte of data from the underlying input stream and updates the
 	 * hasher with the byte read.
 	 */
@@ -71,23 +97,6 @@ public final class HashingInputStream extends FilterInputStream {
 	}
 
 	/**
-	 * mark() is not supported for HashingInputStream
-	 * 
-	 * @return {@code false} always
-	 */
-	@Override
-	public boolean markSupported() {
-		return false;
-	}
-
-	/**
-	 * mark() is not supported for HashingInputStream
-	 */
-	@Override
-	public void mark(int readlimit) {
-	}
-
-	/**
 	 * reset() is not supported for HashingInputStream.
 	 * 
 	 * @throws IOException this operation is not supported
@@ -95,14 +104,5 @@ public final class HashingInputStream extends FilterInputStream {
 	@Override
 	public void reset() throws IOException {
 		throw new IOException("reset not supported");
-	}
-
-	/**
-	 * Returns the {@link HashCode} based on the data read from this stream. The
-	 * result is unspecified if this method is called more than once on the same
-	 * instance.
-	 */
-	public HashCode hash() {
-		return hasher.hash();
 	}
 }
