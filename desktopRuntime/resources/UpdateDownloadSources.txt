@@ -1,2 +1,1 @@
-url: https://starlike.zumbiepig.dev/latest_update.dat
 url: https://starlike.orionzleon.me/latest_update.dat

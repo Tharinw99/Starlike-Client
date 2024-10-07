@@ -67,6 +67,7 @@ public class RecipesCrafting {
 						Character.valueOf('S'), Items.steel, Character.valueOf('U'), Items.uranium_rod });
 		parCraftingManager.addRecipe(new ItemStack(Items.titanium_drill, 1), new Object[] { "TTT", "TDT", "TTT",
 				Character.valueOf('T'), Items.titanium_ingot, Character.valueOf('D'), Items.platinum_drill });
+		/*
 		parCraftingManager.addRecipe(new ItemStack(Blocks.mosaic, 4, BlockMosaic.EnumType.OAK.getMetadata()),
 				new Object[] { "##", "##", Character.valueOf('#'),
 						new ItemStack(Blocks.planks, 1, BlockPlanks.EnumType.OAK.getMetadata()) });
@@ -85,5 +86,6 @@ public class RecipesCrafting {
 		parCraftingManager.addRecipe(new ItemStack(Blocks.mosaic, 4, BlockMosaic.EnumType.DARK_OAK.getMetadata()),
 				new Object[] { "##", "##", Character.valueOf('#'),
 						new ItemStack(Blocks.planks, 1, BlockPlanks.EnumType.DARK_OAK.getMetadata()) });
+		*/
 	}
 }

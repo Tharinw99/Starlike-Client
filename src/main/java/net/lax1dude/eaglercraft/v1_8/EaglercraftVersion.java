@@ -9,7 +9,7 @@ public class EaglercraftVersion {
 	/// Customize these to fit your fork:
 
 	public static final String projectForkName = "Starlike Client";
-	public static final String projectForkVersion = "0.2.0";
+	public static final String projectForkVersion = "0.2.1";
 	public static final String projectForkVendor = "SpeedSlicer and zumbiepig";
 
 	public static final String projectForkURL = "";
@@ -32,7 +32,7 @@ public class EaglercraftVersion {
 	public static final boolean enableUpdateService = true;
 
 	public static final String updateBundlePackageName = "dev.zumbiepig.starlikeclient.client";
-	public static final int updateBundlePackageVersionInt = 200; // (0.2.1 would be 000201 or just 201)
+	public static final int updateBundlePackageVersionInt = 201; // (0.2.1 would be 000201 or just 201)
 
 	public static final String updateLatestLocalStorageKey = "latestUpdate_" + updateBundlePackageName;
 
@@ -55,7 +55,7 @@ public class EaglercraftVersion {
 	public static final String mainMenuStringC = null;
 	public static final String mainMenuStringD = "Copyright Mojang AB. Do not distribute!";
 
-	public static final String mainMenuStringE = projectForkName + " " + projectForkVersion;
+	public static final String mainMenuStringE = "          " + projectForkName + " " + projectForkVersion;
 	public static final String mainMenuStringF = "Made by " + projectForkVendor;
 
 	public static final String mainMenuStringG = null;
