@@ -796,14 +796,16 @@ public class Item {
 				.setUnlocalizedName("platinum_axe").setCreativeTab(CreativeTabs.tabStarlike));
 		registerItem(1030, (String) "starlike:platinum_hoe", (new ItemHoe(Item.ToolMaterial.PLATINUM))
 				.setUnlocalizedName("platinum_hoe").setCreativeTab(CreativeTabs.tabStarlike));
-		registerItem(1031, (String) "starlike:platinum_helmet",
-				(new ItemArmor(ItemArmor.ArmorMaterial.PLATINUM, 5, 0)).setUnlocalizedName("platinum_helmet"));
+		registerItem(1031, (String) "starlike:platinum_helmet", (new ItemArmor(ItemArmor.ArmorMaterial.PLATINUM, 5, 0))
+				.setUnlocalizedName("platinum_helmet").setCreativeTab(CreativeTabs.tabStarlike));
 		registerItem(1032, (String) "starlike:platinum_chestplate",
-				(new ItemArmor(ItemArmor.ArmorMaterial.PLATINUM, 5, 1)).setUnlocalizedName("platinum_chestplate"));
+				(new ItemArmor(ItemArmor.ArmorMaterial.PLATINUM, 5, 1)).setUnlocalizedName("platinum_chestplate")
+						.setCreativeTab(CreativeTabs.tabStarlike));
 		registerItem(1033, (String) "starlike:platinum_leggings",
-				(new ItemArmor(ItemArmor.ArmorMaterial.PLATINUM, 5, 2)).setUnlocalizedName("platinum_leggings"));
-		registerItem(1034, (String) "starlike:platinum_boots",
-				(new ItemArmor(ItemArmor.ArmorMaterial.PLATINUM, 5, 3)).setUnlocalizedName("platinum_boots"));
+				(new ItemArmor(ItemArmor.ArmorMaterial.PLATINUM, 5, 2)).setUnlocalizedName("platinum_leggings")
+						.setCreativeTab(CreativeTabs.tabStarlike));
+		registerItem(1034, (String) "starlike:platinum_boots", (new ItemArmor(ItemArmor.ArmorMaterial.PLATINUM, 5, 3))
+				.setUnlocalizedName("platinum_boots").setCreativeTab(CreativeTabs.tabStarlike));
 		registerItem(1035, (String) "starlike:titanium_ingot",
 				(new Item()).setUnlocalizedName("titanium_ingot").setCreativeTab(CreativeTabs.tabStarlike));
 		registerItem(1036, (String) "starlike:uranium_crystal",

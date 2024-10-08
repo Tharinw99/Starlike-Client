@@ -203,7 +203,7 @@ public class EntityList {
 		addMapping(EntityVillager.class, EntityVillager::new, "Villager", 120, 5651507, 12422002);
 		addMapping(EntityEnderCrystal.class, EntityEnderCrystal::new, "EnderCrystal", 200);
 		// Starlike
-		addMapping(EntityNetherCreeper.class, EntityNetherCreeper::new, "NetherCreeper", 201, 894731, 0);
+		addMapping(EntityNetherCreeper.class, EntityNetherCreeper::new, "NetherCreeper", 201, 0xFFCC0000, 0xFFFFA500);
 
 	}
 

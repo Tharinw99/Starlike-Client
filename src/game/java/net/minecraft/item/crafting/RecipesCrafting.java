@@ -37,7 +37,7 @@ public class RecipesCrafting {
 		parCraftingManager.addRecipe(new ItemStack(Items.steel, 1), new Object[] { "III", "ICI", "III",
 				Character.valueOf('I'), Items.iron_ingot, Character.valueOf('C'), Items.coal });
 		parCraftingManager.addRecipe(new ItemStack(Blocks.steel_grate, 4),
-				new Object[] { "SSS", "S S", "SSS", Character.valueOf('S'), Items.steel });
+				new Object[] { "S S", " S ", "S S", Character.valueOf('S'), Items.steel });
 		parCraftingManager.addRecipe(new ItemStack(Items.platinum_sword, 1), new Object[] { "P", "P", "B",
 				Character.valueOf('P'), Items.platinum_ingot, Character.valueOf('B'), Items.blaze_rod });
 		parCraftingManager.addRecipe(new ItemStack(Items.platinum_pickaxe, 1), new Object[] { "PPP", " B ", " B ",
@@ -67,25 +67,23 @@ public class RecipesCrafting {
 						Character.valueOf('S'), Items.steel, Character.valueOf('U'), Items.uranium_rod });
 		parCraftingManager.addRecipe(new ItemStack(Items.titanium_drill, 1), new Object[] { "TTT", "TDT", "TTT",
 				Character.valueOf('T'), Items.titanium_ingot, Character.valueOf('D'), Items.platinum_drill });
-		/*
 		parCraftingManager.addRecipe(new ItemStack(Blocks.mosaic, 4, BlockMosaic.EnumType.OAK.getMetadata()),
-				new Object[] { "##", "##", Character.valueOf('#'),
+				new Object[] { "# #", "   ", "# #", Character.valueOf('#'),
 						new ItemStack(Blocks.planks, 1, BlockPlanks.EnumType.OAK.getMetadata()) });
 		parCraftingManager.addRecipe(new ItemStack(Blocks.mosaic, 4, BlockMosaic.EnumType.SPRUCE.getMetadata()),
-				new Object[] { "##", "##", Character.valueOf('#'),
+				new Object[] { "# #", "   ", "# #", Character.valueOf('#'),
 						new ItemStack(Blocks.planks, 1, BlockPlanks.EnumType.SPRUCE.getMetadata()) });
 		parCraftingManager.addRecipe(new ItemStack(Blocks.mosaic, 4, BlockMosaic.EnumType.BIRCH.getMetadata()),
-				new Object[] { "##", "##", Character.valueOf('#'),
+				new Object[] { "# #", "   ", "# #", Character.valueOf('#'),
 						new ItemStack(Blocks.planks, 1, BlockPlanks.EnumType.BIRCH.getMetadata()) });
 		parCraftingManager.addRecipe(new ItemStack(Blocks.mosaic, 4, BlockMosaic.EnumType.JUNGLE.getMetadata()),
-				new Object[] { "##", "##", Character.valueOf('#'),
+				new Object[] { "# #", "   ", "# #", Character.valueOf('#'),
 						new ItemStack(Blocks.planks, 1, BlockPlanks.EnumType.JUNGLE.getMetadata()) });
 		parCraftingManager.addRecipe(new ItemStack(Blocks.mosaic, 4, BlockMosaic.EnumType.ACACIA.getMetadata()),
-				new Object[] { "##", "##", Character.valueOf('#'),
+				new Object[] { "# #", "   ", "# #", Character.valueOf('#'),
 						new ItemStack(Blocks.planks, 1, BlockPlanks.EnumType.ACACIA.getMetadata()) });
 		parCraftingManager.addRecipe(new ItemStack(Blocks.mosaic, 4, BlockMosaic.EnumType.DARK_OAK.getMetadata()),
-				new Object[] { "##", "##", Character.valueOf('#'),
+				new Object[] { "# #", "   ", "# #", Character.valueOf('#'),
 						new ItemStack(Blocks.planks, 1, BlockPlanks.EnumType.DARK_OAK.getMetadata()) });
-		*/
 	}
 }

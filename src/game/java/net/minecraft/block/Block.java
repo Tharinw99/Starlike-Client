@@ -703,9 +703,8 @@ public class Block {
 						.setStepSound(soundTypeMetal).setUnlocalizedName("steel_block")
 						.setCreativeTab(CreativeTabs.tabStarlike));
 		registerBlock(515, (String) "starlike:steel_grate",
-				(new BlockSteelGrate()).setHardness(5.0F).setResistance(10.0F)
-						.setStepSound(soundTypeMetal).setUnlocalizedName("steel_grate")
-						.setCreativeTab(CreativeTabs.tabStarlike));
+				(new BlockSteelGrate()).setHardness(5.0F).setResistance(10.0F).setStepSound(soundTypeMetal)
+						.setUnlocalizedName("steel_grate").setCreativeTab(CreativeTabs.tabStarlike));
 		registerBlock(516, (String) "starlike:platinum_ore",
 				(new BlockOre()).setHardness(50.0F).setResistance(250.0F).setStepSound(soundTypePiston)
 						.setUnlocalizedName("platinum_ore").setCreativeTab(CreativeTabs.tabStarlike));
