@@ -76,7 +76,7 @@ public class LWJGLEntryPoint {
 			lr.setVisible(true);
 
 			while (lr.isVisible()) {
-				EagUtils.sleep(100l);
+				EagUtils.sleep(100);
 			}
 
 			lr.dispose();
@@ -93,7 +93,7 @@ public class LWJGLEntryPoint {
 
 		EagRuntime.create();
 
-		Main.appMain(new String[0]);
+		Main.appMain();
 
 	}
 

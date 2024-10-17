@@ -1963,11 +1963,11 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	 * + Plays sounds and makes particles for item in use state
 	 */
 	protected void updateItemUse(ItemStack itemStackIn, int parInt1) {
-		if (itemStackIn.getItemUseAction() == EnumAction.DRINK) {
+		switch (itemStackIn.getItemUseAction()) {
+		case DRINK:
 			this.playSound("random.drink", 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
-		}
-
-		if (itemStackIn.getItemUseAction() == EnumAction.EAT) {
+			break;
+		case EAT:
 			for (int i = 0; i < parInt1; ++i) {
 				Vec3 vec3 = new Vec3(((double) this.rand.nextFloat() - 0.5D) * 0.1D, Math.random() * 0.1D + 0.1D, 0.0D);
 				vec3 = vec3.rotatePitch(-this.rotationPitch * 3.1415927F / 180.0F);
@@ -1990,8 +1990,13 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 
 			this.playSound("random.eat", 0.5F + 0.5F * (float) this.rand.nextInt(2),
 					(this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
+			break;
+		case CHISEL:
+			this.playSound("starlike:random.chisel", 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
+			break;
+		default:
+			break;
 		}
-
 	}
 
 	/**

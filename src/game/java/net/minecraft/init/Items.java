@@ -11,6 +11,7 @@ import net.minecraft.item.ItemMap;
 import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemShears;
 import net.minecraft.util.ResourceLocation;
+import net.starlikeclient.minecraft.items.ItemChisel;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
@@ -239,6 +240,20 @@ public class Items {
 	public static Item uranium_rod;
 	public static Item platinum_drill;
 	public static Item titanium_drill;
+	public static Item dragonite;
+	public static Item copper_ingot;
+	public static Item netherite_scrap;
+	public static Item netherite_ingot;
+	public static Item netherite_sword;
+	public static Item netherite_shovel;
+	public static Item netherite_pickaxe;
+	public static Item netherite_axe;
+	public static Item netherite_hoe;
+	public static ItemArmor netherite_helmet;
+	public static ItemArmor netherite_chestplate;
+	public static ItemArmor netherite_leggings;
+	public static ItemArmor netherite_boots;
+	public static ItemChisel chisel;
 
 	static void doBootstrap() {
 		if (!Bootstrap.isRegistered()) {
@@ -448,6 +463,20 @@ public class Items {
 			uranium_rod = getRegisteredItem("starlike:uranium_rod");
 			platinum_drill = getRegisteredItem("starlike:platinum_drill");
 			titanium_drill = getRegisteredItem("starlike:titanium_drill");
+			dragonite = getRegisteredItem("starlike:dragonite");
+			copper_ingot = getRegisteredItem("starlike:copper_ingot");
+			netherite_scrap = getRegisteredItem("starlike:netherite_scrap");
+			netherite_ingot = getRegisteredItem("starlike:netherite_ingot");
+			netherite_sword = getRegisteredItem("starlike:netherite_sword");
+			netherite_shovel = getRegisteredItem("starlike:netherite_shovel");
+			netherite_pickaxe = getRegisteredItem("starlike:netherite_pickaxe");
+			netherite_axe = getRegisteredItem("starlike:netherite_axe");
+			netherite_hoe = getRegisteredItem("starlike:netherite_hoe");
+			netherite_helmet = (ItemArmor) getRegisteredItem("starlike:netherite_helmet");
+			netherite_chestplate = (ItemArmor) getRegisteredItem("starlike:netherite_chestplate");
+			netherite_leggings = (ItemArmor) getRegisteredItem("starlike:netherite_leggings");
+			netherite_boots = (ItemArmor) getRegisteredItem("starlike:netherite_boots");
+			chisel = (ItemChisel) getRegisteredItem("starlike:chisel");
 		}
 	}
 

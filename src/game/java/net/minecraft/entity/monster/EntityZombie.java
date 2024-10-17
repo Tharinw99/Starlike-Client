@@ -109,7 +109,6 @@ public class EntityZombie extends EntityMob {
 		this.tasks.addTask(7, new EntityAIWander(this, 1.0D));
 		this.tasks.addTask(8, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
 		this.tasks.addTask(8, new EntityAILookIdle(this));
-		this.tasks.addTask(9, new EntityAINearestAttackableTarget(this, EntityNetherCreeper.class, true));
 
 		this.applyEntityAI();
 		this.setSize(0.6F, 1.95F);

@@ -73,6 +73,7 @@ public class GuiEditSign extends GuiScreenVisualViewport {
 		this.drawDefaultBackground();
 		this.drawCenteredString(this.fontRendererObj, I18n.format("sign.edit", new Object[0]), this.width / 2, 40,
 				16777215);
+
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 		GlStateManager.pushMatrix();
 		GlStateManager.translate((float) (this.width / 2), 0.0F, 50.0F);
@@ -80,6 +81,7 @@ public class GuiEditSign extends GuiScreenVisualViewport {
 		GlStateManager.scale(-f1, -f1, -f1);
 		GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
 		Block block = this.tileSign.getBlockType();
+
 		if (block == Blocks.standing_sign) {
 			float f2 = (float) (this.tileSign.getBlockMetadata() * 360) / 16.0F;
 			GlStateManager.rotate(f2, 0.0F, 1.0F, 0.0F);
@@ -90,15 +92,12 @@ public class GuiEditSign extends GuiScreenVisualViewport {
 			if (k == 2) {
 				f3 = 180.0F;
 			}
-
 			if (k == 4) {
 				f3 = 90.0F;
 			}
-
 			if (k == 5) {
 				f3 = -90.0F;
 			}
-
 			GlStateManager.rotate(f3, 0.0F, 1.0F, 0.0F);
 			GlStateManager.translate(0.0F, -1.0625F, 0.0F);
 		}
@@ -117,6 +116,7 @@ public class GuiEditSign extends GuiScreenVisualViewport {
 		} finally {
 			TileEntitySignRenderer.disableProfanityFilter = false;
 		}
+
 		this.tileSign.lineBeingEdited = -1;
 		GlStateManager.popMatrix();
 		super.drawScreen0(i, j, f);

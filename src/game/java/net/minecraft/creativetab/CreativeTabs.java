@@ -90,7 +90,7 @@ public abstract class CreativeTabs {
 			EnumEnchantmentType.ARMOR_TORSO, EnumEnchantmentType.BOW, EnumEnchantmentType.WEAPON });
 	public static final CreativeTabs tabBrewing = new CreativeTabs(9, "brewing") {
 		public Item getTabIconItem() {
-			return Items.potionitem;
+			return Items.cooked_porkchop;
 		}
 	};
 	public static final CreativeTabs tabMaterials = new CreativeTabs(10, "materials") {
@@ -105,7 +105,7 @@ public abstract class CreativeTabs {
 	}).setBackgroundImageName("inventory.png").setNoScrollbar().setNoTitle();
 	public static final CreativeTabs tabStarlike = new CreativeTabs(12, "starlike") {
 		public Item getTabIconItem() {
-			return null;
+			return Items.titanium_drill;
 		}
 	};
 	private final int tabIndex;
@@ -238,7 +238,7 @@ public abstract class CreativeTabs {
 	 * + returns tabIndex < 6
 	 */
 	public boolean isTabInFirstRow() {
-		return this.tabIndex < 6;
+		return this.tabIndex < 7;
 	}
 
 	public CreativeTabs setBackgroundImageName(String texture) {

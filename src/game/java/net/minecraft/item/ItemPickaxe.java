@@ -43,11 +43,11 @@ public class ItemPickaxe extends ItemTool {
 				Blocks.red_sandstone, Blocks.stone, Blocks.stone_slab,
 
 				Blocks.titanium_ore, Blocks.titanium_block, Blocks.uranium_ore, Blocks.uranium_block,
-				Blocks.platinum_ore, Blocks.platinum_block, Blocks.steel_block, Blocks.steel_grate, Blocks.deepstone,
-				Blocks.cobbled_deepstone });
+				Blocks.platinum_ore, Blocks.platinum_block, Blocks.steel_block, Blocks.steel_grate, Blocks.deepslate,
+				Blocks.cobbled_deepslate });
 	}
 
-	protected ItemPickaxe(Item.ToolMaterial material) {
+	public ItemPickaxe(Item.ToolMaterial material) {
 		super(2.0F, material, EFFECTIVE_ON);
 	}
 
@@ -57,8 +57,10 @@ public class ItemPickaxe extends ItemTool {
 	public boolean canHarvestBlock(Block blockIn) {
 		if (blockIn == Blocks.titanium_block || blockIn == Blocks.titanium_ore || blockIn == Blocks.uranium_block
 				|| blockIn == Blocks.uranium_ore) {
+			return this.toolMaterial.getHarvestLevel() >= 5;
+		} else if (blockIn == Blocks.platinum_block || blockIn == Blocks.platinum_ore) {
 			return this.toolMaterial.getHarvestLevel() >= 4;
-		} else if (blockIn == Blocks.platinum_block || blockIn == Blocks.platinum_ore || blockIn == Blocks.obsidian) {
+		} else if (blockIn == Blocks.obsidian) {
 			return this.toolMaterial.getHarvestLevel() >= 3;
 		} else if (blockIn == Blocks.diamond_block || blockIn == Blocks.diamond_ore || blockIn == Blocks.emerald_block
 				|| blockIn == Blocks.emerald_ore || blockIn == Blocks.gold_block || blockIn == Blocks.gold_ore

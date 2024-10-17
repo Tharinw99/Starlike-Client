@@ -1,0 +1,8 @@
+{
+  "parent": "block/cube_bottom_top",
+  "textures": {
+    "top": "starlike:blocks/cracked_blackstone",
+    "bottom": "starlike:blocks/cracked_blackstone",
+    "side": "starlike:blocks/blackstone"
+  }
+}

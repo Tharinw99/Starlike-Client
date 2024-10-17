@@ -6,9 +6,11 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockTorch;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
@@ -186,6 +188,39 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
 
 	}
 
+	private void createCrystal(BlockPos basePos) {
+		int height = 8;
+		int multiplier = 2;
+		int maxHeight = height + 1;
+		for (int i = 0; i < height; i++) {
+			int width = (height - i - 1) * multiplier / 2;
+			for (int j = -width; j <= width; j++) {
+				for (int k = -width; k <= width; k++) {
+					if (Math.abs(j) + Math.abs(k) <= width) {
+						BlockPos pos = basePos.add(j, i - 1, k);
+						this.worldObj.setBlockState(pos, getCrystalRandomState());
+					}
+				}
+			}
+		}
+		BlockPos reverseBasePos = basePos.add(0, -1, 0);
+		this.worldObj.setBlockState(reverseBasePos, Blocks.dragon_egg.getDefaultState());
+
+		reverseBasePos = basePos.add(0, -1, 0);
+
+		for (int i = 0; i < height; i++) {
+			int width = (height - i - 1) * multiplier / 2;
+			for (int j = -width; j <= width; j++) {
+				for (int k = -width; k <= width; k++) {
+					if (Math.abs(j) + Math.abs(k) <= width) {
+						BlockPos pos = reverseBasePos.add(j, -i - 1, k);
+						this.worldObj.setBlockState(pos, getCrystalRandomState());
+					}
+				}
+			}
+		}
+	}
+
 	/**
 	 * + Makes the entity despawn if requirements are reached
 	 */
@@ -214,6 +249,7 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
 					if (block.getMaterial() != Material.air) {
 						if (block != Blocks.barrier && block != Blocks.obsidian && block != Blocks.end_stone
 								&& block != Blocks.bedrock && block != Blocks.command_block
+								&& block != Blocks.dragonite_block
 								&& this.worldObj.getGameRules().getBoolean("mobGriefing")) {
 							flag1 = this.worldObj.setBlockToAir(blockpos) || flag1;
 						} else {
@@ -244,25 +280,27 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
 	/**
 	 * + Generate the portal when the dragon dies
 	 */
-	private void generatePortal(BlockPos pos) {
-		boolean flag = true;
-		double d0 = 12.25D;
-		double d1 = 6.25D;
+	private void generatePortal() {
+		BlockPos surfacePos = this.worldObj.getTopSolidOrLiquidBlock(new BlockPos(0, 30, 0));
+		BlockPos pos = surfacePos.up();
+
+		System.out.println("genportal");
 
 		for (int i = -1; i <= 32; ++i) {
-			for (int j = -4; j <= 4; ++j) {
-				for (int k = -4; k <= 4; ++k) {
+			for (int j = -5; j <= 5; ++j) {
+				for (int k = -5; k <= 5; ++k) {
 					double d2 = (double) (j * j + k * k);
-					if (d2 <= 12.25D) {
-						BlockPos blockpos = pos.add(j, i, k);
+					BlockPos blockpos = pos.add(j, i, k);
+
+					if (d2 <= 16.0D) {
 						if (i < 0) {
-							if (d2 <= 6.25D) {
-								this.worldObj.setBlockState(blockpos, Blocks.bedrock.getDefaultState());
+							if (d2 <= 9.0D) {
+								this.worldObj.setBlockState(blockpos, Blocks.obsidian.getDefaultState());
 							}
 						} else if (i > 0) {
 							this.worldObj.setBlockState(blockpos, Blocks.air.getDefaultState());
-						} else if (d2 > 6.25D) {
-							this.worldObj.setBlockState(blockpos, Blocks.bedrock.getDefaultState());
+						} else if (d2 > 9.0D) {
+							this.worldObj.setBlockState(blockpos, Blocks.obsidian.getDefaultState());
 						} else {
 							this.worldObj.setBlockState(blockpos, Blocks.end_portal.getDefaultState());
 						}
@@ -271,10 +309,12 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
 			}
 		}
 
-		this.worldObj.setBlockState(pos, Blocks.bedrock.getDefaultState());
-		this.worldObj.setBlockState(pos.up(), Blocks.bedrock.getDefaultState());
+		this.worldObj.setBlockState(pos, Blocks.end_stone.getDefaultState());
+		this.worldObj.setBlockState(pos.up(), Blocks.end_stone.getDefaultState());
+		this.worldObj.setBlockState(pos.up().up(), Blocks.dragon_egg.getDefaultState());
+
 		BlockPos blockpos1 = pos.up(2);
-		this.worldObj.setBlockState(blockpos1, Blocks.bedrock.getDefaultState());
+		this.worldObj.setBlockState(blockpos1, Blocks.end_stone.getDefaultState());
 		this.worldObj.setBlockState(blockpos1.west(),
 				Blocks.torch.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.EAST));
 		this.worldObj.setBlockState(blockpos1.east(),
@@ -283,8 +323,42 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
 				Blocks.torch.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.SOUTH));
 		this.worldObj.setBlockState(blockpos1.south(),
 				Blocks.torch.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.NORTH));
-		this.worldObj.setBlockState(pos.up(3), Blocks.bedrock.getDefaultState());
-		this.worldObj.setBlockState(pos.up(4), Blocks.dragon_egg.getDefaultState());
+
+		this.worldObj.setBlockState(pos.up(3), Blocks.end_stone.getDefaultState());
+
+		BlockPos beaconPos = pos.up(12);
+
+		for (int i = 1; i <= 64; ++i) {
+			this.worldObj.setBlockState(beaconPos.up(i), Blocks.air.getDefaultState());
+		}
+
+		BlockPos basePos = beaconPos.down();
+
+		this.worldObj.setBlockState(basePos.down(), Blocks.dragon_egg.getDefaultState());
+
+		BlockPos crystalBase = beaconPos.up(7);
+		createCrystal(crystalBase);
+	}
+
+	private IBlockState getCrystalRandomState() {
+		EaglercraftRandom random = new EaglercraftRandom();
+		int rand = random.nextInt(7);
+		switch (rand) {
+		case 0:
+			return Blocks.stained_glass.getStateFromMeta(6);
+		case 1:
+			return Blocks.end_stone.getDefaultState();
+		case 2:
+			return Blocks.purple_packed_terracotta.getDefaultState();
+		case 3:
+			return Blocks.stained_glass.getStateFromMeta(6);
+		case 4:
+			return Blocks.end_stone.getDefaultState();
+		case 5:
+			return Blocks.dragonite_block.getDefaultState();
+		default:
+			return Blocks.end_stone.getDefaultState();
+		}
 	}
 
 	/**
@@ -388,7 +462,7 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
 				}
 			}
 
-			this.generatePortal(new BlockPos(this.posX, 64.0D, this.posZ));
+			this.generatePortal();
 			this.setDead();
 		}
 
@@ -398,6 +472,7 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
 	 * + Called by the /kill command.
 	 */
 	public void onKillCommand() {
+		this.generatePortal();
 		this.setDead();
 	}
 

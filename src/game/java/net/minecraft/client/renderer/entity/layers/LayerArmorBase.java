@@ -195,6 +195,10 @@ public abstract class LayerArmorBase<T extends ModelBase> implements LayerRender
 				DeferredStateManager.setRoughnessConstant(0.078f);
 				DeferredStateManager.setMetalnessConstant(0.588f);
 				break;
+			case NETHERITE:
+				DeferredStateManager.setRoughnessConstant(0.085f);
+				DeferredStateManager.setMetalnessConstant(0.900f);
+				break;
 			case PLATINUM:
 				DeferredStateManager.setRoughnessConstant(0.129f);
 				DeferredStateManager.setMetalnessConstant(0.913f);
@@ -215,6 +219,7 @@ public abstract class LayerArmorBase<T extends ModelBase> implements LayerRender
 			case IRON:
 			case GOLD:
 			case DIAMOND:
+			case NETHERITE:
 			case PLATINUM:
 				GlStateManager.color(this.colorR, this.colorG, this.colorB, this.alpha);
 				modelbase.render(entitylivingbaseIn, armorSlot, parFloat2, parFloat4, parFloat5, parFloat6, parFloat7);

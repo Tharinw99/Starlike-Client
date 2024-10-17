@@ -531,11 +531,11 @@ public class ChunkProviderGenerate implements IChunkProvider {
 														Blocks.stone.getDefaultState());
 											} else {
 												parChunkPrimer.setBlockState(i * 4 + k2, i2 * 8 + j2, l * 4 + l2,
-														Blocks.deepstone.getDefaultState());
+														Blocks.deepslate.getDefaultState());
 											}
 										} else {
 											parChunkPrimer.setBlockState(i * 4 + k2, i2 * 8 + j2, l * 4 + l2,
-													Blocks.deepstone.getDefaultState());
+													Blocks.deepslate.getDefaultState());
 										}
 									} else {
 										parChunkPrimer.setBlockState(i * 4 + k2, i2 * 8 + j2, l * 4 + l2,

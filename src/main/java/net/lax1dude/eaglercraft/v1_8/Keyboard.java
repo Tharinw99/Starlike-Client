@@ -22,6 +22,10 @@ import net.lax1dude.eaglercraft.v1_8.internal.PlatformInput;
  */
 public class Keyboard {
 
+	public static boolean areKeysLocked() {
+		return PlatformInput.keyboardAreKeysLocked();
+	}
+
 	public static void enableRepeatEvents(boolean b) {
 		PlatformInput.keyboardEnableRepeatEvents(b);
 	}

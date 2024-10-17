@@ -173,6 +173,7 @@ public abstract class BiomeGenBase {
 	public static BiomeGenBase mesa;
 	public static BiomeGenBase mesaPlateau_F;
 	public static BiomeGenBase mesaPlateau;
+
 	public static BiomeGenBase field_180279_ad;
 	protected static NoiseGeneratorPerlin temperatureNoise;
 	protected static NoiseGeneratorPerlin GRASS_COLOR_NOISE;
@@ -252,6 +253,7 @@ public abstract class BiomeGenBase {
 				.setHeight(height_HighPlateaus);
 		mesaPlateau = (new BiomeGenMesa(39, false, false)).setColor(13274213).setBiomeName("Mesa Plateau")
 				.setHeight(height_HighPlateaus);
+
 		field_180279_ad = ocean;
 
 		plains.createMutation();
@@ -274,7 +276,6 @@ public abstract class BiomeGenBase {
 		megaTaiga.createMutation();
 		extremeHills.createMutation();
 		extremeHillsPlus.createMutation();
-		megaTaiga.createMutatedBiome(megaTaigaHills.biomeID + 128).setBiomeName("Redwood Taiga Hills M");
 
 		explorationBiomesList.clear();
 
@@ -342,7 +343,7 @@ public abstract class BiomeGenBase {
 	public float rainfall;
 	public int waterColorMultiplier;
 	public BiomeDecorator theBiomeDecorator;
-	protected List<BiomeGenBase.SpawnListEntry> spawnableMonsterList;
+	public List<BiomeGenBase.SpawnListEntry> spawnableMonsterList;
 	protected List<BiomeGenBase.SpawnListEntry> spawnableCreatureList;
 	protected List<BiomeGenBase.SpawnListEntry> spawnableWaterCreatureList;
 

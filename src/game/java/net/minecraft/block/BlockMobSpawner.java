@@ -38,6 +38,10 @@ public class BlockMobSpawner extends BlockContainer {
 		super(Material.rock);
 	}
 
+	protected boolean canSilkHarvest() {
+		return true;
+	}
+
 	/**
 	 * + Returns a new instance of a block's tile entity class. Called on placing
 	 * the block.

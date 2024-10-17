@@ -41,7 +41,6 @@ import net.lax1dude.eaglercraft.v1_8.futures.FutureTask;
 import net.lax1dude.eaglercraft.v1_8.futures.ListenableFuture;
 import net.lax1dude.eaglercraft.v1_8.futures.ListenableFutureTask;
 import net.lax1dude.eaglercraft.v1_8.internal.EnumPlatformType;
-import net.lax1dude.eaglercraft.v1_8.internal.PlatformInput;
 import net.lax1dude.eaglercraft.v1_8.internal.PlatformRuntime;
 import net.lax1dude.eaglercraft.v1_8.internal.PlatformWebRTC;
 import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
@@ -290,7 +289,7 @@ public class Minecraft implements IThreadListener {
 	private TextureManager renderEngine;
 	public PlayerControllerMP playerController;
 	private boolean fullscreen;
-	private boolean enableGLErrorChecking = true;
+	private boolean enableGLErrorChecking = false;
 	private boolean hasCrashed;
 	private CrashReport crashReporter;
 	public int displayWidth;
@@ -332,7 +331,7 @@ public class Minecraft implements IThreadListener {
 	long systemTime = getSystemTime();
 	private int joinPlayerCounter;
 	public final FrameTimer field_181542_y = new FrameTimer();
-	long field_181543_z = System.nanoTime();
+	long field_181543_z = EagRuntime.nanoTime();
 	private final boolean jvm64bit;
 	private EaglercraftNetworkManager myNetworkManager;
 	private boolean integratedServerIsRunning;
@@ -423,6 +422,7 @@ public class Minecraft implements IThreadListener {
 		this.tempDisplayHeight = gameConfig.displayInfo.height;
 		this.fullscreen = gameConfig.displayInfo.fullscreen;
 		this.jvm64bit = isJvm64bit();
+		this.enableGLErrorChecking = EagRuntime.getConfiguration().isCheckGLErrors();
 		String serverToJoin = EagRuntime.getConfiguration().getServerToJoin();
 		if (serverToJoin != null) {
 			ServerAddress addr = AddressResolver.resolveAddressFromURI(serverToJoin);
@@ -571,10 +571,6 @@ public class Minecraft implements IThreadListener {
 	public ListenableFuture<Object> addScheduledTaskFuture(Runnable runnableToSchedule) {
 		Validate.notNull(runnableToSchedule);
 		return this.addScheduledTaskFuture(Executors.callable(runnableToSchedule));
-	}
-
-	public boolean areKeysLocked() {
-		return PlatformInput.lockKeys;
 	}
 
 	/**
@@ -1427,7 +1423,7 @@ public class Minecraft implements IThreadListener {
 	 * + Called repeatedly from run()
 	 */
 	private void runGameLoop() throws IOException {
-		long i = System.nanoTime();
+		long i = EagRuntime.nanoTime();
 		if (Display.isCloseRequested()) {
 			this.shutdown();
 		}
@@ -1449,26 +1445,16 @@ public class Minecraft implements IThreadListener {
 			}
 		}
 
-		long l = System.nanoTime();
+		long l = EagRuntime.nanoTime();
 
-		if (this.timer.elapsedTicks > 1) {
-			long watchdog = EagRuntime.steadyTimeMillis();
-			for (int j = 0; j < this.timer.elapsedTicks; ++j) {
-				this.runTick();
-				if (j < this.timer.elapsedTicks - 1) {
-					PointerInputAbstraction.runGameLoop();
-				}
-				long millis = EagRuntime.steadyTimeMillis();
-				if (millis - watchdog > 50l) {
-					watchdog = millis;
-					EagRuntime.immediateContinue();
-				}
-			}
-		} else if (this.timer.elapsedTicks == 1) {
+		for (int j = 0; j < this.timer.elapsedTicks; ++j) {
 			this.runTick();
+			if (j < this.timer.elapsedTicks - 1) {
+				PointerInputAbstraction.runGameLoop();
+			}
 		}
 
-		long i1 = System.nanoTime() - l;
+		long i1 = EagRuntime.nanoTime() - l;
 		this.checkGLError("Pre render");
 		this.mcSoundHandler.setListener(this.thePlayer, this.timer.renderPartialTicks);
 
@@ -1497,7 +1483,7 @@ public class Minecraft implements IThreadListener {
 		this.checkGLError("Post render");
 
 		++this.fpsCounter;
-		long k = System.nanoTime();
+		long k = EagRuntime.nanoTime();
 		this.field_181542_y.func_181747_a(k - this.field_181543_z);
 		this.field_181543_z = k;
 
@@ -1516,9 +1502,9 @@ public class Minecraft implements IThreadListener {
 			this.fpsCounter = 0;
 		}
 
-		if (this.isFramerateLimitBelowMax()) {
-			Display.sync(this.getLimitFramerate());
-		}
+//		if (this.isFramerateLimitBelowMax()) {
+//			Display.sync(this.getLimitFramerate());
+//		}
 
 		Mouse.tickCursorShape();
 	}
@@ -1761,7 +1747,7 @@ public class Minecraft implements IThreadListener {
 
 			while (Keyboard.next()) {
 				int k = Keyboard.getEventKey() == 0 ? Keyboard.getEventCharacter() + 256 : Keyboard.getEventKey();
-				if (k == 0x1D && (areKeysLocked() || isFullScreen())) {
+				if (k == 0x1D && (Keyboard.areKeysLocked() || isFullScreen())) {
 					KeyBinding.setKeyBindState(gameSettings.keyBindSprint.getKeyCode(), Keyboard.getEventKeyState());
 				}
 				KeyBinding.setKeyBindState(k, Keyboard.getEventKeyState());
@@ -2267,14 +2253,14 @@ public class Minecraft implements IThreadListener {
 			if (SingleplayerServerController.isWorldRunning()) {
 				SingleplayerServerController.shutdownEaglercraftServer();
 				while (SingleplayerServerController.getStatusState() == IntegratedServerState.WORLD_UNLOADING) {
-					EagUtils.sleep(50l);
+					EagUtils.sleep(50);
 					SingleplayerServerController.runTick();
 				}
 			}
 			if (SingleplayerServerController.isIntegratedServerWorkerAlive()
 					&& SingleplayerServerController.canKillWorker()) {
 				SingleplayerServerController.killWorker();
-				EagUtils.sleep(50l);
+				EagUtils.sleep(50);
 			}
 		} finally {
 			EagRuntime.destroy();
@@ -2408,7 +2394,9 @@ public class Minecraft implements IThreadListener {
 			mainMenu = new GuiConnecting(mainMenu, this, this.serverName, this.serverPort);
 		}
 
-		mainMenu = new GuiScreenEditProfile(mainMenu);
+		if (EagRuntime.getStorage("p") == null) {
+			mainMenu = new GuiScreenEditProfile(mainMenu);
+		}
 
 		if (!EagRuntime.getConfiguration().isForceProfanityFilter() && !gameSettings.hasShownProfanityFilter) {
 			mainMenu = new GuiScreenContentWarning(mainMenu);
@@ -2456,7 +2444,11 @@ public class Minecraft implements IThreadListener {
 		} else {
 			this.gameSettings.enableVsync = false;
 		}
-		Display.update();
+		if (!this.gameSettings.enableVsync && this.isFramerateLimitBelowMax()) {
+			Display.update(this.getLimitFramerate());
+		} else {
+			Display.update(0);
+		}
 		this.checkWindowResize();
 	}
 

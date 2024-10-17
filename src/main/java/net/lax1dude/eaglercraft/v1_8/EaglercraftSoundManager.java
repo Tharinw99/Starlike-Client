@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.lax1dude.eaglercraft.v1_8.internal.EnumPlatformType;
+import net.lax1dude.eaglercraft.v1_8.internal.IAudioCacheLoader;
 import net.lax1dude.eaglercraft.v1_8.internal.IAudioHandle;
 import net.lax1dude.eaglercraft.v1_8.internal.IAudioResource;
 import net.lax1dude.eaglercraft.v1_8.internal.PlatformAudio;
@@ -124,7 +125,7 @@ public class EaglercraftSoundManager {
 	private final List<ActiveSoundEvent> activeSounds;
 	private final List<WaitingSoundEvent> queuedSounds;
 
-	private final PlatformAudio.IAudioCacheLoader browserResourcePackLoader = filename -> {
+	private final IAudioCacheLoader browserResourcePackLoader = filename -> {
 		try {
 			return EaglerInputStream.inputStreamToBytesQuiet(Minecraft.getMinecraft().getResourceManager()
 					.getResource(new ResourceLocation(filename)).getInputStream());

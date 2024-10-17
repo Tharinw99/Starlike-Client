@@ -71,7 +71,6 @@ import net.minecraft.entity.monster.EntityGiantZombie;
 import net.minecraft.entity.monster.EntityGuardian;
 import net.minecraft.entity.monster.EntityIronGolem;
 import net.minecraft.entity.monster.EntityMagmaCube;
-import net.minecraft.entity.monster.EntityNetherCreeper;
 import net.minecraft.entity.monster.EntityPigZombie;
 import net.minecraft.entity.monster.EntitySilverfish;
 import net.minecraft.entity.monster.EntitySkeleton;
@@ -108,6 +107,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ReportedException;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.starlikeclient.minecraft.init.EntitiesStarlike;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
@@ -144,7 +144,7 @@ public class RenderManager {
 		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j / 1.0F, (float) k / 1.0F);
 	}
 
-	private Map<Class<? extends Entity>, Render<? extends Entity>> entityRenderMap = Maps.newHashMap();
+	public Map<Class<? extends Entity>, Render<? extends Entity>> entityRenderMap = Maps.newHashMap();
 	private Map<String, RenderPlayer> skinMap = Maps.newHashMap();
 	private RenderPlayer playerRenderer;
 	private RenderPlayer eaglerRenderer;
@@ -232,7 +232,8 @@ public class RenderManager {
 		this.entityRenderMap.put(EntityFishHook.class, new RenderFish(this));
 		this.entityRenderMap.put(EntityHorse.class, new RenderHorse(this, new ModelHorse(), 0.75F));
 		this.entityRenderMap.put(EntityLightningBolt.class, new RenderLightningBolt(this));
-		this.entityRenderMap.put(EntityNetherCreeper.class, new RenderNetherCreeper(this));
+
+		EntitiesStarlike.renderEntities(this);
 
 		this.playerRenderer = new RenderPlayer(this);
 		this.skinMap.put("default", this.playerRenderer);

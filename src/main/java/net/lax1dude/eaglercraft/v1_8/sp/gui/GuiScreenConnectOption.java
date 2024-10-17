@@ -65,7 +65,11 @@ public class GuiScreenConnectOption extends GuiScreen {
 		prompt = I18n.format("directConnect.prompt");
 		buttonList.clear();
 		buttonList.add(new GuiButton(1, this.width / 2 - 100, this.height / 4 - 60 + 90,
-				I18n.format("directConnect.serverJoin")));
+				I18n.format("directConnect.serverJoin")) {
+			{
+				enabled = false;
+			}
+		});
 		buttonList.add(new GuiButton(2, this.width / 2 - 100, this.height / 4 - 60 + 115,
 				I18n.format("directConnect.lanWorld")));
 		buttonList.add(new GuiButton(0, this.width / 2 - 100, this.height / 4 - 60 + 155, I18n.format("gui.cancel")));

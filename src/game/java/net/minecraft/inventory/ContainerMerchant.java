@@ -2,8 +2,10 @@ package net.minecraft.inventory;
 
 import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.server.S30PacketWindowItems;
 import net.minecraft.world.World;
 
 /**
@@ -80,13 +82,19 @@ public class ContainerMerchant extends Container {
 		if (!this.theWorld.isRemote) {
 			ItemStack itemstack = this.merchantInventory.removeStackFromSlot(0);
 			if (itemstack != null) {
-				entityplayer.dropPlayerItemWithRandomChoice(itemstack, false);
+				if (!entityplayer.inventory.addItemStackToInventory(itemstack)) {
+					entityplayer.dropPlayerItemWithRandomChoice(itemstack, false);
+				}
 			}
 
 			itemstack = this.merchantInventory.removeStackFromSlot(1);
 			if (itemstack != null) {
-				entityplayer.dropPlayerItemWithRandomChoice(itemstack, false);
+				if (!entityplayer.inventory.addItemStackToInventory(itemstack)) {
+					entityplayer.dropPlayerItemWithRandomChoice(itemstack, false);
+				}
 			}
+
+			((EntityPlayerMP) entityplayer).playerNetServerHandler.sendPacket(new S30PacketWindowItems(entityplayer.inventoryContainer.windowId, entityplayer.inventoryContainer.getInventory()));
 		}
 	}
 

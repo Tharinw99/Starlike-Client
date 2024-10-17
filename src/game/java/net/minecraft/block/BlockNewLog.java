@@ -86,6 +86,7 @@ public class BlockNewLog extends BlockLog {
 				return MapColor.stoneColor;
 			case DARK_OAK:
 				return BlockPlanks.EnumType.DARK_OAK.func_181070_c();
+
 			}
 		case Y:
 			return blockplanks$enumtype.func_181070_c();
@@ -142,5 +143,6 @@ public class BlockNewLog extends BlockLog {
 	public void getSubBlocks(Item item, CreativeTabs var2, List<ItemStack> list) {
 		list.add(new ItemStack(item, 1, BlockPlanks.EnumType.ACACIA.getMetadata() - 4));
 		list.add(new ItemStack(item, 1, BlockPlanks.EnumType.DARK_OAK.getMetadata() - 4));
+
 	}
 }

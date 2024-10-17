@@ -249,8 +249,9 @@ public class TileEntityBeacon extends TileEntityLockable implements ITickable, I
 	 * stack size) into the given slot.
 	 */
 	public boolean isItemValidForSlot(int index, ItemStack stack) {
-		return stack.getItem() == Items.emerald || stack.getItem() == Items.diamond
-				|| stack.getItem() == Items.gold_ingot || stack.getItem() == Items.iron_ingot;
+		return stack.getItem() == Items.netherite_ingot || stack.getItem() == Items.emerald
+				|| stack.getItem() == Items.diamond || stack.getItem() == Items.gold_ingot
+				|| stack.getItem() == Items.iron_ingot;
 	}
 
 	/**
@@ -423,7 +424,8 @@ public class TileEntityBeacon extends TileEntityLockable implements ITickable, I
 				for (int j1 = j - l1; j1 <= j + l1 && flag1; ++j1) {
 					for (int k1 = l - l1; k1 <= l + l1; ++k1) {
 						Block block = this.worldObj.getBlockState(new BlockPos(j1, i2, k1)).getBlock();
-						if (block != Blocks.emerald_block && block != Blocks.gold_block && block != Blocks.diamond_block
+						if (block != Blocks.netherite_block && block != Blocks.emerald_block
+								&& block != Blocks.gold_block && block != Blocks.diamond_block
 								&& block != Blocks.iron_block) {
 							flag1 = false;
 							break;

@@ -163,7 +163,7 @@ public abstract class GuiContainer extends GuiScreen {
 		RenderHelper.enableGUIStandardItemLighting();
 		GlStateManager.pushMatrix();
 		GlStateManager.translate((float) k, (float) l, 0.0F);
-		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+		GlStateManager.color(0.9F, 0.9F, 1.0F, 1.0F); // Light blue (closer to white)
 		GlStateManager.enableRescaleNormal();
 		this.theSlot = null;
 		short short1 = 240;
@@ -375,8 +375,8 @@ public abstract class GuiContainer extends GuiScreen {
 	 */
 	protected void keyTyped(char parChar1, int parInt1) {
 		if (parInt1 == this.mc.gameSettings.keyBindClose.getKeyCode()
-				|| parInt1 == this.mc.gameSettings.keyBindInventory.getKeyCode()
-				|| (parInt1 == 1 && (this.mc.gameSettings.keyBindClose.getKeyCode() == 0 || this.mc.areKeysLocked()))) {
+				|| parInt1 == this.mc.gameSettings.keyBindInventory.getKeyCode() || (parInt1 == 1
+						&& (this.mc.gameSettings.keyBindClose.getKeyCode() == 0 || Keyboard.areKeysLocked()))) {
 			this.mc.thePlayer.closeScreen();
 			if (this.mc.currentScreen == null) {
 				this.mc.setIngameFocus();

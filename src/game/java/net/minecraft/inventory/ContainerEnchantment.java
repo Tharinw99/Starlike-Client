@@ -6,6 +6,7 @@ import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -14,6 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.network.play.server.S30PacketWindowItems;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
@@ -196,10 +198,12 @@ public class ContainerEnchantment extends Container {
 			for (int i = 0; i < this.tableInventory.getSizeInventory(); ++i) {
 				ItemStack itemstack = this.tableInventory.removeStackFromSlot(i);
 				if (itemstack != null) {
-					entityplayer.dropPlayerItemWithRandomChoice(itemstack, false);
+					if (!entityplayer.inventory.addItemStackToInventory(itemstack)) {
+						entityplayer.dropPlayerItemWithRandomChoice(itemstack, false);
+					}
 				}
 			}
-
+			((EntityPlayerMP) entityplayer).playerNetServerHandler.sendPacket(new S30PacketWindowItems(entityplayer.inventoryContainer.windowId, entityplayer.inventoryContainer.getInventory()));
 		}
 	}
 

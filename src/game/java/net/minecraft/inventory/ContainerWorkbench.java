@@ -1,10 +1,12 @@
 package net.minecraft.inventory;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
+import net.minecraft.network.play.server.S30PacketWindowItems;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
@@ -89,9 +91,12 @@ public class ContainerWorkbench extends Container {
 			for (int i = 0; i < 9; ++i) {
 				ItemStack itemstack = this.craftMatrix.removeStackFromSlot(i);
 				if (itemstack != null) {
-					entityplayer.dropPlayerItemWithRandomChoice(itemstack, false);
+					if (!entityplayer.inventory.addItemStackToInventory(itemstack)) {
+						entityplayer.dropPlayerItemWithRandomChoice(itemstack, false);
+					}
 				}
 			}
+			((EntityPlayerMP) entityplayer).playerNetServerHandler.sendPacket(new S30PacketWindowItems(entityplayer.inventoryContainer.windowId, entityplayer.inventoryContainer.getInventory()));
 		}
 	}
 

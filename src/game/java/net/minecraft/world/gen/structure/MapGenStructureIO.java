@@ -1,6 +1,7 @@
 package net.minecraft.world.gen.structure;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
 import com.google.common.collect.Maps;
 
@@ -35,17 +36,20 @@ import net.minecraft.world.World;
 public class MapGenStructureIO {
 	private static final Logger logger = LogManager.getLogger();
 	private static Map<String, Class<? extends StructureStart>> startNameToClassMap = Maps.newHashMap();
+	private static Map<String, Supplier<? extends StructureStart>> startNameToSupplierMap = Maps.newHashMap();
 	private static Map<Class<? extends StructureStart>, String> startClassToNameMap = Maps.newHashMap();
 	private static Map<String, Class<? extends StructureComponent>> componentNameToClassMap = Maps.newHashMap();
+	private static Map<String, Supplier<? extends StructureComponent>> componentNameToSupplierMap = Maps.newHashMap();
 	private static Map<Class<? extends StructureComponent>, String> componentClassToNameMap = Maps.newHashMap();
 
 	static {
-		registerStructure(StructureMineshaftStart.class, "Mineshaft");
-		registerStructure(MapGenVillage.Start.class, "Village");
-		registerStructure(MapGenNetherBridge.Start.class, "Fortress");
-		registerStructure(MapGenStronghold.Start.class, "Stronghold");
-		registerStructure(MapGenScatteredFeature.Start.class, "Temple");
-		registerStructure(StructureOceanMonument.StartMonument.class, "Monument");
+		registerStructure(StructureMineshaftStart.class, StructureMineshaftStart::new, "Mineshaft");
+		registerStructure(MapGenVillage.Start.class, MapGenVillage.Start::new, "Village");
+		registerStructure(MapGenNetherBridge.Start.class, MapGenNetherBridge.Start::new, "Fortress");
+		registerStructure(MapGenStronghold.Start.class, MapGenStronghold.Start::new, "Stronghold");
+		registerStructure(MapGenScatteredFeature.Start.class, MapGenScatteredFeature.Start::new, "Temple");
+		registerStructure(StructureOceanMonument.StartMonument.class, StructureOceanMonument.StartMonument::new,
+				"Monument");
 		StructureMineshaftPieces.registerStructurePieces();
 		StructureVillagePieces.registerVillagePieces();
 		StructureNetherBridgePieces.registerNetherFortressPieces();
@@ -58,9 +62,10 @@ public class MapGenStructureIO {
 		StructureComponent structurecomponent = null;
 
 		try {
-			Class oclass = (Class) componentNameToClassMap.get(tagCompound.getString("id"));
+			Supplier<? extends StructureComponent> oclass = componentNameToSupplierMap.get(tagCompound.getString("id"));
 			if (oclass != null) {
-				structurecomponent = (StructureComponent) oclass.newInstance();
+				structurecomponent = oclass.get();
+				;
 			}
 		} catch (Exception exception) {
 			logger.warn("Failed Piece with id " + tagCompound.getString("id"));
@@ -84,9 +89,9 @@ public class MapGenStructureIO {
 		StructureStart structurestart = null;
 
 		try {
-			Class oclass = (Class) startNameToClassMap.get(tagCompound.getString("id"));
+			Supplier<? extends StructureStart> oclass = startNameToSupplierMap.get(tagCompound.getString("id"));
 			if (oclass != null) {
-				structurestart = (StructureStart) oclass.newInstance();
+				structurestart = oclass.get();
 			}
 		} catch (Exception exception) {
 			logger.warn("Failed Start with id " + tagCompound.getString("id"));
@@ -106,13 +111,17 @@ public class MapGenStructureIO {
 		return (String) startClassToNameMap.get(start.getClass());
 	}
 
-	private static void registerStructure(Class<? extends StructureStart> startClass, String structureName) {
+	private static void registerStructure(Class<? extends StructureStart> startClass,
+			Supplier<? extends StructureStart> startSupplier, String structureName) {
 		startNameToClassMap.put(structureName, startClass);
+		startNameToSupplierMap.put(structureName, startSupplier);
 		startClassToNameMap.put(startClass, structureName);
 	}
 
-	static void registerStructureComponent(Class<? extends StructureComponent> componentClass, String componentName) {
+	static void registerStructureComponent(Class<? extends StructureComponent> componentClass,
+			Supplier<? extends StructureComponent> startSupplier, String componentName) {
 		componentNameToClassMap.put(componentName, componentClass);
+		componentNameToSupplierMap.put(componentName, startSupplier);
 		componentClassToNameMap.put(componentClass, componentName);
 	}
 }

@@ -33,6 +33,8 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.starlikeclient.StarlikeSettings;
+import net.starlikeclient.minecraft.init.ItemsStarlike;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
@@ -162,7 +164,6 @@ public class Block {
 		BlockHugeMushroom.bootstrapStates();
 		BlockLever.bootstrapStates();
 		BlockLog.bootstrapStates();
-		BlockMosaic.bootstrapStates();
 		BlockNewLeaf.bootstrapStates();
 		BlockNewLog.bootstrapStates();
 		BlockOldLeaf.bootstrapStates();
@@ -192,7 +193,6 @@ public class Block {
 		BlockTrapDoor.bootstrapStates();
 		BlockWall.bootstrapStates();
 		BlockWoodSlab.bootstrapStates();
-
 	}
 
 	public static Block getBlockById(int id) {
@@ -224,7 +224,7 @@ public class Block {
 	 * + Get a BlockState by it's ID (see getStateId)
 	 */
 	public static IBlockState getStateById(int id) {
-		int i = id & 4095;
+		int i = id & (StarlikeSettings.blockIdLimit - 1);
 		int j = id >> 12 & 15;
 		return getBlockById(i).getStateFromMeta(j);
 	}
@@ -246,7 +246,7 @@ public class Block {
 		blockRegistry.register(id, textualID, block_);
 	}
 
-	private static void registerBlock(int id, String textualID, Block block_) {
+	public static void registerBlock(int id, String textualID, Block block_) {
 		registerBlock(id, new ResourceLocation(textualID), block_);
 	}
 
@@ -692,45 +692,8 @@ public class Block {
 		registerBlock(197, (String) "dark_oak_door", (new BlockDoor(Material.wood)).setHardness(3.0F)
 				.setStepSound(soundTypeWood).setUnlocalizedName("doorDarkOak").disableStats());
 
-		registerBlock(512, (String) "starlike:deepstone",
-				(new BlockDeepstone()).setHardness(3.0F).setResistance(10.0F).setStepSound(soundTypePiston)
-						.setUnlocalizedName("deepstone").setCreativeTab(CreativeTabs.tabStarlike));
-		registerBlock(513, (String) "starlike:cobbled_deepstone",
-				(new Block(Material.rock)).setHardness(3.5F).setResistance(10.0F).setStepSound(soundTypePiston)
-						.setUnlocalizedName("cobbled_deepstone").setCreativeTab(CreativeTabs.tabStarlike));
-		registerBlock(514, (String) "starlike:steel_block",
-				(new Block(Material.iron, MapColor.ironColor)).setHardness(5.0F).setResistance(10.0F)
-						.setStepSound(soundTypeMetal).setUnlocalizedName("steel_block")
-						.setCreativeTab(CreativeTabs.tabStarlike));
-		registerBlock(515, (String) "starlike:steel_grate",
-				(new BlockSteelGrate()).setHardness(5.0F).setResistance(10.0F).setStepSound(soundTypeMetal)
-						.setUnlocalizedName("steel_grate").setCreativeTab(CreativeTabs.tabStarlike));
-		registerBlock(516, (String) "starlike:platinum_ore",
-				(new BlockOre()).setHardness(50.0F).setResistance(250.0F).setStepSound(soundTypePiston)
-						.setUnlocalizedName("platinum_ore").setCreativeTab(CreativeTabs.tabStarlike));
-		registerBlock(517, (String) "starlike:platinum_block",
-				(new Block(Material.iron, MapColor.ironColor)).setHardness(15.0F).setResistance(30.0F)
-						.setStepSound(soundTypeMetal).setUnlocalizedName("platinum_block")
-						.setCreativeTab(CreativeTabs.tabStarlike));
-		registerBlock(518, (String) "starlike:titanium_ore",
-				(new BlockOre()).setHardness(100.0F).setResistance(500.0F).setStepSound(soundTypePiston)
-						.setUnlocalizedName("titanium_ore").setCreativeTab(CreativeTabs.tabStarlike));
-		registerBlock(519, (String) "starlike:titanium_block",
-				(new Block(Material.iron, MapColor.ironColor)).setHardness(25.0F).setResistance(50.0F)
-						.setStepSound(soundTypeMetal).setUnlocalizedName("titanium_block")
-						.setCreativeTab(CreativeTabs.tabStarlike));
-		registerBlock(520, (String) "starlike:uranium_ore",
-				(new BlockOre()).setHardness(5.0F).setResistance(10.0F).setStepSound(soundTypePiston)
-						.setUnlocalizedName("uranium_ore").setCreativeTab(CreativeTabs.tabStarlike));
-		registerBlock(521, (String) "starlike:uranium_block",
-				(new Block(Material.iron, MapColor.greenColor)).setHardness(40.0F).setResistance(200.0F)
-						.setStepSound(soundTypeMetal).setUnlocalizedName("uranium_block")
-						.setCreativeTab(CreativeTabs.tabStarlike));
-		registerBlock(522, (String) "starlike:mosaic", (new BlockMosaic()).setHardness(2.0F).setResistance(5.0F)
-				.setStepSound(soundTypeWood).setUnlocalizedName("mosaic").setCreativeTab(CreativeTabs.tabStarlike));
-		registerBlock(523, (String) "starlike:fabricator",
-				(new BlockFabricator()).setHardness(5.0F).setResistance(10.0F).setStepSound(soundTypePiston)
-						.setUnlocalizedName("fabricator").setCreativeTab(CreativeTabs.tabStarlike));
+		ItemsStarlike.registerBlocks();
+
 		blockRegistry.validateKey();
 
 		for (Block block13 : blockRegistry) {
@@ -820,7 +783,7 @@ public class Block {
 
 	public String unlocalizedName;
 
-	protected Block(Material materialIn) {
+	public Block(Material materialIn) {
 		this(materialIn, materialIn.getMaterialMapColor());
 	}
 
@@ -1614,7 +1577,7 @@ public class Block {
 	public void setBlockBoundsForItemRender() {
 	}
 
-	protected Block setBlockUnbreakable() {
+	public Block setBlockUnbreakable() {
 		this.setHardness(-1.0F);
 		return this;
 	}
@@ -1624,14 +1587,14 @@ public class Block {
 		return this;
 	}
 
-	protected final void setDefaultState(IBlockState state) {
+	public final void setDefaultState(IBlockState state) {
 		this.defaultBlockState = state;
 	}
 
 	/**
 	 * + Sets how many hits it takes to break a block.
 	 */
-	protected Block setHardness(float hardness) {
+	public Block setHardness(float hardness) {
 		this.blockHardness = hardness;
 		if (this.blockResistance < hardness * 5.0F) {
 			this.blockResistance = hardness * 5.0F;
@@ -1644,7 +1607,7 @@ public class Block {
 	 * + Sets the light value that the block emits. Returns resulting block instance
 	 * for constructing convenience. Args: level
 	 */
-	protected Block setLightLevel(float value) {
+	public Block setLightLevel(float value) {
 		this.lightValue = (int) (15.0F * value);
 		return this;
 	}
@@ -1653,7 +1616,7 @@ public class Block {
 	 * + Sets how much light is blocked going through this block. Returns the object
 	 * for convenience in constructing.
 	 */
-	protected Block setLightOpacity(int opacity) {
+	public Block setLightOpacity(int opacity) {
 		this.lightOpacity = opacity;
 		return this;
 	}
@@ -1662,7 +1625,7 @@ public class Block {
 	 * + Sets the the blocks resistance to explosions. Returns the object for
 	 * convenience in constructing.
 	 */
-	protected Block setResistance(float resistance) {
+	public Block setResistance(float resistance) {
 		this.blockResistance = resistance * 3.0F;
 		return this;
 	}
@@ -1671,7 +1634,7 @@ public class Block {
 	 * + Sets the footstep sound for the block. Returns the object for convenience
 	 * in constructing.
 	 */
-	protected Block setStepSound(Block.SoundType sound) {
+	public Block setStepSound(Block.SoundType sound) {
 		this.stepSound = sound;
 		return this;
 	}
@@ -1679,7 +1642,7 @@ public class Block {
 	/**
 	 * + Sets whether this block type will receive random update ticks
 	 */
-	protected Block setTickRandomly(boolean shouldTick) {
+	public Block setTickRandomly(boolean shouldTick) {
 		this.needsRandomTick = shouldTick;
 		return this;
 	}

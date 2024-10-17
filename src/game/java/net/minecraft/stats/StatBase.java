@@ -3,6 +3,7 @@ package net.minecraft.stats;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.function.Supplier;
 
 import net.minecraft.event.HoverEvent;
 import net.minecraft.scoreboard.IScoreObjectiveCriteria;
@@ -74,6 +75,7 @@ public class StatBase {
 	private final IStatType type;
 	private final IScoreObjectiveCriteria field_150957_c;
 	private Class<? extends IJsonSerializable> field_150956_d;
+	private Supplier<? extends IJsonSerializable> field_150956_d_ctor;
 
 	public StatBase(String statIdIn, IChatComponent statNameIn) {
 		this(statIdIn, statNameIn, simpleStatType);
@@ -106,13 +108,19 @@ public class StatBase {
 		return this.field_150957_c;
 	}
 
-	public StatBase func_150953_b(Class<? extends IJsonSerializable> oclass) {
+	public StatBase func_150953_b(Class<? extends IJsonSerializable> oclass,
+			Supplier<? extends IJsonSerializable> octor) {
 		this.field_150956_d = oclass;
+		this.field_150956_d_ctor = octor;
 		return this;
 	}
 
 	public Class<? extends IJsonSerializable> func_150954_l() {
 		return this.field_150956_d;
+	}
+
+	public Supplier<? extends IJsonSerializable> func_150954_l_ctor() {
+		return this.field_150956_d_ctor;
 	}
 
 	public IChatComponent func_150955_j() {

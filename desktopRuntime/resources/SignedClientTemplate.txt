@@ -17,7 +17,8 @@
 
 window.eaglercraftXOptsHints = {
 	hintsVersion: 1,
-	container: "game_frame"
+	container: "game_frame",
+	enableSignatureBadge: true
 };
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

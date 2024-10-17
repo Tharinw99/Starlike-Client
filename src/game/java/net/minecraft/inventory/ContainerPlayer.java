@@ -1,6 +1,7 @@
 package net.minecraft.inventory;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -8,6 +9,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
+import net.minecraft.network.play.server.S30PacketWindowItems;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
@@ -110,11 +112,17 @@ public class ContainerPlayer extends Container {
 		for (int i = 0; i < 4; ++i) {
 			ItemStack itemstack = this.craftMatrix.removeStackFromSlot(i);
 			if (itemstack != null) {
-				entityplayer.dropPlayerItemWithRandomChoice(itemstack, false);
+				if (!entityplayer.inventory.addItemStackToInventory(itemstack)) {
+					entityplayer.dropPlayerItemWithRandomChoice(itemstack, false);
+				}
 			}
 		}
 
 		this.craftResult.setInventorySlotContents(0, (ItemStack) null);
+
+		if (!entityplayer.worldObj.isRemote) {
+			((EntityPlayerMP) entityplayer).playerNetServerHandler.sendPacket(new S30PacketWindowItems(entityplayer.inventoryContainer.windowId, entityplayer.inventoryContainer.getInventory()));
+		}
 	}
 
 	/**

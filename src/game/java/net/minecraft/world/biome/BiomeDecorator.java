@@ -77,6 +77,9 @@ public class BiomeDecorator {
 	protected WorldGenerator lapisGen;
 	protected WorldGenerator platinumGen;
 	protected WorldGenerator titaniumGen;
+	protected WorldGenerator copperGen;
+	protected WorldGenerator limestoneGen;
+	protected WorldGenerator tuffGen;
 
 	protected WorldGenFlowers yellowFlowerGen = new WorldGenFlowers(Blocks.yellow_flower,
 			BlockFlower.EnumFlowerType.DANDELION);
@@ -181,6 +184,11 @@ public class BiomeDecorator {
 					this.chunkProviderSettings.platinumSize);
 			this.titaniumGen = new WorldGenMinable(Blocks.titanium_ore.getDefaultState(),
 					this.chunkProviderSettings.titaniumSize);
+			this.copperGen = new WorldGenMinable(Blocks.copper_ore.getDefaultState(),
+					this.chunkProviderSettings.copperSize);
+			this.tuffGen = new WorldGenMinable(Blocks.tuff.getDefaultState(), this.chunkProviderSettings.tuffSize);
+			this.limestoneGen = new WorldGenMinable(Blocks.limestone.getDefaultState(),
+					this.chunkProviderSettings.limestoneSize);
 			this.genDecorations(parBiomeGenBase);
 			this.currentWorld = null;
 			this.randomGenerator = null;
@@ -429,6 +437,12 @@ public class BiomeDecorator {
 				this.chunkProviderSettings.platinumMinHeight, this.chunkProviderSettings.platinumMaxHeight);
 		this.genStandardOre1(this.chunkProviderSettings.titaniumCount, this.titaniumGen,
 				this.chunkProviderSettings.titaniumMinHeight, this.chunkProviderSettings.titaniumMaxHeight);
+		this.genStandardOre1(this.chunkProviderSettings.copperCount, this.copperGen,
+				this.chunkProviderSettings.copperMinHeight, this.chunkProviderSettings.copperMaxHeight);
+		this.genStandardOre1(this.chunkProviderSettings.limestoneCount, this.limestoneGen,
+				this.chunkProviderSettings.limestoneMinHeight, this.chunkProviderSettings.limestoneMaxHeight);
+		this.genStandardOre1(this.chunkProviderSettings.tuffCount, this.tuffGen,
+				this.chunkProviderSettings.tuffMinHeight, this.chunkProviderSettings.tuffMaxHeight);
 	}
 
 	/**

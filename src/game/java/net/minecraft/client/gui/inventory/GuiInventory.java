@@ -125,7 +125,7 @@ public class GuiInventory extends InventoryEffectRenderer {
 	 * items). Args : mouseX, mouseY
 	 */
 	protected void drawGuiContainerForegroundLayer(int var1, int var2) {
-		this.fontRendererObj.drawString(I18n.format("container.crafting", new Object[0]), 86, 16, 4210752);
+		this.fontRendererObj.drawString(I18n.format("container.crafting", new Object[0]), 86, 16, 0xFFFFFF);
 	}
 
 	/**

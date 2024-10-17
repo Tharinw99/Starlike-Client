@@ -8,9 +8,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.server.S30PacketWindowItems;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MathHelper;
 
@@ -334,11 +336,17 @@ public abstract class Container {
 	 */
 	public void onContainerClosed(EntityPlayer playerIn) {
 		InventoryPlayer inventoryplayer = playerIn.inventory;
-		if (inventoryplayer.getItemStack() != null) {
-			playerIn.dropPlayerItemWithRandomChoice(inventoryplayer.getItemStack(), false);
+		ItemStack itemstack = inventoryplayer.getItemStack();
+		if (itemstack != null) {
+			if (!playerIn.inventory.addItemStackToInventory(itemstack)) {
+				playerIn.dropPlayerItemWithRandomChoice(inventoryplayer.getItemStack(), false);
+			}
 			inventoryplayer.setItemStack((ItemStack) null);
-		}
 
+			if (!playerIn.worldObj.isRemote) {
+				((EntityPlayerMP) playerIn).playerNetServerHandler.sendPacket(new S30PacketWindowItems(playerIn.inventoryContainer.windowId, playerIn.inventoryContainer.getInventory()));
+			}
+		}
 	}
 
 	public void onCraftGuiOpened(ICrafting listener) {

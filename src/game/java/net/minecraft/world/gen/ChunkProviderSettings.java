@@ -107,7 +107,7 @@ public class ChunkProviderSettings {
 		public int ironMinHeight = 30;
 		public int ironMaxHeight = 128;
 		public int goldSize = 9;
-		public int goldCount = 2;
+		public int goldCount = 7;
 		public int goldMinHeight = 0;
 		public int goldMaxHeight = 32;
 		public int redstoneSize = 8;
@@ -115,21 +115,33 @@ public class ChunkProviderSettings {
 		public int redstoneMinHeight = 0;
 		public int redstoneMaxHeight = 32;
 		public int diamondSize = 8;
-		public int diamondCount = 1;
+		public int diamondCount = 4;
 		public int diamondMinHeight = 0;
-		public int diamondMaxHeight = 16;
+		public int diamondMaxHeight = 24;
 		public int lapisSize = 7;
 		public int lapisCount = 1;
 		public int lapisCenterHeight = 16;
 		public int lapisSpread = 16;
-		public int platinumSize = 4;
+		public int platinumSize = 5;
 		public int platinumCount = 3;
 		public int platinumMinHeight = 0;
 		public int platinumMaxHeight = 17;
-		public int titaniumSize = 2;
-		public int titaniumCount = 1;
+		public int titaniumSize = 3;
+		public int titaniumCount = 2;
 		public int titaniumMinHeight = 0;
-		public int titaniumMaxHeight = 10;
+		public int titaniumMaxHeight = 13;
+		public int copperSize = 17;
+		public int copperCount = 20;
+		public int copperMinHeight = 0;
+		public int copperMaxHeight = 128;
+		public int limestoneSize = 33;
+		public int limestoneCount = 10;
+		public int limestoneMinHeight = 0;
+		public int limestoneMaxHeight = 80;
+		public int tuffSize = 33;
+		public int tuffCount = 10;
+		public int tuffMinHeight = 0;
+		public int tuffMaxHeight = 80;
 
 		public Factory() {
 			this.func_177863_a();
@@ -389,7 +401,7 @@ public class ChunkProviderSettings {
 			this.ironMinHeight = 30;
 			this.ironMaxHeight = 128;
 			this.goldSize = 9;
-			this.goldCount = 2;
+			this.goldCount = 7;
 			this.goldMinHeight = 0;
 			this.goldMaxHeight = 32;
 			this.redstoneSize = 8;
@@ -397,21 +409,33 @@ public class ChunkProviderSettings {
 			this.redstoneMinHeight = 0;
 			this.redstoneMaxHeight = 32;
 			this.diamondSize = 8;
-			this.diamondCount = 1;
+			this.diamondCount = 4;
 			this.diamondMinHeight = 0;
-			this.diamondMaxHeight = 16;
+			this.diamondMaxHeight = 24;
 			this.lapisSize = 7;
 			this.lapisCount = 1;
 			this.lapisCenterHeight = 16;
 			this.lapisSpread = 16;
-			this.platinumSize = 4;
-			this.platinumCount = 8;
+			this.platinumSize = 5;
+			this.platinumCount = 3;
 			this.platinumMinHeight = 0;
 			this.platinumMaxHeight = 17;
-			this.titaniumSize = 2;
-			this.titaniumCount = 4;
+			this.titaniumSize = 3;
+			this.titaniumCount = 2;
 			this.titaniumMinHeight = 0;
-			this.titaniumMaxHeight = 10;
+			this.titaniumMaxHeight = 13;
+			this.copperSize = 17;
+			this.copperCount = 20;
+			this.copperMinHeight = 0;
+			this.copperMaxHeight = 128;
+			this.limestoneSize = 33;
+			this.limestoneCount = 10;
+			this.limestoneMinHeight = 0;
+			this.limestoneMaxHeight = 80;
+			this.tuffSize = 33;
+			this.tuffCount = 10;
+			this.tuffMinHeight = 0;
+			this.tuffMaxHeight = 80;
 		}
 
 		public ChunkProviderSettings func_177864_b() {
@@ -770,6 +794,19 @@ public class ChunkProviderSettings {
 			jsonobject.put("titaniumCount", Integer.valueOf(parFactory.titaniumCount));
 			jsonobject.put("titaniumMinHeight", Integer.valueOf(parFactory.titaniumMinHeight));
 			jsonobject.put("titaniumMaxHeight", Integer.valueOf(parFactory.titaniumMaxHeight));
+			jsonobject.put("copperSize", Integer.valueOf(parFactory.copperSize));
+			jsonobject.put("copperCount", Integer.valueOf(parFactory.copperCount));
+			jsonobject.put("copperMinHeight", Integer.valueOf(parFactory.copperMinHeight));
+			jsonobject.put("copperMaxHeight", Integer.valueOf(parFactory.copperMaxHeight));
+			jsonobject.put("limestoneSize", Integer.valueOf(parFactory.limestoneSize));
+			jsonobject.put("limestoneCount", Integer.valueOf(parFactory.limestoneCount));
+			jsonobject.put("limestoneMinHeight", Integer.valueOf(parFactory.limestoneMinHeight));
+			jsonobject.put("limestoneMaxHeight", Integer.valueOf(parFactory.limestoneMaxHeight));
+
+			jsonobject.put("tuffSize", Integer.valueOf(parFactory.tuffSize));
+			jsonobject.put("tuffCount", Integer.valueOf(parFactory.tuffCount));
+			jsonobject.put("tuffMinHeight", Integer.valueOf(parFactory.tuffMinHeight));
+			jsonobject.put("tuffMaxHeight", Integer.valueOf(parFactory.tuffMaxHeight));
 			return jsonobject;
 		}
 	}
@@ -860,6 +897,18 @@ public class ChunkProviderSettings {
 	public final int titaniumCount;
 	public final int titaniumMinHeight;
 	public final int titaniumMaxHeight;
+	public final int copperSize;
+	public final int copperCount;
+	public final int copperMinHeight;
+	public final int copperMaxHeight;
+	public final int limestoneSize;
+	public final int limestoneCount;
+	public final int limestoneMinHeight;
+	public final int limestoneMaxHeight;
+	public final int tuffSize;
+	public final int tuffCount;
+	public final int tuffMinHeight;
+	public final int tuffMaxHeight;
 
 	private ChunkProviderSettings(ChunkProviderSettings.Factory settingsFactory) {
 		this.coordinateScale = settingsFactory.coordinateScale;
@@ -948,5 +997,17 @@ public class ChunkProviderSettings {
 		this.titaniumCount = settingsFactory.titaniumCount;
 		this.titaniumMinHeight = settingsFactory.titaniumMinHeight;
 		this.titaniumMaxHeight = settingsFactory.titaniumMaxHeight;
+		this.copperSize = settingsFactory.copperSize;
+		this.copperCount = settingsFactory.copperCount;
+		this.copperMinHeight = settingsFactory.copperMinHeight;
+		this.copperMaxHeight = settingsFactory.copperMaxHeight;
+		this.limestoneSize = settingsFactory.limestoneSize;
+		this.limestoneCount = settingsFactory.limestoneCount;
+		this.limestoneMinHeight = settingsFactory.limestoneMinHeight;
+		this.limestoneMaxHeight = settingsFactory.limestoneMaxHeight;
+		this.tuffSize = settingsFactory.tuffSize;
+		this.tuffCount = settingsFactory.tuffCount;
+		this.tuffMinHeight = settingsFactory.tuffMinHeight;
+		this.tuffMaxHeight = settingsFactory.tuffMaxHeight;
 	}
 }

@@ -86,7 +86,7 @@ public class WorldGenMinable extends WorldGenerator {
 									IBlockState currentState = world.getBlockState(blockpos1);
 
 									if (blockpos1.getY() < 20 && (currentState.getBlock() == Blocks.stone
-											|| currentState.getBlock() == Blocks.deepstone)) {
+											|| currentState.getBlock() == Blocks.deepslate)) {
 										world.setBlockState(blockpos1, this.oreBlock, 2);
 									} else if (this.predicate.apply(currentState)) {
 										world.setBlockState(blockpos1, this.oreBlock, 2);

@@ -116,7 +116,7 @@ public class LANClientNetworkManager extends EaglercraftNetworkManager {
 								connectState = SENT_DESCRIPTION;
 								continue mainLoop;
 							}
-							EagUtils.sleep(20l);
+							EagUtils.sleep(20);
 						} while (EagRuntime.steadyTimeMillis() - lm < 5000l);
 
 						// no description was sent
@@ -154,7 +154,7 @@ public class LANClientNetworkManager extends EaglercraftNetworkManager {
 								return new LANClientNetworkManager(displayCode, displayRelay);
 
 							}
-							EagUtils.sleep(20l);
+							EagUtils.sleep(20);
 						} while (EagRuntime.steadyTimeMillis() - lm < 5000l);
 
 						// no channel was opened
@@ -194,7 +194,7 @@ public class LANClientNetworkManager extends EaglercraftNetworkManager {
 								connectState = SENT_ICE_CANDIDATE;
 								continue mainLoop;
 							}
-							EagUtils.sleep(20l);
+							EagUtils.sleep(20);
 						} while (EagRuntime.steadyTimeMillis() - lm < 5000l);
 
 						// no ice candidates were sent
@@ -232,7 +232,7 @@ public class LANClientNetworkManager extends EaglercraftNetworkManager {
 					return null;
 				}
 			}
-			EagUtils.sleep(20l);
+			EagUtils.sleep(20);
 		}
 		return null;
 	}

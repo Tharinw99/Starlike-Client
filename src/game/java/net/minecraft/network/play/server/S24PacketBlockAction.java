@@ -7,6 +7,7 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.util.BlockPos;
+import net.starlikeclient.StarlikeSettings;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
@@ -83,7 +84,7 @@ public class S24PacketBlockAction implements Packet<INetHandlerPlayClient> {
 		this.blockPosition = parPacketBuffer.readBlockPos();
 		this.instrument = parPacketBuffer.readUnsignedByte();
 		this.pitch = parPacketBuffer.readUnsignedByte();
-		this.block = Block.getBlockById(parPacketBuffer.readVarIntFromBuffer() & 4095);
+		this.block = Block.getBlockById(parPacketBuffer.readVarIntFromBuffer() & (StarlikeSettings.blockIdLimit - 1));
 	}
 
 	/**
@@ -93,6 +94,6 @@ public class S24PacketBlockAction implements Packet<INetHandlerPlayClient> {
 		parPacketBuffer.writeBlockPos(this.blockPosition);
 		parPacketBuffer.writeByte(this.instrument);
 		parPacketBuffer.writeByte(this.pitch);
-		parPacketBuffer.writeVarIntToBuffer(Block.getIdFromBlock(this.block) & 4095);
+		parPacketBuffer.writeVarIntToBuffer(Block.getIdFromBlock(this.block) & (StarlikeSettings.blockIdLimit - 1));
 	}
 }

@@ -9,7 +9,7 @@ public class EaglercraftVersion {
 	/// Customize these to fit your fork:
 
 	public static final String projectForkName = "Starlike Client";
-	public static final String projectForkVersion = "0.2.2";
+	public static final String projectForkVersion = "0.3.0";
 	public static final String projectForkVendor = "SpeedSlicer and zumbiepig";
 
 	public static final String projectForkURL = "";
@@ -19,7 +19,7 @@ public class EaglercraftVersion {
 	public static final String projectOriginName = "EaglercraftX";
 	public static final String projectOriginAuthor = "lax1dude";
 	public static final String projectOriginRevision = "1.8";
-	public static final String projectOriginVersion = "u39";
+	public static final String projectOriginVersion = "u40";
 
 	public static final String projectOriginURL = "https://gitlab.com/lax1dude/eaglercraftx-1.8"; // rest in peace
 
@@ -32,7 +32,7 @@ public class EaglercraftVersion {
 	public static final boolean enableUpdateService = true;
 
 	public static final String updateBundlePackageName = "dev.zumbiepig.starlikeclient.client";
-	public static final int updateBundlePackageVersionInt = 202; // (0.2.1 would be 000201 or just 201)
+	public static final int updateBundlePackageVersionInt = 300; // (0.2.1 would be 000201 or just 201)
 
 	public static final String updateLatestLocalStorageKey = "latestUpdate_" + updateBundlePackageName;
 
@@ -45,19 +45,20 @@ public class EaglercraftVersion {
 	public static final EaglercraftUUID clientBrandUUID = EagUtils.makeClientBrandUUID(projectForkName);
 
 	public static final EaglercraftUUID legacyClientUUIDInSharedWorld = EagUtils
-			.makeClientBrandUUIDLegacy(projectOriginName);
+			.makeClientBrandUUIDLegacy(projectForkName);
 
 	// Miscellaneous variables:
 
+	// bottom-left
 	public static final String mainMenuStringA = "Minecraft 1.8.8*";
-	public static final String mainMenuStringB = projectOriginName + " " + projectOriginRevision + "-"
-			+ projectOriginVersion;
+	public static final String mainMenuStringB = projectForkName + " " + projectForkVersion;
+	// bottom-right
 	public static final String mainMenuStringC = null;
 	public static final String mainMenuStringD = "Copyright Mojang AB. Do not distribute!";
-
-	public static final String mainMenuStringE = "          " + projectForkName + " " + projectForkVersion;
-	public static final String mainMenuStringF = "Made by " + projectForkVendor;
-
+	// below logo
+	public static final String mainMenuStringE = null;
+	public static final String mainMenuStringF = null;
+	// top-left
 	public static final String mainMenuStringG = null;
 	public static final String mainMenuStringH = null;
 

@@ -45,7 +45,6 @@ import net.minecraft.entity.monster.EntityGuardian;
 import net.minecraft.entity.monster.EntityIronGolem;
 import net.minecraft.entity.monster.EntityMagmaCube;
 import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.entity.monster.EntityNetherCreeper;
 import net.minecraft.entity.monster.EntityPigZombie;
 import net.minecraft.entity.monster.EntitySilverfish;
 import net.minecraft.entity.monster.EntitySkeleton;
@@ -78,6 +77,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.stats.StatBase;
 import net.minecraft.stats.StatList;
 import net.minecraft.world.World;
+import net.starlikeclient.minecraft.init.EntitiesStarlike;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
@@ -202,16 +202,15 @@ public class EntityList {
 		addMapping(EntityRabbit.class, EntityRabbit::new, "Rabbit", 101, 10051392, 7555121);
 		addMapping(EntityVillager.class, EntityVillager::new, "Villager", 120, 5651507, 12422002);
 		addMapping(EntityEnderCrystal.class, EntityEnderCrystal::new, "EnderCrystal", 200);
-		// Starlike
-		addMapping(EntityNetherCreeper.class, EntityNetherCreeper::new, "NetherCreeper", 201, 0xFFCC0000, 0xFFFFA500);
 
+		EntitiesStarlike.registerEntities();
 	}
 
 	/**
 	 * + adds a mapping between Entity classes and both a string representation and
 	 * an ID
 	 */
-	private static void addMapping(Class<? extends Entity> entityClass,
+	public static void addMapping(Class<? extends Entity> entityClass,
 			EntityConstructor<? extends Entity> entityConstructor, String entityName, int id) {
 		if (stringToClassMapping.containsKey(entityName)) {
 			throw new IllegalArgumentException("ID is already registered: " + entityName);
@@ -237,7 +236,7 @@ public class EntityList {
 	 * + adds a mapping between Entity classes and both a string representation and
 	 * an ID
 	 */
-	private static void addMapping(Class<? extends Entity> entityClass,
+	public static void addMapping(Class<? extends Entity> entityClass,
 			EntityConstructor<? extends Entity> entityConstructor, String entityName, int entityID, int baseColor,
 			int spotColor) {
 		addMapping(entityClass, entityConstructor, entityName, entityID);

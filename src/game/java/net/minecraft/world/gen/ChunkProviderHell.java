@@ -89,7 +89,13 @@ public class ChunkProviderHell implements IChunkProvider {
 	double[] noiseData4;
 	double[] noiseData5;
 
+	private final WorldGenerator netheriteOreGen1 = new WorldGenMinable(Blocks.ancient_debris.getDefaultState(), 3,
+			BlockHelper.forBlock(Blocks.netherrack));
+	private final WorldGenerator netheriteOreGen2 = new WorldGenMinable(Blocks.ancient_debris.getDefaultState(), 2,
+			BlockHelper.forBlock(Blocks.netherrack));
 	private final WorldGenerator uraniumOreGen = new WorldGenMinable(Blocks.uranium_ore.getDefaultState(), 4,
+			BlockHelper.forBlock(Blocks.netherrack));
+	private final WorldGenerator soulstoneOreGen = new WorldGenMinable(Blocks.soul_stone.getDefaultState(), 30,
 			BlockHelper.forBlock(Blocks.netherrack));
 
 	public ChunkProviderHell(World worldIn, boolean parFlag, long parLong1) {
@@ -412,11 +418,6 @@ public class ChunkProviderHell implements IChunkProvider {
 					this.hellRNG.nextInt(128), this.hellRNG.nextInt(16) + 8));
 		}
 
-		for (int k1 = 0; k1 < 8; ++k1) {
-			this.uraniumOreGen.generate(this.worldObj, this.hellRNG,
-					blockpos.add(this.hellRNG.nextInt(16), this.hellRNG.nextInt(108) + 10, this.hellRNG.nextInt(16)));
-		}
-
 		for (int k1 = 0; k1 < 16; ++k1) {
 			this.field_177467_w.generate(this.worldObj, this.hellRNG,
 					blockpos.add(this.hellRNG.nextInt(16), this.hellRNG.nextInt(108) + 10, this.hellRNG.nextInt(16)));
@@ -424,6 +425,26 @@ public class ChunkProviderHell implements IChunkProvider {
 
 		for (int l1 = 0; l1 < 16; ++l1) {
 			this.field_177473_x.generate(this.worldObj, this.hellRNG,
+					blockpos.add(this.hellRNG.nextInt(16), this.hellRNG.nextInt(108) + 10, this.hellRNG.nextInt(16)));
+		}
+
+		for (int k1 = 0; k1 < 3; ++k1) {
+			this.netheriteOreGen1.generate(this.worldObj, this.hellRNG, blockpos.add(this.hellRNG.nextInt(16),
+					((this.hellRNG.nextInt(17) + this.hellRNG.nextInt(17)) / 2) + 8, this.hellRNG.nextInt(16)));
+		}
+
+		for (int k1 = 0; k1 < 2; ++k1) {
+			this.netheriteOreGen2.generate(this.worldObj, this.hellRNG,
+					blockpos.add(this.hellRNG.nextInt(16), this.hellRNG.nextInt(112) + 8, this.hellRNG.nextInt(16)));
+		}
+
+		for (int k1 = 0; k1 < 8; ++k1) {
+			this.uraniumOreGen.generate(this.worldObj, this.hellRNG,
+					blockpos.add(this.hellRNG.nextInt(16), this.hellRNG.nextInt(108) + 10, this.hellRNG.nextInt(16)));
+		}
+
+		for (int k1 = 0; k1 < 5; ++k1) {
+			this.soulstoneOreGen.generate(this.worldObj, this.hellRNG,
 					blockpos.add(this.hellRNG.nextInt(16), this.hellRNG.nextInt(108) + 10, this.hellRNG.nextInt(16)));
 		}
 

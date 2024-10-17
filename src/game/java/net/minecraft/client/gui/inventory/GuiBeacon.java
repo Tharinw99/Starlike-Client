@@ -205,6 +205,7 @@ public class GuiBeacon extends GuiContainer {
 		int j = (this.height - this.ySize) / 2;
 		this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
 		this.itemRender.zLevel = 100.0F;
+		this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.netherite_ingot), i + 42 - 22, j + 109);
 		this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.emerald), i + 42, j + 109);
 		this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.diamond), i + 42 + 22, j + 109);
 		this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.gold_ingot), i + 42 + 44, j + 109);

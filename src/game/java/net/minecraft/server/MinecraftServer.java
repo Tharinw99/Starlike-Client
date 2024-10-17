@@ -10,6 +10,7 @@ import java.util.concurrent.Callable;
 import com.google.common.collect.Lists;
 
 import net.lax1dude.eaglercraft.v1_8.EagRuntime;
+import net.lax1dude.eaglercraft.v1_8.EagUtils;
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import net.lax1dude.eaglercraft.v1_8.EaglercraftUUID;
 import net.lax1dude.eaglercraft.v1_8.futures.FutureTask;
@@ -675,7 +676,7 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
 						}
 					}
 
-					Thread.sleep(Math.max(1L, 50L - i));
+					EagUtils.sleep(Math.max(1L, 50L - i));
 					this.serverIsRunning = true;
 				}
 			} else {

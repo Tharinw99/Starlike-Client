@@ -110,9 +110,9 @@ public class WorldGenDungeons extends WorldGenerator {
 						} else if (world.getBlockState(blockpos2).getBlock().getMaterial().isSolid()
 								&& world.getBlockState(blockpos2).getBlock() != Blocks.chest) {
 							if (j3 == -1 && random.nextInt(4) != 0) {
-								world.setBlockState(blockpos2, Blocks.mossy_cobblestone.getDefaultState(), 2);
+								world.setBlockState(blockpos2, Blocks.stonebrick.getStateFromMeta(1), 2);
 							} else {
-								world.setBlockState(blockpos2, Blocks.cobblestone.getDefaultState(), 2);
+								world.setBlockState(blockpos2, Blocks.stonebrick.getDefaultState(), 2);
 							}
 						}
 					}

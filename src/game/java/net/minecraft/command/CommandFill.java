@@ -15,6 +15,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
+import net.starlikeclient.StarlikeSettings;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
@@ -104,9 +105,9 @@ public class CommandFill extends CommandBase {
 					Math.max(blockpos.getY(), blockpos1.getY()), Math.max(blockpos.getZ(), blockpos1.getZ()));
 			int j = (blockpos3.getX() - blockpos2.getX() + 1) * (blockpos3.getY() - blockpos2.getY() + 1)
 					* (blockpos3.getZ() - blockpos2.getZ() + 1);
-			if (j > '\u8000') {
-				throw new CommandException("commands.fill.tooManyBlocks",
-						new Object[] { Integer.valueOf(j), Integer.valueOf('\u8000') });
+			if (j > StarlikeSettings.commandModificationBlockLimit) {
+				throw new CommandException("commands.fill.tooManyBlocks", new Object[] { Integer.valueOf(j),
+						Integer.valueOf(StarlikeSettings.commandModificationBlockLimit) });
 			} else if (blockpos2.getY() >= 0 && blockpos3.getY() < 256) {
 				World world = parICommandSender.getEntityWorld();
 

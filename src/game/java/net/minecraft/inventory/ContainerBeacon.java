@@ -1,8 +1,10 @@
 package net.minecraft.inventory;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.server.S30PacketWindowItems;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
@@ -39,8 +41,9 @@ public class ContainerBeacon extends Container {
 
 		public boolean isItemValid(ItemStack itemstack) {
 			return itemstack == null ? false
-					: itemstack.getItem() == Items.emerald || itemstack.getItem() == Items.diamond
-							|| itemstack.getItem() == Items.gold_ingot || itemstack.getItem() == Items.iron_ingot;
+					: itemstack.getItem() == Items.netherite_ingot || itemstack.getItem() == Items.emerald
+							|| itemstack.getItem() == Items.diamond || itemstack.getItem() == Items.gold_ingot
+							|| itemstack.getItem() == Items.iron_ingot;
 		}
 	}
 
@@ -82,9 +85,11 @@ public class ContainerBeacon extends Container {
 		if (entityplayer != null && !entityplayer.worldObj.isRemote) {
 			ItemStack itemstack = this.beaconSlot.decrStackSize(this.beaconSlot.getSlotStackLimit());
 			if (itemstack != null) {
-				entityplayer.dropPlayerItemWithRandomChoice(itemstack, false);
+				if (!entityplayer.inventory.addItemStackToInventory(itemstack)) {
+					entityplayer.dropPlayerItemWithRandomChoice(itemstack, false);
+				}
+				((EntityPlayerMP) entityplayer).playerNetServerHandler.sendPacket(new S30PacketWindowItems(entityplayer.inventoryContainer.windowId, entityplayer.inventoryContainer.getInventory()));
 			}
-
 		}
 	}
 

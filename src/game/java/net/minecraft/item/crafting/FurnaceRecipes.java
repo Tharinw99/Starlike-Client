@@ -13,6 +13,7 @@ import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemFishFood;
 import net.minecraft.item.ItemStack;
+import net.starlikeclient.minecraft.init.RecipesStarlike;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
@@ -87,16 +88,7 @@ public class FurnaceRecipes {
 			}
 		}
 
-		this.addSmeltingRecipeForBlock(Blocks.coal_ore, new ItemStack(Items.coal), 0.1F);
-		this.addSmeltingRecipeForBlock(Blocks.redstone_ore, new ItemStack(Items.redstone), 0.7F);
-		this.addSmeltingRecipeForBlock(Blocks.lapis_ore, new ItemStack(Items.dye, 1, EnumDyeColor.BLUE.getDyeDamage()),
-				0.2F);
-		this.addSmeltingRecipeForBlock(Blocks.quartz_ore, new ItemStack(Items.quartz), 0.2F);
-
-		this.addSmeltingRecipeForBlock(Blocks.cobbled_deepstone, new ItemStack(Blocks.deepstone), 0.1F);
-		this.addSmeltingRecipeForBlock(Blocks.platinum_ore, new ItemStack(Items.platinum_ingot), 1.5F);
-		this.addSmeltingRecipeForBlock(Blocks.titanium_ore, new ItemStack(Items.titanium_ingot), 2.0F);
-		this.addSmeltingRecipeForBlock(Blocks.uranium_ore, new ItemStack(Items.uranium_crystal), 0.2F);
+		RecipesStarlike.addFurnaceRecipes(this);
 	}
 
 	/**

@@ -19,6 +19,7 @@ import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.ResourceLocation;
+import net.starlikeclient.StarlikeSettings;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
@@ -219,7 +220,7 @@ public class StatList {
 			new ChatComponentTranslation("stat.workbenchInteraction", new Object[0]))).registerStat();
 	public static StatBase field_181723_aa = (new StatBasic("stat.chestOpened",
 			new ChatComponentTranslation("stat.chestOpened", new Object[0]))).registerStat();
-	public static final StatBase[] mineBlockStatArray = new StatBase[4096];
+	public static final StatBase[] mineBlockStatArray = new StatBase[StarlikeSettings.blockIdLimit];
 	/**
 	 * + Tracks the number of items a given block or item has been crafted.
 	 */

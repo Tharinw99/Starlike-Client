@@ -974,8 +974,11 @@ public class ComponentScatteredFeaturePieces {
 	}
 
 	public static void registerScatteredFeaturePieces() {
-		MapGenStructureIO.registerStructureComponent(ComponentScatteredFeaturePieces.DesertPyramid.class, "TeDP");
-		MapGenStructureIO.registerStructureComponent(ComponentScatteredFeaturePieces.JunglePyramid.class, "TeJP");
-		MapGenStructureIO.registerStructureComponent(ComponentScatteredFeaturePieces.SwampHut.class, "TeSH");
+		MapGenStructureIO.registerStructureComponent(ComponentScatteredFeaturePieces.DesertPyramid.class,
+				ComponentScatteredFeaturePieces.DesertPyramid::new, "TeDP");
+		MapGenStructureIO.registerStructureComponent(ComponentScatteredFeaturePieces.JunglePyramid.class,
+				ComponentScatteredFeaturePieces.JunglePyramid::new, "TeJP");
+		MapGenStructureIO.registerStructureComponent(ComponentScatteredFeaturePieces.SwampHut.class,
+				ComponentScatteredFeaturePieces.SwampHut::new, "TeSH");
 	}
 }

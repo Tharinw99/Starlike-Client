@@ -44,11 +44,7 @@ public class RecipesIngots {
 				{ Blocks.redstone_block, new ItemStack(Items.redstone, 9) },
 				{ Blocks.coal_block, new ItemStack(Items.coal, 9, 0) },
 				{ Blocks.hay_block, new ItemStack(Items.wheat, 9) },
-				{ Blocks.slime_block, new ItemStack(Items.slime_ball, 9) },
-				{ Blocks.platinum_block, new ItemStack(Items.platinum_ingot, 9) },
-				{ Blocks.titanium_block, new ItemStack(Items.titanium_ingot, 9) },
-				{ Blocks.uranium_block, new ItemStack(Items.uranium_crystal, 9) },
-				{ Blocks.steel_block, new ItemStack(Items.steel, 9) } };
+				{ Blocks.slime_block, new ItemStack(Items.slime_ball, 9) } };
 		for (int i = 0; i < this.recipeItems.length; ++i) {
 			Block block = (Block) this.recipeItems[i][0];
 			ItemStack itemstack = (ItemStack) this.recipeItems[i][1];

@@ -666,6 +666,13 @@ public class PlatformRuntime {
 		Thread.currentThread().setName(string);
 	}
 
+	public static void sleep(int millis) {
+		try {
+			Thread.sleep(millis);
+		} catch (InterruptedException e) {
+		}
+	}
+
 	public static long steadyTimeMillis() {
 		return System.nanoTime() / 1000000l;
 	}

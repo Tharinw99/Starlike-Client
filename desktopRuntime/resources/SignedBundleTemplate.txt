@@ -10,7 +10,8 @@ if(typeof window !== "undefined") {
 	}else {
 		var relayzId = Math.floor(Math.random() * 3);
 		window.eaglercraftXOpts = {
-			container: "game_frame"
+			container: "game_frame",
+			enableSignatureBadge: true
 		};
 	}
 	window.addEventListener("load", function() {

@@ -75,7 +75,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 			}
 
 			for (int k = 0; k < 9; ++k) {
-				this.addSlotToContainer(new Slot(inventoryplayer, k, 9 + k * 18, 112));
+				this.addSlotToContainer(new Slot(inventoryplayer, k, 9 + k * 18, 113));
 			}
 
 			this.scrollTo(0.0F);
@@ -258,11 +258,11 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 		int k = this.guiLeft + 175;
 		int l = this.guiTop + 18;
-		int i1 = l + 112;
+		int i1 = l + 113;
 		this.mc.getTextureManager().bindTexture(creativeInventoryTabs);
 		if (creativetabs.shouldHidePlayerInventory()) {
 			this.drawTexturedModalRect(k, l + (int) ((float) (i1 - l - 17) * this.currentScroll),
-					232 + (this.needsScrollBars() ? 0 : 12), 0, 12, 15);
+					232 + (this.needsScrollBars() ? 0 : 13), 0, 13, 15);
 		}
 
 		this.func_147051_a(creativetabs);
@@ -282,9 +282,8 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 		if (creativetabs.drawInForegroundOfTab()) {
 			GlStateManager.disableBlend();
 			this.fontRendererObj.drawString(I18n.format(creativetabs.getTranslatedTabLabel(), new Object[0]), 8, 6,
-					4210752);
+					0xFFFFFF);
 		}
-
 	}
 
 	/**
@@ -298,7 +297,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 		int i1 = k + 175;
 		int j1 = l + 18;
 		int k1 = i1 + 14;
-		int l1 = j1 + 112;
+		int l1 = j1 + 113;
 		if (!this.wasClicking && flag && i >= i1 && j >= j1 && i < k1 && j < l1) {
 			this.isScrolling = this.needsScrollBars();
 		}
@@ -595,7 +594,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 				this.searchField.setText("");
 			}
 
-			if (parInt1 == getCloseKey() || (parInt1 == 1 && this.mc.areKeysLocked())) {
+			if (parInt1 == getCloseKey() || (parInt1 == 1 && Keyboard.areKeysLocked())) {
 				mc.displayGuiScreen(null);
 			} else if (!this.checkHotbarKeys(parInt1)) {
 				if (this.searchField.textboxKeyTyped(parChar1, parInt1)) {
@@ -774,14 +773,14 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 					int i1 = k / 9;
 					guicontainercreative$creativeslot.xDisplayPosition = 9 + l * 18;
 					if (j >= 36) {
-						guicontainercreative$creativeslot.yDisplayPosition = 112;
+						guicontainercreative$creativeslot.yDisplayPosition = 113;
 					} else {
 						guicontainercreative$creativeslot.yDisplayPosition = 54 + i1 * 18;
 					}
 				}
 			}
 
-			this.field_147064_C = new Slot(field_147060_v, 0, 173, 112);
+			this.field_147064_C = new Slot(field_147060_v, 0, 173, 113);
 			guicontainercreative$containercreative.inventorySlots.add(this.field_147064_C);
 		} else if (i == CreativeTabs.tabInventory.getTabIndex()) {
 			guicontainercreative$containercreative.inventorySlots = this.field_147063_B;

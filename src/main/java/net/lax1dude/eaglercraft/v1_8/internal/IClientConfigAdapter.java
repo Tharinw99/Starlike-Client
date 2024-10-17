@@ -70,6 +70,8 @@ public interface IClientConfigAdapter {
 
 	boolean isAllowVoiceClient();
 
+	boolean isCheckGLErrors();
+
 	boolean isCheckRelaysForUpdates();
 
 	boolean isCheckShaderGLErrors();

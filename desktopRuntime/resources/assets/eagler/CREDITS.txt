@@ -1,4 +1,14 @@
 
+ Starlike Client
+ ~~~~~~~~~~~~~~~~~~~~~~~
+
+  - SpeedSlicer - Owner
+  - zumbiepig - Co-Owner
+  - CatFoolYou - Texture artist
+  - Oeil-de-Lynx - Contributor
+
+
+
  EaglercraftX Developers
  ~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -58,8 +58,9 @@ public class GuiDispenser extends GuiContainer {
 	 */
 	protected void drawGuiContainerForegroundLayer(int var1, int var2) {
 		String s = this.dispenserInventory.getDisplayName().getUnformattedText();
-		this.fontRendererObj.drawString(s, this.xSize / 2 - this.fontRendererObj.getStringWidth(s) / 2, 6, 4210752);
+		this.fontRendererObj.drawString(s, this.xSize / 2 - this.fontRendererObj.getStringWidth(s) / 2, 6, 0xFFFFFF);
 		this.fontRendererObj.drawString(this.playerInventory.getDisplayName().getUnformattedText(), 8,
-				this.ySize - 96 + 2, 4210752);
+				this.ySize - 96 + 2, 0xFFFFFF);
 	}
+
 }

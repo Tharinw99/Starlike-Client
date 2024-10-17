@@ -171,7 +171,7 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting {
 	 * + The entity the player is currently spectating through.
 	 */
 	private Entity spectatingEntity = null;
-	private int currentWindowId;
+	public int currentWindowId;
 	public boolean isChangingQuantityOnly;
 	public int ping;
 	public boolean playerConqueredTheEnd;
@@ -478,7 +478,7 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting {
 	/**
 	 * + get the next window id to use
 	 */
-	private void getNextWindowId() {
+	public void getNextWindowId() {
 		this.currentWindowId = this.currentWindowId % 100 + 1;
 	}
 

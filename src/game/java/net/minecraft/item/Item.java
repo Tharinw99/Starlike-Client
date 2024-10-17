@@ -14,7 +14,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
 import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.block.BlockFlower;
-import net.minecraft.block.BlockMosaic;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.BlockPrismarine;
 import net.minecraft.block.BlockRedSandstone;
@@ -46,6 +45,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.starlikeclient.minecraft.init.ItemsStarlike;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
@@ -74,10 +74,11 @@ public class Item {
 	public static enum ToolMaterial {
 		// MATERIAL(HARVEST_LEVEL, DURABILITY, EFFICIENCY, DAMAGE, ENCHANTABILITY)
 		WOOD(0, 59, 2.0F, 0.0F, 15), STONE(1, 131, 4.0F, 1.0F, 5), IRON(2, 250, 6.0F, 2.0F, 14),
-		DIAMOND(3, 1561, 8.0F, 3.0F, 10), GOLD(0, 32, 12.0F, 0.0F, 22), PLATINUM(4, 2000, 10.0F, 4.0F, 12),
-		PLATINUM_DRILL(4, 2500, 50.0F, 4.0F, 14), TITANIUM_DRILL(5, 4750, 70.0F, 6.0F, 18),
-		SPEED_DRILL(5, 7500, 200.0F, 6.0F, 18), POWER_DRILL(6, 8500, 50.0F, 6.0F, 18),
-		LATE_GAME_DRILL(7, 8000, 300.0F, 7.0F, 24), OP_DRILL(8, 15000, 500.0F, 8.0F, 30);
+		DIAMOND(3, 1561, 8.0F, 3.0F, 10), GOLD(0, 32, 12.0F, 0.0F, 22), NETHERITE(4, 2031, 9.0F, 4.0F, 15),
+		PLATINUM(5, 2031, 10.0F, 5.0F, 13), PLATINUM_DRILL(5, 2500, 50.0F, 4.0F, 14),
+		TITANIUM_DRILL(6, 4750, 70.0F, 6.0F, 18), SPEED_DRILL(6, 7500, 200.0F, 6.0F, 18),
+		POWER_DRILL(7, 8500, 50.0F, 6.0F, 18), LATE_GAME_DRILL(8, 8000, 300.0F, 7.0F, 24),
+		OP_DRILL(9, 15000, 500.0F, 8.0F, 30);
 
 		private final int harvestLevel;
 		private final int maxUses;
@@ -115,26 +116,31 @@ public class Item {
 		}
 
 		public Item getRepairItem() {
-			return this == WOOD ? Item.getItemFromBlock(Blocks.planks)
-					: (this == STONE ? Item.getItemFromBlock(Blocks.cobblestone)
-							: (this == GOLD ? Items.gold_ingot
-									: (this == IRON ? Items.iron_ingot
-											: (this == DIAMOND ? Items.diamond
-													: (this == PLATINUM ? Items.platinum_ingot
-															: (this == PLATINUM_DRILL ? Items.uranium_rod
-																	: (this == PLATINUM_DRILL ? Items.uranium_rod
-																			: (this == TITANIUM_DRILL
-																					? Items.uranium_rod
-																					: (this == SPEED_DRILL
-																							? Items.uranium_rod
-																							: (this == POWER_DRILL
-																									? Items.uranium_rod
-																									: (this == LATE_GAME_DRILL
-																											? Items.uranium_rod
-																											: (this == OP_DRILL
-																													? Items.uranium_rod
-																													: null))))))))))));
-
+			switch (this) {
+			case WOOD:
+				return Item.getItemFromBlock(Blocks.planks);
+			case STONE:
+				return Item.getItemFromBlock(Blocks.cobblestone);
+			case GOLD:
+				return Items.gold_ingot;
+			case IRON:
+				return Items.iron_ingot;
+			case DIAMOND:
+				return Items.diamond;
+			case NETHERITE:
+				return Items.netherite_ingot;
+			case PLATINUM:
+				return Items.platinum_ingot;
+			case PLATINUM_DRILL:
+			case TITANIUM_DRILL:
+			case SPEED_DRILL:
+			case POWER_DRILL:
+			case LATE_GAME_DRILL:
+			case OP_DRILL:
+				return Items.uranium_rod;
+			default:
+				return null;
+			}
 		}
 	}
 
@@ -176,25 +182,25 @@ public class Item {
 		return (Item) BLOCK_TO_ITEM.get(blockIn);
 	}
 
-	private static void registerItem(int id, ResourceLocation textualID, Item itemIn) {
+	public static void registerItem(int id, ResourceLocation textualID, Item itemIn) {
 		itemRegistry.register(id, textualID, itemIn);
 	}
 
-	private static void registerItem(int id, String textualID, Item itemIn) {
+	public static void registerItem(int id, String textualID, Item itemIn) {
 		registerItem(id, new ResourceLocation(textualID), itemIn);
 	}
 
 	/**
 	 * + Register the given Item as the ItemBlock for the given Block.
 	 */
-	private static void registerItemBlock(Block blockIn) {
+	public static void registerItemBlock(Block blockIn) {
 		registerItemBlock(blockIn, new ItemBlock(blockIn));
 	}
 
 	/**
 	 * + Register the given Item as the ItemBlock for the given Block.
 	 */
-	protected static void registerItemBlock(Block blockIn, Item itemIn) {
+	public static void registerItemBlock(Block blockIn, Item itemIn) {
 		registerItem(Block.getIdFromBlock(blockIn), (ResourceLocation) Block.blockRegistry.getNameForObject(blockIn),
 				itemIn);
 		BLOCK_TO_ITEM.put(blockIn, itemIn);
@@ -627,7 +633,7 @@ public class Item {
 		registerItem(353, (String) "sugar", (new Item()).setUnlocalizedName("sugar")
 				.setPotionEffect(PotionHelper.sugarEffect).setCreativeTab(CreativeTabs.tabMaterials));
 		registerItem(354, (String) "cake", (new ItemReed(Blocks.cake)).setMaxStackSize(1).setUnlocalizedName("cake")
-				.setCreativeTab(CreativeTabs.tabFood));
+				.setCreativeTab(CreativeTabs.tabBrewing));
 		registerItem(355, (String) "bed", (new ItemBed()).setMaxStackSize(1).setUnlocalizedName("bed"));
 		registerItem(356, (String) "repeater", (new ItemReed(Blocks.unpowered_repeater)).setUnlocalizedName("diode")
 				.setCreativeTab(CreativeTabs.tabRedstone));
@@ -701,8 +707,8 @@ public class Item {
 				(new ItemCarrotOnAStick()).setUnlocalizedName("carrotOnAStick"));
 		registerItem(399, (String) "nether_star",
 				(new ItemSimpleFoiled()).setUnlocalizedName("netherStar").setCreativeTab(CreativeTabs.tabMaterials));
-		registerItem(400, (String) "pumpkin_pie",
-				(new ItemFood(8, 0.3F, false)).setUnlocalizedName("pumpkinPie").setCreativeTab(CreativeTabs.tabFood));
+		registerItem(400, (String) "pumpkin_pie", (new ItemFood(8, 0.3F, false)).setUnlocalizedName("pumpkinPie")
+				.setCreativeTab(CreativeTabs.tabBrewing));
 		registerItem(401, (String) "fireworks", (new ItemFirework()).setUnlocalizedName("fireworks"));
 		registerItem(402, (String) "firework_charge",
 				(new ItemFireworkCharge()).setUnlocalizedName("fireworksCharge").setCreativeTab(CreativeTabs.tabMisc));
@@ -764,58 +770,7 @@ public class Item {
 		registerItem(2266, (String) "record_11", (new ItemRecord("11")).setUnlocalizedName("record"));
 		registerItem(2267, (String) "record_wait", (new ItemRecord("wait")).setUnlocalizedName("record"));
 
-		registerItemBlock(Blocks.deepstone);
-		registerItemBlock(Blocks.cobbled_deepstone);
-		registerItemBlock(Blocks.steel_block);
-		registerItemBlock(Blocks.steel_grate);
-		registerItemBlock(Blocks.platinum_ore);
-		registerItemBlock(Blocks.platinum_block);
-		registerItemBlock(Blocks.titanium_ore);
-		registerItemBlock(Blocks.titanium_block);
-		registerItemBlock(Blocks.uranium_ore);
-		registerItemBlock(Blocks.uranium_block);
-		registerItemBlock(Blocks.mosaic,
-				(new ItemMultiTexture(Blocks.mosaic, Blocks.mosaic, new Function<ItemStack, String>() {
-					public String apply(ItemStack itemstack) {
-						return BlockMosaic.EnumType.byMetadata(itemstack.getMetadata()).getUnlocalizedName();
-					}
-				})).setUnlocalizedName("mosaic"));
-		registerItemBlock(Blocks.fabricator);
-
-		registerItem(1024, (String) "starlike:steel",
-				(new Item()).setUnlocalizedName("steel").setCreativeTab(CreativeTabs.tabStarlike));
-		registerItem(1025, (String) "starlike:platinum_ingot",
-				(new Item()).setUnlocalizedName("platinum_ingot").setCreativeTab(CreativeTabs.tabStarlike));
-		registerItem(1026, (String) "starlike:platinum_sword", (new ItemSword(Item.ToolMaterial.PLATINUM))
-				.setUnlocalizedName("platinum_sword").setCreativeTab(CreativeTabs.tabStarlike));
-		registerItem(1027, (String) "starlike:platinum_pickaxe", (new ItemPickaxe(Item.ToolMaterial.PLATINUM))
-				.setUnlocalizedName("platinum_pickaxe").setCreativeTab(CreativeTabs.tabStarlike));
-		registerItem(1028, (String) "starlike:platinum_shovel", (new ItemSpade(Item.ToolMaterial.PLATINUM))
-				.setUnlocalizedName("platinum_shovel").setCreativeTab(CreativeTabs.tabStarlike));
-		registerItem(1029, (String) "starlike:platinum_axe", (new ItemAxe(Item.ToolMaterial.PLATINUM))
-				.setUnlocalizedName("platinum_axe").setCreativeTab(CreativeTabs.tabStarlike));
-		registerItem(1030, (String) "starlike:platinum_hoe", (new ItemHoe(Item.ToolMaterial.PLATINUM))
-				.setUnlocalizedName("platinum_hoe").setCreativeTab(CreativeTabs.tabStarlike));
-		registerItem(1031, (String) "starlike:platinum_helmet", (new ItemArmor(ItemArmor.ArmorMaterial.PLATINUM, 5, 0))
-				.setUnlocalizedName("platinum_helmet").setCreativeTab(CreativeTabs.tabStarlike));
-		registerItem(1032, (String) "starlike:platinum_chestplate",
-				(new ItemArmor(ItemArmor.ArmorMaterial.PLATINUM, 5, 1)).setUnlocalizedName("platinum_chestplate")
-						.setCreativeTab(CreativeTabs.tabStarlike));
-		registerItem(1033, (String) "starlike:platinum_leggings",
-				(new ItemArmor(ItemArmor.ArmorMaterial.PLATINUM, 5, 2)).setUnlocalizedName("platinum_leggings")
-						.setCreativeTab(CreativeTabs.tabStarlike));
-		registerItem(1034, (String) "starlike:platinum_boots", (new ItemArmor(ItemArmor.ArmorMaterial.PLATINUM, 5, 3))
-				.setUnlocalizedName("platinum_boots").setCreativeTab(CreativeTabs.tabStarlike));
-		registerItem(1035, (String) "starlike:titanium_ingot",
-				(new Item()).setUnlocalizedName("titanium_ingot").setCreativeTab(CreativeTabs.tabStarlike));
-		registerItem(1036, (String) "starlike:uranium_crystal",
-				(new Item()).setUnlocalizedName("uranium_crystal").setCreativeTab(CreativeTabs.tabStarlike));
-		registerItem(1037, (String) "starlike:uranium_rod",
-				(new Item()).setUnlocalizedName("uranium_rod").setCreativeTab(CreativeTabs.tabStarlike));
-		registerItem(1038, (String) "starlike:platinum_drill", (new ItemPickaxe(Item.ToolMaterial.PLATINUM_DRILL))
-				.setUnlocalizedName("platinum_drill").setCreativeTab(CreativeTabs.tabStarlike));
-		registerItem(1039, (String) "starlike:titanium_drill", (new ItemPickaxe(Item.ToolMaterial.TITANIUM_DRILL))
-				.setUnlocalizedName("titanium_drill").setCreativeTab(CreativeTabs.tabStarlike));
+		ItemsStarlike.registerItems();
 	}
 
 	private CreativeTabs tabToDisplayOn;

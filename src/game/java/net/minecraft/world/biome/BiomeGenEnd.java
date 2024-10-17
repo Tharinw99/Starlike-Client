@@ -2,6 +2,7 @@ package net.minecraft.world.biome;
 
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.init.Blocks;
+import net.starlikeclient.minecraft.init.EntitiesStarlike;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
@@ -34,6 +35,9 @@ public class BiomeGenEnd extends BiomeGenBase {
 		this.spawnableWaterCreatureList.clear();
 		this.spawnableCaveCreatureList.clear();
 		this.spawnableMonsterList.add(new BiomeGenBase.SpawnListEntry(EntityEnderman.class, 10, 4, 4));
+
+		EntitiesStarlike.configEndEntities(this);
+
 		this.topBlock = Blocks.dirt.getDefaultState();
 		this.fillerBlock = Blocks.dirt.getDefaultState();
 		this.theBiomeDecorator = new BiomeEndDecorator();

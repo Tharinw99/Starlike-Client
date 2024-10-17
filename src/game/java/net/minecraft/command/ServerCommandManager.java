@@ -21,6 +21,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumChatFormatting;
+import net.starlikeclient.minecraft.init.CommandsStarlike;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
@@ -94,10 +95,9 @@ public class ServerCommandManager extends CommandHandler implements IAdminComman
 		this.registerCommand(new CommandListPlayers());
 		this.registerCommand(new CommandSetPlayerTimeout());
 		this.registerCommand(new ClientCommandDummy("eagskull", 2, "command.skull.usage"));
-		this.registerCommand(new CommandGm(0));
-		this.registerCommand(new CommandGm(1));
-		this.registerCommand(new CommandGm(2));
-		this.registerCommand(new CommandGm(3));
+
+		CommandsStarlike.registerCommands(this);
+
 		CommandBase.setAdminCommander(this);
 	}
 

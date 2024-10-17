@@ -222,6 +222,31 @@ public class ItemRenderer {
 		return blockIn != null && blockIn.getBlockLayer() == EnumWorldBlockLayer.TRANSLUCENT;
 	}
 
+	private void renderChiselAnimation(float clientPlayer, AbstractClientPlayer player) {
+		GlStateManager.rotate(-10.0F, 0.0F, 0.0F, 1.0F);
+		GlStateManager.rotate(5.0F, 0.0F, 1.0F, 0.0F);
+		GlStateManager.rotate(-10.0F, 1.0F, 0.0F, 0.0F);
+
+		float useDuration = (float) this.itemToRender.getMaxItemUseDuration()
+				- ((float) player.getItemInUseCount() - clientPlayer + 1.0F);
+		float chiselProgress = useDuration / 20.0F;
+		chiselProgress = (chiselProgress * chiselProgress + chiselProgress * 2.0F) / 3.0F;
+
+		if (chiselProgress > 1.0F) {
+			chiselProgress = 1.0F;
+		}
+
+		if (chiselProgress > 0.1F) {
+			float chiselEffect = MathHelper.sin((useDuration - 0.1F) * 1.5F);
+			float motionAmount = chiselProgress - 0.1F;
+			float forwardMotion = chiselEffect * motionAmount;
+
+			GlStateManager.translate(forwardMotion * 0.0F, forwardMotion * 0.0F, forwardMotion * 0.1F);
+		}
+
+		GlStateManager.scale(1.0F, 1.0F, 1.0F + chiselProgress * 0.1F);
+	}
+
 	/**
 	 * + Renders the fire on the screen for first person mode. Arg: partialTickTime
 	 */
@@ -327,6 +352,11 @@ public class ItemRenderer {
 				case BOW:
 					this.transformFirstPersonItem(f, 0.0F);
 					this.func_178098_a(partialTicks, entityplayersp);
+					break;
+				case CHISEL:
+					this.renderChiselAnimation(f, entityplayersp);
+					this.transformFirstPersonItem(f, 0.0F);
+					break;
 				}
 			} else {
 				this.func_178105_d(f1);

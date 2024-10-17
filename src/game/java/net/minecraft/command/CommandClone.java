@@ -16,6 +16,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
+import net.starlikeclient.StarlikeSettings;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
@@ -114,9 +115,9 @@ public class CommandClone extends CommandBase {
 			StructureBoundingBox structureboundingbox1 = new StructureBoundingBox(blockpos2,
 					blockpos2.add(structureboundingbox.func_175896_b()));
 			int i = structureboundingbox.getXSize() * structureboundingbox.getYSize() * structureboundingbox.getZSize();
-			if (i > '\u8000') {
-				throw new CommandException("commands.clone.tooManyBlocks",
-						new Object[] { Integer.valueOf(i), Integer.valueOf('\u8000') });
+			if (i > StarlikeSettings.commandModificationBlockLimit) {
+				throw new CommandException("commands.clone.tooManyBlocks", new Object[] { Integer.valueOf(i),
+						Integer.valueOf(StarlikeSettings.commandModificationBlockLimit) });
 			} else {
 				boolean flag = false;
 				Block block = null;

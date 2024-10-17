@@ -27,7 +27,6 @@ import net.minecraft.block.BlockDirt;
 import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.block.BlockFlower;
 import net.minecraft.block.BlockHugeMushroom;
-import net.minecraft.block.BlockMosaic;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.BlockPrismarine;
 import net.minecraft.block.BlockQuartz;
@@ -78,6 +77,7 @@ import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.util.ReportedException;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3i;
+import net.starlikeclient.minecraft.init.ItemsStarlike;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
@@ -185,11 +185,11 @@ public class RenderItem implements IResourceManagerReloadListener {
 		renderer.putNormal((float) vec3i.getX(), (float) vec3i.getY(), (float) vec3i.getZ());
 	}
 
-	protected void registerBlock(Block blk, int subType, String identifier) {
+	public void registerBlock(Block blk, int subType, String identifier) {
 		this.registerItem(Item.getItemFromBlock(blk), subType, identifier);
 	}
 
-	private void registerBlock(Block blk, String identifier) {
+	public void registerBlock(Block blk, String identifier) {
 		this.registerBlock(blk, 0, identifier);
 	}
 
@@ -197,7 +197,7 @@ public class RenderItem implements IResourceManagerReloadListener {
 		this.itemModelMesher.register(itm, subType, new ModelResourceLocation(identifier, "inventory"));
 	}
 
-	private void registerItem(Item itm, String identifier) {
+	public void registerItem(Item itm, String identifier) {
 		this.registerItem(itm, 0, identifier);
 	}
 
@@ -762,40 +762,7 @@ public class RenderItem implements IResourceManagerReloadListener {
 				"red_mushroom_block");
 		this.registerBlock(Blocks.dragon_egg, "dragon_egg");
 
-		this.registerBlock(Blocks.deepstone, "starlike:deepstone");
-		this.registerBlock(Blocks.cobbled_deepstone, "starlike:cobbled_deepstone");
-		this.registerBlock(Blocks.steel_block, "starlike:steel_block");
-		this.registerBlock(Blocks.steel_grate, "starlike:steel_grate");
-		this.registerBlock(Blocks.platinum_ore, "starlike:platinum_ore");
-		this.registerBlock(Blocks.platinum_block, "starlike:platinum_block");
-		this.registerBlock(Blocks.titanium_ore, "starlike:titanium_ore");
-		this.registerBlock(Blocks.titanium_block, "starlike:titanium_block");
-		this.registerBlock(Blocks.uranium_ore, "starlike:uranium_ore");
-		this.registerBlock(Blocks.uranium_block, "starlike:uranium_block");
-		this.registerBlock(Blocks.mosaic, BlockMosaic.EnumType.OAK.getMetadata(), "starlike:oak_mosaic");
-		this.registerBlock(Blocks.mosaic, BlockMosaic.EnumType.SPRUCE.getMetadata(), "starlike:spruce_mosaic");
-		this.registerBlock(Blocks.mosaic, BlockMosaic.EnumType.BIRCH.getMetadata(), "starlike:birch_mosaic");
-		this.registerBlock(Blocks.mosaic, BlockMosaic.EnumType.JUNGLE.getMetadata(), "starlike:jungle_mosaic");
-		this.registerBlock(Blocks.mosaic, BlockMosaic.EnumType.ACACIA.getMetadata(), "starlike:acacia_mosaic");
-		this.registerBlock(Blocks.mosaic, BlockMosaic.EnumType.DARK_OAK.getMetadata(), "starlike:dark_oak_mosaic");
-		this.registerBlock(Blocks.fabricator, "starlike:fabricator");
-
-		this.registerItem(Items.steel, "starlike:steel");
-		this.registerItem(Items.platinum_ingot, "starlike:platinum_ingot");
-		this.registerItem(Items.platinum_sword, "starlike:platinum_sword");
-		this.registerItem(Items.platinum_pickaxe, "starlike:platinum_pickaxe");
-		this.registerItem(Items.platinum_shovel, "starlike:platinum_shovel");
-		this.registerItem(Items.platinum_axe, "starlike:platinum_axe");
-		this.registerItem(Items.platinum_hoe, "starlike:platinum_hoe");
-		this.registerItem(Items.platinum_helmet, "starlike:platinum_helmet");
-		this.registerItem(Items.platinum_chestplate, "starlike:platinum_chestplate");
-		this.registerItem(Items.platinum_leggings, "starlike:platinum_leggings");
-		this.registerItem(Items.platinum_boots, "starlike:platinum_boots");
-		this.registerItem(Items.titanium_ingot, "starlike:titanium_ingot");
-		this.registerItem(Items.uranium_crystal, "starlike:uranium_crystal");
-		this.registerItem(Items.uranium_rod, "starlike:uranium_rod");
-		this.registerItem(Items.platinum_drill, "starlike:platinum_drill");
-		this.registerItem(Items.titanium_drill, "starlike:titanium_drill");
+		ItemsStarlike.renderItems(this);
 	}
 
 	private void renderEffect(IBakedModel model) {

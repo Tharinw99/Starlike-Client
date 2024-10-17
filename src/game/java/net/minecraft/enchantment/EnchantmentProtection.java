@@ -130,7 +130,7 @@ public class EnchantmentProtection extends Enchantment {
 	 * + Returns the maximum level that the enchantment can have.
 	 */
 	public int getMaxLevel() {
-		return 8;
+		return 10;
 	}
 
 	/**

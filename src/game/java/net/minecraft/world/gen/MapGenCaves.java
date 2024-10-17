@@ -44,7 +44,7 @@ public class MapGenCaves extends MapGenBase {
 	protected boolean func_175793_a(IBlockState parIBlockState, IBlockState parIBlockState2) {
 		return parIBlockState.getBlock() == Blocks.stone ? true
 				: (parIBlockState.getBlock() == Blocks.dirt ? true
-						: (parIBlockState.getBlock() == Blocks.deepstone ? true
+						: (parIBlockState.getBlock() == Blocks.deepslate ? true
 								: (parIBlockState.getBlock() == Blocks.grass ? true
 										: (parIBlockState.getBlock() == Blocks.hardened_clay ? true
 												: (parIBlockState.getBlock() == Blocks.stained_hardened_clay ? true

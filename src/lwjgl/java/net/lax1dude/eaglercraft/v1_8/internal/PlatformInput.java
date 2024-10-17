@@ -70,6 +70,8 @@ import org.lwjgl.glfw.GLFWGamepadState;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.system.MemoryStack;
 
+import net.lax1dude.eaglercraft.v1_8.Display;
+
 /**
  * Copyright (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
  * 
@@ -182,7 +184,6 @@ public class PlatformInput {
 	private static boolean enableRepeatEvents = false;
 
 	private static int functionKeyModifier = GLFW_KEY_F;
-	public static boolean lockKeys = false;
 
 	private static final List<Character> keyboardCharList = new LinkedList<>();
 
@@ -205,6 +206,8 @@ public class PlatformInput {
 	private static boolean startupFullscreen = false;
 
 	private static int[] lastPos = new int[4];
+
+	private static final long[] syncTimer = new long[1];
 
 	public static boolean contextLost() {
 		return glfwGetWindowAttrib(win, GLFW_ICONIFIED) == GLFW_TRUE;
@@ -570,6 +573,10 @@ public class PlatformInput {
 		return true;
 	}
 
+	public static boolean keyboardAreKeysLocked() {
+		return false;
+	}
+
 	public static void keyboardEnableRepeatEvents(boolean b) {
 		enableRepeatEvents = b;
 	}
@@ -924,12 +931,21 @@ public class PlatformInput {
 	}
 
 	public static void update() {
+		update(0);
+	}
+
+	public static void update(int limitFps) {
 		glfwPollEvents();
 		if (vsync != glfwVSyncState) {
 			glfwSwapInterval(vsync ? 1 : 0);
 			glfwVSyncState = vsync;
 		}
 		glfwSwapBuffers(win);
+		if (limitFps > 0 && !vsync) {
+			Display.sync(limitFps, syncTimer);
+		} else {
+			syncTimer[0] = 0l;
+		}
 	}
 
 	public static boolean wasResized() {

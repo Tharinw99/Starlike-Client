@@ -49,7 +49,7 @@ public class ItemFood extends Item {
 		this.healAmount = amount;
 		this.isWolfsFavoriteMeat = isWolfFood;
 		this.saturationModifier = saturation;
-		this.setCreativeTab(CreativeTabs.tabFood);
+		this.setCreativeTab(CreativeTabs.tabBrewing);
 	}
 
 	public int getHealAmount(ItemStack var1) {

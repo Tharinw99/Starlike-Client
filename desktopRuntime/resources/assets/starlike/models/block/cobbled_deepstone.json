@@ -1,6 +1,0 @@
-{
-    "parent": "block/cube_all",
-    "textures": {
-        "all": "starlike:blocks/cobbled_deepstone"
-    }
-}

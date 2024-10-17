@@ -46,7 +46,8 @@ public class ItemArmor extends Item {
 	public static enum ArmorMaterial {
 		LEATHER("leather", 5, new int[] { 1, 3, 2, 1 }, 15), CHAIN("chainmail", 15, new int[] { 2, 5, 4, 1 }, 12),
 		IRON("iron", 15, new int[] { 2, 6, 5, 2 }, 9), GOLD("gold", 7, new int[] { 2, 5, 3, 1 }, 25),
-		DIAMOND("diamond", 33, new int[] { 3, 8, 6, 3 }, 10), PLATINUM("platinum", 41, new int[] { 4, 10, 7, 3 }, 12);
+		DIAMOND("diamond", 33, new int[] { 3, 8, 6, 3 }, 10), NETHERITE("netherite", 37, new int[] { 3, 8, 6, 3 }, 15),
+		PLATINUM("platinum", 41, new int[] { 4, 10, 7, 3 }, 12);
 
 		private final String name;
 		private final int maxDamageFactor;
@@ -82,7 +83,8 @@ public class ItemArmor extends Item {
 							: (this == GOLD ? Items.gold_ingot
 									: (this == IRON ? Items.iron_ingot
 											: (this == DIAMOND ? Items.diamond
-													: (this == PLATINUM ? Items.platinum_ingot : null)))));
+													: (this == NETHERITE ? Items.netherite_ingot
+															: (this == PLATINUM ? Items.platinum_ingot : null))))));
 		}
 	}
 

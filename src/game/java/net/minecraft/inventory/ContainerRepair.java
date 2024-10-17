@@ -12,12 +12,14 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.network.play.server.S30PacketWindowItems;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
@@ -148,10 +150,12 @@ public class ContainerRepair extends Container {
 			for (int i = 0; i < this.inputSlots.getSizeInventory(); ++i) {
 				ItemStack itemstack = this.inputSlots.removeStackFromSlot(i);
 				if (itemstack != null) {
-					entityplayer.dropPlayerItemWithRandomChoice(itemstack, false);
+					if (!entityplayer.inventory.addItemStackToInventory(itemstack)) {
+						entityplayer.dropPlayerItemWithRandomChoice(itemstack, false);
+					}
 				}
 			}
-
+			((EntityPlayerMP) entityplayer).playerNetServerHandler.sendPacket(new S30PacketWindowItems(entityplayer.inventoryContainer.windowId, entityplayer.inventoryContainer.getInventory()));
 		}
 	}
 

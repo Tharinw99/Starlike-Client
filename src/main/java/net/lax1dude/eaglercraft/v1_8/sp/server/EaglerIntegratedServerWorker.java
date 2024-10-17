@@ -423,7 +423,7 @@ public class EaglerIntegratedServerWorker {
 			}
 		} else {
 			if (!singleThreadMode) {
-				EagUtils.sleep(50l);
+				EagUtils.sleep(50);
 			}
 		}
 	}

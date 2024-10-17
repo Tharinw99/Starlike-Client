@@ -77,7 +77,7 @@ class LANClientPeer {
 					disconnect();
 					return;
 				}
-				EagUtils.sleep(20l);
+				EagUtils.sleep(20);
 			} while (EagRuntime.steadyTimeMillis() - millis < 5000l);
 			logger.error("Getting server description for '{}' timed out!", clientId);
 			disconnect();
@@ -117,7 +117,7 @@ class LANClientPeer {
 					disconnect();
 					return;
 				}
-				EagUtils.sleep(20l);
+				EagUtils.sleep(20);
 			} while (EagRuntime.steadyTimeMillis() - millis < 5000l);
 			logger.error("Getting server ICE candidates for '{}' timed out!", clientId);
 			disconnect();
@@ -149,7 +149,7 @@ class LANClientPeer {
 					disconnect();
 					return;
 				}
-				EagUtils.sleep(20l);
+				EagUtils.sleep(20);
 			} while (EagRuntime.steadyTimeMillis() - millis < 5000l);
 			logger.error("Getting server description for '{}' timed out!", clientId);
 			disconnect();

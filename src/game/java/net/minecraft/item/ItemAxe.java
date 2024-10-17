@@ -39,7 +39,7 @@ public class ItemAxe extends ItemTool {
 				Blocks.chest, Blocks.pumpkin, Blocks.lit_pumpkin, Blocks.melon_block, Blocks.ladder });
 	}
 
-	protected ItemAxe(Item.ToolMaterial material) {
+	public ItemAxe(Item.ToolMaterial material) {
 		super(3.0F, material, EFFECTIVE_ON);
 	}
 

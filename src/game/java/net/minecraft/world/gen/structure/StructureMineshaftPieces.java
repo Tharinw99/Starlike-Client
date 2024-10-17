@@ -826,9 +826,13 @@ public class StructureMineshaftPieces {
 	}
 
 	public static void registerStructurePieces() {
-		MapGenStructureIO.registerStructureComponent(StructureMineshaftPieces.Corridor.class, "MSCorridor");
-		MapGenStructureIO.registerStructureComponent(StructureMineshaftPieces.Cross.class, "MSCrossing");
-		MapGenStructureIO.registerStructureComponent(StructureMineshaftPieces.Room.class, "MSRoom");
-		MapGenStructureIO.registerStructureComponent(StructureMineshaftPieces.Stairs.class, "MSStairs");
+		MapGenStructureIO.registerStructureComponent(StructureMineshaftPieces.Corridor.class,
+				StructureMineshaftPieces.Corridor::new, "MSCorridor");
+		MapGenStructureIO.registerStructureComponent(StructureMineshaftPieces.Cross.class,
+				StructureMineshaftPieces.Cross::new, "MSCrossing");
+		MapGenStructureIO.registerStructureComponent(StructureMineshaftPieces.Room.class,
+				StructureMineshaftPieces.Room::new, "MSRoom");
+		MapGenStructureIO.registerStructureComponent(StructureMineshaftPieces.Stairs.class,
+				StructureMineshaftPieces.Stairs::new, "MSStairs");
 	}
 }
