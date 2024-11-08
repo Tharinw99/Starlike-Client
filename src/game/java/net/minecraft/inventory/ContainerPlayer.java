@@ -121,7 +121,8 @@ public class ContainerPlayer extends Container {
 		this.craftResult.setInventorySlotContents(0, (ItemStack) null);
 
 		if (!entityplayer.worldObj.isRemote) {
-			((EntityPlayerMP) entityplayer).playerNetServerHandler.sendPacket(new S30PacketWindowItems(entityplayer.inventoryContainer.windowId, entityplayer.inventoryContainer.getInventory()));
+			((EntityPlayerMP) entityplayer).playerNetServerHandler.sendPacket(new S30PacketWindowItems(
+					entityplayer.inventoryContainer.windowId, entityplayer.inventoryContainer.getInventory()));
 		}
 	}
 

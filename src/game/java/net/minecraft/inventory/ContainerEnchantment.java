@@ -12,10 +12,10 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.server.S30PacketWindowItems;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.network.play.server.S30PacketWindowItems;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
@@ -203,7 +203,8 @@ public class ContainerEnchantment extends Container {
 					}
 				}
 			}
-			((EntityPlayerMP) entityplayer).playerNetServerHandler.sendPacket(new S30PacketWindowItems(entityplayer.inventoryContainer.windowId, entityplayer.inventoryContainer.getInventory()));
+			((EntityPlayerMP) entityplayer).playerNetServerHandler.sendPacket(new S30PacketWindowItems(
+					entityplayer.inventoryContainer.windowId, entityplayer.inventoryContainer.getInventory()));
 		}
 	}
 

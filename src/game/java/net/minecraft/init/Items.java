@@ -11,6 +11,7 @@ import net.minecraft.item.ItemMap;
 import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemShears;
 import net.minecraft.util.ResourceLocation;
+import net.starlikeclient.minecraft.items.ItemBackpack;
 import net.starlikeclient.minecraft.items.ItemChisel;
 
 /**
@@ -253,7 +254,9 @@ public class Items {
 	public static ItemArmor netherite_chestplate;
 	public static ItemArmor netherite_leggings;
 	public static ItemArmor netherite_boots;
-	public static ItemChisel chisel;
+	public static ItemChisel chisel;	
+	//public static ItemBackpack leather_backpack;
+
 
 	static void doBootstrap() {
 		if (!Bootstrap.isRegistered()) {
@@ -477,6 +480,8 @@ public class Items {
 			netherite_leggings = (ItemArmor) getRegisteredItem("starlike:netherite_leggings");
 			netherite_boots = (ItemArmor) getRegisteredItem("starlike:netherite_boots");
 			chisel = (ItemChisel) getRegisteredItem("starlike:chisel");
+			//leather_backpack = (ItemBackpack) getRegisteredItem("starlike:leather_backpack");
+
 		}
 	}
 

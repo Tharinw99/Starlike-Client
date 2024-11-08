@@ -344,7 +344,8 @@ public abstract class Container {
 			inventoryplayer.setItemStack((ItemStack) null);
 
 			if (!playerIn.worldObj.isRemote) {
-				((EntityPlayerMP) playerIn).playerNetServerHandler.sendPacket(new S30PacketWindowItems(playerIn.inventoryContainer.windowId, playerIn.inventoryContainer.getInventory()));
+				((EntityPlayerMP) playerIn).playerNetServerHandler.sendPacket(new S30PacketWindowItems(
+						playerIn.inventoryContainer.windowId, playerIn.inventoryContainer.getInventory()));
 			}
 		}
 	}

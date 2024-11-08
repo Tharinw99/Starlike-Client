@@ -21,31 +21,26 @@ jobs:
         run: ./gradlew generateJavaScript
       - name: Compile assets.epk
         run: bash ./CompileEPK.sh
-      - name: Generate offline download - standard
-        if: github.ref != 'refs/heads/main'
+      - name: Generate offline download
         run: bash ./MakeOfflineDownload.sh
-      - name: Generate offline download - signed
-        if: github.ref == 'refs/heads/main'
+      - name: Prepare web files
         run: |
-          source ./SIGNED_CLIENT.env &&
-          SIGNED_CLIENT_INPUT="${{ vars.SIGNED_CLIENT_INPUT }}${{ secrets.SIGNED_CLIENT_SECRET }}" &&
-          echo "$SIGNED_CLIENT_INPUT" | bash ./MakeSignedClient.sh &&
-          echo "$SIGNED_CLIENT_INPUT" | bash ./MakeSignedClient.sh
+          mkdir -p ${{ runner.temp }}/gh-pages
+          cp -t ${{ runner.temp }}/gh-pages \
+            javascript/assets.epk \
+            javascript/classes.js \
+            javascript/classes.js.map \
+            javascript/index.html
+          cp javascript/Starlike_Client_Offline.html ${{ runner.temp }}/gh-pages/offline.html
       - name: Upload web files
         continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: web
-          path: |
-            javascript/assets.epk
-            javascript/classes.js
-            javascript/classes.js.map
-            javascript/favicon.png
-            javascript/index.html
+          path: ${{ runner.temp }}/gh-pages/
           retention-days: 1
           compression-level: 9
-      - name: Upload offline download - standard
-        if: github.ref != 'refs/heads/main'
+      - name: Upload offline download
         continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
@@ -53,34 +48,13 @@ jobs:
           path: javascript/Starlike_Client_Offline.html
           retention-days: 1
           compression-level: 9
-      - name: Upload offline download - signed
-        if: github.ref == 'refs/heads/main'
-        continue-on-error: true
-        uses: actions/upload-artifact@v4
-        with:
-          name: offline_signed
-          path: javascript/Starlike_Client_Offline_Signed.html
-          retention-days: 1
-          compression-level: 9
-      - name: Prepare GitHub Pages
-        if: github.ref == 'refs/heads/main'
-        run: |
-          mkdir -p ${{ runner.temp }}/gh-pages
-          cp -t ${{ runner.temp }}/gh-pages \
-            javascript/assets.epk \
-            javascript/classes.js \
-            javascript/classes.js.map \
-            javascript/favicon.png \
-            javascript/index.html
-          cp javascript/Starlike_Client_Offline_Signed.html ${{ runner.temp }}/gh-pages/offline.html
-          cp javascript/Starlike_Client_Offline_Signed.html.dat ${{ runner.temp }}/gh-pages/latest_update.dat
       - name: Deploy to GitHub Pages
         if: github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ${{ runner.temp }}/gh-pages
-          cname: starlikeclient.com
+          cname: starlike.zumbiepig.dev
           force_orphan: true
           user_name: 'github-actions[bot]'
           user_email: '41898282+github-actions[bot]@users.noreply.github.com'

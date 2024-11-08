@@ -88,7 +88,8 @@ public class ContainerBeacon extends Container {
 				if (!entityplayer.inventory.addItemStackToInventory(itemstack)) {
 					entityplayer.dropPlayerItemWithRandomChoice(itemstack, false);
 				}
-				((EntityPlayerMP) entityplayer).playerNetServerHandler.sendPacket(new S30PacketWindowItems(entityplayer.inventoryContainer.windowId, entityplayer.inventoryContainer.getInventory()));
+				((EntityPlayerMP) entityplayer).playerNetServerHandler.sendPacket(new S30PacketWindowItems(
+						entityplayer.inventoryContainer.windowId, entityplayer.inventoryContainer.getInventory()));
 			}
 		}
 	}

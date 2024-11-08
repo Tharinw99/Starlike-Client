@@ -199,6 +199,22 @@ public class Chunk {
 	}
 
 	/**
+	 * Checks light levels for a block and its neighbors
+	 * 
+	 * @param centerPos The position of the block to check
+	 */
+	private void checkLightForBlockAndNeighbors(BlockPos centerPos) {
+		for (EnumFacing facing : EnumFacing.values()) {
+			BlockPos neighborPos = centerPos.offset(facing);
+			if (worldObj.getBlockState(neighborPos).getBlock().getLightValue() > 0) {
+				worldObj.checkLight(neighborPos);
+			}
+		}
+
+		worldObj.checkLight(centerPos);
+	}
+
+	/**
 	 * + Checks the height of a block next to a sky-visible block and schedules a
 	 * lighting update as necessary.
 	 */
@@ -226,36 +242,33 @@ public class Chunk {
 	 * generation.
 	 */
 	public void enqueueRelightChecks() {
-		BlockPos blockpos = new BlockPos(this.xPosition << 4, 0, this.zPosition << 4);
+		final BlockPos chunkStart = new BlockPos(xPosition << 4, 0, zPosition << 4);
+		final int MAX_QUEUE_SIZE = 4096;
+		final int SECTION_SIZE = 16;
 
-		for (int i = 0; i < 8; ++i) {
-			if (this.queuedLightChecks >= 4096) {
+		for (int section = 0; section < 8; section++) {
+			if (queuedLightChecks >= MAX_QUEUE_SIZE) {
 				return;
 			}
 
-			int j = this.queuedLightChecks % 16;
-			int k = this.queuedLightChecks / 16 % 16;
-			int l = this.queuedLightChecks / 256;
-			++this.queuedLightChecks;
+			int ySection = queuedLightChecks % SECTION_SIZE;
+			int xOffset = (queuedLightChecks / SECTION_SIZE) % SECTION_SIZE;
+			int zOffset = queuedLightChecks / 256;
+			queuedLightChecks++;
 
-			EnumFacing[] facings = EnumFacing._VALUES;
-			for (int i1 = 0; i1 < 16; ++i1) {
-				BlockPos blockpos1 = blockpos.add(k, (j << 4) + i1, l);
-				boolean flag = i1 == 0 || i1 == 15 || k == 0 || k == 15 || l == 0 || l == 15;
-				if (this.storageArrays[j] == null && flag || this.storageArrays[j] != null
-						&& this.storageArrays[j].getBlockByExtId(k, i1, l).getMaterial() == Material.air) {
-					for (int m = 0; m < facings.length; ++m) {
-						BlockPos blockpos2 = blockpos1.offset(facings[m]);
-						if (this.worldObj.getBlockState(blockpos2).getBlock().getLightValue() > 0) {
-							this.worldObj.checkLight(blockpos2);
-						}
-					}
+			for (int y = 0; y < SECTION_SIZE; y++) {
+				BlockPos columnPos = chunkStart.add(xOffset, (ySection << 4) + y, zOffset);
 
-					this.worldObj.checkLight(blockpos1);
+				boolean isBorder = y == 0 || y == 15 || xOffset == 0 || xOffset == 15 || zOffset == 0 || zOffset == 15;
+
+				boolean needsRelight = (storageArrays[ySection] == null && isBorder) || (storageArrays[ySection] != null
+						&& storageArrays[ySection].getBlockByExtId(xOffset, y, zOffset).getMaterial() == Material.air);
+
+				if (needsRelight) {
+					checkLightForBlockAndNeighbors(columnPos);
 				}
 			}
 		}
-
 	}
 
 	/**

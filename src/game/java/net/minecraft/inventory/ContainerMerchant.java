@@ -94,7 +94,8 @@ public class ContainerMerchant extends Container {
 				}
 			}
 
-			((EntityPlayerMP) entityplayer).playerNetServerHandler.sendPacket(new S30PacketWindowItems(entityplayer.inventoryContainer.windowId, entityplayer.inventoryContainer.getInventory()));
+			((EntityPlayerMP) entityplayer).playerNetServerHandler.sendPacket(new S30PacketWindowItems(
+					entityplayer.inventoryContainer.windowId, entityplayer.inventoryContainer.getInventory()));
 		}
 	}
 

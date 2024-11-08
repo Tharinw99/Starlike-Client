@@ -44,6 +44,13 @@
  Code used within EaglercraftX
  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
+Other Helpers
+~~~~~~~~~~~~~~~~~~~
+
+  - Cirs?? - Wiki Contributor
+  - A_Person - Boosted the server seven times :)
+
+~~~~~~~~~~~~~~~~~~~
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  
  Project Name: TeaVM

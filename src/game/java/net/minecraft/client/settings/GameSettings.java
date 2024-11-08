@@ -344,7 +344,7 @@ public class GameSettings {
 	 * + GUI scale
 	 */
 	public int guiScale = 3;
-	public int particleSetting;
+	public int particleSetting = 2;
 	public String language;
 	public boolean forceUnicodeFont;
 	public boolean hudFps = true;
@@ -354,7 +354,7 @@ public class GameSettings {
 	public boolean hudStats = false;
 	public boolean hud24h = false;
 	public boolean chunkFix = true;
-	public boolean fog = true;
+	public boolean fog = false;
 	public int fxaa = 0;
 	public boolean shaders = false;
 	public boolean shadersAODisable = false;
@@ -365,7 +365,7 @@ public class GameSettings {
 	public boolean hasHiddenPhishWarning = false;
 
 	public boolean enableProfanityFilter = false;
-	public boolean hasShownProfanityFilter = false;
+	public boolean hasShownProfanityFilter = true;
 	public float touchControlOpacity = 1.0f;
 	public boolean hideDefaultUsernameWarning = false;
 

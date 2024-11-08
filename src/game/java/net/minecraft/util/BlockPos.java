@@ -58,6 +58,12 @@ public class BlockPos extends Vec3i {
 		public int getZ() {
 			return this.z;
 		}
+
+		public void setPos(int i, int j, int k) {
+			this.x = i;
+			this.y = j;
+			this.z = k;
+		}
 	}
 
 	/**

@@ -23,6 +23,7 @@ import net.starlikeclient.minecraft.blocks.BlockDeepslate;
 import net.starlikeclient.minecraft.blocks.BlockMosaic;
 import net.starlikeclient.minecraft.blocks.BlockSmithing;
 import net.starlikeclient.minecraft.blocks.BlockSteelGrate;
+import net.starlikeclient.minecraft.items.ItemBackpack;
 import net.starlikeclient.minecraft.items.ItemChisel;
 
 public class ItemsStarlike {
@@ -806,6 +807,7 @@ public class ItemsStarlike {
 				(new ItemArmor(ItemArmor.ArmorMaterial.NETHERITE, 5, 3)).setUnlocalizedName("netherite_boots")
 						.setCreativeTab(CreativeTabs.tabStarlike));
 		Item.registerItem(1053, (String) "starlike:chisel", (new ItemChisel()).setUnlocalizedName("chisel"));
+		Item.registerItem(1054, (String) "starlike:leather_backpack", (new ItemBackpack()).setUnlocalizedName("leather_backpack"));
 
 //autogenerateregisterblock
 		Item.registerItemBlock(Blocks.tuff_tiles);
@@ -966,6 +968,7 @@ public class ItemsStarlike {
 		Item.registerItemBlock(Blocks.decorated_acacia_log);
 		Item.registerItemBlock(Blocks.chiseled_deep_ocean_bricks);
 		Item.registerItemBlock(Blocks.andesite_bricks);
+		
 	}
 
 	public static void renderItems(RenderItem e) {
@@ -1021,6 +1024,7 @@ public class ItemsStarlike {
 		e.registerItem(Items.netherite_leggings, "starlike:netherite_leggings");
 		e.registerItem(Items.netherite_boots, "starlike:netherite_boots");
 		e.registerItem(Items.chisel, "starlike:chisel");
+		//e.registerItem(Items.leather_backpack, "starlike:leather_backpack");
 
 //autogeneraterenderitem
 		e.registerBlock(Blocks.tuff_tiles, "starlike:tuff_tiles");

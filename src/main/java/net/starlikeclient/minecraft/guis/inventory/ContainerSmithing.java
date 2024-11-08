@@ -10,10 +10,10 @@ import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.play.server.S30PacketWindowItems;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.starlikeclient.minecraft.guis.crafting.SmithingManager;
-import net.minecraft.network.play.server.S30PacketWindowItems;
 
 public class ContainerSmithing extends Container {
 	private final IInventory smithingInventory;
@@ -112,7 +112,8 @@ public class ContainerSmithing extends Container {
 					}
 				}
 			}
-			((EntityPlayerMP) entityplayer).playerNetServerHandler.sendPacket(new S30PacketWindowItems(entityplayer.inventoryContainer.windowId, entityplayer.inventoryContainer.getInventory()));
+			((EntityPlayerMP) entityplayer).playerNetServerHandler.sendPacket(new S30PacketWindowItems(
+					entityplayer.inventoryContainer.windowId, entityplayer.inventoryContainer.getInventory()));
 		}
 	}
 

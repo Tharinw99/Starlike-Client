@@ -418,123 +418,137 @@ public abstract class World implements IBlockAccess {
 	}
 
 	public boolean checkLight(BlockPos pos) {
-		boolean flag = false;
-		if (!this.provider.getHasNoSky()) {
-			flag |= this.checkLightFor(EnumSkyBlock.SKY, pos);
+		if (provider.getHasNoSky()) {
+			return this.checkLightFor(EnumSkyBlock.BLOCK, pos);
 		}
-
-		flag = flag | this.checkLightFor(EnumSkyBlock.BLOCK, pos);
-		return flag;
+		return this.checkLightFor(EnumSkyBlock.SKY, pos) | this.checkLightFor(EnumSkyBlock.BLOCK, pos);
 	}
 
 	public boolean checkLightFor(EnumSkyBlock lightType, BlockPos pos) {
 		if (!this.isAreaLoaded(pos, 17, false)) {
 			return false;
+		}
+
+		int queueSize = 0;
+		int currentIndex = 0;
+
+		int baseX = pos.getX();
+		int baseY = pos.getY();
+		int baseZ = pos.getZ();
+
+		int currentLight = this.getLightFor(lightType, pos);
+		int computedLight = this.getRawLight(pos, lightType);
+		if (computedLight == currentLight) {
+			return true;
+		}
+
+		if (computedLight > currentLight) {
+			this.lightUpdateBlockList[queueSize++] = 133152;
 		} else {
-			int i = 0;
-			int j = 0;
-			int k = this.getLightFor(lightType, pos);
-			int l = this.getRawLight(pos, lightType);
-			int i1 = pos.getX();
-			int j1 = pos.getY();
-			int k1 = pos.getZ();
-			if (l > k) {
-				this.lightUpdateBlockList[j++] = 133152;
-			} else if (l < k) {
-				this.lightUpdateBlockList[j++] = 133152 | k << 18;
+			this.lightUpdateBlockList[queueSize++] = 133152 | currentLight << 18;
 
-				while (i < j) {
-					int l1 = this.lightUpdateBlockList[i++];
-					int i2 = (l1 & 63) - 32 + i1;
-					int j2 = (l1 >> 6 & 63) - 32 + j1;
-					int k2 = (l1 >> 12 & 63) - 32 + k1;
-					int l2 = l1 >> 18 & 15;
-					BlockPos blockpos = new BlockPos(i2, j2, k2);
-					int i3 = this.getLightFor(lightType, blockpos);
-					if (i3 == l2) {
-						this.setLightFor(lightType, blockpos, 0);
-						if (l2 > 0) {
-							int j3 = MathHelper.abs_int(i2 - i1);
-							int k3 = MathHelper.abs_int(j2 - j1);
-							int l3 = MathHelper.abs_int(k2 - k1);
-							if (j3 + k3 + l3 < 17) {
-								BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+			while (currentIndex < queueSize) {
+				int packed = this.lightUpdateBlockList[currentIndex++];
+				int relX = (packed & 63) - 32;
+				int relY = ((packed >> 6) & 63) - 32;
+				int relZ = ((packed >> 12) & 63) - 32;
+				int light = packed >> 18 & 15;
 
-								EnumFacing[] facings = EnumFacing._VALUES;
-								for (int m = 0; m < facings.length; ++m) {
-									EnumFacing enumfacing = facings[m];
-									int i4 = i2 + enumfacing.getFrontOffsetX();
-									int j4 = j2 + enumfacing.getFrontOffsetY();
-									int k4 = k2 + enumfacing.getFrontOffsetZ();
-									blockpos$mutableblockpos.func_181079_c(i4, j4, k4);
-									int l4 = Math.max(1,
-											this.getBlockState(blockpos$mutableblockpos).getBlock().getLightOpacity());
-									i3 = this.getLightFor(lightType, blockpos$mutableblockpos);
-									if (i3 == l2 - l4 && j < this.lightUpdateBlockList.length) {
-										this.lightUpdateBlockList[j++] = i4 - i1 + 32 | j4 - j1 + 32 << 6
-												| k4 - k1 + 32 << 12 | l2 - l4 << 18;
-									}
+				int worldX = relX + baseX;
+				int worldY = relY + baseY;
+				int worldZ = relZ + baseZ;
+
+				BlockPos blockPos = new BlockPos(worldX, worldY, worldZ);
+				int currentBlockLight = this.getLightFor(lightType, blockPos);
+
+				if (currentBlockLight == light) {
+					this.setLightFor(lightType, blockPos, 0);
+
+					if (light > 0) {
+						int manhattan = Math.abs(relX) + Math.abs(relY) + Math.abs(relZ);
+						if (manhattan < 17) {
+							BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
+							EnumFacing[] facings = EnumFacing.values();
+
+							for (EnumFacing facing : facings) {
+								int adjX = worldX + facing.getFrontOffsetX();
+								int adjY = worldY + facing.getFrontOffsetY();
+								int adjZ = worldZ + facing.getFrontOffsetZ();
+
+								mutablePos.func_181079_c(adjX, adjY, adjZ);
+
+								int opacity = Math.max(1, this.getBlockState(mutablePos).getBlock().getLightOpacity());
+								int neighborLight = this.getLightFor(lightType, mutablePos);
+
+								if (neighborLight == light - opacity && queueSize < this.lightUpdateBlockList.length) {
+									this.lightUpdateBlockList[queueSize++] = ((adjX - baseX + 32) & 63)
+											| ((adjY - baseY + 32) & 63) << 6 | ((adjZ - baseZ + 32) & 63) << 12
+											| (light - opacity) << 18;
 								}
 							}
 						}
 					}
 				}
-
-				i = 0;
 			}
 
-			while (i < j) {
-				int i5 = this.lightUpdateBlockList[i++];
-				int j5 = (i5 & 63) - 32 + i1;
-				int k5 = (i5 >> 6 & 63) - 32 + j1;
-				int l5 = (i5 >> 12 & 63) - 32 + k1;
-				BlockPos blockpos1 = new BlockPos(j5, k5, l5);
-				int i6 = this.getLightFor(lightType, blockpos1);
-				int j6 = this.getRawLight(blockpos1, lightType);
-				if (j6 != i6) {
-					this.setLightFor(lightType, blockpos1, j6);
-					if (j6 > i6) {
-						int k6 = Math.abs(j5 - i1);
-						int l6 = Math.abs(k5 - j1);
-						int i7 = Math.abs(l5 - k1);
-						boolean flag = j < this.lightUpdateBlockList.length - 6;
-						if (k6 + l6 + i7 < 17 && flag) {
-							if (this.getLightFor(lightType, blockpos1.west()) < j6) {
-								this.lightUpdateBlockList[j++] = j5 - 1 - i1 + 32 + (k5 - j1 + 32 << 6)
-										+ (l5 - k1 + 32 << 12);
-							}
+			currentIndex = 0;
+		}
 
-							if (this.getLightFor(lightType, blockpos1.east()) < j6) {
-								this.lightUpdateBlockList[j++] = j5 + 1 - i1 + 32 + (k5 - j1 + 32 << 6)
-										+ (l5 - k1 + 32 << 12);
-							}
+		while (currentIndex < queueSize) {
+			int packed = this.lightUpdateBlockList[currentIndex++];
+			int relX = (packed & 63) - 32;
+			int relY = ((packed >> 6) & 63) - 32;
+			int relZ = ((packed >> 12) & 63) - 32;
 
-							if (this.getLightFor(lightType, blockpos1.down()) < j6) {
-								this.lightUpdateBlockList[j++] = j5 - i1 + 32 + (k5 - 1 - j1 + 32 << 6)
-										+ (l5 - k1 + 32 << 12);
-							}
+			int worldX = relX + baseX;
+			int worldY = relY + baseY;
+			int worldZ = relZ + baseZ;
 
-							if (this.getLightFor(lightType, blockpos1.up()) < j6) {
-								this.lightUpdateBlockList[j++] = j5 - i1 + 32 + (k5 + 1 - j1 + 32 << 6)
-										+ (l5 - k1 + 32 << 12);
-							}
+			BlockPos blockPos = new BlockPos(worldX, worldY, worldZ);
+			int currentBlockLight = this.getLightFor(lightType, blockPos);
+			int computedBlockLight = this.getRawLight(blockPos, lightType);
 
-							if (this.getLightFor(lightType, blockpos1.north()) < j6) {
-								this.lightUpdateBlockList[j++] = j5 - i1 + 32 + (k5 - j1 + 32 << 6)
-										+ (l5 - 1 - k1 + 32 << 12);
-							}
+			if (computedBlockLight != currentBlockLight) {
+				this.setLightFor(lightType, blockPos, computedBlockLight);
 
-							if (this.getLightFor(lightType, blockpos1.south()) < j6) {
-								this.lightUpdateBlockList[j++] = j5 - i1 + 32 + (k5 - j1 + 32 << 6)
-										+ (l5 + 1 - k1 + 32 << 12);
-							}
+				if (computedBlockLight > currentBlockLight) {
+					int manhattan = Math.abs(relX) + Math.abs(relY) + Math.abs(relZ);
+					if (manhattan < 17 && queueSize < this.lightUpdateBlockList.length - 6) {
+						if (this.getLightFor(lightType, blockPos.west()) < computedBlockLight) {
+							this.lightUpdateBlockList[queueSize++] = ((worldX - 1 - baseX + 32) & 63)
+									| ((worldY - baseY + 32) & 63) << 6 | ((worldZ - baseZ + 32) & 63) << 12;
+						}
+
+						if (this.getLightFor(lightType, blockPos.east()) < computedBlockLight) {
+							this.lightUpdateBlockList[queueSize++] = ((worldX + 1 - baseX + 32) & 63)
+									| ((worldY - baseY + 32) & 63) << 6 | ((worldZ - baseZ + 32) & 63) << 12;
+						}
+
+						if (this.getLightFor(lightType, blockPos.down()) < computedBlockLight) {
+							this.lightUpdateBlockList[queueSize++] = ((worldX - baseX + 32) & 63)
+									| ((worldY - 1 - baseY + 32) & 63) << 6 | ((worldZ - baseZ + 32) & 63) << 12;
+						}
+
+						if (this.getLightFor(lightType, blockPos.up()) < computedBlockLight) {
+							this.lightUpdateBlockList[queueSize++] = ((worldX - baseX + 32) & 63)
+									| ((worldY + 1 - baseY + 32) & 63) << 6 | ((worldZ - baseZ + 32) & 63) << 12;
+						}
+
+						if (this.getLightFor(lightType, blockPos.north()) < computedBlockLight) {
+							this.lightUpdateBlockList[queueSize++] = ((worldX - baseX + 32) & 63)
+									| ((worldY - baseY + 32) & 63) << 6 | ((worldZ - 1 - baseZ + 32) & 63) << 12;
+						}
+
+						if (this.getLightFor(lightType, blockPos.south()) < computedBlockLight) {
+							this.lightUpdateBlockList[queueSize++] = ((worldX - baseX + 32) & 63)
+									| ((worldY - baseY + 32) & 63) << 6 | ((worldZ + 1 - baseZ + 32) & 63) << 12;
 						}
 					}
 				}
 			}
-
-			return true;
 		}
+
+		return true;
 	}
 
 	/**
