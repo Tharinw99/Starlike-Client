@@ -2,15 +2,17 @@ package net.lax1dude.eaglercraft.v1_8;
 
 import java.math.BigInteger;
 
+import net.starlikeclient.StarlikeClient;
+
 public class EaglercraftVersion {
 
 	//////////////////////////////////////////////////////////////////////
 
 	/// Customize these to fit your fork:
 
-	public static final String projectForkName = "Starlike Client";
-	public static final String projectForkVersion = "0.3.1";
-	public static final String projectForkVendor = "SpeedSlicer and zumbiepig";
+	public static final String projectForkName = StarlikeClient.Config.General.projectForkName;
+	public static final String projectForkVersion = StarlikeClient.Config.General.projectForkVersion;
+	public static final String projectForkVendor = StarlikeClient.Config.General.projectForkVendor;
 
 	public static final String projectForkURL = "";
 
@@ -19,26 +21,27 @@ public class EaglercraftVersion {
 	public static final String projectOriginName = "EaglercraftX";
 	public static final String projectOriginAuthor = "lax1dude";
 	public static final String projectOriginRevision = "1.8";
-	public static final String projectOriginVersion = "u40";
+	public static final String projectOriginVersion = "u46";
 
 	public static final String projectOriginURL = "https://gitlab.com/lax1dude/eaglercraftx-1.8"; // rest in peace
 
 	// EPK Version Identifier
 
-	public static final String EPKVersionIdentifier = projectForkVersion; // Set to null to disable EPK version check
+	public static final String EPKVersionIdentifier = !StarlikeClient.Config.General.isDevBuild ? projectForkVersion
+			: null; // Set to null to disable EPK version check
 
 	// Updating configuration
 
-	public static final boolean enableUpdateService = true;
+	public static final boolean enableUpdateService = false;
 
-	public static final String updateBundlePackageName = "dev.zumbiepig.starlikeclient.client";
-	public static final int updateBundlePackageVersionInt = 301; // (0.2.1 would be 000201 or just 201)
+	public static final String updateBundlePackageName = "net.lax1dude.eaglercraft.v1_8.client";
+	public static final int updateBundlePackageVersionInt = 46;
 
 	public static final String updateLatestLocalStorageKey = "latestUpdate_" + updateBundlePackageName;
 
 	// public key modulus for official 1.8 updates
 	public static final BigInteger updateSignatureModulus = new BigInteger(
-			"28154007251851793016096675136645490267059674193477673066016405606156842861664902840486152246081162714389866569681190683516064018400350723835699291801143446801871211423563444580124984720927762511096224794499752181575422000985856618499073349425764147909008336707018656178546729409024747183847557655756025152351818612306562908429371421145128154560905733480315537161717618356180392502066269414984054854075976130472279535788141377012879285566510859864540548496184877426481234244151342696367793929688648467759736793075080029025728010655173323780256289815694871723570008993011506495225395230611688881103726309118671731354057");
+			"14419476194820052109078379102436982757438300194194974078260570958862225232043861026588258585967060437391326494976080031137298500457111529693806931143421725626747051503616606418909609840275122831550688481329699012469742002429706330734797679859799085213517354399295425740214330234086361416936984593337389989505613123225737002654977194421571825036717017788527234114501215218715499682638139386636103589791643964827904791195488978835113700772208317974307363542114867750505953323167521731238542123593257269990619007858952216110012513121779359926747737258698347806747854986471035713105133999027704095451858121831297923962641");
 
 	// Client brand identification system configuration
 
@@ -50,17 +53,19 @@ public class EaglercraftVersion {
 	// Miscellaneous variables:
 
 	// bottom-left
-	public static final String mainMenuStringA = "Minecraft 1.8.8*";
-	public static final String mainMenuStringB = projectForkName + " " + projectForkVersion;
+	public static final String[] mainMenuStringLeft = StarlikeClient.Config.General.mainMenuStringLeft;
+
 	// bottom-right
-	public static final String mainMenuStringC = null;
-	public static final String mainMenuStringD = "Copyright Mojang AB. Do not distribute!";
+	public static final String[] mainMenuStringRight = StarlikeClient.Config.General.mainMenuStringRight;
+
 	// below logo
 	public static final String mainMenuStringE = null;
 	public static final String mainMenuStringF = null;
 	// top-left
 	public static final String mainMenuStringG = null;
 	public static final String mainMenuStringH = null;
+
+	public static final String screenRecordingFilePrefix = StarlikeClient.Config.General.screenRecordingFilePrefix;
 
 	public static final long demoWorldSeed = (long) "North Carolina".hashCode();
 

@@ -19,13 +19,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -37,7 +37,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class BlockWoodSlab extends BlockSlab {
 	public static PropertyEnum<BlockPlanks.EnumType> VARIANT;
@@ -57,6 +57,7 @@ public abstract class BlockWoodSlab extends BlockSlab {
 		this.setCreativeTab(CreativeTabs.tabBlock);
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return this.isDouble() ? new BlockState(this, new IProperty[] { VARIANT })
 				: new BlockState(this, new IProperty[] { HALF, VARIANT });
@@ -67,10 +68,12 @@ public abstract class BlockWoodSlab extends BlockSlab {
 	 * when the block gets destroyed. It returns the metadata of the dropped item
 	 * based on the old metadata of the block.
 	 */
+	@Override
 	public int damageDropped(IBlockState iblockstate) {
 		return ((BlockPlanks.EnumType) iblockstate.getValue(VARIANT)).getMetadata();
 	}
 
+	@Override
 	public Item getItem(World var1, BlockPos var2) {
 		return Item.getItemFromBlock(Blocks.wooden_slab);
 	}
@@ -78,6 +81,7 @@ public abstract class BlockWoodSlab extends BlockSlab {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
 		return Item.getItemFromBlock(Blocks.wooden_slab);
 	}
@@ -85,6 +89,7 @@ public abstract class BlockWoodSlab extends BlockSlab {
 	/**
 	 * + Get the MapColor for this Block and the given BlockState
 	 */
+	@Override
 	public MapColor getMapColor(IBlockState iblockstate) {
 		return ((BlockPlanks.EnumType) iblockstate.getValue(VARIANT)).func_181070_c();
 	}
@@ -92,6 +97,7 @@ public abstract class BlockWoodSlab extends BlockSlab {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
 		i = i | ((BlockPlanks.EnumType) iblockstate.getValue(VARIANT)).getMetadata();
@@ -105,6 +111,7 @@ public abstract class BlockWoodSlab extends BlockSlab {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		IBlockState iblockstate = this.getDefaultState().withProperty(VARIANT, BlockPlanks.EnumType.byMetadata(i & 7));
 		if (!this.isDouble()) {
@@ -119,6 +126,7 @@ public abstract class BlockWoodSlab extends BlockSlab {
 	 * + returns a list of blocks with the same ID, but different meta (eg: wood
 	 * returns 4 blocks)
 	 */
+	@Override
 	public void getSubBlocks(Item item, CreativeTabs var2, List<ItemStack> list) {
 		if (item != Item.getItemFromBlock(Blocks.double_wooden_slab)) {
 			BlockPlanks.EnumType[] types = BlockPlanks.EnumType.META_LOOKUP;
@@ -132,14 +140,17 @@ public abstract class BlockWoodSlab extends BlockSlab {
 	/**
 	 * + Returns the slab block name with the type associated with it
 	 */
+	@Override
 	public String getUnlocalizedName(int i) {
 		return super.getUnlocalizedName() + "." + BlockPlanks.EnumType.byMetadata(i).getUnlocalizedName();
 	}
 
+	@Override
 	public Object getVariant(ItemStack itemstack) {
 		return BlockPlanks.EnumType.byMetadata(itemstack.getMetadata() & 7);
 	}
 
+	@Override
 	public IProperty<?> getVariantProperty() {
 		return VARIANT;
 	}

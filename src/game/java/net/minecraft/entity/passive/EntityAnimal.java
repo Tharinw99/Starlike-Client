@@ -16,13 +16,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -34,7 +34,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class EntityAnimal extends EntityAgeable implements IAnimals {
 	protected Block spawnableBlock = Blocks.grass;
@@ -48,6 +48,7 @@ public abstract class EntityAnimal extends EntityAgeable implements IAnimals {
 	/**
 	 * + Called when the entity is attacked.
 	 */
+	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float f) {
 		if (this.isEntityInvulnerable(damagesource)) {
 			return false;
@@ -60,6 +61,7 @@ public abstract class EntityAnimal extends EntityAgeable implements IAnimals {
 	/**
 	 * + Determines if an entity can be despawned, used on idle far away entities
 	 */
+	@Override
 	protected boolean canDespawn() {
 		return false;
 	}
@@ -85,6 +87,7 @@ public abstract class EntityAnimal extends EntityAgeable implements IAnimals {
 
 	}
 
+	@Override
 	public float getBlockPathWeight(BlockPos blockpos) {
 		return this.worldObj.getBlockState(blockpos.down()).getBlock() == Blocks.grass ? 10.0F
 				: this.worldObj.getLightBrightness(blockpos) - 0.5F;
@@ -94,6 +97,7 @@ public abstract class EntityAnimal extends EntityAgeable implements IAnimals {
 	 * + Checks if the entity's current position is a valid location to spawn this
 	 * entity.
 	 */
+	@Override
 	public boolean getCanSpawnHere() {
 		int i = MathHelper.floor_double(this.posX);
 		int j = MathHelper.floor_double(this.getEntityBoundingBox().minY);
@@ -106,6 +110,7 @@ public abstract class EntityAnimal extends EntityAgeable implements IAnimals {
 	/**
 	 * + Get the experience points the entity currently has.
 	 */
+	@Override
 	protected int getExperiencePoints(EntityPlayer var1) {
 		return 1 + this.worldObj.rand.nextInt(3);
 	}
@@ -118,10 +123,12 @@ public abstract class EntityAnimal extends EntityAgeable implements IAnimals {
 	 * + Get number of ticks, at least during which the living entity will be
 	 * silent.
 	 */
+	@Override
 	public int getTalkInterval() {
 		return 120;
 	}
 
+	@Override
 	public void handleStatusUpdate(byte b0) {
 		if (b0 == 18) {
 			for (int i = 0; i < 7; ++i) {
@@ -144,6 +151,7 @@ public abstract class EntityAnimal extends EntityAgeable implements IAnimals {
 	 * + Called when a player interacts with a mob. e.g. gets milk from a cow, gets
 	 * into the saddle on a pig.
 	 */
+	@Override
 	public boolean interact(EntityPlayer entityplayer) {
 		ItemStack itemstack = entityplayer.inventory.getCurrentItem();
 		if (itemstack != null) {
@@ -183,6 +191,7 @@ public abstract class EntityAnimal extends EntityAgeable implements IAnimals {
 	 * required. For example, zombies and skeletons use this to react to sunlight
 	 * and start to burn.
 	 */
+	@Override
 	public void onLivingUpdate() {
 		super.onLivingUpdate();
 		if (this.getGrowingAge() != 0) {
@@ -208,6 +217,7 @@ public abstract class EntityAnimal extends EntityAgeable implements IAnimals {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		this.inLove = nbttagcompound.getInteger("InLove");
@@ -223,6 +233,7 @@ public abstract class EntityAnimal extends EntityAgeable implements IAnimals {
 		this.worldObj.setEntityState(this, (byte) 18);
 	}
 
+	@Override
 	protected void updateAITasks() {
 		if (this.getGrowingAge() != 0) {
 			this.inLove = 0;
@@ -234,6 +245,7 @@ public abstract class EntityAnimal extends EntityAgeable implements IAnimals {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		nbttagcompound.setInteger("InLove", this.inLove);

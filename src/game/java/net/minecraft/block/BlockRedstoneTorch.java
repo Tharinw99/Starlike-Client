@@ -20,13 +20,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,7 +38,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockRedstoneTorch extends BlockTorch {
 	static class Toggle {
@@ -61,6 +61,7 @@ public class BlockRedstoneTorch extends BlockTorch {
 		this.setCreativeTab((CreativeTabs) null);
 	}
 
+	@Override
 	public void breakBlock(World world, BlockPos blockpos, IBlockState var3) {
 		if (this.isOn) {
 			EnumFacing[] facings = EnumFacing._VALUES;
@@ -76,10 +77,12 @@ public class BlockRedstoneTorch extends BlockTorch {
 	 * + Can this block provide power. Only wire currently seems to have this change
 	 * based on its state.
 	 */
+	@Override
 	public boolean canProvidePower() {
 		return true;
 	}
 
+	@Override
 	public Item getItem(World var1, BlockPos var2) {
 		return Item.getItemFromBlock(Blocks.redstone_torch);
 	}
@@ -87,19 +90,23 @@ public class BlockRedstoneTorch extends BlockTorch {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
 		return Item.getItemFromBlock(Blocks.redstone_torch);
 	}
 
+	@Override
 	public int getStrongPower(IBlockAccess iblockaccess, BlockPos blockpos, IBlockState iblockstate,
 			EnumFacing enumfacing) {
 		return enumfacing == EnumFacing.DOWN ? this.getWeakPower(iblockaccess, blockpos, iblockstate, enumfacing) : 0;
 	}
 
+	@Override
 	public int getWeakPower(IBlockAccess var1, BlockPos var2, IBlockState iblockstate, EnumFacing enumfacing) {
 		return this.isOn && iblockstate.getValue(FACING) != enumfacing ? 15 : 0;
 	}
 
+	@Override
 	public boolean isAssociatedBlock(Block block) {
 		return block == Blocks.unlit_redstone_torch || block == Blocks.redstone_torch;
 	}
@@ -129,6 +136,7 @@ public class BlockRedstoneTorch extends BlockTorch {
 		return false;
 	}
 
+	@Override
 	public void onBlockAdded(World world, BlockPos blockpos, IBlockState var3) {
 		if (this.isOn) {
 			EnumFacing[] facings = EnumFacing._VALUES;
@@ -143,6 +151,7 @@ public class BlockRedstoneTorch extends BlockTorch {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block var4) {
 		if (!this.onNeighborChangeInternal(world, blockpos, iblockstate)) {
 			if (this.isOn == this.shouldBeOff(world, blockpos, iblockstate)) {
@@ -152,6 +161,7 @@ public class BlockRedstoneTorch extends BlockTorch {
 		}
 	}
 
+	@Override
 	public void randomDisplayTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom random) {
 		if (this.isOn) {
 			double d0 = (double) blockpos.getX() + 0.5D + (random.nextDouble() - 0.5D) * 0.2D;
@@ -174,6 +184,7 @@ public class BlockRedstoneTorch extends BlockTorch {
 	 * + Called randomly when setTickRandomly is set to true (used by e.g. crops to
 	 * grow, etc.)
 	 */
+	@Override
 	public void randomTick(World var1, BlockPos var2, IBlockState var3, EaglercraftRandom var4) {
 	}
 
@@ -185,10 +196,12 @@ public class BlockRedstoneTorch extends BlockTorch {
 	/**
 	 * + How many world ticks before ticking
 	 */
+	@Override
 	public int tickRate(World var1) {
 		return 2;
 	}
 
+	@Override
 	public void updateTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom random) {
 		boolean flag = this.shouldBeOff(world, blockpos, iblockstate);
 		List list = (List) toggles.get(world);

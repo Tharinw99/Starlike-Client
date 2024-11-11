@@ -29,13 +29,13 @@ import net.minecraft.world.gen.structure.StructureOceanMonument;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -47,7 +47,7 @@ import net.minecraft.world.gen.structure.StructureOceanMonument;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ChunkProviderGenerate implements IChunkProvider {
 	private EaglercraftRandom rand;
@@ -120,6 +120,7 @@ public class ChunkProviderGenerate implements IChunkProvider {
 	/**
 	 * + Returns if the IChunkProvider supports saving.
 	 */
+	@Override
 	public boolean canSave() {
 		return true;
 	}
@@ -127,6 +128,7 @@ public class ChunkProviderGenerate implements IChunkProvider {
 	/**
 	 * + Checks to see if a chunk exists at x, z
 	 */
+	@Override
 	public boolean chunkExists(int var1, int var2) {
 		return true;
 	}
@@ -239,6 +241,7 @@ public class ChunkProviderGenerate implements IChunkProvider {
 
 	}
 
+	@Override
 	public boolean func_177460_a(IChunkProvider var1, Chunk chunk, int i, int j) {
 		boolean flag = false;
 		if (this.settings.useMonuments && this.mapFeaturesEnabled && chunk.getInhabitedTime() < 3600L) {
@@ -249,10 +252,12 @@ public class ChunkProviderGenerate implements IChunkProvider {
 		return flag;
 	}
 
+	@Override
 	public int getLoadedChunkCount() {
 		return 0;
 	}
 
+	@Override
 	public List<BiomeGenBase.SpawnListEntry> getPossibleCreatures(EnumCreatureType enumcreaturetype,
 			BlockPos blockpos) {
 		BiomeGenBase biomegenbase = this.worldObj.getBiomeGenForCoords(blockpos);
@@ -271,6 +276,7 @@ public class ChunkProviderGenerate implements IChunkProvider {
 		return biomegenbase.getSpawnableList(enumcreaturetype);
 	}
 
+	@Override
 	public BlockPos getStrongholdGen(World world, String s, BlockPos blockpos) {
 		return "Stronghold".equals(s) && this.strongholdGenerator != null
 				? this.strongholdGenerator.getClosestStrongholdPos(world, blockpos)
@@ -280,6 +286,7 @@ public class ChunkProviderGenerate implements IChunkProvider {
 	/**
 	 * + Converts the instance data to a readable string.
 	 */
+	@Override
 	public String makeString() {
 		return "RandomLevelSource";
 	}
@@ -287,6 +294,7 @@ public class ChunkProviderGenerate implements IChunkProvider {
 	/**
 	 * + Populates chunk with ores etc etc
 	 */
+	@Override
 	public void populate(IChunkProvider var1, int i, int j) {
 		BlockFalling.fallInstantly = true;
 		int k = i * 16;
@@ -371,6 +379,7 @@ public class ChunkProviderGenerate implements IChunkProvider {
 	 * will generates all the blocks for the specified chunk from the map seed and
 	 * chunk seed
 	 */
+	@Override
 	public Chunk provideChunk(BlockPos blockpos) {
 		return this.provideChunk(blockpos.getX() >> 4, blockpos.getZ() >> 4);
 	}
@@ -380,6 +389,7 @@ public class ChunkProviderGenerate implements IChunkProvider {
 	 * will generates all the blocks for the specified chunk from the map seed and
 	 * chunk seed
 	 */
+	@Override
 	public Chunk provideChunk(int i, int j) {
 		this.rand.setSeed((long) i * 341873128712L + (long) j * 132897987541L);
 		ChunkPrimer chunkprimer = new ChunkPrimer();
@@ -426,6 +436,7 @@ public class ChunkProviderGenerate implements IChunkProvider {
 		return chunk;
 	}
 
+	@Override
 	public void recreateStructures(Chunk var1, int i, int j) {
 		if (this.settings.useMineShafts && this.mapFeaturesEnabled) {
 			this.mineshaftGenerator.generate(this, this.worldObj, i, j, (ChunkPrimer) null);
@@ -470,6 +481,7 @@ public class ChunkProviderGenerate implements IChunkProvider {
 	 * passed false, save up to two chunks. Return true if all chunks have been
 	 * saved.
 	 */
+	@Override
 	public boolean saveChunks(boolean var1, IProgressUpdate var2) {
 		return true;
 	}
@@ -478,6 +490,7 @@ public class ChunkProviderGenerate implements IChunkProvider {
 	 * + Save extra data not associated with any Chunk. Not saved during autosave,
 	 * only during world unload. Currently unimplemented.
 	 */
+	@Override
 	public void saveExtraData() {
 	}
 
@@ -566,6 +579,7 @@ public class ChunkProviderGenerate implements IChunkProvider {
 	 * + Unloads chunks that are marked to be unloaded. This is not guaranteed to
 	 * unload every such chunk.
 	 */
+	@Override
 	public boolean unloadQueuedChunks() {
 		return false;
 	}

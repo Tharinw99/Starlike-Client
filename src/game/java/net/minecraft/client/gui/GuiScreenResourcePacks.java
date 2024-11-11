@@ -22,13 +22,13 @@ import net.minecraft.client.resources.ResourcePackRepository;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -40,7 +40,7 @@ import net.minecraft.client.resources.ResourcePackRepository;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiScreenResourcePacks extends GuiScreen {
 	private static final Logger logger = LogManager.getLogger();
@@ -59,6 +59,7 @@ public class GuiScreenResourcePacks extends GuiScreen {
 	 * + Called by the controls from the buttonList when activated. (Mouse pressed
 	 * for buttons)
 	 */
+	@Override
 	protected void actionPerformed(GuiButton parGuiButton) {
 		if (parGuiButton.enabled) {
 			if (parGuiButton.id == 2) {
@@ -102,6 +103,7 @@ public class GuiScreenResourcePacks extends GuiScreen {
 	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
 	 * renderPartialTicks
 	 */
+	@Override
 	public void drawScreen(int i, int j, float f) {
 		this.drawBackground(0);
 		this.availableResourcePacksList.drawScreen(i, j, f);
@@ -139,12 +141,14 @@ public class GuiScreenResourcePacks extends GuiScreen {
 	/**
 	 * + Handles mouse input.
 	 */
+	@Override
 	public void handleMouseInput() throws IOException {
 		super.handleMouseInput();
 		this.selectedResourcePacksList.handleMouseInput();
 		this.availableResourcePacksList.handleMouseInput();
 	}
 
+	@Override
 	public void handleTouchInput() throws IOException {
 		super.handleTouchInput();
 		this.selectedResourcePacksList.handleTouchInput();
@@ -160,6 +164,7 @@ public class GuiScreenResourcePacks extends GuiScreen {
 	 * when the GUI is displayed and when the window resizes, the buttonList is
 	 * cleared beforehand.
 	 */
+	@Override
 	public void initGui() {
 		this.buttonList.add(new GuiOptionButton(2, this.width / 2 - 154, this.height - 48,
 				I18n.format("resourcePack.openFolder", new Object[0])));
@@ -208,6 +213,7 @@ public class GuiScreenResourcePacks extends GuiScreen {
 	/**
 	 * + Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
 	 */
+	@Override
 	protected void mouseClicked(int parInt1, int parInt2, int parInt3) {
 		super.mouseClicked(parInt1, parInt2, parInt3);
 		this.availableResourcePacksList.mouseClicked(parInt1, parInt2, parInt3);
@@ -218,10 +224,12 @@ public class GuiScreenResourcePacks extends GuiScreen {
 	 * + Called when a mouse button is released. Args : mouseX, mouseY,
 	 * releaseButton
 	 */
+	@Override
 	protected void mouseReleased(int i, int j, int k) {
 		super.mouseReleased(i, j, k);
 	}
 
+	@Override
 	public void updateScreen() {
 		FileChooserResult packFile = null;
 		if (EagRuntime.fileChooserHasResult()) {

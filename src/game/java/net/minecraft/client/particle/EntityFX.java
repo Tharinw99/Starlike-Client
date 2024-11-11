@@ -12,13 +12,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,7 +30,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityFX extends Entity {
 	public static double interpPosX;
@@ -83,6 +83,7 @@ public class EntityFX extends Entity {
 	/**
 	 * + If returns false, the item will not inflict any damage against entities.
 	 */
+	@Override
 	public boolean canAttackWithItem() {
 		return false;
 	}
@@ -91,10 +92,12 @@ public class EntityFX extends Entity {
 	 * + returns if this entity triggers Block.onEntityWalking on the blocks they
 	 * walk on. used for spiders and wolves to prevent them from trampling crops
 	 */
+	@Override
 	protected boolean canTriggerWalking() {
 		return false;
 	}
 
+	@Override
 	protected void entityInit() {
 	}
 
@@ -106,6 +109,7 @@ public class EntityFX extends Entity {
 		return this.particleBlue;
 	}
 
+	@Override
 	protected float getEaglerDynamicLightsValueSimple(float partialTicks) {
 		return 0.0f;
 	}
@@ -142,6 +146,7 @@ public class EntityFX extends Entity {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		this.prevPosX = this.posX;
 		this.prevPosY = this.posY;
@@ -165,6 +170,7 @@ public class EntityFX extends Entity {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound tagCompund) {
 	}
 
@@ -272,6 +278,7 @@ public class EntityFX extends Entity {
 		this.particleBlue = particleBlueIn;
 	}
 
+	@Override
 	public String toString() {
 		return this.getClass().getSimpleName() + ", Pos (" + this.posX + "," + this.posY + "," + this.posZ + "), RGBA ("
 				+ this.particleRed + "," + this.particleGreen + "," + this.particleBlue + "," + this.particleAlpha
@@ -281,6 +288,7 @@ public class EntityFX extends Entity {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound tagCompound) {
 	}
 }

@@ -9,13 +9,13 @@ import net.minecraft.village.VillageDoorInfo;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@ import net.minecraft.village.VillageDoorInfo;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityAIRestrictOpenDoor extends EntityAIBase {
 	private EntityCreature entityObj;
@@ -43,6 +43,7 @@ public class EntityAIRestrictOpenDoor extends EntityAIBase {
 	/**
 	 * + Returns whether an in-progress EntityAIBase should continue executing
 	 */
+	@Override
 	public boolean continueExecuting() {
 		return this.entityObj.worldObj.isDaytime() ? false
 				: !this.frontDoor.getIsDetachedFromVillageFlag()
@@ -52,6 +53,7 @@ public class EntityAIRestrictOpenDoor extends EntityAIBase {
 	/**
 	 * + Resets the task
 	 */
+	@Override
 	public void resetTask() {
 		((PathNavigateGround) this.entityObj.getNavigator()).setBreakDoors(true);
 		((PathNavigateGround) this.entityObj.getNavigator()).setEnterDoors(true);
@@ -61,6 +63,7 @@ public class EntityAIRestrictOpenDoor extends EntityAIBase {
 	/**
 	 * + Returns whether the EntityAIBase should begin execution.
 	 */
+	@Override
 	public boolean shouldExecute() {
 		if (this.entityObj.worldObj.isDaytime()) {
 			return false;
@@ -80,6 +83,7 @@ public class EntityAIRestrictOpenDoor extends EntityAIBase {
 	/**
 	 * + Execute a one shot task or start executing a continuous task
 	 */
+	@Override
 	public void startExecuting() {
 		((PathNavigateGround) this.entityObj.getNavigator()).setBreakDoors(false);
 		((PathNavigateGround) this.entityObj.getNavigator()).setEnterDoors(false);
@@ -88,6 +92,7 @@ public class EntityAIRestrictOpenDoor extends EntityAIBase {
 	/**
 	 * + Updates the task
 	 */
+	@Override
 	public void updateTask() {
 		this.frontDoor.incrementDoorOpeningRestrictionCounter();
 	}

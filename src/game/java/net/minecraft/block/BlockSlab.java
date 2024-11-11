@@ -24,13 +24,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -42,7 +42,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class BlockSlab extends Block {
 	public static enum EnumBlockHalf implements IStringSerializable {
@@ -54,10 +54,12 @@ public abstract class BlockSlab extends Block {
 			this.name = name;
 		}
 
+		@Override
 		public String getName() {
 			return this.name;
 		}
 
+		@Override
 		public String toString() {
 			return this.name;
 		}
@@ -88,16 +90,19 @@ public abstract class BlockSlab extends Block {
 	 * + Add all collision boxes of this Block to the list that intersect with the
 	 * given mask.
 	 */
+	@Override
 	public void addCollisionBoxesToList(World world, BlockPos blockpos, IBlockState iblockstate,
 			AxisAlignedBB axisalignedbb, List<AxisAlignedBB> list, Entity entity) {
 		this.setBlockBoundsBasedOnState(world, blockpos);
 		super.addCollisionBoxesToList(world, blockpos, iblockstate, axisalignedbb, list, entity);
 	}
 
+	@Override
 	protected boolean canSilkHarvest() {
 		return false;
 	}
 
+	@Override
 	public int getDamageValue(World world, BlockPos blockpos) {
 		return super.getDamageValue(world, blockpos) & 7;
 	}
@@ -110,6 +115,7 @@ public abstract class BlockSlab extends Block {
 
 	public abstract boolean isDouble();
 
+	@Override
 	public boolean isFullCube() {
 		return this.isDouble();
 	}
@@ -118,10 +124,12 @@ public abstract class BlockSlab extends Block {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return this.isDouble();
 	}
 
+	@Override
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState var3, EntityPlayer entityplayer,
 			EnumFacing var5, float var6, float var7, float var8) {
 		if (!world.isRemote && MinecraftServer.getServer().worldServers[0].getWorldInfo().getGameRulesInstance()
@@ -139,6 +147,7 @@ public abstract class BlockSlab extends Block {
 	 * + Called by ItemBlocks just before a block is actually set in the world, to
 	 * allow for adjustments to the IBlockstate
 	 */
+	@Override
 	public IBlockState onBlockPlaced(World world, BlockPos blockpos, EnumFacing enumfacing, float f, float f1, float f2,
 			int i, EntityLivingBase entitylivingbase) {
 		IBlockState iblockstate = super.onBlockPlaced(world, blockpos, enumfacing, f, f1, f2, i, entitylivingbase)
@@ -151,10 +160,12 @@ public abstract class BlockSlab extends Block {
 	/**
 	 * + Returns the quantity of items to drop on block destruction.
 	 */
+	@Override
 	public int quantityDropped(EaglercraftRandom var1) {
 		return this.isDouble() ? 2 : 1;
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
 		if (this.isDouble()) {
 			this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
@@ -174,6 +185,7 @@ public abstract class BlockSlab extends Block {
 	/**
 	 * + Sets the block's bounds for rendering it as an item
 	 */
+	@Override
 	public void setBlockBoundsForItemRender() {
 		if (this.isDouble()) {
 			this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
@@ -183,6 +195,7 @@ public abstract class BlockSlab extends Block {
 
 	}
 
+	@Override
 	public boolean shouldSideBeRendered(IBlockAccess iblockaccess, BlockPos blockpos, EnumFacing enumfacing) {
 		if (this.isDouble()) {
 			return super.shouldSideBeRendered(iblockaccess, blockpos, enumfacing);

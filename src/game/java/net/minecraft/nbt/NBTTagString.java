@@ -7,13 +7,13 @@ import java.io.IOException;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -25,7 +25,7 @@ import java.io.IOException;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class NBTTagString extends NBTBase {
 	private String data;
@@ -44,10 +44,12 @@ public class NBTTagString extends NBTBase {
 	/**
 	 * + Creates a clone of the tag.
 	 */
+	@Override
 	public NBTBase copy() {
 		return new NBTTagString(this.data);
 	}
 
+	@Override
 	public boolean equals(Object object) {
 		if (!super.equals(object)) {
 			return false;
@@ -61,14 +63,17 @@ public class NBTTagString extends NBTBase {
 	/**
 	 * + Gets the type byte for the tag.
 	 */
+	@Override
 	public byte getId() {
 		return (byte) 8;
 	}
 
+	@Override
 	public String getString() {
 		return this.data;
 	}
 
+	@Override
 	public int hashCode() {
 		return super.hashCode() ^ this.data.hashCode();
 	}
@@ -76,16 +81,19 @@ public class NBTTagString extends NBTBase {
 	/**
 	 * + Return whether this compound has no tags.
 	 */
+	@Override
 	public boolean hasNoTags() {
 		return this.data.isEmpty();
 	}
 
+	@Override
 	void read(DataInput parDataInput, int parInt1, NBTSizeTracker parNBTSizeTracker) throws IOException {
 		parNBTSizeTracker.read(288L);
 		this.data = parDataInput.readUTF();
 		parNBTSizeTracker.read((long) (16 * this.data.length()));
 	}
 
+	@Override
 	public String toString() {
 		return "\"" + this.data.replace("\"", "\\\"") + "\"";
 	}
@@ -94,6 +102,7 @@ public class NBTTagString extends NBTBase {
 	 * + Write the actual data contents of the tag, implemented in NBT extension
 	 * classes
 	 */
+	@Override
 	void write(DataOutput parDataOutput) throws IOException {
 		parDataOutput.writeUTF(this.data);
 	}

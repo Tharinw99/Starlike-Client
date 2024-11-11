@@ -640,7 +640,7 @@ public class JSONObject {
 	/**
 	 * Create a new JSONException in a common format for recursive object
 	 * definition.
-	 * 
+	 *
 	 * @param key name of the key
 	 * @return JSONException that can be thrown.
 	 */
@@ -650,7 +650,7 @@ public class JSONObject {
 
 	/**
 	 * For a prospective number, remove the leading zeros
-	 * 
+	 *
 	 * @param value prospective number
 	 * @return number without leading zeros
 	 */
@@ -959,7 +959,7 @@ public class JSONObject {
 
 	/**
 	 * Create a new JSONException in a common format for incorrect conversions.
-	 * 
+	 *
 	 * @param key       name of the key
 	 * @param valueType the type of value being coerced to
 	 * @param cause     optional cause of the coercion failure
@@ -1169,28 +1169,28 @@ public class JSONObject {
 	 * The {@link JSONPropertyName} annotation can be used on a bean getter to
 	 * override key name used in the JSONObject. For example, using the object above
 	 * with the <code>getName</code> method, if we annotated it with:
-	 * 
+	 *
 	 * <pre>
 	 * &#64;JSONPropertyName("FullName")
 	 * public String getName() {
 	 * 	return this.name;
 	 * }
 	 * </pre>
-	 * 
+	 *
 	 * The resulting JSON object would contain <code>"FullName": "Larry Fine"</code>
 	 * <p>
 	 * Similarly, the {@link JSONPropertyName} annotation can be used on non-
 	 * <code>get</code> and <code>is</code> methods. We can also override key name
 	 * used in the JSONObject as seen below even though the field would normally be
 	 * ignored:
-	 * 
+	 *
 	 * <pre>
 	 * &#64;JSONPropertyName("FullName")
 	 * public String fullName() {
 	 * 	return this.name;
 	 * }
 	 * </pre>
-	 * 
+	 *
 	 * The resulting JSON object would contain <code>"FullName": "Larry Fine"</code>
 	 * <p>
 	 * The {@link JSONPropertyIgnore} annotation can be used to force the bean
@@ -1201,7 +1201,7 @@ public class JSONObject {
 	 * {@link JSONPropertyIgnore} annotation takes precedent and the field is not
 	 * serialized. For example, the following declaration would prevent the
 	 * <code>getName</code> method from being serialized:
-	 * 
+	 *
 	 * <pre>
 	 * &#64;JSONPropertyName("FullName")
 	 * &#64;JSONPropertyIgnore
@@ -2510,19 +2510,19 @@ public class JSONObject {
 	 * Uses a user initialized JSONPointer and tries to match it to an item within
 	 * this JSONObject. For example, given a JSONObject initialized with this
 	 * document:
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 *     "a":{"b":"c"}
 	 * }
 	 * </pre>
-	 * 
+	 *
 	 * and this JSONPointer:
-	 * 
+	 *
 	 * <pre>
 	 * "/a/b"
 	 * </pre>
-	 * 
+	 *
 	 * Then this method will return the String "c". A JSONPointerException may be
 	 * thrown from code called by this method.
 	 *
@@ -2537,19 +2537,19 @@ public class JSONObject {
 	 * Creates a JSONPointer using an initialization string and tries to match it to
 	 * an item within this JSONObject. For example, given a JSONObject initialized
 	 * with this document:
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 *     "a":{"b":"c"}
 	 * }
 	 * </pre>
-	 * 
+	 *
 	 * and this JSONPointer string:
-	 * 
+	 *
 	 * <pre>
 	 * "/a/b"
 	 * </pre>
-	 * 
+	 *
 	 * Then this method will return the String "c". A JSONPointerException may be
 	 * thrown from code called by this method.
 	 *
@@ -2693,20 +2693,20 @@ public class JSONObject {
 	 *
 	 * <p>
 	 * If
-	 * 
+	 *
 	 * <pre>{@code
 	 * indentFactor > 0
 	 * }</pre>
-	 * 
+	 *
 	 * and the {@link JSONObject} has only one key, then the object will be output
 	 * on a single line:
-	 * 
+	 *
 	 * <pre>{@code {"key": 1}}</pre>
 	 *
 	 * <p>
 	 * If an object has 2 or more keys, then it will be output across multiple
 	 * lines:
-	 * 
+	 *
 	 * <pre>{@code {
 	 *  "key1": 1,
 	 *  "key2": "value 2",
@@ -2733,7 +2733,7 @@ public class JSONObject {
 	 * compactness, no whitespace is added.
 	 * <p>
 	 * <b> Warning: This method assumes that the data structure is acyclical. </b>
-	 * 
+	 *
 	 * @param writer the writer object
 	 * @return The writer.
 	 * @throws JSONException if a called function has an error
@@ -2747,20 +2747,20 @@ public class JSONObject {
 	 *
 	 * <p>
 	 * If
-	 * 
+	 *
 	 * <pre>{@code
 	 * indentFactor > 0
 	 * }</pre>
-	 * 
+	 *
 	 * and the {@link JSONObject} has only one key, then the object will be output
 	 * on a single line:
-	 * 
+	 *
 	 * <pre>{@code {"key": 1}}</pre>
 	 *
 	 * <p>
 	 * If an object has 2 or more keys, then it will be output across multiple
 	 * lines:
-	 * 
+	 *
 	 * <pre>{@code {
 	 *  "key1": 1,
 	 *  "key2": "value 2",

@@ -20,13 +20,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,7 +38,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityMinecartHopper extends EntityMinecartContainer implements IHopper {
 	/**
@@ -63,6 +63,7 @@ public class EntityMinecartHopper extends EntityMinecartContainer implements IHo
 		return this.transferTicker > 0;
 	}
 
+	@Override
 	public Container createContainer(InventoryPlayer inventoryplayer, EntityPlayer entityplayer) {
 		return new ContainerHopper(inventoryplayer, this, entityplayer);
 	}
@@ -88,18 +89,22 @@ public class EntityMinecartHopper extends EntityMinecartContainer implements IHo
 		return this.isBlocked;
 	}
 
+	@Override
 	public IBlockState getDefaultDisplayTile() {
 		return Blocks.hopper.getDefaultState();
 	}
 
+	@Override
 	public int getDefaultDisplayTileOffset() {
 		return 1;
 	}
 
+	@Override
 	public String getGuiID() {
 		return "minecraft:hopper";
 	}
 
+	@Override
 	public EntityMinecart.EnumMinecartType getMinecartType() {
 		return EntityMinecart.EnumMinecartType.HOPPER;
 	}
@@ -107,6 +112,7 @@ public class EntityMinecartHopper extends EntityMinecartContainer implements IHo
 	/**
 	 * + Returns the number of slots in the inventory.
 	 */
+	@Override
 	public int getSizeInventory() {
 		return 5;
 	}
@@ -114,6 +120,7 @@ public class EntityMinecartHopper extends EntityMinecartContainer implements IHo
 	/**
 	 * + Returns the worldObj for this tileEntity.
 	 */
+	@Override
 	public World getWorld() {
 		return this.worldObj;
 	}
@@ -121,6 +128,7 @@ public class EntityMinecartHopper extends EntityMinecartContainer implements IHo
 	/**
 	 * + Gets the world X position for this hopper entity.
 	 */
+	@Override
 	public double getXPos() {
 		return this.posX;
 	}
@@ -128,6 +136,7 @@ public class EntityMinecartHopper extends EntityMinecartContainer implements IHo
 	/**
 	 * + Gets the world Y position for this hopper entity.
 	 */
+	@Override
 	public double getYPos() {
 		return this.posY + 0.5D;
 	}
@@ -135,6 +144,7 @@ public class EntityMinecartHopper extends EntityMinecartContainer implements IHo
 	/**
 	 * + Gets the world Z position for this hopper entity.
 	 */
+	@Override
 	public double getZPos() {
 		return this.posZ;
 	}
@@ -142,6 +152,7 @@ public class EntityMinecartHopper extends EntityMinecartContainer implements IHo
 	/**
 	 * + First layer of player interaction
 	 */
+	@Override
 	public boolean interactFirst(EntityPlayer entityplayer) {
 		if (!this.worldObj.isRemote) {
 			entityplayer.displayGUIChest(this);
@@ -150,6 +161,7 @@ public class EntityMinecartHopper extends EntityMinecartContainer implements IHo
 		return true;
 	}
 
+	@Override
 	public void killMinecart(DamageSource damagesource) {
 		super.killMinecart(damagesource);
 		if (this.worldObj.getGameRules().getBoolean("doEntityDrops")) {
@@ -162,6 +174,7 @@ public class EntityMinecartHopper extends EntityMinecartContainer implements IHo
 	 * + Called every tick the minecart is on an activator rail. Args: x, y, z, is
 	 * the rail receiving power
 	 */
+	@Override
 	public void onActivatorRailPass(int var1, int var2, int var3, boolean flag) {
 		boolean flag1 = !flag;
 		if (flag1 != this.getBlocked()) {
@@ -173,6 +186,7 @@ public class EntityMinecartHopper extends EntityMinecartContainer implements IHo
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		super.onUpdate();
 		if (!this.worldObj.isRemote && this.isEntityAlive() && this.getBlocked()) {
@@ -197,6 +211,7 @@ public class EntityMinecartHopper extends EntityMinecartContainer implements IHo
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	protected void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		this.transferTicker = nbttagcompound.getInteger("TransferCooldown");
@@ -219,6 +234,7 @@ public class EntityMinecartHopper extends EntityMinecartContainer implements IHo
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	protected void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		nbttagcompound.setInteger("TransferCooldown", this.transferTicker);

@@ -70,7 +70,7 @@ public abstract class ImmutableMultimap<K, V> extends AbstractMultimap<K, V> imp
 	/**
 	 * A builder for creating immutable multimap instances, especially
 	 * {@code public static final} multimaps ("constant multimaps"). Example:
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 * 	&#64;code

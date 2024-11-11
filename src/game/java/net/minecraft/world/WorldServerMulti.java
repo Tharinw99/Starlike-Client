@@ -10,13 +10,13 @@ import net.minecraft.world.storage.ISaveHandler;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@ import net.minecraft.world.storage.ISaveHandler;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class WorldServerMulti extends WorldServer {
 	private WorldServer delegate;
@@ -37,36 +37,44 @@ public class WorldServerMulti extends WorldServer {
 		super(server, saveHandlerIn, new DerivedWorldInfo(delegate.getWorldInfo()), dimensionId);
 		this.delegate = delegate;
 		delegate.getWorldBorder().addListener(new IBorderListener() {
+			@Override
 			public void onCenterChanged(WorldBorder var1, double d0, double d1) {
 				WorldServerMulti.this.getWorldBorder().setCenter(d0, d1);
 			}
 
+			@Override
 			public void onDamageAmountChanged(WorldBorder var1, double d0) {
 				WorldServerMulti.this.getWorldBorder().setDamageAmount(d0);
 			}
 
+			@Override
 			public void onDamageBufferChanged(WorldBorder var1, double d0) {
 				WorldServerMulti.this.getWorldBorder().setDamageBuffer(d0);
 			}
 
+			@Override
 			public void onSizeChanged(WorldBorder var1, double d0) {
 				WorldServerMulti.this.getWorldBorder().setTransition(d0);
 			}
 
+			@Override
 			public void onTransitionStarted(WorldBorder var1, double d0, double d1, long i) {
 				WorldServerMulti.this.getWorldBorder().setTransition(d0, d1, i);
 			}
 
+			@Override
 			public void onWarningDistanceChanged(WorldBorder var1, int i) {
 				WorldServerMulti.this.getWorldBorder().setWarningDistance(i);
 			}
 
+			@Override
 			public void onWarningTimeChanged(WorldBorder var1, int i) {
 				WorldServerMulti.this.getWorldBorder().setWarningTime(i);
 			}
 		});
 	}
 
+	@Override
 	public World init() {
 		this.mapStorage = this.delegate.getMapStorage();
 		this.worldScoreboard = this.delegate.getScoreboard();
@@ -81,11 +89,5 @@ public class WorldServerMulti extends WorldServer {
 		}
 
 		return this;
-	}
-
-	/**
-	 * + Saves the chunks to disk.
-	 */
-	protected void saveLevel() throws MinecraftException {
 	}
 }

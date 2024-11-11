@@ -38,7 +38,7 @@ import com.google.common.collect.Maps.ImprovedAbstractMap;
 
 /**
  * Implementation of {@link Multimaps#filterEntries(Multimap, Predicate)}.
- * 
+ *
  * @author Jared Levy
  * @author Louis Wasserman
  */

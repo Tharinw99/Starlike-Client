@@ -6,13 +6,13 @@ import net.minecraft.world.IBlockAccess;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -24,7 +24,7 @@ import net.minecraft.world.IBlockAccess;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BiomeColorHelper {
 	interface ColorResolver {
@@ -32,17 +32,20 @@ public class BiomeColorHelper {
 	}
 
 	private static final BiomeColorHelper.ColorResolver field_180291_a = new BiomeColorHelper.ColorResolver() {
+		@Override
 		public int getColorAtPos(BiomeGenBase blockPosition, BlockPos parBlockPos) {
 			return blockPosition.getGrassColorAtPos(parBlockPos);
 		}
 	};
 	private static final BiomeColorHelper.ColorResolver field_180289_b = new BiomeColorHelper.ColorResolver() {
+		@Override
 		public int getColorAtPos(BiomeGenBase biomegenbase, BlockPos blockpos) {
 			return biomegenbase.getFoliageColorAtPos(blockpos);
 		}
 	};
 
 	private static final BiomeColorHelper.ColorResolver field_180290_c = new BiomeColorHelper.ColorResolver() {
+		@Override
 		public int getColorAtPos(BiomeGenBase biomegenbase, BlockPos var2) {
 			return biomegenbase.waterColorMultiplier;
 		}
@@ -54,7 +57,7 @@ public class BiomeColorHelper {
 		int j = 0;
 		int k = 0;
 
-		for (BlockPos.MutableBlockPos blockpos$mutableblockpos : BlockPos.getAllInBoxMutable(parBlockPos.add(-1, 0, -1),
+		for (BlockPos blockpos$mutableblockpos : BlockPos.getAllInBoxMutable(parBlockPos.add(-1, 0, -1),
 				parBlockPos.add(1, 0, 1))) {
 			int l = parColorResolver.getColorAtPos(parIBlockAccess.getBiomeGenForCoords(blockpos$mutableblockpos),
 					blockpos$mutableblockpos);

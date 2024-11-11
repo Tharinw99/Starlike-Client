@@ -15,13 +15,13 @@ import net.lax1dude.eaglercraft.v1_8.EaglercraftUUID;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,7 +33,7 @@ import net.lax1dude.eaglercraft.v1_8.EaglercraftUUID;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ModifiableAttributeInstance implements IAttributeInstance {
 	private final BaseAttributeMap attributeMap;
@@ -56,6 +56,7 @@ public class ModifiableAttributeInstance implements IAttributeInstance {
 
 	}
 
+	@Override
 	public void applyModifier(AttributeModifier attributemodifier) {
 		if (this.getModifier(attributemodifier.getID()) != null) {
 			throw new IllegalArgumentException("Modifier is already applied on this attribute!");
@@ -98,6 +99,7 @@ public class ModifiableAttributeInstance implements IAttributeInstance {
 		this.attributeMap.func_180794_a(this);
 	}
 
+	@Override
 	public Collection<AttributeModifier> func_111122_c() {
 		HashSet hashset = Sets.newHashSet();
 
@@ -125,10 +127,12 @@ public class ModifiableAttributeInstance implements IAttributeInstance {
 	/**
 	 * + Get the Attribute this is an instance of
 	 */
+	@Override
 	public IAttribute getAttribute() {
 		return this.genericAttribute;
 	}
 
+	@Override
 	public double getAttributeValue() {
 		if (this.needsUpdate) {
 			this.cachedValue = this.computeValue();
@@ -138,6 +142,7 @@ public class ModifiableAttributeInstance implements IAttributeInstance {
 		return this.cachedValue;
 	}
 
+	@Override
 	public double getBaseValue() {
 		return this.baseValue;
 	}
@@ -145,18 +150,22 @@ public class ModifiableAttributeInstance implements IAttributeInstance {
 	/**
 	 * + Returns attribute modifier, if any, by the given UUID
 	 */
+	@Override
 	public AttributeModifier getModifier(EaglercraftUUID uuid) {
 		return (AttributeModifier) this.mapByUUID.get(uuid);
 	}
 
+	@Override
 	public Collection<AttributeModifier> getModifiersByOperation(int i) {
 		return (Collection) this.mapByOperation.get(Integer.valueOf(i));
 	}
 
+	@Override
 	public boolean hasModifier(AttributeModifier attributemodifier) {
 		return this.mapByUUID.get(attributemodifier.getID()) != null;
 	}
 
+	@Override
 	public void removeAllModifiers() {
 		Collection collection = this.func_111122_c();
 		if (collection != null) {
@@ -167,6 +176,7 @@ public class ModifiableAttributeInstance implements IAttributeInstance {
 		}
 	}
 
+	@Override
 	public void removeModifier(AttributeModifier attributemodifier) {
 		for (int i = 0; i < 3; ++i) {
 			Set set = (Set) this.mapByOperation.get(Integer.valueOf(i));
@@ -185,6 +195,7 @@ public class ModifiableAttributeInstance implements IAttributeInstance {
 		this.flagForUpdate();
 	}
 
+	@Override
 	public void setBaseValue(double d0) {
 		if (d0 != this.getBaseValue()) {
 			this.baseValue = d0;

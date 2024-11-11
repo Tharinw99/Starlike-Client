@@ -80,7 +80,7 @@ public abstract class ImmutableSet<E> extends ImmutableCollection<E> implements 
 	/**
 	 * A builder for creating immutable set instances, especially {@code public
 	 * static final} sets ("constant sets"). Example:
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 * 	&#64;code

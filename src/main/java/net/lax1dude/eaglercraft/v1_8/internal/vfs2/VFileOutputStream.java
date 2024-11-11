@@ -8,7 +8,7 @@ import net.lax1dude.eaglercraft.v1_8.internal.buffer.ByteBuffer;
 
 /**
  * Copyright (c) 2023-2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -20,7 +20,7 @@ import net.lax1dude.eaglercraft.v1_8.internal.buffer.ByteBuffer;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 class VFileOutputStream extends EaglerOutputStream {
 
@@ -40,11 +40,9 @@ class VFileOutputStream extends EaglerOutputStream {
 			try {
 				copyBuffer.put(buf, 0, count);
 				copyBuffer.flip();
-				try {
-					vfsFile.getFS().eaglerWrite(vfsFile.path, copyBuffer);
-				} catch (Throwable t) {
-					throw new IOException("Could not write stream contents to file!", t);
-				}
+				vfsFile.getFS().eaglerWrite(vfsFile.path, copyBuffer);
+			} catch (Throwable t) {
+				throw new IOException("Could not write stream contents to file!", t);
 			} finally {
 				PlatformRuntime.freeByteBuffer(copyBuffer);
 			}

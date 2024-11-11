@@ -14,13 +14,13 @@ import net.minecraft.item.ItemStack;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -32,56 +32,66 @@ import net.minecraft.item.ItemStack;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class CreativeTabs {
 	public static final CreativeTabs[] creativeTabArray = new CreativeTabs[13];
 	public static final CreativeTabs tabBlock = new CreativeTabs(0, "buildingBlocks") {
+		@Override
 		public Item getTabIconItem() {
 			return Item.getItemFromBlock(Blocks.brick_block);
 		}
 	};
 	public static final CreativeTabs tabDecorations = new CreativeTabs(1, "decorations") {
+		@Override
 		public int getIconItemDamage() {
 			return BlockDoublePlant.EnumPlantType.PAEONIA.getMeta();
 		}
 
+		@Override
 		public Item getTabIconItem() {
 			return Item.getItemFromBlock(Blocks.double_plant);
 		}
 	};
 	public static final CreativeTabs tabRedstone = new CreativeTabs(2, "redstone") {
+		@Override
 		public Item getTabIconItem() {
 			return Items.redstone;
 		}
 	};
 	public static final CreativeTabs tabTransport = new CreativeTabs(3, "transportation") {
+		@Override
 		public Item getTabIconItem() {
 			return Item.getItemFromBlock(Blocks.golden_rail);
 		}
 	};
 	public static final CreativeTabs tabMisc = (new CreativeTabs(4, "misc") {
+		@Override
 		public Item getTabIconItem() {
 			return Items.lava_bucket;
 		}
 	}).setRelevantEnchantmentTypes(new EnumEnchantmentType[] { EnumEnchantmentType.ALL });
 	public static final CreativeTabs tabAllSearch = (new CreativeTabs(5, "search") {
+		@Override
 		public Item getTabIconItem() {
 			return Items.compass;
 		}
 	}).setBackgroundImageName("item_search.png");
 	public static final CreativeTabs tabFood = new CreativeTabs(6, "food") {
+		@Override
 		public Item getTabIconItem() {
 			return Items.apple;
 		}
 	};
 	public static final CreativeTabs tabTools = (new CreativeTabs(7, "tools") {
+		@Override
 		public Item getTabIconItem() {
 			return Items.iron_axe;
 		}
 	}).setRelevantEnchantmentTypes(new EnumEnchantmentType[] { EnumEnchantmentType.DIGGER,
 			EnumEnchantmentType.FISHING_ROD, EnumEnchantmentType.BREAKABLE });
 	public static final CreativeTabs tabCombat = (new CreativeTabs(8, "combat") {
+		@Override
 		public Item getTabIconItem() {
 			return Items.golden_sword;
 		}
@@ -89,21 +99,25 @@ public abstract class CreativeTabs {
 			EnumEnchantmentType.ARMOR_FEET, EnumEnchantmentType.ARMOR_HEAD, EnumEnchantmentType.ARMOR_LEGS,
 			EnumEnchantmentType.ARMOR_TORSO, EnumEnchantmentType.BOW, EnumEnchantmentType.WEAPON });
 	public static final CreativeTabs tabBrewing = new CreativeTabs(9, "brewing") {
+		@Override
 		public Item getTabIconItem() {
 			return Items.cooked_porkchop;
 		}
 	};
 	public static final CreativeTabs tabMaterials = new CreativeTabs(10, "materials") {
+		@Override
 		public Item getTabIconItem() {
 			return Items.stick;
 		}
 	};
 	public static final CreativeTabs tabInventory = (new CreativeTabs(11, "inventory") {
+		@Override
 		public Item getTabIconItem() {
 			return Item.getItemFromBlock(Blocks.chest);
 		}
 	}).setBackgroundImageName("inventory.png").setNoScrollbar().setNoTitle();
 	public static final CreativeTabs tabStarlike = new CreativeTabs(12, "starlike") {
+		@Override
 		public Item getTabIconItem() {
 			return Items.titanium_drill;
 		}

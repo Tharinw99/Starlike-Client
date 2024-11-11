@@ -20,13 +20,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,7 +38,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockCommandBlock extends BlockContainer {
 	public static final PropertyBool TRIGGERED = PropertyBool.create("triggered");
@@ -48,6 +48,7 @@ public class BlockCommandBlock extends BlockContainer {
 		this.setDefaultState(this.blockState.getBaseState().withProperty(TRIGGERED, Boolean.valueOf(false)));
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { TRIGGERED });
 	}
@@ -56,10 +57,12 @@ public class BlockCommandBlock extends BlockContainer {
 	 * + Returns a new instance of a block's tile entity class. Called on placing
 	 * the block.
 	 */
+	@Override
 	public TileEntity createNewTileEntity(World var1, int var2) {
 		return new TileEntityCommandBlock();
 	}
 
+	@Override
 	public int getComparatorInputOverride(World world, BlockPos blockpos) {
 		TileEntity tileentity = world.getTileEntity(blockpos);
 		return tileentity instanceof TileEntityCommandBlock
@@ -70,6 +73,7 @@ public class BlockCommandBlock extends BlockContainer {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
 		if (((Boolean) iblockstate.getValue(TRIGGERED)).booleanValue()) {
@@ -83,6 +87,7 @@ public class BlockCommandBlock extends BlockContainer {
 	 * + The type of render function called. 3 for standard block models, 2 for
 	 * TESR's, 1 for liquids, -1 is no render
 	 */
+	@Override
 	public int getRenderType() {
 		return 3;
 	}
@@ -90,14 +95,17 @@ public class BlockCommandBlock extends BlockContainer {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(TRIGGERED, Boolean.valueOf((i & 1) > 0));
 	}
 
+	@Override
 	public boolean hasComparatorInputOverride() {
 		return true;
 	}
 
+	@Override
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState var3, EntityPlayer entityplayer,
 			EnumFacing var5, float var6, float var7, float var8) {
 		TileEntity tileentity = world.getTileEntity(blockpos);
@@ -110,6 +118,7 @@ public class BlockCommandBlock extends BlockContainer {
 	 * + Called by ItemBlocks just before a block is actually set in the world, to
 	 * allow for adjustments to the IBlockstate
 	 */
+	@Override
 	public IBlockState onBlockPlaced(World var1, BlockPos var2, EnumFacing var3, float var4, float var5, float var6,
 			int var7, EntityLivingBase var8) {
 		return this.getDefaultState().withProperty(TRIGGERED, Boolean.valueOf(false));
@@ -119,6 +128,7 @@ public class BlockCommandBlock extends BlockContainer {
 	 * + Called by ItemBlocks after a block is set in the world, to allow post-place
 	 * logic
 	 */
+	@Override
 	public void onBlockPlacedBy(World world, BlockPos blockpos, IBlockState var3, EntityLivingBase var4,
 			ItemStack itemstack) {
 		TileEntity tileentity = world.getTileEntity(blockpos);
@@ -137,6 +147,7 @@ public class BlockCommandBlock extends BlockContainer {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block var4) {
 		if (!world.isRemote) {
 			boolean flag = world.isBlockPowered(blockpos);
@@ -153,6 +164,7 @@ public class BlockCommandBlock extends BlockContainer {
 	/**
 	 * + Returns the quantity of items to drop on block destruction.
 	 */
+	@Override
 	public int quantityDropped(EaglercraftRandom var1) {
 		return 0;
 	}
@@ -160,10 +172,12 @@ public class BlockCommandBlock extends BlockContainer {
 	/**
 	 * + How many world ticks before ticking
 	 */
+	@Override
 	public int tickRate(World var1) {
 		return 1;
 	}
 
+	@Override
 	public void updateTick(World world, BlockPos blockpos, IBlockState var3, EaglercraftRandom var4) {
 		TileEntity tileentity = world.getTileEntity(blockpos);
 		if (tileentity instanceof TileEntityCommandBlock) {

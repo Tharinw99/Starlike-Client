@@ -113,7 +113,8 @@ public abstract class ContiguousSet<C extends Comparable> extends ImmutableSorte
 	 * These methods perform most headSet, subSet, and tailSet logic, besides
 	 * parameter validation.
 	 */
-	/* @Override */ abstract ContiguousSet<C> headSetImpl(C toElement, boolean inclusive);
+	/* @Override */ @Override
+	abstract ContiguousSet<C> headSetImpl(C toElement, boolean inclusive);
 
 	/**
 	 * Returns the set of values that are contained in both this set and the other.
@@ -169,8 +170,8 @@ public abstract class ContiguousSet<C extends Comparable> extends ImmutableSorte
 		return subSetImpl(fromElement, true, toElement, false);
 	}
 
-	/* @Override */ abstract ContiguousSet<C> subSetImpl(C fromElement, boolean fromInclusive, C toElement,
-			boolean toInclusive);
+	/* @Override */ @Override
+	abstract ContiguousSet<C> subSetImpl(C fromElement, boolean fromInclusive, C toElement, boolean toInclusive);
 
 	@Override
 	public ContiguousSet<C> tailSet(C fromElement) {
@@ -186,7 +187,8 @@ public abstract class ContiguousSet<C extends Comparable> extends ImmutableSorte
 		return tailSetImpl(checkNotNull(fromElement), inclusive);
 	}
 
-	/* @Override */ abstract ContiguousSet<C> tailSetImpl(C fromElement, boolean inclusive);
+	/* @Override */ @Override
+	abstract ContiguousSet<C> tailSetImpl(C fromElement, boolean inclusive);
 
 	/**
 	 * Returns a short-hand representation of the contents such as

@@ -69,7 +69,7 @@ public abstract class ImmutableList<E> extends ImmutableCollection<E> implements
 	/**
 	 * A builder for creating immutable list instances, especially {@code public
 	 * static final} lists ("constant lists"). Example:
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 * 	&#64;code

@@ -38,13 +38,13 @@ import net.minecraft.util.EnumChatFormatting;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -56,7 +56,7 @@ import net.minecraft.util.EnumChatFormatting;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class CommandScoreboard extends CommandBase {
 
@@ -99,6 +99,7 @@ public class CommandScoreboard extends CommandBase {
 	/**
 	 * + Return a list of options when the user types TAB
 	 */
+	@Override
 	public List<String> addTabCompletionOptions(ICommandSender var1, String[] astring, BlockPos var3) {
 		if (astring.length == 1) {
 			return getListOfStringsMatchingLastWord(astring, new String[] { "objectives", "players", "teams" });
@@ -480,6 +481,7 @@ public class CommandScoreboard extends CommandBase {
 	/**
 	 * + Gets the name of the command
 	 */
+	@Override
 	public String getCommandName() {
 		return "scoreboard";
 	}
@@ -487,6 +489,7 @@ public class CommandScoreboard extends CommandBase {
 	/**
 	 * + Gets the usage string for the command.
 	 */
+	@Override
 	public String getCommandUsage(ICommandSender var1) {
 		return "commands.scoreboard.usage";
 	}
@@ -506,6 +509,7 @@ public class CommandScoreboard extends CommandBase {
 	/**
 	 * + Return the required permission level for this command.
 	 */
+	@Override
 	public int getRequiredPermissionLevel() {
 		return 2;
 	}
@@ -528,6 +532,7 @@ public class CommandScoreboard extends CommandBase {
 	 * + Return whether the specified command parameter index is a username
 	 * parameter.
 	 */
+	@Override
 	public boolean isUsernameIndex(String[] astring, int i) {
 		return !astring[0].equalsIgnoreCase("players") ? (astring[0].equalsIgnoreCase("teams") ? i == 2 : false)
 				: (astring.length > 1 && astring[1].equalsIgnoreCase("operation") ? i == 2 || i == 5 : i == 2);
@@ -737,6 +742,7 @@ public class CommandScoreboard extends CommandBase {
 	/**
 	 * + Callback when the command is invoked
 	 */
+	@Override
 	public void processCommand(ICommandSender parICommandSender, String[] parArrayOfString) throws CommandException {
 		if (!this.func_175780_b(parICommandSender, parArrayOfString)) {
 			if (parArrayOfString.length < 1) {

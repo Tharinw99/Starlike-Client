@@ -39,13 +39,13 @@ import net.minecraft.world.storage.WorldInfo;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -57,7 +57,7 @@ import net.minecraft.world.storage.WorldInfo;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class WorldClient extends World {
 	private NetHandlerPlayClient sendQueue;
@@ -110,25 +110,30 @@ public class WorldClient extends World {
 	/**
 	 * + Adds some basic stats of the world to the given crash report.
 	 */
+	@Override
 	public CrashReportCategory addWorldInfoToCrashReport(CrashReport crashreport) {
 		CrashReportCategory crashreportcategory = super.addWorldInfoToCrashReport(crashreport);
 		crashreportcategory.addCrashSectionCallable("Forced entities", new Callable<String>() {
+			@Override
 			public String call() {
 				return WorldClient.this.entityList.size() + " total; " + WorldClient.this.entityList.toString();
 			}
 		});
 		crashreportcategory.addCrashSectionCallable("Retry entities", new Callable<String>() {
+			@Override
 			public String call() {
 				return WorldClient.this.entitySpawnQueue.size() + " total; "
 						+ WorldClient.this.entitySpawnQueue.toString();
 			}
 		});
 		crashreportcategory.addCrashSectionCallable("Server brand", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return WorldClient.this.mc.thePlayer.getClientBrand();
 			}
 		});
 		crashreportcategory.addCrashSectionCallable("Server type", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return "Non-integrated multiplayer server";
 			}
@@ -140,6 +145,7 @@ public class WorldClient extends World {
 	 * + Creates the chunk provider for this world. Called in the constructor.
 	 * Retrieves provider from worldProvider?
 	 */
+	@Override
 	protected IChunkProvider createChunkProvider() {
 		this.clientChunkProvider = new ChunkProviderClient(this);
 		return this.clientChunkProvider;
@@ -165,7 +171,7 @@ public class WorldClient extends World {
 		ItemStack itemstack = this.mc.thePlayer.getHeldItem();
 		boolean flag = this.mc.playerController.getCurrentGameType() == WorldSettings.GameType.CREATIVE
 				&& itemstack != null && Block.getBlockFromItem(itemstack.getItem()) == Blocks.barrier;
-		BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+		BlockPos blockpos$mutableblockpos = new BlockPos();
 
 		for (int i = 0; i < 1000; ++i) {
 			int j = parInt1 + this.rand.nextInt(b0) - this.rand.nextInt(b0);
@@ -186,10 +192,12 @@ public class WorldClient extends World {
 	 * + Returns the Entity with the given ID, or null if it doesn't exist in this
 	 * World.
 	 */
+	@Override
 	public Entity getEntityByID(int i) {
 		return (Entity) (i == this.mc.thePlayer.getEntityId() ? this.mc.thePlayer : super.getEntityByID(i));
 	}
 
+	@Override
 	protected int getRenderDistanceChunks() {
 		return this.mc.gameSettings.renderDistanceChunks;
 	}
@@ -211,12 +219,14 @@ public class WorldClient extends World {
 		return super.setBlockState(parBlockPos, parIBlockState, 3);
 	}
 
+	@Override
 	public void makeFireworks(double d0, double d1, double d2, double d3, double d4, double d5,
 			NBTTagCompound nbttagcompound) {
 		this.mc.effectRenderer.addEffect(
 				new EntityFirework.StarterFX(this, d0, d1, d2, d3, d4, d5, this.mc.effectRenderer, nbttagcompound));
 	}
 
+	@Override
 	protected void onEntityAdded(Entity entity) {
 		super.onEntityAdded(entity);
 		if (this.entitySpawnQueue.contains(entity)) {
@@ -225,6 +235,7 @@ public class WorldClient extends World {
 
 	}
 
+	@Override
 	protected void onEntityRemoved(Entity entity) {
 		super.onEntityRemoved(entity);
 		boolean flag = false;
@@ -242,6 +253,7 @@ public class WorldClient extends World {
 	/**
 	 * + par8 is loudness, all pars passed to minecraftInstance.sndManager.playSound
 	 */
+	@Override
 	public void playSound(double d0, double d1, double d2, String s, float f, float f1, boolean flag) {
 		double d3 = this.mc.getRenderViewEntity().getDistanceSq(d0, d1, d2);
 		PositionedSoundRecord positionedsoundrecord = new PositionedSoundRecord(new ResourceLocation(s), f, f1,
@@ -314,6 +326,7 @@ public class WorldClient extends World {
 	 * + Schedule the entity for removal during the next tick. Marks the entity dead
 	 * in anticipation.
 	 */
+	@Override
 	public void removeEntity(Entity entity) {
 		super.removeEntity(entity);
 		this.entityList.remove(entity);
@@ -332,6 +345,7 @@ public class WorldClient extends World {
 	/**
 	 * + If on MP, sends a quitting packet.
 	 */
+	@Override
 	public void sendQuittingDisconnectingPacket() {
 		this.sendQueue.getNetworkManager().closeChannel(new ChatComponentText("Quitting"));
 	}
@@ -343,6 +357,7 @@ public class WorldClient extends World {
 	/**
 	 * + Sets the world time.
 	 */
+	@Override
 	public void setWorldTime(long i) {
 		if (i < 0L) {
 			i = -i;
@@ -357,6 +372,7 @@ public class WorldClient extends World {
 	/**
 	 * + Called when an entity is spawned in the world. This includes players.
 	 */
+	@Override
 	public boolean spawnEntityInWorld(Entity entity) {
 		boolean flag = super.spawnEntityInWorld(entity);
 		this.entityList.add(entity);
@@ -372,6 +388,7 @@ public class WorldClient extends World {
 	/**
 	 * + Runs a single tick for the world
 	 */
+	@Override
 	public void tick() {
 		super.tick();
 		this.setTotalWorldTime(this.getTotalWorldTime() + 1L);
@@ -391,6 +408,7 @@ public class WorldClient extends World {
 		this.updateBlocks();
 	}
 
+	@Override
 	protected void updateBlocks() {
 		super.updateBlocks();
 		this.previousActiveChunkSet.retainAll(this.activeChunkSet);
@@ -419,6 +437,7 @@ public class WorldClient extends World {
 	/**
 	 * + Updates all weather states.
 	 */
+	@Override
 	protected void updateWeather() {
 	}
 }

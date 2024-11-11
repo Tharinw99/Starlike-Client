@@ -1,3 +1,6 @@
+starlike.welcomeMsg=Welcome to Starlike Client! Click here to view the wiki for guides, recipes, and more!
+starlike.welcomeMsgHover=Click to open the wiki
+
 itemGroup.starlike=Starlike
 
 enchantment.level.11=XI
@@ -27,6 +30,7 @@ commands.gm.usage=/gm%s [player]
 
 entity.NetherCreeper.name=Nether Creeper
 entity.EndCreeper.name=End Creeper
+entity.Watcher.name=Watcher
 
 tile.deepslate.name=Deepslate
 tile.cobbled_deepslate.name=Cobbled Deepslate
@@ -44,6 +48,10 @@ item.netherite_helmet.name=Netherite Helmet
 item.netherite_chestplate.name=Netherite Chestplate
 item.netherite_leggings.name=Netherite Leggings
 item.netherite_boots.name=Netherite Boots
+
+item.steel.name=Steel
+tile.steel_block.name=Steel Block
+tile.steel_grate.name=Steel Grate
 
 tile.platinum_ore.name=Platinum Ore
 tile.platinum_block.name=Platinum Block
@@ -68,14 +76,12 @@ item.uranium_crystal.name=Uranium Crystal
 item.uranium_rod.name=Uranium Rod
 
 item.dragonite.name=Dragonite
+item.dragonite_shard.name=Dragonite Shard
 tile.dragonite_block.name=Dragonite Block
 
 item.platinum_drill.name=Platinum Drill
 item.titanium_drill.name=Titanium Drill
 
-item.steel.name=Steel
-tile.steel_block.name=Steel Block
-tile.steel_grate.name=Steel Grate
 item.chisel.name=Chisel
 
 tile.mosaic.name=Mosaic
@@ -86,8 +92,19 @@ tile.mosaic.jungle.name=Jungle Mosaic
 tile.mosaic.acacia.name=Acacia Mosaic
 tile.mosaic.dark_oak.name=Dark Oak Mosaic
 
+container.smithing=Smithing
 tile.smithing_table.name=Smithing Table
+
+item.leather_backpack.name=Leather Backpack
+item.iron_backpack.name=Steel Backpack
+item.diamond_backpack.name=Diamond Backpack
+item.ender_backpack.name=Ender Backpack
+
+container.fabricator=Fabricator
 tile.fabricator.name=Fabricator
+
+item.amber.name=Amber
+item.ambered_bow.name=Ambered Bow
 
 tile.andesite_tiles.name=Andesite Tiles
 tile.chiseled_deep_ocean_bricks.name=Chiseled Deep Ocean Bricks
@@ -250,3 +267,16 @@ tile.smooth_basalt.name=Smooth Basalt
 tile.soul_stone.name=Soul Stone
 tile.soul_stone_tiles.name=Soul Stone Tiles
 tile.tuff_tiles.name=Tuff Tiles
+tile.dirt_path.name=Dirt path
+tile.stripped_acacia_log.name=Stripped acacia log
+tile.stripped_birch_log.name=Stripped birch log
+tile.stripped_dark_oak_log.name=Stripped dark oak log
+tile.stripped_jungle_log.name=Stripped jungle log
+tile.stripped_oak_log.name=Stripped oak log
+tile.stripped_spruce_log.name=Stripped spruce log
+tile.stripped_acacia_log.name=Stripped acacia log
+tile.stripped_birch_log.name=Stripped birch log
+tile.stripped_dark_oak_log.name=Stripped dark oak log
+tile.stripped_jungle_log.name=Stripped jungle log
+tile.stripped_oak_log.name=Stripped oak log
+tile.stripped_spruce_log.name=Stripped spruce log

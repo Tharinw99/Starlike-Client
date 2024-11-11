@@ -23,13 +23,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -41,7 +41,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class BlockButton extends Block {
 	public static final PropertyDirection FACING = PropertyDirection.create("facing");
@@ -64,6 +64,7 @@ public abstract class BlockButton extends Block {
 		this.wooden = wooden;
 	}
 
+	@Override
 	public void breakBlock(World world, BlockPos blockpos, IBlockState iblockstate) {
 		if (((Boolean) iblockstate.getValue(POWERED)).booleanValue()) {
 			this.notifyNeighbors(world, blockpos, (EnumFacing) iblockstate.getValue(FACING));
@@ -72,6 +73,7 @@ public abstract class BlockButton extends Block {
 		super.breakBlock(world, blockpos, iblockstate);
 	}
 
+	@Override
 	public boolean canPlaceBlockAt(World world, BlockPos blockpos) {
 		EnumFacing[] facings = EnumFacing._VALUES;
 		for (int i = 0; i < facings.length; ++i) {
@@ -87,6 +89,7 @@ public abstract class BlockButton extends Block {
 	/**
 	 * + Check whether this Block can be placed on the given side
 	 */
+	@Override
 	public boolean canPlaceBlockOnSide(World world, BlockPos blockpos, EnumFacing enumfacing) {
 		return func_181088_a(world, blockpos, enumfacing.getOpposite());
 	}
@@ -95,6 +98,7 @@ public abstract class BlockButton extends Block {
 	 * + Can this block provide power. Only wire currently seems to have this change
 	 * based on its state.
 	 */
+	@Override
 	public boolean canProvidePower() {
 		return true;
 	}
@@ -139,10 +143,12 @@ public abstract class BlockButton extends Block {
 		}
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { FACING, POWERED });
 	}
 
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox(World var1, BlockPos var2, IBlockState var3) {
 		return null;
 	}
@@ -150,6 +156,7 @@ public abstract class BlockButton extends Block {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i;
 		switch ((EnumFacing) iblockstate.getValue(FACING)) {
@@ -183,6 +190,7 @@ public abstract class BlockButton extends Block {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		EnumFacing enumfacing;
 		switch (i & 7) {
@@ -210,15 +218,18 @@ public abstract class BlockButton extends Block {
 				Boolean.valueOf((i & 8) > 0));
 	}
 
+	@Override
 	public int getStrongPower(IBlockAccess var1, BlockPos var2, IBlockState iblockstate, EnumFacing enumfacing) {
 		return !((Boolean) iblockstate.getValue(POWERED)).booleanValue() ? 0
 				: (iblockstate.getValue(FACING) == enumfacing ? 15 : 0);
 	}
 
+	@Override
 	public int getWeakPower(IBlockAccess var1, BlockPos var2, IBlockState iblockstate, EnumFacing var4) {
 		return ((Boolean) iblockstate.getValue(POWERED)).booleanValue() ? 15 : 0;
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -227,6 +238,7 @@ public abstract class BlockButton extends Block {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
@@ -236,6 +248,7 @@ public abstract class BlockButton extends Block {
 		worldIn.notifyNeighborsOfStateChange(pos.offset(facing.getOpposite()), this);
 	}
 
+	@Override
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState iblockstate, EntityPlayer var4,
 			EnumFacing var5, float var6, float var7, float var8) {
 		if (((Boolean) iblockstate.getValue(POWERED)).booleanValue()) {
@@ -255,6 +268,7 @@ public abstract class BlockButton extends Block {
 	 * + Called by ItemBlocks just before a block is actually set in the world, to
 	 * allow for adjustments to the IBlockstate
 	 */
+	@Override
 	public IBlockState onBlockPlaced(World world, BlockPos blockpos, EnumFacing enumfacing, float var4, float var5,
 			float var6, int var7, EntityLivingBase var8) {
 		return func_181088_a(world, blockpos, enumfacing.getOpposite())
@@ -266,6 +280,7 @@ public abstract class BlockButton extends Block {
 	/**
 	 * + Called When an Entity Collided with the Block
 	 */
+	@Override
 	public void onEntityCollidedWithBlock(World world, BlockPos blockpos, IBlockState iblockstate, Entity var4) {
 		if (!world.isRemote) {
 			if (this.wooden) {
@@ -279,6 +294,7 @@ public abstract class BlockButton extends Block {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block var4) {
 		if (this.checkForDrop(world, blockpos, iblockstate)
 				&& !func_181088_a(world, blockpos, ((EnumFacing) iblockstate.getValue(FACING)).getOpposite())) {
@@ -292,9 +308,11 @@ public abstract class BlockButton extends Block {
 	 * + Called randomly when setTickRandomly is set to true (used by e.g. crops to
 	 * grow, etc.)
 	 */
+	@Override
 	public void randomTick(World var1, BlockPos var2, IBlockState var3, EaglercraftRandom var4) {
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
 		this.updateBlockBounds(iblockaccess.getBlockState(blockpos));
 	}
@@ -302,6 +320,7 @@ public abstract class BlockButton extends Block {
 	/**
 	 * + Sets the block's bounds for rendering it as an item
 	 */
+	@Override
 	public void setBlockBoundsForItemRender() {
 		float f = 0.1875F;
 		float f1 = 0.125F;
@@ -312,6 +331,7 @@ public abstract class BlockButton extends Block {
 	/**
 	 * + How many world ticks before ticking
 	 */
+	@Override
 	public int tickRate(World var1) {
 		return this.wooden ? 30 : 20;
 	}
@@ -346,6 +366,7 @@ public abstract class BlockButton extends Block {
 
 	}
 
+	@Override
 	public void updateTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom var4) {
 		if (!world.isRemote) {
 			if (((Boolean) iblockstate.getValue(POWERED)).booleanValue()) {

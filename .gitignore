@@ -24,7 +24,10 @@ javascript/Starlike_Client_Offline_Signed.html
 javascript/Starlike_Client_Offline_Signed.html.cert
 javascript/Starlike_Client_Offline_Signed.html.dat
 
-.metadata
+javascript/assets.epw
+javascript/bootstrap.js
+javascript/favicon.png
+javascript/Starlike_Client_Offline_WASM.html
 
-GenerateBlocks.py
-EaglerTools
+.metadata
+.DS_Store

@@ -7,7 +7,7 @@ import net.minecraft.server.management.ServerConfigurationManager;
 
 /**
  * Copyright (c) 2023-2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -19,7 +19,7 @@ import net.minecraft.server.management.ServerConfigurationManager;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EaglerPlayerList extends ServerConfigurationManager {
 
@@ -30,10 +30,12 @@ public class EaglerPlayerList extends ServerConfigurationManager {
 		this.viewDistance = viewDistance;
 	}
 
+	@Override
 	public NBTTagCompound getHostPlayerData() {
 		return this.hostPlayerNBT;
 	}
 
+	@Override
 	public void playerLoggedOut(EntityPlayerMP playerIn) {
 		super.playerLoggedOut(playerIn);
 		EaglerMinecraftServer svr = (EaglerMinecraftServer) getServerInstance();
@@ -41,6 +43,7 @@ public class EaglerPlayerList extends ServerConfigurationManager {
 		svr.capeService.unregisterPlayer(playerIn.getUniqueID());
 	}
 
+	@Override
 	protected void writePlayerData(EntityPlayerMP par1EntityPlayerMP) {
 		if (par1EntityPlayerMP.getName().equals(this.getServerInstance().getServerOwner())) {
 			this.hostPlayerNBT = new NBTTagCompound();

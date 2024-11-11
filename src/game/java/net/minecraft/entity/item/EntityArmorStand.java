@@ -27,13 +27,13 @@ import net.minecraft.world.WorldServer;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -45,7 +45,7 @@ import net.minecraft.world.WorldServer;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityArmorStand extends EntityLivingBase {
 	private static final Rotations DEFAULT_HEAD_ROTATION = new Rotations(0.0F, 0.0F, 0.0F);
@@ -88,6 +88,7 @@ public class EntityArmorStand extends EntityLivingBase {
 	/**
 	 * + Called when the entity is attacked.
 	 */
+	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float var2) {
 		if (this.worldObj.isRemote) {
 			return false;
@@ -150,6 +151,7 @@ public class EntityArmorStand extends EntityLivingBase {
 	 * + Returns true if other Entities should be prevented from moving through this
 	 * Entity.
 	 */
+	@Override
 	public boolean canBeCollidedWith() {
 		return super.canBeCollidedWith() && !this.func_181026_s();
 	}
@@ -158,13 +160,16 @@ public class EntityArmorStand extends EntityLivingBase {
 	 * + Returns true if this entity should push and be pushed by other entities
 	 * when colliding.
 	 */
+	@Override
 	public boolean canBePushed() {
 		return false;
 	}
 
+	@Override
 	protected void collideWithEntity(Entity var1) {
 	}
 
+	@Override
 	protected void collideWithNearbyEntities() {
 		List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox());
 		if (list != null && !list.isEmpty()) {
@@ -210,6 +215,7 @@ public class EntityArmorStand extends EntityLivingBase {
 
 	}
 
+	@Override
 	protected void entityInit() {
 		super.entityInit();
 		this.dataWatcher.addObject(10, Byte.valueOf((byte) 0));
@@ -221,6 +227,7 @@ public class EntityArmorStand extends EntityLivingBase {
 		this.dataWatcher.addObject(16, DEFAULT_RIGHTLEG_ROTATION);
 	}
 
+	@Override
 	protected float func_110146_f(float var1, float var2) {
 		this.prevRenderYawOffset = this.prevRotationYaw;
 		this.renderYawOffset = this.rotationYaw;
@@ -286,6 +293,7 @@ public class EntityArmorStand extends EntityLivingBase {
 		return this.bodyRotation;
 	}
 
+	@Override
 	public ItemStack getCurrentArmor(int i) {
 		return this.contents[i + 1];
 	}
@@ -293,10 +301,12 @@ public class EntityArmorStand extends EntityLivingBase {
 	/**
 	 * + 0: Tool in Hand; 1-4: Armor
 	 */
+	@Override
 	public ItemStack getEquipmentInSlot(int i) {
 		return this.contents[i];
 	}
 
+	@Override
 	public float getEyeHeight() {
 		return this.isChild() ? this.height * 0.5F : this.height * 0.9F;
 	}
@@ -308,6 +318,7 @@ public class EntityArmorStand extends EntityLivingBase {
 	/**
 	 * + Returns the item that this EntityLiving is holding, if any.
 	 */
+	@Override
 	public ItemStack getHeldItem() {
 		return this.contents[0];
 	}
@@ -315,6 +326,7 @@ public class EntityArmorStand extends EntityLivingBase {
 	/**
 	 * + returns the inventory of this entity (only used in EntityPlayerMP it seems)
 	 */
+	@Override
 	public ItemStack[] getInventory() {
 		return this.contents;
 	}
@@ -351,6 +363,7 @@ public class EntityArmorStand extends EntityLivingBase {
 	 * + New version of interactWith that includes vector information on where
 	 * precisely the player targeted.
 	 */
+	@Override
 	public boolean interactAt(EntityPlayer entityplayer, Vec3 vec3) {
 		if (this.func_181026_s()) {
 			return false;
@@ -425,10 +438,12 @@ public class EntityArmorStand extends EntityLivingBase {
 	/**
 	 * + If Animal, checks if the age timer is negative
 	 */
+	@Override
 	public boolean isChild() {
 		return this.isSmall();
 	}
 
+	@Override
 	public boolean isImmuneToExplosions() {
 		return this.isInvisible();
 	}
@@ -438,6 +453,7 @@ public class EntityArmorStand extends EntityLivingBase {
 	 * and comparing it to its average edge length * 64 * renderDistanceWeight Args:
 	 * distance
 	 */
+	@Override
 	public boolean isInRangeToRenderDist(double d0) {
 		double d1 = this.getEntityBoundingBox().getAverageEdgeLength() * 4.0D;
 		if (Double.isNaN(d1) || d1 == 0.0D) {
@@ -451,6 +467,7 @@ public class EntityArmorStand extends EntityLivingBase {
 	/**
 	 * + Returns whether the entity is in a server world
 	 */
+	@Override
 	public boolean isServerWorld() {
 		return super.isServerWorld() && !this.hasNoGravity();
 	}
@@ -462,6 +479,7 @@ public class EntityArmorStand extends EntityLivingBase {
 	/**
 	 * + Moves the entity based on the specified heading. Args: strafe, forward
 	 */
+	@Override
 	public void moveEntityWithHeading(float f, float f1) {
 		if (!this.hasNoGravity()) {
 			super.moveEntityWithHeading(f, f1);
@@ -471,6 +489,7 @@ public class EntityArmorStand extends EntityLivingBase {
 	/**
 	 * + Called by the /kill command.
 	 */
+	@Override
 	public void onKillCommand() {
 		this.setDead();
 	}
@@ -478,6 +497,7 @@ public class EntityArmorStand extends EntityLivingBase {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		super.onUpdate();
 		Rotations rotations = this.dataWatcher.getWatchableObjectRotations(11);
@@ -537,6 +557,7 @@ public class EntityArmorStand extends EntityLivingBase {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		if (nbttagcompound.hasKey("Equipment", 9)) {
@@ -589,6 +610,7 @@ public class EntityArmorStand extends EntityLivingBase {
 		return nbttagcompound;
 	}
 
+	@Override
 	public boolean replaceItemInInventory(int i, ItemStack itemstack) {
 		int j;
 		if (i == 99) {
@@ -618,6 +640,7 @@ public class EntityArmorStand extends EntityLivingBase {
 	 * + Sets the held item, or an armor slot. Slot 0 is held item. Slot 1-4 is
 	 * armor. Params: Item, slot
 	 */
+	@Override
 	public void setCurrentItemOrArmor(int i, ItemStack itemstack) {
 		this.contents[i] = itemstack;
 	}
@@ -627,6 +650,7 @@ public class EntityArmorStand extends EntityLivingBase {
 		this.dataWatcher.updateObject(11, parRotations);
 	}
 
+	@Override
 	public void setInvisible(boolean flag) {
 		this.canInteract = flag;
 		super.setInvisible(flag);
@@ -701,6 +725,7 @@ public class EntityArmorStand extends EntityLivingBase {
 	 * Otherwise, updates potion effect color, ambience, and invisibility metadata
 	 * values
 	 */
+	@Override
 	protected void updatePotionMetadata() {
 		this.setInvisible(this.canInteract);
 	}
@@ -708,6 +733,7 @@ public class EntityArmorStand extends EntityLivingBase {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		NBTTagList nbttaglist = new NBTTagList();

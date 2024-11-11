@@ -13,13 +13,13 @@ import net.minecraft.world.gen.structure.StructureBoundingBox;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -31,13 +31,14 @@ import net.minecraft.world.gen.structure.StructureBoundingBox;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class CommandCompare extends CommandBase {
 
 	/**
 	 * + Return a list of options when the user types TAB
 	 */
+	@Override
 	public List<String> addTabCompletionOptions(ICommandSender var1, String[] astring, BlockPos blockpos) {
 		return astring.length > 0 && astring.length <= 3 ? func_175771_a(astring, 0, blockpos)
 				: (astring.length > 3 && astring.length <= 6 ? func_175771_a(astring, 3, blockpos)
@@ -50,6 +51,7 @@ public class CommandCompare extends CommandBase {
 	/**
 	 * + Gets the name of the command
 	 */
+	@Override
 	public String getCommandName() {
 		return "testforblocks";
 	}
@@ -57,6 +59,7 @@ public class CommandCompare extends CommandBase {
 	/**
 	 * + Gets the usage string for the command.
 	 */
+	@Override
 	public String getCommandUsage(ICommandSender var1) {
 		return "commands.compare.usage";
 	}
@@ -64,6 +67,7 @@ public class CommandCompare extends CommandBase {
 	/**
 	 * + Return the required permission level for this command.
 	 */
+	@Override
 	public int getRequiredPermissionLevel() {
 		return 2;
 	}
@@ -71,6 +75,7 @@ public class CommandCompare extends CommandBase {
 	/**
 	 * + Callback when the command is invoked
 	 */
+	@Override
 	public void processCommand(ICommandSender parICommandSender, String[] parArrayOfString) throws CommandException {
 		if (parArrayOfString.length < 9) {
 			throw new WrongUsageException("commands.compare.usage", new Object[0]);
@@ -99,8 +104,8 @@ public class CommandCompare extends CommandBase {
 					BlockPos blockpos3 = new BlockPos(structureboundingbox1.minX - structureboundingbox.minX,
 							structureboundingbox1.minY - structureboundingbox.minY,
 							structureboundingbox1.minZ - structureboundingbox.minZ);
-					BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
-					BlockPos.MutableBlockPos blockpos$mutableblockpos1 = new BlockPos.MutableBlockPos();
+					BlockPos blockpos$mutableblockpos = new BlockPos();
+					BlockPos blockpos$mutableblockpos1 = new BlockPos();
 
 					for (int j = structureboundingbox.minZ; j <= structureboundingbox.maxZ; ++j) {
 						for (int k = structureboundingbox.minY; k <= structureboundingbox.maxY; ++k) {

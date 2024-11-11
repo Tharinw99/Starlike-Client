@@ -9,7 +9,7 @@ import net.lax1dude.eaglercraft.v1_8.EagRuntime;
 
 /**
  * Copyright (c) 2022 ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -21,7 +21,7 @@ import net.lax1dude.eaglercraft.v1_8.EagRuntime;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ExpiringSet<T> extends HashSet<T> {
 	public interface ExpiringEvent<T> {
@@ -44,6 +44,7 @@ public class ExpiringSet<T> extends HashSet<T> {
 		this.event = event;
 	}
 
+	@Override
 	public boolean add(T o) {
 		checkForExpirations();
 		boolean success = super.add(o);
@@ -71,16 +72,19 @@ public class ExpiringSet<T> extends HashSet<T> {
 		}
 	}
 
+	@Override
 	public void clear() {
 		this.timestamps.clear();
 		super.clear();
 	}
 
+	@Override
 	public boolean contains(Object o) {
 		checkForExpirations();
 		return super.contains(o);
 	}
 
+	@Override
 	public boolean remove(Object o) {
 		checkForExpirations();
 		boolean success = super.remove(o);

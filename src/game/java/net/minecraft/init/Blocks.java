@@ -37,13 +37,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -55,7 +55,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class Blocks {
 	public static Block air;
@@ -274,6 +274,13 @@ public class Blocks {
 	public static Block fabricator;
 
 //autogeneratevar
+	public static Block stripped_spruce_log;
+	public static Block stripped_oak_log;
+	public static Block stripped_jungle_log;
+	public static Block stripped_dark_oak_log;
+	public static Block stripped_birch_log;
+	public static Block stripped_acacia_log;
+	public static Block dirt_path;
 	public static Block tuff_tiles;
 	public static Block soul_stone_tiles;
 	public static Block soul_stone;
@@ -655,6 +662,13 @@ public class Blocks {
 			fabricator = getRegisteredBlock("starlike:fabricator");
 
 //autogenerateequals
+			stripped_spruce_log = getRegisteredBlock("starlike:stripped_spruce_log");
+			stripped_oak_log = getRegisteredBlock("starlike:stripped_oak_log");
+			stripped_jungle_log = getRegisteredBlock("starlike:stripped_jungle_log");
+			stripped_dark_oak_log = getRegisteredBlock("starlike:stripped_dark_oak_log");
+			stripped_birch_log = getRegisteredBlock("starlike:stripped_birch_log");
+			stripped_acacia_log = getRegisteredBlock("starlike:stripped_acacia_log");
+			dirt_path = getRegisteredBlock("starlike:dirt_path");
 			tuff_tiles = getRegisteredBlock("starlike:tuff_tiles");
 			soul_stone_tiles = getRegisteredBlock("starlike:soul_stone_tiles");
 			soul_stone = getRegisteredBlock("starlike:soul_stone");

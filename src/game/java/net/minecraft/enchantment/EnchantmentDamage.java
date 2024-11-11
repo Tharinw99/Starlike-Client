@@ -12,13 +12,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,7 +30,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EnchantmentDamage extends Enchantment {
 	/**
@@ -64,6 +64,7 @@ public class EnchantmentDamage extends Enchantment {
 	 * enchantment. This alternative to calcModifierDamage is sensitive to the
 	 * targets EnumCreatureAttribute.
 	 */
+	@Override
 	public float calcDamageByCreature(int level, EnumCreatureAttribute creatureType) {
 		return this.damageType == 0 ? (float) level * 1.25F
 				: (this.damageType == 1 && creatureType == EnumCreatureAttribute.UNDEAD ? (float) level * 2.5F
@@ -75,6 +76,7 @@ public class EnchantmentDamage extends Enchantment {
 	/**
 	 * + Determines if this enchantment can be applied to a specific ItemStack.
 	 */
+	@Override
 	public boolean canApply(ItemStack stack) {
 		return stack.getItem() instanceof ItemAxe ? true : super.canApply(stack);
 	}
@@ -83,6 +85,7 @@ public class EnchantmentDamage extends Enchantment {
 	 * + Determines if the enchantment passed can be applyied together with this
 	 * enchantment.
 	 */
+	@Override
 	public boolean canApplyTogether(Enchantment ench) {
 		return !(ench instanceof EnchantmentDamage);
 	}
@@ -91,6 +94,7 @@ public class EnchantmentDamage extends Enchantment {
 	 * + Returns the maximum value of enchantability nedded on the enchantment level
 	 * passed.
 	 */
+	@Override
 	public int getMaxEnchantability(int i) {
 		return this.getMinEnchantability(i) + thresholdEnchantability[this.damageType];
 	}
@@ -98,6 +102,7 @@ public class EnchantmentDamage extends Enchantment {
 	/**
 	 * + Returns the maximum level that the enchantment can have.
 	 */
+	@Override
 	public int getMaxLevel() {
 		return 10;
 	}
@@ -106,6 +111,7 @@ public class EnchantmentDamage extends Enchantment {
 	 * + Returns the minimal value of enchantability needed on the enchantment level
 	 * passed.
 	 */
+	@Override
 	public int getMinEnchantability(int i) {
 		return baseEnchantability[this.damageType] + (i - 1) * levelEnchantability[this.damageType];
 	}
@@ -113,6 +119,7 @@ public class EnchantmentDamage extends Enchantment {
 	/**
 	 * + Return the name of key in translation table of this enchantment.
 	 */
+	@Override
 	public String getName() {
 		return "enchantment.damage." + protectionName[this.damageType];
 	}
@@ -121,6 +128,7 @@ public class EnchantmentDamage extends Enchantment {
 	 * + Called whenever a mob is damaged with an item that has this enchantment on
 	 * it.
 	 */
+	@Override
 	public void onEntityDamaged(EntityLivingBase user, Entity target, int level) {
 		if (target instanceof EntityLivingBase) {
 			EntityLivingBase entitylivingbase = (EntityLivingBase) target;

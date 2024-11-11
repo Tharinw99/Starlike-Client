@@ -26,13 +26,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -44,7 +44,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class GuiContainer extends GuiScreen {
 	/**
@@ -119,6 +119,7 @@ public abstract class GuiContainer extends GuiScreen {
 	 * + Returns true if this GUI should pause the game when it is displayed in
 	 * single-player
 	 */
+	@Override
 	public boolean doesGuiPauseGame() {
 		return false;
 	}
@@ -150,6 +151,7 @@ public abstract class GuiContainer extends GuiScreen {
 	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
 	 * renderPartialTicks
 	 */
+	@Override
 	public void drawScreen(int i, int j, float f) {
 		this.drawDefaultBackground();
 		int k = this.guiLeft;
@@ -316,6 +318,7 @@ public abstract class GuiContainer extends GuiScreen {
 		return null;
 	}
 
+	@Override
 	protected float getTouchModeScale() {
 		return 1.25f;
 	}
@@ -337,6 +340,7 @@ public abstract class GuiContainer extends GuiScreen {
 	 * when the GUI is displayed and when the window resizes, the buttonList is
 	 * cleared beforehand.
 	 */
+	@Override
 	public void initGui() {
 		super.initGui();
 		if (primaryTouchPoint != -1 && Touch.fetchPointIdx(primaryTouchPoint) == -1) {
@@ -373,6 +377,7 @@ public abstract class GuiContainer extends GuiScreen {
 	 * the equivalent of KeyListener.keyTyped(KeyEvent e). Args : character
 	 * (character on the key), keyCode (lwjgl Keyboard key code)
 	 */
+	@Override
 	protected void keyTyped(char parChar1, int parInt1) {
 		if (parInt1 == this.mc.gameSettings.keyBindClose.getKeyCode()
 				|| parInt1 == this.mc.gameSettings.keyBindInventory.getKeyCode() || (parInt1 == 1
@@ -398,6 +403,7 @@ public abstract class GuiContainer extends GuiScreen {
 	/**
 	 * + Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
 	 */
+	@Override
 	protected void mouseClicked(int parInt1, int parInt2, int parInt3) {
 		super.mouseClicked(parInt1, parInt2, parInt3);
 		boolean flag = parInt3 == this.mc.gameSettings.keyBindPickBlock.getKeyCode() + 100;
@@ -476,6 +482,7 @@ public abstract class GuiContainer extends GuiScreen {
 	 * + Called when a mouse button is pressed and the mouse is moved around.
 	 * Parameters are : mouseX, mouseY, lastButtonClicked & timeSinceMouseClick.
 	 */
+	@Override
 	protected void mouseClickMove(int i, int j, int k, long var4) {
 		Slot slot = this.getSlotAtPosition(i, j);
 		ItemStack itemstack = this.mc.thePlayer.inventory.getItemStack();
@@ -516,6 +523,7 @@ public abstract class GuiContainer extends GuiScreen {
 	 * + Called when a mouse button is released. Args : mouseX, mouseY,
 	 * releaseButton
 	 */
+	@Override
 	protected void mouseReleased(int i, int j, int k) {
 		Slot slot = this.getSlotAtPosition(i, j);
 		int l = this.guiLeft;
@@ -626,16 +634,19 @@ public abstract class GuiContainer extends GuiScreen {
 	/**
 	 * + Called when the screen is unloaded. Used to disable keyboard repeat events
 	 */
+	@Override
 	public void onGuiClosed() {
 		if (this.mc.thePlayer != null) {
 			this.inventorySlots.onContainerClosed(this.mc.thePlayer);
 		}
 	}
 
+	@Override
 	protected boolean shouldTouchGenerateMouseEvents() {
 		return false;
 	}
 
+	@Override
 	protected void touchEndMove(int touchX, int touchY, int uid) {
 		if (primaryTouchPoint == uid) {
 			primaryTouchPoint = -1;
@@ -645,6 +656,7 @@ public abstract class GuiContainer extends GuiScreen {
 		}
 	}
 
+	@Override
 	protected void touchMoved(int touchX, int touchY, int uid) {
 		if (primaryTouchPoint == uid) {
 			lastTouchX = touchX;
@@ -653,6 +665,7 @@ public abstract class GuiContainer extends GuiScreen {
 		}
 	}
 
+	@Override
 	protected void touchStarted(int touchX, int touchY, int uid) {
 		if (primaryTouchPoint == -1) {
 			primaryTouchPoint = uid;
@@ -662,6 +675,7 @@ public abstract class GuiContainer extends GuiScreen {
 		}
 	}
 
+	@Override
 	protected void touchTapped(int touchX, int touchY, int uid) {
 		if (primaryTouchPoint == uid) {
 			primaryTouchPoint = -1;
@@ -697,6 +711,7 @@ public abstract class GuiContainer extends GuiScreen {
 	/**
 	 * + Called from the main game loop to update the screen.
 	 */
+	@Override
 	public void updateScreen() {
 		super.updateScreen();
 		if (!this.mc.thePlayer.isEntityAlive() || this.mc.thePlayer.isDead) {

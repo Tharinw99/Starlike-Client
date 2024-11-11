@@ -25,13 +25,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -43,7 +43,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockRailDetector extends BlockRailBase {
 	public static PropertyEnum<BlockRailBase.EnumRailDirection> SHAPE;
@@ -52,6 +52,7 @@ public class BlockRailDetector extends BlockRailBase {
 	public static void bootstrapStates() {
 		SHAPE = PropertyEnum.create("shape", BlockRailBase.EnumRailDirection.class,
 				new Predicate<BlockRailBase.EnumRailDirection>() {
+					@Override
 					public boolean apply(BlockRailBase.EnumRailDirection blockrailbase$enumraildirection) {
 						return blockrailbase$enumraildirection != BlockRailBase.EnumRailDirection.NORTH_EAST
 								&& blockrailbase$enumraildirection != BlockRailBase.EnumRailDirection.NORTH_WEST
@@ -72,10 +73,12 @@ public class BlockRailDetector extends BlockRailBase {
 	 * + Can this block provide power. Only wire currently seems to have this change
 	 * based on its state.
 	 */
+	@Override
 	public boolean canProvidePower() {
 		return true;
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { SHAPE, POWERED });
 	}
@@ -87,6 +90,7 @@ public class BlockRailDetector extends BlockRailBase {
 				: worldIn.getEntitiesWithinAABB(clazz, axisalignedbb, filter[0]);
 	}
 
+	@Override
 	public int getComparatorInputOverride(World world, BlockPos blockpos) {
 		if (((Boolean) world.getBlockState(blockpos).getValue(POWERED)).booleanValue()) {
 			List list = this.findMinecarts(world, blockpos, EntityMinecartCommandBlock.class, new Predicate[0]);
@@ -114,6 +118,7 @@ public class BlockRailDetector extends BlockRailBase {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
 		i = i | ((BlockRailBase.EnumRailDirection) iblockstate.getValue(SHAPE)).getMetadata();
@@ -124,6 +129,7 @@ public class BlockRailDetector extends BlockRailBase {
 		return i;
 	}
 
+	@Override
 	public IProperty<BlockRailBase.EnumRailDirection> getShapeProperty() {
 		return SHAPE;
 	}
@@ -131,23 +137,28 @@ public class BlockRailDetector extends BlockRailBase {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(SHAPE, BlockRailBase.EnumRailDirection.byMetadata(i & 7))
 				.withProperty(POWERED, Boolean.valueOf((i & 8) > 0));
 	}
 
+	@Override
 	public int getStrongPower(IBlockAccess var1, BlockPos var2, IBlockState iblockstate, EnumFacing enumfacing) {
 		return !((Boolean) iblockstate.getValue(POWERED)).booleanValue() ? 0 : (enumfacing == EnumFacing.UP ? 15 : 0);
 	}
 
+	@Override
 	public int getWeakPower(IBlockAccess var1, BlockPos var2, IBlockState iblockstate, EnumFacing var4) {
 		return ((Boolean) iblockstate.getValue(POWERED)).booleanValue() ? 15 : 0;
 	}
 
+	@Override
 	public boolean hasComparatorInputOverride() {
 		return true;
 	}
 
+	@Override
 	public void onBlockAdded(World world, BlockPos blockpos, IBlockState iblockstate) {
 		super.onBlockAdded(world, blockpos, iblockstate);
 		this.updatePoweredState(world, blockpos, iblockstate);
@@ -156,6 +167,7 @@ public class BlockRailDetector extends BlockRailBase {
 	/**
 	 * + Called When an Entity Collided with the Block
 	 */
+	@Override
 	public void onEntityCollidedWithBlock(World world, BlockPos blockpos, IBlockState iblockstate, Entity var4) {
 		if (!world.isRemote) {
 			if (!((Boolean) iblockstate.getValue(POWERED)).booleanValue()) {
@@ -168,12 +180,14 @@ public class BlockRailDetector extends BlockRailBase {
 	 * + Called randomly when setTickRandomly is set to true (used by e.g. crops to
 	 * grow, etc.)
 	 */
+	@Override
 	public void randomTick(World var1, BlockPos var2, IBlockState var3, EaglercraftRandom var4) {
 	}
 
 	/**
 	 * + How many world ticks before ticking
 	 */
+	@Override
 	public int tickRate(World var1) {
 		return 20;
 	}
@@ -207,6 +221,7 @@ public class BlockRailDetector extends BlockRailBase {
 		worldIn.updateComparatorOutputLevel(pos, this);
 	}
 
+	@Override
 	public void updateTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom var4) {
 		if (!world.isRemote && ((Boolean) iblockstate.getValue(POWERED)).booleanValue()) {
 			this.updatePoweredState(world, blockpos, iblockstate);

@@ -44,13 +44,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -62,7 +62,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityEnderman extends EntityMob {
 	static class AIFindPlayer extends EntityAINearestAttackableTarget {
@@ -76,6 +76,7 @@ public class EntityEnderman extends EntityMob {
 			this.enderman = parEntityEnderman;
 		}
 
+		@Override
 		public boolean continueExecuting() {
 			if (this.player != null) {
 				if (!this.enderman.shouldAttackPlayer(this.player)) {
@@ -90,6 +91,7 @@ public class EntityEnderman extends EntityMob {
 			}
 		}
 
+		@Override
 		public void resetTask() {
 			this.player = null;
 			this.enderman.setScreaming(false);
@@ -99,6 +101,7 @@ public class EntityEnderman extends EntityMob {
 			super.resetTask();
 		}
 
+		@Override
 		public boolean shouldExecute() {
 			double d0 = this.getTargetDistance();
 			List list = this.taskOwner.worldObj.getEntitiesWithinAABB(EntityPlayer.class,
@@ -112,11 +115,13 @@ public class EntityEnderman extends EntityMob {
 			}
 		}
 
+		@Override
 		public void startExecuting() {
 			this.field_179450_h = 5;
 			this.field_179451_i = 0;
 		}
 
+		@Override
 		public void updateTask() {
 			if (this.player != null) {
 				if (--this.field_179450_h <= 0) {
@@ -164,12 +169,14 @@ public class EntityEnderman extends EntityMob {
 							: (parBlock3.getMaterial() == Material.air ? false : parBlock3.isFullCube()));
 		}
 
+		@Override
 		public boolean shouldExecute() {
 			return !this.enderman.worldObj.getGameRules().getBoolean("mobGriefing") ? false
 					: (this.enderman.getHeldBlockState().getBlock().getMaterial() == Material.air ? false
 							: this.enderman.getRNG().nextInt(2000) == 0);
 		}
 
+		@Override
 		public void updateTask() {
 			EaglercraftRandom random = this.enderman.getRNG();
 			World world = this.enderman.worldObj;
@@ -194,12 +201,14 @@ public class EntityEnderman extends EntityMob {
 			this.enderman = parEntityEnderman;
 		}
 
+		@Override
 		public boolean shouldExecute() {
 			return !this.enderman.worldObj.getGameRules().getBoolean("mobGriefing") ? false
 					: (this.enderman.getHeldBlockState().getBlock().getMaterial() != Material.air ? false
 							: this.enderman.getRNG().nextInt(20) == 0);
 		}
 
+		@Override
 		public void updateTask() {
 			EaglercraftRandom random = this.enderman.getRNG();
 			World world = this.enderman.worldObj;
@@ -259,12 +268,14 @@ public class EntityEnderman extends EntityMob {
 		this.targetTasks.addTask(2, new EntityEnderman.AIFindPlayer(this));
 		this.targetTasks.addTask(3, new EntityAINearestAttackableTarget(this, EntityEndermite.class, 10, true, false,
 				new Predicate<EntityEndermite>() {
+					@Override
 					public boolean apply(EntityEndermite entityendermite) {
 						return entityendermite.isSpawnedByPlayer();
 					}
 				}));
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(40.0D);
@@ -276,6 +287,7 @@ public class EntityEnderman extends EntityMob {
 	/**
 	 * + Called when the entity is attacked.
 	 */
+	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float f) {
 		if (this.isEntityInvulnerable(damagesource)) {
 			return false;
@@ -319,6 +331,7 @@ public class EntityEnderman extends EntityMob {
 	/**
 	 * + Drop 0-2 items of this living's type
 	 */
+	@Override
 	protected void dropFewItems(boolean var1, int i) {
 		Item item = this.getDropItem();
 		if (item != null) {
@@ -331,6 +344,7 @@ public class EntityEnderman extends EntityMob {
 
 	}
 
+	@Override
 	protected void entityInit() {
 		super.entityInit();
 		this.dataWatcher.addObject(16, Short.valueOf((short) 0));
@@ -341,14 +355,17 @@ public class EntityEnderman extends EntityMob {
 	/**
 	 * + Returns the sound this mob makes on death.
 	 */
+	@Override
 	protected String getDeathSound() {
 		return "mob.endermen.death";
 	}
 
+	@Override
 	protected Item getDropItem() {
 		return Items.ender_pearl;
 	}
 
+	@Override
 	public float getEyeHeight() {
 		return 2.55F;
 	}
@@ -363,6 +380,7 @@ public class EntityEnderman extends EntityMob {
 	/**
 	 * + Returns the sound this mob makes when it is hurt.
 	 */
+	@Override
 	protected String getHurtSound() {
 		return "mob.endermen.hit";
 	}
@@ -370,6 +388,7 @@ public class EntityEnderman extends EntityMob {
 	/**
 	 * + Returns the sound this mob makes while it's alive.
 	 */
+	@Override
 	protected String getLivingSound() {
 		return this.isScreaming() ? "mob.endermen.scream" : "mob.endermen.idle";
 	}
@@ -383,6 +402,7 @@ public class EntityEnderman extends EntityMob {
 	 * required. For example, zombies and skeletons use this to react to sunlight
 	 * and start to burn.
 	 */
+	@Override
 	public void onLivingUpdate() {
 		if (this.worldObj.isRemote) {
 			for (int i = 0; i < 2; ++i) {
@@ -402,6 +422,7 @@ public class EntityEnderman extends EntityMob {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		IBlockState iblockstate;
@@ -530,6 +551,7 @@ public class EntityEnderman extends EntityMob {
 		return this.teleportTo(d1, d2, d3);
 	}
 
+	@Override
 	protected void updateAITasks() {
 		if (this.isWet()) {
 			this.attackEntityFrom(DamageSource.drown, 1.0F);
@@ -556,6 +578,7 @@ public class EntityEnderman extends EntityMob {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		IBlockState iblockstate = this.getHeldBlockState();

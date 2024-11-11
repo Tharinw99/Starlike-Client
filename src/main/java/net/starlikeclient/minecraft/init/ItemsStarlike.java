@@ -25,6 +25,7 @@ import net.starlikeclient.minecraft.blocks.BlockSmithing;
 import net.starlikeclient.minecraft.blocks.BlockSteelGrate;
 import net.starlikeclient.minecraft.items.ItemBackpack;
 import net.starlikeclient.minecraft.items.ItemChisel;
+import net.starlikeclient.minecraft.items.ItemEnderBackpack;
 
 public class ItemsStarlike {
 	private static void blockBootstrapStates() {
@@ -33,60 +34,81 @@ public class ItemsStarlike {
 
 	public static void registerBlocks() {
 		blockBootstrapStates();
-		Block.registerBlock(512, (String) "starlike:deepslate", (new BlockDeepslate()).setUnlocalizedName("deepslate"));
-		Block.registerBlock(513, (String) "starlike:cobbled_deepslate",
+		Block.registerBlock(512, "starlike:deepslate", (new BlockDeepslate()).setUnlocalizedName("deepslate"));
+		Block.registerBlock(513, "starlike:cobbled_deepslate",
 				(new Block(Material.rock)).setHardness(3.5F).setResistance(10.0F).setStepSound(Block.soundTypePiston)
 						.setUnlocalizedName("cobbled_deepslate").setCreativeTab(CreativeTabs.tabStarlike));
-		Block.registerBlock(514, (String) "starlike:steel_block",
+		Block.registerBlock(514, "starlike:steel_block",
 				(new Block(Material.iron, MapColor.ironColor)).setHardness(5.0F).setResistance(10.0F)
 						.setStepSound(Block.soundTypeMetal).setUnlocalizedName("steel_block")
 						.setCreativeTab(CreativeTabs.tabStarlike));
-		Block.registerBlock(515, (String) "starlike:steel_grate",
-				(new BlockSteelGrate()).setUnlocalizedName("steel_grate"));
-		Block.registerBlock(516, (String) "starlike:platinum_ore",
+		Block.registerBlock(515, "starlike:steel_grate", (new BlockSteelGrate()).setUnlocalizedName("steel_grate"));
+		Block.registerBlock(516, "starlike:platinum_ore",
 				(new BlockOre()).setHardness(50.0F).setResistance(250.0F).setStepSound(Block.soundTypePiston)
 						.setUnlocalizedName("platinum_ore").setCreativeTab(CreativeTabs.tabStarlike));
-		Block.registerBlock(517, (String) "starlike:platinum_block",
+		Block.registerBlock(517, "starlike:platinum_block",
 				(new Block(Material.iron, MapColor.ironColor)).setHardness(15.0F).setResistance(30.0F)
 						.setStepSound(Block.soundTypeMetal).setUnlocalizedName("platinum_block")
 						.setCreativeTab(CreativeTabs.tabStarlike));
-		Block.registerBlock(518, (String) "starlike:titanium_ore",
+		Block.registerBlock(518, "starlike:titanium_ore",
 				(new BlockOre()).setHardness(100.0F).setResistance(500.0F).setStepSound(Block.soundTypePiston)
 						.setUnlocalizedName("titanium_ore").setCreativeTab(CreativeTabs.tabStarlike));
-		Block.registerBlock(519, (String) "starlike:titanium_block",
+		Block.registerBlock(519, "starlike:titanium_block",
 				(new Block(Material.iron, MapColor.ironColor)).setHardness(25.0F).setResistance(50.0F)
 						.setStepSound(Block.soundTypeMetal).setUnlocalizedName("titanium_block")
 						.setCreativeTab(CreativeTabs.tabStarlike));
-		Block.registerBlock(520, (String) "starlike:uranium_ore",
+		Block.registerBlock(520, "starlike:uranium_ore",
 				(new BlockOre()).setHardness(5.0F).setResistance(10.0F).setStepSound(Block.soundTypePiston)
 						.setUnlocalizedName("uranium_ore").setCreativeTab(CreativeTabs.tabStarlike));
-		Block.registerBlock(521, (String) "starlike:uranium_block",
+		Block.registerBlock(521, "starlike:uranium_block",
 				(new Block(Material.iron, MapColor.greenColor)).setHardness(40.0F).setResistance(80.0F)
 						.setStepSound(Block.soundTypeMetal).setUnlocalizedName("uranium_block")
 						.setCreativeTab(CreativeTabs.tabStarlike));
-		Block.registerBlock(522, (String) "starlike:mosaic", (new BlockMosaic()).setUnlocalizedName("mosaic"));
-		Block.registerBlock(523, (String) "starlike:dragonite_block",
+		Block.registerBlock(522, "starlike:mosaic", (new BlockMosaic()).setUnlocalizedName("mosaic"));
+		Block.registerBlock(523, "starlike:dragonite_block",
 				(new Block(Material.iron, MapColor.purpleColor)).setHardness(60.0F).setResistance(120.0F)
 						.setStepSound(Block.soundTypeMetal).setUnlocalizedName("dragonite_block")
 						.setCreativeTab(CreativeTabs.tabStarlike));
-		Block.registerBlock(684, (String) "starlike:ancient_debris",
+		Block.registerBlock(684, "starlike:ancient_debris",
 				(new Block(Material.iron, MapColor.blackColor)).setHardness(30.0F).setResistance(2000.0F)
 						.setStepSound(Block.soundTypeMetal).setUnlocalizedName("ancient_debris")
 						.setCreativeTab(CreativeTabs.tabStarlike));
-		Block.registerBlock(685, (String) "starlike:netherite_block",
+		Block.registerBlock(685, "starlike:netherite_block",
 				(new Block(Material.iron, MapColor.blackColor)).setHardness(50.0F).setResistance(2000.0F)
 						.setStepSound(Block.soundTypeMetal).setUnlocalizedName("netherite_block")
 						.setCreativeTab(CreativeTabs.tabStarlike));
-		Block.registerBlock(686, (String) "starlike:smithing_table",
-				(new BlockSmithing()).setUnlocalizedName("smithing_table"));
-		/*
-		 * e.registerBlock(686, (String) "starlike:fabricator", (new
-		 * BlockFabricator()).setHardness(5.0F).setResistance(10.0F).setStepSound(Block.
-		 * soundTypePiston)
-		 * .setUnlocalizedName("fabricator").setCreativeTab(CreativeTabs.tabStarlike));
-		 */
+		Block.registerBlock(686, "starlike:smithing_table", (new BlockSmithing()).setUnlocalizedName("smithing_table"));
+		// Block.registerBlock(687, "starlike:fabricator", (new
+		// BlockFabricator()).setUnlocalizedName("fabricator"));
 
 //autogenerateequals
+		Block.registerBlock(694, "starlike:stripped_spruce_log",
+				(new Block(Material.wood, MapColor.purpleColor)).setHardness(0.5f).setResistance(5.0f)
+						.setStepSound(Block.soundTypeWood).setUnlocalizedName("stripped_spruce_log")
+						.setCreativeTab(CreativeTabs.tabStarlike));
+		Block.registerBlock(693, "starlike:stripped_oak_log",
+				(new Block(Material.wood, MapColor.purpleColor)).setHardness(0.5f).setResistance(5.0f)
+						.setStepSound(Block.soundTypeWood).setUnlocalizedName("stripped_oak_log")
+						.setCreativeTab(CreativeTabs.tabStarlike));
+		Block.registerBlock(692, "starlike:stripped_jungle_log",
+				(new Block(Material.wood, MapColor.purpleColor)).setHardness(0.5f).setResistance(5.0f)
+						.setStepSound(Block.soundTypeWood).setUnlocalizedName("stripped_jungle_log")
+						.setCreativeTab(CreativeTabs.tabStarlike));
+		Block.registerBlock(691, "starlike:stripped_dark_oak_log",
+				(new Block(Material.wood, MapColor.purpleColor)).setHardness(0.5f).setResistance(5.0f)
+						.setStepSound(Block.soundTypeWood).setUnlocalizedName("stripped_dark_oak_log")
+						.setCreativeTab(CreativeTabs.tabStarlike));
+		Block.registerBlock(690, "starlike:stripped_birch_log",
+				(new Block(Material.wood, MapColor.purpleColor)).setHardness(0.5f).setResistance(5.0f)
+						.setStepSound(Block.soundTypeWood).setUnlocalizedName("stripped_birch_log")
+						.setCreativeTab(CreativeTabs.tabStarlike));
+		Block.registerBlock(689, "starlike:stripped_acacia_log",
+				(new Block(Material.wood, MapColor.purpleColor)).setHardness(0.5f).setResistance(5.0f)
+						.setStepSound(Block.soundTypeWood).setUnlocalizedName("stripped_acacia_log")
+						.setCreativeTab(CreativeTabs.tabStarlike));
+		Block.registerBlock(688, (String) "starlike:dirt_path",
+				(new Block(Material.ground, MapColor.dirtColor)).setHardness(0.5F).setStepSound(Block.soundTypeGravel)
+						.setUnlocalizedName("dirt_path").setCreativeTab(CreativeTabs.tabStarlike));
 		Block.registerBlock(683, "starlike:tuff_tiles",
 				(new Block(Material.rock, MapColor.purpleColor)).setHardness(1.5f).setResistance(10.0f)
 						.setStepSound(Block.soundTypePiston).setUnlocalizedName("tuff_tiles")
@@ -730,86 +752,104 @@ public class ItemsStarlike {
 		Item.registerItemBlock(Blocks.uranium_block);
 		Item.registerItemBlock(Blocks.mosaic,
 				(new ItemMultiTexture(Blocks.mosaic, Blocks.mosaic, new Function<ItemStack, String>() {
+					@Override
 					public String apply(ItemStack itemstack) {
 						return BlockMosaic.EnumType.byMetadata(itemstack.getMetadata()).getUnlocalizedName();
 					}
 				})).setUnlocalizedName("mosaic"));
 		Item.registerItemBlock(Blocks.dragonite_block);
-		Item.registerItemBlock(Blocks.ancient_debris);
-		Item.registerItemBlock(Blocks.netherite_block);
+		Item.registerItemBlock(Blocks.ancient_debris).setIsImmuneToFire(true);
+		Item.registerItemBlock(Blocks.netherite_block).setIsImmuneToFire(true);
 		Item.registerItemBlock(Blocks.smithing_table);
 		// Item.registerItemBlock(Blocks.fabricator);
 
-		Item.registerItem(1024, (String) "starlike:steel",
+		Item.registerItem(1024, "starlike:steel",
 				(new Item()).setUnlocalizedName("steel").setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1025, (String) "starlike:platinum_ingot",
+		Item.registerItem(1025, "starlike:platinum_ingot",
 				(new Item()).setUnlocalizedName("platinum_ingot").setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1026, (String) "starlike:platinum_sword", (new ItemSword(Item.ToolMaterial.PLATINUM))
+		Item.registerItem(1026, "starlike:platinum_sword", (new ItemSword(Item.ToolMaterial.PLATINUM))
 				.setUnlocalizedName("platinum_sword").setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1027, (String) "starlike:platinum_pickaxe", (new ItemPickaxe(Item.ToolMaterial.PLATINUM))
+		Item.registerItem(1027, "starlike:platinum_pickaxe", (new ItemPickaxe(Item.ToolMaterial.PLATINUM))
 				.setUnlocalizedName("platinum_pickaxe").setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1028, (String) "starlike:platinum_shovel", (new ItemSpade(Item.ToolMaterial.PLATINUM))
+		Item.registerItem(1028, "starlike:platinum_shovel", (new ItemSpade(Item.ToolMaterial.PLATINUM))
 				.setUnlocalizedName("platinum_shovel").setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1029, (String) "starlike:platinum_axe", (new ItemAxe(Item.ToolMaterial.PLATINUM))
+		Item.registerItem(1029, "starlike:platinum_axe", (new ItemAxe(Item.ToolMaterial.PLATINUM))
 				.setUnlocalizedName("platinum_axe").setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1030, (String) "starlike:platinum_hoe", (new ItemHoe(Item.ToolMaterial.PLATINUM))
+		Item.registerItem(1030, "starlike:platinum_hoe", (new ItemHoe(Item.ToolMaterial.PLATINUM))
 				.setUnlocalizedName("platinum_hoe").setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1031, (String) "starlike:platinum_helmet",
-				(new ItemArmor(ItemArmor.ArmorMaterial.PLATINUM, 6, 0)).setUnlocalizedName("platinum_helmet")
-						.setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1032, (String) "starlike:platinum_chestplate",
-				(new ItemArmor(ItemArmor.ArmorMaterial.PLATINUM, 6, 1)).setUnlocalizedName("platinum_chestplate")
-						.setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1033, (String) "starlike:platinum_leggings",
-				(new ItemArmor(ItemArmor.ArmorMaterial.PLATINUM, 6, 2)).setUnlocalizedName("platinum_leggings")
-						.setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1034, (String) "starlike:platinum_boots",
-				(new ItemArmor(ItemArmor.ArmorMaterial.PLATINUM, 6, 3)).setUnlocalizedName("platinum_boots")
-						.setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1035, (String) "starlike:titanium_ingot",
+		Item.registerItem(1031, "starlike:platinum_helmet", (new ItemArmor(ItemArmor.ArmorMaterial.PLATINUM, 6, 0))
+				.setUnlocalizedName("platinum_helmet").setCreativeTab(CreativeTabs.tabStarlike));
+		Item.registerItem(1032, "starlike:platinum_chestplate", (new ItemArmor(ItemArmor.ArmorMaterial.PLATINUM, 6, 1))
+				.setUnlocalizedName("platinum_chestplate").setCreativeTab(CreativeTabs.tabStarlike));
+		Item.registerItem(1033, "starlike:platinum_leggings", (new ItemArmor(ItemArmor.ArmorMaterial.PLATINUM, 6, 2))
+				.setUnlocalizedName("platinum_leggings").setCreativeTab(CreativeTabs.tabStarlike));
+		Item.registerItem(1034, "starlike:platinum_boots", (new ItemArmor(ItemArmor.ArmorMaterial.PLATINUM, 6, 3))
+				.setUnlocalizedName("platinum_boots").setCreativeTab(CreativeTabs.tabStarlike));
+		Item.registerItem(1035, "starlike:titanium_ingot",
 				(new Item()).setUnlocalizedName("titanium_ingot").setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1036, (String) "starlike:uranium_crystal",
+		Item.registerItem(1036, "starlike:uranium_crystal",
 				(new Item()).setUnlocalizedName("uranium_crystal").setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1037, (String) "starlike:uranium_rod",
+		Item.registerItem(1037, "starlike:uranium_rod",
 				(new Item()).setUnlocalizedName("uranium_rod").setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1038, (String) "starlike:platinum_drill", (new ItemPickaxe(Item.ToolMaterial.PLATINUM_DRILL))
+		Item.registerItem(1038, "starlike:platinum_drill", (new ItemPickaxe(Item.ToolMaterial.PLATINUM_DRILL))
 				.setUnlocalizedName("platinum_drill").setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1039, (String) "starlike:titanium_drill", (new ItemPickaxe(Item.ToolMaterial.TITANIUM_DRILL))
+		Item.registerItem(1039, "starlike:titanium_drill", (new ItemPickaxe(Item.ToolMaterial.TITANIUM_DRILL))
 				.setUnlocalizedName("titanium_drill").setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1040, (String) "starlike:dragonite",
+		Item.registerItem(1040, "starlike:dragonite",
 				(new Item()).setUnlocalizedName("dragonite").setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1041, (String) "starlike:copper_ingot",
+		Item.registerItem(1041, "starlike:copper_ingot",
 				(new Item()).setUnlocalizedName("copper_ingot").setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1042, (String) "starlike:netherite_scrap",
-				(new Item()).setUnlocalizedName("netherite_scrap").setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1043, (String) "starlike:netherite_ingot",
-				(new Item()).setUnlocalizedName("netherite_ingot").setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1044, (String) "starlike:netherite_sword", (new ItemSword(Item.ToolMaterial.NETHERITE))
-				.setUnlocalizedName("netherite_sword").setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1045, (String) "starlike:netherite_shovel", (new ItemSpade(Item.ToolMaterial.NETHERITE))
-				.setUnlocalizedName("netherite_shovel").setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1046, (String) "starlike:netherite_pickaxe", (new ItemPickaxe(Item.ToolMaterial.NETHERITE))
-				.setUnlocalizedName("netherite_pickaxe").setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1047, (String) "starlike:netherite_axe", (new ItemAxe(Item.ToolMaterial.NETHERITE))
-				.setUnlocalizedName("netherite_axe").setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1048, (String) "starlike:netherite_hoe", (new ItemHoe(Item.ToolMaterial.NETHERITE))
-				.setUnlocalizedName("netherite_hoe").setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1049, (String) "starlike:netherite_helmet",
+		Item.registerItem(1042, "starlike:netherite_scrap", (new Item()).setUnlocalizedName("netherite_scrap")
+				.setCreativeTab(CreativeTabs.tabStarlike).setIsImmuneToFire(true));
+		Item.registerItem(1043, "starlike:netherite_ingot", (new Item()).setUnlocalizedName("netherite_ingot")
+				.setCreativeTab(CreativeTabs.tabStarlike).setIsImmuneToFire(true));
+		Item.registerItem(1044, "starlike:netherite_sword",
+				(new ItemSword(Item.ToolMaterial.NETHERITE)).setUnlocalizedName("netherite_sword")
+						.setCreativeTab(CreativeTabs.tabStarlike).setIsImmuneToFire(true));
+		Item.registerItem(1045, "starlike:netherite_shovel",
+				(new ItemSpade(Item.ToolMaterial.NETHERITE)).setUnlocalizedName("netherite_shovel")
+						.setCreativeTab(CreativeTabs.tabStarlike).setIsImmuneToFire(true));
+		Item.registerItem(1046, "starlike:netherite_pickaxe",
+				(new ItemPickaxe(Item.ToolMaterial.NETHERITE)).setUnlocalizedName("netherite_pickaxe")
+						.setCreativeTab(CreativeTabs.tabStarlike).setIsImmuneToFire(true));
+		Item.registerItem(1047, "starlike:netherite_axe", (new ItemAxe(Item.ToolMaterial.NETHERITE))
+				.setUnlocalizedName("netherite_axe").setCreativeTab(CreativeTabs.tabStarlike).setIsImmuneToFire(true));
+		Item.registerItem(1048, "starlike:netherite_hoe", (new ItemHoe(Item.ToolMaterial.NETHERITE))
+				.setUnlocalizedName("netherite_hoe").setCreativeTab(CreativeTabs.tabStarlike).setIsImmuneToFire(true));
+		Item.registerItem(1049, "starlike:netherite_helmet",
 				(new ItemArmor(ItemArmor.ArmorMaterial.NETHERITE, 5, 0)).setUnlocalizedName("netherite_helmet")
-						.setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1050, (String) "starlike:netherite_chestplate",
+						.setCreativeTab(CreativeTabs.tabStarlike).setIsImmuneToFire(true));
+		Item.registerItem(1050, "starlike:netherite_chestplate",
 				(new ItemArmor(ItemArmor.ArmorMaterial.NETHERITE, 5, 1)).setUnlocalizedName("netherite_chestplate")
-						.setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1051, (String) "starlike:netherite_leggings",
+						.setCreativeTab(CreativeTabs.tabStarlike).setIsImmuneToFire(true));
+		Item.registerItem(1051, "starlike:netherite_leggings",
 				(new ItemArmor(ItemArmor.ArmorMaterial.NETHERITE, 5, 2)).setUnlocalizedName("netherite_leggings")
-						.setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1052, (String) "starlike:netherite_boots",
+						.setCreativeTab(CreativeTabs.tabStarlike).setIsImmuneToFire(true));
+		Item.registerItem(1052, "starlike:netherite_boots",
 				(new ItemArmor(ItemArmor.ArmorMaterial.NETHERITE, 5, 3)).setUnlocalizedName("netherite_boots")
-						.setCreativeTab(CreativeTabs.tabStarlike));
-		Item.registerItem(1053, (String) "starlike:chisel", (new ItemChisel()).setUnlocalizedName("chisel"));
-		Item.registerItem(1054, (String) "starlike:leather_backpack", (new ItemBackpack()).setUnlocalizedName("leather_backpack"));
+						.setCreativeTab(CreativeTabs.tabStarlike).setIsImmuneToFire(true));
+		Item.registerItem(1053, "starlike:chisel", (new ItemChisel()).setUnlocalizedName("chisel"));
+		// Item.registerItem(1054, "starlike:amber", (new
+		// Item()).setUnlocalizedName("amber").setCreativeTab(CreativeTabs.tabStarlike));
+		// Item.registerItem(1055, "starlike:ambered_bow", (new ItemBow(1.5,
+		// 576)).setUnlocalizedName("ambered_bow"));
+		// Reserve 1060-1069 for backpacks
+		Item.registerItem(1060, "starlike:leather_backpack",
+				(new ItemBackpack(1)).setUnlocalizedName("leather_backpack"));
+		Item.registerItem(1061, "starlike:iron_backpack", (new ItemBackpack(2)).setUnlocalizedName("iron_backpack"));
+		Item.registerItem(1062, "starlike:diamond_backpack",
+				(new ItemBackpack(3)).setUnlocalizedName("diamond_backpack"));
+		Item.registerItem(1069, "starlike:ender_backpack",
+				(new ItemEnderBackpack()).setUnlocalizedName("ender_backpack"));
 
 //autogenerateregisterblock
+		Item.registerItemBlock(Blocks.stripped_spruce_log);
+		Item.registerItemBlock(Blocks.stripped_oak_log);
+		Item.registerItemBlock(Blocks.stripped_jungle_log);
+		Item.registerItemBlock(Blocks.stripped_dark_oak_log);
+		Item.registerItemBlock(Blocks.stripped_birch_log);
+		Item.registerItemBlock(Blocks.stripped_acacia_log);
+		Item.registerItemBlock(Blocks.dirt_path);
 		Item.registerItemBlock(Blocks.tuff_tiles);
 		Item.registerItemBlock(Blocks.soul_stone_tiles);
 		Item.registerItemBlock(Blocks.soul_stone);
@@ -968,7 +1008,7 @@ public class ItemsStarlike {
 		Item.registerItemBlock(Blocks.decorated_acacia_log);
 		Item.registerItemBlock(Blocks.chiseled_deep_ocean_bricks);
 		Item.registerItemBlock(Blocks.andesite_bricks);
-		
+
 	}
 
 	public static void renderItems(RenderItem e) {
@@ -1024,9 +1064,21 @@ public class ItemsStarlike {
 		e.registerItem(Items.netherite_leggings, "starlike:netherite_leggings");
 		e.registerItem(Items.netherite_boots, "starlike:netherite_boots");
 		e.registerItem(Items.chisel, "starlike:chisel");
-		//e.registerItem(Items.leather_backpack, "starlike:leather_backpack");
+		// e.registerItem(Items.amber, "starlike:amber");
+		// e.registerItem(Items.ambered_bow, "starlike:ambered_bow");
+		e.registerItem(Items.leather_backpack, "starlike:leather_backpack");
+		e.registerItem(Items.iron_backpack, "starlike:iron_backpack");
+		e.registerItem(Items.diamond_backpack, "starlike:diamond_backpack");
+		e.registerItem(Items.ender_backpack, "starlike:ender_backpack");
 
 //autogeneraterenderitem
+		e.registerBlock(Blocks.stripped_spruce_log, "starlike:stripped_spruce_log");
+		e.registerBlock(Blocks.stripped_oak_log, "starlike:stripped_oak_log");
+		e.registerBlock(Blocks.stripped_jungle_log, "starlike:stripped_jungle_log");
+		e.registerBlock(Blocks.stripped_dark_oak_log, "starlike:stripped_dark_oak_log");
+		e.registerBlock(Blocks.stripped_birch_log, "starlike:stripped_birch_log");
+		e.registerBlock(Blocks.stripped_acacia_log, "starlike:stripped_acacia_log");
+		e.registerBlock(Blocks.dirt_path, "starlike:dirt_path");
 		e.registerBlock(Blocks.tuff_tiles, "starlike:tuff_tiles");
 		e.registerBlock(Blocks.soul_stone_tiles, "starlike:soul_stone_tiles");
 		e.registerBlock(Blocks.soul_stone, "starlike:soul_stone");

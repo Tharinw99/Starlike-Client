@@ -20,13 +20,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,39 +38,45 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockSilverfish extends Block {
 	public static enum EnumType implements IStringSerializable {
 		STONE(0, "stone") {
+			@Override
 			public IBlockState getModelBlock() {
 				return Blocks.stone.getDefaultState().withProperty(BlockStone.VARIANT, BlockStone.EnumType.STONE);
 			}
 		},
 		COBBLESTONE(1, "cobblestone", "cobble") {
+			@Override
 			public IBlockState getModelBlock() {
 				return Blocks.cobblestone.getDefaultState();
 			}
 		},
 		STONEBRICK(2, "stone_brick", "brick") {
+			@Override
 			public IBlockState getModelBlock() {
 				return Blocks.stonebrick.getDefaultState().withProperty(BlockStoneBrick.VARIANT,
 						BlockStoneBrick.EnumType.DEFAULT);
 			}
 		},
 		MOSSY_STONEBRICK(3, "mossy_brick", "mossybrick") {
+			@Override
 			public IBlockState getModelBlock() {
 				return Blocks.stonebrick.getDefaultState().withProperty(BlockStoneBrick.VARIANT,
 						BlockStoneBrick.EnumType.MOSSY);
 			}
 		},
 		CRACKED_STONEBRICK(4, "cracked_brick", "crackedbrick") {
+			@Override
 			public IBlockState getModelBlock() {
 				return Blocks.stonebrick.getDefaultState().withProperty(BlockStoneBrick.VARIANT,
 						BlockStoneBrick.EnumType.CRACKED);
 			}
 		},
 		CHISELED_STONEBRICK(5, "chiseled_brick", "chiseledbrick") {
+			@Override
 			public IBlockState getModelBlock() {
 				return Blocks.stonebrick.getDefaultState().withProperty(BlockStoneBrick.VARIANT,
 						BlockStoneBrick.EnumType.CHISELED);
@@ -128,6 +134,7 @@ public class BlockSilverfish extends Block {
 
 		public abstract IBlockState getModelBlock();
 
+		@Override
 		public String getName() {
 			return this.name;
 		}
@@ -136,6 +143,7 @@ public class BlockSilverfish extends Block {
 			return this.unlocalizedName;
 		}
 
+		@Override
 		public String toString() {
 			return this.name;
 		}
@@ -160,10 +168,12 @@ public class BlockSilverfish extends Block {
 		this.setCreativeTab(CreativeTabs.tabDecorations);
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { VARIANT });
 	}
 
+	@Override
 	protected ItemStack createStackedBlock(IBlockState iblockstate) {
 		switch ((BlockSilverfish.EnumType) iblockstate.getValue(VARIANT)) {
 		case COBBLESTONE:
@@ -184,6 +194,7 @@ public class BlockSilverfish extends Block {
 	/**
 	 * + Spawns this Block's drops into the World as EntityItems.
 	 */
+	@Override
 	public void dropBlockAsItemWithChance(World world, BlockPos blockpos, IBlockState var3, float var4, int var5) {
 		if (!world.isRemote && world.getGameRules().getBoolean("doTileDrops")) {
 			EntitySilverfish entitysilverfish = new EntitySilverfish(world);
@@ -195,6 +206,7 @@ public class BlockSilverfish extends Block {
 
 	}
 
+	@Override
 	public int getDamageValue(World world, BlockPos blockpos) {
 		IBlockState iblockstate = world.getBlockState(blockpos);
 		return iblockstate.getBlock().getMetaFromState(iblockstate);
@@ -203,6 +215,7 @@ public class BlockSilverfish extends Block {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		return ((BlockSilverfish.EnumType) iblockstate.getValue(VARIANT)).getMetadata();
 	}
@@ -210,6 +223,7 @@ public class BlockSilverfish extends Block {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(VARIANT, BlockSilverfish.EnumType.byMetadata(i));
 	}
@@ -218,6 +232,7 @@ public class BlockSilverfish extends Block {
 	 * + returns a list of blocks with the same ID, but different meta (eg: wood
 	 * returns 4 blocks)
 	 */
+	@Override
 	public void getSubBlocks(Item item, CreativeTabs var2, List<ItemStack> list) {
 		BlockSilverfish.EnumType[] types = BlockSilverfish.EnumType.META_LOOKUP;
 		for (int i = 0; i < types.length; ++i) {
@@ -229,6 +244,7 @@ public class BlockSilverfish extends Block {
 	/**
 	 * + Returns the quantity of items to drop on block destruction.
 	 */
+	@Override
 	public int quantityDropped(EaglercraftRandom var1) {
 		return 0;
 	}

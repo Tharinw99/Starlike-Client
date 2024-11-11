@@ -1,5 +1,5 @@
 {
-    "variants": {
-        "normal": { "model": "starlike:cobbled_deepslate" }
-    }
+  "variants": {
+    "normal": { "model": "starlike:cobbled_deepslate" }
+  }
 }

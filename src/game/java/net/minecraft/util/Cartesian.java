@@ -16,13 +16,13 @@ import com.google.common.collect.UnmodifiableIterator;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -34,13 +34,14 @@ import com.google.common.collect.UnmodifiableIterator;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class Cartesian {
 	static class GetList<T> implements Function<Object[], List<T>> {
 		private GetList() {
 		}
 
+		@Override
 		public List<T> apply(Object[] aobject) {
 			return (List<T>) Arrays.asList((Object[]) aobject);
 		}
@@ -71,6 +72,7 @@ public class Cartesian {
 				Arrays.fill(this.results, (Object) null);
 			}
 
+			@Override
 			public boolean hasNext() {
 				if (this.index == -2) {
 					this.index = 0;
@@ -109,6 +111,7 @@ public class Cartesian {
 				}
 			}
 
+			@Override
 			public T[] next() {
 				if (!this.hasNext()) {
 					throw new NoSuchElementException();
@@ -132,6 +135,7 @@ public class Cartesian {
 			this.iterables = iterables;
 		}
 
+		@Override
 		public Iterator<T[]> iterator() {
 			return (Iterator<T[]>) (this.iterables.length <= 0
 					? Collections.singletonList((T[]) Cartesian.createArray(this.clazz, 0)).iterator()

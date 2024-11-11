@@ -29,6 +29,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.event.ClickEvent;
+import net.minecraft.event.HoverEvent;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.Packet;
@@ -59,6 +61,7 @@ import net.minecraft.stats.StatisticsFile;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.MathHelper;
@@ -74,13 +77,13 @@ import net.minecraft.world.storage.WorldInfo;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -92,7 +95,7 @@ import net.minecraft.world.storage.WorldInfo;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class ServerConfigurationManager {
 	private static final Logger logger = LogManager.getLogger();
@@ -380,6 +383,18 @@ public abstract class ServerConfigurationManager {
 			shaderF4Msg.appendSibling(shaderF4Msg2);
 			playerIn.addChatMessage(shaderF4Msg);
 		}
+
+		playerIn.addChatMessage(
+				new ChatComponentText("[Starlike Client] ")
+						.setChatStyle(new ChatStyle().setColor(EnumChatFormatting.GOLD))
+						.appendSibling(new ChatComponentTranslation("starlike.welcomeMsg").setChatStyle(new ChatStyle()
+								.setColor(EnumChatFormatting.AQUA)
+								.setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL,
+										"https://github.com/zumbiepig/Starlike/wiki"))
+								.setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+										new ChatComponentTranslation("starlike.welcomeMsgHover")
+												.setChatStyle(new ChatStyle().setColor(EnumChatFormatting.GOLD)))))));
+
 		this.playerLoggedIn(playerIn);
 		nethandlerplayserver.setPlayerLocation(playerIn.posX, playerIn.posY, playerIn.posZ, playerIn.rotationYaw,
 				playerIn.rotationPitch);
@@ -745,32 +760,39 @@ public abstract class ServerConfigurationManager {
 	public void setPlayerManager(WorldServer[] worldServers) {
 		this.playerNBTManagerObj = worldServers[0].getSaveHandler().getPlayerNBTManager();
 		worldServers[0].getWorldBorder().addListener(new IBorderListener() {
+			@Override
 			public void onCenterChanged(WorldBorder worldborder, double var2, double var4) {
 				ServerConfigurationManager.this.sendPacketToAllPlayers(
 						new S44PacketWorldBorder(worldborder, S44PacketWorldBorder.Action.SET_CENTER));
 			}
 
+			@Override
 			public void onDamageAmountChanged(WorldBorder var1, double var2) {
 			}
 
+			@Override
 			public void onDamageBufferChanged(WorldBorder var1, double var2) {
 			}
 
+			@Override
 			public void onSizeChanged(WorldBorder worldborder, double var2) {
 				ServerConfigurationManager.this.sendPacketToAllPlayers(
 						new S44PacketWorldBorder(worldborder, S44PacketWorldBorder.Action.SET_SIZE));
 			}
 
+			@Override
 			public void onTransitionStarted(WorldBorder worldborder, double var2, double var4, long var6) {
 				ServerConfigurationManager.this.sendPacketToAllPlayers(
 						new S44PacketWorldBorder(worldborder, S44PacketWorldBorder.Action.LERP_SIZE));
 			}
 
+			@Override
 			public void onWarningDistanceChanged(WorldBorder worldborder, int var2) {
 				ServerConfigurationManager.this.sendPacketToAllPlayers(
 						new S44PacketWorldBorder(worldborder, S44PacketWorldBorder.Action.SET_WARNING_BLOCKS));
 			}
 
+			@Override
 			public void onWarningTimeChanged(WorldBorder worldborder, int var2) {
 				ServerConfigurationManager.this.sendPacketToAllPlayers(
 						new S44PacketWorldBorder(worldborder, S44PacketWorldBorder.Action.SET_WARNING_TIME));

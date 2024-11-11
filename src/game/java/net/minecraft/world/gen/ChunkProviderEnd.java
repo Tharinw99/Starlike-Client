@@ -20,13 +20,13 @@ import net.minecraft.world.chunk.IChunkProvider;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,7 +38,7 @@ import net.minecraft.world.chunk.IChunkProvider;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ChunkProviderEnd implements IChunkProvider {
 	private EaglercraftRandom endRNG;
@@ -69,6 +69,7 @@ public class ChunkProviderEnd implements IChunkProvider {
 	/**
 	 * + Returns if the IChunkProvider supports saving.
 	 */
+	@Override
 	public boolean canSave() {
 		return true;
 	}
@@ -76,10 +77,12 @@ public class ChunkProviderEnd implements IChunkProvider {
 	/**
 	 * + Checks to see if a chunk exists at x, z
 	 */
+	@Override
 	public boolean chunkExists(int var1, int var2) {
 		return true;
 	}
 
+	@Override
 	public boolean func_177460_a(IChunkProvider var1, Chunk var2, int var3, int var4) {
 		return false;
 	}
@@ -180,15 +183,18 @@ public class ChunkProviderEnd implements IChunkProvider {
 
 	}
 
+	@Override
 	public int getLoadedChunkCount() {
 		return 0;
 	}
 
+	@Override
 	public List<BiomeGenBase.SpawnListEntry> getPossibleCreatures(EnumCreatureType enumcreaturetype,
 			BlockPos blockpos) {
 		return this.endWorld.getBiomeGenForCoords(blockpos).getSpawnableList(enumcreaturetype);
 	}
 
+	@Override
 	public BlockPos getStrongholdGen(World var1, String var2, BlockPos var3) {
 		return null;
 	}
@@ -271,6 +277,7 @@ public class ChunkProviderEnd implements IChunkProvider {
 	/**
 	 * + Converts the instance data to a readable string.
 	 */
+	@Override
 	public String makeString() {
 		return "RandomLevelSource";
 	}
@@ -278,6 +285,7 @@ public class ChunkProviderEnd implements IChunkProvider {
 	/**
 	 * + Populates chunk with ores etc etc
 	 */
+	@Override
 	public void populate(IChunkProvider var1, int i, int j) {
 		BlockFalling.fallInstantly = true;
 		BlockPos blockpos = new BlockPos(i * 16, 0, j * 16);
@@ -291,6 +299,7 @@ public class ChunkProviderEnd implements IChunkProvider {
 	 * will generates all the blocks for the specified chunk from the map seed and
 	 * chunk seed
 	 */
+	@Override
 	public Chunk provideChunk(BlockPos blockpos) {
 		return this.provideChunk(blockpos.getX() >> 4, blockpos.getZ() >> 4);
 	}
@@ -300,6 +309,7 @@ public class ChunkProviderEnd implements IChunkProvider {
 	 * will generates all the blocks for the specified chunk from the map seed and
 	 * chunk seed
 	 */
+	@Override
 	public Chunk provideChunk(int i, int j) {
 		this.endRNG.setSeed((long) i * 341873128712L + (long) j * 132897987541L);
 		ChunkPrimer chunkprimer = new ChunkPrimer();
@@ -318,6 +328,7 @@ public class ChunkProviderEnd implements IChunkProvider {
 		return chunk;
 	}
 
+	@Override
 	public void recreateStructures(Chunk var1, int var2, int var3) {
 	}
 
@@ -326,6 +337,7 @@ public class ChunkProviderEnd implements IChunkProvider {
 	 * passed false, save up to two chunks. Return true if all chunks have been
 	 * saved.
 	 */
+	@Override
 	public boolean saveChunks(boolean var1, IProgressUpdate var2) {
 		return true;
 	}
@@ -334,6 +346,7 @@ public class ChunkProviderEnd implements IChunkProvider {
 	 * + Save extra data not associated with any Chunk. Not saved during autosave,
 	 * only during world unload. Currently unimplemented.
 	 */
+	@Override
 	public void saveExtraData() {
 	}
 
@@ -341,6 +354,7 @@ public class ChunkProviderEnd implements IChunkProvider {
 	 * + Unloads chunks that are marked to be unloaded. This is not guaranteed to
 	 * unload every such chunk.
 	 */
+	@Override
 	public boolean unloadQueuedChunks() {
 		return false;
 	}

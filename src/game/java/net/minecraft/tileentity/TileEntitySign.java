@@ -25,13 +25,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -43,7 +43,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class TileEntitySign extends TileEntity {
 	public final IChatComponent[] signText = new IChatComponent[] { new ChatComponentText(""),
@@ -65,42 +65,52 @@ public class TileEntitySign extends TileEntity {
 
 	public boolean executeCommand(final EntityPlayer playerIn) {
 		ICommandSender icommandsender = new ICommandSender() {
+			@Override
 			public void addChatMessage(IChatComponent var1) {
 			}
 
+			@Override
 			public boolean canCommandSenderUseCommand(int j, String var2) {
 				return j <= 2;
 			}
 
+			@Override
 			public Entity getCommandSenderEntity() {
 				return playerIn;
 			}
 
+			@Override
 			public IChatComponent getDisplayName() {
 				return playerIn.getDisplayName();
 			}
 
+			@Override
 			public World getEntityWorld() {
 				return playerIn.getEntityWorld();
 			}
 
+			@Override
 			public String getName() {
 				return playerIn.getName();
 			}
 
+			@Override
 			public BlockPos getPosition() {
 				return TileEntitySign.this.pos;
 			}
 
+			@Override
 			public Vec3 getPositionVector() {
 				return new Vec3((double) TileEntitySign.this.pos.getX() + 0.5D,
 						(double) TileEntitySign.this.pos.getY() + 0.5D, (double) TileEntitySign.this.pos.getZ() + 0.5D);
 			}
 
+			@Override
 			public boolean sendCommandFeedback() {
 				return false;
 			}
 
+			@Override
 			public void setCommandStat(CommandResultStats.Type commandresultstats$type, int j) {
 				TileEntitySign.this.stats.func_179672_a(this, commandresultstats$type, j);
 			}
@@ -120,6 +130,7 @@ public class TileEntitySign extends TileEntity {
 		return true;
 	}
 
+	@Override
 	public boolean func_183000_F() {
 		return true;
 	}
@@ -129,6 +140,7 @@ public class TileEntitySign extends TileEntity {
 	 * used to sync tile entity data from the server to the client easily. For
 	 * example this is used by signs to synchronise the text to be displayed.
 	 */
+	@Override
 	public Packet getDescriptionPacket() {
 		IChatComponent[] aichatcomponent = new IChatComponent[4];
 		System.arraycopy(this.signText, 0, aichatcomponent, 0, 4);
@@ -162,46 +174,57 @@ public class TileEntitySign extends TileEntity {
 		return this.stats;
 	}
 
+	@Override
 	public void readFromNBT(NBTTagCompound nbttagcompound) {
 		this.isEditable = false;
 		super.readFromNBT(nbttagcompound);
 		ICommandSender icommandsender = new ICommandSender() {
+			@Override
 			public void addChatMessage(IChatComponent var1) {
 			}
 
+			@Override
 			public boolean canCommandSenderUseCommand(int var1, String var2) {
 				return true;
 			}
 
+			@Override
 			public Entity getCommandSenderEntity() {
 				return null;
 			}
 
+			@Override
 			public IChatComponent getDisplayName() {
 				return new ChatComponentText(this.getName());
 			}
 
+			@Override
 			public World getEntityWorld() {
 				return TileEntitySign.this.worldObj;
 			}
 
+			@Override
 			public String getName() {
 				return "Sign";
 			}
 
+			@Override
 			public BlockPos getPosition() {
 				return TileEntitySign.this.pos;
 			}
 
+			@Override
 			public Vec3 getPositionVector() {
 				return new Vec3((double) TileEntitySign.this.pos.getX() + 0.5D,
 						(double) TileEntitySign.this.pos.getY() + 0.5D, (double) TileEntitySign.this.pos.getZ() + 0.5D);
 			}
 
+			@Override
 			public boolean sendCommandFeedback() {
 				return false;
 			}
 
+			@Override
 			public void setCommandStat(CommandResultStats.Type var1, int var2) {
 			}
 		};
@@ -241,6 +264,7 @@ public class TileEntitySign extends TileEntity {
 		this.player = playerIn;
 	}
 
+	@Override
 	public void writeToNBT(NBTTagCompound nbttagcompound) {
 		super.writeToNBT(nbttagcompound);
 

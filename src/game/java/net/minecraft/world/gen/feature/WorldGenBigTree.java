@@ -18,13 +18,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -36,15 +36,16 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class WorldGenBigTree extends WorldGenAbstractTree {
-	static class FoliageCoordinates extends BlockPos {
+	static class FoliageCoordinates {
 		private final int field_178000_b;
+		private final BlockPos blockPos;
 
 		public FoliageCoordinates(BlockPos parBlockPos, int parInt1) {
-			super(parBlockPos.getX(), parBlockPos.getY(), parBlockPos.getZ());
 			this.field_178000_b = parInt1;
+			this.blockPos = parBlockPos;
 		}
 
 		public int func_177999_q() {
@@ -97,6 +98,7 @@ public class WorldGenBigTree extends WorldGenAbstractTree {
 		}
 	}
 
+	@Override
 	public void func_175904_e() {
 		this.leafDistanceLimit = 5;
 	}
@@ -152,6 +154,7 @@ public class WorldGenBigTree extends WorldGenAbstractTree {
 
 	}
 
+	@Override
 	public boolean generate(World worldIn, EaglercraftRandom rand, BlockPos position) {
 		this.world = worldIn;
 		this.basePos = position;
@@ -191,9 +194,9 @@ public class WorldGenBigTree extends WorldGenAbstractTree {
 			WorldGenBigTree.FoliageCoordinates worldgenbigtree$foliagecoordinates = this.field_175948_j.get(j);
 			int i = worldgenbigtree$foliagecoordinates.func_177999_q();
 			BlockPos blockpos = new BlockPos(this.basePos.getX(), i, this.basePos.getZ());
-			if (!blockpos.equals(worldgenbigtree$foliagecoordinates)
+			if (!blockpos.equals(worldgenbigtree$foliagecoordinates.blockPos)
 					&& this.leafNodeNeedsBase(i - this.basePos.getY())) {
-				this.func_175937_a(blockpos, worldgenbigtree$foliagecoordinates, Blocks.log);
+				this.func_175937_a(blockpos, worldgenbigtree$foliagecoordinates.blockPos, Blocks.log);
 			}
 		}
 
@@ -251,7 +254,7 @@ public class WorldGenBigTree extends WorldGenAbstractTree {
 	 */
 	void generateLeaves() {
 		for (int i = 0, l = this.field_175948_j.size(); i < l; ++i) {
-			this.generateLeafNode(this.field_175948_j.get(i));
+			this.generateLeafNode(this.field_175948_j.get(i).blockPos);
 		}
 
 	}

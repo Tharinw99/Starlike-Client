@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "normal": {
-            "model": "starlike:cobbled_granite"
-        }
+  "variants": {
+    "normal": {
+      "model": "starlike:cobbled_granite"
     }
+  }
 }

@@ -105,7 +105,7 @@ public interface MapDifference<K, V> {
 
 	/**
 	 * Returns the hash code for this instance. This is defined as the hash code of
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *

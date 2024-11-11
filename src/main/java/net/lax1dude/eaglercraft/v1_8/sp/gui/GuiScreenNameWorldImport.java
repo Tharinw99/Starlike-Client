@@ -13,7 +13,7 @@ import net.minecraft.client.resources.I18n;
 
 /**
  * Copyright (c) 2022-2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -25,7 +25,7 @@ import net.minecraft.client.resources.I18n;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiScreenNameWorldImport extends GuiScreen {
 	private GuiScreen parentGuiScreen;
@@ -55,6 +55,7 @@ public class GuiScreenNameWorldImport extends GuiScreen {
 	 * Fired when a control is clicked. This is the equivalent of
 	 * ActionListener.actionPerformed(ActionEvent e).
 	 */
+	@Override
 	protected void actionPerformed(GuiButton par1GuiButton) {
 		if (par1GuiButton.enabled) {
 			if (par1GuiButton.id == 1) {
@@ -78,6 +79,7 @@ public class GuiScreenNameWorldImport extends GuiScreen {
 	/**
 	 * Draws the screen and all the components in it.
 	 */
+	@Override
 	public void drawScreen(int par1, int par2, float par3) {
 		this.drawDefaultBackground();
 		if (!timeToImport) {
@@ -107,6 +109,7 @@ public class GuiScreenNameWorldImport extends GuiScreen {
 	/**
 	 * Adds the buttons (and other controls) to the screen in question.
 	 */
+	@Override
 	public void initGui() {
 		if (!timeToImport) {
 			Keyboard.enableRepeatEvents(true);
@@ -132,6 +135,7 @@ public class GuiScreenNameWorldImport extends GuiScreen {
 	 * Fired when a key is typed. This is the equivalent of
 	 * KeyListener.keyTyped(KeyEvent e).
 	 */
+	@Override
 	protected void keyTyped(char par1, int par2) {
 		this.theGuiTextField.textboxKeyTyped(par1, par2);
 		((GuiButton) this.buttonList.get(0)).enabled = this.theGuiTextField.getText().trim().length() > 0;
@@ -144,6 +148,7 @@ public class GuiScreenNameWorldImport extends GuiScreen {
 	/**
 	 * Called when the mouse is clicked.
 	 */
+	@Override
 	protected void mouseClicked(int par1, int par2, int par3) {
 		super.mouseClicked(par1, par2, par3);
 		if (!timeToImport) {
@@ -154,6 +159,7 @@ public class GuiScreenNameWorldImport extends GuiScreen {
 	/**
 	 * Called when the screen is unloaded. Used to disable keyboard repeat events
 	 */
+	@Override
 	public void onGuiClosed() {
 		Keyboard.enableRepeatEvents(false);
 	}
@@ -166,6 +172,7 @@ public class GuiScreenNameWorldImport extends GuiScreen {
 	/**
 	 * Called from the main game loop to update the screen.
 	 */
+	@Override
 	public void updateScreen() {
 		if (!timeToImport) {
 			this.theGuiTextField.updateCursorCounter();

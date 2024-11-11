@@ -31,13 +31,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -49,10 +49,11 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockHopper extends BlockContainer {
 	public static final PropertyDirection FACING = PropertyDirection.create("facing", new Predicate<EnumFacing>() {
+		@Override
 		public boolean apply(EnumFacing enumfacing) {
 			return enumfacing != EnumFacing.UP;
 		}
@@ -84,6 +85,7 @@ public class BlockHopper extends BlockContainer {
 	 * + Add all collision boxes of this Block to the list that intersect with the
 	 * given mask.
 	 */
+	@Override
 	public void addCollisionBoxesToList(World world, BlockPos blockpos, IBlockState iblockstate,
 			AxisAlignedBB axisalignedbb, List<AxisAlignedBB> list, Entity entity) {
 		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.625F, 1.0F);
@@ -100,6 +102,7 @@ public class BlockHopper extends BlockContainer {
 		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
 	}
 
+	@Override
 	public void breakBlock(World world, BlockPos blockpos, IBlockState iblockstate) {
 		TileEntity tileentity = world.getTileEntity(blockpos);
 		if (tileentity instanceof TileEntityHopper) {
@@ -110,6 +113,7 @@ public class BlockHopper extends BlockContainer {
 		super.breakBlock(world, blockpos, iblockstate);
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { FACING, ENABLED });
 	}
@@ -118,14 +122,17 @@ public class BlockHopper extends BlockContainer {
 	 * + Returns a new instance of a block's tile entity class. Called on placing
 	 * the block.
 	 */
+	@Override
 	public TileEntity createNewTileEntity(World var1, int var2) {
 		return new TileEntityHopper();
 	}
 
+	@Override
 	public EnumWorldBlockLayer getBlockLayer() {
 		return EnumWorldBlockLayer.CUTOUT_MIPPED;
 	}
 
+	@Override
 	public int getComparatorInputOverride(World world, BlockPos blockpos) {
 		return Container.calcRedstone(world.getTileEntity(blockpos));
 	}
@@ -133,6 +140,7 @@ public class BlockHopper extends BlockContainer {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
 		i = i | ((EnumFacing) iblockstate.getValue(FACING)).getIndex();
@@ -147,6 +155,7 @@ public class BlockHopper extends BlockContainer {
 	 * + The type of render function called. 3 for standard block models, 2 for
 	 * TESR's, 1 for liquids, -1 is no render
 	 */
+	@Override
 	public int getRenderType() {
 		return 3;
 	}
@@ -154,15 +163,18 @@ public class BlockHopper extends BlockContainer {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(FACING, getFacing(i)).withProperty(ENABLED,
 				Boolean.valueOf(isEnabled(i)));
 	}
 
+	@Override
 	public boolean hasComparatorInputOverride() {
 		return true;
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -171,10 +183,12 @@ public class BlockHopper extends BlockContainer {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
 
+	@Override
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState var3, EntityPlayer entityplayer,
 			EnumFacing var5, float var6, float var7, float var8) {
 		if (world.isRemote) {
@@ -190,6 +204,7 @@ public class BlockHopper extends BlockContainer {
 		}
 	}
 
+	@Override
 	public void onBlockAdded(World world, BlockPos blockpos, IBlockState iblockstate) {
 		this.updateState(world, blockpos, iblockstate);
 	}
@@ -198,6 +213,7 @@ public class BlockHopper extends BlockContainer {
 	 * + Called by ItemBlocks just before a block is actually set in the world, to
 	 * allow for adjustments to the IBlockstate
 	 */
+	@Override
 	public IBlockState onBlockPlaced(World var1, BlockPos var2, EnumFacing enumfacing, float var4, float var5,
 			float var6, int var7, EntityLivingBase var8) {
 		EnumFacing enumfacing1 = enumfacing.getOpposite();
@@ -212,6 +228,7 @@ public class BlockHopper extends BlockContainer {
 	 * + Called by ItemBlocks after a block is set in the world, to allow post-place
 	 * logic
 	 */
+	@Override
 	public void onBlockPlacedBy(World world, BlockPos blockpos, IBlockState iblockstate,
 			EntityLivingBase entitylivingbase, ItemStack itemstack) {
 		super.onBlockPlacedBy(world, blockpos, iblockstate, entitylivingbase, itemstack);
@@ -227,14 +244,17 @@ public class BlockHopper extends BlockContainer {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block var4) {
 		this.updateState(world, blockpos, iblockstate);
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess var1, BlockPos var2) {
 		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
 	}
 
+	@Override
 	public boolean shouldSideBeRendered(IBlockAccess var1, BlockPos var2, EnumFacing var3) {
 		return true;
 	}

@@ -9,13 +9,13 @@ import net.minecraft.stats.AchievementList;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@ import net.minecraft.stats.AchievementList;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ContainerBrewingStand extends Container {
 	class Ingredient extends Slot {
@@ -35,10 +35,12 @@ public class ContainerBrewingStand extends Container {
 			super(inventoryIn, index, xPosition, yPosition);
 		}
 
+		@Override
 		public int getSlotStackLimit() {
 			return 64;
 		}
 
+		@Override
 		public boolean isItemValid(ItemStack itemstack) {
 			return itemstack != null ? itemstack.getItem().isPotionIngredient(itemstack) : false;
 		}
@@ -57,14 +59,17 @@ public class ContainerBrewingStand extends Container {
 			this.player = playerIn;
 		}
 
+		@Override
 		public int getSlotStackLimit() {
 			return 1;
 		}
 
+		@Override
 		public boolean isItemValid(ItemStack itemstack) {
 			return canHoldPotion(itemstack);
 		}
 
+		@Override
 		public void onPickupFromSlot(EntityPlayer entityplayer, ItemStack itemstack) {
 			if (itemstack.getItem() == Items.potionitem && itemstack.getMetadata() > 0) {
 				this.player.triggerAchievement(AchievementList.potion);
@@ -102,6 +107,7 @@ public class ContainerBrewingStand extends Container {
 
 	}
 
+	@Override
 	public boolean canInteractWith(EntityPlayer entityplayer) {
 		return this.tileBrewingStand.isUseableByPlayer(entityplayer);
 	}
@@ -109,6 +115,7 @@ public class ContainerBrewingStand extends Container {
 	/**
 	 * + Looks for changes made in the container, sends them to every listener.
 	 */
+	@Override
 	public void detectAndSendChanges() {
 		super.detectAndSendChanges();
 
@@ -122,6 +129,7 @@ public class ContainerBrewingStand extends Container {
 		this.brewTime = this.tileBrewingStand.getField(0);
 	}
 
+	@Override
 	public void onCraftGuiOpened(ICrafting icrafting) {
 		super.onCraftGuiOpened(icrafting);
 		icrafting.func_175173_a(this, this.tileBrewingStand);
@@ -130,6 +138,7 @@ public class ContainerBrewingStand extends Container {
 	/**
 	 * + Take a stack from the specified inventory slot.
 	 */
+	@Override
 	public ItemStack transferStackInSlot(EntityPlayer entityplayer, int i) {
 		ItemStack itemstack = null;
 		Slot slot = (Slot) this.inventorySlots.get(i);
@@ -180,6 +189,7 @@ public class ContainerBrewingStand extends Container {
 		return itemstack;
 	}
 
+	@Override
 	public void updateProgressBar(int i, int j) {
 		this.tileBrewingStand.setField(i, j);
 	}

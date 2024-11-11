@@ -20,13 +20,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,7 +38,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockFarmland extends Block {
 	public static final PropertyInteger MOISTURE = PropertyInteger.create("moisture", 0, 7);
@@ -51,15 +51,18 @@ public class BlockFarmland extends Block {
 		this.setLightOpacity(255);
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { MOISTURE });
 	}
 
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox(World var1, BlockPos blockpos, IBlockState var3) {
 		return new AxisAlignedBB((double) blockpos.getX(), (double) blockpos.getY(), (double) blockpos.getZ(),
 				(double) (blockpos.getX() + 1), (double) (blockpos.getY() + 1), (double) (blockpos.getZ() + 1));
 	}
 
+	@Override
 	public Item getItem(World var1, BlockPos var2) {
 		return Item.getItemFromBlock(Blocks.dirt);
 	}
@@ -67,6 +70,7 @@ public class BlockFarmland extends Block {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom random, int i) {
 		return Blocks.dirt.getItemDropped(
 				Blocks.dirt.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.DIRT), random, i);
@@ -75,6 +79,7 @@ public class BlockFarmland extends Block {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		return ((Integer) iblockstate.getValue(MOISTURE)).intValue();
 	}
@@ -82,6 +87,7 @@ public class BlockFarmland extends Block {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(MOISTURE, Integer.valueOf(i & 7));
 	}
@@ -92,8 +98,7 @@ public class BlockFarmland extends Block {
 	}
 
 	private boolean hasWater(World worldIn, BlockPos pos) {
-		for (BlockPos.MutableBlockPos blockpos$mutableblockpos : BlockPos.getAllInBoxMutable(pos.add(-4, 0, -4),
-				pos.add(4, 1, 4))) {
+		for (BlockPos blockpos$mutableblockpos : BlockPos.getAllInBoxMutable(pos.add(-4, 0, -4), pos.add(4, 1, 4))) {
 			if (worldIn.getBlockState(blockpos$mutableblockpos).getBlock().getMaterial() == Material.water) {
 				return true;
 			}
@@ -102,6 +107,7 @@ public class BlockFarmland extends Block {
 		return false;
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -110,6 +116,7 @@ public class BlockFarmland extends Block {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
@@ -117,6 +124,7 @@ public class BlockFarmland extends Block {
 	/**
 	 * + Block's chance to react to a living entity falling on it.
 	 */
+	@Override
 	public void onFallenUpon(World world, BlockPos blockpos, Entity entity, float f) {
 		if (entity instanceof EntityLivingBase) {
 			if (!world.isRemote && world.rand.nextFloat() < f - 0.5F) {
@@ -134,6 +142,7 @@ public class BlockFarmland extends Block {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block block) {
 		super.onNeighborBlockChange(world, blockpos, iblockstate, block);
 		if (world.getBlockState(blockpos.up()).getBlock().getMaterial().isSolid()) {
@@ -142,6 +151,7 @@ public class BlockFarmland extends Block {
 
 	}
 
+	@Override
 	public boolean shouldSideBeRendered(IBlockAccess iblockaccess, BlockPos blockpos, EnumFacing enumfacing) {
 		switch (enumfacing) {
 		case UP:
@@ -157,6 +167,7 @@ public class BlockFarmland extends Block {
 		}
 	}
 
+	@Override
 	public void updateTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom var4) {
 		int i = ((Integer) iblockstate.getValue(MOISTURE)).intValue();
 		if (!this.hasWater(world, blockpos) && !world.canLightningStrike(blockpos.up())) {

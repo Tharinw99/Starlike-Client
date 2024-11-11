@@ -38,12 +38,14 @@ public class GuiScreenLANInfo extends GuiScreen {
 		this.parent = parent;
 	}
 
+	@Override
 	protected void actionPerformed(GuiButton par1GuiButton) {
 		if (par1GuiButton.id == 0) {
 			mc.displayGuiScreen(parent);
 		}
 	}
 
+	@Override
 	public void drawScreen(int par1, int par2, float par3) {
 		this.drawDefaultBackground();
 		this.drawCenteredString(this.fontRendererObj, I18n.format("lanInfo.title"), this.width / 2,
@@ -57,6 +59,7 @@ public class GuiScreenLANInfo extends GuiScreen {
 		super.drawScreen(par1, par2, par3);
 	}
 
+	@Override
 	public void initGui() {
 		buttonList.clear();
 		buttonList.add(new GuiButton(0, this.width / 2 - 100, height / 6 + 168, I18n.format("gui.continue")));

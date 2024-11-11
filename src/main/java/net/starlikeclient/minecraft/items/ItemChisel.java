@@ -1,6 +1,7 @@
 package net.starlikeclient.minecraft.items;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import net.minecraft.block.Block;
@@ -11,19 +12,22 @@ import net.minecraft.block.BlockRedSandstone;
 import net.minecraft.block.BlockSandStone;
 import net.minecraft.block.BlockStone;
 import net.minecraft.block.BlockStoneBrick;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.EnumDyeColor;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemTool;
+import net.minecraft.potion.Potion;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
-public class ItemChisel extends Item {
+public class ItemChisel extends ItemTool {
 	private static final Map<IBlockState, IBlockState> blockReplacementMap = new HashMap<>();
 	static {
 		// Copper
@@ -164,9 +168,27 @@ public class ItemChisel extends Item {
 	}
 
 	public ItemChisel() {
-		this.setMaxStackSize(1);
+		super(1.0F, ToolMaterial.ZERO, new HashSet<>());
 		this.setMaxDamage(212);
 		this.setCreativeTab(CreativeTabs.tabStarlike);
+	}
+
+	/**
+	 * + Returns true if players can use this item to affect the world (e.g. placing
+	 * blocks, placing ender eyes in portal) when not in creative
+	 */
+	@Override
+	public boolean canItemEditBlocks() {
+		return true;
+	}
+
+	/**
+	 * + Return the enchantability factor of the item, most of the time is based on
+	 * material.
+	 */
+	@Override
+	public int getItemEnchantability() {
+		return 11;
 	}
 
 	/**
@@ -192,13 +214,53 @@ public class ItemChisel extends Item {
 	 */
 	@Override
 	public ItemStack onItemRightClick(ItemStack itemstack, World world, EntityPlayer entityplayer) {
-		MovingObjectPosition movingObjectPosition = this.getMovingObjectPositionFromPlayer(world, entityplayer, false);
-		if (movingObjectPosition != null
-				&& movingObjectPosition.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-			BlockPos blockPos = movingObjectPosition.getBlockPos();
-			IBlockState blockState = world.getBlockState(blockPos);
-			if (blockReplacementMap.containsKey(blockState)) {
-				entityplayer.setItemInUse(itemstack, this.getMaxItemUseDuration(itemstack));
+		MovingObjectPosition movingobjectposition = this.getMovingObjectPositionFromPlayer(world, entityplayer, false);
+		if (movingobjectposition != null
+				&& movingobjectposition.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+			BlockPos blockpos = movingobjectposition.getBlockPos();
+			IBlockState blockState = world.getBlockState(blockpos);
+			if (ItemChisel.blockReplacementMap.containsKey(blockState)) {
+				float f = (float) this.getMaxItemUseDuration(itemstack);
+
+				int i = EnchantmentHelper.getEfficiencyModifier(entityplayer);
+				if (i > 0) {
+					f -= (float) (i * 4 + 1); // lowered from i*i to i*4
+				}
+
+				if (entityplayer.isPotionActive(Potion.digSpeed)) {
+					f /= 1.0F + (float) (entityplayer.getActivePotionEffect(Potion.digSpeed).getAmplifier() + 1) * 0.2F;
+				}
+
+				if (entityplayer.isPotionActive(Potion.digSlowdown)) {
+					float f1 = 1.0F;
+					switch (entityplayer.getActivePotionEffect(Potion.digSlowdown).getAmplifier()) {
+					case 0:
+						f1 = 0.3F;
+						break;
+					case 1:
+						f1 = 0.09F;
+						break;
+					case 2:
+						f1 = 0.0027F;
+						break;
+					case 3:
+					default:
+						f1 = 8.1E-4F;
+					}
+
+					f /= f1;
+				}
+
+				if (entityplayer.isInsideOfMaterial(Material.water)
+						&& !EnchantmentHelper.getAquaAffinityModifier(entityplayer)) {
+					f *= 5.0F;
+				}
+
+				if (!entityplayer.onGround) {
+					f *= 5.0F;
+				}
+
+				entityplayer.setItemInUse(itemstack, (f < 1.0F) ? 1 : (int) f);
 			}
 		}
 		return itemstack;

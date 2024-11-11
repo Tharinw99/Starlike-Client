@@ -57,13 +57,13 @@ import net.minecraft.world.WorldServer;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -75,7 +75,7 @@ import net.minecraft.world.WorldServer;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class EntityLivingBase extends Entity {
 	private static final EaglercraftUUID sprintingSpeedBoostModifierUUID = EaglercraftUUID
@@ -246,6 +246,7 @@ public abstract class EntityLivingBase extends Entity {
 	/**
 	 * + Called when the entity is attacked.
 	 */
+	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float f) {
 		if (this.isEntityInvulnerable(damagesource)) {
 			return false;
@@ -346,6 +347,7 @@ public abstract class EntityLivingBase extends Entity {
 	 * + Returns true if other Entities should be prevented from moving through this
 	 * Entity.
 	 */
+	@Override
 	public boolean canBeCollidedWith() {
 		return !this.isDead;
 	}
@@ -354,6 +356,7 @@ public abstract class EntityLivingBase extends Entity {
 	 * + Returns true if this entity should push and be pushed by other entities
 	 * when colliding.
 	 */
+	@Override
 	public boolean canBePushed() {
 		return !this.isDead;
 	}
@@ -399,6 +402,7 @@ public abstract class EntityLivingBase extends Entity {
 		List list = this.worldObj.getEntitiesInAABBexcluding(this,
 				this.getEntityBoundingBox().expand(0.20000000298023224D, 0.0D, 0.20000000298023224D),
 				Predicates.and(EntitySelectors.NOT_SPECTATING, new Predicate<Entity>() {
+					@Override
 					public boolean apply(Entity entity1) {
 						return entity1.canBePushed();
 					}
@@ -492,6 +496,7 @@ public abstract class EntityLivingBase extends Entity {
 	protected void dropFewItems(boolean parFlag, int parInt1) {
 	}
 
+	@Override
 	protected void entityInit() {
 		this.dataWatcher.addObject(7, Integer.valueOf(0));
 		this.dataWatcher.addObject(8, Byte.valueOf((byte) 0));
@@ -499,6 +504,7 @@ public abstract class EntityLivingBase extends Entity {
 		this.dataWatcher.addObject(6, Float.valueOf(1.0F));
 	}
 
+	@Override
 	public void fall(float f, float f1) {
 		super.fall(f, f1);
 		PotionEffect potioneffect = this.getActivePotionEffect(Potion.jump);
@@ -545,6 +551,7 @@ public abstract class EntityLivingBase extends Entity {
 		return parFloat2;
 	}
 
+	@Override
 	public void func_181013_g(float f) {
 		this.renderYawOffset = f;
 	}
@@ -586,6 +593,7 @@ public abstract class EntityLivingBase extends Entity {
 		return this.entityLivingToAttack;
 	}
 
+	@Override
 	public boolean getAlwaysRenderNameTagForRender() {
 		return false;
 	}
@@ -639,6 +647,7 @@ public abstract class EntityLivingBase extends Entity {
 		return "game.neutral.die";
 	}
 
+	@Override
 	protected float getEaglerDynamicLightsValueSimple(float partialTicks) {
 		float f = super.getEaglerDynamicLightsValueSimple(partialTicks);
 		ItemStack itm = this.getHeldItem();
@@ -682,6 +691,7 @@ public abstract class EntityLivingBase extends Entity {
 		return "game.neutral.hurt";
 	}
 
+	@Override
 	public abstract ItemStack[] getInventory();
 
 	protected float getJumpUpwardsMotion() {
@@ -699,6 +709,7 @@ public abstract class EntityLivingBase extends Entity {
 	/**
 	 * + interpolated look vector
 	 */
+	@Override
 	public Vec3 getLook(float f) {
 		if (f == 1.0F) {
 			return this.getVectorForRotation(this.rotationPitch, this.rotationYawHead);
@@ -712,6 +723,7 @@ public abstract class EntityLivingBase extends Entity {
 	/**
 	 * + returns a (normalized) vector of where this entity is looking
 	 */
+	@Override
 	public Vec3 getLookVec() {
 		return this.getLook(1.0F);
 	}
@@ -728,6 +740,7 @@ public abstract class EntityLivingBase extends Entity {
 		return this.rand;
 	}
 
+	@Override
 	public float getRotationYawHead() {
 		return this.rotationYawHead;
 	}
@@ -785,6 +798,7 @@ public abstract class EntityLivingBase extends Entity {
 		this.motionY += 0.03999999910593033D;
 	}
 
+	@Override
 	public void handleStatusUpdate(byte b0) {
 		if (b0 == 2) {
 			this.limbSwingAmount = 1.5F;
@@ -834,6 +848,7 @@ public abstract class EntityLivingBase extends Entity {
 	/**
 	 * + Checks whether target entity is alive.
 	 */
+	@Override
 	public boolean isEntityAlive() {
 		return !this.isDead && this.getHealth() > 0.0F;
 	}
@@ -937,6 +952,7 @@ public abstract class EntityLivingBase extends Entity {
 	/**
 	 * + sets the dead flag. Used when you fall off the bottom of the world.
 	 */
+	@Override
 	protected void kill() {
 		this.attackEntityFrom(DamageSource.outOfWorld, 4.0F);
 	}
@@ -970,6 +986,7 @@ public abstract class EntityLivingBase extends Entity {
 	/**
 	 * + Called when a player mounts an entity. e.g. mounts a pig, mounts a boat.
 	 */
+	@Override
 	public void mountEntity(Entity entity) {
 		if (this.ridingEntity != null && entity == null) {
 			if (!this.worldObj.isRemote) {
@@ -1191,6 +1208,7 @@ public abstract class EntityLivingBase extends Entity {
 	/**
 	 * + Gets called every tick from main Entity class
 	 */
+	@Override
 	public void onEntityUpdate() {
 		this.prevSwingProgress = this.swingProgress;
 		super.onEntityUpdate();
@@ -1321,6 +1339,7 @@ public abstract class EntityLivingBase extends Entity {
 	/**
 	 * + Called by the /kill command.
 	 */
+	@Override
 	public void onKillCommand() {
 		this.attackEntityFrom(DamageSource.outOfWorld, Float.MAX_VALUE);
 	}
@@ -1407,6 +1426,7 @@ public abstract class EntityLivingBase extends Entity {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		super.onUpdate();
 		if (!this.worldObj.isRemote) {
@@ -1509,6 +1529,7 @@ public abstract class EntityLivingBase extends Entity {
 	 * + Setups the entity to do the hurt animation. Only used by packets in
 	 * multiplayer.
 	 */
+	@Override
 	public void performHurtAnimation() {
 		this.hurtTime = this.maxHurtTime = 10;
 		this.attackedAtYaw = 0.0F;
@@ -1517,6 +1538,7 @@ public abstract class EntityLivingBase extends Entity {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		this.setAbsorptionAmount(nbttagcompound.getFloat("AbsorptionAmount"));
 		if (nbttagcompound.hasKey("Attributes", 9) && this.worldObj != null && !this.worldObj.isRemote) {
@@ -1592,6 +1614,7 @@ public abstract class EntityLivingBase extends Entity {
 
 	}
 
+	@Override
 	protected void renderDynamicLightsEaglerAt(double entityX, double entityY, double entityZ, double renderX,
 			double renderY, double renderZ, float partialTicks, boolean isInFrustum) {
 		super.renderDynamicLightsEaglerAt(entityX, entityY, entityZ, renderX, renderY, renderZ, partialTicks,
@@ -1647,11 +1670,13 @@ public abstract class EntityLivingBase extends Entity {
 	/**
 	 * + Sets that this entity has been attacked.
 	 */
+	@Override
 	protected void setBeenAttacked() {
 		this.velocityChanged = this.rand.nextDouble() >= this
 				.getEntityAttribute(SharedMonsterAttributes.knockbackResistance).getAttributeValue();
 	}
 
+	@Override
 	public abstract void setCurrentItemOrArmor(int var1, ItemStack var2);
 
 	public void setHealth(float health) {
@@ -1672,6 +1697,7 @@ public abstract class EntityLivingBase extends Entity {
 		this.lastAttackerTime = this.ticksExisted;
 	}
 
+	@Override
 	public void setPositionAndRotation2(double d0, double d1, double d2, float f, float f1, int i, boolean var10) {
 		this.newPosX = d0;
 		this.newPosY = d1;
@@ -1689,6 +1715,7 @@ public abstract class EntityLivingBase extends Entity {
 	/**
 	 * + Sets the head's yaw rotation of the entity.
 	 */
+	@Override
 	public void setRotationYawHead(float f) {
 		this.rotationYawHead = f;
 	}
@@ -1696,6 +1723,7 @@ public abstract class EntityLivingBase extends Entity {
 	/**
 	 * + Set sprinting switch for Entity.
 	 */
+	@Override
 	public void setSprinting(boolean flag) {
 		super.setSprinting(flag);
 		IAttributeInstance iattributeinstance = this.getEntityAttribute(SharedMonsterAttributes.movementSpeed);
@@ -1753,6 +1781,7 @@ public abstract class EntityLivingBase extends Entity {
 	protected void updateEntityActionState() {
 	}
 
+	@Override
 	protected void updateFallState(double d0, boolean flag, Block block, BlockPos blockpos) {
 		if (!this.isInWater()) {
 			this.handleWaterMovement();
@@ -1851,6 +1880,7 @@ public abstract class EntityLivingBase extends Entity {
 	/**
 	 * + Handles updating while being ridden by an entity
 	 */
+	@Override
 	public void updateRidden() {
 		super.updateRidden();
 		this.prevOnGroundSpeedFactor = this.onGroundSpeedFactor;
@@ -1861,6 +1891,7 @@ public abstract class EntityLivingBase extends Entity {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		nbttagcompound.setFloat("HealF", this.getHealth());
 		nbttagcompound.setShort("Health", (short) ((int) Math.ceil((double) this.getHealth())));

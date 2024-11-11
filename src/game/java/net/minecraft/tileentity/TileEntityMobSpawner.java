@@ -11,13 +11,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,22 +29,26 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class TileEntityMobSpawner extends TileEntity implements ITickable {
 	private final MobSpawnerBaseLogic spawnerLogic = new MobSpawnerBaseLogic() {
+		@Override
 		public void func_98267_a(int i) {
 			TileEntityMobSpawner.this.worldObj.addBlockEvent(TileEntityMobSpawner.this.pos, Blocks.mob_spawner, i, 0);
 		}
 
+		@Override
 		public BlockPos getSpawnerPosition() {
 			return TileEntityMobSpawner.this.pos;
 		}
 
+		@Override
 		public World getSpawnerWorld() {
 			return TileEntityMobSpawner.this.worldObj;
 		}
 
+		@Override
 		public void setRandomEntity(
 				MobSpawnerBaseLogic.WeightedRandomMinecart mobspawnerbaselogic$weightedrandomminecart) {
 			super.setRandomEntity(mobspawnerbaselogic$weightedrandomminecart);
@@ -55,6 +59,7 @@ public class TileEntityMobSpawner extends TileEntity implements ITickable {
 		}
 	};
 
+	@Override
 	public boolean func_183000_F() {
 		return true;
 	}
@@ -64,6 +69,7 @@ public class TileEntityMobSpawner extends TileEntity implements ITickable {
 	 * used to sync tile entity data from the server to the client easily. For
 	 * example this is used by signs to synchronise the text to be displayed.
 	 */
+	@Override
 	public Packet getDescriptionPacket() {
 		NBTTagCompound nbttagcompound = new NBTTagCompound();
 		this.writeToNBT(nbttagcompound);
@@ -75,11 +81,13 @@ public class TileEntityMobSpawner extends TileEntity implements ITickable {
 		return this.spawnerLogic;
 	}
 
+	@Override
 	public void readFromNBT(NBTTagCompound nbttagcompound) {
 		super.readFromNBT(nbttagcompound);
 		this.spawnerLogic.readFromNBT(nbttagcompound);
 	}
 
+	@Override
 	public boolean receiveClientEvent(int i, int j) {
 		return this.spawnerLogic.setDelayToMin(i) ? true : super.receiveClientEvent(i, j);
 	}
@@ -87,10 +95,12 @@ public class TileEntityMobSpawner extends TileEntity implements ITickable {
 	/**
 	 * + Like the old updateEntity(), except more generic.
 	 */
+	@Override
 	public void update() {
 		this.spawnerLogic.updateSpawner();
 	}
 
+	@Override
 	public void writeToNBT(NBTTagCompound nbttagcompound) {
 		super.writeToNBT(nbttagcompound);
 		this.spawnerLogic.writeToNBT(nbttagcompound);

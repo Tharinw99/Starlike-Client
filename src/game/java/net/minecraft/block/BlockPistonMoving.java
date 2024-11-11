@@ -23,13 +23,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -41,7 +41,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockPistonMoving extends BlockContainer {
 	public static final PropertyDirection FACING = BlockPistonExtension.FACING;
@@ -63,6 +63,7 @@ public class BlockPistonMoving extends BlockContainer {
 		this.setHardness(-1.0F);
 	}
 
+	@Override
 	public void breakBlock(World world, BlockPos blockpos, IBlockState iblockstate) {
 		TileEntity tileentity = world.getTileEntity(blockpos);
 		if (tileentity instanceof TileEntityPiston) {
@@ -73,6 +74,7 @@ public class BlockPistonMoving extends BlockContainer {
 
 	}
 
+	@Override
 	public boolean canPlaceBlockAt(World var1, BlockPos var2) {
 		return false;
 	}
@@ -80,6 +82,7 @@ public class BlockPistonMoving extends BlockContainer {
 	/**
 	 * + Check whether this Block can be placed on the given side
 	 */
+	@Override
 	public boolean canPlaceBlockOnSide(World var1, BlockPos var2, EnumFacing var3) {
 		return false;
 	}
@@ -88,10 +91,12 @@ public class BlockPistonMoving extends BlockContainer {
 	 * + Ray traces through the blocks collision from start vector to end vector
 	 * returning a ray trace hit.
 	 */
+	@Override
 	public MovingObjectPosition collisionRayTrace(World var1, BlockPos var2, Vec3 var3, Vec3 var4) {
 		return null;
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { FACING, TYPE });
 	}
@@ -100,6 +105,7 @@ public class BlockPistonMoving extends BlockContainer {
 	 * + Returns a new instance of a block's tile entity class. Called on placing
 	 * the block.
 	 */
+	@Override
 	public TileEntity createNewTileEntity(World var1, int var2) {
 		return null;
 	}
@@ -107,6 +113,7 @@ public class BlockPistonMoving extends BlockContainer {
 	/**
 	 * + Spawns this Block's drops into the World as EntityItems.
 	 */
+	@Override
 	public void dropBlockAsItemWithChance(World world, BlockPos blockpos, IBlockState var3, float var4, int var5) {
 		if (!world.isRemote) {
 			TileEntityPiston tileentitypiston = this.getTileEntity(world, blockpos);
@@ -156,6 +163,7 @@ public class BlockPistonMoving extends BlockContainer {
 		}
 	}
 
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox(World world, BlockPos blockpos, IBlockState var3) {
 		TileEntityPiston tileentitypiston = this.getTileEntity(world, blockpos);
 		if (tileentitypiston == null) {
@@ -171,6 +179,7 @@ public class BlockPistonMoving extends BlockContainer {
 		}
 	}
 
+	@Override
 	public Item getItem(World var1, BlockPos var2) {
 		return null;
 	}
@@ -178,6 +187,7 @@ public class BlockPistonMoving extends BlockContainer {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
 		return null;
 	}
@@ -185,6 +195,7 @@ public class BlockPistonMoving extends BlockContainer {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
 		i = i | ((EnumFacing) iblockstate.getValue(FACING)).getIndex();
@@ -198,6 +209,7 @@ public class BlockPistonMoving extends BlockContainer {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(FACING, BlockPistonExtension.getFacing(i)).withProperty(TYPE,
 				(i & 8) > 0 ? BlockPistonExtension.EnumPistonType.STICKY : BlockPistonExtension.EnumPistonType.DEFAULT);
@@ -208,6 +220,7 @@ public class BlockPistonMoving extends BlockContainer {
 		return tileentity instanceof TileEntityPiston ? (TileEntityPiston) tileentity : null;
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -216,10 +229,12 @@ public class BlockPistonMoving extends BlockContainer {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
 
+	@Override
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState var3, EntityPlayer var4,
 			EnumFacing var5, float var6, float var7, float var8) {
 		if (!world.isRemote && world.getTileEntity(blockpos) == null) {
@@ -233,6 +248,7 @@ public class BlockPistonMoving extends BlockContainer {
 	/**
 	 * + Called when a player destroys this Block
 	 */
+	@Override
 	public void onBlockDestroyedByPlayer(World world, BlockPos blockpos, IBlockState iblockstate) {
 		BlockPos blockpos1 = blockpos.offset(((EnumFacing) iblockstate.getValue(FACING)).getOpposite());
 		IBlockState iblockstate1 = world.getBlockState(blockpos1);
@@ -246,12 +262,14 @@ public class BlockPistonMoving extends BlockContainer {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState var3, Block var4) {
 		if (!world.isRemote) {
 			world.getTileEntity(blockpos);
 		}
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
 		TileEntityPiston tileentitypiston = this.getTileEntity(iblockaccess, blockpos);
 		if (tileentitypiston != null) {

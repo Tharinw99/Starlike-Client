@@ -21,13 +21,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -39,7 +39,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class AbstractResourcePack implements IResourcePack {
 	private static final Logger resourceLog = LogManager.getLogger();
@@ -70,16 +70,19 @@ public abstract class AbstractResourcePack implements IResourcePack {
 		this.resourcePackFile = resourcePackFileIn;
 	}
 
+	@Override
 	public InputStream getInputStream(ResourceLocation location) throws IOException {
 		return this.getInputStreamByName(locationToName(location));
 	}
 
 	protected abstract InputStream getInputStreamByName(String var1) throws IOException;
 
+	@Override
 	public ImageData getPackImage() throws IOException {
 		return TextureUtil.readBufferedImage(this.getInputStreamByName("pack.png"));
 	}
 
+	@Override
 	public <T extends IMetadataSection> T getPackMetadata(IMetadataSerializer parIMetadataSerializer, String parString1)
 			throws IOException {
 		try {
@@ -92,6 +95,7 @@ public abstract class AbstractResourcePack implements IResourcePack {
 		}
 	}
 
+	@Override
 	public String getPackName() {
 		return this.resourcePackFile;
 	}
@@ -103,6 +107,7 @@ public abstract class AbstractResourcePack implements IResourcePack {
 				new Object[] { parString1, this.resourcePackFile });
 	}
 
+	@Override
 	public boolean resourceExists(ResourceLocation location) {
 		return this.hasResourceName(locationToName(location));
 	}

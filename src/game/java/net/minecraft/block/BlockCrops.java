@@ -17,13 +17,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -35,7 +35,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockCrops extends BlockBush implements IGrowable {
 	public static final PropertyInteger AGE = PropertyInteger.create("age", 0, 7);
@@ -97,6 +97,7 @@ public class BlockCrops extends BlockBush implements IGrowable {
 		this.disableStats();
 	}
 
+	@Override
 	public boolean canBlockStay(World world, BlockPos blockpos, IBlockState var3) {
 		return (world.getLight(blockpos) >= 8 || world.canSeeSky(blockpos))
 				&& this.canPlaceBlockOn(world.getBlockState(blockpos.down()).getBlock());
@@ -105,6 +106,7 @@ public class BlockCrops extends BlockBush implements IGrowable {
 	/**
 	 * + Whether this IGrowable can grow
 	 */
+	@Override
 	public boolean canGrow(World var1, BlockPos var2, IBlockState iblockstate, boolean var4) {
 		return ((Integer) iblockstate.getValue(AGE)).intValue() < 7;
 	}
@@ -112,14 +114,17 @@ public class BlockCrops extends BlockBush implements IGrowable {
 	/**
 	 * + is the block grass, dirt or farmland
 	 */
+	@Override
 	protected boolean canPlaceBlockOn(Block block) {
 		return block == Blocks.farmland;
 	}
 
+	@Override
 	public boolean canUseBonemeal(World var1, EaglercraftRandom var2, BlockPos var3, IBlockState var4) {
 		return true;
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { AGE });
 	}
@@ -127,6 +132,7 @@ public class BlockCrops extends BlockBush implements IGrowable {
 	/**
 	 * + Spawns this Block's drops into the World as EntityItems.
 	 */
+	@Override
 	public void dropBlockAsItemWithChance(World world, BlockPos blockpos, IBlockState iblockstate, float f, int i) {
 		super.dropBlockAsItemWithChance(world, blockpos, iblockstate, f, 0);
 		if (!world.isRemote) {
@@ -147,6 +153,7 @@ public class BlockCrops extends BlockBush implements IGrowable {
 		return Items.wheat;
 	}
 
+	@Override
 	public Item getItem(World var1, BlockPos var2) {
 		return this.getSeed();
 	}
@@ -154,6 +161,7 @@ public class BlockCrops extends BlockBush implements IGrowable {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState iblockstate, EaglercraftRandom var2, int var3) {
 		return ((Integer) iblockstate.getValue(AGE)).intValue() == 7 ? this.getCrop() : this.getSeed();
 	}
@@ -161,6 +169,7 @@ public class BlockCrops extends BlockBush implements IGrowable {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		return ((Integer) iblockstate.getValue(AGE)).intValue();
 	}
@@ -172,6 +181,7 @@ public class BlockCrops extends BlockBush implements IGrowable {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(AGE, Integer.valueOf(i));
 	}
@@ -185,10 +195,12 @@ public class BlockCrops extends BlockBush implements IGrowable {
 		worldIn.setBlockState(pos, state.withProperty(AGE, Integer.valueOf(i)), 2);
 	}
 
+	@Override
 	public void grow(World world, EaglercraftRandom var2, BlockPos blockpos, IBlockState iblockstate) {
 		this.grow(world, blockpos, iblockstate);
 	}
 
+	@Override
 	public void updateTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom random) {
 		super.updateTick(world, blockpos, iblockstate, random);
 		if (world.getLightFromNeighbors(blockpos.up()) >= 9) {

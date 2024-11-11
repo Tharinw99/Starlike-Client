@@ -477,7 +477,7 @@ public final class IntMath {
 	 *
 	 * <p>
 	 * For example:
-	 * 
+	 *
 	 * <pre>
 	 *  {@code
 	 *
@@ -577,7 +577,7 @@ public final class IntMath {
 			 * We wish to test whether or not x <= (sqrtFloor + 0.5)^2 = halfSquare + 0.25.
 			 * Since both x and halfSquare are integers, this is equivalent to testing
 			 * whether or not x <= halfSquare. (We have to deal with overflow, though.)
-			 * 
+			 *
 			 * If we treat halfSquare as an unsigned int, we know that sqrtFloor^2 <= x <
 			 * (sqrtFloor + 1)^2 halfSquare - sqrtFloor <= x < halfSquare + sqrtFloor + 1 so
 			 * |x - halfSquare| <= sqrtFloor. Therefore, it's safe to treat x - halfSquare

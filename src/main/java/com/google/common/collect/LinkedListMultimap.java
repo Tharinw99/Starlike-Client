@@ -47,7 +47,7 @@ import com.google.common.annotations.GwtIncompatible;
  * iteration order for both keys and values. The iteration order is preserved
  * across non-distinct key values. For example, for the following multimap
  * definition:
- * 
+ *
  * <pre>
  * {
  * 	&#64;code
@@ -63,7 +63,7 @@ import com.google.common.annotations.GwtIncompatible;
  * and similarly for {@link #entries()}. Unlike {@link LinkedHashMultimap}, the
  * iteration order is kept consistent between keys, entries and values. For
  * example, calling:
- * 
+ *
  * <pre>
  *    {@code
  *

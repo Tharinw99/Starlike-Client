@@ -10,13 +10,13 @@ import net.minecraft.util.EnumChatFormatting;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@ import net.minecraft.util.EnumChatFormatting;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class GuiResourcePackList extends GuiListExtended {
 	protected final Minecraft mc;
@@ -45,6 +45,7 @@ public abstract class GuiResourcePackList extends GuiListExtended {
 	/**
 	 * + Handles drawing a list's header row.
 	 */
+	@Override
 	protected void drawListHeader(int i, int j, Tessellator var3) {
 		String s = EnumChatFormatting.UNDERLINE + "" + EnumChatFormatting.BOLD + this.getListHeader();
 		this.mc.fontRendererObj.drawString(s, i + this.width / 2 - this.mc.fontRendererObj.getStringWidth(s) / 2,
@@ -58,6 +59,7 @@ public abstract class GuiResourcePackList extends GuiListExtended {
 	/**
 	 * + Gets the IGuiListEntry object for the given index
 	 */
+	@Override
 	public ResourcePackListEntry getListEntry(int i) {
 		return (ResourcePackListEntry) this.getList().get(i);
 	}
@@ -67,14 +69,17 @@ public abstract class GuiResourcePackList extends GuiListExtended {
 	/**
 	 * + Gets the width of the list
 	 */
+	@Override
 	public int getListWidth() {
 		return this.width;
 	}
 
+	@Override
 	protected int getScrollBarX() {
 		return this.right - 6;
 	}
 
+	@Override
 	protected int getSize() {
 		return this.getList().size();
 	}

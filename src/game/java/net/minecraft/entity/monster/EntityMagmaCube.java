@@ -10,13 +10,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityMagmaCube extends EntitySlime {
 	public EntityMagmaCube(World worldIn) {
@@ -36,10 +36,12 @@ public class EntityMagmaCube extends EntitySlime {
 		this.isImmuneToFire = true;
 	}
 
+	@Override
 	protected void alterSquishAmount() {
 		this.squishAmount *= 0.9F;
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.20000000298023224D);
@@ -49,10 +51,12 @@ public class EntityMagmaCube extends EntitySlime {
 	 * + Indicates weather the slime is able to damage the player (based upon the
 	 * slime's size)
 	 */
+	@Override
 	protected boolean canDamagePlayer() {
 		return true;
 	}
 
+	@Override
 	protected EntitySlime createInstance() {
 		return new EntityMagmaCube(this.worldObj);
 	}
@@ -60,6 +64,7 @@ public class EntityMagmaCube extends EntitySlime {
 	/**
 	 * + Drop 0-2 items of this living's type
 	 */
+	@Override
 	protected void dropFewItems(boolean var1, int i) {
 		Item item = this.getDropItem();
 		if (item != null && this.getSlimeSize() > 1) {
@@ -75,12 +80,14 @@ public class EntityMagmaCube extends EntitySlime {
 
 	}
 
+	@Override
 	public void fall(float var1, float var2) {
 	}
 
 	/**
 	 * + Gets the amount of damage dealt to the player when "attacked" by the slime.
 	 */
+	@Override
 	protected int getAttackStrength() {
 		return super.getAttackStrength() + 2;
 	}
@@ -88,10 +95,12 @@ public class EntityMagmaCube extends EntitySlime {
 	/**
 	 * + Gets how bright this entity is.
 	 */
+	@Override
 	public float getBrightness(float var1) {
 		return 1.0F;
 	}
 
+	@Override
 	public int getBrightnessForRender(float var1) {
 		return 15728880;
 	}
@@ -100,14 +109,17 @@ public class EntityMagmaCube extends EntitySlime {
 	 * + Checks if the entity's current position is a valid location to spawn this
 	 * entity.
 	 */
+	@Override
 	public boolean getCanSpawnHere() {
 		return this.worldObj.getDifficulty() != EnumDifficulty.PEACEFUL;
 	}
 
+	@Override
 	protected Item getDropItem() {
 		return Items.magma_cream;
 	}
 
+	@Override
 	protected float getEaglerDynamicLightsValueSimple(float partialTicks) {
 		return 1.0f;
 	}
@@ -115,6 +127,7 @@ public class EntityMagmaCube extends EntitySlime {
 	/**
 	 * + Gets the amount of time the slime needs to wait between jumps.
 	 */
+	@Override
 	protected int getJumpDelay() {
 		return super.getJumpDelay() * 4;
 	}
@@ -122,10 +135,12 @@ public class EntityMagmaCube extends EntitySlime {
 	/**
 	 * + Returns the name of the sound played when the slime jumps.
 	 */
+	@Override
 	protected String getJumpSound() {
 		return this.getSlimeSize() > 1 ? "mob.magmacube.big" : "mob.magmacube.small";
 	}
 
+	@Override
 	protected EnumParticleTypes getParticleType() {
 		return EnumParticleTypes.FLAME;
 	}
@@ -134,10 +149,12 @@ public class EntityMagmaCube extends EntitySlime {
 	 * + Returns the current armor value as determined by a call to
 	 * InventoryPlayer.getTotalArmorValue
 	 */
+	@Override
 	public int getTotalArmorValue() {
 		return this.getSlimeSize() * 3;
 	}
 
+	@Override
 	protected void handleJumpLava() {
 		this.motionY = (double) (0.22F + (float) this.getSlimeSize() * 0.05F);
 		this.isAirBorne = true;
@@ -147,6 +164,7 @@ public class EntityMagmaCube extends EntitySlime {
 	 * + Returns true if the entity is on fire. Used by render to add the fire
 	 * effect on rendering.
 	 */
+	@Override
 	public boolean isBurning() {
 		return false;
 	}
@@ -154,6 +172,7 @@ public class EntityMagmaCube extends EntitySlime {
 	/**
 	 * + Checks that the entity is not colliding with any blocks / liquids
 	 */
+	@Override
 	public boolean isNotColliding() {
 		return this.worldObj.checkNoEntityCollision(this.getEntityBoundingBox(), this)
 				&& this.worldObj.getCollidingBoundingBoxes(this, this.getEntityBoundingBox()).isEmpty()
@@ -163,6 +182,7 @@ public class EntityMagmaCube extends EntitySlime {
 	/**
 	 * + Causes this entity to do an upwards motion (jumping).
 	 */
+	@Override
 	protected void jump() {
 		this.motionY = (double) (0.42F + (float) this.getSlimeSize() * 0.1F);
 		this.isAirBorne = true;
@@ -172,6 +192,7 @@ public class EntityMagmaCube extends EntitySlime {
 	 * + Returns true if the slime makes a sound when it lands after a jump (based
 	 * upon the slime's size)
 	 */
+	@Override
 	protected boolean makesSoundOnLand() {
 		return true;
 	}

@@ -15,13 +15,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,10 +33,11 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityDiggingFX extends EntityFX {
 	public static class Factory implements IParticleFactory {
+		@Override
 		public EntityFX getEntityFX(int var1, World world, double d0, double d1, double d2, double d3, double d4,
 				double d5, int... aint) {
 			return (new EntityDiggingFX(world, d0, d1, d2, d3, d4, d5, Block.getStateById(aint[0]))).func_174845_l();
@@ -86,6 +87,7 @@ public class EntityDiggingFX extends EntityFX {
 		}
 	}
 
+	@Override
 	public int getBrightnessForRender(float f) {
 		int i = super.getBrightnessForRender(f);
 		int j = 0;
@@ -96,10 +98,12 @@ public class EntityDiggingFX extends EntityFX {
 		return i == 0 ? j : i;
 	}
 
+	@Override
 	public int getFXLayer() {
 		return 1;
 	}
 
+	@Override
 	public boolean renderAccelerated(IAcceleratedParticleEngine accelerator, Entity var2, float f, float f1, float f2,
 			float f3, float f4, float f5) {
 		int w = this.particleIcon.getIconWidth();
@@ -116,6 +120,7 @@ public class EntityDiggingFX extends EntityFX {
 	/**
 	 * + Renders the particle
 	 */
+	@Override
 	public void renderParticle(WorldRenderer worldrenderer, Entity var2, float f, float f1, float f2, float f3,
 			float f4, float f5) {
 		float f6 = ((float) this.particleTextureIndexX + this.particleTextureJitterX / 4.0F) / 16.0F;

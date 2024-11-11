@@ -12,13 +12,13 @@ import net.minecraft.util.BlockPos;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,13 +30,14 @@ import net.minecraft.util.BlockPos;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class CommandEnchant extends CommandBase {
 
 	/**
 	 * + Return a list of options when the user types TAB
 	 */
+	@Override
 	public List<String> addTabCompletionOptions(ICommandSender var1, String[] astring, BlockPos var3) {
 		return astring.length == 1 ? getListOfStringsMatchingLastWord(astring, this.getListOfPlayers())
 				: (astring.length == 2 ? getListOfStringsMatchingLastWord(astring, Enchantment.func_181077_c()) : null);
@@ -45,6 +46,7 @@ public class CommandEnchant extends CommandBase {
 	/**
 	 * + Gets the name of the command
 	 */
+	@Override
 	public String getCommandName() {
 		return "enchant";
 	}
@@ -52,6 +54,7 @@ public class CommandEnchant extends CommandBase {
 	/**
 	 * + Gets the usage string for the command.
 	 */
+	@Override
 	public String getCommandUsage(ICommandSender var1) {
 		return "commands.enchant.usage";
 	}
@@ -63,6 +66,7 @@ public class CommandEnchant extends CommandBase {
 	/**
 	 * + Return the required permission level for this command.
 	 */
+	@Override
 	public int getRequiredPermissionLevel() {
 		return 2;
 	}
@@ -71,6 +75,7 @@ public class CommandEnchant extends CommandBase {
 	 * + Return whether the specified command parameter index is a username
 	 * parameter.
 	 */
+	@Override
 	public boolean isUsernameIndex(String[] args, int index) {
 		return index == 0;
 	}
@@ -78,6 +83,7 @@ public class CommandEnchant extends CommandBase {
 	/**
 	 * + Callback when the command is invoked
 	 */
+	@Override
 	public void processCommand(ICommandSender parICommandSender, String[] parArrayOfString) throws CommandException {
 		if (parArrayOfString.length < 2) {
 			throw new WrongUsageException("commands.enchant.usage", new Object[0]);

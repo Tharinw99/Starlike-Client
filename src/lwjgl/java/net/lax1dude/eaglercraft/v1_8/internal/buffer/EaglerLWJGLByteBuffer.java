@@ -5,7 +5,7 @@ import net.lax1dude.unsafememcpy.UnsafeUtils;
 
 /**
  * Copyright (c) 2022-2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -17,7 +17,7 @@ import net.lax1dude.unsafememcpy.UnsafeUtils;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EaglerLWJGLByteBuffer implements ByteBuffer {
 
@@ -288,7 +288,7 @@ public class EaglerLWJGLByteBuffer implements ByteBuffer {
 			if (position + l > limit)
 				throw Buffer.makeIOOBE(position + l - 1);
 			for (int i = 0; i < l; ++i) {
-				UnsafeUtils.setMemByte(address + position + l, src.get());
+				UnsafeUtils.setMemByte(address + position + i, src.get());
 			}
 			position += l;
 		}

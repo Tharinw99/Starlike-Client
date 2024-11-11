@@ -31,13 +31,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -49,7 +49,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockRedstoneComparator extends BlockRedstoneDiode implements ITileEntityProvider {
 	public static enum Mode implements IStringSerializable {
@@ -61,10 +61,12 @@ public class BlockRedstoneComparator extends BlockRedstoneDiode implements ITile
 			this.name = name;
 		}
 
+		@Override
 		public String getName() {
 			return this.name;
 		}
 
+		@Override
 		public String toString() {
 			return this.name;
 		}
@@ -86,12 +88,14 @@ public class BlockRedstoneComparator extends BlockRedstoneDiode implements ITile
 		this.isBlockContainer = true;
 	}
 
+	@Override
 	public void breakBlock(World world, BlockPos blockpos, IBlockState iblockstate) {
 		super.breakBlock(world, blockpos, iblockstate);
 		world.removeTileEntity(blockpos);
 		this.notifyNeighbors(world, blockpos, iblockstate);
 	}
 
+	@Override
 	protected int calculateInputStrength(World worldIn, BlockPos pos, IBlockState state) {
 		int i = super.calculateInputStrength(worldIn, pos, state);
 		EnumFacing enumfacing = (EnumFacing) state.getValue(FACING);
@@ -122,6 +126,7 @@ public class BlockRedstoneComparator extends BlockRedstoneDiode implements ITile
 				: this.calculateInputStrength(worldIn, pos, state);
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { FACING, MODE, POWERED });
 	}
@@ -130,6 +135,7 @@ public class BlockRedstoneComparator extends BlockRedstoneDiode implements ITile
 	 * + Returns a new instance of a block's tile entity class. Called on placing
 	 * the block.
 	 */
+	@Override
 	public TileEntity createNewTileEntity(World var1, int var2) {
 		return new TileEntityComparator();
 	}
@@ -139,6 +145,7 @@ public class BlockRedstoneComparator extends BlockRedstoneDiode implements ITile
 				new AxisAlignedBB((double) pos.getX(), (double) pos.getY(), (double) pos.getZ(),
 						(double) (pos.getX() + 1), (double) (pos.getY() + 1), (double) (pos.getZ() + 1)),
 				new Predicate<Entity>() {
+					@Override
 					public boolean apply(Entity entity) {
 						return entity != null && entity.getHorizontalFacing() == facing;
 					}
@@ -146,15 +153,18 @@ public class BlockRedstoneComparator extends BlockRedstoneDiode implements ITile
 		return list.size() == 1 ? (EntityItemFrame) list.get(0) : null;
 	}
 
+	@Override
 	protected int getActiveSignal(IBlockAccess worldIn, BlockPos pos, IBlockState state) {
 		TileEntity tileentity = worldIn.getTileEntity(pos);
 		return tileentity instanceof TileEntityComparator ? ((TileEntityComparator) tileentity).getOutputSignal() : 0;
 	}
 
+	@Override
 	protected int getDelay(IBlockState state) {
 		return 2;
 	}
 
+	@Override
 	public Item getItem(World var1, BlockPos var2) {
 		return Items.comparator;
 	}
@@ -162,6 +172,7 @@ public class BlockRedstoneComparator extends BlockRedstoneDiode implements ITile
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
 		return Items.comparator;
 	}
@@ -169,6 +180,7 @@ public class BlockRedstoneComparator extends BlockRedstoneDiode implements ITile
 	/**
 	 * + Gets the localized name of this block. Used for the statistics page.
 	 */
+	@Override
 	public String getLocalizedName() {
 		return StatCollector.translateToLocal("item.comparator.name");
 	}
@@ -176,6 +188,7 @@ public class BlockRedstoneComparator extends BlockRedstoneDiode implements ITile
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
 		i = i | ((EnumFacing) iblockstate.getValue(FACING)).getHorizontalIndex();
@@ -190,6 +203,7 @@ public class BlockRedstoneComparator extends BlockRedstoneDiode implements ITile
 		return i;
 	}
 
+	@Override
 	protected IBlockState getPoweredState(IBlockState unpoweredState) {
 		Boolean obool = (Boolean) unpoweredState.getValue(POWERED);
 		BlockRedstoneComparator.Mode blockredstonecomparator$mode = (BlockRedstoneComparator.Mode) unpoweredState
@@ -202,12 +216,14 @@ public class BlockRedstoneComparator extends BlockRedstoneDiode implements ITile
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(FACING, EnumFacing.getHorizontal(i))
 				.withProperty(POWERED, Boolean.valueOf((i & 8) > 0)).withProperty(MODE,
 						(i & 4) > 0 ? BlockRedstoneComparator.Mode.SUBTRACT : BlockRedstoneComparator.Mode.COMPARE);
 	}
 
+	@Override
 	protected IBlockState getUnpoweredState(IBlockState poweredState) {
 		Boolean obool = (Boolean) poweredState.getValue(POWERED);
 		BlockRedstoneComparator.Mode blockredstonecomparator$mode = (BlockRedstoneComparator.Mode) poweredState
@@ -217,10 +233,12 @@ public class BlockRedstoneComparator extends BlockRedstoneDiode implements ITile
 				.withProperty(POWERED, obool).withProperty(MODE, blockredstonecomparator$mode);
 	}
 
+	@Override
 	protected boolean isPowered(IBlockState state) {
 		return this.isRepeaterPowered || ((Boolean) state.getValue(POWERED)).booleanValue();
 	}
 
+	@Override
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState iblockstate, EntityPlayer entityplayer,
 			EnumFacing var5, float var6, float var7, float var8) {
 		if (!entityplayer.capabilities.allowEdit) {
@@ -236,6 +254,7 @@ public class BlockRedstoneComparator extends BlockRedstoneDiode implements ITile
 		}
 	}
 
+	@Override
 	public void onBlockAdded(World world, BlockPos blockpos, IBlockState iblockstate) {
 		super.onBlockAdded(world, blockpos, iblockstate);
 		world.setTileEntity(blockpos, this.createNewTileEntity(world, 0));
@@ -244,6 +263,7 @@ public class BlockRedstoneComparator extends BlockRedstoneDiode implements ITile
 	/**
 	 * + Called on both Client and Server when World#addBlockEvent is called
 	 */
+	@Override
 	public boolean onBlockEventReceived(World world, BlockPos blockpos, IBlockState iblockstate, int i, int j) {
 		super.onBlockEventReceived(world, blockpos, iblockstate, i, j);
 		TileEntity tileentity = world.getTileEntity(blockpos);
@@ -254,6 +274,7 @@ public class BlockRedstoneComparator extends BlockRedstoneDiode implements ITile
 	 * + Called by ItemBlocks just before a block is actually set in the world, to
 	 * allow for adjustments to the IBlockstate
 	 */
+	@Override
 	public IBlockState onBlockPlaced(World var1, BlockPos var2, EnumFacing var3, float var4, float var5, float var6,
 			int var7, EntityLivingBase entitylivingbase) {
 		return this.getDefaultState().withProperty(FACING, entitylivingbase.getHorizontalFacing().getOpposite())
@@ -284,6 +305,7 @@ public class BlockRedstoneComparator extends BlockRedstoneDiode implements ITile
 
 	}
 
+	@Override
 	protected boolean shouldBePowered(World worldIn, BlockPos pos, IBlockState state) {
 		int i = this.calculateInputStrength(worldIn, pos, state);
 		if (i >= 15) {
@@ -296,6 +318,7 @@ public class BlockRedstoneComparator extends BlockRedstoneDiode implements ITile
 		}
 	}
 
+	@Override
 	protected void updateState(World worldIn, BlockPos pos, IBlockState state) {
 		if (!worldIn.isBlockTickPending(pos, this)) {
 			int i = this.calculateOutput(worldIn, pos, state);
@@ -313,6 +336,7 @@ public class BlockRedstoneComparator extends BlockRedstoneDiode implements ITile
 		}
 	}
 
+	@Override
 	public void updateTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom var4) {
 		if (this.isRepeaterPowered) {
 			world.setBlockState(blockpos,

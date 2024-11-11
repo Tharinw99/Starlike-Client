@@ -10,13 +10,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockRail extends BlockRailBase {
 	public static PropertyEnum<BlockRailBase.EnumRailDirection> SHAPE;
@@ -43,6 +43,7 @@ public class BlockRail extends BlockRailBase {
 				this.blockState.getBaseState().withProperty(SHAPE, BlockRailBase.EnumRailDirection.NORTH_SOUTH));
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { SHAPE });
 	}
@@ -50,10 +51,12 @@ public class BlockRail extends BlockRailBase {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		return ((BlockRailBase.EnumRailDirection) iblockstate.getValue(SHAPE)).getMetadata();
 	}
 
+	@Override
 	public IProperty<BlockRailBase.EnumRailDirection> getShapeProperty() {
 		return SHAPE;
 	}
@@ -61,10 +64,12 @@ public class BlockRail extends BlockRailBase {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(SHAPE, BlockRailBase.EnumRailDirection.byMetadata(i));
 	}
 
+	@Override
 	protected void onNeighborChangedInternal(World world, BlockPos blockpos, IBlockState iblockstate, Block block) {
 		if (block.canProvidePower()
 				&& (new BlockRailBase.Rail(world, blockpos, iblockstate)).countAdjacentRails() == 3) {

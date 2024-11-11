@@ -38,7 +38,7 @@ package org.apache.commons.lang3.builder;
  *
  * <p>
  * Example Builder:
- * 
+ *
  * <pre>
  * <code>
  * class FontBuilder implements Builder&lt;Font&gt; {
@@ -68,7 +68,7 @@ package org.apache.commons.lang3.builder;
  * </pre>
  *
  * Example Builder Usage:
- * 
+ *
  * <pre>
  * <code>
  * Font bold14ptSansSerifFont = new FontBuilder(Font.SANS_SERIF).bold()

@@ -9,13 +9,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,13 +27,14 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockAir extends Block {
 	protected BlockAir() {
 		super(Material.air);
 	}
 
+	@Override
 	public boolean canCollideCheck(IBlockState state, boolean hitIfLiquid) {
 		return false;
 	}
@@ -41,9 +42,11 @@ public class BlockAir extends Block {
 	/**
 	 * + Spawns this Block's drops into the World as EntityItems.
 	 */
+	@Override
 	public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune) {
 	}
 
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state) {
 		return null;
 	}
@@ -52,6 +55,7 @@ public class BlockAir extends Block {
 	 * + The type of render function called. 3 for standard block models, 2 for
 	 * TESR's, 1 for liquids, -1 is no render
 	 */
+	@Override
 	public int getRenderType() {
 		return -1;
 	}
@@ -60,6 +64,7 @@ public class BlockAir extends Block {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
@@ -68,6 +73,7 @@ public class BlockAir extends Block {
 	 * + Whether this Block can be replaced directly by other blocks (true for e.g.
 	 * tall grass)
 	 */
+	@Override
 	public boolean isReplaceable(World worldIn, BlockPos pos) {
 		return true;
 	}

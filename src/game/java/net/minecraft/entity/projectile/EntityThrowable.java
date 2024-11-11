@@ -23,13 +23,13 @@ import net.minecraft.world.WorldServer;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -41,7 +41,7 @@ import net.minecraft.world.WorldServer;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class EntityThrowable extends Entity implements IProjectile {
 	private int xTile = -1;
@@ -87,6 +87,7 @@ public abstract class EntityThrowable extends Entity implements IProjectile {
 		this.setThrowableHeading(this.motionX, this.motionY, this.motionZ, this.getVelocity(), 1.0F);
 	}
 
+	@Override
 	protected void entityInit() {
 	}
 
@@ -129,6 +130,7 @@ public abstract class EntityThrowable extends Entity implements IProjectile {
 	 * and comparing it to its average edge length * 64 * renderDistanceWeight Args:
 	 * distance
 	 */
+	@Override
 	public boolean isInRangeToRenderDist(double d0) {
 		double d1 = this.getEntityBoundingBox().getAverageEdgeLength() * 4.0D;
 		if (Double.isNaN(d1)) {
@@ -144,6 +146,7 @@ public abstract class EntityThrowable extends Entity implements IProjectile {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		this.lastTickPosX = this.posX;
 		this.lastTickPosY = this.posY;
@@ -272,6 +275,7 @@ public abstract class EntityThrowable extends Entity implements IProjectile {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		this.xTile = nbttagcompound.getShort("xTile");
 		this.yTile = nbttagcompound.getShort("yTile");
@@ -297,6 +301,7 @@ public abstract class EntityThrowable extends Entity implements IProjectile {
 	 * + Similar to setArrowHeading, it's point the throwable entity to a x, y, z
 	 * direction.
 	 */
+	@Override
 	public void setThrowableHeading(double d0, double d1, double d2, float f, float f1) {
 		float f2 = MathHelper.sqrt_double(d0 * d0 + d1 * d1 + d2 * d2);
 		d0 = d0 / (double) f2;
@@ -322,6 +327,7 @@ public abstract class EntityThrowable extends Entity implements IProjectile {
 	/**
 	 * + Sets the velocity to the args. Args: x, y, z
 	 */
+	@Override
 	public void setVelocity(double d0, double d1, double d2) {
 		this.motionX = d0;
 		this.motionY = d1;
@@ -339,6 +345,7 @@ public abstract class EntityThrowable extends Entity implements IProjectile {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		nbttagcompound.setShort("xTile", (short) this.xTile);
 		nbttagcompound.setShort("yTile", (short) this.yTile);

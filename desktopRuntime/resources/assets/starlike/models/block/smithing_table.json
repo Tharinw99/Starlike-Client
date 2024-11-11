@@ -1,12 +1,12 @@
 {
-    "parent": "block/cube_all",
-    "textures": {
-        "down": "starlike:blocks/smithing_table_bottom",
-        "east": "starlike:blocks/smithing_table_side",
-        "north": "starlike:blocks/smithing_table_front",
-        "particle": "starlike:blocks/smithing_table_front",
-        "south": "starlike:blocks/smithing_table_front",
-        "up": "starlike:blocks/smithing_table_top",
-        "west": "starlike:blocks/smithing_table_side"
-    }
+  "parent": "block/cube_all",
+  "textures": {
+    "down": "starlike:blocks/smithing_table_bottom",
+    "east": "starlike:blocks/smithing_table_side",
+    "north": "starlike:blocks/smithing_table_front",
+    "particle": "starlike:blocks/smithing_table_front",
+    "south": "starlike:blocks/smithing_table_front",
+    "up": "starlike:blocks/smithing_table_top",
+    "west": "starlike:blocks/smithing_table_side"
+  }
 }

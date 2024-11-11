@@ -11,13 +11,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,7 +29,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ContainerMerchant extends Container {
 	private IMerchant theMerchant;
@@ -57,6 +57,7 @@ public class ContainerMerchant extends Container {
 
 	}
 
+	@Override
 	public boolean canInteractWith(EntityPlayer entityplayer) {
 		return this.theMerchant.getCustomer() == entityplayer;
 	}
@@ -64,6 +65,7 @@ public class ContainerMerchant extends Container {
 	/**
 	 * + Looks for changes made in the container, sends them to every listener.
 	 */
+	@Override
 	public void detectAndSendChanges() {
 		super.detectAndSendChanges();
 	}
@@ -75,6 +77,7 @@ public class ContainerMerchant extends Container {
 	/**
 	 * + Called when the container is closed.
 	 */
+	@Override
 	public void onContainerClosed(EntityPlayer entityplayer) {
 		super.onContainerClosed(entityplayer);
 		this.theMerchant.setCustomer((EntityPlayer) null);
@@ -99,6 +102,7 @@ public class ContainerMerchant extends Container {
 		}
 	}
 
+	@Override
 	public void onCraftGuiOpened(ICrafting icrafting) {
 		super.onCraftGuiOpened(icrafting);
 	}
@@ -106,6 +110,7 @@ public class ContainerMerchant extends Container {
 	/**
 	 * + Callback for when the crafting matrix is changed.
 	 */
+	@Override
 	public void onCraftMatrixChanged(IInventory iinventory) {
 		this.merchantInventory.resetRecipeAndSlots();
 		super.onCraftMatrixChanged(iinventory);
@@ -118,6 +123,7 @@ public class ContainerMerchant extends Container {
 	/**
 	 * + Take a stack from the specified inventory slot.
 	 */
+	@Override
 	public ItemStack transferStackInSlot(EntityPlayer entityplayer, int i) {
 		ItemStack itemstack = null;
 		Slot slot = (Slot) this.inventorySlots.get(i);
@@ -158,6 +164,7 @@ public class ContainerMerchant extends Container {
 		return itemstack;
 	}
 
+	@Override
 	public void updateProgressBar(int var1, int var2) {
 	}
 }

@@ -11,13 +11,13 @@ import com.google.common.collect.Lists;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,7 +29,7 @@ import com.google.common.collect.Lists;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ObjectIntIdentityMap<T> implements IObjectIntIterable<T> {
 	private final IdentityHashMap<T, Integer> identityMap = new IdentityHashMap(512);
@@ -44,6 +44,7 @@ public class ObjectIntIdentityMap<T> implements IObjectIntIterable<T> {
 		return (T) (value >= 0 && value < this.objectList.size() ? this.objectList.get(value) : null);
 	}
 
+	@Override
 	public Iterator<T> iterator() {
 		return Iterators.filter(this.objectList.iterator(), Predicates.notNull());
 	}

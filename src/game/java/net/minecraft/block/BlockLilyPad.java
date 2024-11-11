@@ -16,13 +16,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -34,7 +34,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockLilyPad extends BlockBush {
 	protected BlockLilyPad() {
@@ -48,6 +48,7 @@ public class BlockLilyPad extends BlockBush {
 	 * + Add all collision boxes of this Block to the list that intersect with the
 	 * given mask.
 	 */
+	@Override
 	public void addCollisionBoxesToList(World world, BlockPos blockpos, IBlockState iblockstate,
 			AxisAlignedBB axisalignedbb, List<AxisAlignedBB> list, Entity entity) {
 		if (entity == null || !(entity instanceof EntityBoat)) {
@@ -56,6 +57,7 @@ public class BlockLilyPad extends BlockBush {
 
 	}
 
+	@Override
 	public boolean canBlockStay(World world, BlockPos blockpos, IBlockState var3) {
 		if (blockpos.getY() >= 0 && blockpos.getY() < 256) {
 			IBlockState iblockstate = world.getBlockState(blockpos.down());
@@ -69,18 +71,22 @@ public class BlockLilyPad extends BlockBush {
 	/**
 	 * + is the block grass, dirt or farmland
 	 */
+	@Override
 	protected boolean canPlaceBlockOn(Block block) {
 		return block == Blocks.water;
 	}
 
+	@Override
 	public int colorMultiplier(IBlockAccess var1, BlockPos var2, int var3) {
 		return 2129968;
 	}
 
+	@Override
 	public int getBlockColor() {
 		return 7455580;
 	}
 
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox(World var1, BlockPos blockpos, IBlockState var3) {
 		return new AxisAlignedBB((double) blockpos.getX() + this.minX, (double) blockpos.getY() + this.minY,
 				(double) blockpos.getZ() + this.minZ, (double) blockpos.getX() + this.maxX,
@@ -90,10 +96,12 @@ public class BlockLilyPad extends BlockBush {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState var1) {
 		return 0;
 	}
 
+	@Override
 	public int getRenderColor(IBlockState var1) {
 		return 7455580;
 	}

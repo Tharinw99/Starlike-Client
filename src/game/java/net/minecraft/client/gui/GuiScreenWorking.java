@@ -5,13 +5,13 @@ import net.minecraft.util.IProgressUpdate;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -23,7 +23,7 @@ import net.minecraft.util.IProgressUpdate;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiScreenWorking extends GuiScreen implements IProgressUpdate {
 	private String field_146591_a = "";
@@ -35,6 +35,7 @@ public class GuiScreenWorking extends GuiScreen implements IProgressUpdate {
 	 * + Displays a string on the loading screen supposed to indicate what is being
 	 * done currently.
 	 */
+	@Override
 	public void displayLoadingString(String s) {
 		this.field_146589_f = s;
 		this.setLoadingProgress(0);
@@ -43,6 +44,7 @@ public class GuiScreenWorking extends GuiScreen implements IProgressUpdate {
 	/**
 	 * + Shows the 'Saving level' string.
 	 */
+	@Override
 	public void displaySavingString(String s) {
 		this.resetProgressAndMessage(s);
 	}
@@ -51,6 +53,7 @@ public class GuiScreenWorking extends GuiScreen implements IProgressUpdate {
 	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
 	 * renderPartialTicks
 	 */
+	@Override
 	public void drawScreen(int i, int j, float f) {
 		if (this.doneWorking) {
 			if (!this.mc.func_181540_al()) {
@@ -71,11 +74,13 @@ public class GuiScreenWorking extends GuiScreen implements IProgressUpdate {
 	 * lines shown. This resets progress to 0, and the WorkingString to
 	 * "working...".
 	 */
+	@Override
 	public void resetProgressAndMessage(String s) {
 		this.field_146591_a = s;
 		this.displayLoadingString("Working...");
 	}
 
+	@Override
 	public void setDoneWorking() {
 		this.doneWorking = true;
 	}
@@ -84,6 +89,7 @@ public class GuiScreenWorking extends GuiScreen implements IProgressUpdate {
 	 * + Updates the progress bar on the loading screen to the specified amount.
 	 * Args: loadProgress
 	 */
+	@Override
 	public void setLoadingProgress(int i) {
 		this.progress = i;
 	}

@@ -10,15 +10,15 @@ import net.lax1dude.eaglercraft.v1_8.EagRuntime;
 import net.lax1dude.eaglercraft.v1_8.EaglerInputStream;
 import net.lax1dude.eaglercraft.v1_8.EaglerOutputStream;
 import net.lax1dude.eaglercraft.v1_8.internal.PlatformApplication;
-import net.lax1dude.eaglercraft.v1_8.internal.PlatformWebRTC;
 import net.lax1dude.eaglercraft.v1_8.sp.relay.RelayManager;
+import net.lax1dude.eaglercraft.v1_8.sp.relay.RelayQueryDispatch;
 import net.lax1dude.eaglercraft.v1_8.sp.relay.RelayServerSocket;
 import net.lax1dude.eaglercraft.v1_8.sp.relay.pkt.RelayPacket00Handshake;
 import net.minecraft.client.Minecraft;
 
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,7 +30,7 @@ import net.minecraft.client.Minecraft;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class RelayUpdateChecker {
 
@@ -59,7 +59,7 @@ public class RelayUpdateChecker {
 	private static void connect(RelayEntry socket) {
 		try {
 			socket.handshake = false;
-			socket.currentSocket = PlatformWebRTC.openRelayConnection(socket.uri, 10000);
+			socket.currentSocket = RelayQueryDispatch.openRelayConnection(socket.uri, 10000);
 			if (socket.currentSocket.isClosed()) {
 				socket.currentSocket = null;
 			}

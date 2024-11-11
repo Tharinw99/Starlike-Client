@@ -12,13 +12,13 @@ import net.minecraft.util.BlockPos;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,7 +30,7 @@ import net.minecraft.util.BlockPos;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class WorldManager implements IWorldAccess {
 	private MinecraftServer mcServer;
@@ -41,10 +41,12 @@ public class WorldManager implements IWorldAccess {
 		this.theWorldServer = parWorldServer;
 	}
 
+	@Override
 	public void broadcastSound(int i, BlockPos blockpos, int j) {
 		this.mcServer.getConfigurationManager().sendPacketToAllPlayers(new S28PacketEffect(i, blockpos, j, true));
 	}
 
+	@Override
 	public void markBlockForUpdate(BlockPos blockpos) {
 		this.theWorldServer.getPlayerManager().markBlockForUpdate(blockpos);
 	}
@@ -53,9 +55,11 @@ public class WorldManager implements IWorldAccess {
 	 * + On the client, re-renders all blocks in this range, inclusive. On the
 	 * server, does nothing. Args: min x, min y, min z, max x, max y, max z
 	 */
+	@Override
 	public void markBlockRangeForRenderUpdate(int var1, int var2, int var3, int var4, int var5, int var6) {
 	}
 
+	@Override
 	public void notifyLightSet(BlockPos var1) {
 	}
 
@@ -64,6 +68,7 @@ public class WorldManager implements IWorldAccess {
 	 * worlds, starts downloading any necessary textures. On server worlds, adds the
 	 * entity to the entity tracker.
 	 */
+	@Override
 	public void onEntityAdded(Entity entity) {
 		this.theWorldServer.getEntityTracker().trackEntity(entity);
 	}
@@ -73,23 +78,27 @@ public class WorldManager implements IWorldAccess {
 	 * client worlds, releases any downloaded textures. On server worlds, removes
 	 * the entity from the entity tracker.
 	 */
+	@Override
 	public void onEntityRemoved(Entity entity) {
 		this.theWorldServer.getEntityTracker().untrackEntity(entity);
 		this.theWorldServer.getScoreboard().func_181140_a(entity);
 	}
 
+	@Override
 	public void playAuxSFX(EntityPlayer entityplayer, int i, BlockPos blockpos, int j) {
 		this.mcServer.getConfigurationManager().sendToAllNearExcept(entityplayer, (double) blockpos.getX(),
 				(double) blockpos.getY(), (double) blockpos.getZ(), 64.0D,
 				this.theWorldServer.provider.getDimensionId(), new S28PacketEffect(i, blockpos, j, false));
 	}
 
+	@Override
 	public void playRecord(String var1, BlockPos var2) {
 	}
 
 	/**
 	 * + Plays the specified sound. Arg: soundName, x, y, z, volume, pitch
 	 */
+	@Override
 	public void playSound(String s, double d0, double d1, double d2, float f, float f1) {
 		this.mcServer.getConfigurationManager().sendToAllNear(d0, d1, d2, f > 1.0F ? (double) (16.0F * f) : 16.0D,
 				this.theWorldServer.provider.getDimensionId(), new S29PacketSoundEffect(s, d0, d1, d2, f, f1));
@@ -98,6 +107,7 @@ public class WorldManager implements IWorldAccess {
 	/**
 	 * + Plays sound to all near players except the player reference given
 	 */
+	@Override
 	public void playSoundToNearExcept(EntityPlayer entityplayer, String s, double d0, double d1, double d2, float f,
 			float f1) {
 		this.mcServer.getConfigurationManager().sendToAllNearExcept(entityplayer, d0, d1, d2,
@@ -105,6 +115,7 @@ public class WorldManager implements IWorldAccess {
 				new S29PacketSoundEffect(s, d0, d1, d2, f, f1));
 	}
 
+	@Override
 	public void sendBlockBreakProgress(int i, BlockPos blockpos, int j) {
 		for (EntityPlayerMP entityplayermp : this.mcServer.getConfigurationManager().func_181057_v()) {
 			if (entityplayermp != null && entityplayermp.worldObj == this.theWorldServer
@@ -120,6 +131,7 @@ public class WorldManager implements IWorldAccess {
 
 	}
 
+	@Override
 	public void spawnParticle(int var1, boolean var2, double var3, double var5, double var7, double var9, double var11,
 			double var13, int... var15) {
 	}

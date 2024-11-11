@@ -30,7 +30,7 @@ import net.lax1dude.eaglercraft.v1_8.update.UpdateService;
 
 /**
  * Copyright (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -42,7 +42,7 @@ import net.lax1dude.eaglercraft.v1_8.update.UpdateService;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EagRuntime {
 
@@ -264,6 +264,9 @@ public class EagRuntime {
 	}
 
 	public static String getStackTrace(Throwable t) {
+		if (t == null) {
+			return "[null]";
+		}
 		StringBuilder sb = new StringBuilder();
 		getStackTrace0(t, sb);
 		Throwable c = t.getCause();
@@ -276,6 +279,8 @@ public class EagRuntime {
 	}
 
 	public static void getStackTrace(Throwable t, Consumer<String> ret) {
+		if (t == null)
+			return;
 		PlatformRuntime.getStackTrace(t, ret);
 	}
 
@@ -287,6 +292,8 @@ public class EagRuntime {
 	}
 
 	public static String[] getStackTraceElements(Throwable t) {
+		if (t == null)
+			return new String[0];
 		List<String> lst = new ArrayList<>();
 		PlatformRuntime.getStackTrace(t, (s) -> {
 			lst.add(s);
@@ -308,6 +315,10 @@ public class EagRuntime {
 
 	public static void immediateContinue() {
 		PlatformRuntime.immediateContinue();
+	}
+
+	public static boolean immediateContinueSupported() {
+		return PlatformRuntime.immediateContinueSupported();
 	}
 
 	public static boolean isOfflineDownloadURL() {

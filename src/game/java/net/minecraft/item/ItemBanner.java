@@ -20,13 +20,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,7 +38,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ItemBanner extends ItemBlock {
 	public ItemBanner() {
@@ -53,6 +53,7 @@ public class ItemBanner extends ItemBlock {
 	 * + allows items to add custom lines of information to the mouseover
 	 * description
 	 */
+	@Override
 	public void addInformation(ItemStack itemstack, EntityPlayer var2, List<String> list, boolean var4) {
 		NBTTagCompound nbttagcompound = itemstack.getSubCompound("BlockEntityTag", false);
 		if (nbttagcompound != null && nbttagcompound.hasKey("Patterns")) {
@@ -85,6 +86,7 @@ public class ItemBanner extends ItemBlock {
 		return enumdyecolor;
 	}
 
+	@Override
 	public int getColorFromItemStack(ItemStack itemstack, int i) {
 		if (i == 0) {
 			return 16777215;
@@ -97,10 +99,12 @@ public class ItemBanner extends ItemBlock {
 	/**
 	 * + gets the CreativeTab this item is displayed on
 	 */
+	@Override
 	public CreativeTabs getCreativeTab() {
 		return CreativeTabs.tabDecorations;
 	}
 
+	@Override
 	public String getItemStackDisplayName(ItemStack itemstack) {
 		String s = "item.banner.";
 		EnumDyeColor enumdyecolor = this.getBaseColor(itemstack);
@@ -112,6 +116,7 @@ public class ItemBanner extends ItemBlock {
 	 * + returns a list of items with the same ID, but different meta (eg: dye
 	 * returns 16 items)
 	 */
+	@Override
 	public void getSubItems(Item item, CreativeTabs var2, List<ItemStack> list) {
 		EnumDyeColor[] colors = EnumDyeColor.META_LOOKUP;
 		for (int i = 0; i < colors.length; ++i) {
@@ -130,6 +135,7 @@ public class ItemBanner extends ItemBlock {
 	/**
 	 * + Called when a Block is right-clicked with this Item
 	 */
+	@Override
 	public boolean onItemUse(ItemStack itemstack, EntityPlayer entityplayer, World world, BlockPos blockpos,
 			EnumFacing enumfacing, float var6, float var7, float var8) {
 		if (enumfacing == EnumFacing.DOWN) {

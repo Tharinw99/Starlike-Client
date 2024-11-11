@@ -9,13 +9,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class RenderWolf extends RenderLiving<EntityWolf> {
 	private static final ResourceLocation wolfTextures = new ResourceLocation("textures/entity/wolf/wolf.png");
@@ -49,6 +49,7 @@ public class RenderWolf extends RenderLiving<EntityWolf> {
 	 * func_76986_a(T entity, double d, double d1, double d2, float f, float f1).
 	 * But JAD is pre 1.5 so doe
 	 */
+	@Override
 	public void doRender(EntityWolf entitywolf, double d0, double d1, double d2, float f, float f1) {
 		if (entitywolf.isWolfWet()) {
 			float f2 = entitywolf.getBrightness(f1) * entitywolf.getShadingWhileWet(f1);
@@ -62,6 +63,7 @@ public class RenderWolf extends RenderLiving<EntityWolf> {
 	 * + Returns the location of an entity's texture. Doesn't seem to be called
 	 * unless you call Render.bindEntityTexture.
 	 */
+	@Override
 	protected ResourceLocation getEntityTexture(EntityWolf entitywolf) {
 		return entitywolf.isTamed() ? tamedWolfTextures : (entitywolf.isAngry() ? anrgyWolfTextures : wolfTextures);
 	}
@@ -69,6 +71,7 @@ public class RenderWolf extends RenderLiving<EntityWolf> {
 	/**
 	 * + Defines what float the third param in setRotationAngles of ModelBase is
 	 */
+	@Override
 	protected float handleRotationFloat(EntityWolf entitywolf, float var2) {
 		return entitywolf.getTailRotation();
 	}

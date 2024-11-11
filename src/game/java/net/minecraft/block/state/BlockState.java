@@ -29,13 +29,13 @@ import net.minecraft.util.MapPopulator;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -47,7 +47,7 @@ import net.minecraft.util.MapPopulator;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockState {
 	static class StateImplementation extends BlockStateBase {
@@ -79,14 +79,17 @@ public class BlockState {
 			}
 		}
 
+		@Override
 		public boolean equals(Object object) {
 			return this == object;
 		}
 
+		@Override
 		public Block getBlock() {
 			return this.block;
 		}
 
+		@Override
 		public ImmutableMap<IProperty, Comparable> getProperties() {
 			return this.properties;
 		}
@@ -97,10 +100,12 @@ public class BlockState {
 			return hashmap;
 		}
 
+		@Override
 		public Collection<IProperty> getPropertyNames() {
 			return Collections.unmodifiableCollection(this.properties.keySet());
 		}
 
+		@Override
 		public <T extends Comparable<T>> T getValue(IProperty<T> iproperty) {
 			if (!this.properties.containsKey(iproperty)) {
 				throw new IllegalArgumentException(
@@ -110,10 +115,12 @@ public class BlockState {
 			}
 		}
 
+		@Override
 		public int hashCode() {
 			return this.properties.hashCode();
 		}
 
+		@Override
 		public <T extends Comparable<T>, V extends T> IBlockState withProperty(IProperty<T> iproperty, V comparable) {
 			if (!this.properties.containsKey(iproperty)) {
 				throw new IllegalArgumentException(
@@ -131,6 +138,7 @@ public class BlockState {
 
 	private static final Joiner COMMA_JOINER = Joiner.on(", ");
 	private static final Function<IProperty, String> GET_NAME_FUNC = new Function<IProperty, String>() {
+		@Override
 		public String apply(IProperty iproperty) {
 			return iproperty == null ? "<NULL>" : iproperty.getName();
 		}
@@ -143,6 +151,7 @@ public class BlockState {
 	public BlockState(Block blockIn, IProperty... properties) {
 		this.block = blockIn;
 		Arrays.sort(properties, new Comparator<IProperty>() {
+			@Override
 			public int compare(IProperty iproperty, IProperty iproperty1) {
 				return iproperty.getName().compareTo(iproperty1.getName());
 			}
@@ -192,6 +201,7 @@ public class BlockState {
 		return this.validStates;
 	}
 
+	@Override
 	public String toString() {
 		return Objects.toStringHelper(this).add("block", Block.blockRegistry.getNameForObject(this.block))
 				.add("properties", Iterables.transform(this.properties, GET_NAME_FUNC)).toString();

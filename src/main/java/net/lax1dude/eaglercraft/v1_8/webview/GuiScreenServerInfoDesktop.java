@@ -9,7 +9,7 @@ import net.minecraft.client.resources.I18n;
 
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -21,7 +21,7 @@ import net.minecraft.client.resources.I18n;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiScreenServerInfoDesktop extends GuiScreen {
 
@@ -38,6 +38,7 @@ public class GuiScreenServerInfoDesktop extends GuiScreen {
 		this.opts = opts;
 	}
 
+	@Override
 	public void actionPerformed(GuiButton button) {
 		if (button.id == 0) {
 			String link = WebViewOverlayController.getFallbackURL();
@@ -49,6 +50,7 @@ public class GuiScreenServerInfoDesktop extends GuiScreen {
 		}
 	}
 
+	@Override
 	public void drawScreen(int mx, int my, float pt) {
 		drawDefaultBackground();
 		drawCenteredString(fontRendererObj, PauseMenuCustomizeState.serverInfoEmbedTitle, this.width / 2, 70, 16777215);
@@ -60,6 +62,7 @@ public class GuiScreenServerInfoDesktop extends GuiScreen {
 		super.drawScreen(mx, my, pt);
 	}
 
+	@Override
 	public void initGui() {
 		buttonList.clear();
 		buttonList.add(btnOpen = new GuiButton(0, (width - 200) / 2, height / 6 + 110,
@@ -69,14 +72,17 @@ public class GuiScreenServerInfoDesktop extends GuiScreen {
 				new GuiButton(1, (width - 200) / 2, height / 6 + 140, I18n.format("fallbackWebViewScreen.exitButton")));
 	}
 
+	@Override
 	protected boolean isPartOfPauseMenu() {
 		return true;
 	}
 
+	@Override
 	public void onGuiClosed() {
 		WebViewOverlayController.endFallbackServer();
 	}
 
+	@Override
 	public void updateScreen() {
 		++timer;
 		if (timer == 2) {

@@ -24,13 +24,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -42,7 +42,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ContainerRepair extends Container {
 	private static final Logger logger = LogManager.getLogger();
@@ -59,6 +59,7 @@ public class ContainerRepair extends Container {
 			EntityPlayer player) {
 		this.outputSlot = new InventoryCraftResult();
 		this.inputSlots = new InventoryBasic("Repair", true, 2) {
+			@Override
 			public void markDirty() {
 				super.markDirty();
 				ContainerRepair.this.onCraftMatrixChanged(this);
@@ -70,16 +71,19 @@ public class ContainerRepair extends Container {
 		this.addSlotToContainer(new Slot(this.inputSlots, 0, 27, 47));
 		this.addSlotToContainer(new Slot(this.inputSlots, 1, 76, 47));
 		this.addSlotToContainer(new Slot(this.outputSlot, 2, 134, 47) {
+			@Override
 			public boolean canTakeStack(EntityPlayer playerIn) {
 				return (playerIn.capabilities.isCreativeMode
 						|| playerIn.experienceLevel >= ContainerRepair.this.maximumCost)
 						&& ContainerRepair.this.maximumCost > 0 && this.getHasStack();
 			}
 
+			@Override
 			public boolean isItemValid(ItemStack var1) {
 				return false;
 			}
 
+			@Override
 			public void onPickupFromSlot(EntityPlayer entityplayer, ItemStack var2) {
 				if (!entityplayer.capabilities.isCreativeMode) {
 					entityplayer.addExperienceLevel(-ContainerRepair.this.maximumCost);
@@ -135,6 +139,7 @@ public class ContainerRepair extends Container {
 		this(playerInventory, worldIn, BlockPos.ORIGIN, player);
 	}
 
+	@Override
 	public boolean canInteractWith(EntityPlayer entityplayer) {
 		return this.theWorld.getBlockState(this.selfPosition).getBlock() != Blocks.anvil ? false
 				: entityplayer.getDistanceSq((double) this.selfPosition.getX() + 0.5D,
@@ -144,6 +149,7 @@ public class ContainerRepair extends Container {
 	/**
 	 * + Called when the container is closed.
 	 */
+	@Override
 	public void onContainerClosed(EntityPlayer entityplayer) {
 		super.onContainerClosed(entityplayer);
 		if (!this.theWorld.isRemote) {
@@ -160,6 +166,7 @@ public class ContainerRepair extends Container {
 		}
 	}
 
+	@Override
 	public void onCraftGuiOpened(ICrafting icrafting) {
 		super.onCraftGuiOpened(icrafting);
 		icrafting.sendProgressBarUpdate(this, 0, this.maximumCost);
@@ -168,6 +175,7 @@ public class ContainerRepair extends Container {
 	/**
 	 * + Callback for when the crafting matrix is changed.
 	 */
+	@Override
 	public void onCraftMatrixChanged(IInventory iinventory) {
 		super.onCraftMatrixChanged(iinventory);
 		if (iinventory == this.inputSlots) {
@@ -179,6 +187,7 @@ public class ContainerRepair extends Container {
 	/**
 	 * + Take a stack from the specified inventory slot.
 	 */
+	@Override
 	public ItemStack transferStackInSlot(EntityPlayer entityplayer, int i) {
 		ItemStack itemstack = null;
 		Slot slot = (Slot) this.inventorySlots.get(i);
@@ -232,6 +241,7 @@ public class ContainerRepair extends Container {
 		this.updateRepairOutput();
 	}
 
+	@Override
 	public void updateProgressBar(int i, int j) {
 		if (i == 0) {
 			this.maximumCost = j;

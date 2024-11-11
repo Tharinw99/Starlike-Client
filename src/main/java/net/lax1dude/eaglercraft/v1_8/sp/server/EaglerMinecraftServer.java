@@ -23,7 +23,7 @@ import net.minecraft.world.WorldSettings.GameType;
 
 /**
  * Copyright (c) 2023-2024 lax1dude, ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -35,7 +35,7 @@ import net.minecraft.world.WorldSettings.GameType;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EaglerMinecraftServer extends MinecraftServer {
 
@@ -151,6 +151,7 @@ public class EaglerMinecraftServer extends MinecraftServer {
 				: newWorldSettings.isMapFeaturesEnabled();
 	}
 
+	@Override
 	public void deleteWorldAndStopServer() {
 		super.deleteWorldAndStopServer();
 		logger.info("Deleting world...");
@@ -204,6 +205,7 @@ public class EaglerMinecraftServer extends MinecraftServer {
 		return 4;
 	}
 
+	@Override
 	public boolean getPaused() {
 		return paused;
 	}
@@ -299,6 +301,7 @@ public class EaglerMinecraftServer extends MinecraftServer {
 		this.setAllowFlight(true);
 	}
 
+	@Override
 	public void setPaused(boolean p) {
 		paused = p;
 		if (!p) {
@@ -319,6 +322,7 @@ public class EaglerMinecraftServer extends MinecraftServer {
 		return true;
 	}
 
+	@Override
 	public void updateTimeLightAndEntities() {
 		this.skinService.flushCache();
 		super.updateTimeLightAndEntities();

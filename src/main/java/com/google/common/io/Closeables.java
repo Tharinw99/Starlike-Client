@@ -51,7 +51,7 @@ public final class Closeables {
 	 *
 	 * <p>
 	 * Example:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *

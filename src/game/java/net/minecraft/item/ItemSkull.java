@@ -23,13 +23,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -41,7 +41,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ItemSkull extends Item {
 	private static final String[] skullTypes = new String[] { "skeleton", "wither", "zombie", "char", "creeper" };
@@ -52,6 +52,7 @@ public class ItemSkull extends Item {
 		this.setHasSubtypes(true);
 	}
 
+	@Override
 	public String getItemStackDisplayName(ItemStack itemstack) {
 		if (itemstack.getMetadata() == 3 && itemstack.hasTagCompound()) {
 			if (itemstack.getTagCompound().hasKey("SkullOwner", 8)) {
@@ -76,6 +77,7 @@ public class ItemSkull extends Item {
 	 * placed in the world when this Item is placed as a Block (mostly used with
 	 * ItemBlocks).
 	 */
+	@Override
 	public int getMetadata(int i) {
 		return i;
 	}
@@ -84,6 +86,7 @@ public class ItemSkull extends Item {
 	 * + returns a list of items with the same ID, but different meta (eg: dye
 	 * returns 16 items)
 	 */
+	@Override
 	public void getSubItems(Item item, CreativeTabs var2, List<ItemStack> list) {
 		for (int i = 0; i < skullTypes.length; ++i) {
 			list.add(new ItemStack(item, 1, i));
@@ -96,6 +99,7 @@ public class ItemSkull extends Item {
 	 * ItemStack so different stacks can have different names based on their damage
 	 * or NBT.
 	 */
+	@Override
 	public String getUnlocalizedName(ItemStack itemstack) {
 		int i = itemstack.getMetadata();
 		if (i < 0 || i >= skullTypes.length) {
@@ -108,6 +112,7 @@ public class ItemSkull extends Item {
 	/**
 	 * + Called when a Block is right-clicked with this Item
 	 */
+	@Override
 	public boolean onItemUse(ItemStack itemstack, EntityPlayer entityplayer, World world, BlockPos blockpos,
 			EnumFacing enumfacing, float var6, float var7, float var8) {
 		if (enumfacing == EnumFacing.DOWN) {
@@ -175,6 +180,7 @@ public class ItemSkull extends Item {
 	 * + Called when an ItemStack with NBT data is read to potentially that
 	 * ItemStack's NBT data
 	 */
+	@Override
 	public boolean updateItemStackNBT(NBTTagCompound nbt) {
 		super.updateItemStackNBT(nbt);
 		if (nbt.hasKey("SkullOwner", 8) && nbt.getString("SkullOwner").length() > 0) {

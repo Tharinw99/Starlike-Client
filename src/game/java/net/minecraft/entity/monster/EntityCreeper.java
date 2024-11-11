@@ -26,13 +26,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -44,7 +44,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityCreeper extends EntityMob {
 	private int lastActiveTime;
@@ -69,15 +69,18 @@ public class EntityCreeper extends EntityMob {
 		this.targetTasks.addTask(2, new EntityAIHurtByTarget(this, false, new Class[0]));
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.25D);
 	}
 
+	@Override
 	public boolean attackEntityAsMob(Entity var1) {
 		return true;
 	}
 
+	@Override
 	protected void entityInit() {
 		super.entityInit();
 		this.dataWatcher.addObject(16, Byte.valueOf((byte) -1));
@@ -100,6 +103,7 @@ public class EntityCreeper extends EntityMob {
 
 	}
 
+	@Override
 	public void fall(float f, float f1) {
 		super.fall(f, f1);
 		this.timeSinceIgnited = (int) ((float) this.timeSinceIgnited + f * 1.5F);
@@ -132,14 +136,17 @@ public class EntityCreeper extends EntityMob {
 	/**
 	 * + Returns the sound this mob makes on death.
 	 */
+	@Override
 	protected String getDeathSound() {
 		return "mob.creeper.death";
 	}
 
+	@Override
 	protected Item getDropItem() {
 		return Items.gunpowder;
 	}
 
+	@Override
 	protected float getEaglerDynamicLightsValueSimple(float partialTicks) {
 		float f = super.getEaglerDynamicLightsValueSimple(partialTicks);
 		float ff = getCreeperFlashIntensity(partialTicks);
@@ -152,6 +159,7 @@ public class EntityCreeper extends EntityMob {
 	/**
 	 * + Returns the sound this mob makes when it is hurt.
 	 */
+	@Override
 	protected String getHurtSound() {
 		return "mob.creeper.say";
 	}
@@ -160,6 +168,7 @@ public class EntityCreeper extends EntityMob {
 	 * + The maximum height from where the entity is alowed to jump (used in
 	 * pathfinder)
 	 */
+	@Override
 	public int getMaxFallHeight() {
 		return this.getAttackTarget() == null ? 3 : 3 + (int) (this.getHealth() - 1.0F);
 	}
@@ -183,6 +192,7 @@ public class EntityCreeper extends EntityMob {
 	 * + Called when a player interacts with a mob. e.g. gets milk from a cow, gets
 	 * into the saddle on a pig.
 	 */
+	@Override
 	protected boolean interact(EntityPlayer entityplayer) {
 		ItemStack itemstack = entityplayer.inventory.getCurrentItem();
 		if (itemstack != null && itemstack.getItem() == Items.flint_and_steel) {
@@ -209,6 +219,7 @@ public class EntityCreeper extends EntityMob {
 	/**
 	 * + Called when the mob's health reaches 0.
 	 */
+	@Override
 	public void onDeath(DamageSource damagesource) {
 		super.onDeath(damagesource);
 		if (damagesource.getEntity() instanceof EntitySkeleton) {
@@ -228,6 +239,7 @@ public class EntityCreeper extends EntityMob {
 	/**
 	 * + Called when a lightning bolt hits the entity.
 	 */
+	@Override
 	public void onStruckByLightning(EntityLightningBolt entitylightningbolt) {
 		super.onStruckByLightning(entitylightningbolt);
 		this.dataWatcher.updateObject(17, Byte.valueOf((byte) 1));
@@ -236,6 +248,7 @@ public class EntityCreeper extends EntityMob {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		if (this.isEntityAlive()) {
 			this.lastActiveTime = this.timeSinceIgnited;
@@ -265,6 +278,7 @@ public class EntityCreeper extends EntityMob {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		this.dataWatcher.updateObject(17, Byte.valueOf((byte) (nbttagcompound.getBoolean("powered") ? 1 : 0)));
@@ -282,6 +296,7 @@ public class EntityCreeper extends EntityMob {
 
 	}
 
+	@Override
 	protected void renderDynamicLightsEaglerAt(double entityX, double entityY, double entityZ, double renderX,
 			double renderY, double renderZ, float partialTicks, boolean isInFrustum) {
 		super.renderDynamicLightsEaglerAt(entityX, entityY, entityZ, renderX, renderY, renderZ, partialTicks,
@@ -305,6 +320,7 @@ public class EntityCreeper extends EntityMob {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		if (this.dataWatcher.getWatchableObjectByte(17) == 1) {

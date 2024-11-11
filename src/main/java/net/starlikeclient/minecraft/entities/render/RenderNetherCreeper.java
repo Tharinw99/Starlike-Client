@@ -2,23 +2,24 @@ package net.starlikeclient.minecraft.entities.render;
 
 import net.lax1dude.eaglercraft.v1_8.opengl.GlStateManager;
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.DeferredStateManager;
+import net.minecraft.client.model.ModelCreeper;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.starlikeclient.minecraft.entities.entity.EntityNetherCreeper;
 import net.starlikeclient.minecraft.entities.layers.LayerNetherCreeperCharge;
-import net.starlikeclient.minecraft.entities.model.ModelNetherCreeper;
 
 public class RenderNetherCreeper extends RenderLiving<EntityNetherCreeper> {
 	private static final ResourceLocation creeperTextures = new ResourceLocation(
-			"starlike:textures/entity/nethercreeper/creeper.png");
+			"starlike:textures/entity/nethercreeper/nethercreeper.png");
 
 	public RenderNetherCreeper(RenderManager renderManagerIn) {
-		super(renderManagerIn, new ModelNetherCreeper(), 0.5F);
+		super(renderManagerIn, new ModelCreeper(), 0.5F);
 		this.addLayer(new LayerNetherCreeperCharge(this));
 	}
 
+	@Override
 	public void doRender(EntityNetherCreeper entitycreeper, double d0, double d1, double d2, float f, float f1) {
 		float ff = entitycreeper.getCreeperFlashIntensity(f);
 		if ((int) (ff * 10.0F) % 2 != 0) {
@@ -35,6 +36,7 @@ public class RenderNetherCreeper extends RenderLiving<EntityNetherCreeper> {
 	 * + Returns an ARGB int color back. Args: entityLiving, lightBrightness,
 	 * partialTickTime
 	 */
+	@Override
 	protected int getColorMultiplier(EntityNetherCreeper entitycreeper, float var2, float f) {
 		float f1 = entitycreeper.getCreeperFlashIntensity(f);
 		if ((int) (f1 * 10.0F) % 2 == 0) {
@@ -50,6 +52,7 @@ public class RenderNetherCreeper extends RenderLiving<EntityNetherCreeper> {
 	 * + Returns the location of an entity's texture. Doesn't seem to be called
 	 * unless you call Render.bindEntityTexture.
 	 */
+	@Override
 	protected ResourceLocation getEntityTexture(EntityNetherCreeper var1) {
 		return creeperTextures;
 	}
@@ -58,6 +61,7 @@ public class RenderNetherCreeper extends RenderLiving<EntityNetherCreeper> {
 	 * + Allows the render to do any OpenGL state modifications necessary before the
 	 * model is rendered. Args: entityLiving, partialTickTime
 	 */
+	@Override
 	protected void preRenderCallback(EntityNetherCreeper entitycreeper, float f) {
 		float f1 = entitycreeper.getCreeperFlashIntensity(f);
 		float f2 = 1.0F + MathHelper.sin(f1 * 100.0F) * f1 * 0.01F;

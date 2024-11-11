@@ -19,13 +19,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -37,7 +37,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class ResourcePackListEntry implements GuiListExtended.IGuiListEntry {
 	private static final ResourceLocation RESOURCE_PACKS_TEXTURE = new ResourceLocation(
@@ -56,6 +56,7 @@ public abstract class ResourcePackListEntry implements GuiListExtended.IGuiListE
 		this.mc = Minecraft.getMinecraft();
 	}
 
+	@Override
 	public void drawEntry(int var1, int i, int j, int k, int l, int i1, int j1, boolean flag) {
 		int k1 = this.func_183019_a();
 		if (k1 != 1) {
@@ -168,6 +169,7 @@ public abstract class ResourcePackListEntry implements GuiListExtended.IGuiListE
 	/**
 	 * + Returns true if the mouse has been pressed on this control.
 	 */
+	@Override
 	public boolean mousePressed(int var1, int var2, int var3, int var4, int i, int j) {
 		if (this.func_148310_d() && i <= 32) {
 			if (this.func_148309_e()) {
@@ -178,6 +180,7 @@ public abstract class ResourcePackListEntry implements GuiListExtended.IGuiListE
 					proceedWithBs(l, false);
 				} else {
 					this.mc.displayGuiScreen(new GuiYesNo(new GuiYesNoCallback() {
+						@Override
 						public void confirmClicked(boolean flag, int var2) {
 							proceedWithBs(l, flag);
 
@@ -223,6 +226,7 @@ public abstract class ResourcePackListEntry implements GuiListExtended.IGuiListE
 	 * + Fired when the mouse button is released. Arguments: index, x, y,
 	 * mouseEvent, relativeX, relativeY
 	 */
+	@Override
 	public void mouseReleased(int var1, int var2, int var3, int var4, int var5, int var6) {
 	}
 
@@ -231,6 +235,7 @@ public abstract class ResourcePackListEntry implements GuiListExtended.IGuiListE
 			String s1 = I18n.format("resourcePack.incompatible.confirm.title", new Object[0]);
 			String s = I18n.format("resourcePack.incompatible.confirm." + (l > 1 ? "new" : "old"), new Object[0]);
 			this.mc.displayGuiScreen(new GuiYesNo(new GuiYesNoCallback() {
+				@Override
 				public void confirmClicked(boolean flag, int var2) {
 					List list2 = ResourcePackListEntry.this.resourcePacksGUI
 							.getListContaining(ResourcePackListEntry.this);
@@ -256,6 +261,7 @@ public abstract class ResourcePackListEntry implements GuiListExtended.IGuiListE
 		}
 	}
 
+	@Override
 	public void setSelected(int var1, int var2, int var3) {
 	}
 }

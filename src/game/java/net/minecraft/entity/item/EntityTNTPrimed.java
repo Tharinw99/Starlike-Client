@@ -10,13 +10,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityTNTPrimed extends Entity {
 	public int fuse;
@@ -59,6 +59,7 @@ public class EntityTNTPrimed extends Entity {
 	 * + Returns true if other Entities should be prevented from moving through this
 	 * Entity.
 	 */
+	@Override
 	public boolean canBeCollidedWith() {
 		return !this.isDead;
 	}
@@ -67,10 +68,12 @@ public class EntityTNTPrimed extends Entity {
 	 * + returns if this entity triggers Block.onEntityWalking on the blocks they
 	 * walk on. used for spiders and wolves to prevent them from trampling crops
 	 */
+	@Override
 	protected boolean canTriggerWalking() {
 		return false;
 	}
 
+	@Override
 	protected void entityInit() {
 	}
 
@@ -79,6 +82,7 @@ public class EntityTNTPrimed extends Entity {
 		this.worldObj.createExplosion(this, this.posX, this.posY + (double) (this.height / 16.0F), this.posZ, f, true);
 	}
 
+	@Override
 	protected float getEaglerDynamicLightsValueSimple(float partialTicks) {
 		float f = super.getEaglerDynamicLightsValueSimple(partialTicks);
 		if (fuse / 5 % 2 == 0) {
@@ -87,6 +91,7 @@ public class EntityTNTPrimed extends Entity {
 		return f;
 	}
 
+	@Override
 	public float getEyeHeight() {
 		return 0.0F;
 	}
@@ -101,6 +106,7 @@ public class EntityTNTPrimed extends Entity {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		this.prevPosX = this.posX;
 		this.prevPosY = this.posY;
@@ -132,10 +138,12 @@ public class EntityTNTPrimed extends Entity {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	protected void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		this.fuse = nbttagcompound.getByte("Fuse");
 	}
 
+	@Override
 	protected void renderDynamicLightsEaglerAt(double entityX, double entityY, double entityZ, double renderX,
 			double renderY, double renderZ, float partialTicks, boolean isInFrustum) {
 		super.renderDynamicLightsEaglerAt(entityX, entityY, entityZ, renderX, renderY, renderZ, partialTicks,
@@ -150,6 +158,7 @@ public class EntityTNTPrimed extends Entity {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	protected void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		nbttagcompound.setByte("Fuse", (byte) this.fuse);
 	}

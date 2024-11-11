@@ -8,13 +8,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -26,7 +26,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class RenderChicken extends RenderLiving<EntityChicken> {
 	private static final ResourceLocation chickenTextures = new ResourceLocation("textures/entity/chicken.png");
@@ -39,6 +39,7 @@ public class RenderChicken extends RenderLiving<EntityChicken> {
 	 * + Returns the location of an entity's texture. Doesn't seem to be called
 	 * unless you call Render.bindEntityTexture.
 	 */
+	@Override
 	protected ResourceLocation getEntityTexture(EntityChicken var1) {
 		return chickenTextures;
 	}
@@ -46,6 +47,7 @@ public class RenderChicken extends RenderLiving<EntityChicken> {
 	/**
 	 * + Defines what float the third param in setRotationAngles of ModelBase is
 	 */
+	@Override
 	protected float handleRotationFloat(EntityChicken livingBase, float partialTicks) {
 		float f = livingBase.field_70888_h + (livingBase.wingRotation - livingBase.field_70888_h) * partialTicks;
 		float f1 = livingBase.field_70884_g + (livingBase.destPos - livingBase.field_70884_g) * partialTicks;

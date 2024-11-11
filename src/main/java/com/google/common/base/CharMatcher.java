@@ -48,7 +48,7 @@ import com.google.common.annotations.GwtIncompatible;
  *
  * <p>
  * Example usages:
- * 
+ *
  * <pre>
  *   String trimmed = {@link #WHITESPACE WHITESPACE}.{@link #trimFrom trimFrom}(userInput);
  *   if ({@link #ASCII ASCII}.{@link #matchesAllOf matchesAllOf}(s)) { ... }
@@ -948,7 +948,7 @@ public abstract class CharMatcher implements Predicate<Character> {
 	 * Returns a string copy of the input character sequence, with each group of
 	 * consecutive characters that match this matcher replaced by a single
 	 * replacement character. For example:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *
@@ -1220,7 +1220,7 @@ public abstract class CharMatcher implements Predicate<Character> {
 	/**
 	 * Returns a string containing all non-matching characters of a character
 	 * sequence, in order. For example:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *
@@ -1263,7 +1263,7 @@ public abstract class CharMatcher implements Predicate<Character> {
 	 * Returns a string copy of the input character sequence, with each character
 	 * that matches this matcher replaced by a given replacement character. For
 	 * example:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *
@@ -1304,7 +1304,7 @@ public abstract class CharMatcher implements Predicate<Character> {
 	 * Returns a string copy of the input character sequence, with each character
 	 * that matches this matcher replaced by a given replacement sequence. For
 	 * example:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *
@@ -1357,7 +1357,7 @@ public abstract class CharMatcher implements Predicate<Character> {
 	/**
 	 * Returns a string containing all matching characters of a character sequence,
 	 * in order. For example:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *
@@ -1419,7 +1419,7 @@ public abstract class CharMatcher implements Predicate<Character> {
 	 * Returns a substring of the input character sequence that omits all characters
 	 * this matcher matches from the beginning and from the end of the string. For
 	 * example:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *
@@ -1431,7 +1431,7 @@ public abstract class CharMatcher implements Predicate<Character> {
 	 *
 	 * <p>
 	 * Note that:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *
@@ -1464,7 +1464,7 @@ public abstract class CharMatcher implements Predicate<Character> {
 	/**
 	 * Returns a substring of the input character sequence that omits all characters
 	 * this matcher matches from the beginning of the string. For example:
-	 * 
+	 *
 	 * <pre>
 	 *  {@code
 	 *
@@ -1488,7 +1488,7 @@ public abstract class CharMatcher implements Predicate<Character> {
 	/**
 	 * Returns a substring of the input character sequence that omits all characters
 	 * this matcher matches from the end of the string. For example:
-	 * 
+	 *
 	 * <pre>
 	 *  {@code
 	 *

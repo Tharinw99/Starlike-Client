@@ -8,7 +8,7 @@ import net.lax1dude.eaglercraft.v1_8.internal.PlatformRuntime;
 
 /**
  * Copyright (c) 2022-2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -20,7 +20,7 @@ import net.lax1dude.eaglercraft.v1_8.internal.PlatformRuntime;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class Logger {
 
@@ -139,6 +139,10 @@ public class Logger {
 	}
 
 	private void logExcp(final Level level, String h, Throwable msg) {
+		if (msg == null) {
+			log(level, "{}: <null>", h);
+			return;
+		}
 		log(level, "{}: {}", h, msg.toString());
 		EagRuntime.getStackTrace(msg, (e) -> log(level, "    at {}", e));
 		PlatformRuntime.printJSExceptionIfBrowser(msg);

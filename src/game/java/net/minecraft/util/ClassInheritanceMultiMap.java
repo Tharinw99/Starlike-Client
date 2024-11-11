@@ -14,13 +14,13 @@ import com.google.common.collect.Sets;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -32,7 +32,7 @@ import com.google.common.collect.Sets;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ClassInheritanceMultiMap<T> extends AbstractSet<T> {
 	private static final Set<Class<?>> field_181158_a = Sets.newHashSet();
@@ -52,6 +52,7 @@ public class ClassInheritanceMultiMap<T> extends AbstractSet<T> {
 
 	}
 
+	@Override
 	public boolean add(T parObject) {
 		for (Class oclass : this.knownKeys) {
 			if (oclass.isAssignableFrom(parObject.getClass())) {
@@ -62,6 +63,7 @@ public class ClassInheritanceMultiMap<T> extends AbstractSet<T> {
 		return true;
 	}
 
+	@Override
 	public boolean contains(Object parObject) {
 		return Iterators.contains(this.getByClass(parObject.getClass()).iterator(), parObject);
 	}
@@ -103,6 +105,7 @@ public class ClassInheritanceMultiMap<T> extends AbstractSet<T> {
 
 	public <S> Iterable<S> getByClass(final Class<S> clazz) {
 		return new Iterable<S>() {
+			@Override
 			public Iterator<S> iterator() {
 				List list = (List) ClassInheritanceMultiMap.this.map
 						.get(ClassInheritanceMultiMap.this.func_181157_b(clazz));
@@ -116,11 +119,13 @@ public class ClassInheritanceMultiMap<T> extends AbstractSet<T> {
 		};
 	}
 
+	@Override
 	public Iterator<T> iterator() {
 		return this.field_181745_e.isEmpty() ? Iterators.emptyIterator()
 				: Iterators.unmodifiableIterator(this.field_181745_e.iterator());
 	}
 
+	@Override
 	public boolean remove(Object parObject) {
 		Object object = parObject;
 		boolean flag = false;
@@ -137,6 +142,7 @@ public class ClassInheritanceMultiMap<T> extends AbstractSet<T> {
 		return flag;
 	}
 
+	@Override
 	public int size() {
 		return this.field_181745_e.size();
 	}

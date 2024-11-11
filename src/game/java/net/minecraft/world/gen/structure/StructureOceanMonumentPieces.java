@@ -22,13 +22,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -40,7 +40,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class StructureOceanMonumentPieces {
 	public static class DoubleXRoom extends StructureOceanMonumentPieces.Piece {
@@ -52,6 +52,7 @@ public class StructureOceanMonumentPieces {
 			super(1, parEnumFacing, parRoomDefinition, 2, 1, 1);
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition = this.field_175830_k.field_175965_b[EnumFacing.EAST
@@ -126,6 +127,7 @@ public class StructureOceanMonumentPieces {
 			super(1, parEnumFacing, parRoomDefinition, 2, 2, 1);
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition = this.field_175830_k.field_175965_b[EnumFacing.EAST
@@ -246,6 +248,7 @@ public class StructureOceanMonumentPieces {
 			super(1, parEnumFacing, parRoomDefinition, 1, 2, 1);
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			if (this.field_175830_k.field_175967_a / 25 > 0) {
@@ -350,6 +353,7 @@ public class StructureOceanMonumentPieces {
 			super(1, parEnumFacing, parRoomDefinition, 1, 2, 2);
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition = this.field_175830_k.field_175965_b[EnumFacing.NORTH
@@ -480,6 +484,7 @@ public class StructureOceanMonumentPieces {
 			super(1, parEnumFacing, parRoomDefinition, 1, 1, 2);
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition = this.field_175830_k.field_175965_b[EnumFacing.NORTH
@@ -572,6 +577,7 @@ public class StructureOceanMonumentPieces {
 			super(1, parEnumFacing, parRoomDefinition, 1, 1, 1);
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			this.fillWithBlocks(world, structureboundingbox, 0, 3, 0, 2, 3, 7, field_175826_b, field_175826_b, false);
@@ -603,6 +609,7 @@ public class StructureOceanMonumentPieces {
 		private FitSimpleRoomHelper() {
 		}
 
+		@Override
 		public StructureOceanMonumentPieces.Piece func_175968_a(EnumFacing enumfacing,
 				StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition,
 				EaglercraftRandom random) {
@@ -611,6 +618,7 @@ public class StructureOceanMonumentPieces {
 					random);
 		}
 
+		@Override
 		public boolean func_175969_a(StructureOceanMonumentPieces.RoomDefinition var1) {
 			return true;
 		}
@@ -620,6 +628,7 @@ public class StructureOceanMonumentPieces {
 		private FitSimpleRoomTopHelper() {
 		}
 
+		@Override
 		public StructureOceanMonumentPieces.Piece func_175968_a(EnumFacing enumfacing,
 				StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition,
 				EaglercraftRandom random) {
@@ -628,6 +637,7 @@ public class StructureOceanMonumentPieces {
 					structureoceanmonumentpieces$roomdefinition, random);
 		}
 
+		@Override
 		public boolean func_175969_a(
 				StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition) {
 			return !structureoceanmonumentpieces$roomdefinition.field_175966_c[EnumFacing.WEST.getIndex()]
@@ -725,6 +735,7 @@ public class StructureOceanMonumentPieces {
 					.add(new StructureOceanMonumentPieces.Penthouse(this.coordBaseMode, structureboundingbox));
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			int i = Math.max(world.func_181545_F(), 64) - this.boundingBox.minY;
@@ -1336,6 +1347,7 @@ public class StructureOceanMonumentPieces {
 			super(1, parEnumFacing, parRoomDefinition, 2, 2, 2);
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			this.func_175819_a(world, structureboundingbox, 1, 8, 0, 14, 8, 14, field_175828_a);
@@ -1428,6 +1440,7 @@ public class StructureOceanMonumentPieces {
 			super(parEnumFacing, parStructureBoundingBox);
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			this.fillWithBlocks(world, structureboundingbox, 2, -1, 2, 11, -1, 11, field_175826_b, field_175826_b,
@@ -1638,9 +1651,11 @@ public class StructureOceanMonumentPieces {
 
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound var1) {
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound var1) {
 		}
 	}
@@ -1717,6 +1732,7 @@ public class StructureOceanMonumentPieces {
 			this.field_175833_o = parRandom.nextInt(3);
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			if (this.field_175830_k.field_175967_a / 25 > 0) {
@@ -1960,6 +1976,7 @@ public class StructureOceanMonumentPieces {
 			super(1, parEnumFacing, parRoomDefinition, 1, 1, 1);
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			if (this.field_175830_k.field_175967_a / 25 > 0) {
@@ -2016,6 +2033,7 @@ public class StructureOceanMonumentPieces {
 			this.field_175834_o = parInt1 & 1;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			if (this.field_175834_o == 0) {
@@ -2140,6 +2158,7 @@ public class StructureOceanMonumentPieces {
 		private XDoubleRoomFitHelper() {
 		}
 
+		@Override
 		public StructureOceanMonumentPieces.Piece func_175968_a(EnumFacing parEnumFacing,
 				StructureOceanMonumentPieces.RoomDefinition parRoomDefinition, EaglercraftRandom parRandom) {
 			parRoomDefinition.field_175963_d = true;
@@ -2147,6 +2166,7 @@ public class StructureOceanMonumentPieces {
 			return new StructureOceanMonumentPieces.DoubleXRoom(parEnumFacing, parRoomDefinition, parRandom);
 		}
 
+		@Override
 		public boolean func_175969_a(StructureOceanMonumentPieces.RoomDefinition parRoomDefinition) {
 			return parRoomDefinition.field_175966_c[EnumFacing.EAST.getIndex()]
 					&& !parRoomDefinition.field_175965_b[EnumFacing.EAST.getIndex()].field_175963_d;
@@ -2157,6 +2177,7 @@ public class StructureOceanMonumentPieces {
 		private XYDoubleRoomFitHelper() {
 		}
 
+		@Override
 		public StructureOceanMonumentPieces.Piece func_175968_a(EnumFacing enumfacing,
 				StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition,
 				EaglercraftRandom random) {
@@ -2170,6 +2191,7 @@ public class StructureOceanMonumentPieces {
 					structureoceanmonumentpieces$roomdefinition, random);
 		}
 
+		@Override
 		public boolean func_175969_a(
 				StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition) {
 			if (structureoceanmonumentpieces$roomdefinition.field_175966_c[EnumFacing.EAST.getIndex()]
@@ -2193,6 +2215,7 @@ public class StructureOceanMonumentPieces {
 		private YDoubleRoomFitHelper() {
 		}
 
+		@Override
 		public StructureOceanMonumentPieces.Piece func_175968_a(EnumFacing enumfacing,
 				StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition,
 				EaglercraftRandom random) {
@@ -2202,6 +2225,7 @@ public class StructureOceanMonumentPieces {
 					random);
 		}
 
+		@Override
 		public boolean func_175969_a(
 				StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition) {
 			return structureoceanmonumentpieces$roomdefinition.field_175966_c[EnumFacing.UP.getIndex()]
@@ -2214,6 +2238,7 @@ public class StructureOceanMonumentPieces {
 		private YZDoubleRoomFitHelper() {
 		}
 
+		@Override
 		public StructureOceanMonumentPieces.Piece func_175968_a(EnumFacing enumfacing,
 				StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition,
 				EaglercraftRandom random) {
@@ -2227,6 +2252,7 @@ public class StructureOceanMonumentPieces {
 					structureoceanmonumentpieces$roomdefinition, random);
 		}
 
+		@Override
 		public boolean func_175969_a(
 				StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition) {
 			if (structureoceanmonumentpieces$roomdefinition.field_175966_c[EnumFacing.NORTH.getIndex()]
@@ -2250,6 +2276,7 @@ public class StructureOceanMonumentPieces {
 		private ZDoubleRoomFitHelper() {
 		}
 
+		@Override
 		public StructureOceanMonumentPieces.Piece func_175968_a(EnumFacing enumfacing,
 				StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition,
 				EaglercraftRandom random) {
@@ -2268,6 +2295,7 @@ public class StructureOceanMonumentPieces {
 					structureoceanmonumentpieces$roomdefinition1, random);
 		}
 
+		@Override
 		public boolean func_175969_a(
 				StructureOceanMonumentPieces.RoomDefinition structureoceanmonumentpieces$roomdefinition) {
 			return structureoceanmonumentpieces$roomdefinition.field_175966_c[EnumFacing.NORTH.getIndex()]

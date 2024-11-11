@@ -67,13 +67,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -85,7 +85,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 	static class EmeraldForItems implements EntityVillager.ITradeList {
@@ -97,6 +97,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 			this.price = priceIn;
 		}
 
+		@Override
 		public void modifyMerchantRecipeList(MerchantRecipeList recipeList, EaglercraftRandom random) {
 			int i = 1;
 			if (this.price != null) {
@@ -121,6 +122,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 			this.field_179408_d = parPriceInfo2;
 		}
 
+		@Override
 		public void modifyMerchantRecipeList(MerchantRecipeList merchantrecipelist, EaglercraftRandom random) {
 			int i = 1;
 			if (this.field_179409_b != null) {
@@ -144,6 +146,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 	}
 
 	static class ListEnchantedBookForEmeralds implements EntityVillager.ITradeList {
+		@Override
 		public void modifyMerchantRecipeList(MerchantRecipeList merchantrecipelist, EaglercraftRandom random) {
 			Enchantment enchantment = Enchantment.enchantmentsBookList[random
 					.nextInt(Enchantment.enchantmentsBookList.length)];
@@ -168,6 +171,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 			this.field_179406_b = parPriceInfo;
 		}
 
+		@Override
 		public void modifyMerchantRecipeList(MerchantRecipeList merchantrecipelist, EaglercraftRandom random) {
 			int i = 1;
 			if (this.field_179406_b != null) {
@@ -195,6 +199,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 			this.field_179402_b = priceInfo;
 		}
 
+		@Override
 		public void modifyMerchantRecipeList(MerchantRecipeList merchantrecipelist, EaglercraftRandom random) {
 			int i = 1;
 			if (this.field_179402_b != null) {
@@ -492,10 +497,12 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 		this.setCanPickUpLoot(true);
 	}
 
+	@Override
 	public boolean allowLeashing() {
 		return false;
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.5D);
@@ -513,6 +520,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 	/**
 	 * + Determines if an entity can be despawned, used on idle far away entities
 	 */
+	@Override
 	protected boolean canDespawn() {
 		return false;
 	}
@@ -522,6 +530,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 				|| itemIn == Items.wheat_seeds;
 	}
 
+	@Override
 	public EntityVillager createChild(EntityAgeable var1) {
 		EntityVillager entityvillager = new EntityVillager(this.worldObj);
 		entityvillager.onInitialSpawn(this.worldObj.getDifficultyForLocation(new BlockPos(entityvillager)),
@@ -529,6 +538,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 		return entityvillager;
 	}
 
+	@Override
 	protected void entityInit() {
 		super.entityInit();
 		this.dataWatcher.addObject(16, Integer.valueOf(0));
@@ -543,6 +553,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 		return flag ? !this.hasEnoughItems(5) : !this.hasEnoughItems(1);
 	}
 
+	@Override
 	public EntityPlayer getCustomer() {
 		return this.buyingPlayer;
 	}
@@ -550,6 +561,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 	/**
 	 * + Returns the sound this mob makes on death.
 	 */
+	@Override
 	protected String getDeathSound() {
 		return "mob.villager.death";
 	}
@@ -558,6 +570,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 	 * + Get the formatted ChatComponent that will be used for the sender's username
 	 * in chat
 	 */
+	@Override
 	public IChatComponent getDisplayName() {
 		return getDisplayNameImpl(false);
 	}
@@ -622,10 +635,12 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 		}
 	}
 
+	@Override
 	public IChatComponent getDisplayNameProfanityFilter() {
 		return getDisplayNameImpl(true);
 	}
 
+	@Override
 	public float getEyeHeight() {
 		float f = 1.62F;
 		if (this.isChild()) {
@@ -638,6 +653,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 	/**
 	 * + Returns the sound this mob makes when it is hurt.
 	 */
+	@Override
 	protected String getHurtSound() {
 		return "mob.villager.hit";
 	}
@@ -676,6 +692,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 	/**
 	 * + Returns the sound this mob makes while it's alive.
 	 */
+	@Override
 	protected String getLivingSound() {
 		return this.isTrading() ? "mob.villager.haggle" : "mob.villager.idle";
 	}
@@ -684,6 +701,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 		return Math.max(this.dataWatcher.getWatchableObjectInt(16) % 5, 0);
 	}
 
+	@Override
 	public MerchantRecipeList getRecipes(EntityPlayer var1) {
 		if (this.buyingList == null) {
 			this.populateBuyingList();
@@ -696,6 +714,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 		return this.villagerInventory;
 	}
 
+	@Override
 	public void handleStatusUpdate(byte b0) {
 		if (b0 == 12) {
 			this.spawnParticles(EnumParticleTypes.HEART);
@@ -737,6 +756,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 	 * + Called when a player interacts with a mob. e.g. gets milk from a cow, gets
 	 * into the saddle on a pig.
 	 */
+	@Override
 	public boolean interact(EntityPlayer entityplayer) {
 		ItemStack itemstack = entityplayer.inventory.getCurrentItem();
 		boolean flag = itemstack != null && itemstack.getItem() == Items.spawn_egg;
@@ -783,6 +803,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 	/**
 	 * + Called when the mob's health reaches 0.
 	 */
+	@Override
 	public void onDeath(DamageSource damagesource) {
 		if (this.villageObj != null) {
 			Entity entity = damagesource.getEntity();
@@ -807,6 +828,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 	 * + This is called when Entity's growing age timer reaches 0 (negative values
 	 * are considered as a child, positive as an adult)
 	 */
+	@Override
 	protected void onGrowingAdult() {
 		if (this.getProfession() == 0) {
 			this.tasks.addTask(8, new EntityAIHarvestFarmland(this, 0.6D));
@@ -820,6 +842,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 	 * spawner, natural spawning etc, but not called when entity is reloaded from
 	 * nbt. Mainly used for initializing attributes and inventory
 	 */
+	@Override
 	public IEntityLivingData onInitialSpawn(DifficultyInstance difficultyinstance,
 			IEntityLivingData ientitylivingdata) {
 		ientitylivingdata = super.onInitialSpawn(difficultyinstance, ientitylivingdata);
@@ -831,6 +854,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 	/**
 	 * + Called when a lightning bolt hits the entity.
 	 */
+	@Override
 	public void onStruckByLightning(EntityLightningBolt var1) {
 		if (!this.worldObj.isRemote && !this.isDead) {
 			EntityWitch entitywitch = new EntityWitch(this.worldObj);
@@ -878,6 +902,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		this.setProfession(nbttagcompound.getInteger("Profession"));
@@ -903,6 +928,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 		this.setAdditionalAItasks();
 	}
 
+	@Override
 	public boolean replaceItemInInventory(int i, ItemStack itemstack) {
 		if (super.replaceItemInInventory(i, itemstack)) {
 			return true;
@@ -929,6 +955,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 		}
 	}
 
+	@Override
 	public void setCustomer(EntityPlayer entityplayer) {
 		this.buyingPlayer = entityplayer;
 	}
@@ -953,9 +980,11 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 		this.dataWatcher.updateObject(16, Integer.valueOf(professionId));
 	}
 
+	@Override
 	public void setRecipes(MerchantRecipeList var1) {
 	}
 
+	@Override
 	public void setRevengeTarget(EntityLivingBase entitylivingbase) {
 		super.setRevengeTarget(entitylivingbase);
 		if (this.villageObj != null && entitylivingbase != null) {
@@ -989,6 +1018,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 
 	}
 
+	@Override
 	protected void updateAITasks() {
 		if (--this.randomTickDivider <= 0) {
 			BlockPos blockpos = new BlockPos(this);
@@ -1037,6 +1067,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 	 * + Tests if this entity should pickup a weapon or an armor. Entity drops
 	 * current weapon or armor if the new one is better.
 	 */
+	@Override
 	protected void updateEquipmentIfNeeded(EntityItem entityitem) {
 		ItemStack itemstack = entityitem.getEntityItem();
 		Item item = itemstack.getItem();
@@ -1051,6 +1082,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 
 	}
 
+	@Override
 	public void useRecipe(MerchantRecipe merchantrecipe) {
 		merchantrecipe.incrementToolUses();
 		this.livingSoundTime = -this.getTalkInterval();
@@ -1084,6 +1116,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 	 * Usually, this is just a sound byte being played depending if the suggested
 	 * itemstack is not null.
 	 */
+	@Override
 	public void verifySellingItem(ItemStack itemstack) {
 		if (!this.worldObj.isRemote && this.livingSoundTime > -this.getTalkInterval() + 20) {
 			this.livingSoundTime = -this.getTalkInterval();
@@ -1099,6 +1132,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		nbttagcompound.setInteger("Profession", this.getProfession());

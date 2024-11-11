@@ -9,13 +9,13 @@ import net.minecraft.util.EnumWorldBlockLayer;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@ import net.minecraft.util.EnumWorldBlockLayer;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockGlass extends BlockBreakable {
 	public BlockGlass(Material materialIn, boolean ignoreSimilarity) {
@@ -35,18 +35,22 @@ public class BlockGlass extends BlockBreakable {
 		this.setCreativeTab(CreativeTabs.tabBlock);
 	}
 
+	@Override
 	protected boolean canSilkHarvest() {
 		return true;
 	}
 
+	@Override
 	public boolean eaglerShadersShouldRenderGlassHighlights() {
 		return DeferredStateManager.isRenderingGlassHighlights();
 	}
 
+	@Override
 	public EnumWorldBlockLayer getBlockLayer() {
 		return EnumWorldBlockLayer.CUTOUT;
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -54,6 +58,7 @@ public class BlockGlass extends BlockBreakable {
 	/**
 	 * + Returns the quantity of items to drop on block destruction.
 	 */
+	@Override
 	public int quantityDropped(EaglercraftRandom var1) {
 		return 0;
 	}

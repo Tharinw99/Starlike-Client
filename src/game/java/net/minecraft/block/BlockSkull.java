@@ -39,13 +39,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -57,12 +57,13 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockSkull extends BlockContainer {
 	public static final PropertyDirection FACING = PropertyDirection.create("facing");
 	public static final PropertyBool NODROP = PropertyBool.create("nodrop");
 	private static final Predicate<BlockWorldState> IS_WITHER_SKELETON = new Predicate<BlockWorldState>() {
+		@Override
 		public boolean apply(BlockWorldState blockworldstate) {
 			return blockworldstate.getBlockState() != null && blockworldstate.getBlockState().getBlock() == Blocks.skull
 					&& blockworldstate.getTileEntity() instanceof TileEntitySkull
@@ -79,6 +80,7 @@ public class BlockSkull extends BlockContainer {
 		this.setBlockBounds(0.25F, 0.0F, 0.25F, 0.75F, 0.5F, 0.75F);
 	}
 
+	@Override
 	public void breakBlock(World world, BlockPos blockpos, IBlockState iblockstate) {
 		if (!world.isRemote) {
 			if (!((Boolean) iblockstate.getValue(NODROP)).booleanValue()) {
@@ -162,6 +164,7 @@ public class BlockSkull extends BlockContainer {
 		}
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { FACING, NODROP });
 	}
@@ -170,6 +173,7 @@ public class BlockSkull extends BlockContainer {
 	 * + Returns a new instance of a block's tile entity class. Called on placing
 	 * the block.
 	 */
+	@Override
 	public TileEntity createNewTileEntity(World var1, int var2) {
 		return new TileEntitySkull();
 	}
@@ -177,20 +181,24 @@ public class BlockSkull extends BlockContainer {
 	/**
 	 * + Spawns this Block's drops into the World as EntityItems.
 	 */
+	@Override
 	public void dropBlockAsItemWithChance(World var1, BlockPos var2, IBlockState var3, float var4, int var5) {
 	}
 
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox(World world, BlockPos blockpos, IBlockState iblockstate) {
 		this.setBlockBoundsBasedOnState(world, blockpos);
 		return super.getCollisionBoundingBox(world, blockpos, iblockstate);
 	}
 
+	@Override
 	public int getDamageValue(World world, BlockPos blockpos) {
 		TileEntity tileentity = world.getTileEntity(blockpos);
 		return tileentity instanceof TileEntitySkull ? ((TileEntitySkull) tileentity).getSkullType()
 				: super.getDamageValue(world, blockpos);
 	}
 
+	@Override
 	public Item getItem(World var1, BlockPos var2) {
 		return Items.skull;
 	}
@@ -198,6 +206,7 @@ public class BlockSkull extends BlockContainer {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
 		return Items.skull;
 	}
@@ -205,6 +214,7 @@ public class BlockSkull extends BlockContainer {
 	/**
 	 * + Gets the localized name of this block. Used for the statistics page.
 	 */
+	@Override
 	public String getLocalizedName() {
 		return StatCollector.translateToLocal("tile.skull.skeleton.name");
 	}
@@ -212,6 +222,7 @@ public class BlockSkull extends BlockContainer {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
 		i = i | ((EnumFacing) iblockstate.getValue(FACING)).getIndex();
@@ -225,6 +236,7 @@ public class BlockSkull extends BlockContainer {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(FACING, EnumFacing.getFront(i & 7)).withProperty(NODROP,
 				Boolean.valueOf((i & 8) > 0));
@@ -251,6 +263,7 @@ public class BlockSkull extends BlockContainer {
 		return this.witherPattern;
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -259,10 +272,12 @@ public class BlockSkull extends BlockContainer {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
 
+	@Override
 	public void onBlockHarvested(World world, BlockPos blockpos, IBlockState iblockstate, EntityPlayer entityplayer) {
 		if (entityplayer.capabilities.isCreativeMode) {
 			iblockstate = iblockstate.withProperty(NODROP, Boolean.valueOf(true));
@@ -276,12 +291,14 @@ public class BlockSkull extends BlockContainer {
 	 * + Called by ItemBlocks just before a block is actually set in the world, to
 	 * allow for adjustments to the IBlockstate
 	 */
+	@Override
 	public IBlockState onBlockPlaced(World var1, BlockPos var2, EnumFacing var3, float var4, float var5, float var6,
 			int var7, EntityLivingBase entitylivingbase) {
 		return this.getDefaultState().withProperty(FACING, entitylivingbase.getHorizontalFacing()).withProperty(NODROP,
 				Boolean.valueOf(false));
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
 		switch ((EnumFacing) iblockaccess.getBlockState(blockpos).getValue(FACING)) {
 		case UP:

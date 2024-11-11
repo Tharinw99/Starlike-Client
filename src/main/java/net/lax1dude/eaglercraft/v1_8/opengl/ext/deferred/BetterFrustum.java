@@ -35,7 +35,7 @@ import net.lax1dude.eaglercraft.v1_8.vector.Vector4f;
  * This class is preferred over the frustum intersection methods in
  * {@link Matrix4fc} when many objects need to be culled by the same static
  * frustum.
- * 
+ *
  * @author Kai Burjack
  */
 public class BetterFrustum {
@@ -176,9 +176,9 @@ public class BetterFrustum {
 	 * <p>
 	 * In order to update the compute frustum planes later on, call
 	 * {@link #set(Matrix4fc)}.
-	 * 
+	 *
 	 * @see #set(Matrix4fc)
-	 * 
+	 *
 	 * @param m the {@link Matrix4fc} to create the frustum culler from
 	 */
 	public BetterFrustum(Matrix4f m) {
@@ -191,9 +191,9 @@ public class BetterFrustum {
 	 * <p>
 	 * In order to update the compute frustum planes later on, call
 	 * {@link #set(Matrix4fc)}.
-	 * 
+	 *
 	 * @see #set(Matrix4fc)
-	 * 
+	 *
 	 * @param m                the {@link Matrix4fc} to create the frustum culler
 	 *                         from
 	 * @param allowTestSpheres whether the methods
@@ -211,7 +211,7 @@ public class BetterFrustum {
 	/**
 	 * Compute the signed distance from the given axis-aligned box to the
 	 * <code>plane</code>.
-	 * 
+	 *
 	 * @param minX  the x-coordinate of the minimum corner
 	 * @param minY  the y-coordinate of the minimum corner
 	 * @param minZ  the z-coordinate of the minimum corner
@@ -248,7 +248,7 @@ public class BetterFrustum {
 	 * Reference:
 	 * <a href="http://old.cescg.org/CESCG-2002/DSykoraJJelinek/">Efficient View
 	 * Frustum Culling</a>
-	 * 
+	 *
 	 * @param minX the x-coordinate of the minimum corner
 	 * @param minY the y-coordinate of the minimum corner
 	 * @param minZ the z-coordinate of the minimum corner
@@ -266,7 +266,7 @@ public class BetterFrustum {
 		/*
 		 * This is an implementation of the "2.4 Basic intersection test" of the
 		 * mentioned site.
-		 * 
+		 *
 		 * In addition to the algorithm in the paper, this method also returns the index
 		 * of the first plane that culled the box.
 		 */
@@ -332,7 +332,7 @@ public class BetterFrustum {
 	 * Reference:
 	 * <a href="http://old.cescg.org/CESCG-2002/DSykoraJJelinek/">Efficient View
 	 * Frustum Culling</a>
-	 * 
+	 *
 	 * @param minX the x-coordinate of the minimum corner
 	 * @param minY the y-coordinate of the minimum corner
 	 * @param minZ the z-coordinate of the minimum corner
@@ -355,7 +355,7 @@ public class BetterFrustum {
 		/*
 		 * This is an implementation of the first algorithm in
 		 * "2.5 Plane masking and coherency" of the mentioned site.
-		 * 
+		 *
 		 * In addition to the algorithm in the paper, this method also returns the index
 		 * of the first plane that culled the box.
 		 */
@@ -432,7 +432,7 @@ public class BetterFrustum {
 	 * Reference:
 	 * <a href="http://old.cescg.org/CESCG-2002/DSykoraJJelinek/">Efficient View
 	 * Frustum Culling</a>
-	 * 
+	 *
 	 * @param minX       the x-coordinate of the minimum corner
 	 * @param minY       the y-coordinate of the minimum corner
 	 * @param minZ       the z-coordinate of the minimum corner
@@ -460,7 +460,7 @@ public class BetterFrustum {
 		/*
 		 * This is an implementation of the second algorithm in
 		 * "2.5 Plane masking and coherency" of the mentioned site.
-		 * 
+		 *
 		 * In addition to the algorithm in the paper, this method also returns the index
 		 * of the first plane that culled the box.
 		 */
@@ -523,7 +523,7 @@ public class BetterFrustum {
 	 * <a href=
 	 * "http://iquilezles.org/www/articles/frustumcorrect/frustumcorrect.htm">iquilezles.org</a>
 	 * for an examination of this problem.
-	 * 
+	 *
 	 * @param min the minimum corner coordinates of the axis-aligned box
 	 * @param max the maximum corner coordinates of the axis-aligned box
 	 * @return the index of the first plane that culled the box, if the box does not
@@ -556,7 +556,7 @@ public class BetterFrustum {
 	 * <a href=
 	 * "http://iquilezles.org/www/articles/frustumcorrect/frustumcorrect.htm">iquilezles.org</a>
 	 * for an examination of this problem.
-	 * 
+	 *
 	 * @param min  the minimum corner coordinates of the axis-aligned box
 	 * @param max  the maximum corner coordinates of the axis-aligned box
 	 * @param mask contains as bitset all the planes that should be tested. This
@@ -603,7 +603,7 @@ public class BetterFrustum {
 	 * <a href=
 	 * "http://iquilezles.org/www/articles/frustumcorrect/frustumcorrect.htm">iquilezles.org</a>
 	 * for an examination of this problem.
-	 * 
+	 *
 	 * @param min        the minimum corner coordinates of the axis-aligned box
 	 * @param max        the maximum corner coordinates of the axis-aligned box
 	 * @param mask       contains as bitset all the planes that should be tested.
@@ -636,7 +636,7 @@ public class BetterFrustum {
 	 * <a href=
 	 * "http://iquilezles.org/www/articles/frustumcorrect/frustumcorrect.htm">iquilezles.org</a>
 	 * for an examination of this problem.
-	 * 
+	 *
 	 * @param x the x-coordinate of the sphere's center
 	 * @param y the y-coordinate of the sphere's center
 	 * @param z the z-coordinate of the sphere's center
@@ -686,7 +686,7 @@ public class BetterFrustum {
 	 * <a href=
 	 * "http://iquilezles.org/www/articles/frustumcorrect/frustumcorrect.htm">iquilezles.org</a>
 	 * for an examination of this problem.
-	 * 
+	 *
 	 * @param center the sphere's center
 	 * @param radius the sphere's radius
 	 * @return {@link #INSIDE} if the given sphere is completely inside the frustum,
@@ -705,7 +705,7 @@ public class BetterFrustum {
 	 * "http://gamedevs.org/uploads/fast-extraction-viewing-frustum-planes-from-world-view-projection-matrix.pdf">
 	 * Fast Extraction of Viewing Frustum Planes from the World-View-Projection
 	 * Matrix</a>
-	 * 
+	 *
 	 * @param m the {@link Matrix4fc matrix} to update <code>this</code> frustum
 	 *          culler's frustum planes from
 	 * @return this
@@ -724,7 +724,7 @@ public class BetterFrustum {
 	 * "http://gamedevs.org/uploads/fast-extraction-viewing-frustum-planes-from-world-view-projection-matrix.pdf">
 	 * Fast Extraction of Viewing Frustum Planes from the World-View-Projection
 	 * Matrix</a>
-	 * 
+	 *
 	 * @param m                the {@link Matrix4fc matrix} to update
 	 *                         <code>this</code> frustum culler's frustum planes
 	 *                         from
@@ -829,7 +829,7 @@ public class BetterFrustum {
 	 * Reference:
 	 * <a href="http://old.cescg.org/CESCG-2002/DSykoraJJelinek/">Efficient View
 	 * Frustum Culling</a>
-	 * 
+	 *
 	 * @param minX the x-coordinate of the minimum corner
 	 * @param minY the y-coordinate of the minimum corner
 	 * @param minZ the z-coordinate of the minimum corner
@@ -866,7 +866,7 @@ public class BetterFrustum {
 	 * <a href=
 	 * "http://iquilezles.org/www/articles/frustumcorrect/frustumcorrect.htm">iquilezles.org</a>
 	 * for an examination of this problem.
-	 * 
+	 *
 	 * @param min the minimum corner coordinates of the axis-aligned box
 	 * @param max the maximum corner coordinates of the axis-aligned box
 	 * @return <code>true</code> if the axis-aligned box is completely or partly
@@ -880,7 +880,7 @@ public class BetterFrustum {
 	 * Test whether the given line segment, defined by the end points
 	 * <code>(aX, aY, aZ)</code> and <code>(bX, bY, bZ)</code>, is partly or
 	 * completely within the frustum defined by <code>this</code> frustum culler.
-	 * 
+	 *
 	 * @param aX the x coordinate of the line segment's first end point
 	 * @param aY the y coordinate of the line segment's first end point
 	 * @param aZ the z coordinate of the line segment's first end point
@@ -986,7 +986,7 @@ public class BetterFrustum {
 	 * Test whether the given line segment, defined by the end points <code>a</code>
 	 * and <code>b</code>, is partly or completely within the frustum defined by
 	 * <code>this</code> frustum culler.
-	 * 
+	 *
 	 * @param a the line segment's first end point
 	 * @param b the line segment's second end point
 	 * @return <code>true</code> if the given line segment is partly or completely
@@ -1012,7 +1012,7 @@ public class BetterFrustum {
 	 * Reference:
 	 * <a href="http://old.cescg.org/CESCG-2002/DSykoraJJelinek/">Efficient View
 	 * Frustum Culling</a>
-	 * 
+	 *
 	 * @param minX the x-coordinate of the minimum corner
 	 * @param minY the y-coordinate of the minimum corner
 	 * @param maxX the x-coordinate of the maximum corner
@@ -1046,7 +1046,7 @@ public class BetterFrustum {
 	 * <a href=
 	 * "http://iquilezles.org/www/articles/frustumcorrect/frustumcorrect.htm">iquilezles.org</a>
 	 * for an examination of this problem.
-	 * 
+	 *
 	 * @param min the minimum corner coordinates of the XY-plane
 	 * @param max the maximum corner coordinates of the XY-plane
 	 * @return <code>true</code> if the XY-plane is completely or partly inside of
@@ -1072,7 +1072,7 @@ public class BetterFrustum {
 	 * Reference:
 	 * <a href="http://old.cescg.org/CESCG-2002/DSykoraJJelinek/">Efficient View
 	 * Frustum Culling</a>
-	 * 
+	 *
 	 * @param minX the x-coordinate of the minimum corner
 	 * @param minZ the z-coordinate of the minimum corner
 	 * @param maxX the x-coordinate of the maximum corner
@@ -1097,7 +1097,7 @@ public class BetterFrustum {
 	/**
 	 * Test whether the given point <code>(x, y, z)</code> is within the frustum
 	 * defined by <code>this</code> frustum culler.
-	 * 
+	 *
 	 * @param x the x-coordinate of the point
 	 * @param y the y-coordinate of the point
 	 * @param z the z-coordinate of the point
@@ -1113,7 +1113,7 @@ public class BetterFrustum {
 	/**
 	 * Test whether the given point is within the frustum defined by
 	 * <code>this</code> frustum culler.
-	 * 
+	 *
 	 * @param point the point to test
 	 * @return <code>true</code> if the given point is inside the frustum;
 	 *         <code>false</code> otherwise
@@ -1132,7 +1132,7 @@ public class BetterFrustum {
 	 * <a href=
 	 * "http://iquilezles.org/www/articles/frustumcorrect/frustumcorrect.htm">iquilezles.org</a>
 	 * for an examination of this problem.
-	 * 
+	 *
 	 * @param x the x-coordinate of the sphere's center
 	 * @param y the y-coordinate of the sphere's center
 	 * @param z the z-coordinate of the sphere's center
@@ -1156,7 +1156,7 @@ public class BetterFrustum {
 	 * <a href=
 	 * "http://iquilezles.org/www/articles/frustumcorrect/frustumcorrect.htm">iquilezles.org</a>
 	 * for an examination of this problem.
-	 * 
+	 *
 	 * @param center the sphere's center
 	 * @param radius the sphere's radius
 	 * @return <code>true</code> if the given sphere is partly or completely inside

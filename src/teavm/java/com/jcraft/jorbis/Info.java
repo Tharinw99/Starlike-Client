@@ -1,24 +1,24 @@
 /* -*-mode:java; c-basic-offset:2; indent-tabs-mode:nil -*- */
 /* JOrbis
  * Copyright (C) 2000 ymnk, JCraft,Inc.
- *  
+ *
  * Written by: 2000 ymnk<ymnk@jcraft.com>
- *   
- * Many thanks to 
- *   Monty <monty@xiph.org> and 
+ *
+ * Many thanks to
+ *   Monty <monty@xiph.org> and
  *   The XIPHOPHORUS Company http://www.xiph.org/ .
  * JOrbis has been based on their awesome works, Vorbis codec.
- *   
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public License
  * as published by the Free Software Foundation; either version 2 of
  * the License, or (at your option) any later version.
-   
+
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -26,7 +26,8 @@
 
 package com.jcraft.jorbis;
 
-import com.jcraft.jogg.*;
+import com.jcraft.jogg.Buffer;
+import com.jcraft.jogg.Packet;
 
 public class Info {
 	private static final int OV_EBADPACKET = -136;
@@ -104,9 +105,33 @@ public class Info {
 	float preecho_thresh;
 	float preecho_clamp;
 
-	// used by synthesis, which has a full, alloced vi
-	public void init() {
-		rate = 0;
+	public int blocksize(Packet op) {
+		// codec_setup_info
+		Buffer opb = new Buffer();
+
+		int mode;
+
+		opb.readinit(op.packet_base, op.packet, op.bytes);
+
+		/* Check the packet type */
+		if (opb.read(1) != 0) {
+			/* Oops. This is not an audio data packet */
+			return (OV_ENOTAUDIO);
+		}
+		{
+			int modebits = 0;
+			int v = modes;
+			while (v > 1) {
+				modebits++;
+				v >>>= 1;
+			}
+
+			/* read our mode and pre/post windowsize */
+			mode = opb.read(modebits);
+		}
+		if (mode == -1)
+			return (OV_EBADPACKET);
+		return (blocksizes[mode_param[mode].blockflag]);
 	}
 
 	public void clear() {
@@ -155,28 +180,144 @@ public class Info {
 
 	}
 
-	// Header packing/unpacking
-	int unpack_info(Buffer opb) {
-		version = opb.read(32);
-		if (version != 0)
-			return (-1);
+	// used by synthesis, which has a full, alloced vi
+	public void init() {
+		rate = 0;
+	}
 
-		channels = opb.read(8);
-		rate = opb.read(32);
+	int pack_books(Buffer opb) {
+		opb.write(0x05, 8);
+		opb.write(_vorbis);
 
-		bitrate_upper = opb.read(32);
-		bitrate_nominal = opb.read(32);
-		bitrate_lower = opb.read(32);
-
-		blocksizes[0] = 1 << opb.read(4);
-		blocksizes[1] = 1 << opb.read(4);
-
-		if ((rate < 1) || (channels < 1) || (blocksizes[0] < 8) || (blocksizes[1] < blocksizes[0])
-				|| (opb.read(1) != 1)) {
-			clear();
-			return (-1);
+		// books
+		opb.write(books - 1, 8);
+		for (int i = 0; i < books; i++) {
+			if (book_param[i].pack(opb) != 0) {
+				// goto err_out;
+				return (-1);
+			}
 		}
+
+		// times
+		opb.write(times - 1, 6);
+		for (int i = 0; i < times; i++) {
+			opb.write(time_type[i], 16);
+			FuncTime.time_P[time_type[i]].pack(this.time_param[i], opb);
+		}
+
+		// floors
+		opb.write(floors - 1, 6);
+		for (int i = 0; i < floors; i++) {
+			opb.write(floor_type[i], 16);
+			FuncFloor.floor_P[floor_type[i]].pack(floor_param[i], opb);
+		}
+
+		// residues
+		opb.write(residues - 1, 6);
+		for (int i = 0; i < residues; i++) {
+			opb.write(residue_type[i], 16);
+			FuncResidue.residue_P[residue_type[i]].pack(residue_param[i], opb);
+		}
+
+		// maps
+		opb.write(maps - 1, 6);
+		for (int i = 0; i < maps; i++) {
+			opb.write(map_type[i], 16);
+			FuncMapping.mapping_P[map_type[i]].pack(this, map_param[i], opb);
+		}
+
+		// modes
+		opb.write(modes - 1, 6);
+		for (int i = 0; i < modes; i++) {
+			opb.write(mode_param[i].blockflag, 1);
+			opb.write(mode_param[i].windowtype, 16);
+			opb.write(mode_param[i].transformtype, 16);
+			opb.write(mode_param[i].mapping, 8);
+		}
+		opb.write(1, 1);
 		return (0);
+	}
+
+	// The Vorbis header is in three packets; the initial small packet in
+	// the first page that identifies basic parameters, a second packet
+	// with bitstream comments and a third packet that holds the
+	// codebook.
+
+	// pack side
+	int pack_info(Buffer opb) {
+		// preamble
+		opb.write(0x01, 8);
+		opb.write(_vorbis);
+
+		// basic information about the stream
+		opb.write(0x00, 32);
+		opb.write(channels, 8);
+		opb.write(rate, 32);
+
+		opb.write(bitrate_upper, 32);
+		opb.write(bitrate_nominal, 32);
+		opb.write(bitrate_lower, 32);
+
+		opb.write(Util.ilog2(blocksizes[0]), 4);
+		opb.write(Util.ilog2(blocksizes[1]), 4);
+		opb.write(1, 1);
+		return (0);
+	}
+
+	public int synthesis_headerin(Comment vc, Packet op) {
+		Buffer opb = new Buffer();
+
+		if (op != null) {
+			opb.readinit(op.packet_base, op.packet, op.bytes);
+
+			// Which of the three types of header is this?
+			// Also verify header-ness, vorbis
+			{
+				byte[] buffer = new byte[6];
+				int packtype = opb.read(8);
+				opb.read(buffer, 6);
+				if (buffer[0] != 'v' || buffer[1] != 'o' || buffer[2] != 'r' || buffer[3] != 'b' || buffer[4] != 'i'
+						|| buffer[5] != 's') {
+					// not a vorbis header
+					return (-1);
+				}
+				switch (packtype) {
+				case 0x01: // least significant *bit* is read first
+					if (op.b_o_s == 0) {
+						// Not the initial packet
+						return (-1);
+					}
+					if (rate != 0) {
+						// previously initialized info header
+						return (-1);
+					}
+					return (unpack_info(opb));
+				case 0x03: // least significant *bit* is read first
+					if (rate == 0) {
+						// um... we didn't get the initial header
+						return (-1);
+					}
+					return (vc.unpack(opb));
+				case 0x05: // least significant *bit* is read first
+					if (rate == 0 || vc.vendor == null) {
+						// um... we didn;t get the initial header or comments yet
+						return (-1);
+					}
+					return (unpack_books(opb));
+				default:
+					// Not a valid vorbis header type
+					// return(-1);
+					break;
+				}
+			}
+		}
+		return (-1);
+	}
+
+	@Override
+	public String toString() {
+		return "version:" + version + ", channels:" + channels + ", rate:" + rate + ", bitrate:" + bitrate_upper + ","
+				+ bitrate_nominal + "," + bitrate_lower;
 	}
 
 	// all of the real encoding details are here. The modes, books,
@@ -302,167 +443,27 @@ public class Info {
 		return (0);
 	}
 
-	// The Vorbis header is in three packets; the initial small packet in
-	// the first page that identifies basic parameters, a second packet
-	// with bitstream comments and a third packet that holds the
-	// codebook.
+	// Header packing/unpacking
+	int unpack_info(Buffer opb) {
+		version = opb.read(32);
+		if (version != 0)
+			return (-1);
 
-	public int synthesis_headerin(Comment vc, Packet op) {
-		Buffer opb = new Buffer();
+		channels = opb.read(8);
+		rate = opb.read(32);
 
-		if (op != null) {
-			opb.readinit(op.packet_base, op.packet, op.bytes);
+		bitrate_upper = opb.read(32);
+		bitrate_nominal = opb.read(32);
+		bitrate_lower = opb.read(32);
 
-			// Which of the three types of header is this?
-			// Also verify header-ness, vorbis
-			{
-				byte[] buffer = new byte[6];
-				int packtype = opb.read(8);
-				opb.read(buffer, 6);
-				if (buffer[0] != 'v' || buffer[1] != 'o' || buffer[2] != 'r' || buffer[3] != 'b' || buffer[4] != 'i'
-						|| buffer[5] != 's') {
-					// not a vorbis header
-					return (-1);
-				}
-				switch (packtype) {
-				case 0x01: // least significant *bit* is read first
-					if (op.b_o_s == 0) {
-						// Not the initial packet
-						return (-1);
-					}
-					if (rate != 0) {
-						// previously initialized info header
-						return (-1);
-					}
-					return (unpack_info(opb));
-				case 0x03: // least significant *bit* is read first
-					if (rate == 0) {
-						// um... we didn't get the initial header
-						return (-1);
-					}
-					return (vc.unpack(opb));
-				case 0x05: // least significant *bit* is read first
-					if (rate == 0 || vc.vendor == null) {
-						// um... we didn;t get the initial header or comments yet
-						return (-1);
-					}
-					return (unpack_books(opb));
-				default:
-					// Not a valid vorbis header type
-					// return(-1);
-					break;
-				}
-			}
+		blocksizes[0] = 1 << opb.read(4);
+		blocksizes[1] = 1 << opb.read(4);
+
+		if ((rate < 1) || (channels < 1) || (blocksizes[0] < 8) || (blocksizes[1] < blocksizes[0])
+				|| (opb.read(1) != 1)) {
+			clear();
+			return (-1);
 		}
-		return (-1);
-	}
-
-	// pack side
-	int pack_info(Buffer opb) {
-		// preamble
-		opb.write(0x01, 8);
-		opb.write(_vorbis);
-
-		// basic information about the stream
-		opb.write(0x00, 32);
-		opb.write(channels, 8);
-		opb.write(rate, 32);
-
-		opb.write(bitrate_upper, 32);
-		opb.write(bitrate_nominal, 32);
-		opb.write(bitrate_lower, 32);
-
-		opb.write(Util.ilog2(blocksizes[0]), 4);
-		opb.write(Util.ilog2(blocksizes[1]), 4);
-		opb.write(1, 1);
 		return (0);
-	}
-
-	int pack_books(Buffer opb) {
-		opb.write(0x05, 8);
-		opb.write(_vorbis);
-
-		// books
-		opb.write(books - 1, 8);
-		for (int i = 0; i < books; i++) {
-			if (book_param[i].pack(opb) != 0) {
-				// goto err_out;
-				return (-1);
-			}
-		}
-
-		// times
-		opb.write(times - 1, 6);
-		for (int i = 0; i < times; i++) {
-			opb.write(time_type[i], 16);
-			FuncTime.time_P[time_type[i]].pack(this.time_param[i], opb);
-		}
-
-		// floors
-		opb.write(floors - 1, 6);
-		for (int i = 0; i < floors; i++) {
-			opb.write(floor_type[i], 16);
-			FuncFloor.floor_P[floor_type[i]].pack(floor_param[i], opb);
-		}
-
-		// residues
-		opb.write(residues - 1, 6);
-		for (int i = 0; i < residues; i++) {
-			opb.write(residue_type[i], 16);
-			FuncResidue.residue_P[residue_type[i]].pack(residue_param[i], opb);
-		}
-
-		// maps
-		opb.write(maps - 1, 6);
-		for (int i = 0; i < maps; i++) {
-			opb.write(map_type[i], 16);
-			FuncMapping.mapping_P[map_type[i]].pack(this, map_param[i], opb);
-		}
-
-		// modes
-		opb.write(modes - 1, 6);
-		for (int i = 0; i < modes; i++) {
-			opb.write(mode_param[i].blockflag, 1);
-			opb.write(mode_param[i].windowtype, 16);
-			opb.write(mode_param[i].transformtype, 16);
-			opb.write(mode_param[i].mapping, 8);
-		}
-		opb.write(1, 1);
-		return (0);
-	}
-
-	public int blocksize(Packet op) {
-		// codec_setup_info
-		Buffer opb = new Buffer();
-
-		int mode;
-
-		opb.readinit(op.packet_base, op.packet, op.bytes);
-
-		/* Check the packet type */
-		if (opb.read(1) != 0) {
-			/* Oops. This is not an audio data packet */
-			return (OV_ENOTAUDIO);
-		}
-		{
-			int modebits = 0;
-			int v = modes;
-			while (v > 1) {
-				modebits++;
-				v >>>= 1;
-			}
-
-			/* read our mode and pre/post windowsize */
-			mode = opb.read(modebits);
-		}
-		if (mode == -1)
-			return (OV_EBADPACKET);
-		return (blocksizes[mode_param[mode].blockflag]);
-	}
-
-	public String toString() {
-		return "version:" + version + ", channels:" + channels + ", rate:" + rate
-				+ ", bitrate:" + bitrate_upper + "," + bitrate_nominal + ","
-				+ bitrate_lower;
 	}
 }

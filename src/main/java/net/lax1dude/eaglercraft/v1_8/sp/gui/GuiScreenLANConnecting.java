@@ -23,7 +23,7 @@ import net.minecraft.util.ChatComponentText;
 
 /**
  * Copyright (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -35,7 +35,7 @@ import net.minecraft.util.ChatComponentText;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiScreenLANConnecting extends GuiScreen {
 
@@ -62,14 +62,17 @@ public class GuiScreenLANConnecting extends GuiScreen {
 		Minecraft.getMinecraft().setServerData(new ServerData("Shared World", "shared:" + relay.address, false));
 	}
 
+	@Override
 	public boolean canCloseGui() {
 		return false;
 	}
 
+	@Override
 	public boolean doesGuiPauseGame() {
 		return false;
 	}
 
+	@Override
 	public void drawScreen(int par1, int par2, float par3) {
 		this.drawDefaultBackground();
 		if (completed) {
@@ -119,8 +122,10 @@ public class GuiScreenLANConnecting extends GuiScreen {
 						ConnectionHandshake.getSPHandshakeProtocolData(), EaglercraftVersion.clientBrandUUID));
 			}
 		}
+		super.drawScreen(par1, par2, par3);
 	}
 
+	@Override
 	public void updateScreen() {
 		if (networkManager != null) {
 			if (networkManager.isChannelOpen()) {

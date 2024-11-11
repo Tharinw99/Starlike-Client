@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * Copyright (c) 2022-2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -20,7 +20,7 @@ import java.util.List;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class RelayPacket07LocalWorlds extends RelayPacket {
 
@@ -45,6 +45,7 @@ public class RelayPacket07LocalWorlds extends RelayPacket {
 		this.worldsList = worldsList;
 	}
 
+	@Override
 	public int packetLength() {
 		int accum = 1;
 		if (worldsList != null) {
@@ -56,6 +57,7 @@ public class RelayPacket07LocalWorlds extends RelayPacket {
 		return accum;
 	}
 
+	@Override
 	public void read(DataInputStream input) throws IOException {
 		int l = input.read();
 		if (worldsList == null) {
@@ -68,6 +70,7 @@ public class RelayPacket07LocalWorlds extends RelayPacket {
 		}
 	}
 
+	@Override
 	public void write(DataOutputStream output) throws IOException {
 		if (worldsList == null) {
 			output.write(0);

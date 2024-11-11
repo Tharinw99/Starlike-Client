@@ -12,13 +12,13 @@ import net.minecraft.world.IBlockAccess;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,9 +30,10 @@ import net.minecraft.world.IBlockAccess;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class SwimNodeProcessor extends NodeProcessor {
+	@Override
 	public int findPathOptions(PathPoint[] apathpoint, Entity entity, PathPoint pathpoint, PathPoint pathpoint1,
 			float f) {
 		int i = 0;
@@ -51,7 +52,7 @@ public class SwimNodeProcessor extends NodeProcessor {
 	}
 
 	private int func_176186_b(Entity entityIn, int x, int y, int z) {
-		BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+		BlockPos blockpos$mutableblockpos = new BlockPos();
 
 		for (int i = x; i < x + this.entitySizeX; ++i) {
 			for (int j = y; j < y + this.entitySizeY; ++j) {
@@ -71,6 +72,7 @@ public class SwimNodeProcessor extends NodeProcessor {
 	/**
 	 * + Returns given entity's position as PathPoint
 	 */
+	@Override
 	public PathPoint getPathPointTo(Entity entity) {
 		return this.openPoint(MathHelper.floor_double(entity.getEntityBoundingBox().minX),
 				MathHelper.floor_double(entity.getEntityBoundingBox().minY + 0.5D),
@@ -80,6 +82,7 @@ public class SwimNodeProcessor extends NodeProcessor {
 	/**
 	 * + Returns PathPoint for given coordinates
 	 */
+	@Override
 	public PathPoint getPathPointToCoords(Entity entity, double d0, double d1, double d2) {
 		return this.openPoint(MathHelper.floor_double(d0 - (double) (entity.width / 2.0F)),
 				MathHelper.floor_double(d1 + 0.5D), MathHelper.floor_double(d2 - (double) (entity.width / 2.0F)));
@@ -93,6 +96,7 @@ public class SwimNodeProcessor extends NodeProcessor {
 		return i == -1 ? this.openPoint(x, y, z) : null;
 	}
 
+	@Override
 	public void initProcessor(IBlockAccess iblockaccess, Entity entity) {
 		super.initProcessor(iblockaccess, entity);
 	}
@@ -104,6 +108,7 @@ public class SwimNodeProcessor extends NodeProcessor {
 	 * {@link net.minecraft.world.pathfinder.WalkNodeProcessor#avoidsWater
 	 * avoidsWater}
 	 */
+	@Override
 	public void postProcess() {
 		super.postProcess();
 	}

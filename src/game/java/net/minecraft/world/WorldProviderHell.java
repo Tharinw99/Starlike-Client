@@ -10,13 +10,13 @@ import net.minecraft.world.gen.ChunkProviderHell;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,13 +28,14 @@ import net.minecraft.world.gen.ChunkProviderHell;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class WorldProviderHell extends WorldProvider {
 	/**
 	 * + Calculates the angle of sun and moon in the sky relative to a specified
 	 * time (usually worldTime)
 	 */
+	@Override
 	public float calculateCelestialAngle(long var1, float var3) {
 		return 0.5F;
 	}
@@ -43,6 +44,7 @@ public class WorldProviderHell extends WorldProvider {
 	 * + Will check if the x, z position specified is alright to be set as the map
 	 * spawn point
 	 */
+	@Override
 	public boolean canCoordinateBeSpawn(int var1, int var2) {
 		return false;
 	}
@@ -51,6 +53,7 @@ public class WorldProviderHell extends WorldProvider {
 	 * + True if the player can respawn in this dimension (true = overworld, false =
 	 * nether).
 	 */
+	@Override
 	public boolean canRespawnHere() {
 		return false;
 	}
@@ -58,6 +61,7 @@ public class WorldProviderHell extends WorldProvider {
 	/**
 	 * + Returns a new chunk provider which generates chunks for this world
 	 */
+	@Override
 	public IChunkProvider createChunkGenerator() {
 		return new ChunkProviderHell(this.worldObj, this.worldObj.getWorldInfo().isMapFeaturesEnabled(),
 				this.worldObj.getSeed());
@@ -66,6 +70,7 @@ public class WorldProviderHell extends WorldProvider {
 	/**
 	 * + Returns true if the given X,Z coordinate should show environmental fog.
 	 */
+	@Override
 	public boolean doesXZShowFog(int var1, int var2) {
 		return true;
 	}
@@ -73,6 +78,7 @@ public class WorldProviderHell extends WorldProvider {
 	/**
 	 * + Creates the light to brightness table
 	 */
+	@Override
 	protected void generateLightBrightnessTable() {
 		float f = 0.1F;
 
@@ -86,6 +92,7 @@ public class WorldProviderHell extends WorldProvider {
 	/**
 	 * + Returns the dimension's name, e.g. "The End", "Nether", or "Overworld".
 	 */
+	@Override
 	public String getDimensionName() {
 		return "Nether";
 	}
@@ -93,20 +100,25 @@ public class WorldProviderHell extends WorldProvider {
 	/**
 	 * + Return Vec3D with biome specific fog color
 	 */
+	@Override
 	public Vec3 getFogColor(float var1, float var2) {
 		return new Vec3(0.20000000298023224D, 0.029999999329447746D, 0.029999999329447746D);
 	}
 
+	@Override
 	public String getInternalNameSuffix() {
 		return "_nether";
 	}
 
+	@Override
 	public WorldBorder getWorldBorder() {
 		return new WorldBorder() {
+			@Override
 			public double getCenterX() {
 				return super.getCenterX() / 8.0D;
 			}
 
+			@Override
 			public double getCenterZ() {
 				return super.getCenterZ() / 8.0D;
 			}
@@ -117,6 +129,7 @@ public class WorldProviderHell extends WorldProvider {
 	 * + Returns 'true' if in the "main surface world", but 'false' if in the Nether
 	 * or End dimensions.
 	 */
+	@Override
 	public boolean isSurfaceWorld() {
 		return false;
 	}
@@ -124,6 +137,7 @@ public class WorldProviderHell extends WorldProvider {
 	/**
 	 * + creates a new world chunk manager for WorldProvider
 	 */
+	@Override
 	public void registerWorldChunkManager() {
 		this.worldChunkMgr = new WorldChunkManagerHell(BiomeGenBase.hell, 0.0F);
 		this.isHellWorld = true;

@@ -29,13 +29,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -47,7 +47,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockAnvil extends BlockFalling {
 	public static class Anvil implements IInteractionObject {
@@ -59,22 +59,27 @@ public class BlockAnvil extends BlockFalling {
 			this.position = pos;
 		}
 
+		@Override
 		public Container createContainer(InventoryPlayer playerInventory, EntityPlayer playerIn) {
 			return new ContainerRepair(playerInventory, this.world, this.position, playerIn);
 		}
 
+		@Override
 		public IChatComponent getDisplayName() {
 			return new ChatComponentTranslation(Blocks.anvil.getUnlocalizedName() + ".name", new Object[0]);
 		}
 
+		@Override
 		public String getGuiID() {
 			return "minecraft:anvil";
 		}
 
+		@Override
 		public String getName() {
 			return "anvil";
 		}
 
+		@Override
 		public boolean hasCustomName() {
 			return false;
 		}
@@ -92,6 +97,7 @@ public class BlockAnvil extends BlockFalling {
 		this.setCreativeTab(CreativeTabs.tabDecorations);
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { FACING, DAMAGE });
 	}
@@ -101,6 +107,7 @@ public class BlockAnvil extends BlockFalling {
 	 * when the block gets destroyed. It returns the metadata of the dropped item
 	 * based on the old metadata of the block.
 	 */
+	@Override
 	public int damageDropped(IBlockState state) {
 		return ((Integer) state.getValue(DAMAGE)).intValue();
 	}
@@ -108,6 +115,7 @@ public class BlockAnvil extends BlockFalling {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState state) {
 		int i = 0;
 		i = i | ((EnumFacing) state.getValue(FACING)).getHorizontalIndex();
@@ -119,6 +127,7 @@ public class BlockAnvil extends BlockFalling {
 	 * + Possibly modify the given BlockState before rendering it on an Entity
 	 * (Minecarts, Endermen, ...)
 	 */
+	@Override
 	public IBlockState getStateForEntityRender(IBlockState state) {
 		return this.getDefaultState().withProperty(FACING, EnumFacing.SOUTH);
 	}
@@ -126,6 +135,7 @@ public class BlockAnvil extends BlockFalling {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int meta) {
 		return this.getDefaultState().withProperty(FACING, EnumFacing.getHorizontal(meta & 3)).withProperty(DAMAGE,
 				Integer.valueOf((meta & 15) >> 2));
@@ -135,12 +145,14 @@ public class BlockAnvil extends BlockFalling {
 	 * + returns a list of blocks with the same ID, but different meta (eg: wood
 	 * returns 4 blocks)
 	 */
+	@Override
 	public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list) {
 		list.add(new ItemStack(itemIn, 1, 0));
 		list.add(new ItemStack(itemIn, 1, 1));
 		list.add(new ItemStack(itemIn, 1, 2));
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -149,10 +161,12 @@ public class BlockAnvil extends BlockFalling {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
 
+	@Override
 	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn,
 			EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (!worldIn.isRemote) {
@@ -165,6 +179,7 @@ public class BlockAnvil extends BlockFalling {
 	 * + Called by ItemBlocks just before a block is actually set in the world, to
 	 * allow for adjustments to the IBlockstate
 	 */
+	@Override
 	public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ,
 			int meta, EntityLivingBase placer) {
 		EnumFacing enumfacing = placer.getHorizontalFacing().rotateY();
@@ -172,14 +187,17 @@ public class BlockAnvil extends BlockFalling {
 				.withProperty(FACING, enumfacing).withProperty(DAMAGE, Integer.valueOf(meta >> 2));
 	}
 
+	@Override
 	public void onEndFalling(World parWorld, BlockPos parBlockPos) {
 		parWorld.playAuxSFX(1022, parBlockPos, 0);
 	}
 
+	@Override
 	protected void onStartFalling(EntityFallingBlock fallingEntity) {
 		fallingEntity.setHurtEntities(true);
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos) {
 		EnumFacing enumfacing = (EnumFacing) worldIn.getBlockState(pos).getValue(FACING);
 		if (enumfacing.getAxis() == EnumFacing.Axis.X) {
@@ -190,6 +208,7 @@ public class BlockAnvil extends BlockFalling {
 
 	}
 
+	@Override
 	public boolean shouldSideBeRendered(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
 		return true;
 	}

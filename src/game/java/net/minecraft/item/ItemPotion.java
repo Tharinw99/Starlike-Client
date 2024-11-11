@@ -30,13 +30,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -48,7 +48,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ItemPotion extends Item {
 	private static final Map<List<PotionEffect>, Integer> SUB_ITEMS_CACHE = Maps.newLinkedHashMap();
@@ -74,6 +74,7 @@ public class ItemPotion extends Item {
 	 * + allows items to add custom lines of information to the mouseover
 	 * description
 	 */
+	@Override
 	public void addInformation(ItemStack itemstack, EntityPlayer var2, List<String> list, boolean var4) {
 		if (itemstack.getMetadata() != 0) {
 			List<PotionEffect> list1 = Items.potionitem.getEffects(itemstack);
@@ -151,6 +152,7 @@ public class ItemPotion extends Item {
 		return PotionHelper.getLiquidColor(meta, false);
 	}
 
+	@Override
 	public int getColorFromItemStack(ItemStack itemstack, int i) {
 		return i > 0 ? 16777215 : this.getColorFromDamage(itemstack.getMetadata());
 	}
@@ -196,6 +198,7 @@ public class ItemPotion extends Item {
 		}
 	}
 
+	@Override
 	public String getItemStackDisplayName(ItemStack stack) {
 		if (stack.getMetadata() == 0) {
 			return StatCollector.translateToLocal("item.emptyPotion.name").trim();
@@ -221,6 +224,7 @@ public class ItemPotion extends Item {
 	 * + returns the action that specifies what animation to play when the items is
 	 * being used
 	 */
+	@Override
 	public EnumAction getItemUseAction(ItemStack var1) {
 		return EnumAction.DRINK;
 	}
@@ -228,6 +232,7 @@ public class ItemPotion extends Item {
 	/**
 	 * + How long it takes to use or consume an item
 	 */
+	@Override
 	public int getMaxItemUseDuration(ItemStack var1) {
 		return 32;
 	}
@@ -236,6 +241,7 @@ public class ItemPotion extends Item {
 	 * + returns a list of items with the same ID, but different meta (eg: dye
 	 * returns 16 items)
 	 */
+	@Override
 	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
 		super.getSubItems(itemIn, tab, subItems);
 		if (SUB_ITEMS_CACHE.isEmpty()) {
@@ -276,6 +282,7 @@ public class ItemPotion extends Item {
 
 	}
 
+	@Override
 	public boolean hasEffect(ItemStack stack) {
 		List list = this.getEffects(stack);
 		return list != null && !list.isEmpty();
@@ -300,6 +307,7 @@ public class ItemPotion extends Item {
 	 * + Called whenever this item is equipped and the right mouse button is
 	 * pressed. Args: itemStack, world, entityPlayer
 	 */
+	@Override
 	public ItemStack onItemRightClick(ItemStack itemstack, World world, EntityPlayer entityplayer) {
 		if (isSplash(itemstack.getMetadata())) {
 			if (!entityplayer.capabilities.isCreativeMode) {
@@ -324,6 +332,7 @@ public class ItemPotion extends Item {
 	 * Not called when the player stops using the Item before the action is
 	 * complete.
 	 */
+	@Override
 	public ItemStack onItemUseFinish(ItemStack itemstack, World world, EntityPlayer entityplayer) {
 		if (!entityplayer.capabilities.isCreativeMode) {
 			--itemstack.stackSize;

@@ -21,7 +21,6 @@ import net.minecraft.util.IProgressUpdate;
 import net.minecraft.util.LongHashMap;
 import net.minecraft.util.ReportedException;
 import net.minecraft.world.ChunkCoordIntPair;
-import net.minecraft.world.MinecraftException;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -33,13 +32,13 @@ import net.minecraft.world.chunk.storage.IChunkLoader;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -51,7 +50,7 @@ import net.minecraft.world.chunk.storage.IChunkLoader;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ChunkProviderServer implements IChunkProvider {
 	private static final Logger logger = LogManager.getLogger();
@@ -82,6 +81,7 @@ public class ChunkProviderServer implements IChunkProvider {
 	/**
 	 * + Returns if the IChunkProvider supports saving.
 	 */
+	@Override
 	public boolean canSave() {
 		return !this.worldObj.disableLevelSaving;
 	}
@@ -89,6 +89,7 @@ public class ChunkProviderServer implements IChunkProvider {
 	/**
 	 * + Checks to see if a chunk exists at x, z
 	 */
+	@Override
 	public boolean chunkExists(int i, int j) {
 		return this.id2ChunkMap.containsItem(ChunkCoordIntPair.chunkXZ2Int(i, j));
 	}
@@ -108,6 +109,7 @@ public class ChunkProviderServer implements IChunkProvider {
 		return this.loadedChunks;
 	}
 
+	@Override
 	public boolean func_177460_a(IChunkProvider ichunkprovider, Chunk chunk, int i, int j) {
 		if (this.serverChunkGenerator != null && this.serverChunkGenerator.func_177460_a(ichunkprovider, chunk, i, j)) {
 			Chunk chunk1 = this.provideChunk(i, j);
@@ -118,15 +120,18 @@ public class ChunkProviderServer implements IChunkProvider {
 		}
 	}
 
+	@Override
 	public int getLoadedChunkCount() {
 		return this.id2ChunkMap.getNumHashElements();
 	}
 
+	@Override
 	public List<BiomeGenBase.SpawnListEntry> getPossibleCreatures(EnumCreatureType enumcreaturetype,
 			BlockPos blockpos) {
 		return this.serverChunkGenerator.getPossibleCreatures(enumcreaturetype, blockpos);
 	}
 
+	@Override
 	public BlockPos getStrongholdGen(World world, String s, BlockPos blockpos) {
 		return this.serverChunkGenerator.getStrongholdGen(world, s, blockpos);
 	}
@@ -196,6 +201,7 @@ public class ChunkProviderServer implements IChunkProvider {
 	/**
 	 * + Converts the instance data to a readable string.
 	 */
+	@Override
 	public String makeString() {
 		return "ServerChunkCache: " + this.id2ChunkMap.getNumHashElements() + " Drop: " + this.droppedChunksSet.size();
 	}
@@ -203,6 +209,7 @@ public class ChunkProviderServer implements IChunkProvider {
 	/**
 	 * + Populates chunk with ores etc etc
 	 */
+	@Override
 	public void populate(IChunkProvider ichunkprovider, int i, int j) {
 		Chunk chunk = this.provideChunk(i, j);
 		if (!chunk.isTerrainPopulated()) {
@@ -220,6 +227,7 @@ public class ChunkProviderServer implements IChunkProvider {
 	 * will generates all the blocks for the specified chunk from the map seed and
 	 * chunk seed
 	 */
+	@Override
 	public Chunk provideChunk(BlockPos blockpos) {
 		return this.provideChunk(blockpos.getX() >> 4, blockpos.getZ() >> 4);
 	}
@@ -229,12 +237,14 @@ public class ChunkProviderServer implements IChunkProvider {
 	 * will generates all the blocks for the specified chunk from the map seed and
 	 * chunk seed
 	 */
+	@Override
 	public Chunk provideChunk(int i, int j) {
 		Chunk chunk = (Chunk) this.id2ChunkMap.getValueByKey(ChunkCoordIntPair.chunkXZ2Int(i, j));
 		return chunk == null ? (!this.worldObj.isFindingSpawnPoint() && !this.chunkLoadOverride ? this.dummyChunk
 				: this.loadChunk(i, j)) : chunk;
 	}
 
+	@Override
 	public void recreateStructures(Chunk var1, int var2, int var3) {
 	}
 
@@ -247,11 +257,7 @@ public class ChunkProviderServer implements IChunkProvider {
 			} catch (IOException ioexception) {
 				logger.error("Couldn\'t save chunk");
 				logger.error(ioexception);
-			} catch (MinecraftException minecraftexception) {
-				logger.error("Couldn\'t save chunk; already in use by another instance of Minecraft?");
-				logger.error(minecraftexception);
 			}
-
 		}
 	}
 
@@ -272,6 +278,7 @@ public class ChunkProviderServer implements IChunkProvider {
 	 * passed false, save up to two chunks. Return true if all chunks have been
 	 * saved.
 	 */
+	@Override
 	public boolean saveChunks(boolean flag, IProgressUpdate var2) {
 		int i = 0;
 		ArrayList arraylist = Lists.newArrayList(this.loadedChunks);
@@ -299,6 +306,7 @@ public class ChunkProviderServer implements IChunkProvider {
 	 * + Save extra data not associated with any Chunk. Not saved during autosave,
 	 * only during world unload. Currently unimplemented.
 	 */
+	@Override
 	public void saveExtraData() {
 		if (this.chunkLoader != null) {
 			this.chunkLoader.saveExtraData();
@@ -320,6 +328,7 @@ public class ChunkProviderServer implements IChunkProvider {
 	 * + Unloads chunks that are marked to be unloaded. This is not guaranteed to
 	 * unload every such chunk.
 	 */
+	@Override
 	public boolean unloadQueuedChunks() {
 		if (!this.worldObj.disableLevelSaving) {
 			for (int i = 0; i < 100; ++i) {

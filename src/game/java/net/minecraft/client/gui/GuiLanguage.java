@@ -15,13 +15,13 @@ import net.minecraft.client.settings.GameSettings;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,7 +33,7 @@ import net.minecraft.client.settings.GameSettings;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiLanguage extends GuiScreen {
 	class List extends GuiSlot {
@@ -50,10 +50,12 @@ public class GuiLanguage extends GuiScreen {
 
 		}
 
+		@Override
 		protected void drawBackground() {
 			GuiLanguage.this.drawDefaultBackground();
 		}
 
+		@Override
 		protected void drawSlot(int i, int var2, int j, int var4, int var5, int var6) {
 			GuiLanguage.this.fontRendererObj.setBidiFlag(true);
 			GuiLanguage.this.drawCenteredString(GuiLanguage.this.fontRendererObj,
@@ -63,6 +65,7 @@ public class GuiLanguage extends GuiScreen {
 					.setBidiFlag(GuiLanguage.this.languageManager.getCurrentLanguage().isBidirectional());
 		}
 
+		@Override
 		protected void elementClicked(int i, boolean var2, int var3, int var4) {
 			Language language = (Language) this.languageMap.get(this.langCodeList.get(i));
 			GuiLanguage.this.languageManager.setCurrentLanguage(language);
@@ -80,14 +83,17 @@ public class GuiLanguage extends GuiScreen {
 			GuiLanguage.this.mc.displayGuiScreen(GuiLanguage.this);
 		}
 
+		@Override
 		protected int getContentHeight() {
 			return this.getSize() * 18;
 		}
 
+		@Override
 		protected int getSize() {
 			return this.langCodeList.size();
 		}
 
+		@Override
 		protected boolean isSelected(int i) {
 			return ((String) this.langCodeList.get(i))
 					.equals(GuiLanguage.this.languageManager.getCurrentLanguage().getLanguageCode());
@@ -112,6 +118,7 @@ public class GuiLanguage extends GuiScreen {
 	 * + Called by the controls from the buttonList when activated. (Mouse pressed
 	 * for buttons)
 	 */
+	@Override
 	protected void actionPerformed(GuiButton parGuiButton) {
 		if (parGuiButton.enabled) {
 			switch (parGuiButton.id) {
@@ -142,6 +149,7 @@ public class GuiLanguage extends GuiScreen {
 	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
 	 * renderPartialTicks
 	 */
+	@Override
 	public void drawScreen(int i, int j, float f) {
 		this.list.drawScreen(i, j, f);
 		this.drawCenteredString(this.fontRendererObj, I18n.format("options.language", new Object[0]), this.width / 2,
@@ -154,11 +162,13 @@ public class GuiLanguage extends GuiScreen {
 	/**
 	 * + Handles mouse input.
 	 */
+	@Override
 	public void handleMouseInput() throws IOException {
 		super.handleMouseInput();
 		this.list.handleMouseInput();
 	}
 
+	@Override
 	public void handleTouchInput() throws IOException {
 		super.handleTouchInput();
 		this.list.handleTouchInput();
@@ -169,6 +179,7 @@ public class GuiLanguage extends GuiScreen {
 	 * when the GUI is displayed and when the window resizes, the buttonList is
 	 * cleared beforehand.
 	 */
+	@Override
 	public void initGui() {
 		this.buttonList.add(this.forceUnicodeFontBtn = new GuiOptionButton(100, this.width / 2 - 155, this.height - 38,
 				GameSettings.Options.FORCE_UNICODE_FONT,

@@ -28,7 +28,7 @@ import com.google.common.annotations.Beta;
  * <p>
  * Implementations that choose to support the {@link #add(Range)} operation are
  * required to ignore empty ranges and coalesce connected ranges. For example:
- * 
+ *
  * <pre>
  *    {@code
  *
@@ -101,10 +101,10 @@ public interface RangeSet<C extends Comparable> {
 	/**
 	 * Removes all ranges from this {@code RangeSet} (optional operation). After
 	 * this operation, {@code this.contains(c)} will return false for all {@code c}.
-	 * 
+	 *
 	 * <p>
 	 * This is equivalent to {@code remove(Range.all())}.
-	 * 
+	 *
 	 * @throws UnsupportedOperationException if this range set does not support the
 	 *                                       {@code clear} operation
 	 */

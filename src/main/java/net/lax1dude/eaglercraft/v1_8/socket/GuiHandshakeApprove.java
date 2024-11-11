@@ -9,7 +9,7 @@ import net.minecraft.client.resources.I18n;
 
 /**
  * Copyright (c) 2022-2023 lax1dude, ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -21,7 +21,7 @@ import net.minecraft.client.resources.I18n;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiHandshakeApprove extends GuiScreen {
 
@@ -44,6 +44,7 @@ public class GuiHandshakeApprove extends GuiScreen {
 		this.yes = yes;
 	}
 
+	@Override
 	protected void actionPerformed(GuiButton parGuiButton) {
 		if (parGuiButton.id == 0) {
 			mc.displayGuiScreen(no);
@@ -52,6 +53,7 @@ public class GuiHandshakeApprove extends GuiScreen {
 		}
 	}
 
+	@Override
 	public void drawScreen(int xx, int yy, float partialTicks) {
 		drawBackground(0);
 		drawCenteredString(fontRendererObj, titleString, width / 2, bodyY, 16777215);
@@ -73,6 +75,7 @@ public class GuiHandshakeApprove extends GuiScreen {
 		}
 	}
 
+	@Override
 	public void initGui() {
 		this.buttonList.clear();
 		titleString = I18n.format("handshakeApprove." + message + ".title");

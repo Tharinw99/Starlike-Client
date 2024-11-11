@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "normal": {
-            "model": "starlike:smooth_basalt"
-        }
+  "variants": {
+    "normal": {
+      "model": "starlike:smooth_basalt"
     }
+  }
 }

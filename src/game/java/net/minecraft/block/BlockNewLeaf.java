@@ -21,13 +21,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -39,13 +39,14 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockNewLeaf extends BlockLeaves {
 	public static PropertyEnum<BlockPlanks.EnumType> VARIANT;
 
 	public static void bootstrapStates() {
 		VARIANT = PropertyEnum.create("variant", BlockPlanks.EnumType.class, new Predicate<BlockPlanks.EnumType>() {
+			@Override
 			public boolean apply(BlockPlanks.EnumType blockplanks$enumtype) {
 				return blockplanks$enumtype.getMetadata() >= 4;
 			}
@@ -57,10 +58,12 @@ public class BlockNewLeaf extends BlockLeaves {
 				.withProperty(CHECK_DECAY, Boolean.valueOf(true)).withProperty(DECAYABLE, Boolean.valueOf(true)));
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { VARIANT, CHECK_DECAY, DECAYABLE });
 	}
 
+	@Override
 	protected ItemStack createStackedBlock(IBlockState iblockstate) {
 		return new ItemStack(Item.getItemFromBlock(this), 1,
 				((BlockPlanks.EnumType) iblockstate.getValue(VARIANT)).getMetadata() - 4);
@@ -71,16 +74,19 @@ public class BlockNewLeaf extends BlockLeaves {
 	 * when the block gets destroyed. It returns the metadata of the dropped item
 	 * based on the old metadata of the block.
 	 */
+	@Override
 	public int damageDropped(IBlockState iblockstate) {
 		return ((BlockPlanks.EnumType) iblockstate.getValue(VARIANT)).getMetadata();
 	}
 
+	@Override
 	protected void dropApple(World world, BlockPos blockpos, IBlockState iblockstate, int i) {
 		if (iblockstate.getValue(VARIANT) == BlockPlanks.EnumType.DARK_OAK && world.rand.nextInt(i) == 0) {
 			spawnAsEntity(world, blockpos, new ItemStack(Items.apple, 1, 0));
 		}
 	}
 
+	@Override
 	public int getDamageValue(World world, BlockPos blockpos) {
 		IBlockState iblockstate = world.getBlockState(blockpos);
 		return iblockstate.getBlock().getMetaFromState(iblockstate) & 3;
@@ -89,6 +95,7 @@ public class BlockNewLeaf extends BlockLeaves {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
 		i = i | ((BlockPlanks.EnumType) iblockstate.getValue(VARIANT)).getMetadata() - 4;
@@ -106,6 +113,7 @@ public class BlockNewLeaf extends BlockLeaves {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(VARIANT, this.getWoodType(i))
 				.withProperty(DECAYABLE, Boolean.valueOf((i & 4) == 0))
@@ -116,15 +124,18 @@ public class BlockNewLeaf extends BlockLeaves {
 	 * + returns a list of blocks with the same ID, but different meta (eg: wood
 	 * returns 4 blocks)
 	 */
+	@Override
 	public void getSubBlocks(Item item, CreativeTabs var2, List<ItemStack> list) {
 		list.add(new ItemStack(item, 1, 0));
 		list.add(new ItemStack(item, 1, 1));
 	}
 
+	@Override
 	public BlockPlanks.EnumType getWoodType(int i) {
 		return BlockPlanks.EnumType.byMetadata((i & 3) + 4);
 	}
 
+	@Override
 	public void harvestBlock(World world, EntityPlayer entityplayer, BlockPos blockpos, IBlockState iblockstate,
 			TileEntity tileentity) {
 		if (!world.isRemote && entityplayer.getCurrentEquippedItem() != null

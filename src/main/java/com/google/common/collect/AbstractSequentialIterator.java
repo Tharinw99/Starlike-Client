@@ -30,7 +30,7 @@ import com.google.common.annotations.GwtCompatible;
  *
  * <p>
  * Example:
- * 
+ *
  * <pre>
  * {
  * 	&#64;code

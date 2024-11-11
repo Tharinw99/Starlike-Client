@@ -4,15 +4,17 @@ Copyright (c) 2024 zumbiepig and SpeedSlicer
 
 ## 1. Attribution
 
-If you use any part of this code in your project, you **must credit** the original author, zumbiepig and SpeedSlicer, in a clearly visible manner in both the project documentation and the software interface, including but not limited to:
+If you use any part of this code in your project, you **must credit** the original authors, zumbiepig and SpeedSlicer, in a clearly visible manner in both the project documentation and the software interface, including but not limited to:
+
 - **Credits section** in documentation
 - **Main menu or splash screen** within the application
 
-The **main menu** of the software or application **must not be changed** without written permission from zumbiepig and SpeedSlicer.
+The **main menu** of the software or application **must not be changed** without written permission from _both_ zumbiepig and SpeedSlicer.
 
 ## 2. Open Source Requirement for Derivative Works
 
 If you create any derivative work (a "fork") based on this project:
+
 - You **must release the source code** of the derivative work under this same license, ensuring that all forks and modifications remain open source.
 - You **must clearly state** that the original code is based on work by zumbiepig and SpeedSlicer.
 
@@ -27,7 +29,5 @@ If you create any derivative work (a "fork") based on this project:
 This software is provided "as is", without any warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and non-infringement. In no event shall the author be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the software or the use or other dealings in the software.
 
 ---
-
-License written by HoosierTransfer
 
 By using this code, you agree to the terms of this license.

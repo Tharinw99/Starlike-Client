@@ -5,13 +5,13 @@ import net.minecraft.client.Minecraft;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -23,7 +23,7 @@ import net.minecraft.client.Minecraft;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class GuiListExtended extends GuiSlot {
 	public interface IGuiListEntry {
@@ -40,9 +40,11 @@ public abstract class GuiListExtended extends GuiSlot {
 		super(mcIn, widthIn, heightIn, topIn, bottomIn, slotHeightIn);
 	}
 
+	@Override
 	protected void drawBackground() {
 	}
 
+	@Override
 	protected void drawSlot(int entryID, int mouseXIn, int mouseYIn, int parInt4, int parInt5, int parInt6) {
 		this.getListEntry(entryID).drawEntry(entryID, mouseXIn, mouseYIn, this.getListWidth(), parInt4, parInt5,
 				parInt6, this.getSlotIndexFromScreenCoords(parInt5, parInt6) == entryID);
@@ -52,9 +54,11 @@ public abstract class GuiListExtended extends GuiSlot {
 	 * + The element in the slot that was clicked, boolean for whether it was double
 	 * clicked or not
 	 */
+	@Override
 	protected void elementClicked(int slotIndex, boolean isDoubleClick, int mouseX, int mouseY) {
 	}
 
+	@Override
 	protected void func_178040_a(int parInt1, int parInt2, int parInt3) {
 		this.getListEntry(parInt1).setSelected(parInt1, parInt2, parInt3);
 	}
@@ -64,6 +68,7 @@ public abstract class GuiListExtended extends GuiSlot {
 	/**
 	 * + Returns true if the element passed in is currently selected
 	 */
+	@Override
 	protected boolean isSelected(int slotIndex) {
 		return false;
 	}

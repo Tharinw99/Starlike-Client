@@ -3,16 +3,15 @@ package net.lax1dude.eaglercraft.v1_8.internal.teavm;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.lax1dude.eaglercraft.v1_8.EagRuntime;
-import net.lax1dude.eaglercraft.v1_8.EaglercraftVersion;
-import net.lax1dude.eaglercraft.v1_8.ThreadLocalRandom;
-import net.lax1dude.eaglercraft.v1_8.boot_menu.teavm.IBootMenuConfigAdapter;
-import net.lax1dude.eaglercraft.v1_8.sp.relay.RelayManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.teavm.jso.JSObject;
 import org.teavm.jso.core.JSArrayReader;
 
+import net.lax1dude.eaglercraft.v1_8.EagRuntime;
+import net.lax1dude.eaglercraft.v1_8.EaglercraftVersion;
+import net.lax1dude.eaglercraft.v1_8.ThreadLocalRandom;
+import net.lax1dude.eaglercraft.v1_8.boot_menu.teavm.IBootMenuConfigAdapter;
 import net.lax1dude.eaglercraft.v1_8.internal.IClientConfigAdapter;
 import net.lax1dude.eaglercraft.v1_8.internal.IClientConfigAdapterHooks;
 import net.lax1dude.eaglercraft.v1_8.internal.teavm.opts.JSEaglercraftXOptsHooks;
@@ -20,21 +19,23 @@ import net.lax1dude.eaglercraft.v1_8.internal.teavm.opts.JSEaglercraftXOptsRelay
 import net.lax1dude.eaglercraft.v1_8.internal.teavm.opts.JSEaglercraftXOptsRoot;
 import net.lax1dude.eaglercraft.v1_8.internal.teavm.opts.JSEaglercraftXOptsServer;
 import net.lax1dude.eaglercraft.v1_8.sp.relay.RelayEntry;
+import net.lax1dude.eaglercraft.v1_8.sp.relay.RelayManager;
 
 /**
  * Copyright (c) 2022-2024 lax1dude. All Rights Reserved.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class TeaVMClientConfigAdapter implements IClientConfigAdapter, IBootMenuConfigAdapter {
 
@@ -43,7 +44,7 @@ public class TeaVMClientConfigAdapter implements IClientConfigAdapter, IBootMenu
 	private String defaultLocale = "en_US";
 	private List<DefaultServer> defaultServers = new ArrayList<>();
 	private List<RelayEntry> relays = new ArrayList<>();
-	private String serverToJoin = null;   
+	private String serverToJoin = null;
 	private String worldsDB = "worlds_starlike";
 	private String resourcePacksDB = "resourcePacks_starlike";
 	private JSONObject integratedServerOpts;
@@ -55,8 +56,8 @@ public class TeaVMClientConfigAdapter implements IClientConfigAdapter, IBootMenu
 	private boolean isEnableDownloadOfflineButton = true;
 	private String downloadOfflineButtonLink = null;
 	private boolean useSpecialCursors = false;
-	private boolean logInvalidCerts = true;
-	private boolean checkRelaysForUpdates = true;
+	private boolean logInvalidCerts = false;
+	private boolean checkRelaysForUpdates = false;
 	private boolean enableSignatureBadge = false;
 	private boolean allowVoiceClient = true;
 	private boolean allowFNAWSkins = true;
@@ -69,15 +70,15 @@ public class TeaVMClientConfigAdapter implements IClientConfigAdapter, IBootMenu
 	private boolean openDebugConsoleOnLaunch = false;
 	private boolean fixDebugConsoleUnloadListener = false;
 	private boolean forceWebViewSupport = false;
-	private boolean enableWebViewCSP = false;
-	private boolean autoFixLegacyStyleAttr = true;
+	private boolean enableWebViewCSP = true;
+	private boolean autoFixLegacyStyleAttr = false;
 	private boolean showBootMenuOnLaunch = false;
 	private boolean bootMenuBlocksUnsignedClients = false;
 	private boolean allowBootMenu = true;
 	private boolean forceProfanityFilter = false;
 	private boolean forceWebGL1 = false;
 	private boolean forceWebGL2 = false;
-	private boolean allowExperimentalWebGL1 = false;
+	private boolean allowExperimentalWebGL1 = true;
 	private boolean useWebGLExt = true;
 	private boolean useDelayOnSwap = false;
 	private boolean useJOrbisAudioDecoder = false;
@@ -90,10 +91,351 @@ public class TeaVMClientConfigAdapter implements IClientConfigAdapter, IBootMenu
 	private boolean singleThreadMode = false;
 	private boolean enableEPKVersionCheck = true;
 
+	@Override
+	public boolean allowUpdateDL() {
+		return isAllowUpdateDL;
+	}
+
+	@Override
+	public boolean allowUpdateSvc() {
+		return isAllowUpdateSvc;
+	}
+
+	@Override
+	public String getDefaultLocale() {
+		return defaultLocale;
+	}
+
+	@Override
+	public List<DefaultServer> getDefaultServerList() {
+		return defaultServers;
+	}
+
+	@Override
+	public String getDownloadOfflineButtonLink() {
+		return downloadOfflineButtonLink;
+	}
+
+	@Override
+	public IClientConfigAdapterHooks getHooks() {
+		return hooks;
+	}
+
+	@Override
+	public JSONObject getIntegratedServerOpts() {
+		return integratedServerOpts;
+	}
+
+	@Override
+	public String getLocalStorageNamespace() {
+		return localStorageNamespace;
+	}
+
+	@Override
+	public List<RelayEntry> getRelays() {
+		return relays;
+	}
+
+	@Override
+	public String getResourcePacksDB() {
+		return resourcePacksDB;
+	}
+
+	@Override
+	public String getServerToJoin() {
+		return serverToJoin;
+	}
+
+	@Override
+	public String getWorldsDB() {
+		return worldsDB;
+	}
+
+	@Override
+	public boolean isAllowBootMenu() {
+		return allowBootMenu;
+	}
+
+	public boolean isAllowExperimentalWebGL1TeaVM() {
+		return allowExperimentalWebGL1;
+	}
+
+	@Override
+	public boolean isAllowFNAWSkins() {
+		return allowFNAWSkins;
+	}
+
+	@Override
+	public boolean isAllowServerRedirects() {
+		return allowServerRedirects;
+	}
+
+	@Override
+	public boolean isAllowVoiceClient() {
+		return allowVoiceClient;
+	}
+
+	public boolean isAutoFixLegacyStyleAttrTeaVM() {
+		return autoFixLegacyStyleAttr;
+	}
+
+	@Override
+	public boolean isBootMenuBlocksUnsignedClients() {
+		return bootMenuBlocksUnsignedClients;
+	}
+
+	@Override
+	public boolean isCheckGLErrors() {
+		return checkGLErrors;
+	}
+
+	@Override
+	public boolean isCheckRelaysForUpdates() {
+		return checkRelaysForUpdates;
+	}
+
+	@Override
+	public boolean isCheckShaderGLErrors() {
+		return checkShaderGLErrors;
+	}
+
+	@Override
+	public boolean isDemo() {
+		return demoMode;
+	}
+
+	public boolean isDeobfStackTracesTeaVM() {
+		return deobfStackTraces;
+	}
+
+	public boolean isDisableBlobURLsTeaVM() {
+		return disableBlobURLs;
+	}
+
+	@Override
+	public boolean isEaglerNoDelay() {
+		return eaglerNoDelay;
+	}
+
+	@Override
+	public boolean isEnableDownloadOfflineButton() {
+		return isEnableDownloadOfflineButton;
+	}
+
+	public boolean isEnableEPKVersionCheckTeaVM() {
+		return enableEPKVersionCheck;
+	}
+
+	@Override
+	public boolean isEnableMinceraft() {
+		return enableMinceraft;
+	}
+
+	@Override
+	public boolean isEnableServerCookies() {
+		return enableServerCookies;
+	}
+
+	@Override
+	public boolean isEnableSignatureBadge() {
+		return enableSignatureBadge;
+	}
+
+	@Override
+	public boolean isEnableWebViewCSP() {
+		return enableWebViewCSP;
+	}
+
+	@Override
+	public boolean isEnforceVSync() {
+		return false;
+	}
+
+	public boolean isFixDebugConsoleUnloadListenerTeaVM() {
+		return fixDebugConsoleUnloadListener;
+	}
+
+	@Override
+	public boolean isForceProfanityFilter() {
+		return forceProfanityFilter;
+	}
+
+	public boolean isForceWebGL1TeaVM() {
+		return forceWebGL1;
+	}
+
+	public boolean isForceWebGL2TeaVM() {
+		return forceWebGL2;
+	}
+
+	@Override
+	public boolean isForceWebViewSupport() {
+		return forceWebViewSupport;
+	}
+
+	@Override
+	public boolean isLogInvalidCerts() {
+		return logInvalidCerts;
+	}
+
+	@Override
+	public boolean isOpenDebugConsoleOnLaunch() {
+		return openDebugConsoleOnLaunch;
+	}
+
+	@Override
+	public boolean isRamdiskMode() {
+		return ramdiskMode;
+	}
+
+	@Override
+	public boolean isShowBootMenuOnLaunch() {
+		return showBootMenuOnLaunch;
+	}
+
+	public boolean isSingleThreadModeTeaVM() {
+		return singleThreadMode;
+	}
+
+	public boolean isUseDelayOnSwapTeaVM() {
+		return useDelayOnSwap;
+	}
+
+	public boolean isUseJOrbisAudioDecoderTeaVM() {
+		return useJOrbisAudioDecoder;
+	}
+
+	public boolean isUseVisualViewportTeaVM() {
+		return useVisualViewport;
+	}
+
+	public boolean isUseWebGLExtTeaVM() {
+		return useWebGLExt;
+	}
+
+	public boolean isUseXHRFetchTeaVM() {
+		return useXHRFetch;
+	}
+
+	public void loadJSON(JSONObject eaglercraftOpts) {
+		integratedServerOpts = eaglercraftOpts;
+		defaultLocale = eaglercraftOpts.optString("lang", "en_US");
+		serverToJoin = eaglercraftOpts.optString("joinServer", null);
+		worldsDB = eaglercraftOpts.optString("worldsDB", "worlds_starlike");
+		resourcePacksDB = eaglercraftOpts.optString("resourcePacksDB", "resourcePacks_starlike");
+		checkGLErrors = eaglercraftOpts.optBoolean("checkGLErrors", false);
+		checkShaderGLErrors = eaglercraftOpts.optBoolean("checkShaderGLErrors", false);
+		if (EaglercraftVersion.forceDemoMode) {
+			eaglercraftOpts.put("demoMode", true);
+		}
+		demoMode = EaglercraftVersion.forceDemoMode || eaglercraftOpts.optBoolean("demoMode", false);
+		isAllowUpdateSvc = EaglercraftVersion.enableUpdateService && !demoMode
+				&& eaglercraftOpts.optBoolean("allowUpdateSvc", true);
+		isAllowUpdateDL = EaglercraftVersion.enableUpdateService && !demoMode
+				&& eaglercraftOpts.optBoolean("allowUpdateDL", true);
+		isEnableDownloadOfflineButton = eaglercraftOpts.optBoolean("enableDownloadOfflineButton", true);
+		downloadOfflineButtonLink = eaglercraftOpts.optString("downloadOfflineButtonLink", null);
+		useSpecialCursors = eaglercraftOpts.optBoolean("html5CursorSupport", false);
+		logInvalidCerts = EaglercraftVersion.enableUpdateService && !demoMode
+				&& eaglercraftOpts.optBoolean("logInvalidCerts", false);
+		enableSignatureBadge = eaglercraftOpts.optBoolean("enableSignatureBadge", false);
+		allowVoiceClient = eaglercraftOpts.optBoolean("allowVoiceClient", true);
+		allowFNAWSkins = eaglercraftOpts.optBoolean("allowFNAWSkins", true);
+		localStorageNamespace = eaglercraftOpts.optString("localStorageNamespace",
+				EaglercraftVersion.localStorageNamespace);
+		enableMinceraft = eaglercraftOpts.optBoolean("enableMinceraft", true);
+		enableServerCookies = !demoMode && eaglercraftOpts.optBoolean("enableServerCookies", true);
+		allowServerRedirects = eaglercraftOpts.optBoolean("allowServerRedirects", true);
+		crashOnUncaughtExceptions = eaglercraftOpts.optBoolean("crashOnUncaughtExceptions", false);
+		openDebugConsoleOnLaunch = eaglercraftOpts.optBoolean("openDebugConsoleOnLaunch", false);
+		fixDebugConsoleUnloadListener = eaglercraftOpts.optBoolean("fixDebugConsoleUnloadListener", false);
+		forceWebViewSupport = eaglercraftOpts.optBoolean("forceWebViewSupport", false);
+		enableWebViewCSP = eaglercraftOpts.optBoolean("enableWebViewCSP", true);
+		autoFixLegacyStyleAttr = eaglercraftOpts.optBoolean("autoFixLegacyStyleAttr", true);
+		showBootMenuOnLaunch = eaglercraftOpts.optBoolean("showBootMenuOnLaunch", false);
+		bootMenuBlocksUnsignedClients = eaglercraftOpts.optBoolean("bootMenuBlocksUnsignedClients", false);
+		allowBootMenu = eaglercraftOpts.optBoolean("allowBootMenu", !demoMode);
+		forceProfanityFilter = eaglercraftOpts.optBoolean("forceProfanityFilter", false);
+		forceWebGL1 = eaglercraftOpts.optBoolean("forceWebGL1", false);
+		forceWebGL2 = eaglercraftOpts.optBoolean("forceWebGL2", false);
+		allowExperimentalWebGL1 = eaglercraftOpts.optBoolean("allowExperimentalWebGL1", true);
+		useWebGLExt = eaglercraftOpts.optBoolean("useWebGLExt", true);
+		useDelayOnSwap = eaglercraftOpts.optBoolean("useDelayOnSwap", false);
+		useJOrbisAudioDecoder = eaglercraftOpts.optBoolean("useJOrbisAudioDecoder", false);
+		useXHRFetch = eaglercraftOpts.optBoolean("useXHRFetch", false);
+		useVisualViewport = eaglercraftOpts.optBoolean("useVisualViewport", true);
+		deobfStackTraces = eaglercraftOpts.optBoolean("deobfStackTraces", true);
+		disableBlobURLs = eaglercraftOpts.optBoolean("disableBlobURLs", false);
+		eaglerNoDelay = eaglercraftOpts.optBoolean("eaglerNoDelay", false);
+		ramdiskMode = eaglercraftOpts.optBoolean("ramdiskMode", false);
+		singleThreadMode = eaglercraftOpts.optBoolean("singleThreadMode", false);
+		enableEPKVersionCheck = eaglercraftOpts.optBoolean("enableEPKVersionCheck", true);
+		defaultServers.clear();
+		JSONArray serversArray = eaglercraftOpts.optJSONArray("servers");
+		if (serversArray != null) {
+			for (int i = 0, l = serversArray.length(); i < l; ++i) {
+				JSONObject serverEntry = serversArray.getJSONObject(i);
+				boolean hideAddr = serverEntry.optBoolean("hideAddr", false);
+				String serverAddr = serverEntry.optString("addr", null);
+				if (serverAddr != null) {
+					String serverName = serverEntry.optString("name", "Default Server #" + i);
+					defaultServers.add(new DefaultServer(serverName, serverAddr, hideAddr));
+				}
+			}
+		}
+
+		relays.clear();
+		JSONArray relaysArray = eaglercraftOpts.optJSONArray("relays");
+		if (relaysArray != null) {
+			boolean gotAPrimary = false;
+			for (int i = 0, l = relaysArray.length(); i < l; ++i) {
+				JSONObject relay = relaysArray.getJSONObject(i);
+				boolean p = relay.optBoolean("primary");
+				if (p) {
+					if (gotAPrimary) {
+						p = false;
+					} else {
+						gotAPrimary = true;
+					}
+				}
+				relays.add(new RelayEntry(relay.getString("addr"), relay.getString("comment"), p));
+			}
+		}
+
+		boolean officialUpdates = !demoMode
+				&& EaglercraftVersion.updateBundlePackageName.equals("net.lax1dude.eaglercraft.v1_8.client");
+		if (relays.size() <= 0) {
+			int choice = ThreadLocalRandom.current().nextInt(3);
+			relays.add(new RelayEntry("wss://relay.deev.is/", "lax1dude relay #1", choice == 0));
+			relays.add(new RelayEntry("wss://relay.lax1dude.net/", "lax1dude relay #2", choice == 1));
+			relays.add(new RelayEntry("wss://relay.shhnowisnottheti.me/", "ayunami relay #1", choice == 2));
+			checkRelaysForUpdates = !demoMode && eaglercraftOpts.optBoolean("checkRelaysForUpdates", officialUpdates);
+		} else {
+			if (officialUpdates) {
+				for (int i = 0, l = relays.size(); i < l; ++i) {
+					String addr = relays.get(i).address;
+					if (!addr.contains("deev.is") && !addr.contains("lax1dude.net")
+							&& !addr.contains("shhnowisnottheti.me")) {
+						officialUpdates = false;
+						break;
+					}
+				}
+			}
+			checkRelaysForUpdates = !demoMode && eaglercraftOpts.optBoolean("checkRelaysForUpdates", officialUpdates);
+		}
+
+		RelayManager.relayManager.load(EagRuntime.getStorage("r"));
+
+		if (RelayManager.relayManager.count() <= 0) {
+			RelayManager.relayManager.loadDefaults();
+			RelayManager.relayManager.save();
+		}
+	}
+
 	public void loadNative(JSObject jsObject) {
 		integratedServerOpts = new JSONObject();
-		JSEaglercraftXOptsRoot eaglercraftXOpts = (JSEaglercraftXOptsRoot)jsObject;
-		
+		JSEaglercraftXOptsRoot eaglercraftXOpts = (JSEaglercraftXOptsRoot) jsObject;
+
 		defaultLocale = eaglercraftXOpts.getLang("en_US");
 		serverToJoin = eaglercraftXOpts.getJoinServer(null);
 		worldsDB = eaglercraftXOpts.getWorldsDB("worlds_starlike");
@@ -101,12 +443,15 @@ public class TeaVMClientConfigAdapter implements IClientConfigAdapter, IBootMenu
 		checkGLErrors = eaglercraftXOpts.getCheckGLErrors(false);
 		checkShaderGLErrors = eaglercraftXOpts.getCheckShaderGLErrors(false);
 		demoMode = EaglercraftVersion.forceDemoMode || eaglercraftXOpts.getDemoMode(false);
-		isAllowUpdateSvc = EaglercraftVersion.enableUpdateService && !demoMode && eaglercraftXOpts.getAllowUpdateSvc(true);
-		isAllowUpdateDL = EaglercraftVersion.enableUpdateService && !demoMode && eaglercraftXOpts.getAllowUpdateDL(true);
+		isAllowUpdateSvc = EaglercraftVersion.enableUpdateService && !demoMode
+				&& eaglercraftXOpts.getAllowUpdateSvc(true);
+		isAllowUpdateDL = EaglercraftVersion.enableUpdateService && !demoMode
+				&& eaglercraftXOpts.getAllowUpdateDL(true);
 		isEnableDownloadOfflineButton = eaglercraftXOpts.getEnableDownloadOfflineButton(true);
 		downloadOfflineButtonLink = eaglercraftXOpts.getDownloadOfflineButtonLink(null);
 		useSpecialCursors = eaglercraftXOpts.getHtml5CursorSupport(false);
-		logInvalidCerts = EaglercraftVersion.enableUpdateService && !demoMode && eaglercraftXOpts.getLogInvalidCerts(true);
+		logInvalidCerts = EaglercraftVersion.enableUpdateService && !demoMode
+				&& eaglercraftXOpts.getLogInvalidCerts(false);
 		enableSignatureBadge = eaglercraftXOpts.getEnableSignatureBadge(false);
 		allowVoiceClient = eaglercraftXOpts.getAllowVoiceClient(true);
 		allowFNAWSkins = !demoMode && eaglercraftXOpts.getAllowFNAWSkins(true);
@@ -139,10 +484,10 @@ public class TeaVMClientConfigAdapter implements IClientConfigAdapter, IBootMenu
 		singleThreadMode = eaglercraftXOpts.getSingleThreadMode(false);
 		enableEPKVersionCheck = eaglercraftXOpts.getEnableEPKVersionCheck(true);
 		JSEaglercraftXOptsHooks hooksObj = eaglercraftXOpts.getHooks();
-		if(hooksObj != null) {
+		if (hooksObj != null) {
 			hooks.loadHooks(hooksObj);
 		}
-		
+
 		integratedServerOpts.put("worldsDB", worldsDB);
 		integratedServerOpts.put("demoMode", demoMode);
 		integratedServerOpts.put("lang", defaultLocale);
@@ -156,34 +501,34 @@ public class TeaVMClientConfigAdapter implements IClientConfigAdapter, IBootMenu
 		integratedServerOpts.put("eaglerNoDelay", eaglerNoDelay);
 		integratedServerOpts.put("ramdiskMode", ramdiskMode);
 		integratedServerOpts.put("singleThreadMode", singleThreadMode);
-		
+
 		defaultServers.clear();
 		JSArrayReader<JSEaglercraftXOptsServer> serversArray = eaglercraftXOpts.getServers();
-		if(serversArray != null) {
-			for(int i = 0, l = serversArray.getLength(); i < l; ++i) {
+		if (serversArray != null) {
+			for (int i = 0, l = serversArray.getLength(); i < l; ++i) {
 				JSEaglercraftXOptsServer serverEntry = serversArray.get(i);
 				boolean hideAddr = serverEntry.getHideAddr(false);
 				String serverAddr = serverEntry.getAddr();
-				if(serverAddr != null) {
+				if (serverAddr != null) {
 					String serverName = serverEntry.getName("Default Server #" + i);
 					defaultServers.add(new DefaultServer(serverName, serverAddr, hideAddr));
 				}
 			}
 		}
-		
+
 		relays.clear();
 		JSArrayReader<JSEaglercraftXOptsRelay> relaysArray = eaglercraftXOpts.getRelays();
-		if(relaysArray != null) {
+		if (relaysArray != null) {
 			boolean gotAPrimary = false;
-			for(int i = 0, l = relaysArray.getLength(); i < l; ++i) {
+			for (int i = 0, l = relaysArray.getLength(); i < l; ++i) {
 				JSEaglercraftXOptsRelay relay = relaysArray.get(i);
 				String addr = relay.getAddr();
-				if(addr != null) {
+				if (addr != null) {
 					boolean p = relay.getPrimary();
-					if(p) {
-						if(gotAPrimary) {
+					if (p) {
+						if (gotAPrimary) {
 							p = false;
-						}else {
+						} else {
 							gotAPrimary = true;
 						}
 					}
@@ -191,19 +536,21 @@ public class TeaVMClientConfigAdapter implements IClientConfigAdapter, IBootMenu
 				}
 			}
 		}
-		
-		boolean officialUpdates = !demoMode && EaglercraftVersion.updateBundlePackageName.equals("net.lax1dude.eaglercraft.v1_8.client");
+
+		boolean officialUpdates = !demoMode
+				&& EaglercraftVersion.updateBundlePackageName.equals("net.lax1dude.eaglercraft.v1_8.client");
 		if (relays.size() <= 0) {
 			int choice = ThreadLocalRandom.current().nextInt(3);
 			relays.add(new RelayEntry("wss://relay.deev.is/", "lax1dude relay #1", choice == 0));
 			relays.add(new RelayEntry("wss://relay.lax1dude.net/", "lax1dude relay #2", choice == 1));
 			relays.add(new RelayEntry("wss://relay.shhnowisnottheti.me/", "ayunami relay #1", choice == 2));
 			checkRelaysForUpdates = !demoMode && eaglercraftXOpts.getCheckRelaysForUpdates(officialUpdates);
-		}else {
-			if(officialUpdates) {
-				for(int i = 0, l = relays.size(); i < l; ++i) {
+		} else {
+			if (officialUpdates) {
+				for (int i = 0, l = relays.size(); i < l; ++i) {
 					String addr = relays.get(i).address;
-					if(!addr.contains("deev.is") && !addr.contains("lax1dude.net") && !addr.contains("shhnowisnottheti.me")) {
+					if (!addr.contains("deev.is") && !addr.contains("lax1dude.net")
+							&& !addr.contains("shhnowisnottheti.me")) {
 						officialUpdates = false;
 						break;
 					}
@@ -211,348 +558,13 @@ public class TeaVMClientConfigAdapter implements IClientConfigAdapter, IBootMenu
 			}
 			checkRelaysForUpdates = !demoMode && eaglercraftXOpts.getCheckRelaysForUpdates(officialUpdates);
 		}
-		
+
 		RelayManager.relayManager.load(EagRuntime.getStorage("r"));
-		
+
 		if (RelayManager.relayManager.count() <= 0) {
 			RelayManager.relayManager.loadDefaults();
 			RelayManager.relayManager.save();
 		}
-	}
-
-	public void loadJSON(JSONObject eaglercraftOpts) {
-		integratedServerOpts = eaglercraftOpts;
-		defaultLocale = eaglercraftOpts.optString("lang", "en_US");
-		serverToJoin = eaglercraftOpts.optString("joinServer", null);
-		worldsDB = eaglercraftOpts.optString("worldsDB", "worlds_starlike");
-		resourcePacksDB = eaglercraftOpts.optString("resourcePacksDB", "resourcePacks_starlike");
-		checkGLErrors = eaglercraftOpts.optBoolean("checkGLErrors", false);
-		checkShaderGLErrors = eaglercraftOpts.optBoolean("checkShaderGLErrors", false);
-		if(EaglercraftVersion.forceDemoMode) {
-			eaglercraftOpts.put("demoMode", true);
-		}
-		demoMode = EaglercraftVersion.forceDemoMode || eaglercraftOpts.optBoolean("demoMode", false);
-		isAllowUpdateSvc = EaglercraftVersion.enableUpdateService && !demoMode && eaglercraftOpts.optBoolean("allowUpdateSvc", true);
-		isAllowUpdateDL = EaglercraftVersion.enableUpdateService && !demoMode && eaglercraftOpts.optBoolean("allowUpdateDL", true);
-		isEnableDownloadOfflineButton = eaglercraftOpts.optBoolean("enableDownloadOfflineButton", true);
-		downloadOfflineButtonLink = eaglercraftOpts.optString("downloadOfflineButtonLink", null);
-		useSpecialCursors = eaglercraftOpts.optBoolean("html5CursorSupport", false);
-		logInvalidCerts = EaglercraftVersion.enableUpdateService && !demoMode && eaglercraftOpts.optBoolean("logInvalidCerts", true);
-		enableSignatureBadge = eaglercraftOpts.optBoolean("enableSignatureBadge", false);
-		allowVoiceClient = eaglercraftOpts.optBoolean("allowVoiceClient", true);
-		allowFNAWSkins = eaglercraftOpts.optBoolean("allowFNAWSkins", true);
-		localStorageNamespace = eaglercraftOpts.optString("localStorageNamespace", EaglercraftVersion.localStorageNamespace);
-		enableMinceraft = eaglercraftOpts.optBoolean("enableMinceraft", true);
-		enableServerCookies = !demoMode && eaglercraftOpts.optBoolean("enableServerCookies", true);
-		allowServerRedirects = eaglercraftOpts.optBoolean("allowServerRedirects", true);
-		crashOnUncaughtExceptions = eaglercraftOpts.optBoolean("crashOnUncaughtExceptions", false);
-		openDebugConsoleOnLaunch = eaglercraftOpts.optBoolean("openDebugConsoleOnLaunch", false);
-		fixDebugConsoleUnloadListener = eaglercraftOpts.optBoolean("fixDebugConsoleUnloadListener", false);
-		forceWebViewSupport = eaglercraftOpts.optBoolean("forceWebViewSupport", false);
-		enableWebViewCSP = eaglercraftOpts.optBoolean("enableWebViewCSP", true);
-		autoFixLegacyStyleAttr = eaglercraftOpts.optBoolean("autoFixLegacyStyleAttr", true);
-		showBootMenuOnLaunch = eaglercraftOpts.optBoolean("showBootMenuOnLaunch", false);
-		bootMenuBlocksUnsignedClients = eaglercraftOpts.optBoolean("bootMenuBlocksUnsignedClients", false);
-		allowBootMenu = eaglercraftOpts.optBoolean("allowBootMenu", !demoMode);
-		forceProfanityFilter = eaglercraftOpts.optBoolean("forceProfanityFilter", false);
-		forceWebGL1 = eaglercraftOpts.optBoolean("forceWebGL1", false);
-		forceWebGL2 = eaglercraftOpts.optBoolean("forceWebGL2", false);
-		allowExperimentalWebGL1 = eaglercraftOpts.optBoolean("allowExperimentalWebGL1", true);
-		useWebGLExt = eaglercraftOpts.optBoolean("useWebGLExt", true);
-		useDelayOnSwap = eaglercraftOpts.optBoolean("useDelayOnSwap", false);
-		useJOrbisAudioDecoder = eaglercraftOpts.optBoolean("useJOrbisAudioDecoder", false);
-		useXHRFetch = eaglercraftOpts.optBoolean("useXHRFetch", false);
-		useVisualViewport = eaglercraftOpts.optBoolean("useVisualViewport", true);
-		deobfStackTraces = eaglercraftOpts.optBoolean("deobfStackTraces", true);
-		disableBlobURLs = eaglercraftOpts.optBoolean("disableBlobURLs", false);
-		eaglerNoDelay = eaglercraftOpts.optBoolean("eaglerNoDelay", false);
-		ramdiskMode = eaglercraftOpts.optBoolean("ramdiskMode", false);
-		singleThreadMode = eaglercraftOpts.optBoolean("singleThreadMode", false);
-		enableEPKVersionCheck = eaglercraftOpts.optBoolean("enableEPKVersionCheck", true);
-		defaultServers.clear();
-		JSONArray serversArray = eaglercraftOpts.optJSONArray("servers");
-		if(serversArray != null) {
-			for(int i = 0, l = serversArray.length(); i < l; ++i) {
-				JSONObject serverEntry = serversArray.getJSONObject(i);
-				boolean hideAddr = serverEntry.optBoolean("hideAddr", false);
-				String serverAddr = serverEntry.optString("addr", null);
-				if(serverAddr != null) {
-					String serverName = serverEntry.optString("name", "Default Server #" + i);
-					defaultServers.add(new DefaultServer(serverName, serverAddr, hideAddr));
-				}
-			}
-		}
-
-		relays.clear();
-		JSONArray relaysArray = eaglercraftOpts.optJSONArray("relays");
-		if(relaysArray != null) {
-			boolean gotAPrimary = false;
-			for (int i = 0, l = relaysArray.length(); i < l; ++i) {
-				JSONObject relay = relaysArray.getJSONObject(i);
-				boolean p = relay.optBoolean("primary");
-				if(p) {
-					if(gotAPrimary) {
-						p = false;
-					}else {
-						gotAPrimary = true;
-					}
-				}
-				relays.add(new RelayEntry(relay.getString("addr"), relay.getString("comment"), p));
-			}
-		}
-
-		boolean officialUpdates = !demoMode && EaglercraftVersion.updateBundlePackageName.equals("net.lax1dude.eaglercraft.v1_8.client");
-		if (relays.size() <= 0) {
-			int choice = ThreadLocalRandom.current().nextInt(3);
-			relays.add(new RelayEntry("wss://relay.deev.is/", "lax1dude relay #1", choice == 0));
-			relays.add(new RelayEntry("wss://relay.lax1dude.net/", "lax1dude relay #2", choice == 1));
-			relays.add(new RelayEntry("wss://relay.shhnowisnottheti.me/", "ayunami relay #1", choice == 2));
-			checkRelaysForUpdates = !demoMode && eaglercraftOpts.optBoolean("checkRelaysForUpdates", officialUpdates);
-		}else {
-			if(officialUpdates) {
-				for(int i = 0, l = relays.size(); i < l; ++i) {
-					String addr = relays.get(i).address;
-					if(!addr.contains("deev.is") && !addr.contains("lax1dude.net") && !addr.contains("shhnowisnottheti.me")) {
-						officialUpdates = false;
-						break;
-					}
-				}
-			}
-			checkRelaysForUpdates = !demoMode && eaglercraftOpts.optBoolean("checkRelaysForUpdates", officialUpdates);
-		}
-		
-		RelayManager.relayManager.load(EagRuntime.getStorage("r"));
-		
-		if (RelayManager.relayManager.count() <= 0) {
-			RelayManager.relayManager.loadDefaults();
-			RelayManager.relayManager.save();
-		}
-	}
-
-	@Override
-	public String getDefaultLocale() {
-		return defaultLocale;
-	}
-
-	@Override
-	public List<DefaultServer> getDefaultServerList() {
-		return defaultServers;
-	}
-
-	@Override
-	public String getServerToJoin() {
-		return serverToJoin;
-	}
-
-	@Override
-	public String getWorldsDB() {
-		return worldsDB;
-	}
-
-	@Override
-	public String getResourcePacksDB() {
-		return resourcePacksDB;
-	}
-
-	@Override
-	public JSONObject getIntegratedServerOpts() {
-		return integratedServerOpts;
-	}
-
-	@Override
-	public List<RelayEntry> getRelays() {
-		return relays;
-	}
-
-	@Override
-	public boolean isCheckGLErrors() {
-		return checkGLErrors;
-	}
-
-	@Override
-	public boolean isCheckShaderGLErrors() {
-		return checkShaderGLErrors;
-	}
-
-	@Override
-	public boolean isDemo() {
-		return demoMode;
-	}
-
-	@Override
-	public boolean allowUpdateSvc() {
-		return isAllowUpdateSvc;
-	}
-
-	@Override
-	public boolean allowUpdateDL() {
-		return isAllowUpdateDL;
-	}
-
-	@Override
-	public boolean isEnableDownloadOfflineButton() {
-		return isEnableDownloadOfflineButton;
-	}
-
-	@Override
-	public String getDownloadOfflineButtonLink() {
-		return downloadOfflineButtonLink;
-	}
-
-	@Override
-	public boolean useSpecialCursors() {
-		return useSpecialCursors;
-	}
-
-	@Override
-	public boolean isLogInvalidCerts() {
-		return logInvalidCerts;
-	}
-
-	@Override
-	public boolean isCheckRelaysForUpdates() {
-		return checkRelaysForUpdates;
-	}
-
-	@Override
-	public boolean isEnableSignatureBadge() {
-		return enableSignatureBadge;
-	}
-
-	@Override
-	public boolean isAllowVoiceClient() {
-		return allowVoiceClient;
-	}
-
-	@Override
-	public boolean isAllowFNAWSkins() {
-		return allowFNAWSkins;
-	}
-
-	@Override
-	public String getLocalStorageNamespace() {
-		return localStorageNamespace;
-	}
-
-	@Override
-	public boolean isEnableMinceraft() {
-		return enableMinceraft;
-	}
-
-	@Override
-	public boolean isEnableServerCookies() {
-		return enableServerCookies;
-	}
-
-	@Override
-	public boolean isAllowServerRedirects() {
-		return allowServerRedirects;
-	}
-
-	@Override
-	public boolean isOpenDebugConsoleOnLaunch() {
-		return openDebugConsoleOnLaunch;
-	}
-
-	public boolean isFixDebugConsoleUnloadListenerTeaVM() {
-		return fixDebugConsoleUnloadListener;
-	}
-
-	@Override
-	public boolean isForceWebViewSupport() {
-		return forceWebViewSupport;
-	}
-
-	@Override
-	public boolean isEnableWebViewCSP() {
-		return enableWebViewCSP;
-	}
-
-	public boolean isAutoFixLegacyStyleAttrTeaVM() {
-		return autoFixLegacyStyleAttr;
-	}
-
-	public boolean isForceWebGL1TeaVM() {
-		return forceWebGL1;
-	}
-
-	public boolean isForceWebGL2TeaVM() {
-		return forceWebGL2;
-	}
-
-	public boolean isAllowExperimentalWebGL1TeaVM() {
-		return allowExperimentalWebGL1;
-	}
-
-	public boolean isUseWebGLExtTeaVM() {
-		return useWebGLExt;
-	}
-
-	public boolean isUseDelayOnSwapTeaVM() {
-		return useDelayOnSwap;
-	}
-
-	public boolean isUseJOrbisAudioDecoderTeaVM() {
-		return useJOrbisAudioDecoder;
-	}
-
-	public boolean isUseXHRFetchTeaVM() {
-		return useXHRFetch;
-	}
-
-	public boolean isDeobfStackTracesTeaVM() {
-		return deobfStackTraces;
-	}
-
-	public boolean isUseVisualViewportTeaVM() {
-		return useVisualViewport;
-	}
-
-	public boolean isDisableBlobURLsTeaVM() {
-		return disableBlobURLs;
-	}
-
-	public boolean isSingleThreadModeTeaVM() {
-		return singleThreadMode;
-	}
-
-	public boolean isEnableEPKVersionCheckTeaVM() {
-		return enableEPKVersionCheck;
-	}
-
-	@Override
-	public boolean isShowBootMenuOnLaunch() {
-		return showBootMenuOnLaunch;
-	}
-
-	@Override
-	public boolean isBootMenuBlocksUnsignedClients() {
-		return bootMenuBlocksUnsignedClients;
-	}
-
-	@Override
-	public boolean isAllowBootMenu() {
-		return allowBootMenu;
-	}
-
-	@Override
-	public boolean isForceProfanityFilter() {
-		return forceProfanityFilter;
-	}
-
-	@Override
-	public boolean isEaglerNoDelay() {
-		return eaglerNoDelay;
-	}
-
-	@Override
-	public boolean isRamdiskMode() {
-		return ramdiskMode;
-	}
-
-	@Override
-	public IClientConfigAdapterHooks getHooks() {
-		return hooks;
 	}
 
 	public JSONObject toJSONObject() {
@@ -603,7 +615,7 @@ public class TeaVMClientConfigAdapter implements IClientConfigAdapter, IBootMenu
 		jsonObject.put("singleThreadMode", singleThreadMode);
 		jsonObject.put("enableEPKVersionCheck", enableEPKVersionCheck);
 		JSONArray serversArr = new JSONArray();
-		for(int i = 0, l = defaultServers.size(); i < l; ++i) {
+		for (int i = 0, l = defaultServers.size(); i < l; ++i) {
 			DefaultServer srv = defaultServers.get(i);
 			JSONObject obj = new JSONObject();
 			obj.put("addr", srv.addr);
@@ -613,7 +625,7 @@ public class TeaVMClientConfigAdapter implements IClientConfigAdapter, IBootMenu
 		}
 		jsonObject.put("servers", serversArr);
 		JSONArray relaysArr = new JSONArray();
-		for(int i = 0, l = relays.size(); i < l; ++i) {
+		for (int i = 0, l = relays.size(); i < l; ++i) {
 			RelayEntry rl = relays.get(i);
 			JSONObject obj = new JSONObject();
 			obj.put("addr", rl.address);
@@ -632,6 +644,11 @@ public class TeaVMClientConfigAdapter implements IClientConfigAdapter, IBootMenu
 
 	public String toStringFormatted() {
 		return toJSONObject().toString(4);
+	}
+
+	@Override
+	public boolean useSpecialCursors() {
+		return useSpecialCursors;
 	}
 
 }

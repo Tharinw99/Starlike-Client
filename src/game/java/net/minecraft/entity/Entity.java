@@ -57,13 +57,13 @@ import net.minecraft.world.WorldServer;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -75,7 +75,7 @@ import net.minecraft.world.WorldServer;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class Entity implements ICommandSender {
 	private static final AxisAlignedBB ZERO_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D);
@@ -157,6 +157,8 @@ public abstract class Entity implements ICommandSender {
 
 	private String lastFilteredNameTagForFilter = null;
 
+	public boolean shouldCull = false;
+
 	public Entity(World worldIn) {
 		this.entityId = nextEntityID++;
 		this.renderDistanceWeight = 1.0D;
@@ -187,17 +189,20 @@ public abstract class Entity implements ICommandSender {
 	/**
 	 * + Send a chat message to the CommandSender
 	 */
+	@Override
 	public void addChatMessage(IChatComponent var1) {
 	}
 
 	public void addEntityCrashInfo(CrashReportCategory category) {
 		category.addCrashSectionCallable("Entity Type", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return EntityList.getEntityString(Entity.this) + " (" + Entity.this.getClass().getCanonicalName() + ")";
 			}
 		});
 		category.addCrashSection("Entity ID", Integer.valueOf(this.entityId));
 		category.addCrashSectionCallable("Entity Name", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return Entity.this.getName();
 			}
@@ -210,11 +215,13 @@ public abstract class Entity implements ICommandSender {
 		category.addCrashSection("Entity\'s Momentum", String.format("%.2f, %.2f, %.2f", new Object[] {
 				Double.valueOf(this.motionX), Double.valueOf(this.motionY), Double.valueOf(this.motionZ) }));
 		category.addCrashSectionCallable("Entity\'s Rider", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return Entity.this.riddenByEntity.toString();
 			}
 		});
 		category.addCrashSectionCallable("Entity\'s Vehicle", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return Entity.this.ridingEntity.toString();
 			}
@@ -323,6 +330,7 @@ public abstract class Entity implements ICommandSender {
 	 * + Returns {@code true} if the CommandSender is allowed to execute the
 	 * command, {@code false} if not
 	 */
+	@Override
 	public boolean canCommandSenderUseCommand(int var1, String var2) {
 		return true;
 	}
@@ -396,7 +404,6 @@ public abstract class Entity implements ICommandSender {
 		if (!this.isImmuneToFire) {
 			this.attackEntityFrom(DamageSource.inFire, (float) amount);
 		}
-
 	}
 
 	protected void doBlockCollisions() {
@@ -462,6 +469,7 @@ public abstract class Entity implements ICommandSender {
 
 	protected abstract void entityInit();
 
+	@Override
 	public boolean equals(Object object) {
 		return object instanceof Entity ? ((Entity) object).entityId == this.entityId : false;
 	}
@@ -581,6 +589,7 @@ public abstract class Entity implements ICommandSender {
 	/**
 	 * + Returns the entity associated with the command sender. MAY BE NULL!
 	 */
+	@Override
 	public Entity getCommandSenderEntity() {
 		return this;
 	}
@@ -618,6 +627,7 @@ public abstract class Entity implements ICommandSender {
 	 * + Get the formatted ChatComponent that will be used for the sender's username
 	 * in chat
 	 */
+	@Override
 	public IChatComponent getDisplayName() {
 		ChatComponentText chatcomponenttext = new ChatComponentText(this.getName());
 		chatcomponenttext.getChatStyle().setChatHoverEvent(this.getHoverEvent());
@@ -713,6 +723,7 @@ public abstract class Entity implements ICommandSender {
 	 * + Get the world, if available. <b>{@code null} is not allowed!</b> If you are
 	 * not an entity in the world, return the overworld
 	 */
+	@Override
 	public World getEntityWorld() {
 		return this.worldObj;
 	}
@@ -809,6 +820,7 @@ public abstract class Entity implements ICommandSender {
 	 * + Gets the name of this command sender (usually username, but possibly
 	 * "Rcon")
 	 */
+	@Override
 	public String getName() {
 		if (this.hasCustomName()) {
 			return this.getCustomNameTag();
@@ -857,6 +869,7 @@ public abstract class Entity implements ICommandSender {
 	 * + Get the position in the world. <b>{@code null} is not allowed!</b> If you
 	 * are not an entity in the world, return the coordinates 0, 0, 0
 	 */
+	@Override
 	public BlockPos getPosition() {
 		return new BlockPos(this.posX, this.posY + 0.5D, this.posZ);
 	}
@@ -877,6 +890,7 @@ public abstract class Entity implements ICommandSender {
 	 * + Get the position vector. <b>{@code null} is not allowed!</b> If you are not
 	 * an entity in the world, return 0.0D, 0.0D, 0.0D
 	 */
+	@Override
 	public Vec3 getPositionVector() {
 		return new Vec3(this.posX, this.posY, this.posZ);
 	}
@@ -947,6 +961,7 @@ public abstract class Entity implements ICommandSender {
 		return this.dataWatcher.getWatchableObjectString(2).length() > 0;
 	}
 
+	@Override
 	public int hashCode() {
 		return this.entityId;
 	}
@@ -1008,8 +1023,7 @@ public abstract class Entity implements ICommandSender {
 		if (this.noClip) {
 			return false;
 		} else {
-			BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos(Integer.MIN_VALUE,
-					Integer.MIN_VALUE, Integer.MIN_VALUE);
+			BlockPos blockpos$mutableblockpos = new BlockPos(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
 
 			for (int i = 0; i < 8; ++i) {
 				int j = MathHelper.floor_double(
@@ -1148,7 +1162,7 @@ public abstract class Entity implements ICommandSender {
 
 	/**
 	 * +
-	 * 
+	 *
 	 * @return True if this entity will not play sounds
 	 */
 	public boolean isSilent() {
@@ -1833,7 +1847,10 @@ public abstract class Entity implements ICommandSender {
 			this.dimension = tagCompund.getInteger("Dimension");
 			this.invulnerable = tagCompund.getBoolean("Invulnerable");
 			this.timeUntilPortal = tagCompund.getInteger("PortalCooldown");
-			if (tagCompund.hasKey("UUIDMost", 4) && tagCompund.hasKey("UUIDLeast", 4)) {
+			if (tagCompund.hasKey("UUID", 12)) {
+				long[] uuidArray = tagCompund.getLongArray("UUID");
+				this.entityUniqueID = new EaglercraftUUID(uuidArray[0], uuidArray[1]);
+			} else if (tagCompund.hasKey("UUIDMost", 4) && tagCompund.hasKey("UUIDLeast", 4)) {
 				this.entityUniqueID = new EaglercraftUUID(tagCompund.getLong("UUIDMost"),
 						tagCompund.getLong("UUIDLeast"));
 			} else if (tagCompund.hasKey("UUID", 8)) {
@@ -1954,6 +1971,7 @@ public abstract class Entity implements ICommandSender {
 	 * + Returns true if the command sender should be sent feedback about executed
 	 * commands
 	 */
+	@Override
 	public boolean sendCommandFeedback() {
 		return false;
 	}
@@ -1987,6 +2005,7 @@ public abstract class Entity implements ICommandSender {
 		this.velocityChanged = true;
 	}
 
+	@Override
 	public void setCommandStat(CommandResultStats.Type commandresultstats$type, int i) {
 		this.cmdResultStats.func_179672_a(this, commandresultstats$type, i);
 	}
@@ -2237,6 +2256,7 @@ public abstract class Entity implements ICommandSender {
 
 	}
 
+	@Override
 	public String toString() {
 		return HString.format("%s[\'%s\'/%d, l=\'%s\', x=%.2f, y=%.2f, z=%.2f]",
 				new Object[] { this.getClass().getSimpleName(), this.getName(), Integer.valueOf(this.entityId),
@@ -2401,8 +2421,8 @@ public abstract class Entity implements ICommandSender {
 			tagCompund.setInteger("Dimension", this.dimension);
 			tagCompund.setBoolean("Invulnerable", this.invulnerable);
 			tagCompund.setInteger("PortalCooldown", this.timeUntilPortal);
-			tagCompund.setLong("UUIDMost", this.getUniqueID().getMostSignificantBits());
-			tagCompund.setLong("UUIDLeast", this.getUniqueID().getLeastSignificantBits());
+			tagCompund.setLongArray("UUID", new long[] { this.getUniqueID().getMostSignificantBits(),
+					this.getUniqueID().getLeastSignificantBits() });
 			if (this.getCustomNameTag() != null && this.getCustomNameTag().length() > 0) {
 				tagCompund.setString("CustomName", this.getCustomNameTag());
 				tagCompund.setBoolean("CustomNameVisible", this.getAlwaysRenderNameTag());

@@ -35,13 +35,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -53,7 +53,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityDragon extends EntityLiving implements IBossDisplayData, IEntityMultiPart, IMob {
 	public double targetX;
@@ -103,6 +103,7 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
 		this.ignoreFrustumCheck = true;
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(200.0D);
@@ -132,6 +133,7 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
 	/**
 	 * + Called when the entity is attacked.
 	 */
+	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float f) {
 		if (damagesource instanceof EntityDamageSource && ((EntityDamageSource) damagesource).getIsThornsDamage()) {
 			this.attackDragonFrom(damagesource, f);
@@ -140,6 +142,7 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
 		return false;
 	}
 
+	@Override
 	public boolean attackEntityFromPart(EntityDragonPart entitydragonpart, DamageSource damagesource, float f) {
 		if (entitydragonpart != this.dragonPartHead) {
 			f = f / 4.0F + 1.0F;
@@ -163,6 +166,7 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
 	 * + Returns true if other Entities should be prevented from moving through this
 	 * Entity.
 	 */
+	@Override
 	public boolean canBeCollidedWith() {
 		return false;
 	}
@@ -224,6 +228,7 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
 	/**
 	 * + Makes the entity despawn if requirements are reached
 	 */
+	@Override
 	protected void despawnEntity() {
 	}
 
@@ -273,6 +278,7 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
 		return flag;
 	}
 
+	@Override
 	protected void entityInit() {
 		super.entityInit();
 	}
@@ -364,6 +370,7 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
 	/**
 	 * + Returns the sound this mob makes when it is hurt.
 	 */
+	@Override
 	protected String getHurtSound() {
 		return "mob.enderdragon.hit";
 	}
@@ -371,6 +378,7 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
 	/**
 	 * + Returns the sound this mob makes while it's alive.
 	 */
+	@Override
 	protected String getLivingSound() {
 		return "mob.enderdragon.growl";
 	}
@@ -402,6 +410,7 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
 	/**
 	 * + Return the Entity parts making up this Entity (currently only for dragons)
 	 */
+	@Override
 	public Entity[] getParts() {
 		return this.dragonPartArray;
 	}
@@ -409,10 +418,12 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
 	/**
 	 * + Returns the volume for the sounds this mob makes.
 	 */
+	@Override
 	protected float getSoundVolume() {
 		return 5.0F;
 	}
 
+	@Override
 	public World getWorld() {
 		return this.worldObj;
 	}
@@ -420,6 +431,7 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
 	/**
 	 * + handles entity death timer, experience orb and particle creation
 	 */
+	@Override
 	protected void onDeathUpdate() {
 		++this.deathTicks;
 		if (this.deathTicks >= 180 && this.deathTicks <= 200) {
@@ -471,6 +483,7 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
 	/**
 	 * + Called by the /kill command.
 	 */
+	@Override
 	public void onKillCommand() {
 		this.generatePortal();
 		this.setDead();
@@ -481,6 +494,7 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
 	 * required. For example, zombies and skeletons use this to react to sunlight
 	 * and start to burn.
 	 */
+	@Override
 	public void onLivingUpdate() {
 		if (this.worldObj.isRemote) {
 			float f = MathHelper.cos(this.animTime * 3.1415927F * 2.0F);

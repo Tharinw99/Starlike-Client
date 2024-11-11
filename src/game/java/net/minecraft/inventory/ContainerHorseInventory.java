@@ -8,13 +8,13 @@ import net.minecraft.item.ItemStack;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -26,7 +26,7 @@ import net.minecraft.item.ItemStack;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ContainerHorseInventory extends Container {
 	private IInventory horseInventory;
@@ -40,15 +40,18 @@ public class ContainerHorseInventory extends Container {
 		horseInventoryIn.openInventory(player);
 		int i = (b0 - 4) * 18;
 		this.addSlotToContainer(new Slot(horseInventoryIn, 0, 8, 18) {
+			@Override
 			public boolean isItemValid(ItemStack itemstack) {
 				return super.isItemValid(itemstack) && itemstack.getItem() == Items.saddle && !this.getHasStack();
 			}
 		});
 		this.addSlotToContainer(new Slot(horseInventoryIn, 1, 8, 36) {
+			@Override
 			public boolean canBeHovered() {
 				return horse.canWearArmor();
 			}
 
+			@Override
 			public boolean isItemValid(ItemStack itemstack) {
 				return super.isItemValid(itemstack) && horse.canWearArmor()
 						&& EntityHorse.isArmorItem(itemstack.getItem());
@@ -74,6 +77,7 @@ public class ContainerHorseInventory extends Container {
 
 	}
 
+	@Override
 	public boolean canInteractWith(EntityPlayer entityplayer) {
 		return this.horseInventory.isUseableByPlayer(entityplayer) && this.theHorse.isEntityAlive()
 				&& this.theHorse.getDistanceToEntity(entityplayer) < 8.0F;
@@ -82,6 +86,7 @@ public class ContainerHorseInventory extends Container {
 	/**
 	 * + Called when the container is closed.
 	 */
+	@Override
 	public void onContainerClosed(EntityPlayer entityplayer) {
 		super.onContainerClosed(entityplayer);
 		this.horseInventory.closeInventory(entityplayer);
@@ -90,6 +95,7 @@ public class ContainerHorseInventory extends Container {
 	/**
 	 * + Take a stack from the specified inventory slot.
 	 */
+	@Override
 	public ItemStack transferStackInSlot(EntityPlayer var1, int i) {
 		ItemStack itemstack = null;
 		Slot slot = (Slot) this.inventorySlots.get(i);

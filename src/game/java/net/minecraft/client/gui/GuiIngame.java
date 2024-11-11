@@ -59,17 +59,18 @@ import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StringUtils;
 import net.minecraft.world.border.WorldBorder;
+import net.starlikeclient.StarlikeClient;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -81,7 +82,7 @@ import net.minecraft.world.border.WorldBorder;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiIngame extends Gui {
 	private static final ResourceLocation vignetteTexPath = new ResourceLocation("textures/misc/vignette.png");
@@ -223,12 +224,16 @@ public class GuiIngame extends Gui {
 					&& touchVPosX < interactButtonX + interactButtonW && touchVPosY < interactButtonY + interactButtonH;
 			float f = MathHelper.clamp_float(mc.gameSettings.touchControlOpacity, 0.0f, 1.0f);
 			if (f > 0.0f) {
+				if (f < 1.0f)
+					GlStateManager.enableBlend();
 				GlStateManager.color(1.0f, 1.0f, 1.0f, f);
 				drawTexturedModalRect(xx, yy, 0, hover ? 216 : 236, 118, 20);
 				GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 				drawCenteredString(mc.fontRendererObj, I18n.format("touch.interact.entity"),
 						parScaledResolution.getScaledWidth() / 2, yy + 6,
 						(hover ? 16777120 : 14737632) | ((int) (f * 255.0f) << 24));
+				if (f < 1.0f)
+					GlStateManager.disableBlend();
 			}
 		} else {
 			interactButtonX = -1;
@@ -570,6 +575,13 @@ public class GuiIngame extends Gui {
 		GlStateManager.tryBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 1, 0);
 		GlStateManager.enableDepth();
 		GlStateManager.disableLighting();
+
+		if (StarlikeClient.Config.General.isDevBuild) {
+			drawRect(0, 0, i, 12, 0xAAFFFF00);
+			mc.fontRendererObj.drawStringWithShadow(StarlikeClient.Config.General.devBuildWarning,
+					(i - mc.fontRendererObj.getStringWidth(StarlikeClient.Config.General.devBuildWarning)) / 2, 2,
+					0xFFFFFF);
+		}
 
 		ItemStack itemstack = this.mc.thePlayer.inventory.armorItemInSlot(3);
 		if (this.mc.gameSettings.thirdPersonView == 0 && itemstack != null
@@ -1038,6 +1050,7 @@ public class GuiIngame extends Gui {
 		Scoreboard scoreboard = parScoreObjective.getScoreboard();
 		Collection collection = scoreboard.getSortedScores(parScoreObjective);
 		ArrayList arraylist = Lists.newArrayList(Iterables.filter(collection, new Predicate<Score>() {
+			@Override
 			public boolean apply(Score score2) {
 				return score2.getPlayerName() != null && !score2.getPlayerName().startsWith("#");
 			}

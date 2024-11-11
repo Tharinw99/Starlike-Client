@@ -17,13 +17,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -35,11 +35,12 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class DefaultResourcePack implements IResourcePack {
 	public static final Set<String> defaultResourceDomains = ImmutableSet.of("minecraft", "eagler", "starlike");
 
+	@Override
 	public InputStream getInputStream(ResourceLocation parResourceLocation) throws IOException {
 		InputStream inputstream = this.getResourceStream(parResourceLocation);
 		if (inputstream != null) {
@@ -58,10 +59,12 @@ public class DefaultResourcePack implements IResourcePack {
 		return null;
 	}
 
+	@Override
 	public ImageData getPackImage() throws IOException {
 		return TextureUtil.readBufferedImage(EagRuntime.getRequiredResourceStream("pack.png"));
 	}
 
+	@Override
 	public <T extends IMetadataSection> T getPackMetadata(IMetadataSerializer parIMetadataSerializer, String parString1)
 			throws IOException {
 		try {
@@ -72,10 +75,12 @@ public class DefaultResourcePack implements IResourcePack {
 		}
 	}
 
+	@Override
 	public String getPackName() {
 		return "Default";
 	}
 
+	@Override
 	public Set<String> getResourceDomains() {
 		return defaultResourceDomains;
 	}
@@ -85,6 +90,7 @@ public class DefaultResourcePack implements IResourcePack {
 				.getResourceStream("/assets/" + location.getResourceDomain() + "/" + location.getResourcePath());
 	}
 
+	@Override
 	public boolean resourceExists(ResourceLocation location) {
 		return EagRuntime
 				.getResourceExists("/assets/" + location.getResourceDomain() + "/" + location.getResourcePath());

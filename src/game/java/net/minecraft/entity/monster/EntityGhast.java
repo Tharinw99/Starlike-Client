@@ -24,13 +24,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -42,7 +42,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityGhast extends EntityFlying implements IMob {
 	static class AIFireballAttack extends EntityAIBase {
@@ -53,18 +53,22 @@ public class EntityGhast extends EntityFlying implements IMob {
 			this.parentEntity = parEntityGhast;
 		}
 
+		@Override
 		public void resetTask() {
 			this.parentEntity.setAttacking(false);
 		}
 
+		@Override
 		public boolean shouldExecute() {
 			return this.parentEntity.getAttackTarget() != null;
 		}
 
+		@Override
 		public void startExecuting() {
 			this.attackTimer = 0;
 		}
 
+		@Override
 		public void updateTask() {
 			EntityLivingBase entitylivingbase = this.parentEntity.getAttackTarget();
 			double d0 = 64.0D;
@@ -110,10 +114,12 @@ public class EntityGhast extends EntityFlying implements IMob {
 			this.setMutexBits(2);
 		}
 
+		@Override
 		public boolean shouldExecute() {
 			return true;
 		}
 
+		@Override
 		public void updateTask() {
 			if (this.parentEntity.getAttackTarget() == null) {
 				this.parentEntity.renderYawOffset = this.parentEntity.rotationYaw = -((float) MathHelper
@@ -140,10 +146,12 @@ public class EntityGhast extends EntityFlying implements IMob {
 			this.setMutexBits(1);
 		}
 
+		@Override
 		public boolean continueExecuting() {
 			return false;
 		}
 
+		@Override
 		public boolean shouldExecute() {
 			EntityMoveHelper entitymovehelper = this.parentEntity.getMoveHelper();
 			if (!entitymovehelper.isUpdating()) {
@@ -157,6 +165,7 @@ public class EntityGhast extends EntityFlying implements IMob {
 			}
 		}
 
+		@Override
 		public void startExecuting() {
 			EaglercraftRandom random = this.parentEntity.getRNG();
 			double d0 = this.parentEntity.posX + (double) ((random.nextFloat() * 2.0F - 1.0F) * 16.0F);
@@ -191,6 +200,7 @@ public class EntityGhast extends EntityFlying implements IMob {
 			return true;
 		}
 
+		@Override
 		public void onUpdateMoveHelper() {
 			if (this.update) {
 				double d0 = this.posX - this.parentEntity.posX;
@@ -230,6 +240,7 @@ public class EntityGhast extends EntityFlying implements IMob {
 		this.targetTasks.addTask(1, new EntityAIFindEntityNearestPlayer(this));
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(10.0D);
@@ -239,6 +250,7 @@ public class EntityGhast extends EntityFlying implements IMob {
 	/**
 	 * + Called when the entity is attacked.
 	 */
+	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float f) {
 		if (this.isEntityInvulnerable(damagesource)) {
 			return false;
@@ -255,6 +267,7 @@ public class EntityGhast extends EntityFlying implements IMob {
 	/**
 	 * + Drop 0-2 items of this living's type
 	 */
+	@Override
 	protected void dropFewItems(boolean var1, int i) {
 		int j = this.rand.nextInt(2) + this.rand.nextInt(1 + i);
 
@@ -270,6 +283,7 @@ public class EntityGhast extends EntityFlying implements IMob {
 
 	}
 
+	@Override
 	protected void entityInit() {
 		super.entityInit();
 		this.dataWatcher.addObject(16, Byte.valueOf((byte) 0));
@@ -279,6 +293,7 @@ public class EntityGhast extends EntityFlying implements IMob {
 	 * + Checks if the entity's current position is a valid location to spawn this
 	 * entity.
 	 */
+	@Override
 	public boolean getCanSpawnHere() {
 		return this.rand.nextInt(20) == 0 && super.getCanSpawnHere()
 				&& this.worldObj.getDifficulty() != EnumDifficulty.PEACEFUL;
@@ -287,14 +302,17 @@ public class EntityGhast extends EntityFlying implements IMob {
 	/**
 	 * + Returns the sound this mob makes on death.
 	 */
+	@Override
 	protected String getDeathSound() {
 		return "mob.ghast.death";
 	}
 
+	@Override
 	protected Item getDropItem() {
 		return Items.gunpowder;
 	}
 
+	@Override
 	public float getEyeHeight() {
 		return 2.6F;
 	}
@@ -306,6 +324,7 @@ public class EntityGhast extends EntityFlying implements IMob {
 	/**
 	 * + Returns the sound this mob makes when it is hurt.
 	 */
+	@Override
 	protected String getHurtSound() {
 		return "mob.ghast.scream";
 	}
@@ -313,6 +332,7 @@ public class EntityGhast extends EntityFlying implements IMob {
 	/**
 	 * + Returns the sound this mob makes while it's alive.
 	 */
+	@Override
 	protected String getLivingSound() {
 		return "mob.ghast.moan";
 	}
@@ -320,6 +340,7 @@ public class EntityGhast extends EntityFlying implements IMob {
 	/**
 	 * + Will return how many at most can spawn in a chunk at once.
 	 */
+	@Override
 	public int getMaxSpawnedInChunk() {
 		return 1;
 	}
@@ -327,6 +348,7 @@ public class EntityGhast extends EntityFlying implements IMob {
 	/**
 	 * + Returns the volume for the sounds this mob makes.
 	 */
+	@Override
 	protected float getSoundVolume() {
 		return 10.0F;
 	}
@@ -338,6 +360,7 @@ public class EntityGhast extends EntityFlying implements IMob {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		super.onUpdate();
 		if (!this.worldObj.isRemote && this.worldObj.getDifficulty() == EnumDifficulty.PEACEFUL) {
@@ -349,6 +372,7 @@ public class EntityGhast extends EntityFlying implements IMob {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		if (nbttagcompound.hasKey("ExplosionPower", 99)) {
@@ -364,6 +388,7 @@ public class EntityGhast extends EntityFlying implements IMob {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		nbttagcompound.setInteger("ExplosionPower", this.explosionStrength);

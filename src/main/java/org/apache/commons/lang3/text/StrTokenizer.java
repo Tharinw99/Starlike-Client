@@ -52,7 +52,7 @@ import org.apache.commons.lang3.StringUtils;
  * removed. One usage might be to remove new line characters.
  * <p>
  * Empty tokens may be removed or returned as null.
- * 
+ *
  * <pre>
  * "a,b,c"         - Three tokens "a","b","c"   (comma delimiter)
  * " a, b , c "    - Three tokens "a","b","c"   (default CSV processing trims whitespace)
@@ -137,7 +137,7 @@ public class StrTokenizer implements ListIterator<String>, Cloneable {
 	 * method).
 	 * <p>
 	 * You must call a "reset" method to set the string which you want to parse.
-	 * 
+	 *
 	 * @return a new tokenizer instance which parses Comma Separated Value strings
 	 */
 	public static StrTokenizer getCSVInstance() {
@@ -189,7 +189,7 @@ public class StrTokenizer implements ListIterator<String>, Cloneable {
 	 * be overridden with the setTrimmer method).
 	 * <p>
 	 * You must call a "reset" method to set the string which you want to parse.
-	 * 
+	 *
 	 * @return a new tokenizer instance which parses Tab Separated Value strings.
 	 */
 	public static StrTokenizer getTSVInstance() {
@@ -200,7 +200,7 @@ public class StrTokenizer implements ListIterator<String>, Cloneable {
 	 * Gets a new tokenizer instance which parses Tab Separated Value strings. The
 	 * default for CSV processing will be trim whitespace from both ends (which can
 	 * be overridden with the setTrimmer method).
-	 * 
+	 *
 	 * @param input the string to parse
 	 * @return a new tokenizer instance which parses Tab Separated Value strings.
 	 */
@@ -214,7 +214,7 @@ public class StrTokenizer implements ListIterator<String>, Cloneable {
 	 * Gets a new tokenizer instance which parses Tab Separated Value strings. The
 	 * default for CSV processing will be trim whitespace from both ends (which can
 	 * be overridden with the setTrimmer method).
-	 * 
+	 *
 	 * @param input the string to parse
 	 * @return a new tokenizer instance which parses Tab Separated Value strings.
 	 */
@@ -408,7 +408,7 @@ public class StrTokenizer implements ListIterator<String>, Cloneable {
 
 	/**
 	 * Unsupported ListIterator operation.
-	 * 
+	 *
 	 * @param obj this parameter ignored.
 	 * @throws UnsupportedOperationException always
 	 */
@@ -917,7 +917,7 @@ public class StrTokenizer implements ListIterator<String>, Cloneable {
 
 	/**
 	 * Unsupported ListIterator operation.
-	 * 
+	 *
 	 * @param obj this parameter ignored.
 	 * @throws UnsupportedOperationException always
 	 */

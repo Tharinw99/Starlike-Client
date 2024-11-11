@@ -9,13 +9,13 @@ import com.google.common.collect.HashBiMap;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@ import com.google.common.collect.HashBiMap;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class RegistryNamespaced<K, V> extends RegistrySimple<K, V> implements IObjectIntIterable<V> {
 	/**
@@ -43,10 +43,12 @@ public class RegistryNamespaced<K, V> extends RegistrySimple<K, V> implements IO
 	/**
 	 * + Does this registry contain an entry for the given key?
 	 */
+	@Override
 	public boolean containsKey(K parObject) {
 		return super.containsKey(parObject);
 	}
 
+	@Override
 	protected Map<K, V> createUnderlyingMap() {
 		return HashBiMap.create();
 	}
@@ -65,6 +67,7 @@ public class RegistryNamespaced<K, V> extends RegistrySimple<K, V> implements IO
 		return (K) this.inverseObjectRegistry.get(parObject);
 	}
 
+	@Override
 	public V getObject(K object) {
 		return super.getObject(object);
 	}
@@ -76,6 +79,7 @@ public class RegistryNamespaced<K, V> extends RegistrySimple<K, V> implements IO
 		return (V) this.underlyingIntegerMap.getByValue(i);
 	}
 
+	@Override
 	public Iterator<V> iterator() {
 		return this.underlyingIntegerMap.iterator();
 	}

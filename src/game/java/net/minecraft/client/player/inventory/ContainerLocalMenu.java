@@ -15,13 +15,13 @@ import net.minecraft.world.LockCode;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,7 +33,7 @@ import net.minecraft.world.LockCode;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ContainerLocalMenu extends InventoryBasic implements ILockableContainer {
 	private String guiID;
@@ -44,36 +44,44 @@ public class ContainerLocalMenu extends InventoryBasic implements ILockableConta
 		this.guiID = id;
 	}
 
+	@Override
 	public Container createContainer(InventoryPlayer var1, EntityPlayer var2) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public int getField(int i) {
 		return this.field_174895_b.containsKey(Integer.valueOf(i))
 				? ((Integer) this.field_174895_b.get(Integer.valueOf(i))).intValue()
 				: 0;
 	}
 
+	@Override
 	public int getFieldCount() {
 		return this.field_174895_b.size();
 	}
 
+	@Override
 	public String getGuiID() {
 		return this.guiID;
 	}
 
+	@Override
 	public LockCode getLockCode() {
 		return LockCode.EMPTY_CODE;
 	}
 
+	@Override
 	public boolean isLocked() {
 		return false;
 	}
 
+	@Override
 	public void setField(int i, int j) {
 		this.field_174895_b.put(Integer.valueOf(i), Integer.valueOf(j));
 	}
 
+	@Override
 	public void setLockCode(LockCode var1) {
 	}
 }

@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "normal": {
-            "model": "starlike:decorated_red_sandstone"
-        }
+  "variants": {
+    "normal": {
+      "model": "starlike:decorated_red_sandstone"
     }
+  }
 }

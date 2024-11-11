@@ -1,5 +1,6 @@
 package net.minecraft.world.chunk;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,13 +40,13 @@ import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -57,7 +58,7 @@ import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class Chunk {
 	public static enum EnumCreateEntityType {
@@ -172,6 +173,7 @@ public class Chunk {
 
 	public void addTileEntity(BlockPos blockpos, TileEntity tileentity) {
 		tileentity.setWorldObj(this.worldObj);
+		blockpos = new BlockPos(blockpos);
 		tileentity.setPos(blockpos);
 		if (this.getBlock(blockpos) instanceof ITileEntityProvider) {
 			if (this.chunkTileEntityMap.containsKey(blockpos)) {
@@ -200,7 +202,7 @@ public class Chunk {
 
 	/**
 	 * Checks light levels for a block and its neighbors
-	 * 
+	 *
 	 * @param centerPos The position of the block to check
 	 */
 	private void checkLightForBlockAndNeighbors(BlockPos centerPos) {
@@ -340,12 +342,14 @@ public class Chunk {
 		}
 
 		this.field_150815_m = true;
+
 		if (!this.isLightPopulated && this.isTerrainPopulated) {
 			this.func_150809_p();
 		}
 
-		while (!this.tileEntityPosQueue.isEmpty()) {
-			BlockPos blockpos = (BlockPos) this.tileEntityPosQueue.remove(0);
+		List<BlockPos> tileEntityPositions = new ArrayList<>(this.tileEntityPosQueue);
+		this.tileEntityPosQueue.clear();
+		for (BlockPos blockpos : tileEntityPositions) {
 			if (this.getTileEntity(blockpos, Chunk.EnumCreateEntityType.CHECK) == null
 					&& this.getBlock(blockpos).hasTileEntity()) {
 				TileEntity tileentity = this.createNewTileEntity(blockpos);
@@ -353,7 +357,6 @@ public class Chunk {
 				this.worldObj.markBlockRangeForRenderUpdate(blockpos, blockpos);
 			}
 		}
-
 	}
 
 	public void func_150809_p() {
@@ -363,39 +366,34 @@ public class Chunk {
 		if (!this.worldObj.provider.getHasNoSky()) {
 			if (this.worldObj.isAreaLoaded(blockpos.add(-1, 0, -1),
 					blockpos.add(16, this.worldObj.func_181545_F(), 16))) {
-				label92: for (int i = 0; i < 16; ++i) {
+				for (int i = 0; i < 16; ++i) {
 					for (int j = 0; j < 16; ++j) {
 						if (!this.func_150811_f(i, j)) {
 							this.isLightPopulated = false;
-							break label92;
+							break;
 						}
 					}
 				}
-
 				if (this.isLightPopulated) {
 					EnumFacing[] facings = EnumFacing.Plane.HORIZONTAL.facingsArray;
-					for (int i = 0; i < facings.length; ++i) {
-						EnumFacing enumfacing = facings[i];
+					for (EnumFacing enumfacing : facings) {
 						int k = enumfacing.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? 16 : 1;
 						this.worldObj.getChunkFromBlockCoords(blockpos.offset(enumfacing, k))
 								.func_180700_a(enumfacing.getOpposite());
 					}
-
 					this.func_177441_y();
 				}
 			} else {
 				this.isLightPopulated = false;
 			}
 		}
-
 	}
 
 	private boolean func_150811_f(int x, int z) {
 		int i = this.getTopFilledSegment();
 		boolean flag = false;
 		boolean flag1 = false;
-		BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos((this.xPosition << 4) + x, 0,
-				(this.zPosition << 4) + z);
+		BlockPos blockpos$mutableblockpos = new BlockPos((this.xPosition << 4) + x, 0, (this.zPosition << 4) + z);
 
 		for (int j = i + 16 - 1; j > this.worldObj.func_181545_F() || j > 0 && !flag1; --j) {
 			blockpos$mutableblockpos.func_181079_c(blockpos$mutableblockpos.getX(), j, blockpos$mutableblockpos.getZ());
@@ -587,6 +585,7 @@ public class Chunk {
 			CrashReportCategory crashreportcategory = reportedexception.getCrashReport()
 					.makeCategory("Block being got");
 			crashreportcategory.addCrashSectionCallable("Location", new Callable<String>() {
+				@Override
 				public String call() throws Exception {
 					return CrashReportCategory.getCoordinateInfo(blockpos);
 				}
@@ -602,6 +601,7 @@ public class Chunk {
 			CrashReportCategory crashreportcategory = reportedexception.getCrashReport()
 					.makeCategory("Block being got");
 			crashreportcategory.addCrashSectionCallable("Location", new Callable<String>() {
+				@Override
 				public String call() throws Exception {
 					return CrashReportCategory.getCoordinateInfo(
 							new BlockPos(Chunk.this.xPosition * 16 + x, y, Chunk.this.zPosition * 16 + z));
@@ -675,6 +675,7 @@ public class Chunk {
 			CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Getting block state");
 			CrashReportCategory crashreportcategory = crashreport.makeCategory("Block being got");
 			crashreportcategory.addCrashSectionCallable("Location", new Callable<String>() {
+				@Override
 				public String call() throws Exception {
 					return CrashReportCategory.getCoordinateInfo(pos);
 				}
@@ -703,6 +704,7 @@ public class Chunk {
 			CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Getting block state");
 			CrashReportCategory crashreportcategory = crashreport.makeCategory("Block being got");
 			crashreportcategory.addCrashSectionCallable("Location", new Callable<String>() {
+				@Override
 				public String call() throws Exception {
 					return CrashReportCategory.getCoordinateInfo(pos);
 				}
@@ -877,11 +879,12 @@ public class Chunk {
 	public TileEntity getTileEntity(BlockPos blockpos, Chunk.EnumCreateEntityType chunk$enumcreateentitytype) {
 		TileEntity tileentity = (TileEntity) this.chunkTileEntityMap.get(blockpos);
 		if (tileentity == null) {
+			BlockPos pos2 = new BlockPos(blockpos);
 			if (chunk$enumcreateentitytype == Chunk.EnumCreateEntityType.IMMEDIATE) {
-				tileentity = this.createNewTileEntity(blockpos);
-				this.worldObj.setTileEntity(blockpos, tileentity);
+				tileentity = this.createNewTileEntity(pos2);
+				this.worldObj.setTileEntity(pos2, tileentity);
 			} else if (chunk$enumcreateentitytype == Chunk.EnumCreateEntityType.QUEUED) {
-				this.tileEntityPosQueue.add(blockpos);
+				this.tileEntityPosQueue.add(pos2);
 			}
 		} else if (tileentity.isInvalid()) {
 			this.chunkTileEntityMap.remove(blockpos);
@@ -1045,6 +1048,9 @@ public class Chunk {
 	}
 
 	private void recheckGaps(boolean parFlag) {
+		if (!this.worldObj.isRemote) {
+			++EaglerMinecraftServer.counterLightUpdate;
+		}
 		if (this.worldObj.isAreaLoaded(new BlockPos(this.xPosition * 16 + 8, 0, this.zPosition * 16 + 8), 16)) {
 			for (int i = 0; i < 16; ++i) {
 				for (int j = 0; j < 16; ++j) {

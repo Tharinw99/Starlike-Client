@@ -74,13 +74,13 @@ import net.minecraft.world.storage.WorldInfo;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -92,7 +92,7 @@ import net.minecraft.world.storage.WorldInfo;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class WorldServer extends World implements IThreadListener {
 	static class ServerBlockEventList extends ArrayList<BlockEventData> {
@@ -147,6 +147,7 @@ public class WorldServer extends World implements IThreadListener {
 		this.getWorldBorder().setSize(server.getMaxWorldSize());
 	}
 
+	@Override
 	public void addBlockEvent(BlockPos blockpos, Block block, int i, int j) {
 		BlockEventData blockeventdata = new BlockEventData(blockpos, block, i, j);
 
@@ -160,6 +161,7 @@ public class WorldServer extends World implements IThreadListener {
 		this.field_147490_S[this.blockEventCacheIndex].add(blockeventdata);
 	}
 
+	@Override
 	public void addScheduledTask(Runnable runnable) {
 		this.mcServer.addScheduledTask(runnable);
 	}
@@ -167,6 +169,7 @@ public class WorldServer extends World implements IThreadListener {
 	/**
 	 * + adds a lightning bolt to the list of lightning bolts in this world.
 	 */
+	@Override
 	public boolean addWeatherEffect(Entity entity) {
 		if (super.addWeatherEffect(entity)) {
 			this.mcServer.getConfigurationManager().sendToAllNear(entity.posX, entity.posY, entity.posZ, 512.0D,
@@ -183,6 +186,7 @@ public class WorldServer extends World implements IThreadListener {
 				new BlockPos(blockpos.getX(), this.getHeight(), blockpos.getZ()))).expand(3.0D, 3.0D, 3.0D);
 		List list = this.getEntitiesWithinAABB(EntityLivingBase.class, axisalignedbb,
 				new Predicate<EntityLivingBase>() {
+					@Override
 					public boolean apply(EntityLivingBase entitylivingbase) {
 						return entitylivingbase != null && entitylivingbase.isEntityAlive()
 								&& WorldServer.this.canSeeSky(entitylivingbase.getPosition());
@@ -241,6 +245,7 @@ public class WorldServer extends World implements IThreadListener {
 	 * + Creates the chunk provider for this world. Called in the constructor.
 	 * Retrieves provider from worldProvider?
 	 */
+	@Override
 	protected IChunkProvider createChunkProvider() {
 		IChunkLoader ichunkloader = this.saveHandler.getChunkLoader(this.provider);
 		this.theChunkProviderServer = new ChunkProviderServer(this, ichunkloader, this.provider.createChunkGenerator());
@@ -304,6 +309,7 @@ public class WorldServer extends World implements IThreadListener {
 		this.saveHandler.flush();
 	}
 
+	@Override
 	public List<NextTickListEntry> func_175712_a(StructureBoundingBox structureboundingbox, boolean flag) {
 		ArrayList arraylist = null;
 
@@ -357,6 +363,7 @@ public class WorldServer extends World implements IThreadListener {
 		return this.mcServer;
 	}
 
+	@Override
 	public List<NextTickListEntry> getPendingBlockUpdates(Chunk chunk, boolean flag) {
 		ChunkCoordIntPair chunkcoordintpair = chunk.getChunkCoordIntPair();
 		int i = (chunkcoordintpair.chunkXPos << 4) - 2;
@@ -370,6 +377,7 @@ public class WorldServer extends World implements IThreadListener {
 		return this.thePlayerManager;
 	}
 
+	@Override
 	protected int getRenderDistanceChunks() {
 		return this.mcServer.getConfigurationManager().getViewDistance();
 	}
@@ -406,6 +414,7 @@ public class WorldServer extends World implements IThreadListener {
 		return arraylist;
 	}
 
+	@Override
 	public World init() {
 		this.mapStorage = new MapStorage(this.saveHandler);
 		String s = VillageCollection.fileNameForProvider(this.provider);
@@ -443,6 +452,7 @@ public class WorldServer extends World implements IThreadListener {
 		return this;
 	}
 
+	@Override
 	public void initialize(WorldSettings worldsettings) {
 		if (!this.worldInfo.isInitialized()) {
 			try {
@@ -469,11 +479,13 @@ public class WorldServer extends World implements IThreadListener {
 
 	}
 
+	@Override
 	public boolean isBlockModifiable(EntityPlayer entityplayer, BlockPos blockpos) {
 		return !this.mcServer.isBlockProtected(this, blockpos, entityplayer)
 				&& this.getWorldBorder().contains(blockpos);
 	}
 
+	@Override
 	public boolean isBlockTickPending(BlockPos blockpos, Block block) {
 		NextTickListEntry nextticklistentry = new NextTickListEntry(blockpos, block);
 		return this.pendingTickListEntriesThisTick.contains(nextticklistentry);
@@ -483,6 +495,7 @@ public class WorldServer extends World implements IThreadListener {
 	 * + returns a new explosion. Does initiation (at time of writing Explosion is
 	 * not finished)
 	 */
+	@Override
 	public Explosion newExplosion(Entity entity, double d0, double d1, double d2, float f, boolean flag,
 			boolean flag1) {
 		Explosion explosion = new Explosion(this, entity, d0, d1, d2, f, flag, flag1);
@@ -505,6 +518,7 @@ public class WorldServer extends World implements IThreadListener {
 		return explosion;
 	}
 
+	@Override
 	protected void onEntityAdded(Entity entity) {
 		super.onEntityAdded(entity);
 		this.entitiesById.addKey(entity.getEntityId(), entity);
@@ -518,6 +532,7 @@ public class WorldServer extends World implements IThreadListener {
 
 	}
 
+	@Override
 	protected void onEntityRemoved(Entity entity) {
 		super.onEntityRemoved(entity);
 		this.entitiesById.removeObject(entity.getEntityId());
@@ -548,7 +563,7 @@ public class WorldServer extends World implements IThreadListener {
 	/**
 	 * + Saves all chunks to disk while updating progress bar.
 	 */
-	public void saveAllChunks(boolean progressCallback, IProgressUpdate parIProgressUpdate) throws MinecraftException {
+	public void saveAllChunks(boolean progressCallback, IProgressUpdate parIProgressUpdate) {
 		if (this.chunkProvider.canSave()) {
 			if (parIProgressUpdate != null) {
 				parIProgressUpdate.displaySavingString("Saving level");
@@ -585,8 +600,7 @@ public class WorldServer extends World implements IThreadListener {
 	/**
 	 * + Saves the chunks to disk.
 	 */
-	protected void saveLevel() throws MinecraftException {
-		this.checkSessionLock();
+	protected void saveLevel() {
 		this.worldInfo.setBorderSize(this.getWorldBorder().getDiameter());
 		this.worldInfo.getBorderCenterX(this.getWorldBorder().getCenterX());
 		this.worldInfo.getBorderCenterZ(this.getWorldBorder().getCenterZ());
@@ -601,6 +615,7 @@ public class WorldServer extends World implements IThreadListener {
 		this.mapStorage.saveAllData();
 	}
 
+	@Override
 	public void scheduleBlockUpdate(BlockPos blockpos, Block block, int i, int j) {
 		NextTickListEntry nextticklistentry = new NextTickListEntry(blockpos, block);
 		nextticklistentry.setPriority(j);
@@ -615,6 +630,7 @@ public class WorldServer extends World implements IThreadListener {
 
 	}
 
+	@Override
 	public void scheduleUpdate(BlockPos blockpos, Block block, int i) {
 		this.updateBlockTick(blockpos, block, i, 0);
 	}
@@ -658,6 +674,7 @@ public class WorldServer extends World implements IThreadListener {
 	/**
 	 * + sends a Packet 38 (Entity Status) to all tracked players of that entity
 	 */
+	@Override
 	public void setEntityState(Entity entity, byte b0) {
 		this.getEntityTracker().func_151248_b(entity, new S19PacketEntityStatus(entity, b0));
 	}
@@ -666,6 +683,7 @@ public class WorldServer extends World implements IThreadListener {
 	 * + Sets a new spawn location by finding an uncovered block at a random (x,z)
 	 * location in the chunk.
 	 */
+	@Override
 	public void setInitialSpawnLocation() {
 		if (this.worldInfo.getSpawnY() <= 0) {
 			this.worldInfo.setSpawnY(this.func_181545_F() + 1);
@@ -724,6 +742,7 @@ public class WorldServer extends World implements IThreadListener {
 	/**
 	 * + Runs a single tick for the world
 	 */
+	@Override
 	public void tick() {
 		super.tick();
 		if (this.getWorldInfo().isHardcoreModeEnabled() && this.getDifficulty() != EnumDifficulty.HARD) {
@@ -769,6 +788,7 @@ public class WorldServer extends World implements IThreadListener {
 	/**
 	 * + Runs through the list of updates to run and ticks them
 	 */
+	@Override
 	public boolean tickUpdates(boolean flag) {
 		if (this.worldInfo.getTerrainType() == WorldType.DEBUG_WORLD) {
 			return false;
@@ -833,6 +853,7 @@ public class WorldServer extends World implements IThreadListener {
 	 * + Updates the flag that indicates whether or not all players in the world are
 	 * sleeping.
 	 */
+	@Override
 	public void updateAllPlayersSleepingFlag() {
 		this.allPlayersSleeping = false;
 		if (!this.playerEntities.isEmpty()) {
@@ -853,6 +874,7 @@ public class WorldServer extends World implements IThreadListener {
 
 	}
 
+	@Override
 	protected void updateBlocks() {
 		super.updateBlocks();
 		if (this.worldInfo.getTerrainType() == WorldType.DEBUG_WORLD) {
@@ -931,6 +953,7 @@ public class WorldServer extends World implements IThreadListener {
 		}
 	}
 
+	@Override
 	public void updateBlockTick(BlockPos blockpos, Block block, int i, int j) {
 		NextTickListEntry nextticklistentry = new NextTickListEntry(blockpos, block);
 		byte b0 = 0;
@@ -970,6 +993,7 @@ public class WorldServer extends World implements IThreadListener {
 	/**
 	 * + Updates (and cleans up) entities and tile entities
 	 */
+	@Override
 	public void updateEntities() {
 		if (this.playerEntities.isEmpty()) {
 			if (this.updateEntityTick++ >= 1200) {
@@ -986,6 +1010,7 @@ public class WorldServer extends World implements IThreadListener {
 	 * + Will update the entity in the world if the chunk the entity is in is
 	 * currently loaded or its forced to update. Args: entity, forceUpdate
 	 */
+	@Override
 	public void updateEntityWithOptionalForce(Entity entity, boolean flag) {
 		if (!this.canSpawnAnimals() && (entity instanceof EntityAnimal || entity instanceof EntityWaterMob)) {
 			entity.setDead();
@@ -1001,6 +1026,7 @@ public class WorldServer extends World implements IThreadListener {
 	/**
 	 * + Updates all weather states.
 	 */
+	@Override
 	protected void updateWeather() {
 		boolean flag = this.isRaining();
 		super.updateWeather();

@@ -8,20 +8,58 @@ import org.teavm.jso.dom.html.HTMLInputElement;
 
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BootMenuDOM {
+
+	public static boolean getChecked(HTMLElement el) {
+		return ((HTMLInputElement) el).isChecked();
+	}
+
+	public static String getValue(HTMLElement el) {
+		return ((HTMLInputElement) el).getValue();
+	}
+
+	public static void hide(HTMLElement el) {
+		el.getStyle().setProperty("display", "none");
+	}
+
+	private static HTMLElement selectHelper(HTMLElement parent, String name) {
+		name = "." + BootMenuConstants.cssClassPrefixBootMenu + name;
+		HTMLElement ret = parent.querySelector(name);
+		if (ret == null) {
+			throw new RuntimeException("Failed to select \"" + name + "\" from boot menu!");
+		}
+		return ret;
+	}
+
+	public static void setChecked(HTMLElement el, boolean checked) {
+		((HTMLInputElement) el).setChecked(checked);
+	}
+
+	public static void setDisabled(HTMLElement el, boolean disabled) {
+		((HTMLInputElement) el).setDisabled(disabled);
+	}
+
+	public static void setValue(HTMLElement el, String value) {
+		((HTMLInputElement) el).setValue(value);
+	}
+
+	public static void show(HTMLElement el) {
+		el.getStyle().setProperty("display", "block");
+	}
 
 	public final HTMLElement content_view_selection;
 	public final HTMLElement content_selection;
@@ -30,7 +68,7 @@ public class BootMenuDOM {
 	public final HTMLElement launch_conf_val_profile_name;
 	public final HTMLElement launch_conf_val_data_format;
 	public final HTMLElement launch_conf_val_launch_type;
-	public final Map<EnumClientLaunchType,HTMLElement> launch_conf_val_launch_type_opts;
+	public final Map<EnumClientLaunchType, HTMLElement> launch_conf_val_launch_type_opts;
 	public final HTMLElement launch_conf_join_server;
 	public final HTMLElement launch_conf_val_join_server;
 	public final HTMLElement launch_conf_opts_name;
@@ -55,13 +93,21 @@ public class BootMenuDOM {
 	public final HTMLElement popup_input_title;
 	public final HTMLElement popup_input_val;
 	public final HTMLElement popup_input_opt_cancel;
+
 	public final HTMLElement popup_input_opt_done;
+
 	public final HTMLElement footer_text_boot_select;
+
 	public final HTMLElement footer_text_boot_select_count;
+
 	public final HTMLElement footer_text_boot_countdown;
+
 	public final HTMLElement footer_text_menu_select;
+
 	public final HTMLElement footer_text_opts_editor;
+
 	public final HTMLElement footer_text_opts_editor_alt;
+
 	public final HTMLElement footer_text_boot_order;
 
 	public BootMenuDOM(HTMLElement parentElement) {
@@ -73,14 +119,22 @@ public class BootMenuDOM {
 		launch_conf_val_data_format = selectHelper(parentElement, "launch_conf_val_data_format");
 		launch_conf_val_launch_type = selectHelper(parentElement, "launch_conf_val_launch_type");
 		launch_conf_val_launch_type_opts = new HashMap<>();
-		launch_conf_val_launch_type_opts.put(EnumClientLaunchType.EAGLERX_V1, selectHelper(parentElement, "launch_conf_val_launch_type_opt[value=EAGLERX_V1]"));
-		launch_conf_val_launch_type_opts.put(EnumClientLaunchType.EAGLERX_SIGNED_V1, selectHelper(parentElement, "launch_conf_val_launch_type_opt[value=EAGLERX_SIGNED_V1]"));
-		launch_conf_val_launch_type_opts.put(EnumClientLaunchType.EAGLER_1_5_V2, selectHelper(parentElement, "launch_conf_val_launch_type_opt[value=EAGLER_1_5_V2]"));
-		launch_conf_val_launch_type_opts.put(EnumClientLaunchType.EAGLER_1_5_V1, selectHelper(parentElement, "launch_conf_val_launch_type_opt[value=EAGLER_1_5_V1]"));
-		launch_conf_val_launch_type_opts.put(EnumClientLaunchType.EAGLER_BETA_V1, selectHelper(parentElement, "launch_conf_val_launch_type_opt[value=EAGLER_BETA_V1]"));
-		launch_conf_val_launch_type_opts.put(EnumClientLaunchType.PEYTON_V1, selectHelper(parentElement, "launch_conf_val_launch_type_opt[value=PEYTON_V1]"));
-		launch_conf_val_launch_type_opts.put(EnumClientLaunchType.PEYTON_V2, selectHelper(parentElement, "launch_conf_val_launch_type_opt[value=PEYTON_V2]"));
-		launch_conf_val_launch_type_opts.put(EnumClientLaunchType.STANDARD_OFFLINE_V1, selectHelper(parentElement, "launch_conf_val_launch_type_opt[value=STANDARD_OFFLINE_V1]"));
+		launch_conf_val_launch_type_opts.put(EnumClientLaunchType.EAGLERX_V1,
+				selectHelper(parentElement, "launch_conf_val_launch_type_opt[value=EAGLERX_V1]"));
+		launch_conf_val_launch_type_opts.put(EnumClientLaunchType.EAGLERX_SIGNED_V1,
+				selectHelper(parentElement, "launch_conf_val_launch_type_opt[value=EAGLERX_SIGNED_V1]"));
+		launch_conf_val_launch_type_opts.put(EnumClientLaunchType.EAGLER_1_5_V2,
+				selectHelper(parentElement, "launch_conf_val_launch_type_opt[value=EAGLER_1_5_V2]"));
+		launch_conf_val_launch_type_opts.put(EnumClientLaunchType.EAGLER_1_5_V1,
+				selectHelper(parentElement, "launch_conf_val_launch_type_opt[value=EAGLER_1_5_V1]"));
+		launch_conf_val_launch_type_opts.put(EnumClientLaunchType.EAGLER_BETA_V1,
+				selectHelper(parentElement, "launch_conf_val_launch_type_opt[value=EAGLER_BETA_V1]"));
+		launch_conf_val_launch_type_opts.put(EnumClientLaunchType.PEYTON_V1,
+				selectHelper(parentElement, "launch_conf_val_launch_type_opt[value=PEYTON_V1]"));
+		launch_conf_val_launch_type_opts.put(EnumClientLaunchType.PEYTON_V2,
+				selectHelper(parentElement, "launch_conf_val_launch_type_opt[value=PEYTON_V2]"));
+		launch_conf_val_launch_type_opts.put(EnumClientLaunchType.STANDARD_OFFLINE_V1,
+				selectHelper(parentElement, "launch_conf_val_launch_type_opt[value=STANDARD_OFFLINE_V1]"));
 		launch_conf_join_server = selectHelper(parentElement, "launch_conf_join_server");
 		launch_conf_val_join_server = selectHelper(parentElement, "launch_conf_val_join_server");
 		launch_conf_opts_name = selectHelper(parentElement, "launch_conf_opts_name");
@@ -161,43 +215,6 @@ public class BootMenuDOM {
 		popup_input_opt_done.addEventListener("mouseover", (evt) -> {
 			BootMenuMain.fireMouseOverEvent(popup_input_opt_done);
 		});
-	}
-
-	public static void show(HTMLElement el) {
-		el.getStyle().setProperty("display", "block");
-	}
-
-	public static void hide(HTMLElement el) {
-		el.getStyle().setProperty("display", "none");
-	}
-
-	public static void setValue(HTMLElement el, String value) {
-		((HTMLInputElement)el).setValue(value);
-	}
-
-	public static String getValue(HTMLElement el) {
-		return ((HTMLInputElement)el).getValue();
-	}
-
-	public static void setChecked(HTMLElement el, boolean checked) {
-		((HTMLInputElement)el).setChecked(checked);
-	}
-
-	public static boolean getChecked(HTMLElement el) {
-		return ((HTMLInputElement)el).isChecked();
-	}
-
-	public static void setDisabled(HTMLElement el, boolean disabled) {
-		((HTMLInputElement)el).setDisabled(disabled);
-	}
-
-	private static HTMLElement selectHelper(HTMLElement parent, String name) {
-		name = "." + BootMenuConstants.cssClassPrefixBootMenu + name;
-		HTMLElement ret = parent.querySelector(name);
-		if(ret == null) {
-			throw new RuntimeException("Failed to select \"" + name + "\" from boot menu!");
-		}
-		return ret;
 	}
 
 }

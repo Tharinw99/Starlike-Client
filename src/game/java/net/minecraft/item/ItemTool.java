@@ -15,13 +15,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,7 +33,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ItemTool extends Item {
 	private Set<Block> effectiveBlocks;
@@ -54,11 +54,13 @@ public class ItemTool extends Item {
 	/**
 	 * + Return whether this item is repairable in an anvil.
 	 */
+	@Override
 	public boolean getIsRepairable(ItemStack itemstack, ItemStack itemstack1) {
 		return this.toolMaterial.getRepairItem() == itemstack1.getItem() ? true
 				: super.getIsRepairable(itemstack, itemstack1);
 	}
 
+	@Override
 	public Multimap<String, AttributeModifier> getItemAttributeModifiers() {
 		Multimap multimap = super.getItemAttributeModifiers();
 		multimap.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(),
@@ -70,10 +72,12 @@ public class ItemTool extends Item {
 	 * + Return the enchantability factor of the item, most of the time is based on
 	 * material.
 	 */
+	@Override
 	public int getItemEnchantability() {
 		return this.toolMaterial.getEnchantability();
 	}
 
+	@Override
 	public float getStrVsBlock(ItemStack var1, Block block) {
 		return this.effectiveBlocks.contains(block) ? this.efficiencyOnProperMaterial : 1.0F;
 	}
@@ -93,6 +97,7 @@ public class ItemTool extends Item {
 	 * + Current implementations of this method in child classes do not use the
 	 * entry argument beside ev. They just raise the damage on the stack.
 	 */
+	@Override
 	public boolean hitEntity(ItemStack itemstack, EntityLivingBase var2, EntityLivingBase entitylivingbase) {
 		itemstack.damageItem(2, entitylivingbase);
 		return true;
@@ -101,6 +106,7 @@ public class ItemTool extends Item {
 	/**
 	 * + Returns True is the item is renderer in full 3D when hold.
 	 */
+	@Override
 	public boolean isFull3D() {
 		return true;
 	}
@@ -109,6 +115,7 @@ public class ItemTool extends Item {
 	 * + Called when a Block is destroyed using this Item. Return true to trigger
 	 * the "Use Item" statistic.
 	 */
+	@Override
 	public boolean onBlockDestroyed(ItemStack itemstack, World world, Block block, BlockPos blockpos,
 			EntityLivingBase entitylivingbase) {
 		if ((double) block.getBlockHardness(world, blockpos) != 0.0D) {

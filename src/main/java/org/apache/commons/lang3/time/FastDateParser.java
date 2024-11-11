@@ -226,7 +226,7 @@ public class FastDateParser implements DateParser, Serializable {
 
 		/**
 		 * Constructs a Strategy that parses a TimeZone
-		 * 
+		 *
 		 * @param pattern The Pattern
 		 */
 		ISO8601TimeZoneStrategy(final String pattern) {
@@ -687,7 +687,7 @@ public class FastDateParser implements DateParser, Serializable {
 
 	/**
 	 * Gets the short and long values displayed for a field
-	 * 
+	 *
 	 * @param calendar The calendar to obtain the short and long values
 	 * @param locale   The locale of display names
 	 * @param field    The field of interest
@@ -714,7 +714,7 @@ public class FastDateParser implements DateParser, Serializable {
 
 	/**
 	 * Gets a cache of Strategies for a particular field
-	 * 
+	 *
 	 * @param field The Calendar field
 	 * @return a cache of Locale to Strategy
 	 */
@@ -831,7 +831,7 @@ public class FastDateParser implements DateParser, Serializable {
 
 	/**
 	 * Adjusts dates to be within appropriate century
-	 * 
+	 *
 	 * @param twoDigitYear The year to adjust
 	 * @return A value between centuryStart(inclusive) to
 	 *         centuryStart+100(exclusive)
@@ -862,7 +862,7 @@ public class FastDateParser implements DateParser, Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.apache.commons.lang3.time.DateParser#getLocale()
 	 */
 	@Override
@@ -872,7 +872,7 @@ public class FastDateParser implements DateParser, Serializable {
 
 	/**
 	 * Constructs a Strategy that parses a Text field
-	 * 
+	 *
 	 * @param field            The Calendar field
 	 * @param definingCalendar The calendar to obtain the short and long values
 	 * @return a TextStrategy for the field and Locale
@@ -895,7 +895,7 @@ public class FastDateParser implements DateParser, Serializable {
 	// -----------------------------------------------------------------------
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.apache.commons.lang3.time.DateParser#getPattern()
 	 */
 	@Override
@@ -905,7 +905,7 @@ public class FastDateParser implements DateParser, Serializable {
 
 	/**
 	 * Gets a Strategy given a field from a SimpleDateFormat pattern
-	 * 
+	 *
 	 * @param f                A sub-sequence of the SimpleDateFormat pattern
 	 * @param definingCalendar The calendar to obtain the short and long values
 	 * @return The Strategy that will handle parsing for the field
@@ -965,7 +965,7 @@ public class FastDateParser implements DateParser, Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.apache.commons.lang3.time.DateParser#getTimeZone()
 	 */
 	@Override
@@ -1007,7 +1007,7 @@ public class FastDateParser implements DateParser, Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.apache.commons.lang3.time.DateParser#parse(java.lang.String)
 	 */
 	@Override
@@ -1079,7 +1079,7 @@ public class FastDateParser implements DateParser, Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.apache.commons.lang3.time.DateParser#parseObject(java.lang.String)
 	 */
 	@Override
@@ -1089,7 +1089,7 @@ public class FastDateParser implements DateParser, Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.apache.commons.lang3.time.DateParser#parseObject(java.lang.String,
 	 * java.text.ParsePosition)
 	 */

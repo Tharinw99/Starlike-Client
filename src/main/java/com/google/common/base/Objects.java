@@ -330,7 +330,7 @@ public final class Objects {
 	 * This is useful for implementing {@link Object#hashCode()}. For example, in an
 	 * object that has three properties, {@code x}, {@code y}, and {@code z}, one
 	 * could write:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 * public int hashCode() {
@@ -390,7 +390,7 @@ public final class Objects {
 	 * <p>
 	 * This is helpful for implementing {@link Object#toString()}. Specification by
 	 * example:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 * // Returns "ClassName{}"

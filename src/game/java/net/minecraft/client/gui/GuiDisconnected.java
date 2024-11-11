@@ -12,13 +12,13 @@ import net.minecraft.util.IChatComponent;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,7 +30,7 @@ import net.minecraft.util.IChatComponent;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiDisconnected extends GuiScreen {
 	public static GuiScreen createRateLimitKick(GuiScreen prev) {
@@ -54,6 +54,7 @@ public class GuiDisconnected extends GuiScreen {
 	 * + Called by the controls from the buttonList when activated. (Mouse pressed
 	 * for buttons)
 	 */
+	@Override
 	protected void actionPerformed(GuiButton parGuiButton) {
 		if (parGuiButton.id == 0) {
 			this.mc.displayGuiScreen(this.parentScreen);
@@ -65,6 +66,7 @@ public class GuiDisconnected extends GuiScreen {
 	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
 	 * renderPartialTicks
 	 */
+	@Override
 	public void drawScreen(int i, int j, float f) {
 		this.drawDefaultBackground();
 		this.drawCenteredString(this.fontRendererObj, this.reason, this.width / 2,
@@ -86,6 +88,7 @@ public class GuiDisconnected extends GuiScreen {
 	 * when the GUI is displayed and when the window resizes, the buttonList is
 	 * cleared beforehand.
 	 */
+	@Override
 	public void initGui() {
 		this.buttonList.clear();
 		this.multilineMessage = this.fontRendererObj.listFormattedStringToWidth(this.message.getFormattedText(),
@@ -101,9 +104,11 @@ public class GuiDisconnected extends GuiScreen {
 	 * the equivalent of KeyListener.keyTyped(KeyEvent e). Args : character
 	 * (character on the key), keyCode (lwjgl Keyboard key code)
 	 */
+	@Override
 	protected void keyTyped(char parChar1, int parInt1) {
 	}
 
+	@Override
 	public void updateScreen() {
 		IPCPacket15Crashed[] pkt = SingleplayerServerController.worldStatusErrors();
 		if (pkt != null && pkt.length > 0) {

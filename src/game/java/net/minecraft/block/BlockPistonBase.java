@@ -26,13 +26,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -44,7 +44,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockPistonBase extends Block {
 	public static final PropertyDirection FACING = PropertyDirection.create("facing");
@@ -125,6 +125,7 @@ public class BlockPistonBase extends Block {
 	 * + Add all collision boxes of this Block to the list that intersect with the
 	 * given mask.
 	 */
+	@Override
 	public void addCollisionBoxesToList(World world, BlockPos blockpos, IBlockState iblockstate,
 			AxisAlignedBB axisalignedbb, List<AxisAlignedBB> list, Entity entity) {
 		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
@@ -145,6 +146,7 @@ public class BlockPistonBase extends Block {
 
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { FACING, EXTENDED });
 	}
@@ -222,6 +224,7 @@ public class BlockPistonBase extends Block {
 		}
 	}
 
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox(World world, BlockPos blockpos, IBlockState iblockstate) {
 		this.setBlockBoundsBasedOnState(world, blockpos);
 		return super.getCollisionBoundingBox(world, blockpos, iblockstate);
@@ -230,6 +233,7 @@ public class BlockPistonBase extends Block {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
 		i = i | ((EnumFacing) iblockstate.getValue(FACING)).getIndex();
@@ -244,6 +248,7 @@ public class BlockPistonBase extends Block {
 	 * + Possibly modify the given BlockState before rendering it on an Entity
 	 * (Minecarts, Endermen, ...)
 	 */
+	@Override
 	public IBlockState getStateForEntityRender(IBlockState var1) {
 		return this.getDefaultState().withProperty(FACING, EnumFacing.UP);
 	}
@@ -251,11 +256,13 @@ public class BlockPistonBase extends Block {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(FACING, getFacing(i)).withProperty(EXTENDED,
 				Boolean.valueOf((i & 8) > 0));
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -264,10 +271,12 @@ public class BlockPistonBase extends Block {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
 
+	@Override
 	public void onBlockAdded(World world, BlockPos blockpos, IBlockState iblockstate) {
 		if (!world.isRemote && world.getTileEntity(blockpos) == null) {
 			this.checkForMove(world, blockpos, iblockstate);
@@ -278,6 +287,7 @@ public class BlockPistonBase extends Block {
 	/**
 	 * + Called on both Client and Server when World#addBlockEvent is called
 	 */
+	@Override
 	public boolean onBlockEventReceived(World world, BlockPos blockpos, IBlockState iblockstate, int i, int j) {
 		EnumFacing enumfacing = (EnumFacing) iblockstate.getValue(FACING);
 		if (!world.isRemote) {
@@ -350,6 +360,7 @@ public class BlockPistonBase extends Block {
 	 * + Called by ItemBlocks just before a block is actually set in the world, to
 	 * allow for adjustments to the IBlockstate
 	 */
+	@Override
 	public IBlockState onBlockPlaced(World world, BlockPos blockpos, EnumFacing var3, float var4, float var5,
 			float var6, int var7, EntityLivingBase entitylivingbase) {
 		return this.getDefaultState().withProperty(FACING, getFacingFromEntity(world, blockpos, entitylivingbase))
@@ -360,6 +371,7 @@ public class BlockPistonBase extends Block {
 	 * + Called by ItemBlocks after a block is set in the world, to allow post-place
 	 * logic
 	 */
+	@Override
 	public void onBlockPlacedBy(World world, BlockPos blockpos, IBlockState iblockstate,
 			EntityLivingBase entitylivingbase, ItemStack var5) {
 		world.setBlockState(blockpos,
@@ -373,6 +385,7 @@ public class BlockPistonBase extends Block {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block var4) {
 		if (!world.isRemote) {
 			this.checkForMove(world, blockpos, iblockstate);
@@ -380,6 +393,7 @@ public class BlockPistonBase extends Block {
 
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
 		IBlockState iblockstate = iblockaccess.getBlockState(blockpos);
 		if (iblockstate.getBlock() == this && ((Boolean) iblockstate.getValue(EXTENDED)).booleanValue()) {
@@ -415,6 +429,7 @@ public class BlockPistonBase extends Block {
 	/**
 	 * + Sets the block's bounds for rendering it as an item
 	 */
+	@Override
 	public void setBlockBoundsForItemRender() {
 		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
 	}

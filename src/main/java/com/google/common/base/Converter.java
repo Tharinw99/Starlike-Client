@@ -64,7 +64,7 @@ import com.google.common.annotations.GwtCompatible;
  * {@link #doBackward} are guaranteed to never be passed {@code null}, and must
  * never return {@code null}.
  *
- * 
+ *
  * <h3>Common ways to use</h3>
  *
  * <p>

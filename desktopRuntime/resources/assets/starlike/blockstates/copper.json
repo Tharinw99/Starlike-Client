@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "normal": {
-            "model": "starlike:copper"
-        }
+  "variants": {
+    "normal": {
+      "model": "starlike:copper"
     }
+  }
 }

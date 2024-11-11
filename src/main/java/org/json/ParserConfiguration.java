@@ -67,7 +67,7 @@ public class ParserConfiguration {
 	/**
 	 * The maximum nesting depth that the parser will descend before throwing an
 	 * exception when parsing the XML into JSONML.
-	 * 
+	 *
 	 * @return the maximum nesting depth set for this configuration
 	 */
 	public int getMaxNestingDepth() {
@@ -93,7 +93,7 @@ public class ParserConfiguration {
 	 * @param newVal new value to use for the <code>keepStrings</code> configuration
 	 *               option.
 	 * @param <T>    the type of the configuration object
-	 * 
+	 *
 	 * @return The existing configuration will not be modified. A new configuration
 	 *         is returned.
 	 */
@@ -111,10 +111,10 @@ public class ParserConfiguration {
 	 * the maximum depth is reached. Using any negative value as a parameter is
 	 * equivalent to setting no limit to the nesting depth, which means the parses
 	 * will go as deep as the maximum call stack size allows.
-	 * 
+	 *
 	 * @param maxNestingDepth the maximum nesting depth allowed to the XML parser
 	 * @param <T>             the type of the configuration object
-	 * 
+	 *
 	 * @return The existing configuration will not be modified. A new configuration
 	 *         is returned.
 	 */

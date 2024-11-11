@@ -14,7 +14,7 @@ import net.minecraft.world.WorldSettings;
 
 /**
  * Copyright (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -26,7 +26,7 @@ import net.minecraft.world.WorldSettings;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiShareToLan extends GuiScreen {
 	/**
@@ -65,6 +65,7 @@ public class GuiShareToLan extends GuiScreen {
 	 * Fired when a control is clicked. This is the equivalent of
 	 * ActionListener.actionPerformed(ActionEvent e).
 	 */
+	@Override
 	protected void actionPerformed(GuiButton par1GuiButton) {
 		if (par1GuiButton.id == 102) {
 			this.mc.displayGuiScreen(this.parentScreen);
@@ -104,7 +105,7 @@ public class GuiShareToLan extends GuiScreen {
 			}
 			this.mc.displayGuiScreen(null);
 			LoadingScreenRenderer ls = mc.loadingScreen;
-			String code = LANServerController.shareToLAN(ls::resetProgressAndMessage, worldName, hiddenToggle);
+			String code = LANServerController.shareToLAN((msg) -> ls.eaglerShow(msg, null), worldName, hiddenToggle);
 			if (code != null) {
 				SingleplayerServerController.configureLAN(WorldSettings.GameType.getByName(this.gameMode),
 						this.allowCommands);
@@ -116,6 +117,7 @@ public class GuiShareToLan extends GuiScreen {
 		}
 	}
 
+	@Override
 	public boolean blockPTTKey() {
 		return this.codeTextField.isFocused();
 	}
@@ -123,6 +125,7 @@ public class GuiShareToLan extends GuiScreen {
 	/**
 	 * Draws the screen and all the components in it.
 	 */
+	@Override
 	public void drawScreen(int par1, int par2, float par3) {
 		this.drawDefaultBackground();
 		this.drawCenteredString(this.fontRendererObj, I18n.format("lanServer.title"), this.width / 2, 35, 16777215);
@@ -165,6 +168,7 @@ public class GuiShareToLan extends GuiScreen {
 	/**
 	 * Adds the buttons (and other controls) to the screen in question.
 	 */
+	@Override
 	public void initGui() {
 		this.buttonList.clear();
 		this.buttonList.add(
@@ -185,11 +189,13 @@ public class GuiShareToLan extends GuiScreen {
 		this.func_74088_g();
 	}
 
+	@Override
 	protected void keyTyped(char c, int k) {
 		super.keyTyped(c, k);
 		this.codeTextField.textboxKeyTyped(c, k);
 	}
 
+	@Override
 	public void mouseClicked(int par1, int par2, int par3) {
 		super.mouseClicked(par1, par2, par3);
 		this.relaysButton.mouseClicked(par1, par2, par3);
@@ -201,6 +207,7 @@ public class GuiShareToLan extends GuiScreen {
 		return this.codeTextField.isFocused();
 	}
 
+	@Override
 	public void updateScreen() {
 		super.updateScreen();
 		this.codeTextField.updateCursorCounter();

@@ -11,13 +11,13 @@ import net.minecraft.world.gen.ChunkProviderEnd;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,12 +29,13 @@ import net.minecraft.world.gen.ChunkProviderEnd;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class WorldProviderEnd extends WorldProvider {
 	/**
 	 * + Returns array with sunrise/sunset colors
 	 */
+	@Override
 	public float[] calcSunriseSunsetColors(float var1, float var2) {
 		return null;
 	}
@@ -43,6 +44,7 @@ public class WorldProviderEnd extends WorldProvider {
 	 * + Calculates the angle of sun and moon in the sky relative to a specified
 	 * time (usually worldTime)
 	 */
+	@Override
 	public float calculateCelestialAngle(long var1, float var3) {
 		return 0.0F;
 	}
@@ -51,6 +53,7 @@ public class WorldProviderEnd extends WorldProvider {
 	 * + Will check if the x, z position specified is alright to be set as the map
 	 * spawn point
 	 */
+	@Override
 	public boolean canCoordinateBeSpawn(int i, int j) {
 		return this.worldObj.getGroundAboveSeaLevel(new BlockPos(i, 0, j)).getMaterial().blocksMovement();
 	}
@@ -59,6 +62,7 @@ public class WorldProviderEnd extends WorldProvider {
 	 * + True if the player can respawn in this dimension (true = overworld, false =
 	 * nether).
 	 */
+	@Override
 	public boolean canRespawnHere() {
 		return false;
 	}
@@ -66,6 +70,7 @@ public class WorldProviderEnd extends WorldProvider {
 	/**
 	 * + Returns a new chunk provider which generates chunks for this world
 	 */
+	@Override
 	public IChunkProvider createChunkGenerator() {
 		return new ChunkProviderEnd(this.worldObj, this.worldObj.getSeed());
 	}
@@ -73,10 +78,12 @@ public class WorldProviderEnd extends WorldProvider {
 	/**
 	 * + Returns true if the given X,Z coordinate should show environmental fog.
 	 */
+	@Override
 	public boolean doesXZShowFog(int var1, int var2) {
 		return true;
 	}
 
+	@Override
 	public int getAverageGroundLevel() {
 		return 50;
 	}
@@ -84,6 +91,7 @@ public class WorldProviderEnd extends WorldProvider {
 	/**
 	 * + the y level at which clouds are rendered.
 	 */
+	@Override
 	public float getCloudHeight() {
 		return 8.0F;
 	}
@@ -91,6 +99,7 @@ public class WorldProviderEnd extends WorldProvider {
 	/**
 	 * + Returns the dimension's name, e.g. "The End", "Nether", or "Overworld".
 	 */
+	@Override
 	public String getDimensionName() {
 		return "The End";
 	}
@@ -98,6 +107,7 @@ public class WorldProviderEnd extends WorldProvider {
 	/**
 	 * + Return Vec3D with biome specific fog color
 	 */
+	@Override
 	public Vec3 getFogColor(float f, float var2) {
 		int i = 10518688;
 		float f1 = MathHelper.cos(f * 3.1415927F * 2.0F) * 2.0F + 0.5F;
@@ -111,14 +121,17 @@ public class WorldProviderEnd extends WorldProvider {
 		return new Vec3((double) f2, (double) f3, (double) f4);
 	}
 
+	@Override
 	public String getInternalNameSuffix() {
 		return "_end";
 	}
 
+	@Override
 	public BlockPos getSpawnCoordinate() {
 		return new BlockPos(100, 50, 0);
 	}
 
+	@Override
 	public boolean isSkyColored() {
 		return false;
 	}
@@ -127,6 +140,7 @@ public class WorldProviderEnd extends WorldProvider {
 	 * + Returns 'true' if in the "main surface world", but 'false' if in the Nether
 	 * or End dimensions.
 	 */
+	@Override
 	public boolean isSurfaceWorld() {
 		return false;
 	}
@@ -134,6 +148,7 @@ public class WorldProviderEnd extends WorldProvider {
 	/**
 	 * + creates a new world chunk manager for WorldProvider
 	 */
+	@Override
 	public void registerWorldChunkManager() {
 		this.worldChunkMgr = new WorldChunkManagerHell(BiomeGenBase.sky, 0.0F);
 		this.dimensionId = 1;

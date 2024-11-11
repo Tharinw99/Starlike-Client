@@ -30,7 +30,7 @@ package org.apache.commons.lang3;
  * <p>
  * #ThreadSafe#
  * </p>
- * 
+ *
  * @since 2.1
  */
 public class CharUtils {

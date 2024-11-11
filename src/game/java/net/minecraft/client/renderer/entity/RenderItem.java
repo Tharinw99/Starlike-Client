@@ -82,13 +82,13 @@ import net.starlikeclient.minecraft.init.ItemsStarlike;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -100,7 +100,7 @@ import net.starlikeclient.minecraft.init.ItemsStarlike;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class RenderItem implements IResourceManagerReloadListener {
 	private static final ResourceLocation RES_ITEM_GLINT = new ResourceLocation(
@@ -163,6 +163,7 @@ public class RenderItem implements IResourceManagerReloadListener {
 		return this.itemModelMesher;
 	}
 
+	@Override
 	public void onResourceManagerReload(IResourceManager var1) {
 		this.itemModelMesher.rebuildCache();
 	}
@@ -668,6 +669,7 @@ public class RenderItem implements IResourceManagerReloadListener {
 
 		this.registerItem(Items.nether_wart, "nether_wart");
 		this.itemModelMesher.register(Items.potionitem, new ItemMeshDefinition() {
+			@Override
 			public ModelResourceLocation getModelLocation(ItemStack itemstack) {
 				return ItemPotion.isSplash(itemstack.getMetadata())
 						? new ModelResourceLocation("bottle_splash", "inventory")
@@ -684,6 +686,7 @@ public class RenderItem implements IResourceManagerReloadListener {
 		this.registerItem(Items.ender_eye, "ender_eye");
 		this.registerItem(Items.speckled_melon, "speckled_melon");
 		this.itemModelMesher.register(Items.spawn_egg, new ItemMeshDefinition() {
+			@Override
 			public ModelResourceLocation getModelLocation(ItemStack var1) {
 				return new ModelResourceLocation("spawn_egg", "inventory");
 			}
@@ -721,6 +724,7 @@ public class RenderItem implements IResourceManagerReloadListener {
 		this.registerItem(Items.lead, "lead");
 		this.registerItem(Items.name_tag, "name_tag");
 		this.itemModelMesher.register(Items.banner, new ItemMeshDefinition() {
+			@Override
 			public ModelResourceLocation getModelLocation(ItemStack var1) {
 				return new ModelResourceLocation("banner", "inventory");
 			}
@@ -741,11 +745,13 @@ public class RenderItem implements IResourceManagerReloadListener {
 		this.registerItem(Items.prismarine_shard, "prismarine_shard");
 		this.registerItem(Items.prismarine_crystals, "prismarine_crystals");
 		this.itemModelMesher.register(Items.enchanted_book, new ItemMeshDefinition() {
+			@Override
 			public ModelResourceLocation getModelLocation(ItemStack var1) {
 				return new ModelResourceLocation("enchanted_book", "inventory");
 			}
 		});
 		this.itemModelMesher.register(Items.filled_map, new ItemMeshDefinition() {
+			@Override
 			public ModelResourceLocation getModelLocation(ItemStack var1) {
 				return new ModelResourceLocation("filled_map", "inventory");
 			}
@@ -892,21 +898,25 @@ public class RenderItem implements IResourceManagerReloadListener {
 				CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Rendering item");
 				CrashReportCategory crashreportcategory = crashreport.makeCategory("Item being rendered");
 				crashreportcategory.addCrashSectionCallable("Item Type", new Callable<String>() {
+					@Override
 					public String call() throws Exception {
 						return String.valueOf(stack.getItem());
 					}
 				});
 				crashreportcategory.addCrashSectionCallable("Item Aux", new Callable<String>() {
+					@Override
 					public String call() throws Exception {
 						return String.valueOf(stack.getMetadata());
 					}
 				});
 				crashreportcategory.addCrashSectionCallable("Item NBT", new Callable<String>() {
+					@Override
 					public String call() throws Exception {
 						return String.valueOf(stack.getTagCompound());
 					}
 				});
 				crashreportcategory.addCrashSectionCallable("Item Foil", new Callable<String>() {
+					@Override
 					public String call() throws Exception {
 						return String.valueOf(stack.hasEffect());
 					}

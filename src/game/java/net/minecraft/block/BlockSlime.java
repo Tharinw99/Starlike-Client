@@ -11,13 +11,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,7 +29,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockSlime extends BlockBreakable {
 	public BlockSlime() {
@@ -38,6 +38,7 @@ public class BlockSlime extends BlockBreakable {
 		this.slipperiness = 0.8F;
 	}
 
+	@Override
 	public EnumWorldBlockLayer getBlockLayer() {
 		return EnumWorldBlockLayer.TRANSLUCENT;
 	}
@@ -46,6 +47,7 @@ public class BlockSlime extends BlockBreakable {
 	 * + Triggered whenever an entity collides with this block (enters into the
 	 * block)
 	 */
+	@Override
 	public void onEntityCollidedWithBlock(World world, BlockPos blockpos, Entity entity) {
 		if (Math.abs(entity.motionY) < 0.1D && !entity.isSneaking()) {
 			double d0 = 0.4D + Math.abs(entity.motionY) * 0.2D;
@@ -59,6 +61,7 @@ public class BlockSlime extends BlockBreakable {
 	/**
 	 * + Block's chance to react to a living entity falling on it.
 	 */
+	@Override
 	public void onFallenUpon(World world, BlockPos blockpos, Entity entity, float f) {
 		if (entity.isSneaking()) {
 			super.onFallenUpon(world, blockpos, entity, f);
@@ -72,6 +75,7 @@ public class BlockSlime extends BlockBreakable {
 	 * + Called when an Entity lands on this Block. This method *must* update
 	 * motionY because the entity will not do that on its own
 	 */
+	@Override
 	public void onLanded(World world, Entity entity) {
 		if (entity.isSneaking()) {
 			super.onLanded(world, entity);

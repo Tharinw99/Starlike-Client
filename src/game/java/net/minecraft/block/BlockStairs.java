@@ -31,13 +31,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -49,7 +49,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockStairs extends Block {
 	public static enum EnumHalf implements IStringSerializable {
@@ -61,10 +61,12 @@ public class BlockStairs extends Block {
 			this.name = name;
 		}
 
+		@Override
 		public String getName() {
 			return this.name;
 		}
 
+		@Override
 		public String toString() {
 			return this.name;
 		}
@@ -80,10 +82,12 @@ public class BlockStairs extends Block {
 			this.name = name;
 		}
 
+		@Override
 		public String getName() {
 			return this.name;
 		}
 
+		@Override
 		public String toString() {
 			return this.name;
 		}
@@ -146,6 +150,7 @@ public class BlockStairs extends Block {
 	 * + Add all collision boxes of this Block to the list that intersect with the
 	 * given mask.
 	 */
+	@Override
 	public void addCollisionBoxesToList(World world, BlockPos blockpos, IBlockState iblockstate,
 			AxisAlignedBB axisalignedbb, List<AxisAlignedBB> list, Entity entity) {
 		this.setBaseCollisionBounds(world, blockpos);
@@ -159,14 +164,17 @@ public class BlockStairs extends Block {
 		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
 	}
 
+	@Override
 	public void breakBlock(World world, BlockPos blockpos, IBlockState var3) {
 		this.modelBlock.breakBlock(world, blockpos, this.modelState);
 	}
 
+	@Override
 	public boolean canCollideCheck(IBlockState iblockstate, boolean flag) {
 		return this.modelBlock.canCollideCheck(iblockstate, flag);
 	}
 
+	@Override
 	public boolean canPlaceBlockAt(World world, BlockPos blockpos) {
 		return this.modelBlock.canPlaceBlockAt(world, blockpos);
 	}
@@ -175,6 +183,7 @@ public class BlockStairs extends Block {
 	 * + Ray traces through the blocks collision from start vector to end vector
 	 * returning a ray trace hit.
 	 */
+	@Override
 	public MovingObjectPosition collisionRayTrace(World world, BlockPos blockpos, Vec3 vec3, Vec3 vec31) {
 		MovingObjectPosition[] amovingobjectposition = new MovingObjectPosition[8];
 		IBlockState iblockstate = world.getBlockState(blockpos);
@@ -211,6 +220,7 @@ public class BlockStairs extends Block {
 		return movingobjectposition1;
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { FACING, HALF, SHAPE });
 	}
@@ -510,6 +520,7 @@ public class BlockStairs extends Block {
 	 * + Get the actual Block state of this Block at the given position. This
 	 * applies properties not visible in the metadata, such as fence connections.
 	 */
+	@Override
 	public IBlockState getActualState(IBlockState iblockstate, IBlockAccess iblockaccess, BlockPos blockpos) {
 		if (this.func_176306_h(iblockaccess, blockpos)) {
 			switch (this.func_176305_g(iblockaccess, blockpos)) {
@@ -538,6 +549,7 @@ public class BlockStairs extends Block {
 		return iblockstate;
 	}
 
+	@Override
 	public EnumWorldBlockLayer getBlockLayer() {
 		return this.modelBlock.getBlockLayer();
 	}
@@ -546,6 +558,7 @@ public class BlockStairs extends Block {
 	 * + Returns how much this block can resist explosions from the passed in
 	 * entity.
 	 */
+	@Override
 	public float getExplosionResistance(Entity entity) {
 		return this.modelBlock.getExplosionResistance(entity);
 	}
@@ -553,6 +566,7 @@ public class BlockStairs extends Block {
 	/**
 	 * + Get the MapColor for this Block and the given BlockState
 	 */
+	@Override
 	public MapColor getMapColor(IBlockState var1) {
 		return this.modelBlock.getMapColor(this.modelState);
 	}
@@ -560,6 +574,7 @@ public class BlockStairs extends Block {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
 		if (iblockstate.getValue(HALF) == BlockStairs.EnumHalf.TOP) {
@@ -570,10 +585,12 @@ public class BlockStairs extends Block {
 		return i;
 	}
 
+	@Override
 	public int getMixedBrightnessForBlock(IBlockAccess iblockaccess, BlockPos blockpos) {
 		return this.modelBlock.getMixedBrightnessForBlock(iblockaccess, blockpos);
 	}
 
+	@Override
 	public AxisAlignedBB getSelectedBoundingBox(World world, BlockPos blockpos) {
 		return this.modelBlock.getSelectedBoundingBox(world, blockpos);
 	}
@@ -581,6 +598,7 @@ public class BlockStairs extends Block {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		IBlockState iblockstate = this.getDefaultState().withProperty(HALF,
 				(i & 4) > 0 ? BlockStairs.EnumHalf.TOP : BlockStairs.EnumHalf.BOTTOM);
@@ -591,10 +609,12 @@ public class BlockStairs extends Block {
 	/**
 	 * + Returns if this block is collidable (only used by Fire). Args: x, y, z
 	 */
+	@Override
 	public boolean isCollidable() {
 		return this.modelBlock.isCollidable();
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -603,14 +623,17 @@ public class BlockStairs extends Block {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
 
+	@Override
 	public Vec3 modifyAcceleration(World world, BlockPos blockpos, Entity entity, Vec3 vec3) {
 		return this.modelBlock.modifyAcceleration(world, blockpos, entity, vec3);
 	}
 
+	@Override
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState var3, EntityPlayer entityplayer,
 			EnumFacing var5, float var6, float var7, float var8) {
 		if (!world.isRemote && MinecraftServer.getServer().worldServers[0].getWorldInfo().getGameRulesInstance()
@@ -625,11 +648,13 @@ public class BlockStairs extends Block {
 				0.0F, 0.0F);
 	}
 
+	@Override
 	public void onBlockAdded(World world, BlockPos blockpos, IBlockState var3) {
 		this.onNeighborBlockChange(world, blockpos, this.modelState, Blocks.air);
 		this.modelBlock.onBlockAdded(world, blockpos, this.modelState);
 	}
 
+	@Override
 	public void onBlockClicked(World world, BlockPos blockpos, EntityPlayer entityplayer) {
 		this.modelBlock.onBlockClicked(world, blockpos, entityplayer);
 	}
@@ -637,6 +662,7 @@ public class BlockStairs extends Block {
 	/**
 	 * + Called when this Block is destroyed by an Explosion
 	 */
+	@Override
 	public void onBlockDestroyedByExplosion(World world, BlockPos blockpos, Explosion explosion) {
 		this.modelBlock.onBlockDestroyedByExplosion(world, blockpos, explosion);
 	}
@@ -644,6 +670,7 @@ public class BlockStairs extends Block {
 	/**
 	 * + Called when a player destroys this Block
 	 */
+	@Override
 	public void onBlockDestroyedByPlayer(World world, BlockPos blockpos, IBlockState iblockstate) {
 		this.modelBlock.onBlockDestroyedByPlayer(world, blockpos, iblockstate);
 	}
@@ -652,6 +679,7 @@ public class BlockStairs extends Block {
 	 * + Called by ItemBlocks just before a block is actually set in the world, to
 	 * allow for adjustments to the IBlockstate
 	 */
+	@Override
 	public IBlockState onBlockPlaced(World world, BlockPos blockpos, EnumFacing enumfacing, float f, float f1, float f2,
 			int i, EntityLivingBase entitylivingbase) {
 		IBlockState iblockstate = super.onBlockPlaced(world, blockpos, enumfacing, f, f1, f2, i, entitylivingbase);
@@ -666,10 +694,12 @@ public class BlockStairs extends Block {
 	 * + Triggered whenever an entity collides with this block (enters into the
 	 * block)
 	 */
+	@Override
 	public void onEntityCollidedWithBlock(World world, BlockPos blockpos, Entity entity) {
 		this.modelBlock.onEntityCollidedWithBlock(world, blockpos, entity);
 	}
 
+	@Override
 	public void randomDisplayTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom random) {
 		this.modelBlock.randomDisplayTick(world, blockpos, iblockstate, random);
 	}
@@ -687,6 +717,7 @@ public class BlockStairs extends Block {
 
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess var1, BlockPos var2) {
 		if (this.hasRaytraced) {
 			this.setBlockBounds(0.5F * (float) (this.rayTracePass % 2), 0.5F * (float) (this.rayTracePass / 4 % 2),
@@ -702,10 +733,12 @@ public class BlockStairs extends Block {
 	/**
 	 * + How many world ticks before ticking
 	 */
+	@Override
 	public int tickRate(World world) {
 		return this.modelBlock.tickRate(world);
 	}
 
+	@Override
 	public void updateTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom random) {
 		this.modelBlock.updateTick(world, blockpos, iblockstate, random);
 	}

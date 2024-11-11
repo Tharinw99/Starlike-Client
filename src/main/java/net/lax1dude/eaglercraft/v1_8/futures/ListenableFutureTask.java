@@ -7,7 +7,7 @@ import java.util.concurrent.Executor;
 
 /**
  * Copyright (c) 2022-2023 lax1dude, ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -19,7 +19,7 @@ import java.util.concurrent.Executor;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ListenableFutureTask<V> extends FutureTask<V> implements ListenableFuture<V> {
 
@@ -45,6 +45,7 @@ public class ListenableFutureTask<V> extends FutureTask<V> implements Listenable
 		});
 	}
 
+	@Override
 	protected void done() {
 		for (int i = 0, l = listeners.size(); i < l; ++i) {
 			Runnable r = listeners.get(i);

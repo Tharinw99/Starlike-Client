@@ -23,13 +23,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -41,7 +41,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockTripWire extends Block {
 	public static final PropertyBool POWERED = PropertyBool.create("powered");
@@ -80,10 +80,12 @@ public class BlockTripWire extends Block {
 		this.setTickRandomly(true);
 	}
 
+	@Override
 	public void breakBlock(World world, BlockPos blockpos, IBlockState iblockstate) {
 		this.notifyHook(world, blockpos, iblockstate.withProperty(POWERED, Boolean.valueOf(true)));
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this,
 				new IProperty[] { POWERED, SUSPENDED, ATTACHED, DISARMED, NORTH, EAST, WEST, SOUTH });
@@ -93,6 +95,7 @@ public class BlockTripWire extends Block {
 	 * + Get the actual Block state of this Block at the given position. This
 	 * applies properties not visible in the metadata, such as fence connections.
 	 */
+	@Override
 	public IBlockState getActualState(IBlockState iblockstate, IBlockAccess iblockaccess, BlockPos blockpos) {
 		return iblockstate
 				.withProperty(NORTH,
@@ -105,14 +108,17 @@ public class BlockTripWire extends Block {
 						Boolean.valueOf(isConnectedTo(iblockaccess, blockpos, iblockstate, EnumFacing.WEST)));
 	}
 
+	@Override
 	public EnumWorldBlockLayer getBlockLayer() {
 		return EnumWorldBlockLayer.TRANSLUCENT;
 	}
 
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox(World var1, BlockPos var2, IBlockState var3) {
 		return null;
 	}
 
+	@Override
 	public Item getItem(World var1, BlockPos var2) {
 		return Items.string;
 	}
@@ -120,6 +126,7 @@ public class BlockTripWire extends Block {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
 		return Items.string;
 	}
@@ -127,6 +134,7 @@ public class BlockTripWire extends Block {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
 		if (((Boolean) iblockstate.getValue(POWERED)).booleanValue()) {
@@ -151,6 +159,7 @@ public class BlockTripWire extends Block {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(POWERED, Boolean.valueOf((i & 1) > 0))
 				.withProperty(SUSPENDED, Boolean.valueOf((i & 2) > 0))
@@ -158,6 +167,7 @@ public class BlockTripWire extends Block {
 				.withProperty(DISARMED, Boolean.valueOf((i & 8) > 0));
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -166,6 +176,7 @@ public class BlockTripWire extends Block {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
@@ -190,6 +201,7 @@ public class BlockTripWire extends Block {
 
 	}
 
+	@Override
 	public void onBlockAdded(World world, BlockPos blockpos, IBlockState iblockstate) {
 		iblockstate = iblockstate.withProperty(SUSPENDED,
 				Boolean.valueOf(!World.doesBlockHaveSolidTopSurface(world, blockpos.down())));
@@ -197,6 +209,7 @@ public class BlockTripWire extends Block {
 		this.notifyHook(world, blockpos, iblockstate);
 	}
 
+	@Override
 	public void onBlockHarvested(World world, BlockPos blockpos, IBlockState iblockstate, EntityPlayer entityplayer) {
 		if (!world.isRemote) {
 			if (entityplayer.getCurrentEquippedItem() != null
@@ -209,6 +222,7 @@ public class BlockTripWire extends Block {
 	/**
 	 * + Called When an Entity Collided with the Block
 	 */
+	@Override
 	public void onEntityCollidedWithBlock(World world, BlockPos blockpos, IBlockState iblockstate, Entity var4) {
 		if (!world.isRemote) {
 			if (!((Boolean) iblockstate.getValue(POWERED)).booleanValue()) {
@@ -220,6 +234,7 @@ public class BlockTripWire extends Block {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block var4) {
 		boolean flag = ((Boolean) iblockstate.getValue(SUSPENDED)).booleanValue();
 		boolean flag1 = !World.doesBlockHaveSolidTopSurface(world, blockpos.down());
@@ -234,9 +249,11 @@ public class BlockTripWire extends Block {
 	 * + Called randomly when setTickRandomly is set to true (used by e.g. crops to
 	 * grow, etc.)
 	 */
+	@Override
 	public void randomTick(World var1, BlockPos var2, IBlockState var3, EaglercraftRandom var4) {
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
 		IBlockState iblockstate = iblockaccess.getBlockState(blockpos);
 		boolean flag = ((Boolean) iblockstate.getValue(ATTACHED)).booleanValue();
@@ -280,6 +297,7 @@ public class BlockTripWire extends Block {
 
 	}
 
+	@Override
 	public void updateTick(World world, BlockPos blockpos, IBlockState var3, EaglercraftRandom var4) {
 		if (!world.isRemote) {
 			if (((Boolean) world.getBlockState(blockpos).getValue(POWERED)).booleanValue()) {

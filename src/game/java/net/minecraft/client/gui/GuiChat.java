@@ -28,13 +28,13 @@ import net.minecraft.util.MovingObjectPosition;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -46,7 +46,7 @@ import net.minecraft.util.MovingObjectPosition;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiChat extends GuiScreenVisualViewport {
 	private static final Logger logger = LogManager.getLogger();
@@ -77,6 +77,7 @@ public class GuiChat extends GuiScreenVisualViewport {
 		this.defaultInputFieldText = defaultText;
 	}
 
+	@Override
 	protected void actionPerformed(GuiButton par1GuiButton) {
 		if (par1GuiButton.id == 69) {
 			this.mc.displayGuiScreen(null);
@@ -127,6 +128,7 @@ public class GuiChat extends GuiScreenVisualViewport {
 		this.inputField.writeText((String) this.foundPlayerNames.get(this.autocompleteIndex++));
 	}
 
+	@Override
 	public boolean blockPTTKey() {
 		return true;
 	}
@@ -135,10 +137,12 @@ public class GuiChat extends GuiScreenVisualViewport {
 	 * + Returns true if this GUI should pause the game when it is displayed in
 	 * single-player
 	 */
+	@Override
 	public boolean doesGuiPauseGame() {
 		return false;
 	}
 
+	@Override
 	public void drawScreen0(int i, int j, float f) {
 		drawRect(2, this.height - 14, this.width - 2, this.height - 2, Integer.MIN_VALUE);
 		this.inputField.drawTextBox();
@@ -156,6 +160,7 @@ public class GuiChat extends GuiScreenVisualViewport {
 		super.drawScreen0(i, j, f);
 	}
 
+	@Override
 	public void fireInputEvent(EnumInputEvent event, String str) {
 		inputField.fireInputEvent(event, str);
 	}
@@ -186,6 +191,7 @@ public class GuiChat extends GuiScreenVisualViewport {
 	/**
 	 * + Handles mouse input.
 	 */
+	@Override
 	public void handleMouseInput() throws IOException {
 		super.handleMouseInput();
 		int i = Mouse.getEventDWheel();
@@ -212,6 +218,7 @@ public class GuiChat extends GuiScreenVisualViewport {
 	 * when the GUI is displayed and when the window resizes, the buttonList is
 	 * cleared beforehand.
 	 */
+	@Override
 	public void initGui() {
 		Keyboard.enableRepeatEvents(true);
 		if (!(this instanceof GuiSleepMP)) {
@@ -236,6 +243,7 @@ public class GuiChat extends GuiScreenVisualViewport {
 	 * the equivalent of KeyListener.keyTyped(KeyEvent e). Args : character
 	 * (character on the key), keyCode (lwjgl Keyboard key code)
 	 */
+	@Override
 	protected void keyTyped(char parChar1, int parInt1) {
 		if (parInt1 == 1 && (this.mc.gameSettings.keyBindClose.getKeyCode() == 0 || Keyboard.areKeysLocked())) {
 			this.mc.displayGuiScreen((GuiScreen) null);
@@ -271,6 +279,7 @@ public class GuiChat extends GuiScreenVisualViewport {
 
 	}
 
+	@Override
 	protected void mouseClicked0(int parInt1, int parInt2, int parInt3) {
 		if (parInt3 == 0) {
 			IChatComponent ichatcomponent = this.mc.ingameGUI.getChatGUI()
@@ -318,6 +327,7 @@ public class GuiChat extends GuiScreenVisualViewport {
 	/**
 	 * + Called when the screen is unloaded. Used to disable keyboard repeat events
 	 */
+	@Override
 	public void onGuiClosed() {
 		Keyboard.enableRepeatEvents(false);
 		this.mc.ingameGUI.getChatGUI().resetScroll();
@@ -339,6 +349,7 @@ public class GuiChat extends GuiScreenVisualViewport {
 	/**
 	 * + Sets the text of the chat
 	 */
+	@Override
 	protected void setText(String newChatText, boolean shouldOverwrite) {
 		if (shouldOverwrite) {
 			this.inputField.setText(newChatText);
@@ -348,10 +359,12 @@ public class GuiChat extends GuiScreenVisualViewport {
 
 	}
 
+	@Override
 	public boolean showCopyPasteButtons() {
 		return true;
 	}
 
+	@Override
 	public void updateScreen0() {
 		this.inputField.updateCursorCounter();
 		if (notifBellButton != null && mc.thePlayer != null) {

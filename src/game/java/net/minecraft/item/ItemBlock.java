@@ -18,13 +18,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -36,7 +36,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ItemBlock extends Item {
 	public static boolean setTileEntityNBT(World worldIn, EntityPlayer pos, BlockPos stack, ItemStack parItemStack) {
@@ -98,10 +98,12 @@ public class ItemBlock extends Item {
 	/**
 	 * + gets the CreativeTab this item is displayed on
 	 */
+	@Override
 	public CreativeTabs getCreativeTab() {
 		return this.block.getCreativeTabToDisplayOn();
 	}
 
+	@Override
 	public float getHeldItemBrightnessEagler(ItemStack itemStack) {
 		return this.block.getLightValue() * 0.06667f;
 	}
@@ -110,6 +112,7 @@ public class ItemBlock extends Item {
 	 * + returns a list of items with the same ID, but different meta (eg: dye
 	 * returns 16 items)
 	 */
+	@Override
 	public void getSubItems(Item item, CreativeTabs creativetabs, List<ItemStack> list) {
 		this.block.getSubBlocks(item, creativetabs, list);
 	}
@@ -117,6 +120,7 @@ public class ItemBlock extends Item {
 	/**
 	 * + Returns the unlocalized name of this item.
 	 */
+	@Override
 	public String getUnlocalizedName() {
 		return this.block.getUnlocalizedName();
 	}
@@ -124,6 +128,7 @@ public class ItemBlock extends Item {
 	/**
 	 * + Returns the unlocalized name of this item.
 	 */
+	@Override
 	public String getUnlocalizedName(ItemStack var1) {
 		return this.block.getUnlocalizedName();
 	}
@@ -131,6 +136,7 @@ public class ItemBlock extends Item {
 	/**
 	 * + Called when a Block is right-clicked with this Item
 	 */
+	@Override
 	public boolean onItemUse(ItemStack itemstack, EntityPlayer entityplayer, World world, BlockPos blockpos,
 			EnumFacing enumfacing, float f, float f1, float f2) {
 		IBlockState iblockstate = world.getBlockState(blockpos);
@@ -171,6 +177,7 @@ public class ItemBlock extends Item {
 	 * + Sets the unlocalized name of this item to the string passed as the
 	 * parameter, prefixed by "item."
 	 */
+	@Override
 	public ItemBlock setUnlocalizedName(String unlocalizedName) {
 		super.setUnlocalizedName(unlocalizedName);
 		return this;

@@ -13,13 +13,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -31,7 +31,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class CommandResultStats {
 
@@ -153,42 +153,52 @@ public class CommandResultStats {
 		String s = this.field_179675_c[resultTypeIn.getTypeID()];
 		if (s != null) {
 			ICommandSender icommandsender = new ICommandSender() {
+				@Override
 				public void addChatMessage(IChatComponent ichatcomponent) {
 					sender.addChatMessage(ichatcomponent);
 				}
 
+				@Override
 				public boolean canCommandSenderUseCommand(int var1, String var2) {
 					return true;
 				}
 
+				@Override
 				public Entity getCommandSenderEntity() {
 					return sender.getCommandSenderEntity();
 				}
 
+				@Override
 				public IChatComponent getDisplayName() {
 					return sender.getDisplayName();
 				}
 
+				@Override
 				public World getEntityWorld() {
 					return sender.getEntityWorld();
 				}
 
+				@Override
 				public String getName() {
 					return sender.getName();
 				}
 
+				@Override
 				public BlockPos getPosition() {
 					return sender.getPosition();
 				}
 
+				@Override
 				public Vec3 getPositionVector() {
 					return sender.getPositionVector();
 				}
 
+				@Override
 				public boolean sendCommandFeedback() {
 					return sender.sendCommandFeedback();
 				}
 
+				@Override
 				public void setCommandStat(CommandResultStats.Type commandresultstats$type, int i) {
 					sender.setCommandStat(commandresultstats$type, i);
 				}

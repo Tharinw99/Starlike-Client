@@ -27,99 +27,89 @@ import net.lax1dude.eaglercraft.v1_8.opengl.ImageData;
 
 /**
  * Copyright (c) 2022-2023 lax1dude. All Rights Reserved.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class PlatformAssets {
-	
+
 	private static final byte[] MISSING_FILE = new byte[0];
 
-	static Map<String,byte[]> assets = new HashMap<>();
+	static Map<String, byte[]> assets = new HashMap<>();
+
+	private static HTMLCanvasElement imageLoadCanvas = null;
+
+	private static CanvasRenderingContext2D imageLoadContext = null;
+
+	@JSBody(params = { "ctx" }, script = "ctx.imageSmoothingEnabled = false;")
+	private static native void disableImageSmoothing(CanvasRenderingContext2D ctx);
+
+	public static void freeAssetRepoTeaVM() {
+		assets = new HashMap<>();
+	}
+
+	public static byte[] getResourceBytes(String path) {
+		if (path.startsWith("/")) {
+			path = path.substring(1);
+		}
+		byte[] data = assets.get(path);
+		if (data == null && path.startsWith("assets/minecraft/lang/") && !path.endsWith(".mcmeta")) {
+			ArrayBuffer file = PlatformRuntime
+					.downloadRemoteURI(ClientMain.configLocalesFolder + "/" + path.substring(22));
+			if (file != null) {
+				data = TeaVMUtils.wrapByteArrayBuffer(file);
+				assets.put(path, data);
+				return data;
+			} else {
+				assets.put(path, MISSING_FILE);
+				return null;
+			}
+		} else {
+			return data == MISSING_FILE ? null : data;
+		}
+	}
 
 	public static boolean getResourceExists(String path) {
-		if(path.startsWith("/")) {
+		if (path.startsWith("/")) {
 			path = path.substring(1);
 		}
 		byte[] ret = assets.get(path);
-		if(ret != null && ret != MISSING_FILE) {
+		if (ret != null && ret != MISSING_FILE) {
 			return true;
-		}else {
-			if(path.startsWith("assets/minecraft/lang/") && !path.endsWith(".mcmeta")) {
-				ArrayBuffer file = PlatformRuntime.downloadRemoteURI(
-						ClientMain.configLocalesFolder + "/" + path.substring(22));
-				if(file != null) {
+		} else {
+			if (path.startsWith("assets/minecraft/lang/") && !path.endsWith(".mcmeta")) {
+				ArrayBuffer file = PlatformRuntime
+						.downloadRemoteURI(ClientMain.configLocalesFolder + "/" + path.substring(22));
+				if (file != null) {
 					assets.put(path, TeaVMUtils.wrapByteArrayBuffer(file));
 					return true;
-				}else {
+				} else {
 					assets.put(path, MISSING_FILE);
 					return false;
 				}
-			}else {
+			} else {
 				return false;
 			}
 		}
 	}
-	
-	public static byte[] getResourceBytes(String path) {
-		if(path.startsWith("/")) {
-			path = path.substring(1);
-		}
-		byte[] data = assets.get(path);
-		if(data == null && path.startsWith("assets/minecraft/lang/") && !path.endsWith(".mcmeta")) {
-			ArrayBuffer file = PlatformRuntime.downloadRemoteURI(
-					ClientMain.configLocalesFolder + "/" + path.substring(22));
-			if(file != null) {
-				data = TeaVMUtils.wrapByteArrayBuffer(file);
-				assets.put(path, data);
-				return data;
-			}else {
-				assets.put(path, MISSING_FILE);
-				return null;
-			}
-		}else {
-			return data == MISSING_FILE ? null : data;
-		}
-	}
-	
-	public static ImageData loadImageFile(InputStream data) {
-		return loadImageFile(data, "image/png");
-	}
-	
-	public static ImageData loadImageFile(InputStream data, String mime) {
-		byte[] b = EaglerInputStream.inputStreamToBytesQuiet(data);
-		if(b != null) {
-			return loadImageFile(b, mime);
-		}else {
-			return null;
-		}
-	}
-	
-	private static HTMLCanvasElement imageLoadCanvas = null;
-	private static CanvasRenderingContext2D imageLoadContext = null;
-	
+
 	public static ImageData loadImageFile(byte[] data) {
 		return loadImageFile(data, "image/png");
 	}
-	
-	@JSBody(params = { }, script = "return { willReadFrequently: true };")
-	static native JSObject youEagler();
-	
-	@JSBody(params = { "ctx" }, script = "ctx.imageSmoothingEnabled = false;")
-	private static native void disableImageSmoothing(CanvasRenderingContext2D ctx);
-	
+
 	@Async
 	public static native ImageData loadImageFile(byte[] data, String mime);
-	
+
 	private static void loadImageFile(byte[] data, String mime, final AsyncCallback<ImageData> ret) {
 		final Document doc = Window.current().getDocument();
 		final HTMLImageElement toLoad = (HTMLImageElement) doc.createElement("img");
@@ -127,30 +117,32 @@ public class PlatformAssets {
 		toLoad.addEventListener("load", new EventListener<Event>() {
 			@Override
 			public void handleEvent(Event evt) {
-				if(imageLoadCanvas == null) {
+				if (imageLoadCanvas == null) {
 					imageLoadCanvas = (HTMLCanvasElement) doc.createElement("canvas");
 				}
-				if(imageLoadCanvas.getWidth() < toLoad.getWidth()) {
+				if (imageLoadCanvas.getWidth() < toLoad.getWidth()) {
 					imageLoadCanvas.setWidth(toLoad.getWidth());
 				}
-				if(imageLoadCanvas.getHeight() < toLoad.getHeight()) {
+				if (imageLoadCanvas.getHeight() < toLoad.getHeight()) {
 					imageLoadCanvas.setHeight(toLoad.getHeight());
 				}
-				if(imageLoadContext == null) {
+				if (imageLoadContext == null) {
 					imageLoadContext = (CanvasRenderingContext2D) imageLoadCanvas.getContext("2d", youEagler());
 					disableImageSmoothing(imageLoadContext);
 				}
 				imageLoadContext.clearRect(0, 0, toLoad.getWidth(), toLoad.getHeight());
 				imageLoadContext.drawImage(toLoad, 0, 0, toLoad.getWidth(), toLoad.getHeight());
-				org.teavm.jso.canvas.ImageData pxlsDat = imageLoadContext.getImageData(0, 0, toLoad.getWidth(), toLoad.getHeight());
+				org.teavm.jso.canvas.ImageData pxlsDat = imageLoadContext.getImageData(0, 0, toLoad.getWidth(),
+						toLoad.getHeight());
 				Uint8ClampedArray pxls = pxlsDat.getData();
 				int totalPixels = pxlsDat.getWidth() * pxlsDat.getHeight();
 				TeaVMBlobURLManager.releaseURL(src[0]);
-				if(pxls.getByteLength() < totalPixels << 2) {
+				if (pxls.getByteLength() < totalPixels << 2) {
 					ret.complete(null);
 					return;
 				}
-				ret.complete(new ImageData(pxlsDat.getWidth(), pxlsDat.getHeight(), TeaVMUtils.wrapIntArrayBuffer(pxls.getBuffer()), true));
+				ret.complete(new ImageData(pxlsDat.getWidth(), pxlsDat.getHeight(),
+						TeaVMUtils.wrapIntArrayBuffer(pxls.getBuffer()), true));
 			}
 		});
 		toLoad.addEventListener("error", new EventListener<Event>() {
@@ -161,14 +153,26 @@ public class PlatformAssets {
 			}
 		});
 		src[0] = TeaVMBlobURLManager.registerNewURLByte(data, mime);
-		if(src[0] != null) {
+		if (src[0] != null) {
 			toLoad.setSrc(src[0].toExternalForm());
-		}else {
+		} else {
 			ret.complete(null);
 		}
 	}
 
-	public static void freeAssetRepoTeaVM() {
-		assets = new HashMap<>();
+	public static ImageData loadImageFile(InputStream data) {
+		return loadImageFile(data, "image/png");
 	}
+
+	public static ImageData loadImageFile(InputStream data, String mime) {
+		byte[] b = EaglerInputStream.inputStreamToBytesQuiet(data);
+		if (b != null) {
+			return loadImageFile(b, mime);
+		} else {
+			return null;
+		}
+	}
+
+	@JSBody(params = {}, script = "return { willReadFrequently: true };")
+	static native JSObject youEagler();
 }

@@ -1,6 +1,7 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -14,13 +15,13 @@ import net.minecraft.util.Vec3;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -32,14 +33,13 @@ import net.minecraft.util.Vec3;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class S27PacketExplosion implements Packet<INetHandlerPlayClient> {
-	private double posX;
-	private double posY;
-	private double posZ;
+	private double posX, posY, posZ;
 	private float strength;
 	private List<BlockPos> affectedBlockPositions;
+	private float motionX, motionY, motionZ;
 	private float field_149152_f;
 	private float field_149153_g;
 	private float field_149159_h;
@@ -47,19 +47,18 @@ public class S27PacketExplosion implements Packet<INetHandlerPlayClient> {
 	public S27PacketExplosion() {
 	}
 
-	public S27PacketExplosion(double parDouble1, double y, double z, float strengthIn, List<BlockPos> affectedBlocksIn,
-			Vec3 parVec3_1) {
-		this.posX = parDouble1;
+	public S27PacketExplosion(double x, double y, double z, float strengthIn, List<BlockPos> affectedBlocksIn,
+			Vec3 motion) {
+		this.posX = x;
 		this.posY = y;
 		this.posZ = z;
 		this.strength = strengthIn;
-		this.affectedBlockPositions = Lists.newArrayList(affectedBlocksIn);
-		if (parVec3_1 != null) {
-			this.field_149152_f = (float) parVec3_1.xCoord;
-			this.field_149153_g = (float) parVec3_1.yCoord;
-			this.field_149159_h = (float) parVec3_1.zCoord;
+		this.affectedBlockPositions = Collections.unmodifiableList(Lists.newArrayList(affectedBlocksIn));
+		if (motion != null) {
+			this.motionX = (float) motion.xCoord;
+			this.motionY = (float) motion.yCoord;
+			this.motionZ = (float) motion.zCoord;
 		}
-
 	}
 
 	public float func_149144_d() {
@@ -94,64 +93,53 @@ public class S27PacketExplosion implements Packet<INetHandlerPlayClient> {
 		return this.posZ;
 	}
 
-	/**
-	 * + Passes this Packet on to the NetHandler for processing.
-	 */
-	public void processPacket(INetHandlerPlayClient inethandlerplayclient) {
-		inethandlerplayclient.handleExplosion(this);
+	@Override
+	public void processPacket(INetHandlerPlayClient handler) {
+		handler.handleExplosion(this);
 	}
 
-	/**
-	 * + Reads the raw packet data from the data stream.
-	 */
-	public void readPacketData(PacketBuffer parPacketBuffer) throws IOException {
-		this.posX = (double) parPacketBuffer.readFloat();
-		this.posY = (double) parPacketBuffer.readFloat();
-		this.posZ = (double) parPacketBuffer.readFloat();
-		this.strength = parPacketBuffer.readFloat();
-		int i = parPacketBuffer.readInt();
-		this.affectedBlockPositions = Lists.newArrayListWithCapacity(i);
-		int j = (int) this.posX;
-		int k = (int) this.posY;
-		int l = (int) this.posZ;
+	@Override
+	public void readPacketData(PacketBuffer buf) throws IOException {
+		this.posX = buf.readFloat();
+		this.posY = buf.readFloat();
+		this.posZ = buf.readFloat();
+		this.strength = buf.readFloat();
 
-		for (int i1 = 0; i1 < i; ++i1) {
-			int j1 = parPacketBuffer.readByte() + j;
-			int k1 = parPacketBuffer.readByte() + k;
-			int l1 = parPacketBuffer.readByte() + l;
-			this.affectedBlockPositions.add(new BlockPos(j1, k1, l1));
+		int affectedBlocks = buf.readInt();
+		if (affectedBlocks < 0 || affectedBlocks > 4096) {
+			throw new IOException("Too many affected blocks: " + affectedBlocks);
 		}
 
-		this.field_149152_f = parPacketBuffer.readFloat();
-		this.field_149153_g = parPacketBuffer.readFloat();
-		this.field_149159_h = parPacketBuffer.readFloat();
-	}
-
-	/**
-	 * + Writes the raw packet data to the data stream.
-	 */
-	public void writePacketData(PacketBuffer parPacketBuffer) throws IOException {
-		parPacketBuffer.writeFloat((float) this.posX);
-		parPacketBuffer.writeFloat((float) this.posY);
-		parPacketBuffer.writeFloat((float) this.posZ);
-		parPacketBuffer.writeFloat(this.strength);
-		parPacketBuffer.writeInt(this.affectedBlockPositions.size());
-		int i = (int) this.posX;
-		int j = (int) this.posY;
-		int k = (int) this.posZ;
-
-		for (int m = 0, n = this.affectedBlockPositions.size(); m < n; ++m) {
-			BlockPos blockpos = this.affectedBlockPositions.get(m);
-			int l = blockpos.getX() - i;
-			int i1 = blockpos.getY() - j;
-			int j1 = blockpos.getZ() - k;
-			parPacketBuffer.writeByte(l);
-			parPacketBuffer.writeByte(i1);
-			parPacketBuffer.writeByte(j1);
+		this.affectedBlockPositions = Lists.newArrayListWithCapacity(affectedBlocks);
+		for (int i = 0; i < affectedBlocks; i++) {
+			int x = buf.readByte() + (int) posX;
+			int y = buf.readByte() + (int) posY;
+			int z = buf.readByte() + (int) posZ;
+			this.affectedBlockPositions.add(new BlockPos(x, y, z));
 		}
 
-		parPacketBuffer.writeFloat(this.field_149152_f);
-		parPacketBuffer.writeFloat(this.field_149153_g);
-		parPacketBuffer.writeFloat(this.field_149159_h);
+		this.motionX = buf.readFloat();
+		this.motionY = buf.readFloat();
+		this.motionZ = buf.readFloat();
 	}
+
+	@Override
+	public void writePacketData(PacketBuffer buf) throws IOException {
+		buf.writeFloat((float) this.posX);
+		buf.writeFloat((float) this.posY);
+		buf.writeFloat((float) this.posZ);
+		buf.writeFloat(this.strength);
+
+		buf.writeInt(this.affectedBlockPositions.size());
+		for (BlockPos blockPos : this.affectedBlockPositions) {
+			buf.writeByte(blockPos.getX() - (int) posX);
+			buf.writeByte(blockPos.getY() - (int) posY);
+			buf.writeByte(blockPos.getZ() - (int) posZ);
+		}
+
+		buf.writeFloat(this.motionX);
+		buf.writeFloat(this.motionY);
+		buf.writeFloat(this.motionZ);
+	}
+
 }

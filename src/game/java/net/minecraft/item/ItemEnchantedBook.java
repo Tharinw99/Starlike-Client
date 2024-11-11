@@ -15,13 +15,13 @@ import net.minecraft.util.WeightedRandomChestContent;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,7 +33,7 @@ import net.minecraft.util.WeightedRandomChestContent;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ItemEnchantedBook extends Item {
 	/**
@@ -73,6 +73,7 @@ public class ItemEnchantedBook extends Item {
 	 * + allows items to add custom lines of information to the mouseover
 	 * description
 	 */
+	@Override
 	public void addInformation(ItemStack itemstack, EntityPlayer entityplayer, List<String> list, boolean flag) {
 		super.addInformation(itemstack, entityplayer, list, flag);
 		NBTTagList nbttaglist = this.getEnchantments(itemstack);
@@ -124,10 +125,12 @@ public class ItemEnchantedBook extends Item {
 	/**
 	 * + Return an item rarity from EnumRarity
 	 */
+	@Override
 	public EnumRarity getRarity(ItemStack itemstack) {
 		return this.getEnchantments(itemstack).tagCount() > 0 ? EnumRarity.UNCOMMON : super.getRarity(itemstack);
 	}
 
+	@Override
 	public boolean hasEffect(ItemStack var1) {
 		return true;
 	}
@@ -135,6 +138,7 @@ public class ItemEnchantedBook extends Item {
 	/**
 	 * + Checks isDamagable and if it cannot be stacked
 	 */
+	@Override
 	public boolean isItemTool(ItemStack var1) {
 		return false;
 	}

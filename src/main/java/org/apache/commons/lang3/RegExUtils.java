@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
  * <p>
  * Helpers to process Strings using regular expressions.
  * </p>
- * 
+ *
  * @see java.util.regex.Pattern
  * @since 3.8
  */

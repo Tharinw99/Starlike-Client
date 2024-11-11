@@ -182,7 +182,7 @@ public abstract class DiscreteDomain<C extends Comparable> {
 
 	/**
 	 * Returns the discrete domain for values of type {@code Integer}.
-	 * 
+	 *
 	 * @since 14.0 (since 10.0 as {@code DiscreteDomains.integers()})
 	 */
 	public static DiscreteDomain<Integer> integers() {
@@ -191,7 +191,7 @@ public abstract class DiscreteDomain<C extends Comparable> {
 
 	/**
 	 * Returns the discrete domain for values of type {@code Long}.
-	 * 
+	 *
 	 * @since 14.0 (since 10.0 as {@code DiscreteDomains.longs()})
 	 */
 	public static DiscreteDomain<Long> longs() {

@@ -17,13 +17,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -35,7 +35,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ServerListEntryNormal implements GuiListExtended.IGuiListEntry {
 	private static final Logger logger = LogManager.getLogger();
@@ -54,6 +54,7 @@ public class ServerListEntryNormal implements GuiListExtended.IGuiListEntry {
 		this.mc = Minecraft.getMinecraft();
 	}
 
+	@Override
 	public void drawEntry(int i, int j, int k, int l, int var5, int i1, int j1, boolean flag) {
 		if (!this.field_148301_e.field_78841_f) {
 			this.field_148301_e.field_78841_f = true;
@@ -201,6 +202,7 @@ public class ServerListEntryNormal implements GuiListExtended.IGuiListEntry {
 	/**
 	 * + Returns true if the mouse has been pressed on this control.
 	 */
+	@Override
 	public boolean mousePressed(int i, int var2, int var3, int var4, int j, int k) {
 		if (j <= 32) {
 			if (j < 32 && j > 16 && this.func_178013_b()) {
@@ -233,9 +235,11 @@ public class ServerListEntryNormal implements GuiListExtended.IGuiListEntry {
 	 * + Fired when the mouse button is released. Arguments: index, x, y,
 	 * mouseEvent, relativeX, relativeY
 	 */
+	@Override
 	public void mouseReleased(int var1, int var2, int var3, int var4, int var5, int var6) {
 	}
 
+	@Override
 	public void setSelected(int var1, int var2, int var3) {
 	}
 }

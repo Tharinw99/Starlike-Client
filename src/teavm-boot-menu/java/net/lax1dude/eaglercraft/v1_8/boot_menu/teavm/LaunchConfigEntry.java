@@ -6,18 +6,19 @@ import net.lax1dude.eaglercraft.v1_8.EaglercraftUUID;
 
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class LaunchConfigEntry {
 
@@ -57,18 +58,19 @@ public class LaunchConfigEntry {
 	public LaunchConfigEntry(EaglercraftUUID uuid, JSONObject jsonObject) {
 		this.uuid = uuid;
 		EaglercraftUUID sanityUUID = EaglercraftUUID.fromString(jsonObject.getString("uuid"));
-		if(!sanityUUID.equals(uuid)) {
-			throw new IllegalArgumentException("The file's name UUID does not equal the UUID string found in the file!");
+		if (!sanityUUID.equals(uuid)) {
+			throw new IllegalArgumentException(
+					"The file's name UUID does not equal the UUID string found in the file!");
 		}
 		int typeId = jsonObject.getInt("type");
 		type = EnumClientLaunchType.getById(typeId);
-		if(type == null) {
+		if (type == null) {
 			throw new IllegalArgumentException("Unknown launch configuration type " + typeId + "!");
 		}
 		clientDataUUID = EaglercraftUUID.fromString(jsonObject.getString("dataUUID"));
 		displayName = jsonObject.getString("displayName");
 		clearCookiesBeforeLaunch = jsonObject.getBoolean("clearCookies");
-		switch(type) {
+		switch (type) {
 		case STANDARD_OFFLINE_V1:
 			launchOpts = jsonObject.getString("launchOpts");
 			launchOptsVar = jsonObject.getString("launchOptsVar");
@@ -91,9 +93,19 @@ public class LaunchConfigEntry {
 			break;
 		case PEYTON_V1:
 			break;
-		default: //?
+		default: // ?
 			break;
 		}
+	}
+
+	public LaunchConfigEntry fork() {
+		return new LaunchConfigEntry(uuid, clientDataUUID, displayName, type, joinServer, launchOptsVar,
+				launchOptsAssetsURIVar, launchOptsContainerVar, mainFunction, launchOpts, clearCookiesBeforeLaunch);
+	}
+
+	public LaunchConfigEntry rotateUUIDs(EaglercraftUUID rotatedLaunchUUID, EaglercraftUUID rotatedClientUUID) {
+		return new LaunchConfigEntry(rotatedLaunchUUID, rotatedClientUUID, displayName, type, joinServer, launchOptsVar,
+				launchOptsAssetsURIVar, launchOptsContainerVar, mainFunction, launchOpts, clearCookiesBeforeLaunch);
 	}
 
 	public void writeJSON(JSONObject jsonObject) {
@@ -102,7 +114,7 @@ public class LaunchConfigEntry {
 		jsonObject.put("dataUUID", clientDataUUID.toString());
 		jsonObject.put("displayName", displayName);
 		jsonObject.put("clearCookies", clearCookiesBeforeLaunch);
-		switch(type) {
+		switch (type) {
 		case STANDARD_OFFLINE_V1:
 			jsonObject.put("launchOpts", launchOpts != null ? launchOpts : "{ }");
 			jsonObject.put("launchOptsVar", launchOptsVar != null ? launchOptsVar : "eaglercraftXOpts");
@@ -125,19 +137,9 @@ public class LaunchConfigEntry {
 			break;
 		case PEYTON_V1:
 			break;
-		default: //?
+		default: // ?
 			break;
 		}
-	}
-
-	public LaunchConfigEntry rotateUUIDs(EaglercraftUUID rotatedLaunchUUID, EaglercraftUUID rotatedClientUUID) {
-		return new LaunchConfigEntry(rotatedLaunchUUID, rotatedClientUUID, displayName, type, joinServer, launchOptsVar,
-				launchOptsAssetsURIVar, launchOptsContainerVar, mainFunction, launchOpts, clearCookiesBeforeLaunch);
-	}
-
-	public LaunchConfigEntry fork() {
-		return new LaunchConfigEntry(uuid, clientDataUUID, displayName, type, joinServer, launchOptsVar,
-				launchOptsAssetsURIVar, launchOptsContainerVar, mainFunction, launchOpts, clearCookiesBeforeLaunch);
 	}
 
 }

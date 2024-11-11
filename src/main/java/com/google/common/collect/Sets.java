@@ -662,7 +662,7 @@ public final class Sets {
 	 * each of the given sets in order; the "n-ary
 	 * <a href="http://en.wikipedia.org/wiki/Cartesian_product">Cartesian
 	 * product</a>" of the sets. For example:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *
@@ -685,7 +685,7 @@ public final class Sets {
 	 * <p>
 	 * The result is guaranteed to be in the "traditional", lexicographical order
 	 * for Cartesian products that you would get from nesting for loops:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *
@@ -729,7 +729,7 @@ public final class Sets {
 	 * each of the given sets in order; the "n-ary
 	 * <a href="http://en.wikipedia.org/wiki/Cartesian_product">Cartesian
 	 * product</a>" of the sets. For example:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *
@@ -752,7 +752,7 @@ public final class Sets {
 	 * <p>
 	 * The result is guaranteed to be in the "traditional", lexicographical order
 	 * for Cartesian products that you would get from nesting for loops:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *
@@ -1121,7 +1121,7 @@ public final class Sets {
 	 * Unfortunately, since this method sets the generic type of the returned set
 	 * based on the type of the first set passed, this could in rare cases force you
 	 * to make a cast, for example:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *
@@ -1372,7 +1372,7 @@ public final class Sets {
 	 * are ensured if the map is created empty, passed directly to this method, and
 	 * no reference to the map is retained, as illustrated in the following code
 	 * fragment:
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 * 	&#64;code
@@ -1545,7 +1545,7 @@ public final class Sets {
 	 * It is imperative that the user manually synchronize on the returned sorted
 	 * set when iterating over it or any of its {@code descendingSet},
 	 * {@code subSet}, {@code headSet}, or {@code tailSet} views.
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *
@@ -1562,7 +1562,7 @@ public final class Sets {
 	 *
 	 * <p>
 	 * or:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *

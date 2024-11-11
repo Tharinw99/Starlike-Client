@@ -14,7 +14,7 @@ import net.minecraft.client.resources.I18n;
 
 /**
  * Copyright (c) 2023 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -26,7 +26,7 @@ import net.minecraft.client.resources.I18n;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiShaderConfig extends GuiScreen {
 
@@ -45,6 +45,7 @@ public class GuiShaderConfig extends GuiScreen {
 		this.shaderStartState = Minecraft.getMinecraft().gameSettings.shaders;
 	}
 
+	@Override
 	protected void actionPerformed(GuiButton btn) {
 		if (btn.id == 0) {
 			mc.gameSettings.shaders = !mc.gameSettings.shaders;
@@ -56,6 +57,7 @@ public class GuiShaderConfig extends GuiScreen {
 		}
 	}
 
+	@Override
 	public void drawScreen(int i, int j, float f) {
 		this.drawBackground(0);
 		listView.drawScreen(i, j, f);
@@ -72,16 +74,19 @@ public class GuiShaderConfig extends GuiScreen {
 		return mc;
 	}
 
+	@Override
 	public void handleMouseInput() throws IOException {
 		super.handleMouseInput();
 		listView.handleMouseInput();
 	}
 
+	@Override
 	public void handleTouchInput() throws IOException {
 		super.handleTouchInput();
 		listView.handleTouchInput();
 	}
 
+	@Override
 	public void initGui() {
 		this.title = I18n.format("shaders.gui.title");
 		this.buttonList.clear();
@@ -96,16 +101,19 @@ public class GuiShaderConfig extends GuiScreen {
 		}
 	}
 
+	@Override
 	protected void mouseClicked(int parInt1, int parInt2, int parInt3) {
 		super.mouseClicked(parInt1, parInt2, parInt3);
 		listView.mouseClicked(parInt1, parInt2, parInt3);
 	}
 
+	@Override
 	protected void mouseReleased(int i, int j, int k) {
 		super.mouseReleased(i, j, k);
 		listView.mouseReleased(i, j, k);
 	}
 
+	@Override
 	public void onGuiClosed() {
 		if (shaderStartState != mc.gameSettings.shaders || listView.isDirty()) {
 			mc.gameSettings.saveOptions();

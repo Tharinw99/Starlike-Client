@@ -70,7 +70,7 @@ public class ImmutableSetMultimap<K, V> extends ImmutableMultimap<K, V> implemen
 	/**
 	 * A builder for creating immutable {@code SetMultimap} instances, especially
 	 * {@code public static final} multimaps ("constant multimaps"). Example:
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 * 	&#64;code
@@ -426,6 +426,7 @@ public class ImmutableSetMultimap<K, V> extends ImmutableMultimap<K, V> implemen
 	 *
 	 * @since 11.0
 	 */
+	@Override
 	public ImmutableSetMultimap<V, K> inverse() {
 		ImmutableSetMultimap<V, K> result = inverse;
 		return (result == null) ? (inverse = invert()) : result;

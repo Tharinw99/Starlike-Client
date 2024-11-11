@@ -13,13 +13,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -31,7 +31,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiScreenOptionsSounds extends GuiScreen {
 	class Button extends GuiButton {
@@ -49,14 +49,17 @@ public class GuiScreenOptionsSounds extends GuiScreen {
 			this.field_146156_o = GuiScreenOptionsSounds.this.game_settings_4.getSoundLevel(parSoundCategory);
 		}
 
+		@Override
 		protected int getHoverState(boolean var1) {
 			return 0;
 		}
 
+		@Override
 		public boolean isSliderTouchEvents() {
 			return true;
 		}
 
+		@Override
 		protected void mouseDragged(Minecraft minecraft, int i, int var3) {
 			if (this.visible) {
 				if (this.field_146155_p) {
@@ -76,6 +79,7 @@ public class GuiScreenOptionsSounds extends GuiScreen {
 			}
 		}
 
+		@Override
 		public boolean mousePressed(Minecraft minecraft, int i, int j) {
 			if (super.mousePressed(minecraft, i, j)) {
 				this.field_146156_o = (float) (i - (this.xPosition + 4)) / (float) (this.width - 8);
@@ -91,6 +95,7 @@ public class GuiScreenOptionsSounds extends GuiScreen {
 			}
 		}
 
+		@Override
 		public void mouseReleased(int var1, int var2) {
 			if (this.field_146155_p) {
 				if (this.field_146153_r == SoundCategory.MASTER) {
@@ -106,6 +111,7 @@ public class GuiScreenOptionsSounds extends GuiScreen {
 			this.field_146155_p = false;
 		}
 
+		@Override
 		public void playPressSound(SoundHandler var1) {
 		}
 	}
@@ -125,6 +131,7 @@ public class GuiScreenOptionsSounds extends GuiScreen {
 	 * + Called by the controls from the buttonList when activated. (Mouse pressed
 	 * for buttons)
 	 */
+	@Override
 	protected void actionPerformed(GuiButton parGuiButton) {
 		if (parGuiButton.enabled) {
 			if (parGuiButton.id == 200) {
@@ -139,6 +146,7 @@ public class GuiScreenOptionsSounds extends GuiScreen {
 	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
 	 * renderPartialTicks
 	 */
+	@Override
 	public void drawScreen(int i, int j, float f) {
 		this.drawDefaultBackground();
 		this.drawCenteredString(this.fontRendererObj, this.field_146507_a, this.width / 2, 15, 16777215);
@@ -155,6 +163,7 @@ public class GuiScreenOptionsSounds extends GuiScreen {
 	 * when the GUI is displayed and when the window resizes, the buttonList is
 	 * cleared beforehand.
 	 */
+	@Override
 	public void initGui() {
 		int i = 0;
 		this.field_146507_a = I18n.format("options.sounds.title", new Object[0]);

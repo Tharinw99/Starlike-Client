@@ -1,24 +1,24 @@
 /* -*-mode:java; c-basic-offset:2; indent-tabs-mode:nil -*- */
 /* JOrbis
  * Copyright (C) 2000 ymnk, JCraft,Inc.
- *  
+ *
  * Written by: 2000 ymnk<ymnk@jcraft.com>
- *   
- * Many thanks to 
- *   Monty <monty@xiph.org> and 
+ *
+ * Many thanks to
+ *   Monty <monty@xiph.org> and
  *   The XIPHOPHORUS Company http://www.xiph.org/ .
  * JOrbis has been based on their awesome works, Vorbis codec.
- *   
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public License
  * as published by the Free Software Foundation; either version 2 of
  * the License, or (at your option) any later version.
-   
+
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -30,68 +30,6 @@ public class DspState {
 	static final float M_PI = 3.1415926539f;
 	static final int VI_TRANSFORMB = 1;
 	static final int VI_WINDOWB = 1;
-
-	int analysisp;
-	Info vi;
-	int modebits;
-
-	float[][] pcm;
-	int pcm_storage;
-	int pcm_current;
-	int pcm_returned;
-
-	float[] multipliers;
-	int envelope_storage;
-	int envelope_current;
-
-	int eofflag;
-
-	int lW;
-	int W;
-	int nW;
-	int centerW;
-
-	long granulepos;
-	long sequence;
-
-	long glue_bits;
-	long time_bits;
-	long floor_bits;
-	long res_bits;
-
-	// local lookup storage
-	float[][][][][] window; // block, leadin, leadout, type
-	Object[][] transform;
-	CodeBook[] fullbooks;
-	// backend lookups are tied to the mode, not the backend or naked mapping
-	Object[] mode;
-
-	// local storage, only used on the encoding side. This way the
-	// application does not need to worry about freeing some packets'
-	// memory and not others'; packet storage is always tracked.
-	// Cleared next call to a _dsp_ function
-	byte[] header;
-	byte[] header1;
-	byte[] header2;
-
-	public DspState() {
-		transform = new Object[2][];
-		window = new float[2][][][][];
-		window[0] = new float[2][][][];
-		window[0][0] = new float[2][][];
-		window[0][1] = new float[2][][];
-		window[0][0][0] = new float[2][];
-		window[0][0][1] = new float[2][];
-		window[0][1][0] = new float[2][];
-		window[0][1][1] = new float[2][];
-		window[1] = new float[2][][][];
-		window[1][0] = new float[2][][];
-		window[1][1] = new float[2][][];
-		window[1][0][0] = new float[2][];
-		window[1][0][1] = new float[2][];
-		window[1][1][0] = new float[2][];
-		window[1][1][1] = new float[2][];
-	}
 
 	static float[] window(int type, int window, int left, int right) {
 		float[] ret = new float[window];
@@ -132,9 +70,85 @@ public class DspState {
 		return (ret);
 	}
 
+	int analysisp;
+	Info vi;
+
+	int modebits;
+	float[][] pcm;
+	int pcm_storage;
+	int pcm_current;
+
+	int pcm_returned;
+	float[] multipliers;
+	int envelope_storage;
+
+	int envelope_current;
+
+	int eofflag;
+	int lW;
+	int W;
+	int nW;
+
+	int centerW;
+	long granulepos;
+
+	long sequence;
+	long glue_bits;
+	long time_bits;
+	long floor_bits;
+
+	long res_bits;
+	// local lookup storage
+	float[][][][][] window; // block, leadin, leadout, type
+	Object[][] transform;
+	CodeBook[] fullbooks;
+
+	// backend lookups are tied to the mode, not the backend or naked mapping
+	Object[] mode;
+	// local storage, only used on the encoding side. This way the
+	// application does not need to worry about freeing some packets'
+	// memory and not others'; packet storage is always tracked.
+	// Cleared next call to a _dsp_ function
+	byte[] header;
+	byte[] header1;
+
+	byte[] header2;
+
+	public DspState() {
+		transform = new Object[2][];
+		window = new float[2][][][][];
+		window[0] = new float[2][][][];
+		window[0][0] = new float[2][][];
+		window[0][1] = new float[2][][];
+		window[0][0][0] = new float[2][];
+		window[0][0][1] = new float[2][];
+		window[0][1][0] = new float[2][];
+		window[0][1][1] = new float[2][];
+		window[1] = new float[2][][][];
+		window[1][0] = new float[2][][];
+		window[1][1] = new float[2][][];
+		window[1][0][0] = new float[2][];
+		window[1][0][1] = new float[2][];
+		window[1][1][0] = new float[2][];
+		window[1][1][1] = new float[2][];
+	}
+
 	// Analysis side code, but directly related to blocking. Thus it's
 	// here and not in analysis.c (which is for analysis transforms only).
 	// The init is here because some of it is shared
+
+	DspState(Info vi) {
+		this();
+		init(vi, false);
+		// Adjust centerW to allow an easier mechanism for determining output
+		pcm_returned = centerW;
+		centerW -= vi.blocksizes[W] / 4 + vi.blocksizes[lW] / 4;
+		granulepos = -1;
+		sequence = -1;
+	}
+
+	public void clear() {
+	}
 
 	int init(Info vi, boolean encp) {
 		this.vi = vi;
@@ -204,26 +218,6 @@ public class DspState {
 			mode[i] = FuncMapping.mapping_P[maptype].look(this, vi.mode_param[i], vi.map_param[mapnum]);
 		}
 		return (0);
-	}
-
-	public int synthesis_init(Info vi) {
-		init(vi, false);
-		// Adjust centerW to allow an easier mechanism for determining output
-		pcm_returned = centerW;
-		centerW -= vi.blocksizes[W] / 4 + vi.blocksizes[lW] / 4;
-		granulepos = -1;
-		sequence = -1;
-		return (0);
-	}
-
-	DspState(Info vi) {
-		this();
-		init(vi, false);
-		// Adjust centerW to allow an easier mechanism for determining output
-		pcm_returned = centerW;
-		centerW -= vi.blocksizes[W] / 4 + vi.blocksizes[lW] / 4;
-		granulepos = -1;
-		sequence = -1;
 	}
 
 	// Unike in analysis, the window is only partially applied for each
@@ -343,6 +337,16 @@ public class DspState {
 		return (0);
 	}
 
+	public int synthesis_init(Info vi) {
+		init(vi, false);
+		// Adjust centerW to allow an easier mechanism for determining output
+		pcm_returned = centerW;
+		centerW -= vi.blocksizes[W] / 4 + vi.blocksizes[lW] / 4;
+		granulepos = -1;
+		sequence = -1;
+		return (0);
+	}
+
 	// pcm==NULL indicates we just want the pending samples, no more
 	public int synthesis_pcmout(float[][][] _pcm, int[] index) {
 		if (pcm_returned < centerW) {
@@ -362,8 +366,5 @@ public class DspState {
 			return (-1);
 		pcm_returned += bytes;
 		return (0);
-	}
-
-	public void clear() {
 	}
 }

@@ -46,7 +46,7 @@ import com.google.common.base.Objects;
  * All methods that modify the table are optional, and the views returned by the
  * table may or may not be modifiable. When modification isn't supported, those
  * methods will throw an {@link UnsupportedOperationException}.
- * 
+ *
  * <p>
  * See the Guava User Guide article on <a href=
  * "http://code.google.com/p/guava-libraries/wiki/NewCollectionTypesExplained#Table">

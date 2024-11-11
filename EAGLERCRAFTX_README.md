@@ -1,4 +1,3 @@
-
 # EaglercraftX 1.8
 
 ### Play Minecraft 1.8 in your browser, supports singleplayer and multiplayer
@@ -7,28 +6,28 @@
 
 ### This repository contains:
 
- - **Utilities to decompile Minecraft 1.8 and apply patch files to it**
- - **Source code to provide the LWJGL keyboard, mouse, and OpenGL APIs in a browser**
- - **Patch files to mod the Minecraft 1.8 source code to make it browser compatible**
- - **Browser-modified portions of Minecraft 1.8's open-source dependencies**
- - **Plugins for Minecraft servers to allow the eagler client to connect to them**
+- **Utilities to decompile Minecraft 1.8 and apply patch files to it**
+- **Source code to provide the LWJGL keyboard, mouse, and OpenGL APIs in a browser**
+- **Patch files to mod the Minecraft 1.8 source code to make it browser compatible**
+- **Browser-modified portions of Minecraft 1.8's open-source dependencies**
+- **Plugins for Minecraft servers to allow the eagler client to connect to them**
 
 ### This repository does NOT contain:
 
- - **Any portion of the decompiled Minecraft 1.8 source code or resources**
- - **Any portion of Mod Coder Pack and it's config files**
- - **Data that can be used alone to reconstruct portions of the game's source code**
+- **Any portion of the decompiled Minecraft 1.8 source code or resources**
+- **Any portion of Mod Coder Pack and it's config files**
+- **Data that can be used alone to reconstruct portions of the game's source code**
 
 ## Getting Started:
 
-### To compile the latest version of the client, on Windows:
+### To compile the latest version of the JavaScript client, on Windows:
 
 1. Make sure you have at least Java 11 installed and added to your PATH, it is recommended to use Java 17
 2. Download (clone) this repository to your computer
 3. Double click `CompileLatestClient.bat`, a GUI resembling a classic windows installer should open
 4. Follow the steps shown to you in the new window to finish compiling
 
-### To compile the latest version of the client, on Linux/macOS:
+### To compile the latest version of the JavaScript client, on Linux/macOS:
 
 1. Make sure you have at least Java 11 installed, it is recommended to use Java 17
 2. Download (clone) this repository to your computer
@@ -37,9 +36,21 @@
 5. Type `./CompileLatestClient.sh` and hit enter, a GUI resembling a classic windows installer should open
 6. Follow the steps shown to you in the new window to finish compiling
 
+### To set up the development environment
+
+1. Prepare the required files in the mcp918 folder ([readme](mcp918/readme.txt))
+2. Run the `build_init` script
+3. Run the `build_make_workspace` script
+
 ## Browser Compatibility
 
-EaglercraftX 1.8 is currently known to work on browsers as old as Chrome 38 on Windows XP, the game supports both WebGL 1.0 and WebGL 2.0 however features such as dynamic lighting and PBR shaders require WebGL 2.0. The game also supports mobile browsers that don't have a keyboard or mouse, the game will enter touch screen mode automatically when touch input is detected. The game also includes an embedded OGG codec (JOrbis) for loading audio files on iOS where the browsers don't support loading OGG files in an AudioContext.
+The JavaScript runtime of EaglercraftX 1.8 is currently known to work on browsers as old as Chrome 38 on Windows XP, the game supports both WebGL 1.0 and WebGL 2.0 however features such as dynamic lighting and PBR shaders require WebGL 2.0. The game also supports mobile browsers that don't have a keyboard or mouse, the game will enter touch screen mode automatically when touch input is detected. The game also includes an embedded OGG codec (JOrbis) for loading audio files on iOS where the browsers don't support loading OGG files in an AudioContext.
+
+## WebAssembly GC Support
+
+EaglercraftX 1.8 also has an experimental WebAssembly GC (WASM-GC) runtime, almost all of the features supported on the JavaScript runtime are also supported on the WebAssembly GC runtime, however it is still incompatible with several major browsers (especially Safari) and will not run in Chrome unless you can access the `chrome://flags` menu or request an origin trial token from Google for your website. Its based on experimental technology and may still crash sometimes due to browser bugs or unresolved issues in the Java to WASM compiler. Hopefully in the coming months the required feature (JSPI, WebAssembly JavaScript Promise Integration) will become enabled by default on the Chrome browser. It performs significantly better than the JavaScript client, around 50% more FPS and TPS in some cases, and will hopefully replace it someday. Just make sure you enable VSync when you play it, otherwise the game will run "too fast" and choke the browser's event loop, causing input lag.
+
+You can compile the WebAssembly GC runtime by creating a development environment (workspace) and reading the README in the "wasm_gc_teavm" folder.
 
 ## Singleplayer
 
@@ -55,7 +66,7 @@ If you would like to invite other players to join your singleplayer world and pl
 
 Once you press "Start Shared World", EaglercraftX 1.8 will give you a "join code" (usually 5 letters) to share with your friends. On a different device, go the "Multiplayer" screen and press "Direct Connect" and press "Join Shared World", enter the join code given to you when you started the shared world and press "Join World". Given a few seconds, the client should successfully be able to join your shared world from any other device on the internet that also has unrestricted internet access. If it does not work, check the "Network Settings" screen and make sure you and your friends all have the same set of shared world relay URLs configured or your clients will not be able to find each other.
 
-If you would like to host your own relay, the JAR file and instructions can be downloaded from the "Network Settings" screen in the client. EaglercraftX 1.8 uses the same "LAN world" relay server that is used by Eaglercraft 1.5.2, if you would like the relay source code find a random copy of the Eaglercraft 1.5.2 source code and it should be located in the "sp-relay" folder. The relay has not been updated since then, it has only been renamed from "LAN world relay" to "Shared world relay".
+If you would like to host your own relay, the JAR file and instructions can be downloaded from the "Network Settings" screen in the client. EaglercraftX 1.8 uses the same "LAN world" relay server that is used by Eaglercraft 1.5.2, however there have been several bug fixes. The current version is available in the `sp-relay/SharedWorldRelay` folder.
 
 ## PBR Shaders
 
@@ -76,6 +87,8 @@ If you are creating a resource pack and want to disable the blur filter on the m
 To make a server for EaglercraftX 1.8 the recommended software to use is EaglercraftXBungee ("EaglerXBungee") which is included in this repository in the `gateway/EaglercraftXBungee` folder. This is a plugin designed to be used with BungeeCord to allow Eaglercraft players to join your BungeeCord server. It is assumed that the reader already knows what BungeeCord is and has a working server set up that is joinable via java edition. If you don't know what BungeeCord is, please research the topic yourself first before continuing. Waterfall and FlameCord have also been tested, but EaglerXBungee was natively compiled against BungeeCord.
 
 There is an experimental velocity plugin available in `gateway/EaglercraftXVelocity` but it is still in development and not recommended for public servers, so be sure to check for updates regularly if you use it. Configuration files are basically identical to EaglercraftXBungee so its safe to just directy copy in your old EaglercraftXBungee config files to the `plugins/eaglerxvelocity` folder and they should work with a minimal number of edits if you are migrating your network from BungeeCord to Velocity.
+
+**Warning:** Both EaglerXBungee and EaglerXVelocity perform a lot of reflection that will inevitably break after a while when BungeeCord or Velocity is updated upstream. Both plugins will display the precise build number of BungeeCord and Velocity that has been tested by the developers and known to be compatible with EaglerXBungee and EaglerXVelocity when the proxy first starts up. If you are experiencing issues, try checking the BungeeCord or Velocity website for old versions and find the closest version number to whatever the current compatible version number is that is printed by EaglerXBungee/EaglerXVelocity, it will probably fix whatever missing functions the error messages are complaining about.
 
 ### Detailed READMEs
 
@@ -198,11 +211,12 @@ The default eaglercraftXOpts values is this:
 - `ramdiskMode:` if worlds and resource packs should be stored in RAM instead of IndexedDB
 - `singleThreadMode:` if the game should run the client and integrated server in the same context instead of creating a worker object
 - `enableEPKVersionCheck:` if the game should attempt to bypass the browser's cache and retry downloading assets.epk when its outdated
+- `enforceVSync:` (WASM only) if the game should automatically re-enable VSync at launch if its disabled
 - `hooks:` can be used to define JavaScript callbacks for certain events
-    * `localStorageSaved:` JavaScript callback to save local storage keys (key, data)
-    * `localStorageLoaded:` JavaScript callback to load local storage keys (key) returns data
-    * `crashReportShow:` JavaScript callback when a crash report is shown (report, customMessageCB)
-    * `screenChanged:` JavaScript callback when the screen changes/resizes (screenName, scaledWidth, scaledHeight, realWidth, realHeight, scaleFactor)
+  - `localStorageSaved:` JavaScript callback to save local storage keys (key, data)
+  - `localStorageLoaded:` JavaScript callback to load local storage keys (key) returns data
+  - `crashReportShow:` JavaScript callback when a crash report is shown (report, customMessageCB)
+  - `screenChanged:` JavaScript callback when the screen changes/resizes (screenName, scaledWidth, scaledHeight, realWidth, realHeight, scaleFactor)
 
 ### Using Hooks
 
@@ -245,7 +259,7 @@ The `crashReportShow` hook can be used to capture crash reports and append addit
 
 There is currently no system in place to make forks of 1.8 and merge commits made to the patch files in this repository with the patch files or workspace of the fork, you're on your own if you try to keep a fork of this repo for reasons other than to contribute to it
 
-A javascript-based modding API resembling Minecraft Forge may be implemented someday though for adding custom content to the game.
+**Note:** If you are trying to use the desktop runtime on Linux, make sure you add the "desktopRuntime" folder to the `LD_LIBRARY_PATH` environment variable of the Java process. This should be done automatically by the Eclipse project's default run configuration, but it might not work properly on every system, or when the Eclipse project is imported into IntelliJ.
 
 # EaglercraftX 1.8 Workspace
 
@@ -258,17 +272,20 @@ A javascript-based modding API resembling Minecraft Forge may be implemented som
 Java must be added to your PATH!
 
 **To compile the web client:**
+
 1. Run `CompileEPK`
 2. Run `CompileJS` (or the `generateJavaScript` gradle task in your IDE)
 3. Check the "javascript" folder
 
 **To compile an offline download:**
+
 1. Run `CompileEPK`
 2. Run `CompileJS` (or the `generateJavaScript` gradle task in your IDE)
 3. Run `MakeOfflineDownload`
 4. Check the "javascript" folder
 
 **To use the desktop runtime:**
+
 1. Import the Eclipse project in "desktopRuntime/eclipseProject" into your IDE
 2. Open one of the .java files from the source folders (workaround for a bug)
 3. Run/Debug the client with the included "eaglercraftDebugRuntime" configuration
@@ -437,6 +454,7 @@ if(lightValue > 0.0) {
 ```
 
 **Correct:**
+
 ```glsl
 float lightValue = max(dot(lightDirection, normal), 0.0);
 color += lightValue * lightColor * diffuseColor;
@@ -461,7 +479,6 @@ float depthValue = textureLod(depthBuffer, pos, 0.0).r;
 ### 11. Divide complex and branch-intensive shaders into multiple draw calls
 
 You can use a variety of different blending modes to mathematically combine the results of shaders. This is done for the same reason as flattening the control flow, to try and keep instruction pointers in sync by periodically resetting their positions, and also to allow for the driver to multitask better on GPUs with insane numbers of cores. It also allows the shader’s execution to be distributed across multiple frames in the case of something that doesn’t need to update often (like clouds).
-
 
 ### 12. Don't abuse `@JSBody` in TeaVM code
 
@@ -528,7 +545,7 @@ try(InputStream is = new FileInputStream(new File("phile.txt"))) {
 
 Notice that the `.close()` can be omitted completely when using a try-with-resources
 
-### 15. Always close compression/decompression streams 
+### 15. Always close compression/decompression streams
 
 In the desktop runtime, the default oracle JDK uses native code to implement the compression/decompression streams (InflaterInputStream, GZIPInputStream, etc) and therefore if you forget to close the compression/decompression stream it will cause a memory leak when the code isn't running in a browser. This is a common issue when using byte array input/output streams since you might believe when decompressing data from a byte array that there's no reason to close the stream when you're done since its not a file, but that will still cause a memory leak due to the decompression stream not being cleaned up.
 

@@ -11,13 +11,13 @@ import net.minecraft.util.MathHelper;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,7 +29,7 @@ import net.minecraft.util.MathHelper;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class S11PacketSpawnExperienceOrb implements Packet<INetHandlerPlayClient> {
 	private int entityID;
@@ -72,6 +72,7 @@ public class S11PacketSpawnExperienceOrb implements Packet<INetHandlerPlayClient
 	/**
 	 * + Passes this Packet on to the NetHandler for processing.
 	 */
+	@Override
 	public void processPacket(INetHandlerPlayClient inethandlerplayclient) {
 		inethandlerplayclient.handleSpawnExperienceOrb(this);
 	}
@@ -79,6 +80,7 @@ public class S11PacketSpawnExperienceOrb implements Packet<INetHandlerPlayClient
 	/**
 	 * + Reads the raw packet data from the data stream.
 	 */
+	@Override
 	public void readPacketData(PacketBuffer parPacketBuffer) throws IOException {
 		this.entityID = parPacketBuffer.readVarIntFromBuffer();
 		this.posX = parPacketBuffer.readInt();
@@ -90,6 +92,7 @@ public class S11PacketSpawnExperienceOrb implements Packet<INetHandlerPlayClient
 	/**
 	 * + Writes the raw packet data to the data stream.
 	 */
+	@Override
 	public void writePacketData(PacketBuffer parPacketBuffer) throws IOException {
 		parPacketBuffer.writeVarIntToBuffer(this.entityID);
 		parPacketBuffer.writeInt(this.posX);

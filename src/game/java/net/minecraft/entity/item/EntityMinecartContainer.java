@@ -14,13 +14,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -32,7 +32,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class EntityMinecartContainer extends EntityMinecart implements ILockableContainer {
 	private ItemStack[] minecartContainerItems = new ItemStack[36];
@@ -51,6 +51,7 @@ public abstract class EntityMinecartContainer extends EntityMinecart implements 
 		super(worldIn, parDouble1, parDouble2, parDouble3);
 	}
 
+	@Override
 	protected void applyDrag() {
 		int i = 15 - Container.calcRedstoneFromInventory(this);
 		float f = 0.98F + (float) i * 0.001F;
@@ -59,6 +60,7 @@ public abstract class EntityMinecartContainer extends EntityMinecart implements 
 		this.motionZ *= (double) f;
 	}
 
+	@Override
 	public void clear() {
 		for (int i = 0; i < this.minecartContainerItems.length; ++i) {
 			this.minecartContainerItems[i] = null;
@@ -66,6 +68,7 @@ public abstract class EntityMinecartContainer extends EntityMinecart implements 
 
 	}
 
+	@Override
 	public void closeInventory(EntityPlayer var1) {
 	}
 
@@ -73,6 +76,7 @@ public abstract class EntityMinecartContainer extends EntityMinecart implements 
 	 * + Removes up to a specified number of items from an inventory slot and
 	 * returns them in a new stack.
 	 */
+	@Override
 	public ItemStack decrStackSize(int i, int j) {
 		if (this.minecartContainerItems[i] != null) {
 			if (this.minecartContainerItems[i].stackSize <= j) {
@@ -92,10 +96,12 @@ public abstract class EntityMinecartContainer extends EntityMinecart implements 
 		}
 	}
 
+	@Override
 	public int getField(int var1) {
 		return 0;
 	}
 
+	@Override
 	public int getFieldCount() {
 		return 0;
 	}
@@ -104,10 +110,12 @@ public abstract class EntityMinecartContainer extends EntityMinecart implements 
 	 * + Returns the maximum stack size for a inventory slot. Seems to always be 64,
 	 * possibly will be extended.
 	 */
+	@Override
 	public int getInventoryStackLimit() {
 		return 64;
 	}
 
+	@Override
 	public LockCode getLockCode() {
 		return LockCode.EMPTY_CODE;
 	}
@@ -116,6 +124,7 @@ public abstract class EntityMinecartContainer extends EntityMinecart implements 
 	 * + Gets the name of this command sender (usually username, but possibly
 	 * "Rcon")
 	 */
+	@Override
 	public String getName() {
 		return this.hasCustomName() ? this.getCustomNameTag() : "container.minecart";
 	}
@@ -123,6 +132,7 @@ public abstract class EntityMinecartContainer extends EntityMinecart implements 
 	/**
 	 * + Returns the stack in the given slot.
 	 */
+	@Override
 	public ItemStack getStackInSlot(int i) {
 		return this.minecartContainerItems[i];
 	}
@@ -130,6 +140,7 @@ public abstract class EntityMinecartContainer extends EntityMinecart implements 
 	/**
 	 * + First layer of player interaction
 	 */
+	@Override
 	public boolean interactFirst(EntityPlayer entityplayer) {
 		if (!this.worldObj.isRemote) {
 			entityplayer.displayGUIChest(this);
@@ -142,10 +153,12 @@ public abstract class EntityMinecartContainer extends EntityMinecart implements 
 	 * + Returns true if automation is allowed to insert the given stack (ignoring
 	 * stack size) into the given slot.
 	 */
+	@Override
 	public boolean isItemValidForSlot(int var1, ItemStack var2) {
 		return true;
 	}
 
+	@Override
 	public boolean isLocked() {
 		return false;
 	}
@@ -154,10 +167,12 @@ public abstract class EntityMinecartContainer extends EntityMinecart implements 
 	 * + Do not make give this method the name canInteractWith because it clashes
 	 * with Container
 	 */
+	@Override
 	public boolean isUseableByPlayer(EntityPlayer entityplayer) {
 		return this.isDead ? false : entityplayer.getDistanceSqToEntity(this) <= 64.0D;
 	}
 
+	@Override
 	public void killMinecart(DamageSource damagesource) {
 		super.killMinecart(damagesource);
 		if (this.worldObj.getGameRules().getBoolean("doEntityDrops")) {
@@ -170,15 +185,18 @@ public abstract class EntityMinecartContainer extends EntityMinecart implements 
 	 * + For tile entities, ensures the chunk containing the tile entity is saved to
 	 * disk later - the game won't think it hasn't changed and skip it.
 	 */
+	@Override
 	public void markDirty() {
 	}
 
+	@Override
 	public void openInventory(EntityPlayer var1) {
 	}
 
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	protected void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		NBTTagList nbttaglist = nbttagcompound.getTagList("Items", 10);
@@ -197,6 +215,7 @@ public abstract class EntityMinecartContainer extends EntityMinecart implements 
 	/**
 	 * + Removes a stack from the given slot and returns it.
 	 */
+	@Override
 	public ItemStack removeStackFromSlot(int i) {
 		if (this.minecartContainerItems[i] != null) {
 			ItemStack itemstack = this.minecartContainerItems[i];
@@ -210,6 +229,7 @@ public abstract class EntityMinecartContainer extends EntityMinecart implements 
 	/**
 	 * + Will get destroyed next tick.
 	 */
+	@Override
 	public void setDead() {
 		if (this.dropContentsWhenDead) {
 			InventoryHelper.func_180176_a(this.worldObj, this, this);
@@ -218,6 +238,7 @@ public abstract class EntityMinecartContainer extends EntityMinecart implements 
 		super.setDead();
 	}
 
+	@Override
 	public void setField(int var1, int var2) {
 	}
 
@@ -225,6 +246,7 @@ public abstract class EntityMinecartContainer extends EntityMinecart implements 
 	 * + Sets the given item stack to the specified slot in the inventory (can be
 	 * crafting or armor sections).
 	 */
+	@Override
 	public void setInventorySlotContents(int i, ItemStack itemstack) {
 		this.minecartContainerItems[i] = itemstack;
 		if (itemstack != null && itemstack.stackSize > this.getInventoryStackLimit()) {
@@ -233,6 +255,7 @@ public abstract class EntityMinecartContainer extends EntityMinecart implements 
 
 	}
 
+	@Override
 	public void setLockCode(LockCode var1) {
 	}
 
@@ -240,6 +263,7 @@ public abstract class EntityMinecartContainer extends EntityMinecart implements 
 	 * + Teleports the entity to another dimension. Params: Dimension number to
 	 * teleport to
 	 */
+	@Override
 	public void travelToDimension(int i) {
 		this.dropContentsWhenDead = false;
 		super.travelToDimension(i);
@@ -248,6 +272,7 @@ public abstract class EntityMinecartContainer extends EntityMinecart implements 
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	protected void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		NBTTagList nbttaglist = new NBTTagList();

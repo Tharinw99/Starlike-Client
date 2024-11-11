@@ -15,13 +15,13 @@ import net.minecraft.util.WeightedRandom;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,7 +33,7 @@ import net.minecraft.util.WeightedRandom;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class WeightedBakedModel implements IBakedModel {
 	public static class Builder {
@@ -63,6 +63,7 @@ public class WeightedBakedModel implements IBakedModel {
 			this.model = parIBakedModel;
 		}
 
+		@Override
 		public int compareTo(WeightedBakedModel.MyWeighedRandomItem weightedbakedmodel$myweighedrandomitem) {
 			return ComparisonChain.start().compare(weightedbakedmodel$myweighedrandomitem.itemWeight, this.itemWeight)
 					.compare(this.getCountQuads(), weightedbakedmodel$myweighedrandomitem.getCountQuads()).result();
@@ -79,6 +80,7 @@ public class WeightedBakedModel implements IBakedModel {
 			return i;
 		}
 
+		@Override
 		public String toString() {
 			return "MyWeighedRandomItem{weight=" + this.itemWeight + ", model=" + this.model + '}';
 		}
@@ -101,30 +103,37 @@ public class WeightedBakedModel implements IBakedModel {
 				Math.abs((int) parLong1 >> 16) % this.totalWeight)).model;
 	}
 
+	@Override
 	public List<BakedQuad> getFaceQuads(EnumFacing enumfacing) {
 		return this.baseModel.getFaceQuads(enumfacing);
 	}
 
+	@Override
 	public List<BakedQuad> getGeneralQuads() {
 		return this.baseModel.getGeneralQuads();
 	}
 
+	@Override
 	public ItemCameraTransforms getItemCameraTransforms() {
 		return this.baseModel.getItemCameraTransforms();
 	}
 
+	@Override
 	public EaglerTextureAtlasSprite getParticleTexture() {
 		return this.baseModel.getParticleTexture();
 	}
 
+	@Override
 	public boolean isAmbientOcclusion() {
 		return this.baseModel.isAmbientOcclusion();
 	}
 
+	@Override
 	public boolean isBuiltInRenderer() {
 		return this.baseModel.isBuiltInRenderer();
 	}
 
+	@Override
 	public boolean isGui3d() {
 		return this.baseModel.isGui3d();
 	}

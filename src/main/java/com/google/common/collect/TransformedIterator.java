@@ -21,6 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.Iterator;
 
 import com.google.common.annotations.GwtCompatible;
+import com.google.common.base.Function;
 
 /**
  * An iterator that transforms a backing iterator; for internal use. This avoids

@@ -16,14 +16,14 @@ Public Domain.
  * A JSONTokener takes a source string and extracts characters and tokens from
  * it. It is used by the JSONObject and JSONArray constructors to parse JSON
  * source strings.
- * 
+ *
  * @author JSON.org
  * @version 2014-05-03
  */
 public class JSONTokener {
 	/**
 	 * Get the hex value of a character (base16).
-	 * 
+	 *
 	 * @param c A character between '0' and '9' or between 'A' and 'F' or between
 	 *          'a' and 'f'.
 	 * @return An int between 0 and 15, or -1 if c was not a hex digit.
@@ -62,7 +62,7 @@ public class JSONTokener {
 	/**
 	 * Construct a JSONTokener from an InputStream. The caller must close the input
 	 * stream.
-	 * 
+	 *
 	 * @param inputStream The source.
 	 */
 	public JSONTokener(InputStream inputStream) {
@@ -98,7 +98,7 @@ public class JSONTokener {
 	 * Back up one character. This provides a sort of lookahead capability, so that
 	 * you can test for a digit or letter before attempting to parse the next number
 	 * or identifier.
-	 * 
+	 *
 	 * @throws JSONException Thrown if trying to step back more than 1 step or if
 	 *                       already at the start of the string
 	 */
@@ -148,7 +148,7 @@ public class JSONTokener {
 	/**
 	 * Get the last character read from the input or '\0' if nothing has been read
 	 * yet.
-	 * 
+	 *
 	 * @return the last character read from the input.
 	 */
 	protected char getPrevious() {
@@ -158,7 +158,7 @@ public class JSONTokener {
 	/**
 	 * Increments the internal indexes according to the previous character read and
 	 * the character passed as the current character.
-	 * 
+	 *
 	 * @param c the current character read.
 	 */
 	private void incrementIndexes(int c) {
@@ -183,7 +183,7 @@ public class JSONTokener {
 	/**
 	 * Determine if the source string still contains characters that next() can
 	 * consume.
-	 * 
+	 *
 	 * @return true if not yet at the end of the source.
 	 * @throws JSONException thrown if there is an error stepping forward or
 	 *                       backward while checking for more data.
@@ -239,7 +239,7 @@ public class JSONTokener {
 
 	/**
 	 * Consume the next character, and check that it matches a specified character.
-	 * 
+	 *
 	 * @param c The character to match.
 	 * @return The character.
 	 * @throws JSONException if the character does not match.
@@ -283,7 +283,7 @@ public class JSONTokener {
 
 	/**
 	 * Get the next char in the string, skipping whitespace.
-	 * 
+	 *
 	 * @throws JSONException Thrown if there is an error reading the source string.
 	 * @return A character, or 0 if there are no more characters.
 	 */
@@ -334,7 +334,7 @@ public class JSONTokener {
 	 * Return the characters up to the next close quote character. Backslash
 	 * processing is done. The formal JSON format does not allow strings in single
 	 * quotes, but an implementation is allowed to accept them.
-	 * 
+	 *
 	 * @param quote The quoting character, either <code>"</code>&nbsp;<small>(double
 	 *              quote)</small> or <code>'</code>&nbsp;<small>(single
 	 *              quote)</small>.
@@ -398,7 +398,7 @@ public class JSONTokener {
 	/**
 	 * Get the text up but not including the specified character or the end of line,
 	 * whichever comes first.
-	 * 
+	 *
 	 * @param delimiter A delimiter character.
 	 * @return A string.
 	 * @throws JSONException Thrown if there is an error while searching for the
@@ -421,7 +421,7 @@ public class JSONTokener {
 	/**
 	 * Get the text up but not including one of the specified delimiter characters
 	 * or the end of line, whichever comes first.
-	 * 
+	 *
 	 * @param delimiters A set of delimiter characters.
 	 * @return A string, trimmed.
 	 * @throws JSONException Thrown if there is an error while searching for the
@@ -445,7 +445,7 @@ public class JSONTokener {
 	/**
 	 * Get the next value. The value can be a Boolean, Double, Integer, JSONArray,
 	 * JSONObject, Long, or String, or the JSONObject.NULL object.
-	 * 
+	 *
 	 * @throws JSONException If syntax error.
 	 *
 	 * @return An object.
@@ -474,7 +474,7 @@ public class JSONTokener {
 	/**
 	 * Skip characters until the next character is the requested character. If the
 	 * requested character is not found, no characters are skipped.
-	 * 
+	 *
 	 * @param to A character to skip to.
 	 * @return The requested character, or zero if the requested character is not
 	 *         found.

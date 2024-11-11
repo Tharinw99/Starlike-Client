@@ -8,13 +8,13 @@ import java.util.Arrays;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -26,7 +26,7 @@ import java.util.Arrays;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class NBTTagIntArray extends NBTBase {
 	private int[] intArray;
@@ -41,12 +41,14 @@ public class NBTTagIntArray extends NBTBase {
 	/**
 	 * + Creates a clone of the tag.
 	 */
+	@Override
 	public NBTBase copy() {
 		int[] aint = new int[this.intArray.length];
 		System.arraycopy(this.intArray, 0, aint, 0, this.intArray.length);
 		return new NBTTagIntArray(aint);
 	}
 
+	@Override
 	public boolean equals(Object object) {
 		return super.equals(object) ? Arrays.equals(this.intArray, ((NBTTagIntArray) object).intArray) : false;
 	}
@@ -54,6 +56,7 @@ public class NBTTagIntArray extends NBTBase {
 	/**
 	 * + Gets the type byte for the tag.
 	 */
+	@Override
 	public byte getId() {
 		return (byte) 11;
 	}
@@ -62,10 +65,12 @@ public class NBTTagIntArray extends NBTBase {
 		return this.intArray;
 	}
 
+	@Override
 	public int hashCode() {
 		return super.hashCode() ^ Arrays.hashCode(this.intArray);
 	}
 
+	@Override
 	void read(DataInput parDataInput, int parInt1, NBTSizeTracker parNBTSizeTracker) throws IOException {
 		parNBTSizeTracker.read(192L);
 		int i = parDataInput.readInt();
@@ -78,6 +83,7 @@ public class NBTTagIntArray extends NBTBase {
 
 	}
 
+	@Override
 	public String toString() {
 		String s = "[";
 
@@ -92,6 +98,7 @@ public class NBTTagIntArray extends NBTBase {
 	 * + Write the actual data contents of the tag, implemented in NBT extension
 	 * classes
 	 */
+	@Override
 	void write(DataOutput parDataOutput) throws IOException {
 		parDataOutput.writeInt(this.intArray.length);
 

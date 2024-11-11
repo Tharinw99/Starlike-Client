@@ -48,7 +48,7 @@ import org.apache.commons.lang3.time.DurationUtils;
  * <p>
  * #ThreadSafe#
  * </p>
- * 
+ *
  * @since 1.0
  */
 //@Immutable
@@ -959,19 +959,19 @@ public class ObjectUtils {
 	/*
 	 * These methods ensure constants are not inlined by javac. For example,
 	 * typically a developer might declare a constant like so:
-	 * 
+	 *
 	 * public final static int MAGIC_NUMBER = 5;
-	 * 
+	 *
 	 * Should a different jar file refer to this, and the MAGIC_NUMBER is changed a
 	 * later date (e.g., MAGIC_NUMBER = 6), the different jar file will need to
 	 * recompile itself. This is because javac typically inlines the primitive or
 	 * String constant directly into the bytecode, and removes the reference to the
 	 * MAGIC_NUMBER field.
-	 * 
+	 *
 	 * To help the other jar (so that it does not need to recompile when constants
 	 * are changed) the original developer can declare their constant using one of
 	 * the CONST() utility methods, instead:
-	 * 
+	 *
 	 * public final static int MAGIC_NUMBER = CONST(5);
 	 */
 
@@ -1086,7 +1086,7 @@ public class ObjectUtils {
 	/**
 	 * Find the "best guess" middle value among comparables. If there is an even
 	 * number of total values, the lower of the two middle values will be returned.
-	 * 
+	 *
 	 * @param <T>        type of values processed by this method
 	 * @param comparator to use for comparisons
 	 * @param items      to compare
@@ -1111,7 +1111,7 @@ public class ObjectUtils {
 	/**
 	 * Find the "best guess" middle value among comparables. If there is an even
 	 * number of total values, the lower of the two middle values will be returned.
-	 * 
+	 *
 	 * @param <T>   type of values processed by this method
 	 * @param items to compare
 	 * @return T at middle position
@@ -1318,7 +1318,7 @@ public class ObjectUtils {
 	 * <pre>
 	 * ObjectUtils.toString(obj, () -&gt; expensive())
 	 * </pre>
-	 * 
+	 *
 	 * <pre>
 	 * ObjectUtils.toString(null, () -&gt; expensive())         = result of expensive()
 	 * ObjectUtils.toString(null, () -&gt; expensive())         = result of expensive()

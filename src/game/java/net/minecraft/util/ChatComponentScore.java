@@ -11,13 +11,13 @@ import net.minecraft.server.MinecraftServer;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,7 +29,7 @@ import net.minecraft.server.MinecraftServer;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ChatComponentScore extends ChatComponentStyle {
 	private final String name;
@@ -48,6 +48,7 @@ public class ChatComponentScore extends ChatComponentStyle {
 	 * + Creates a copy of this component. Almost a deep copy, except the style is
 	 * shallow-copied.
 	 */
+	@Override
 	public ChatComponentScore createCopy() {
 		ChatComponentScore chatcomponentscore = new ChatComponentScore(this.name, this.objective);
 		chatcomponentscore.setValue(this.value);
@@ -61,6 +62,7 @@ public class ChatComponentScore extends ChatComponentStyle {
 		return chatcomponentscore;
 	}
 
+	@Override
 	public boolean equals(Object object) {
 		if (this == object) {
 			return true;
@@ -85,6 +87,7 @@ public class ChatComponentScore extends ChatComponentStyle {
 	 * + Gets the text of this component, without any special formatting codes
 	 * added, for chat. TODO: why is this two different methods?
 	 */
+	@Override
 	public String getUnformattedTextForChat() {
 		MinecraftServer minecraftserver = MinecraftServer.getServer();
 		if (minecraftserver != null && StringUtils.isNullOrEmpty(this.value)) {
@@ -108,6 +111,7 @@ public class ChatComponentScore extends ChatComponentStyle {
 		this.value = valueIn;
 	}
 
+	@Override
 	public String toString() {
 		return "ScoreComponent{name=\'" + this.name + '\'' + "objective=\'" + this.objective + '\'' + ", siblings="
 				+ this.siblings + ", style=" + this.getChatStyle() + '}';

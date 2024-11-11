@@ -16,7 +16,7 @@ import net.minecraft.util.IChatComponent;
 
 /**
  * Copyright (c) 2022-2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@ import net.minecraft.util.IChatComponent;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class WebSocketNetworkManager extends EaglercraftNetworkManager {
 
@@ -39,6 +39,7 @@ public class WebSocketNetworkManager extends EaglercraftNetworkManager {
 		this.webSocketClient = webSocketClient;
 	}
 
+	@Override
 	public boolean checkDisconnected() {
 		if (webSocketClient.isClosed()) {
 			try {
@@ -52,6 +53,7 @@ public class WebSocketNetworkManager extends EaglercraftNetworkManager {
 		}
 	}
 
+	@Override
 	public void closeChannel(IChatComponent reason) {
 		webSocketClient.close();
 		if (nethandler != null) {
@@ -60,13 +62,16 @@ public class WebSocketNetworkManager extends EaglercraftNetworkManager {
 		clientDisconnected = true;
 	}
 
+	@Override
 	public void connect() {
 	}
 
+	@Override
 	public EnumEaglerConnectionState getConnectStatus() {
 		return webSocketClient.getState();
 	}
 
+	@Override
 	public void processReceivedPackets() throws IOException {
 		if (nethandler == null)
 			return;
@@ -125,6 +130,7 @@ public class WebSocketNetworkManager extends EaglercraftNetworkManager {
 		}
 	}
 
+	@Override
 	public void sendPacket(Packet pkt) {
 		if (!isChannelOpen()) {
 			logger.error("Packet was sent on a closed connection: {}", pkt.getClass().getSimpleName());

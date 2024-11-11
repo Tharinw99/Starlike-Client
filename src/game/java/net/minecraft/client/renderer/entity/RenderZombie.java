@@ -18,13 +18,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -36,7 +36,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class RenderZombie extends RenderBiped<EntityZombie> {
 	private static final ResourceLocation zombieTextures = new ResourceLocation("textures/entity/zombie/zombie.png");
@@ -54,6 +54,7 @@ public class RenderZombie extends RenderBiped<EntityZombie> {
 		this.zombieVillagerModel = new ModelZombieVillager();
 		this.addLayer(new LayerHeldItem(this));
 		LayerBipedArmor layerbipedarmor = new LayerBipedArmor(this) {
+			@Override
 			protected void initArmor() {
 				this.field_177189_c = new ModelZombie(0.5F, false);
 				this.field_177186_d = new ModelZombie(1.0F, false);
@@ -79,6 +80,7 @@ public class RenderZombie extends RenderBiped<EntityZombie> {
 	 * func_76986_a(T entity, double d, double d1, double d2, float f, float f1).
 	 * But JAD is pre 1.5 so doe
 	 */
+	@Override
 	public void doRender(EntityZombie entityzombie, double d0, double d1, double d2, float f, float f1) {
 		this.func_82427_a(entityzombie);
 		super.doRender(entityzombie, d0, d1, d2, f, f1);
@@ -100,10 +102,12 @@ public class RenderZombie extends RenderBiped<EntityZombie> {
 	 * + Returns the location of an entity's texture. Doesn't seem to be called
 	 * unless you call Render.bindEntityTexture.
 	 */
+	@Override
 	protected ResourceLocation getEntityTexture(EntityZombie entityzombie) {
 		return entityzombie.isVillager() ? zombieVillagerTextures : zombieTextures;
 	}
 
+	@Override
 	protected void rotateCorpse(EntityZombie entityzombie, float f, float f1, float f2) {
 		if (entityzombie.isConverting()) {
 			f1 += (float) (Math.cos((double) entityzombie.ticksExisted * 3.25D) * 3.141592653589793D * 0.25D);

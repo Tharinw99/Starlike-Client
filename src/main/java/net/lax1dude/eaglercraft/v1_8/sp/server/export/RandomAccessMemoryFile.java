@@ -7,7 +7,7 @@ import java.io.IOException;
 
 /**
  * Copyright (c) 2023-2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -19,7 +19,7 @@ import java.io.IOException;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class RandomAccessMemoryFile implements DataInput, DataOutput {
 
@@ -66,6 +66,7 @@ public class RandomAccessMemoryFile implements DataInput, DataOutput {
 		return readBytes(b, off, len);
 	}
 
+	@Override
 	public final boolean readBoolean() throws IOException {
 		int ch = this.read();
 		if (ch < 0)
@@ -73,6 +74,7 @@ public class RandomAccessMemoryFile implements DataInput, DataOutput {
 		return (ch != 0);
 	}
 
+	@Override
 	public final byte readByte() throws IOException {
 		int ch = this.read();
 		if (ch < 0)
@@ -97,6 +99,7 @@ public class RandomAccessMemoryFile implements DataInput, DataOutput {
 		return len;
 	}
 
+	@Override
 	public final char readChar() throws IOException {
 		int ch1 = this.read();
 		int ch2 = this.read();
@@ -105,18 +108,22 @@ public class RandomAccessMemoryFile implements DataInput, DataOutput {
 		return (char) ((ch1 << 8) + (ch2 << 0));
 	}
 
+	@Override
 	public final double readDouble() throws IOException {
 		return Double.longBitsToDouble(readLong());
 	}
 
+	@Override
 	public final float readFloat() throws IOException {
 		return Float.intBitsToFloat(readInt());
 	}
 
+	@Override
 	public final void readFully(byte b[]) throws IOException {
 		readFully(b, 0, b.length);
 	}
 
+	@Override
 	public final void readFully(byte b[], int off, int len) throws IOException {
 		int n = 0;
 		do {
@@ -127,6 +134,7 @@ public class RandomAccessMemoryFile implements DataInput, DataOutput {
 		} while (n < len);
 	}
 
+	@Override
 	public final int readInt() throws IOException {
 		int ch1 = this.read();
 		int ch2 = this.read();
@@ -137,6 +145,7 @@ public class RandomAccessMemoryFile implements DataInput, DataOutput {
 		return ((ch1 << 24) + (ch2 << 16) + (ch3 << 8) + (ch4 << 0));
 	}
 
+	@Override
 	public final String readLine() throws IOException {
 		StringBuilder input = new StringBuilder();
 		int c = -1;
@@ -167,10 +176,12 @@ public class RandomAccessMemoryFile implements DataInput, DataOutput {
 		return input.toString();
 	}
 
+	@Override
 	public final long readLong() throws IOException {
 		return ((long) (readInt()) << 32) + (readInt() & 0xFFFFFFFFL);
 	}
 
+	@Override
 	public final short readShort() throws IOException {
 		int ch1 = this.read();
 		int ch2 = this.read();
@@ -179,6 +190,7 @@ public class RandomAccessMemoryFile implements DataInput, DataOutput {
 		return (short) ((ch1 << 8) + (ch2 << 0));
 	}
 
+	@Override
 	public final int readUnsignedByte() throws IOException {
 		int ch = this.read();
 		if (ch < 0)
@@ -186,6 +198,7 @@ public class RandomAccessMemoryFile implements DataInput, DataOutput {
 		return ch;
 	}
 
+	@Override
 	public final int readUnsignedShort() throws IOException {
 		int ch1 = this.read();
 		int ch2 = this.read();
@@ -194,6 +207,7 @@ public class RandomAccessMemoryFile implements DataInput, DataOutput {
 		return (ch1 << 8) + (ch2 << 0);
 	}
 
+	@Override
 	public final String readUTF() throws IOException {
 		throw new IOException("TODO");
 	}
@@ -206,6 +220,7 @@ public class RandomAccessMemoryFile implements DataInput, DataOutput {
 		grow(newLength);
 	}
 
+	@Override
 	public int skipBytes(int n) throws IOException {
 		int newpos;
 
@@ -221,24 +236,29 @@ public class RandomAccessMemoryFile implements DataInput, DataOutput {
 		return (int) (newpos - pos);
 	}
 
+	@Override
 	public void write(byte b[]) throws IOException {
 		writeBytes(b, 0, b.length);
 	}
 
+	@Override
 	public void write(byte b[], int off, int len) throws IOException {
 		writeBytes(b, off, len);
 	}
 
+	@Override
 	public void write(int b) throws IOException {
 		grow(pos + 1);
 		buffer[pos] = (byte) b;
 		pos += 1;
 	}
 
+	@Override
 	public final void writeBoolean(boolean v) throws IOException {
 		write(v ? 1 : 0);
 	}
 
+	@Override
 	public final void writeByte(int v) throws IOException {
 		write(v);
 	}
@@ -249,6 +269,7 @@ public class RandomAccessMemoryFile implements DataInput, DataOutput {
 		pos += len;
 	}
 
+	@Override
 	public final void writeBytes(String s) throws IOException {
 		int len = s.length();
 		byte[] b = new byte[len];
@@ -256,11 +277,13 @@ public class RandomAccessMemoryFile implements DataInput, DataOutput {
 		writeBytes(b, 0, len);
 	}
 
+	@Override
 	public final void writeChar(int v) throws IOException {
 		write((v >>> 8) & 0xFF);
 		write((v >>> 0) & 0xFF);
 	}
 
+	@Override
 	public final void writeChars(String s) throws IOException {
 		int clen = s.length();
 		int blen = 2 * clen;
@@ -274,14 +297,17 @@ public class RandomAccessMemoryFile implements DataInput, DataOutput {
 		writeBytes(b, 0, blen);
 	}
 
+	@Override
 	public final void writeDouble(double v) throws IOException {
 		writeLong(Double.doubleToLongBits(v));
 	}
 
+	@Override
 	public final void writeFloat(float v) throws IOException {
 		writeInt(Float.floatToIntBits(v));
 	}
 
+	@Override
 	public final void writeInt(int v) throws IOException {
 		write((v >>> 24) & 0xFF);
 		write((v >>> 16) & 0xFF);
@@ -289,6 +315,7 @@ public class RandomAccessMemoryFile implements DataInput, DataOutput {
 		write((v >>> 0) & 0xFF);
 	}
 
+	@Override
 	public final void writeLong(long v) throws IOException {
 		write((int) (v >>> 56) & 0xFF);
 		write((int) (v >>> 48) & 0xFF);
@@ -300,11 +327,13 @@ public class RandomAccessMemoryFile implements DataInput, DataOutput {
 		write((int) (v >>> 0) & 0xFF);
 	}
 
+	@Override
 	public final void writeShort(int v) throws IOException {
 		write((v >>> 8) & 0xFF);
 		write((v >>> 0) & 0xFF);
 	}
 
+	@Override
 	public final void writeUTF(String str) throws IOException {
 		throw new IOException("TODO");
 	}

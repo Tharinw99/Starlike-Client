@@ -224,7 +224,7 @@ public interface HashFunction {
 	 * Begins a new hash code computation by returning an initialized, stateful
 	 * {@code
 	 * Hasher} instance that is ready to receive data. Example:
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 * 	&#64;code

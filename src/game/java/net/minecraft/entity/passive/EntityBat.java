@@ -15,13 +15,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,7 +33,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityBat extends EntityAmbientCreature {
 	private BlockPos spawnPosition;
@@ -44,6 +44,7 @@ public class EntityBat extends EntityAmbientCreature {
 		this.setIsBatHanging(true);
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(6.0D);
@@ -52,6 +53,7 @@ public class EntityBat extends EntityAmbientCreature {
 	/**
 	 * + Called when the entity is attacked.
 	 */
+	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float f) {
 		if (this.isEntityInvulnerable(damagesource)) {
 			return false;
@@ -68,6 +70,7 @@ public class EntityBat extends EntityAmbientCreature {
 	 * + Returns true if this entity should push and be pushed by other entities
 	 * when colliding.
 	 */
+	@Override
 	public boolean canBePushed() {
 		return false;
 	}
@@ -76,13 +79,16 @@ public class EntityBat extends EntityAmbientCreature {
 	 * + returns if this entity triggers Block.onEntityWalking on the blocks they
 	 * walk on. used for spiders and wolves to prevent them from trampling crops
 	 */
+	@Override
 	protected boolean canTriggerWalking() {
 		return false;
 	}
 
+	@Override
 	protected void collideWithEntity(Entity var1) {
 	}
 
+	@Override
 	protected void collideWithNearbyEntities() {
 	}
 
@@ -90,15 +96,18 @@ public class EntityBat extends EntityAmbientCreature {
 	 * + Return whether this entity should NOT trigger a pressure plate or a
 	 * tripwire.
 	 */
+	@Override
 	public boolean doesEntityNotTriggerPressurePlate() {
 		return true;
 	}
 
+	@Override
 	protected void entityInit() {
 		super.entityInit();
 		this.dataWatcher.addObject(16, Byte.valueOf((byte) 0));
 	}
 
+	@Override
 	public void fall(float var1, float var2) {
 	}
 
@@ -106,6 +115,7 @@ public class EntityBat extends EntityAmbientCreature {
 	 * + Checks if the entity's current position is a valid location to spawn this
 	 * entity.
 	 */
+	@Override
 	public boolean getCanSpawnHere() {
 		BlockPos blockpos = new BlockPos(this.posX, this.getEntityBoundingBox().minY, this.posZ);
 		if (blockpos.getY() >= this.worldObj.func_181545_F()) {
@@ -126,10 +136,12 @@ public class EntityBat extends EntityAmbientCreature {
 	/**
 	 * + Returns the sound this mob makes on death.
 	 */
+	@Override
 	protected String getDeathSound() {
 		return "mob.bat.death";
 	}
 
+	@Override
 	public float getEyeHeight() {
 		return this.height / 2.0F;
 	}
@@ -137,6 +149,7 @@ public class EntityBat extends EntityAmbientCreature {
 	/**
 	 * + Returns the sound this mob makes when it is hurt.
 	 */
+	@Override
 	protected String getHurtSound() {
 		return "mob.bat.hurt";
 	}
@@ -148,6 +161,7 @@ public class EntityBat extends EntityAmbientCreature {
 	/**
 	 * + Returns the sound this mob makes while it's alive.
 	 */
+	@Override
 	protected String getLivingSound() {
 		return this.getIsBatHanging() && this.rand.nextInt(4) != 0 ? null : "mob.bat.idle";
 	}
@@ -155,6 +169,7 @@ public class EntityBat extends EntityAmbientCreature {
 	/**
 	 * + Gets the pitch of living sounds in living entities.
 	 */
+	@Override
 	protected float getSoundPitch() {
 		return super.getSoundPitch() * 0.95F;
 	}
@@ -162,6 +177,7 @@ public class EntityBat extends EntityAmbientCreature {
 	/**
 	 * + Returns the volume for the sounds this mob makes.
 	 */
+	@Override
 	protected float getSoundVolume() {
 		return 0.1F;
 	}
@@ -174,6 +190,7 @@ public class EntityBat extends EntityAmbientCreature {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		super.onUpdate();
 		if (this.getIsBatHanging()) {
@@ -188,6 +205,7 @@ public class EntityBat extends EntityAmbientCreature {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		this.dataWatcher.updateObject(16, Byte.valueOf(nbttagcompound.getByte("BatFlags")));
@@ -203,6 +221,7 @@ public class EntityBat extends EntityAmbientCreature {
 
 	}
 
+	@Override
 	protected void updateAITasks() {
 		super.updateAITasks();
 		BlockPos blockpos = new BlockPos(this);
@@ -253,12 +272,14 @@ public class EntityBat extends EntityAmbientCreature {
 
 	}
 
+	@Override
 	protected void updateFallState(double var1, boolean var3, Block var4, BlockPos var5) {
 	}
 
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		nbttagcompound.setByte("BatFlags", this.dataWatcher.getWatchableObjectByte(16));

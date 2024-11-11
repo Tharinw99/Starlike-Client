@@ -16,13 +16,13 @@ import net.minecraft.item.ItemStack;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -34,13 +34,14 @@ import net.minecraft.item.ItemStack;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockOldLog extends BlockLog {
 	public static PropertyEnum<BlockPlanks.EnumType> VARIANT;
 
 	public static void bootstrapStates() {
 		VARIANT = PropertyEnum.create("variant", BlockPlanks.EnumType.class, new Predicate<BlockPlanks.EnumType>() {
+			@Override
 			public boolean apply(BlockPlanks.EnumType blockplanks$enumtype) {
 				return blockplanks$enumtype.getMetadata() < 4;
 			}
@@ -48,14 +49,17 @@ public class BlockOldLog extends BlockLog {
 	}
 
 	public BlockOldLog() {
+		this.setHardness(5F);
 		this.setDefaultState(this.blockState.getBaseState().withProperty(VARIANT, BlockPlanks.EnumType.OAK)
 				.withProperty(LOG_AXIS, BlockLog.EnumAxis.Y));
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { VARIANT, LOG_AXIS });
 	}
 
+	@Override
 	protected ItemStack createStackedBlock(IBlockState iblockstate) {
 		return new ItemStack(Item.getItemFromBlock(this), 1,
 				((BlockPlanks.EnumType) iblockstate.getValue(VARIANT)).getMetadata());
@@ -66,6 +70,7 @@ public class BlockOldLog extends BlockLog {
 	 * when the block gets destroyed. It returns the metadata of the dropped item
 	 * based on the old metadata of the block.
 	 */
+	@Override
 	public int damageDropped(IBlockState iblockstate) {
 		return ((BlockPlanks.EnumType) iblockstate.getValue(VARIANT)).getMetadata();
 	}
@@ -73,6 +78,7 @@ public class BlockOldLog extends BlockLog {
 	/**
 	 * + Get the MapColor for this Block and the given BlockState
 	 */
+	@Override
 	public MapColor getMapColor(IBlockState iblockstate) {
 		BlockPlanks.EnumType blockplanks$enumtype = (BlockPlanks.EnumType) iblockstate.getValue(VARIANT);
 		switch ((BlockLog.EnumAxis) iblockstate.getValue(LOG_AXIS)) {
@@ -99,6 +105,7 @@ public class BlockOldLog extends BlockLog {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
 		i = i | ((BlockPlanks.EnumType) iblockstate.getValue(VARIANT)).getMetadata();
@@ -119,6 +126,7 @@ public class BlockOldLog extends BlockLog {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		IBlockState iblockstate = this.getDefaultState().withProperty(VARIANT,
 				BlockPlanks.EnumType.byMetadata((i & 3) % 4));
@@ -143,6 +151,7 @@ public class BlockOldLog extends BlockLog {
 	 * + returns a list of blocks with the same ID, but different meta (eg: wood
 	 * returns 4 blocks)
 	 */
+	@Override
 	public void getSubBlocks(Item item, CreativeTabs var2, List<ItemStack> list) {
 		list.add(new ItemStack(item, 1, BlockPlanks.EnumType.OAK.getMetadata()));
 		list.add(new ItemStack(item, 1, BlockPlanks.EnumType.SPRUCE.getMetadata()));

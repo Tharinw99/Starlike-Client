@@ -8,7 +8,7 @@ import net.minecraft.client.Minecraft;
 
 /**
  * Copyright (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -20,7 +20,7 @@ import net.minecraft.client.Minecraft;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class RelayServer {
 
@@ -88,13 +88,14 @@ public class RelayServer {
 	}
 
 	public RelayServerSocket openSocket() {
-		return PlatformWebRTC.openRelayConnection(address, Minecraft.getMinecraft().gameSettings.relayTimeout * 1000);
+		return RelayQueryDispatch.openRelayConnection(address,
+				Minecraft.getMinecraft().gameSettings.relayTimeout * 1000);
 	}
 
 	public void ping() {
 		if (PlatformWebRTC.supported()) {
 			close();
-			query = PlatformWebRTC.openRelayQuery(address);
+			query = RelayQueryDispatch.openRelayQuery(address);
 			queriedVersion = -1;
 			queriedComment = null;
 			queriedVendor = null;

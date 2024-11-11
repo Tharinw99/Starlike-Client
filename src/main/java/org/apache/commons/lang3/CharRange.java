@@ -32,7 +32,7 @@ import java.util.NoSuchElementException;
  * <p>
  * #ThreadSafe#
  * </p>
- * 
+ *
  * @since 1.0
  */
 // TODO: This is no longer public and will be removed later as CharSet is moved
@@ -387,7 +387,7 @@ final class CharRange implements Iterable<Character>, Serializable {
 	 * <p>
 	 * #NotThreadSafe# the iterator is not thread-safe
 	 * </p>
-	 * 
+	 *
 	 * @return an iterator to the chars represented by this range
 	 * @since 2.5
 	 */

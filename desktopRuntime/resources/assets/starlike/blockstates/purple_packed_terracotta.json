@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "normal": {
-            "model": "starlike:purple_packed_terracotta"
-        }
+  "variants": {
+    "normal": {
+      "model": "starlike:purple_packed_terracotta"
     }
+  }
 }

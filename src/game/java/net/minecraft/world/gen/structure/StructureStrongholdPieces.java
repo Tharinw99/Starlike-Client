@@ -22,13 +22,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -40,7 +40,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class StructureStrongholdPieces {
 	public static class ChestCorridor extends StructureStrongholdPieces.Stronghold {
@@ -89,6 +89,7 @@ public class StructureStrongholdPieces {
 			this.boundingBox = parStructureBoundingBox;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			if (this.isLiquidInStructureBoundingBox(world, structureboundingbox)) {
@@ -133,16 +134,19 @@ public class StructureStrongholdPieces {
 			}
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
 				EaglercraftRandom random) {
 			this.getNextComponentNormal((StructureStrongholdPieces.Stairs2) structurecomponent, list, random, 1, 1);
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			super.readStructureFromNBT(nbttagcompound);
 			this.hasMadeChest = nbttagcompound.getBoolean("Chest");
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			super.writeStructureToNBT(nbttagcompound);
 			nbttagcompound.setBoolean("Chest", this.hasMadeChest);
@@ -189,6 +193,7 @@ public class StructureStrongholdPieces {
 					: parStructureBoundingBox.getZSize();
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			if (this.isLiquidInStructureBoundingBox(world, structureboundingbox)) {
@@ -220,11 +225,13 @@ public class StructureStrongholdPieces {
 			}
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			super.readStructureFromNBT(nbttagcompound);
 			this.field_74993_a = nbttagcompound.getInteger("Steps");
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			super.writeStructureToNBT(nbttagcompound);
 			nbttagcompound.setInteger("Steps", this.field_74993_a);
@@ -265,6 +272,7 @@ public class StructureStrongholdPieces {
 			this.field_74999_h = parRandom.nextInt(3) > 0;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			if (this.isLiquidInStructureBoundingBox(world, structureboundingbox)) {
@@ -326,6 +334,7 @@ public class StructureStrongholdPieces {
 			}
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
 				EaglercraftRandom random) {
 			int i = 3;
@@ -354,6 +363,7 @@ public class StructureStrongholdPieces {
 
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			super.readStructureFromNBT(nbttagcompound);
 			this.field_74996_b = nbttagcompound.getBoolean("leftLow");
@@ -362,6 +372,7 @@ public class StructureStrongholdPieces {
 			this.field_74999_h = nbttagcompound.getBoolean("rightHigh");
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			super.writeStructureToNBT(nbttagcompound);
 			nbttagcompound.setBoolean("leftLow", this.field_74996_b);
@@ -395,6 +406,7 @@ public class StructureStrongholdPieces {
 			this.boundingBox = parStructureBoundingBox;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			if (this.isLiquidInStructureBoundingBox(world, structureboundingbox)) {
@@ -415,6 +427,7 @@ public class StructureStrongholdPieces {
 			}
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
 				EaglercraftRandom random) {
 			if (this.coordBaseMode != EnumFacing.NORTH && this.coordBaseMode != EnumFacing.EAST) {
@@ -465,6 +478,7 @@ public class StructureStrongholdPieces {
 			this.isLargeRoom = parStructureBoundingBox.getYSize() > 6;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			if (this.isLiquidInStructureBoundingBox(world, structureboundingbox)) {
@@ -593,11 +607,13 @@ public class StructureStrongholdPieces {
 			}
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			super.readStructureFromNBT(nbttagcompound);
 			this.isLargeRoom = nbttagcompound.getBoolean("Tall");
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			super.writeStructureToNBT(nbttagcompound);
 			nbttagcompound.setBoolean("Tall", this.isLargeRoom);
@@ -650,6 +666,7 @@ public class StructureStrongholdPieces {
 			this.boundingBox = parStructureBoundingBox;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			this.fillWithRandomizedBlocks(world, structureboundingbox, 0, 0, 0, 10, 7, 15, false, random,
@@ -771,6 +788,7 @@ public class StructureStrongholdPieces {
 			return true;
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> var2,
 				EaglercraftRandom var3) {
 			if (structurecomponent != null) {
@@ -779,11 +797,13 @@ public class StructureStrongholdPieces {
 
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			super.readStructureFromNBT(nbttagcompound);
 			this.hasSpawner = nbttagcompound.getBoolean("Mob");
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			super.writeStructureToNBT(nbttagcompound);
 			nbttagcompound.setBoolean("Mob", this.hasSpawner);
@@ -814,6 +834,7 @@ public class StructureStrongholdPieces {
 			this.boundingBox = parStructureBoundingBox;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			if (this.isLiquidInStructureBoundingBox(world, structureboundingbox)) {
@@ -854,6 +875,7 @@ public class StructureStrongholdPieces {
 			}
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
 				EaglercraftRandom random) {
 			this.getNextComponentNormal((StructureStrongholdPieces.Stairs2) structurecomponent, list, random, 1, 1);
@@ -861,6 +883,7 @@ public class StructureStrongholdPieces {
 	}
 
 	public static class RightTurn extends StructureStrongholdPieces.LeftTurn {
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			if (this.isLiquidInStructureBoundingBox(world, structureboundingbox)) {
@@ -881,6 +904,7 @@ public class StructureStrongholdPieces {
 			}
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
 				EaglercraftRandom random) {
 			if (this.coordBaseMode != EnumFacing.NORTH && this.coordBaseMode != EnumFacing.EAST) {
@@ -928,6 +952,7 @@ public class StructureStrongholdPieces {
 			this.roomType = parRandom.nextInt(5);
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			if (this.isLiquidInStructureBoundingBox(world, structureboundingbox)) {
@@ -1041,6 +1066,7 @@ public class StructureStrongholdPieces {
 			}
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
 				EaglercraftRandom random) {
 			this.getNextComponentNormal((StructureStrongholdPieces.Stairs2) structurecomponent, list, random, 4, 1);
@@ -1048,11 +1074,13 @@ public class StructureStrongholdPieces {
 			this.getNextComponentZ((StructureStrongholdPieces.Stairs2) structurecomponent, list, random, 1, 4);
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			super.readStructureFromNBT(nbttagcompound);
 			this.roomType = nbttagcompound.getInteger("Type");
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			super.writeStructureToNBT(nbttagcompound);
 			nbttagcompound.setInteger("Type", this.roomType);
@@ -1102,6 +1130,7 @@ public class StructureStrongholdPieces {
 			this.boundingBox = parStructureBoundingBox;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			if (this.isLiquidInStructureBoundingBox(world, structureboundingbox)) {
@@ -1145,6 +1174,7 @@ public class StructureStrongholdPieces {
 			}
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
 				EaglercraftRandom random) {
 			if (this.field_75024_a) {
@@ -1154,11 +1184,13 @@ public class StructureStrongholdPieces {
 			this.getNextComponentNormal((StructureStrongholdPieces.Stairs2) structurecomponent, list, random, 1, 1);
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			super.readStructureFromNBT(nbttagcompound);
 			this.field_75024_a = nbttagcompound.getBoolean("Source");
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			super.writeStructureToNBT(nbttagcompound);
 			nbttagcompound.setBoolean("Source", this.field_75024_a);
@@ -1177,6 +1209,7 @@ public class StructureStrongholdPieces {
 			super(0, parRandom, parInt2, parInt3);
 		}
 
+		@Override
 		public BlockPos getBoundingBoxCenter() {
 			return this.strongholdPortalRoom != null ? this.strongholdPortalRoom.getBoundingBoxCenter()
 					: super.getBoundingBoxCenter();
@@ -1207,6 +1240,7 @@ public class StructureStrongholdPieces {
 			this.boundingBox = parStructureBoundingBox;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			if (this.isLiquidInStructureBoundingBox(world, structureboundingbox)) {
@@ -1240,6 +1274,7 @@ public class StructureStrongholdPieces {
 			}
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
 				EaglercraftRandom random) {
 			this.getNextComponentNormal((StructureStrongholdPieces.Stairs2) structurecomponent, list, random, 1, 1);
@@ -1250,6 +1285,7 @@ public class StructureStrongholdPieces {
 		private Stones() {
 		}
 
+		@Override
 		public void selectBlocks(EaglercraftRandom random, int var2, int var3, int var4, boolean flag) {
 			if (flag) {
 				float f = random.nextFloat();
@@ -1300,6 +1336,7 @@ public class StructureStrongholdPieces {
 			this.expandsZ = parRandom.nextInt(2) == 0;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			if (this.isLiquidInStructureBoundingBox(world, structureboundingbox)) {
@@ -1332,6 +1369,7 @@ public class StructureStrongholdPieces {
 			}
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
 				EaglercraftRandom random) {
 			this.getNextComponentNormal((StructureStrongholdPieces.Stairs2) structurecomponent, list, random, 1, 1);
@@ -1345,12 +1383,14 @@ public class StructureStrongholdPieces {
 
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			super.readStructureFromNBT(nbttagcompound);
 			this.expandsX = nbttagcompound.getBoolean("Left");
 			this.expandsZ = nbttagcompound.getBoolean("Right");
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			super.writeStructureToNBT(nbttagcompound);
 			nbttagcompound.setBoolean("Left", this.expandsX);
@@ -1548,11 +1588,13 @@ public class StructureStrongholdPieces {
 
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			this.field_143013_d = StructureStrongholdPieces.Stronghold.Door
 					.valueOf(nbttagcompound.getString("EntryDoor"));
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			nbttagcompound.setString("EntryDoor", this.field_143013_d.name());
 		}
@@ -1569,10 +1611,12 @@ public class StructureStrongholdPieces {
 			new StructureStrongholdPieces.PieceWeight(StructureStrongholdPieces.Crossing.class, 5, 4),
 			new StructureStrongholdPieces.PieceWeight(StructureStrongholdPieces.ChestCorridor.class, 5, 4),
 			new StructureStrongholdPieces.PieceWeight(StructureStrongholdPieces.Library.class, 10, 2) {
+				@Override
 				public boolean canSpawnMoreStructuresOfType(int parInt1) {
 					return super.canSpawnMoreStructuresOfType(parInt1) && parInt1 > 4;
 				}
 			}, new StructureStrongholdPieces.PieceWeight(StructureStrongholdPieces.PortalRoom.class, 20, 1) {
+				@Override
 				public boolean canSpawnMoreStructuresOfType(int i) {
 					return super.canSpawnMoreStructuresOfType(i) && i > 5;
 				}

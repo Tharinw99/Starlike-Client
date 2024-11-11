@@ -13,6 +13,7 @@ import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
 import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.GameMessagePacket;
 import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketVoiceSignalAllowedEAG;
+import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketVoiceSignalConnectAnnounceV4EAG;
 import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketVoiceSignalConnectV3EAG;
 import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketVoiceSignalConnectV4EAG;
 import net.lax1dude.eaglercraft.v1_8.socket.protocol.pkt.server.SPacketVoiceSignalDescEAG;
@@ -24,7 +25,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -36,7 +37,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class IntegratedVoiceService {
 
@@ -98,13 +99,27 @@ public class IntegratedVoiceService {
 	}
 
 	public void handleVoiceSignalPacketTypeConnect(EntityPlayerMP sender) {
-		if (voicePlayers.containsKey(sender.getUniqueID())) {
+		EaglercraftUUID senderUuid = sender.getUniqueID();
+		if (voicePlayers.containsKey(senderUuid)) {
 			return;
 		}
 		boolean hasNoOtherPlayers = voicePlayers.isEmpty();
-		voicePlayers.put(sender.getUniqueID(), sender);
+		voicePlayers.put(senderUuid, sender);
 		if (hasNoOtherPlayers) {
 			return;
+		}
+		GameMessagePacket v3p = null;
+		GameMessagePacket v4p = null;
+		for (EntityPlayerMP conn : voicePlayers.values()) {
+			if (conn.playerNetServerHandler.getEaglerMessageProtocol().ver <= 3) {
+				conn.playerNetServerHandler.sendEaglerMessage(v3p == null
+						? (v3p = new SPacketVoiceSignalConnectV3EAG(senderUuid.msb, senderUuid.lsb, true, false))
+						: v3p);
+			} else {
+				conn.playerNetServerHandler.sendEaglerMessage(
+						v4p == null ? (v4p = new SPacketVoiceSignalConnectAnnounceV4EAG(senderUuid.msb, senderUuid.lsb))
+								: v4p);
+			}
 		}
 		Collection<SPacketVoiceSignalGlobalEAG.UserData> userDatas = new ArrayList<>(voicePlayers.size());
 		for (EntityPlayerMP player : voicePlayers.values()) {

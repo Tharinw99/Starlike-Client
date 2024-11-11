@@ -7,13 +7,13 @@ import net.minecraft.item.ItemStack;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -25,7 +25,7 @@ import net.minecraft.item.ItemStack;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ContainerHopper extends Container {
 	private final IInventory hopperInventory;
@@ -51,6 +51,7 @@ public class ContainerHopper extends Container {
 
 	}
 
+	@Override
 	public boolean canInteractWith(EntityPlayer entityplayer) {
 		return this.hopperInventory.isUseableByPlayer(entityplayer);
 	}
@@ -58,6 +59,7 @@ public class ContainerHopper extends Container {
 	/**
 	 * + Called when the container is closed.
 	 */
+	@Override
 	public void onContainerClosed(EntityPlayer entityplayer) {
 		super.onContainerClosed(entityplayer);
 		this.hopperInventory.closeInventory(entityplayer);
@@ -66,6 +68,7 @@ public class ContainerHopper extends Container {
 	/**
 	 * + Take a stack from the specified inventory slot.
 	 */
+	@Override
 	public ItemStack transferStackInSlot(EntityPlayer var1, int i) {
 		ItemStack itemstack = null;
 		Slot slot = (Slot) this.inventorySlots.get(i);

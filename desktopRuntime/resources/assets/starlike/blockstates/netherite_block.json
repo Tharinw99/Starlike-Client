@@ -1,7 +1,7 @@
 {
   "variants": {
-      "normal": {
-          "model": "starlike:netherite_block"
-      }
+    "normal": {
+      "model": "starlike:netherite_block"
+    }
   }
 }

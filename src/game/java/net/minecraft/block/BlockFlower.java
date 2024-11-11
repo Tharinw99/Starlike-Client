@@ -20,13 +20,13 @@ import net.minecraft.util.IStringSerializable;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,7 +38,7 @@ import net.minecraft.util.IStringSerializable;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class BlockFlower extends BlockBush {
 	public static enum EnumFlowerColor {
@@ -70,6 +70,7 @@ public abstract class BlockFlower extends BlockBush {
 				final BlockFlower.EnumFlowerColor blockflower$enumflowercolor = colors[i];
 				Collection collection = Collections2.filter(Lists.newArrayList(values()),
 						new Predicate<BlockFlower.EnumFlowerType>() {
+							@Override
 							public boolean apply(BlockFlower.EnumFlowerType blockflower$enumflowertype) {
 								return blockflower$enumflowertype.getBlockType() == blockflower$enumflowercolor;
 							}
@@ -123,6 +124,7 @@ public abstract class BlockFlower extends BlockBush {
 			return this.meta;
 		}
 
+		@Override
 		public String getName() {
 			return this.name;
 		}
@@ -131,6 +133,7 @@ public abstract class BlockFlower extends BlockBush {
 			return this.unlocalizedName;
 		}
 
+		@Override
 		public String toString() {
 			return this.name;
 		}
@@ -144,6 +147,7 @@ public abstract class BlockFlower extends BlockBush {
 						: BlockFlower.EnumFlowerType.DANDELION));
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { this.getTypeProperty() });
 	}
@@ -153,6 +157,7 @@ public abstract class BlockFlower extends BlockBush {
 	 * when the block gets destroyed. It returns the metadata of the dropped item
 	 * based on the old metadata of the block.
 	 */
+	@Override
 	public int damageDropped(IBlockState iblockstate) {
 		return ((BlockFlower.EnumFlowerType) iblockstate.getValue(this.getTypeProperty())).getMeta();
 	}
@@ -162,6 +167,7 @@ public abstract class BlockFlower extends BlockBush {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		return ((BlockFlower.EnumFlowerType) iblockstate.getValue(this.getTypeProperty())).getMeta();
 	}
@@ -170,6 +176,7 @@ public abstract class BlockFlower extends BlockBush {
 	 * + Get the OffsetType for this Block. Determines if the model is rendered
 	 * slightly offset.
 	 */
+	@Override
 	public Block.EnumOffsetType getOffsetType() {
 		return Block.EnumOffsetType.XZ;
 	}
@@ -177,6 +184,7 @@ public abstract class BlockFlower extends BlockBush {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(this.getTypeProperty(),
 				BlockFlower.EnumFlowerType.getType(this.getBlockType(), i));
@@ -186,6 +194,7 @@ public abstract class BlockFlower extends BlockBush {
 	 * + returns a list of blocks with the same ID, but different meta (eg: wood
 	 * returns 4 blocks)
 	 */
+	@Override
 	public void getSubBlocks(Item item, CreativeTabs var2, List<ItemStack> list) {
 		BlockFlower.EnumFlowerType[] flowerTypes = BlockFlower.EnumFlowerType.getTypes(this.getBlockType());
 		for (int i = 0; i < flowerTypes.length; ++i) {
@@ -198,6 +207,7 @@ public abstract class BlockFlower extends BlockBush {
 		if (this.type == null) {
 			this.type = PropertyEnum.create("type", BlockFlower.EnumFlowerType.class,
 					new Predicate<BlockFlower.EnumFlowerType>() {
+						@Override
 						public boolean apply(BlockFlower.EnumFlowerType blockflower$enumflowertype) {
 							return blockflower$enumflowertype.getBlockType() == BlockFlower.this.getBlockType();
 						}

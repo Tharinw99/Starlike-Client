@@ -50,13 +50,13 @@ import net.starlikeclient.minecraft.init.ItemsStarlike;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -68,17 +68,17 @@ import net.starlikeclient.minecraft.init.ItemsStarlike;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class Item {
 	public static enum ToolMaterial {
 		// MATERIAL(HARVEST_LEVEL, DURABILITY, EFFICIENCY, DAMAGE, ENCHANTABILITY)
-		WOOD(0, 59, 2.0F, 0.0F, 15), STONE(1, 131, 4.0F, 1.0F, 5), IRON(2, 250, 6.0F, 2.0F, 14),
-		DIAMOND(3, 1561, 8.0F, 3.0F, 10), GOLD(0, 32, 12.0F, 0.0F, 22), NETHERITE(4, 2031, 9.0F, 4.0F, 15),
-		PLATINUM(5, 2031, 10.0F, 5.0F, 13), PLATINUM_DRILL(5, 2500, 50.0F, 4.0F, 14),
-		TITANIUM_DRILL(6, 4750, 70.0F, 6.0F, 18), SPEED_DRILL(6, 7500, 200.0F, 6.0F, 18),
-		POWER_DRILL(7, 8500, 50.0F, 6.0F, 18), LATE_GAME_DRILL(8, 8000, 300.0F, 7.0F, 24),
-		OP_DRILL(9, 15000, 500.0F, 8.0F, 30);
+		ZERO(0, 0, 0.0F, 0.0F, 0), WOOD(0, 59, 2.0F, 0.0F, 15), STONE(1, 131, 4.0F, 1.0F, 5),
+		IRON(2, 250, 6.0F, 2.0F, 14), DIAMOND(3, 1561, 8.0F, 3.0F, 10), GOLD(0, 32, 12.0F, 0.0F, 22),
+		NETHERITE(4, 2031, 9.0F, 4.0F, 15), PLATINUM(5, 2031, 10.0F, 5.0F, 13),
+		PLATINUM_DRILL(5, 2500, 50.0F, 4.0F, 14), TITANIUM_DRILL(6, 4750, 70.0F, 6.0F, 18),
+		SPEED_DRILL(6, 7500, 200.0F, 6.0F, 18), POWER_DRILL(7, 8500, 50.0F, 6.0F, 18),
+		LATE_GAME_DRILL(8, 8000, 300.0F, 7.0F, 24), OP_DRILL(9, 15000, 500.0F, 8.0F, 30);
 
 		private final int harvestLevel;
 		private final int maxUses;
@@ -117,6 +117,8 @@ public class Item {
 
 		public Item getRepairItem() {
 			switch (this) {
+			case ZERO:
+				return null;
 			case WOOD:
 				return Item.getItemFromBlock(Blocks.planks);
 			case STONE:
@@ -193,22 +195,24 @@ public class Item {
 	/**
 	 * + Register the given Item as the ItemBlock for the given Block.
 	 */
-	public static void registerItemBlock(Block blockIn) {
-		registerItemBlock(blockIn, new ItemBlock(blockIn));
+	public static Item registerItemBlock(Block blockIn) {
+		return registerItemBlock(blockIn, new ItemBlock(blockIn));
 	}
 
 	/**
 	 * + Register the given Item as the ItemBlock for the given Block.
 	 */
-	public static void registerItemBlock(Block blockIn, Item itemIn) {
+	public static Item registerItemBlock(Block blockIn, Item itemIn) {
 		registerItem(Block.getIdFromBlock(blockIn), (ResourceLocation) Block.blockRegistry.getNameForObject(blockIn),
 				itemIn);
 		BLOCK_TO_ITEM.put(blockIn, itemIn);
+		return itemIn;
 	}
 
 	public static void registerItems() {
 		registerItemBlock(Blocks.stone,
 				(new ItemMultiTexture(Blocks.stone, Blocks.stone, new Function<ItemStack, String>() {
+					@Override
 					public String apply(ItemStack itemstack) {
 						return BlockStone.EnumType.byMetadata(itemstack.getMetadata()).getUnlocalizedName();
 					}
@@ -216,6 +220,7 @@ public class Item {
 		registerItemBlock(Blocks.grass, new ItemColored(Blocks.grass, false));
 		registerItemBlock(Blocks.dirt,
 				(new ItemMultiTexture(Blocks.dirt, Blocks.dirt, new Function<ItemStack, String>() {
+					@Override
 					public String apply(ItemStack itemstack) {
 						return BlockDirt.DirtType.byMetadata(itemstack.getMetadata()).getUnlocalizedName();
 					}
@@ -223,12 +228,14 @@ public class Item {
 		registerItemBlock(Blocks.cobblestone);
 		registerItemBlock(Blocks.planks,
 				(new ItemMultiTexture(Blocks.planks, Blocks.planks, new Function<ItemStack, String>() {
+					@Override
 					public String apply(ItemStack itemstack) {
 						return BlockPlanks.EnumType.byMetadata(itemstack.getMetadata()).getUnlocalizedName();
 					}
 				})).setUnlocalizedName("wood"));
 		registerItemBlock(Blocks.sapling,
 				(new ItemMultiTexture(Blocks.sapling, Blocks.sapling, new Function<ItemStack, String>() {
+					@Override
 					public String apply(ItemStack itemstack) {
 						return BlockPlanks.EnumType.byMetadata(itemstack.getMetadata()).getUnlocalizedName();
 					}
@@ -236,6 +243,7 @@ public class Item {
 		registerItemBlock(Blocks.bedrock);
 		registerItemBlock(Blocks.sand,
 				(new ItemMultiTexture(Blocks.sand, Blocks.sand, new Function<ItemStack, String>() {
+					@Override
 					public String apply(ItemStack itemstack) {
 						return BlockSand.EnumType.byMetadata(itemstack.getMetadata()).getUnlocalizedName();
 					}
@@ -245,12 +253,14 @@ public class Item {
 		registerItemBlock(Blocks.iron_ore);
 		registerItemBlock(Blocks.coal_ore);
 		registerItemBlock(Blocks.log, (new ItemMultiTexture(Blocks.log, Blocks.log, new Function<ItemStack, String>() {
+			@Override
 			public String apply(ItemStack itemstack) {
 				return BlockPlanks.EnumType.byMetadata(itemstack.getMetadata()).getUnlocalizedName();
 			}
 		})).setUnlocalizedName("log"));
 		registerItemBlock(Blocks.log2,
 				(new ItemMultiTexture(Blocks.log2, Blocks.log2, new Function<ItemStack, String>() {
+					@Override
 					public String apply(ItemStack itemstack) {
 						return BlockPlanks.EnumType.byMetadata(itemstack.getMetadata() + 4).getUnlocalizedName();
 					}
@@ -259,6 +269,7 @@ public class Item {
 		registerItemBlock(Blocks.leaves2, (new ItemLeaves(Blocks.leaves2)).setUnlocalizedName("leaves"));
 		registerItemBlock(Blocks.sponge,
 				(new ItemMultiTexture(Blocks.sponge, Blocks.sponge, new Function<ItemStack, String>() {
+					@Override
 					public String apply(ItemStack itemstack) {
 						return (itemstack.getMetadata() & 1) == 1 ? "wet" : "dry";
 					}
@@ -269,6 +280,7 @@ public class Item {
 		registerItemBlock(Blocks.dispenser);
 		registerItemBlock(Blocks.sandstone,
 				(new ItemMultiTexture(Blocks.sandstone, Blocks.sandstone, new Function<ItemStack, String>() {
+					@Override
 					public String apply(ItemStack itemstack) {
 						return BlockSandStone.EnumType.byMetadata(itemstack.getMetadata()).getUnlocalizedName();
 					}
@@ -285,6 +297,7 @@ public class Item {
 		registerItemBlock(Blocks.wool, (new ItemCloth(Blocks.wool)).setUnlocalizedName("cloth"));
 		registerItemBlock(Blocks.yellow_flower,
 				(new ItemMultiTexture(Blocks.yellow_flower, Blocks.yellow_flower, new Function<ItemStack, String>() {
+					@Override
 					public String apply(ItemStack itemstack) {
 						return BlockFlower.EnumFlowerType
 								.getType(BlockFlower.EnumFlowerColor.YELLOW, itemstack.getMetadata())
@@ -293,6 +306,7 @@ public class Item {
 				})).setUnlocalizedName("flower"));
 		registerItemBlock(Blocks.red_flower,
 				(new ItemMultiTexture(Blocks.red_flower, Blocks.red_flower, new Function<ItemStack, String>() {
+					@Override
 					public String apply(ItemStack itemstack) {
 						return BlockFlower.EnumFlowerType
 								.getType(BlockFlower.EnumFlowerColor.RED, itemstack.getMetadata()).getUnlocalizedName();
@@ -350,12 +364,14 @@ public class Item {
 		registerItemBlock(Blocks.trapdoor);
 		registerItemBlock(Blocks.monster_egg,
 				(new ItemMultiTexture(Blocks.monster_egg, Blocks.monster_egg, new Function<ItemStack, String>() {
+					@Override
 					public String apply(ItemStack itemstack) {
 						return BlockSilverfish.EnumType.byMetadata(itemstack.getMetadata()).getUnlocalizedName();
 					}
 				})).setUnlocalizedName("monsterStoneEgg"));
 		registerItemBlock(Blocks.stonebrick,
 				(new ItemMultiTexture(Blocks.stonebrick, Blocks.stonebrick, new Function<ItemStack, String>() {
+					@Override
 					public String apply(ItemStack itemstack) {
 						return BlockStoneBrick.EnumType.byMetadata(itemstack.getMetadata()).getUnlocalizedName();
 					}
@@ -399,6 +415,7 @@ public class Item {
 		registerItemBlock(Blocks.beacon);
 		registerItemBlock(Blocks.cobblestone_wall, (new ItemMultiTexture(Blocks.cobblestone_wall,
 				Blocks.cobblestone_wall, new Function<ItemStack, String>() {
+					@Override
 					public String apply(ItemStack itemstack) {
 						return BlockWall.EnumType.byMetadata(itemstack.getMetadata()).getUnlocalizedName();
 					}
@@ -431,6 +448,7 @@ public class Item {
 		registerItemBlock(Blocks.slime_block);
 		registerItemBlock(Blocks.double_plant,
 				(new ItemDoublePlant(Blocks.double_plant, Blocks.double_plant, new Function<ItemStack, String>() {
+					@Override
 					public String apply(ItemStack itemstack) {
 						return BlockDoublePlant.EnumPlantType.byMetadata(itemstack.getMetadata()).getUnlocalizedName();
 					}
@@ -441,6 +459,7 @@ public class Item {
 				(new ItemCloth(Blocks.stained_glass_pane)).setUnlocalizedName("stainedGlassPane"));
 		registerItemBlock(Blocks.prismarine,
 				(new ItemMultiTexture(Blocks.prismarine, Blocks.prismarine, new Function<ItemStack, String>() {
+					@Override
 					public String apply(ItemStack itemstack) {
 						return BlockPrismarine.EnumType.byMetadata(itemstack.getMetadata()).getUnlocalizedName();
 					}
@@ -448,6 +467,7 @@ public class Item {
 		registerItemBlock(Blocks.sea_lantern);
 		registerItemBlock(Blocks.red_sandstone,
 				(new ItemMultiTexture(Blocks.red_sandstone, Blocks.red_sandstone, new Function<ItemStack, String>() {
+					@Override
 					public String apply(ItemStack itemstack) {
 						return BlockRedSandstone.EnumType.byMetadata(itemstack.getMetadata()).getUnlocalizedName();
 					}
@@ -792,6 +812,8 @@ public class Item {
 
 	private String unlocalizedName;
 
+	private boolean isImmuneToFire = false;
+
 	/**
 	 * + allows items to add custom lines of information to the mouseover
 	 * description
@@ -1002,6 +1024,10 @@ public class Item {
 		return this.bFull3D;
 	}
 
+	public boolean isImmuneToFire() {
+		return this.isImmuneToFire;
+	}
+
 	/**
 	 * + Checks isDamagable and if it cannot be stacked
 	 */
@@ -1104,6 +1130,11 @@ public class Item {
 
 	protected Item setHasSubtypes(boolean hasSubtypes) {
 		this.hasSubtypes = hasSubtypes;
+		return this;
+	}
+
+	public Item setIsImmuneToFire(boolean isImmuneToFire) {
+		this.isImmuneToFire = isImmuneToFire;
 		return this;
 	}
 

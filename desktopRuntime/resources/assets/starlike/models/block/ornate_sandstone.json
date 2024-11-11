@@ -1,6 +1,6 @@
 {
-    "parent": "block/cube_all",
-    "textures": {
-        "all": "starlike:blocks/ornate_sandstone"
-    }
+  "parent": "block/cube_all",
+  "textures": {
+    "all": "starlike:blocks/ornate_sandstone"
+  }
 }

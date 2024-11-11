@@ -27,6 +27,7 @@ import net.lax1dude.eaglercraft.v1_8.internal.EnumPlatformType;
 import net.lax1dude.eaglercraft.v1_8.internal.KeyboardConstants;
 import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
 import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
+import net.lax1dude.eaglercraft.v1_8.minecraft.GuiScreenVideoSettingsWarning;
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.EaglerDeferredConfig;
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.EaglerDeferredPipeline;
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.dynamiclights.DynamicLightsStateManager;
@@ -48,13 +49,13 @@ import net.minecraft.world.EnumDifficulty;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -66,7 +67,7 @@ import net.minecraft.world.EnumDifficulty;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GameSettings {
 	public static enum Options {
@@ -245,7 +246,7 @@ public class GameSettings {
 
 	public float mouseSensitivity = 0.5F;
 	public boolean invertMouse;
-	public int renderDistanceChunks = -1;
+	public int renderDistanceChunks = 4;
 	public boolean viewBobbing = true;
 	public boolean anaglyph;
 	public boolean fboEnable = true;
@@ -271,7 +272,7 @@ public class GameSettings {
 	public boolean allowBlockAlternatives = true;
 	public boolean reducedDebugInfo = false;
 	public boolean hideServerAddress;
-	public boolean advancedItemTooltips;
+	public boolean advancedItemTooltips = EagRuntime.getPlatformType() == EnumPlatformType.DESKTOP;
 	/**
 	 * + Whether to pause when the game loses focus, toggled by F3+P
 	 */
@@ -323,30 +324,36 @@ public class GameSettings {
 			new KeyBinding("key.hotbar.7", 8, "key.categories.inventory"),
 			new KeyBinding("key.hotbar.8", 9, "key.categories.inventory"),
 			new KeyBinding("key.hotbar.9", 10, "key.categories.inventory") };
-	public KeyBinding[] keyBindings;
-	protected Minecraft mc;
-	public EnumDifficulty difficulty;
+	public KeyBinding[] keyBindings = (KeyBinding[]) ArrayUtils.addAll(
+			new KeyBinding[] { this.keyBindAttack, this.keyBindUseItem, this.keyBindForward, this.keyBindLeft,
+					this.keyBindBack, this.keyBindRight, this.keyBindJump, this.keyBindSneak, this.keyBindSprint,
+					this.keyBindDrop, this.keyBindInventory, this.keyBindChat, this.keyBindPlayerList,
+					this.keyBindPickBlock, this.keyBindCommand, this.keyBindScreenshot, this.keyBindTogglePerspective,
+					this.keyBindSmoothCamera, this.keyBindZoomCamera, this.keyBindFunction, this.keyBindClose },
+			this.keyBindsHotbar);
+	protected final Minecraft mc;
+	public EnumDifficulty difficulty = EnumDifficulty.NORMAL;
 	public boolean hasCreatedDemoWorld;
-	public int relayTimeout;
-	public boolean hideJoinCode;
+	public int relayTimeout = 4;
+	public boolean hideJoinCode = false;
 	public boolean hideGUI;
 	public int thirdPersonView;
 	public boolean showDebugInfo;
 	public boolean showDebugProfilerChart;
 	public boolean field_181657_aC;
-	public String lastServer;
+	public String lastServer = "";
 	public boolean smoothCamera;
 	public boolean debugCamEnable;
-	public float fovSetting;
-	public float gammaSetting;
+	public float fovSetting = 70.0F;
+	public float gammaSetting = 1.0F;
 	public float saturation;
 	/**
 	 * + GUI scale
 	 */
 	public int guiScale = 3;
 	public int particleSetting = 2;
-	public String language;
-	public boolean forceUnicodeFont;
+	public String language = EagRuntime.getConfiguration().getDefaultLocale();
+	public boolean forceUnicodeFont = false;
 	public boolean hudFps = true;
 	public boolean hudCoords = true;
 	public boolean hudPlayer = false;
@@ -368,12 +375,13 @@ public class GameSettings {
 	public boolean hasShownProfanityFilter = true;
 	public float touchControlOpacity = 1.0f;
 	public boolean hideDefaultUsernameWarning = false;
+	public boolean hideVideoSettingsWarning = EagRuntime.getPlatformType() == EnumPlatformType.DESKTOP;
 
 	public int voiceListenRadius = 16;
 	public float voiceListenVolume = 0.5f;
 	public float voiceSpeakVolume = 0.5f;
 	public int voicePTTKey = 47; // V
-	public EnumScreenRecordingCodec screenRecordCodec;
+	public EnumScreenRecordingCodec screenRecordCodec = ScreenRecordingController.getDefaultCodec();
 	public int screenRecordFPS = ScreenRecordingController.DEFAULT_FPS;
 	public int screenRecordResolution = ScreenRecordingController.DEFAULT_RESOLUTION;
 
@@ -386,24 +394,24 @@ public class GameSettings {
 	public float screenRecordMicVolume = ScreenRecordingController.DEFAULT_MIC_VOLUME;
 
 	public GameSettings(Minecraft mcIn) {
-		this.keyBindings = (KeyBinding[]) ArrayUtils.addAll(new KeyBinding[] { this.keyBindAttack, this.keyBindUseItem,
-				this.keyBindForward, this.keyBindLeft, this.keyBindBack, this.keyBindRight, this.keyBindJump,
-				this.keyBindSneak, this.keyBindSprint, this.keyBindDrop, this.keyBindInventory, this.keyBindChat,
-				this.keyBindPlayerList, this.keyBindPickBlock, this.keyBindCommand, this.keyBindScreenshot,
-				this.keyBindTogglePerspective, this.keyBindSmoothCamera, this.keyBindZoomCamera, this.keyBindFunction,
-				this.keyBindClose }, this.keyBindsHotbar);
-		this.difficulty = EnumDifficulty.NORMAL;
-		this.relayTimeout = 4;
-		this.hideJoinCode = false;
-		this.lastServer = "";
-		this.fovSetting = 70.0F;
-		this.gammaSetting = 1.0F;
-		this.language = EagRuntime.getConfiguration().getDefaultLocale();
-		this.forceUnicodeFont = false;
 		this.mc = mcIn;
-		this.renderDistanceChunks = 4;
-		this.screenRecordCodec = ScreenRecordingController.getDefaultCodec();
 		this.loadOptions();
+	}
+
+	public int checkBadVideoSettings() {
+		return hideVideoSettingsWarning ? 0
+				: ((renderDistanceChunks > 6 ? GuiScreenVideoSettingsWarning.WARNING_RENDER_DISTANCE : 0)
+						| (!enableVsync ? GuiScreenVideoSettingsWarning.WARNING_VSYNC : 0)
+						| (limitFramerate < 30 ? GuiScreenVideoSettingsWarning.WARNING_FRAME_LIMIT : 0));
+	}
+
+	public void fixBadVideoSettings() {
+		if (renderDistanceChunks > 6)
+			renderDistanceChunks = 4;
+		if (!enableVsync)
+			enableVsync = true;
+		if (limitFramerate < 30)
+			limitFramerate = 260;
 	}
 
 	public int func_181147_e() {
@@ -992,6 +1000,10 @@ public class GameSettings {
 						this.hideDefaultUsernameWarning = astring[1].equals("true");
 					}
 
+					if (astring[0].equals("hideVideoSettingsWarning")) {
+						hideVideoSettingsWarning = astring[1].equals("true");
+					}
+
 					deferredShaderConf.readOption(astring[0], astring[1]);
 				} catch (Exception var8) {
 					logger.warn("Skipping bad option: " + s);
@@ -1411,6 +1423,7 @@ public class GameSettings {
 			printwriter.println("screenRecordMicVolume:" + this.screenRecordMicVolume);
 			printwriter.println("touchControlOpacity:" + this.touchControlOpacity);
 			printwriter.println("hideDefaultUsernameWarning:" + this.hideDefaultUsernameWarning);
+			printwriter.println("hideVideoSettingsWarning:" + this.hideVideoSettingsWarning);
 
 			for (KeyBinding keybinding : this.keyBindings) {
 				printwriter.println("key_" + keybinding.getKeyDescription() + ":" + keybinding.getKeyCode());

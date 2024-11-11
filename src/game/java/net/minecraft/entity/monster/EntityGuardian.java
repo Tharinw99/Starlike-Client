@@ -43,13 +43,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -61,7 +61,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityGuardian extends EntityMob {
 	static class AIGuardianAttack extends EntityAIBase {
@@ -73,22 +73,26 @@ public class EntityGuardian extends EntityMob {
 			this.setMutexBits(3);
 		}
 
+		@Override
 		public boolean continueExecuting() {
 			return super.continueExecuting() && (this.theEntity.isElder()
 					|| this.theEntity.getDistanceSqToEntity(this.theEntity.getAttackTarget()) > 9.0D);
 		}
 
+		@Override
 		public void resetTask() {
 			this.theEntity.setTargetedEntity(0);
 			this.theEntity.setAttackTarget((EntityLivingBase) null);
 			this.theEntity.wander.makeUpdate();
 		}
 
+		@Override
 		public boolean shouldExecute() {
 			EntityLivingBase entitylivingbase = this.theEntity.getAttackTarget();
 			return entitylivingbase != null && entitylivingbase.isEntityAlive();
 		}
 
+		@Override
 		public void startExecuting() {
 			this.tickCounter = -10;
 			this.theEntity.getNavigator().clearPathEntity();
@@ -96,6 +100,7 @@ public class EntityGuardian extends EntityMob {
 			this.theEntity.isAirBorne = true;
 		}
 
+		@Override
 		public void updateTask() {
 			EntityLivingBase entitylivingbase = this.theEntity.getAttackTarget();
 			this.theEntity.getNavigator().clearPathEntity();
@@ -140,6 +145,7 @@ public class EntityGuardian extends EntityMob {
 			this.entityGuardian = parEntityGuardian;
 		}
 
+		@Override
 		public void onUpdateMoveHelper() {
 			if (this.update && !this.entityGuardian.getNavigator().noPath()) {
 				double d0 = this.posX - this.entityGuardian.posX;
@@ -195,6 +201,7 @@ public class EntityGuardian extends EntityMob {
 			this.parentEntity = parEntityGuardian;
 		}
 
+		@Override
 		public boolean apply(EntityLivingBase entitylivingbase) {
 			return (entitylivingbase instanceof EntityPlayer || entitylivingbase instanceof EntitySquid)
 					&& entitylivingbase.getDistanceSqToEntity(this.parentEntity) > 9.0D;
@@ -236,12 +243,14 @@ public class EntityGuardian extends EntityMob {
 	/**
 	 * + Causes this Entity to drop a random item.
 	 */
+	@Override
 	protected void addRandomDrop() {
 		ItemStack itemstack = ((WeightedRandomFishable) WeightedRandom.getRandomItem(this.rand,
 				EntityFishHook.func_174855_j())).getItemStack(this.rand);
 		this.entityDropItem(itemstack, 1.0F);
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.attackDamage).setBaseValue(6.0D);
@@ -253,6 +262,7 @@ public class EntityGuardian extends EntityMob {
 	/**
 	 * + Called when the entity is attacked.
 	 */
+	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float f) {
 		if (!this.func_175472_n() && !damagesource.isMagicDamage()
 				&& damagesource.getSourceOfDamage() instanceof EntityLivingBase) {
@@ -271,6 +281,7 @@ public class EntityGuardian extends EntityMob {
 	 * + returns if this entity triggers Block.onEntityWalking on the blocks they
 	 * walk on. used for spiders and wolves to prevent them from trampling crops
 	 */
+	@Override
 	protected boolean canTriggerWalking() {
 		return false;
 	}
@@ -278,6 +289,7 @@ public class EntityGuardian extends EntityMob {
 	/**
 	 * + Drop 0-2 items of this living's type
 	 */
+	@Override
 	protected void dropFewItems(boolean flag, int i) {
 		int j = this.rand.nextInt(3) + this.rand.nextInt(i + 1);
 		if (j > 0) {
@@ -296,6 +308,7 @@ public class EntityGuardian extends EntityMob {
 
 	}
 
+	@Override
 	protected void entityInit() {
 		super.entityInit();
 		this.dataWatcher.addObject(16, Integer.valueOf(0));
@@ -326,6 +339,7 @@ public class EntityGuardian extends EntityMob {
 		return ((float) this.field_175479_bo + parFloat1) / (float) this.func_175464_ck();
 	}
 
+	@Override
 	public float getBlockPathWeight(BlockPos blockpos) {
 		return this.worldObj.getBlockState(blockpos).getBlock().getMaterial() == Material.water
 				? 10.0F + this.worldObj.getLightBrightness(blockpos) - 0.5F
@@ -336,6 +350,7 @@ public class EntityGuardian extends EntityMob {
 	 * + Checks if the entity's current position is a valid location to spawn this
 	 * entity.
 	 */
+	@Override
 	public boolean getCanSpawnHere() {
 		return (this.rand.nextInt(20) == 0 || !this.worldObj.canBlockSeeSky(new BlockPos(this)))
 				&& super.getCanSpawnHere();
@@ -344,11 +359,13 @@ public class EntityGuardian extends EntityMob {
 	/**
 	 * + Returns the sound this mob makes on death.
 	 */
+	@Override
 	protected String getDeathSound() {
 		return !this.isInWater() ? "mob.guardian.land.death"
 				: (this.isElder() ? "mob.guardian.elder.death" : "mob.guardian.death");
 	}
 
+	@Override
 	public float getEyeHeight() {
 		return this.height * 0.5F;
 	}
@@ -356,6 +373,7 @@ public class EntityGuardian extends EntityMob {
 	/**
 	 * + Returns the sound this mob makes when it is hurt.
 	 */
+	@Override
 	protected String getHurtSound() {
 		return !this.isInWater() ? "mob.guardian.land.hit"
 				: (this.isElder() ? "mob.guardian.elder.hit" : "mob.guardian.hit");
@@ -364,6 +382,7 @@ public class EntityGuardian extends EntityMob {
 	/**
 	 * + Returns the sound this mob makes while it's alive.
 	 */
+	@Override
 	protected String getLivingSound() {
 		return !this.isInWater() ? "mob.guardian.land.idle"
 				: (this.isElder() ? "mob.guardian.elder.idle" : "mob.guardian.idle");
@@ -372,6 +391,7 @@ public class EntityGuardian extends EntityMob {
 	/**
 	 * + Returns new PathNavigateGround instance
 	 */
+	@Override
 	protected PathNavigate getNewNavigator(World world) {
 		return new PathNavigateSwimmer(this, world);
 	}
@@ -380,6 +400,7 @@ public class EntityGuardian extends EntityMob {
 	 * + Get number of ticks, at least during which the living entity will be
 	 * silent.
 	 */
+	@Override
 	public int getTalkInterval() {
 		return 160;
 	}
@@ -408,6 +429,7 @@ public class EntityGuardian extends EntityMob {
 	 * + The speed it takes to move the entityliving's rotationPitch through the
 	 * faceEntity method. This is only currently use in wolves.
 	 */
+	@Override
 	public int getVerticalFaceSpeed() {
 		return 180;
 	}
@@ -423,6 +445,7 @@ public class EntityGuardian extends EntityMob {
 	/**
 	 * + Checks that the entity is not colliding with any blocks / liquids
 	 */
+	@Override
 	public boolean isNotColliding() {
 		return this.worldObj.checkNoEntityCollision(this.getEntityBoundingBox(), this)
 				&& this.worldObj.getCollidingBoundingBoxes(this, this.getEntityBoundingBox()).isEmpty();
@@ -438,6 +461,7 @@ public class EntityGuardian extends EntityMob {
 	/**
 	 * + Checks to make sure the light is not too bright where the mob is spawning
 	 */
+	@Override
 	protected boolean isValidLightLevel() {
 		return true;
 	}
@@ -445,6 +469,7 @@ public class EntityGuardian extends EntityMob {
 	/**
 	 * + Moves the entity based on the specified heading. Args: strafe, forward
 	 */
+	@Override
 	public void moveEntityWithHeading(float f, float f1) {
 		if (this.isServerWorld()) {
 			if (this.isInWater()) {
@@ -465,6 +490,7 @@ public class EntityGuardian extends EntityMob {
 
 	}
 
+	@Override
 	public void onDataWatcherUpdate(int i) {
 		super.onDataWatcherUpdate(i);
 		if (i == 16) {
@@ -483,6 +509,7 @@ public class EntityGuardian extends EntityMob {
 	 * required. For example, zombies and skeletons use this to react to sunlight
 	 * and start to burn.
 	 */
+	@Override
 	public void onLivingUpdate() {
 		if (this.worldObj.isRemote) {
 			this.field_175484_c = this.field_175482_b;
@@ -577,6 +604,7 @@ public class EntityGuardian extends EntityMob {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		this.setElder(nbttagcompound.getBoolean("Elder"));
@@ -624,6 +652,7 @@ public class EntityGuardian extends EntityMob {
 		this.dataWatcher.updateObject(17, Integer.valueOf(entityId));
 	}
 
+	@Override
 	protected void updateAITasks() {
 		super.updateAITasks();
 		if (this.isElder()) {
@@ -636,6 +665,7 @@ public class EntityGuardian extends EntityMob {
 
 				List<EntityPlayerMP> lst = this.worldObj.getPlayers(EntityPlayerMP.class,
 						new Predicate<EntityPlayerMP>() {
+							@Override
 							public boolean apply(EntityPlayerMP entityplayermp1) {
 								return EntityGuardian.this.getDistanceSqToEntity(entityplayermp1) < 2500.0D
 										&& entityplayermp1.theItemInWorldManager.survivalOrAdventure();
@@ -662,6 +692,7 @@ public class EntityGuardian extends EntityMob {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		nbttagcompound.setBoolean("Elder", this.isElder());

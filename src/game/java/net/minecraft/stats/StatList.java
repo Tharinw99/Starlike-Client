@@ -19,18 +19,17 @@ import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.ResourceLocation;
-import net.starlikeclient.StarlikeSettings;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -42,7 +41,7 @@ import net.starlikeclient.StarlikeSettings;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class StatList {
 	protected static Map<String, StatBase> oneShotStats = Maps.newHashMap();
@@ -220,7 +219,7 @@ public class StatList {
 			new ChatComponentTranslation("stat.workbenchInteraction", new Object[0]))).registerStat();
 	public static StatBase field_181723_aa = (new StatBasic("stat.chestOpened",
 			new ChatComponentTranslation("stat.chestOpened", new Object[0]))).registerStat();
-	public static final StatBase[] mineBlockStatArray = new StatBase[StarlikeSettings.blockIdLimit];
+	public static final StatBase[] mineBlockStatArray = new StatBase[4096];
 	/**
 	 * + Tracks the number of items a given block or item has been crafted.
 	 */

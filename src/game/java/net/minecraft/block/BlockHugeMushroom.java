@@ -17,13 +17,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -35,7 +35,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockHugeMushroom extends Block {
 	public static enum EnumType implements IStringSerializable {
@@ -75,10 +75,12 @@ public class BlockHugeMushroom extends Block {
 			return this.meta;
 		}
 
+		@Override
 		public String getName() {
 			return this.name;
 		}
 
+		@Override
 		public String toString() {
 			return this.name;
 		}
@@ -99,10 +101,12 @@ public class BlockHugeMushroom extends Block {
 		this.smallBlock = parBlock;
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { VARIANT });
 	}
 
+	@Override
 	public Item getItem(World var1, BlockPos var2) {
 		return Item.getItemFromBlock(this.smallBlock);
 	}
@@ -110,6 +114,7 @@ public class BlockHugeMushroom extends Block {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
 		return Item.getItemFromBlock(this.smallBlock);
 	}
@@ -117,6 +122,7 @@ public class BlockHugeMushroom extends Block {
 	/**
 	 * + Get the MapColor for this Block and the given BlockState
 	 */
+	@Override
 	public MapColor getMapColor(IBlockState iblockstate) {
 		switch ((BlockHugeMushroom.EnumType) iblockstate.getValue(VARIANT)) {
 		case ALL_STEM:
@@ -133,6 +139,7 @@ public class BlockHugeMushroom extends Block {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		return ((BlockHugeMushroom.EnumType) iblockstate.getValue(VARIANT)).getMetadata();
 	}
@@ -140,6 +147,7 @@ public class BlockHugeMushroom extends Block {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(VARIANT, BlockHugeMushroom.EnumType.byMetadata(i));
 	}
@@ -148,6 +156,7 @@ public class BlockHugeMushroom extends Block {
 	 * + Called by ItemBlocks just before a block is actually set in the world, to
 	 * allow for adjustments to the IBlockstate
 	 */
+	@Override
 	public IBlockState onBlockPlaced(World var1, BlockPos var2, EnumFacing var3, float var4, float var5, float var6,
 			int var7, EntityLivingBase var8) {
 		return this.getDefaultState();
@@ -156,6 +165,7 @@ public class BlockHugeMushroom extends Block {
 	/**
 	 * + Returns the quantity of items to drop on block destruction.
 	 */
+	@Override
 	public int quantityDropped(EaglercraftRandom random) {
 		return Math.max(0, random.nextInt(10) - 7);
 	}

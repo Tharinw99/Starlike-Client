@@ -21,13 +21,13 @@ import net.minecraft.world.chunk.IChunkProvider;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -39,7 +39,7 @@ import net.minecraft.world.chunk.IChunkProvider;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ChunkProviderClient implements IChunkProvider {
 	private static final Logger logger = LogManager.getLogger();
@@ -65,6 +65,7 @@ public class ChunkProviderClient implements IChunkProvider {
 	/**
 	 * + Returns if the IChunkProvider supports saving.
 	 */
+	@Override
 	public boolean canSave() {
 		return false;
 	}
@@ -72,22 +73,27 @@ public class ChunkProviderClient implements IChunkProvider {
 	/**
 	 * + Checks to see if a chunk exists at x, z
 	 */
+	@Override
 	public boolean chunkExists(int var1, int var2) {
 		return true;
 	}
 
+	@Override
 	public boolean func_177460_a(IChunkProvider var1, Chunk var2, int var3, int var4) {
 		return false;
 	}
 
+	@Override
 	public int getLoadedChunkCount() {
 		return this.chunkListing.size();
 	}
 
+	@Override
 	public List<BiomeGenBase.SpawnListEntry> getPossibleCreatures(EnumCreatureType var1, BlockPos var2) {
 		return null;
 	}
 
+	@Override
 	public BlockPos getStrongholdGen(World var1, String var2, BlockPos var3) {
 		return null;
 	}
@@ -106,6 +112,7 @@ public class ChunkProviderClient implements IChunkProvider {
 	/**
 	 * + Converts the instance data to a readable string.
 	 */
+	@Override
 	public String makeString() {
 		return "MultiplayerChunkCache: " + this.chunkMapping.getNumHashElements() + ", " + this.chunkListing.size();
 	}
@@ -113,6 +120,7 @@ public class ChunkProviderClient implements IChunkProvider {
 	/**
 	 * + Populates chunk with ores etc etc
 	 */
+	@Override
 	public void populate(IChunkProvider var1, int var2, int var3) {
 	}
 
@@ -121,6 +129,7 @@ public class ChunkProviderClient implements IChunkProvider {
 	 * will generates all the blocks for the specified chunk from the map seed and
 	 * chunk seed
 	 */
+	@Override
 	public Chunk provideChunk(BlockPos blockpos) {
 		return this.provideChunk(blockpos.getX() >> 4, blockpos.getZ() >> 4);
 	}
@@ -130,11 +139,13 @@ public class ChunkProviderClient implements IChunkProvider {
 	 * will generates all the blocks for the specified chunk from the map seed and
 	 * chunk seed
 	 */
+	@Override
 	public Chunk provideChunk(int i, int j) {
 		Chunk chunk = (Chunk) this.chunkMapping.getValueByKey(ChunkCoordIntPair.chunkXZ2Int(i, j));
 		return chunk == null ? this.blankChunk : chunk;
 	}
 
+	@Override
 	public void recreateStructures(Chunk var1, int var2, int var3) {
 	}
 
@@ -143,6 +154,7 @@ public class ChunkProviderClient implements IChunkProvider {
 	 * passed false, save up to two chunks. Return true if all chunks have been
 	 * saved.
 	 */
+	@Override
 	public boolean saveChunks(boolean var1, IProgressUpdate var2) {
 		return true;
 	}
@@ -151,6 +163,7 @@ public class ChunkProviderClient implements IChunkProvider {
 	 * + Save extra data not associated with any Chunk. Not saved during autosave,
 	 * only during world unload. Currently unimplemented.
 	 */
+	@Override
 	public void saveExtraData() {
 	}
 
@@ -172,6 +185,7 @@ public class ChunkProviderClient implements IChunkProvider {
 	 * + Unloads chunks that are marked to be unloaded. This is not guaranteed to
 	 * unload every such chunk.
 	 */
+	@Override
 	public boolean unloadQueuedChunks() {
 		long i = EagRuntime.steadyTimeMillis();
 

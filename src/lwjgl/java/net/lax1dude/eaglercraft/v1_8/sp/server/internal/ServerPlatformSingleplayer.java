@@ -8,12 +8,14 @@ import net.lax1dude.eaglercraft.v1_8.Filesystem;
 import net.lax1dude.eaglercraft.v1_8.internal.IClientConfigAdapter;
 import net.lax1dude.eaglercraft.v1_8.internal.IEaglerFilesystem;
 import net.lax1dude.eaglercraft.v1_8.internal.IPCPacketData;
+import net.lax1dude.eaglercraft.v1_8.internal.PlatformWebRTC;
 import net.lax1dude.eaglercraft.v1_8.internal.lwjgl.DesktopClientConfigAdapter;
+import net.lax1dude.eaglercraft.v1_8.sp.server.IWASMCrashCallback;
 import net.lax1dude.eaglercraft.v1_8.sp.server.internal.lwjgl.MemoryConnection;
 
 /**
  * Copyright (c) 2023-2024 lax1dude, ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -25,7 +27,7 @@ import net.lax1dude.eaglercraft.v1_8.sp.server.internal.lwjgl.MemoryConnection;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ServerPlatformSingleplayer {
 
@@ -83,9 +85,20 @@ public class ServerPlatformSingleplayer {
 	}
 
 	public static void sendPacket(IPCPacketData packet) {
+		if (PlatformWebRTC.serverLANPeerPassIPC(packet)) {
+			return;
+		}
 		synchronized (MemoryConnection.serverToClientQueue) {
 			MemoryConnection.serverToClientQueue.add(packet);
 		}
+	}
+
+	public static void setCrashCallbackWASM(IWASMCrashCallback callback) {
+
+	}
+
+	public static boolean isTabAboutToCloseWASM() {
+		return false;
 	}
 
 }

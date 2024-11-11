@@ -9,13 +9,13 @@ import net.minecraft.network.play.server.S30PacketWindowItems;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@ import net.minecraft.network.play.server.S30PacketWindowItems;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ContainerBeacon extends Container {
 	class BeaconSlot extends Slot {
@@ -35,10 +35,12 @@ public class ContainerBeacon extends Container {
 			super(parIInventory, parInt1, parInt2, parInt3);
 		}
 
+		@Override
 		public int getSlotStackLimit() {
 			return 1;
 		}
 
+		@Override
 		public boolean isItemValid(ItemStack itemstack) {
 			return itemstack == null ? false
 					: itemstack.getItem() == Items.netherite_ingot || itemstack.getItem() == Items.emerald
@@ -69,6 +71,7 @@ public class ContainerBeacon extends Container {
 
 	}
 
+	@Override
 	public boolean canInteractWith(EntityPlayer entityplayer) {
 		return this.tileBeacon.isUseableByPlayer(entityplayer);
 	}
@@ -80,6 +83,7 @@ public class ContainerBeacon extends Container {
 	/**
 	 * + Called when the container is closed.
 	 */
+	@Override
 	public void onContainerClosed(EntityPlayer entityplayer) {
 		super.onContainerClosed(entityplayer);
 		if (entityplayer != null && !entityplayer.worldObj.isRemote) {
@@ -94,6 +98,7 @@ public class ContainerBeacon extends Container {
 		}
 	}
 
+	@Override
 	public void onCraftGuiOpened(ICrafting icrafting) {
 		super.onCraftGuiOpened(icrafting);
 		icrafting.func_175173_a(this, this.tileBeacon);
@@ -102,6 +107,7 @@ public class ContainerBeacon extends Container {
 	/**
 	 * + Take a stack from the specified inventory slot.
 	 */
+	@Override
 	public ItemStack transferStackInSlot(EntityPlayer entityplayer, int i) {
 		ItemStack itemstack = null;
 		Slot slot = (Slot) this.inventorySlots.get(i);
@@ -147,6 +153,7 @@ public class ContainerBeacon extends Container {
 		return itemstack;
 	}
 
+	@Override
 	public void updateProgressBar(int i, int j) {
 		this.tileBeacon.setField(i, j);
 	}

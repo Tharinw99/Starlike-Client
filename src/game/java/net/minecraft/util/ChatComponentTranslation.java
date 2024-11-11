@@ -15,13 +15,13 @@ import net.lax1dude.eaglercraft.v1_8.HString;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,7 +33,7 @@ import net.lax1dude.eaglercraft.v1_8.HString;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ChatComponentTranslation extends ChatComponentStyle {
 	public static final Pattern stringVariablePattern = Pattern.compile("%(?:(\\d+)\\$)?([A-Za-z%]|$)");
@@ -60,6 +60,7 @@ public class ChatComponentTranslation extends ChatComponentStyle {
 	 * + Creates a copy of this component. Almost a deep copy, except the style is
 	 * shallow-copied.
 	 */
+	@Override
 	public ChatComponentTranslation createCopy() {
 		Object[] aobject = new Object[this.formatArgs.length];
 
@@ -111,6 +112,7 @@ public class ChatComponentTranslation extends ChatComponentStyle {
 
 	}
 
+	@Override
 	public boolean equals(Object object) {
 		if (this == object) {
 			return true;
@@ -152,6 +154,7 @@ public class ChatComponentTranslation extends ChatComponentStyle {
 	 * + Gets the text of this component, without any special formatting codes
 	 * added, for chat. TODO: why is this two different methods?
 	 */
+	@Override
 	public String getUnformattedTextForChat() {
 		this.ensureInitialized();
 		StringBuilder stringbuilder = new StringBuilder();
@@ -163,6 +166,7 @@ public class ChatComponentTranslation extends ChatComponentStyle {
 		return stringbuilder.toString();
 	}
 
+	@Override
 	public int hashCode() {
 		int i = super.hashCode();
 		i = 31 * i + this.key.hashCode();
@@ -223,11 +227,13 @@ public class ChatComponentTranslation extends ChatComponentStyle {
 		}
 	}
 
+	@Override
 	public Iterator<IChatComponent> iterator() {
 		this.ensureInitialized();
 		return Iterators.concat(createDeepCopyIterator(this.children), createDeepCopyIterator(this.siblings));
 	}
 
+	@Override
 	public IChatComponent setChatStyle(ChatStyle chatstyle) {
 		super.setChatStyle(chatstyle);
 
@@ -247,6 +253,7 @@ public class ChatComponentTranslation extends ChatComponentStyle {
 		return this;
 	}
 
+	@Override
 	public String toString() {
 		return "TranslatableComponent{key=\'" + this.key + '\'' + ", args=" + Arrays.toString(this.formatArgs)
 				+ ", siblings=" + this.siblings + ", style=" + this.getChatStyle() + '}';

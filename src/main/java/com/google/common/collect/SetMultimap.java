@@ -39,7 +39,7 @@ import com.google.common.annotations.GwtCompatible;
  * If the values corresponding to a single key should be ordered according to a
  * {@link java.util.Comparator} (or the natural order), see the
  * {@link SortedSetMultimap} subinterface.
- * 
+ *
  * <p>
  * Since the value collections are sets, the behavior of a {@code SetMultimap}
  * is not specified if key <em>or value</em> objects already present in the

@@ -1,5 +1,5 @@
 {
-    "variants": {
-        "normal": { "model": "starlike:titanium_ore" }
-    }
+  "variants": {
+    "normal": { "model": "starlike:titanium_ore" }
+  }
 }

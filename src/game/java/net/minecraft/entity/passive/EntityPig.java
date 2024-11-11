@@ -27,13 +27,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -45,7 +45,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityPig extends EntityAnimal {
 	private final EntityAIControlledByPlayer aiControlledByPlayer;
@@ -66,6 +66,7 @@ public class EntityPig extends EntityAnimal {
 		this.tasks.addTask(8, new EntityAILookIdle(this));
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(10.0D);
@@ -77,11 +78,13 @@ public class EntityPig extends EntityAnimal {
 	 * pigs, this is true if it is being ridden by a player and the player is
 	 * holding a carrot-on-a-stick
 	 */
+	@Override
 	public boolean canBeSteered() {
 		ItemStack itemstack = ((EntityPlayer) this.riddenByEntity).getHeldItem();
 		return itemstack != null && itemstack.getItem() == Items.carrot_on_a_stick;
 	}
 
+	@Override
 	public EntityPig createChild(EntityAgeable var1) {
 		return new EntityPig(this.worldObj);
 	}
@@ -89,6 +92,7 @@ public class EntityPig extends EntityAnimal {
 	/**
 	 * + Drop 0-2 items of this living's type
 	 */
+	@Override
 	protected void dropFewItems(boolean var1, int i) {
 		int j = this.rand.nextInt(3) + 1 + this.rand.nextInt(1 + i);
 
@@ -106,11 +110,13 @@ public class EntityPig extends EntityAnimal {
 
 	}
 
+	@Override
 	protected void entityInit() {
 		super.entityInit();
 		this.dataWatcher.addObject(16, Byte.valueOf((byte) 0));
 	}
 
+	@Override
 	public void fall(float f, float f1) {
 		super.fall(f, f1);
 		if (f > 5.0F && this.riddenByEntity instanceof EntityPlayer) {
@@ -129,10 +135,12 @@ public class EntityPig extends EntityAnimal {
 	/**
 	 * + Returns the sound this mob makes on death.
 	 */
+	@Override
 	protected String getDeathSound() {
 		return "mob.pig.death";
 	}
 
+	@Override
 	protected Item getDropItem() {
 		return this.isBurning() ? Items.cooked_porkchop : Items.porkchop;
 	}
@@ -140,6 +148,7 @@ public class EntityPig extends EntityAnimal {
 	/**
 	 * + Returns the sound this mob makes when it is hurt.
 	 */
+	@Override
 	protected String getHurtSound() {
 		return "mob.pig.say";
 	}
@@ -147,6 +156,7 @@ public class EntityPig extends EntityAnimal {
 	/**
 	 * + Returns the sound this mob makes while it's alive.
 	 */
+	@Override
 	protected String getLivingSound() {
 		return "mob.pig.say";
 	}
@@ -162,6 +172,7 @@ public class EntityPig extends EntityAnimal {
 	 * + Called when a player interacts with a mob. e.g. gets milk from a cow, gets
 	 * into the saddle on a pig.
 	 */
+	@Override
 	public boolean interact(EntityPlayer entityplayer) {
 		if (super.interact(entityplayer)) {
 			return true;
@@ -178,6 +189,7 @@ public class EntityPig extends EntityAnimal {
 	 * + Checks if the parameter is an item which this animal can be fed to breed it
 	 * (wheat, carrots or seeds depending on the animal type)
 	 */
+	@Override
 	public boolean isBreedingItem(ItemStack itemstack) {
 		return itemstack != null && itemstack.getItem() == Items.carrot;
 	}
@@ -185,6 +197,7 @@ public class EntityPig extends EntityAnimal {
 	/**
 	 * + Called when a lightning bolt hits the entity.
 	 */
+	@Override
 	public void onStruckByLightning(EntityLightningBolt var1) {
 		if (!this.worldObj.isRemote && !this.isDead) {
 			EntityPigZombie entitypigzombie = new EntityPigZombie(this.worldObj);
@@ -201,6 +214,7 @@ public class EntityPig extends EntityAnimal {
 		}
 	}
 
+	@Override
 	protected void playStepSound(BlockPos var1, Block var2) {
 		this.playSound("mob.pig.step", 0.15F, 1.0F);
 	}
@@ -208,6 +222,7 @@ public class EntityPig extends EntityAnimal {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		this.setSaddled(nbttagcompound.getBoolean("Saddle"));
@@ -228,6 +243,7 @@ public class EntityPig extends EntityAnimal {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		nbttagcompound.setBoolean("Saddle", this.getSaddled());

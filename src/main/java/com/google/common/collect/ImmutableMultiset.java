@@ -55,7 +55,7 @@ public abstract class ImmutableMultiset<E> extends ImmutableCollection<E> implem
 	/**
 	 * A builder for creating immutable multiset instances, especially {@code
 	 * public static final} multisets ("constant multisets"). Example:
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 * 	&#64;code
@@ -248,6 +248,7 @@ public abstract class ImmutableMultiset<E> extends ImmutableCollection<E> implem
 		// We can't label this with @Override, because it doesn't override anything
 		// in the GWT emulated version.
 		// TODO(cpovirk): try making all copies of this method @GwtIncompatible instead
+		@Override
 		Object writeReplace() {
 			return new EntrySetSerializedForm<E>(ImmutableMultiset.this);
 		}
@@ -597,6 +598,7 @@ public abstract class ImmutableMultiset<E> extends ImmutableCollection<E> implem
 
 	// We can't label this with @Override, because it doesn't override anything
 	// in the GWT emulated version.
+	@Override
 	Object writeReplace() {
 		return new SerializedForm(this);
 	}

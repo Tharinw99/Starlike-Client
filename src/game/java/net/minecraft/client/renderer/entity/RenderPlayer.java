@@ -24,13 +24,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -42,7 +42,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class RenderPlayer extends RendererLivingEntity<AbstractClientPlayer> {
 	private boolean smallArms;
@@ -76,6 +76,7 @@ public class RenderPlayer extends RendererLivingEntity<AbstractClientPlayer> {
 	 * func_76986_a(T entity, double d, double d1, double d2, float f, float f1).
 	 * But JAD is pre 1.5 so doe
 	 */
+	@Override
 	public void doRender(AbstractClientPlayer abstractclientplayer, double d0, double d1, double d2, float f,
 			float f1) {
 		if (!abstractclientplayer.isUser() || this.renderManager.livingPlayer == abstractclientplayer) {
@@ -93,10 +94,12 @@ public class RenderPlayer extends RendererLivingEntity<AbstractClientPlayer> {
 	 * + Returns the location of an entity's texture. Doesn't seem to be called
 	 * unless you call Render.bindEntityTexture.
 	 */
+	@Override
 	protected ResourceLocation getEntityTexture(AbstractClientPlayer abstractclientplayer) {
 		return abstractclientplayer.getLocationSkin();
 	}
 
+	@Override
 	public ModelBiped getMainModel() {
 		return (ModelBiped) super.getMainModel();
 	}
@@ -105,6 +108,7 @@ public class RenderPlayer extends RendererLivingEntity<AbstractClientPlayer> {
 	 * + Allows the render to do any OpenGL state modifications necessary before the
 	 * model is rendered. Args: entityLiving, partialTickTime
 	 */
+	@Override
 	protected void preRenderCallback(AbstractClientPlayer var1, float var2) {
 		float f = 0.9375F;
 		GlStateManager.scale(f, f, f);
@@ -126,6 +130,7 @@ public class RenderPlayer extends RendererLivingEntity<AbstractClientPlayer> {
 	/**
 	 * + Sets a simple glTranslate on a LivingEntity.
 	 */
+	@Override
 	public void renderLivingAt(AbstractClientPlayer abstractclientplayer, double d0, double d1, double d2) {
 		if (abstractclientplayer.isEntityAlive() && abstractclientplayer.isPlayerSleeping()) {
 			super.renderLivingAt(abstractclientplayer, d0 + (double) abstractclientplayer.renderOffsetX,
@@ -136,6 +141,7 @@ public class RenderPlayer extends RendererLivingEntity<AbstractClientPlayer> {
 
 	}
 
+	@Override
 	protected void renderOffsetLivingLabel(AbstractClientPlayer abstractclientplayer, double d0, double d1, double d2,
 			String s, float f, double d3) {
 		if (d3 < 100.0D) {
@@ -165,6 +171,7 @@ public class RenderPlayer extends RendererLivingEntity<AbstractClientPlayer> {
 		}
 	}
 
+	@Override
 	protected void rotateCorpse(AbstractClientPlayer abstractclientplayer, float f, float f1, float f2) {
 		if (abstractclientplayer.isEntityAlive() && abstractclientplayer.isPlayerSleeping()) {
 			GlStateManager.rotate(abstractclientplayer.getBedOrientationInDegrees(), 0.0F, 1.0F, 0.0F);
@@ -214,6 +221,7 @@ public class RenderPlayer extends RendererLivingEntity<AbstractClientPlayer> {
 
 	}
 
+	@Override
 	public void transformHeldFull3DItemLayer() {
 		GlStateManager.translate(0.0F, 0.1875F, 0.0F);
 	}

@@ -20,13 +20,13 @@ import net.minecraft.world.gen.ChunkProviderSettings;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,7 +38,7 @@ import net.minecraft.world.gen.ChunkProviderSettings;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiCustomizeWorldScreen extends GuiScreen
 		implements GuiSlider.FormatHelper, GuiPageButtonList.GuiResponder {
@@ -60,6 +60,7 @@ public class GuiCustomizeWorldScreen extends GuiScreen
 	private int field_175339_B = 0;
 	private boolean field_175340_C = false;
 	private Predicate<String> field_175332_D = new Predicate<String>() {
+		@Override
 		public boolean apply(String s) {
 			Float f = Floats.tryParse(s);
 			return s.length() == 0 || f != null && Floats.isFinite(f.floatValue()) && f.floatValue() >= 0.0F;
@@ -81,6 +82,7 @@ public class GuiCustomizeWorldScreen extends GuiScreen
 	 * + Called by the controls from the buttonList when activated. (Mouse pressed
 	 * for buttons)
 	 */
+	@Override
 	protected void actionPerformed(GuiButton parGuiButton) {
 		if (parGuiButton.enabled) {
 			switch (parGuiButton.id) {
@@ -149,6 +151,7 @@ public class GuiCustomizeWorldScreen extends GuiScreen
 	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
 	 * renderPartialTicks
 	 */
+	@Override
 	public void drawScreen(int i, int j, float f) {
 		this.drawDefaultBackground();
 		this.field_175349_r.drawScreen(i, j, f);
@@ -199,6 +202,7 @@ public class GuiCustomizeWorldScreen extends GuiScreen
 		field_175349_r.fireInputEvent(event, param);
 	}
 
+	@Override
 	public void func_175319_a(int i, String s) {
 		float f = 0.0F;
 
@@ -270,6 +274,7 @@ public class GuiCustomizeWorldScreen extends GuiScreen
 
 	}
 
+	@Override
 	public void func_175321_a(int i, boolean flag) {
 		switch (i) {
 		case 148:
@@ -835,6 +840,7 @@ public class GuiCustomizeWorldScreen extends GuiScreen
 		this.field_175346_u.enabled = parFlag;
 	}
 
+	@Override
 	public String getText(int i, String s, float f) {
 		return s + ": " + this.func_175330_b(i, f);
 	}
@@ -842,11 +848,13 @@ public class GuiCustomizeWorldScreen extends GuiScreen
 	/**
 	 * + Handles mouse input.
 	 */
+	@Override
 	public void handleMouseInput() throws IOException {
 		super.handleMouseInput();
 		this.field_175349_r.handleMouseInput();
 	}
 
+	@Override
 	public void handleTouchInput() throws IOException {
 		super.handleTouchInput();
 		this.field_175349_r.handleTouchInput();
@@ -857,6 +865,7 @@ public class GuiCustomizeWorldScreen extends GuiScreen
 	 * when the GUI is displayed and when the window resizes, the buttonList is
 	 * cleared beforehand.
 	 */
+	@Override
 	public void initGui() {
 		int i = 0;
 		int j = 0;
@@ -906,6 +915,7 @@ public class GuiCustomizeWorldScreen extends GuiScreen
 	 * the equivalent of KeyListener.keyTyped(KeyEvent e). Args : character
 	 * (character on the key), keyCode (lwjgl Keyboard key code)
 	 */
+	@Override
 	protected void keyTyped(char parChar1, int parInt1) {
 		super.keyTyped(parChar1, parInt1);
 		if (this.field_175339_B == 0) {
@@ -926,6 +936,7 @@ public class GuiCustomizeWorldScreen extends GuiScreen
 	/**
 	 * + Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
 	 */
+	@Override
 	protected void mouseClicked(int parInt1, int parInt2, int parInt3) {
 		super.mouseClicked(parInt1, parInt2, parInt3);
 		if (this.field_175339_B == 0 && !this.field_175340_C) {
@@ -937,6 +948,7 @@ public class GuiCustomizeWorldScreen extends GuiScreen
 	 * + Called when a mouse button is released. Args : mouseX, mouseY,
 	 * releaseButton
 	 */
+	@Override
 	protected void mouseReleased(int i, int j, int k) {
 		super.mouseReleased(i, j, k);
 		if (this.field_175340_C) {
@@ -946,6 +958,7 @@ public class GuiCustomizeWorldScreen extends GuiScreen
 		}
 	}
 
+	@Override
 	public void onTick(int i, float f) {
 		switch (i) {
 		case 100:

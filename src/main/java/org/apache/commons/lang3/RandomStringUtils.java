@@ -55,7 +55,7 @@ import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
  * <p>
  * #ThreadSafe#
  * </p>
- * 
+ *
  * @since 1.0
  */
 public class RandomStringUtils {

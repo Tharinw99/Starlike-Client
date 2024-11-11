@@ -70,11 +70,9 @@ import org.lwjgl.glfw.GLFWGamepadState;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.system.MemoryStack;
 
-import net.lax1dude.eaglercraft.v1_8.Display;
-
 /**
  * Copyright (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -86,7 +84,7 @@ import net.lax1dude.eaglercraft.v1_8.Display;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class PlatformInput {
 
@@ -207,7 +205,7 @@ public class PlatformInput {
 
 	private static int[] lastPos = new int[4];
 
-	private static final long[] syncTimer = new long[1];
+	private static long syncTimer = 0l;
 
 	public static boolean contextLost() {
 		return glfwGetWindowAttrib(win, GLFW_ICONIFIED) == GLFW_TRUE;
@@ -863,14 +861,6 @@ public class PlatformInput {
 	}
 
 	public static float touchGetEventTouchRadiusMixed(int pointId) {
-		return touchGetEventTouchRadiusX(pointId) * 0.5f + touchGetEventTouchRadiusY(pointId) * 0.5f;
-	}
-
-	public static float touchGetEventTouchRadiusX(int pointId) {
-		return 0.0f;
-	}
-
-	public static float touchGetEventTouchRadiusY(int pointId) {
 		return 0.0f;
 	}
 
@@ -915,14 +905,6 @@ public class PlatformInput {
 	}
 
 	public static float touchRadiusMixed(int pointId) {
-		return touchRadiusX(pointId) * 0.5f + touchRadiusY(pointId) * 0.5f;
-	}
-
-	public static float touchRadiusX(int pointId) {
-		return 0.0f;
-	}
-
-	public static float touchRadiusY(int pointId) {
 		return 0.0f;
 	}
 
@@ -941,10 +923,23 @@ public class PlatformInput {
 			glfwVSyncState = vsync;
 		}
 		glfwSwapBuffers(win);
-		if (limitFps > 0 && !vsync) {
-			Display.sync(limitFps, syncTimer);
+		if(!vsync && limitFps > 0 && limitFps <= 1000) {
+			long frameNanos = (1000000000l / limitFps);
+			if(syncTimer == 0l) {
+				syncTimer = System.nanoTime() + frameNanos;
+			}else {
+				long nanos = System.nanoTime();
+				int remaining = (int)((syncTimer - nanos) / 1000000l);
+				if(remaining > 0) {
+					PlatformRuntime.sleep(remaining);
+					nanos = System.nanoTime();
+				}
+				if((syncTimer += frameNanos) < nanos) {
+					syncTimer = nanos;
+				}
+			}
 		} else {
-			syncTimer[0] = 0l;
+			syncTimer = 0l;
 		}
 	}
 

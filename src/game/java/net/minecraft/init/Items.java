@@ -13,17 +13,18 @@ import net.minecraft.item.ItemShears;
 import net.minecraft.util.ResourceLocation;
 import net.starlikeclient.minecraft.items.ItemBackpack;
 import net.starlikeclient.minecraft.items.ItemChisel;
+import net.starlikeclient.minecraft.items.ItemEnderBackpack;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -35,7 +36,7 @@ import net.starlikeclient.minecraft.items.ItemChisel;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class Items {
 	public static Item iron_shovel;
@@ -254,9 +255,13 @@ public class Items {
 	public static ItemArmor netherite_chestplate;
 	public static ItemArmor netherite_leggings;
 	public static ItemArmor netherite_boots;
-	public static ItemChisel chisel;	
-	//public static ItemBackpack leather_backpack;
-
+	public static ItemChisel chisel;
+	public static Item amber;
+	public static ItemBow ambered_bow;
+	public static ItemBackpack leather_backpack;
+	public static ItemBackpack iron_backpack;
+	public static ItemBackpack diamond_backpack;
+	public static ItemEnderBackpack ender_backpack;
 
 	static void doBootstrap() {
 		if (!Bootstrap.isRegistered()) {
@@ -480,8 +485,12 @@ public class Items {
 			netherite_leggings = (ItemArmor) getRegisteredItem("starlike:netherite_leggings");
 			netherite_boots = (ItemArmor) getRegisteredItem("starlike:netherite_boots");
 			chisel = (ItemChisel) getRegisteredItem("starlike:chisel");
-			//leather_backpack = (ItemBackpack) getRegisteredItem("starlike:leather_backpack");
-
+			amber = getRegisteredItem("starlike:amber");
+			leather_backpack = (ItemBackpack) getRegisteredItem("starlike:leather_backpack");
+			iron_backpack = (ItemBackpack) getRegisteredItem("starlike:iron_backpack");
+			// ambered_bow = (ItemBow) getRegisteredItem("starlike:ambered_bow");
+			diamond_backpack = (ItemBackpack) getRegisteredItem("starlike:diamond_backpack");
+			ender_backpack = (ItemEnderBackpack) getRegisteredItem("starlike:ender_backpack");
 		}
 	}
 

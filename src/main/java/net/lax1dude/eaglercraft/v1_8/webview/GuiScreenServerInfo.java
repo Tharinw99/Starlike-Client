@@ -17,7 +17,7 @@ import net.minecraft.client.resources.I18n;
 
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,7 +29,7 @@ import net.minecraft.client.resources.I18n;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiScreenServerInfo extends GuiScreen {
 
@@ -97,12 +97,14 @@ public class GuiScreenServerInfo extends GuiScreen {
 		this.opts = opts;
 	}
 
+	@Override
 	public void actionPerformed(GuiButton btn) {
 		if (btn.id == 0) {
 			mc.displayGuiScreen(parent);
 		}
 	}
 
+	@Override
 	public void drawScreen(int mx, int my, float pt) {
 		drawDefaultBackground();
 		drawCenteredString(fontRendererObj, PauseMenuCustomizeState.serverInfoEmbedTitle == null ? "Server Info"
@@ -110,6 +112,7 @@ public class GuiScreenServerInfo extends GuiScreen {
 		super.drawScreen(mx, my, pt);
 	}
 
+	@Override
 	public void initGui() {
 		ScaledResolution res = mc.scaledResolution;
 		if (!isShowing) {
@@ -122,10 +125,12 @@ public class GuiScreenServerInfo extends GuiScreen {
 		buttonList.add(new GuiButton(0, (width - 200) / 2, height - 25, I18n.format("gui.done")));
 	}
 
+	@Override
 	protected boolean isPartOfPauseMenu() {
 		return true;
 	}
 
+	@Override
 	public void onGuiClosed() {
 		if (isShowing) {
 			isShowing = false;

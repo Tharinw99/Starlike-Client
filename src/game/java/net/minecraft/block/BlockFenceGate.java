@@ -18,13 +18,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -36,7 +36,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockFenceGate extends BlockDirectional {
 	public static final PropertyBool OPEN = PropertyBool.create("open");
@@ -50,12 +50,14 @@ public class BlockFenceGate extends BlockDirectional {
 		this.setCreativeTab(CreativeTabs.tabRedstone);
 	}
 
+	@Override
 	public boolean canPlaceBlockAt(World world, BlockPos blockpos) {
 		return world.getBlockState(blockpos.down()).getBlock().getMaterial().isSolid()
 				? super.canPlaceBlockAt(world, blockpos)
 				: false;
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { FACING, OPEN, POWERED, IN_WALL });
 	}
@@ -64,6 +66,7 @@ public class BlockFenceGate extends BlockDirectional {
 	 * + Get the actual Block state of this Block at the given position. This
 	 * applies properties not visible in the metadata, such as fence connections.
 	 */
+	@Override
 	public IBlockState getActualState(IBlockState iblockstate, IBlockAccess iblockaccess, BlockPos blockpos) {
 		EnumFacing.Axis enumfacing$axis = ((EnumFacing) iblockstate.getValue(FACING)).getAxis();
 		if (enumfacing$axis == EnumFacing.Axis.Z
@@ -78,6 +81,7 @@ public class BlockFenceGate extends BlockDirectional {
 		return iblockstate;
 	}
 
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox(World var1, BlockPos blockpos, IBlockState iblockstate) {
 		if (((Boolean) iblockstate.getValue(OPEN)).booleanValue()) {
 			return null;
@@ -96,6 +100,7 @@ public class BlockFenceGate extends BlockDirectional {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
 		i = i | ((EnumFacing) iblockstate.getValue(FACING)).getHorizontalIndex();
@@ -113,11 +118,13 @@ public class BlockFenceGate extends BlockDirectional {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(FACING, EnumFacing.getHorizontal(i))
 				.withProperty(OPEN, Boolean.valueOf((i & 4) != 0)).withProperty(POWERED, Boolean.valueOf((i & 8) != 0));
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -126,14 +133,17 @@ public class BlockFenceGate extends BlockDirectional {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
 
+	@Override
 	public boolean isPassable(IBlockAccess iblockaccess, BlockPos blockpos) {
 		return ((Boolean) iblockaccess.getBlockState(blockpos).getValue(OPEN)).booleanValue();
 	}
 
+	@Override
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState iblockstate, EntityPlayer entityplayer,
 			EnumFacing var5, float var6, float var7, float var8) {
 		if (((Boolean) iblockstate.getValue(OPEN)).booleanValue()) {
@@ -158,6 +168,7 @@ public class BlockFenceGate extends BlockDirectional {
 	 * + Called by ItemBlocks just before a block is actually set in the world, to
 	 * allow for adjustments to the IBlockstate
 	 */
+	@Override
 	public IBlockState onBlockPlaced(World var1, BlockPos var2, EnumFacing var3, float var4, float var5, float var6,
 			int var7, EntityLivingBase entitylivingbase) {
 		return this.getDefaultState().withProperty(FACING, entitylivingbase.getHorizontalFacing())
@@ -168,6 +179,7 @@ public class BlockFenceGate extends BlockDirectional {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block block) {
 		if (!world.isRemote) {
 			boolean flag = world.isBlockPowered(blockpos);
@@ -189,6 +201,7 @@ public class BlockFenceGate extends BlockDirectional {
 		}
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
 		EnumFacing.Axis enumfacing$axis = ((EnumFacing) iblockaccess.getBlockState(blockpos).getValue(FACING))
 				.getAxis();
@@ -200,6 +213,7 @@ public class BlockFenceGate extends BlockDirectional {
 
 	}
 
+	@Override
 	public boolean shouldSideBeRendered(IBlockAccess var1, BlockPos var2, EnumFacing var3) {
 		return true;
 	}

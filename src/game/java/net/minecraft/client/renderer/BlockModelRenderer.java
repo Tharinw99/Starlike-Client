@@ -27,13 +27,13 @@ import net.minecraft.world.IBlockAccess;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -45,7 +45,7 @@ import net.minecraft.world.IBlockAccess;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockModelRenderer {
 	class AmbientOcclusionFace {
@@ -558,62 +558,61 @@ public class BlockModelRenderer {
 	private void renderModelAmbientOcclusionQuads(IBlockAccess blockAccessIn, Block blockIn, BlockPos blockPosIn,
 			WorldRenderer worldRendererIn, List<BakedQuad> listQuadsIn, float[] quadBounds, BitSet boundsFlags,
 			BlockModelRenderer.AmbientOcclusionFace aoFaceIn) {
+
 		boolean isDeferred = DeferredStateManager.isDeferredRenderer();
 		boolean isDynamicLights = isDeferred || DynamicLightsStateManager.isDynamicLightsRender();
-		double d0 = (double) blockPosIn.getX();
-		double d1 = (double) blockPosIn.getY();
-		double d2 = (double) blockPosIn.getZ();
-		Block.EnumOffsetType block$enumoffsettype = blockIn.getOffsetType();
-		if (block$enumoffsettype != Block.EnumOffsetType.NONE) {
-			long i = MathHelper.getPositionRandom(blockPosIn);
-			d0 += ((double) ((float) (i >> 16 & 15L) / 15.0F) - 0.5D) * 0.5D;
-			d2 += ((double) ((float) (i >> 24 & 15L) / 15.0F) - 0.5D) * 0.5D;
-			if (!isDeferred && block$enumoffsettype == Block.EnumOffsetType.XYZ) {
-				d1 += ((double) ((float) (i >> 20 & 15L) / 15.0F) - 1.0D) * 0.2D;
+
+		double posX = blockPosIn.getX();
+		double posY = blockPosIn.getY();
+		double posZ = blockPosIn.getZ();
+
+		Block.EnumOffsetType offsetType = blockIn.getOffsetType();
+		if (offsetType != Block.EnumOffsetType.NONE) {
+			long randomOffset = MathHelper.getPositionRandom(blockPosIn);
+			posX += ((randomOffset >> 16 & 15L) / 15.0F - 0.5D) * 0.5D;
+			posZ += ((randomOffset >> 24 & 15L) / 15.0F - 0.5D) * 0.5D;
+			if (!isDeferred && offsetType == Block.EnumOffsetType.XYZ) {
+				posY += ((randomOffset >> 20 & 15L) / 15.0F - 1.0D) * 0.2D;
 			}
 		}
 
-		for (int i = 0, l = listQuadsIn.size(); i < l; ++i) {
-			BakedQuad bakedquad = listQuadsIn.get(i);
-			int[] vertData = isDynamicLights ? bakedquad.getVertexDataWithNormals() : bakedquad.getVertexData();
-			this.fillQuadBounds(blockIn, vertData, bakedquad.getFace(), quadBounds, boundsFlags,
+		for (BakedQuad bakedQuad : listQuadsIn) {
+			int[] vertexData = isDynamicLights ? bakedQuad.getVertexDataWithNormals() : bakedQuad.getVertexData();
+
+			this.fillQuadBounds(blockIn, vertexData, bakedQuad.getFace(), quadBounds, boundsFlags,
 					isDynamicLights ? 8 : 7);
-			aoFaceIn.updateVertexBrightness(blockAccessIn, blockIn, blockPosIn, bakedquad.getFace(), quadBounds,
+
+			aoFaceIn.updateVertexBrightness(blockAccessIn, blockIn, blockPosIn, bakedQuad.getFace(), quadBounds,
 					boundsFlags);
-			worldRendererIn.addVertexData(vertData);
+
+			worldRendererIn.addVertexData(vertexData);
+
 			worldRendererIn.putBrightness4(aoFaceIn.vertexBrightness[0], aoFaceIn.vertexBrightness[1],
 					aoFaceIn.vertexBrightness[2], aoFaceIn.vertexBrightness[3]);
-			if (bakedquad.hasTintIndex()) {
-				int j = blockIn.colorMultiplier(blockAccessIn, blockPosIn, bakedquad.getTintIndex());
+
+			if (bakedQuad.hasTintIndex()) {
+				int colorMultiplier = blockIn.colorMultiplier(blockAccessIn, blockPosIn, bakedQuad.getTintIndex());
 				if (EntityRenderer.anaglyphEnable) {
-					j = TextureUtil.anaglyphColor(j);
+					colorMultiplier = TextureUtil.anaglyphColor(colorMultiplier);
 				}
 
-				float f = (float) (j >> 16 & 255) / 255.0F;
-				float f1 = (float) (j >> 8 & 255) / 255.0F;
-				float f2 = (float) (j & 255) / 255.0F;
-				worldRendererIn.putColorMultiplier(aoFaceIn.vertexColorMultiplier[0] * f,
-						aoFaceIn.vertexColorMultiplier[0] * f1, aoFaceIn.vertexColorMultiplier[0] * f2, 4);
-				worldRendererIn.putColorMultiplier(aoFaceIn.vertexColorMultiplier[1] * f,
-						aoFaceIn.vertexColorMultiplier[1] * f1, aoFaceIn.vertexColorMultiplier[1] * f2, 3);
-				worldRendererIn.putColorMultiplier(aoFaceIn.vertexColorMultiplier[2] * f,
-						aoFaceIn.vertexColorMultiplier[2] * f1, aoFaceIn.vertexColorMultiplier[2] * f2, 2);
-				worldRendererIn.putColorMultiplier(aoFaceIn.vertexColorMultiplier[3] * f,
-						aoFaceIn.vertexColorMultiplier[3] * f1, aoFaceIn.vertexColorMultiplier[3] * f2, 1);
+				float red = (colorMultiplier >> 16 & 255) / 255.0F;
+				float green = (colorMultiplier >> 8 & 255) / 255.0F;
+				float blue = (colorMultiplier & 255) / 255.0F;
+
+				for (int vertex = 0; vertex < 4; vertex++) {
+					float aoColor = aoFaceIn.vertexColorMultiplier[vertex];
+					worldRendererIn.putColorMultiplier(aoColor * red, aoColor * green, aoColor * blue, 4 - vertex);
+				}
 			} else {
-				worldRendererIn.putColorMultiplier(aoFaceIn.vertexColorMultiplier[0], aoFaceIn.vertexColorMultiplier[0],
-						aoFaceIn.vertexColorMultiplier[0], 4);
-				worldRendererIn.putColorMultiplier(aoFaceIn.vertexColorMultiplier[1], aoFaceIn.vertexColorMultiplier[1],
-						aoFaceIn.vertexColorMultiplier[1], 3);
-				worldRendererIn.putColorMultiplier(aoFaceIn.vertexColorMultiplier[2], aoFaceIn.vertexColorMultiplier[2],
-						aoFaceIn.vertexColorMultiplier[2], 2);
-				worldRendererIn.putColorMultiplier(aoFaceIn.vertexColorMultiplier[3], aoFaceIn.vertexColorMultiplier[3],
-						aoFaceIn.vertexColorMultiplier[3], 1);
+				for (int vertex = 0; vertex < 4; vertex++) {
+					float aoColor = aoFaceIn.vertexColorMultiplier[vertex];
+					worldRendererIn.putColorMultiplier(aoColor, aoColor, aoColor, 4 - vertex);
+				}
 			}
 
-			worldRendererIn.putPosition(d0, d1, d2);
+			worldRendererIn.putPosition(posX, posY, posZ);
 		}
-
 	}
 
 	public void renderModelBrightness(IBakedModel parIBakedModel, IBlockState parIBlockState, float parFloat1,
@@ -678,7 +677,7 @@ public class BlockModelRenderer {
 		float[] afloat = isDeferred ? new float[EnumFacing._VALUES.length * 2] : null;
 		BitSet bitset = new BitSet(3);
 
-		BlockPos.MutableBlockPos pointer = new BlockPos.MutableBlockPos();
+		BlockPos pointer = new BlockPos();
 		EnumFacing[] facings = EnumFacing._VALUES;
 		for (int m = 0; m < facings.length; ++m) {
 			EnumFacing enumfacing = facings[m];

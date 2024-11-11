@@ -44,6 +44,7 @@ public class FabricatorManager {
 				new Object[] { "///", " / ", "/_/", Character.valueOf('/'), Items.stick, Character.valueOf('_'),
 						new ItemStack(Blocks.stone, 1, BlockStoneSlab.EnumType.STONE.getMetadata()) });
 		Collections.sort(this.recipes, new Comparator<IRecipe>() {
+			@Override
 			public int compare(IRecipe parIRecipe, IRecipe parIRecipe2) {
 				return parIRecipe instanceof ShapelessRecipes && parIRecipe2 instanceof ShapedRecipes ? 1
 						: (parIRecipe2 instanceof ShapelessRecipes && parIRecipe instanceof ShapedRecipes ? -1
@@ -69,10 +70,9 @@ public class FabricatorManager {
 		int j = 0;
 		int k = 0;
 		if (recipeComponents[i] instanceof String[]) {
-			String[] astring = (String[]) ((String[]) recipeComponents[i++]);
+			String[] astring = ((String[]) recipeComponents[i++]);
 
-			for (int l = 0; l < astring.length; ++l) {
-				String s2 = astring[l];
+			for (String s2 : astring) {
 				++k;
 				j = s2.length();
 				s = s + s2;
@@ -123,8 +123,7 @@ public class FabricatorManager {
 	public void addShapelessRecipe(ItemStack stack, Object... recipeComponents) {
 		ArrayList arraylist = Lists.newArrayList();
 
-		for (int i = 0; i < recipeComponents.length; ++i) {
-			Object object = recipeComponents[i];
+		for (Object object : recipeComponents) {
 			if (object instanceof ItemStack) {
 				arraylist.add(((ItemStack) object).copy());
 			} else if (object instanceof Item) {
@@ -146,8 +145,7 @@ public class FabricatorManager {
 	 * + Retrieves an ItemStack that has multiple recipes for it.
 	 */
 	public ItemStack findMatchingRecipe(InventoryCrafting worldIn, World parWorld) {
-		for (int i = 0, l = this.recipes.size(); i < l; ++i) {
-			IRecipe irecipe = this.recipes.get(i);
+		for (IRecipe irecipe : this.recipes) {
 			if (irecipe.matches(worldIn, parWorld)) {
 				return irecipe.getCraftingResult(worldIn);
 			}
@@ -157,8 +155,7 @@ public class FabricatorManager {
 	}
 
 	public ItemStack[] func_180303_b(InventoryCrafting worldIn, World parWorld) {
-		for (int i = 0, l = this.recipes.size(); i < l; ++i) {
-			IRecipe irecipe = this.recipes.get(i);
+		for (IRecipe irecipe : this.recipes) {
 			if (irecipe.matches(worldIn, parWorld)) {
 				return irecipe.getRemainingItems(worldIn);
 			}

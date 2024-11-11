@@ -8,18 +8,19 @@ import com.google.common.collect.Sets;
 
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class LegacyKeycodeTranslator {
 
@@ -51,12 +52,130 @@ public class LegacyKeycodeTranslator {
 
 	}
 
-	private static final Set<String> numpadVolatile = Sets.newHashSet(
-			"Comma", "Minus", "Period", "Slash", "Equal", "Enter", "Digit0", "Digit1", "Digit2", "Digit3",
-			"Digit4", "Digit5", "Digit6", "Digit7", "Digit8", "Digit9", "IntlYen");
+	private static final Set<String> numpadVolatile = Sets.newHashSet("Comma", "Minus", "Period", "Slash", "Equal",
+			"Enter", "Digit0", "Digit1", "Digit2", "Digit3", "Digit4", "Digit5", "Digit6", "Digit7", "Digit8", "Digit9",
+			"IntlYen");
 
-	private final Map<String,LegacyKeycode> codeLookupBase = new HashMap<>();
-	private final Map<String,LegacyKeycode> codeLookupLayout = new HashMap<>();
+	public static String getCodeFromLayoutChar(String keyChar) {
+		if (keyChar.length() != 1) {
+			return null;
+		}
+		char c = keyChar.charAt(0);
+		String ret = getCodeFromLayoutChar0(c);
+		if (ret == null) {
+			ret = getCodeFromLayoutChar0(Character.toLowerCase(c));
+		}
+		return ret;
+	}
+
+	private static String getCodeFromLayoutChar0(char keyChar) {
+		switch (keyChar) {
+		case 'e':
+			return "KeyE";
+		case 'd':
+			return "KeyD";
+		case 'u':
+			return "KeyU";
+		case '-':
+			return "Minus";
+		case 'h':
+			return "KeyH";
+		case 'z':
+			return "KeyZ";
+		case '=':
+			return "Equal";
+		case 'p':
+			return "KeyP";
+		case ';':
+			return "Semicolon";
+		case ']':
+			return "BracketRight";
+		case '/':
+			return "Slash";
+		case '[':
+			return "BracketLeft";
+		case 'l':
+			return "KeyL";
+		case '8':
+			return "Digit8";
+		case 'w':
+			return "KeyW";
+		case 's':
+			return "KeyS";
+		case '5':
+			return "Digit5";
+		case '9':
+			return "Digit9";
+		case 'o':
+			return "KeyO";
+		case '.':
+			return "Period";
+		case '6':
+			return "Digit6";
+		case 'v':
+			return "KeyV";
+		case '3':
+			return "Digit3";
+		case '`':
+			return "Backquote";
+		case 'g':
+			return "KeyG";
+		case 'j':
+			return "KeyJ";
+		case 'q':
+			return "KeyQ";
+		case '1':
+			return "Digit1";
+		case 't':
+			return "KeyT";
+		case 'y':
+			return "KeyY";
+		case '\'':
+			return "Quote";
+		case '\\':
+			return "Backslash";
+		case 'k':
+			return "KeyK";
+		case 'f':
+			return "KeyF";
+		case 'i':
+			return "KeyI";
+		case 'r':
+			return "KeyR";
+		case 'x':
+			return "KeyX";
+		case 'a':
+			return "KeyA";
+		case '2':
+			return "Digit2";
+		case '7':
+			return "Digit7";
+		case 'm':
+			return "KeyM";
+		case '4':
+			return "Digit4";
+		case '0':
+			return "Digit0";
+		case 'n':
+			return "KeyN";
+		case 'b':
+			return "KeyB";
+		case 'c':
+			return "KeyC";
+		case ',':
+			return "Comma";
+		case '*':
+			return "NumpadMultiply";
+		case 0xA5:
+			return "IntlYen";
+		default:
+			return null;
+		}
+	}
+
+	private final Map<String, LegacyKeycode> codeLookupBase = new HashMap<>();
+
+	private final Map<String, LegacyKeycode> codeLookupLayout = new HashMap<>();
 
 	public LegacyKeycodeTranslator() {
 		codeLookupBase.put("Digit0", new LegacyKeycode(0x30, 0));
@@ -185,144 +304,29 @@ public class LegacyKeycodeTranslator {
 
 	public LegacyKeycodeTranslator addBrowserLayoutMapping(String keyChar, String codeStr) {
 		LegacyKeycode mapTo = codeLookupBase.get(codeStr);
-		if(mapTo != null) {
+		if (mapTo != null) {
 			String keyCode = getCodeFromLayoutChar(keyChar);
-			if(keyCode != null && !keyCode.equals(codeStr) && !(codeStr.startsWith("Numpad") && numpadVolatile.contains(keyCode)) && !mapTo.equals(codeLookupBase.get(keyCode))) {
+			if (keyCode != null && !keyCode.equals(codeStr)
+					&& !(codeStr.startsWith("Numpad") && numpadVolatile.contains(keyCode))
+					&& !mapTo.equals(codeLookupBase.get(keyCode))) {
 				codeLookupLayout.put(keyCode, mapTo);
 			}
 		}
 		return this;
 	}
 
-	public int getRemappedKeyCount() {
-		return codeLookupLayout.size();
-	}
-
-	public Map<String,LegacyKeycode> buildLayoutTable() {
-		if(codeLookupLayout.isEmpty()) {
+	public Map<String, LegacyKeycode> buildLayoutTable() {
+		if (codeLookupLayout.isEmpty()) {
 			return codeLookupBase;
 		}
-		Map<String,LegacyKeycode> ret = new HashMap<>();
+		Map<String, LegacyKeycode> ret = new HashMap<>();
 		ret.putAll(codeLookupBase);
 		ret.putAll(codeLookupLayout);
 		return ret;
 	}
 
-	public static String getCodeFromLayoutChar(String keyChar) {
-		if(keyChar.length() != 1) {
-			return null;
-		}
-		char c = keyChar.charAt(0);
-		String ret = getCodeFromLayoutChar0(c);
-		if(ret == null) {
-			ret = getCodeFromLayoutChar0(Character.toLowerCase(c));
-		}
-		return ret;
-	}
-
-	private static String getCodeFromLayoutChar0(char keyChar) {
-		switch(keyChar) {
-		case 'e':
-			return "KeyE";
-		case 'd':
-			return "KeyD";
-		case 'u':
-			return "KeyU";
-		case '-':
-			return "Minus";
-		case 'h':
-			return "KeyH";
-		case 'z':
-			return "KeyZ";
-		case '=':
-			return "Equal";
-		case 'p':
-			return "KeyP";
-		case ';':
-			return "Semicolon";
-		case ']':
-			return "BracketRight";
-		case '/':
-			return "Slash";
-		case '[':
-			return "BracketLeft";
-		case 'l':
-			return "KeyL";
-		case '8':
-			return "Digit8";
-		case 'w':
-			return "KeyW";
-		case 's':
-			return "KeyS";
-		case '5':
-			return "Digit5";
-		case '9':
-			return "Digit9";
-		case 'o':
-			return "KeyO";
-		case '.':
-			return "Period";
-		case '6':
-			return "Digit6";
-		case 'v':
-			return "KeyV";
-		case '3':
-			return "Digit3";
-		case '`':
-			return "Backquote";
-		case 'g':
-			return "KeyG";
-		case 'j':
-			return "KeyJ";
-		case 'q':
-			return "KeyQ";
-		case '1':
-			return "Digit1";
-		case 't':
-			return "KeyT";
-		case 'y':
-			return "KeyY";
-		case '\'':
-			return "Quote";
-		case '\\':
-			return "Backslash";
-		case 'k':
-			return "KeyK";
-		case 'f':
-			return "KeyF";
-		case 'i':
-			return "KeyI";
-		case 'r':
-			return "KeyR";
-		case 'x':
-			return "KeyX";
-		case 'a':
-			return "KeyA";
-		case '2':
-			return "Digit2";
-		case '7':
-			return "Digit7";
-		case 'm':
-			return "KeyM";
-		case '4':
-			return "Digit4";
-		case '0':
-			return "Digit0";
-		case 'n':
-			return "KeyN";
-		case 'b':
-			return "KeyB";
-		case 'c':
-			return "KeyC";
-		case ',':
-			return "Comma";
-		case '*':
-			return "NumpadMultiply";
-		case 0xA5:
-			return "IntlYen";
-		default:
-			return null;
-		}
+	public int getRemappedKeyCount() {
+		return codeLookupLayout.size();
 	}
 
 }

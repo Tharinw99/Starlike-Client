@@ -20,13 +20,13 @@ import net.minecraft.world.gen.FlatLayerInfo;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,7 +38,7 @@ import net.minecraft.world.gen.FlatLayerInfo;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiCreateFlatWorld extends GuiScreen {
 	class Details extends GuiSlot {
@@ -49,9 +49,11 @@ public class GuiCreateFlatWorld extends GuiScreen {
 					GuiCreateFlatWorld.this.height - 60, 24);
 		}
 
+		@Override
 		protected void drawBackground() {
 		}
 
+		@Override
 		protected void drawSlot(int i, int j, int k, int var4, int var5, int var6) {
 			FlatLayerInfo flatlayerinfo = (FlatLayerInfo) GuiCreateFlatWorld.this.theFlatGeneratorInfo.getFlatLayers()
 					.get(GuiCreateFlatWorld.this.theFlatGeneratorInfo.getFlatLayers().size() - i - 1);
@@ -95,6 +97,7 @@ public class GuiCreateFlatWorld extends GuiScreen {
 					j + 2 + 213 - GuiCreateFlatWorld.this.fontRendererObj.getStringWidth(s1), k + 3, 16777215);
 		}
 
+		@Override
 		protected void elementClicked(int i, boolean var2, int var3, int var4) {
 			this.field_148228_k = i;
 			GuiCreateFlatWorld.this.func_146375_g();
@@ -141,14 +144,17 @@ public class GuiCreateFlatWorld extends GuiScreen {
 			this.func_148224_c(parInt1, parInt2, 0, 0);
 		}
 
+		@Override
 		protected int getScrollBarX() {
 			return this.width - 70;
 		}
 
+		@Override
 		protected int getSize() {
 			return GuiCreateFlatWorld.this.theFlatGeneratorInfo.getFlatLayers().size();
 		}
 
+		@Override
 		protected boolean isSelected(int i) {
 			return i == this.field_148228_k;
 		}
@@ -174,6 +180,7 @@ public class GuiCreateFlatWorld extends GuiScreen {
 	 * + Called by the controls from the buttonList when activated. (Mouse pressed
 	 * for buttons)
 	 */
+	@Override
 	protected void actionPerformed(GuiButton parGuiButton) {
 		int i = this.theFlatGeneratorInfo.getFlatLayers().size() - this.createFlatWorldListSlotGui.field_148228_k - 1;
 		if (parGuiButton.id == 1) {
@@ -197,6 +204,7 @@ public class GuiCreateFlatWorld extends GuiScreen {
 	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
 	 * renderPartialTicks
 	 */
+	@Override
 	public void drawScreen(int i, int j, float f) {
 		this.drawDefaultBackground();
 		this.createFlatWorldListSlotGui.drawScreen(i, j, f);
@@ -232,11 +240,13 @@ public class GuiCreateFlatWorld extends GuiScreen {
 	/**
 	 * + Handles mouse input.
 	 */
+	@Override
 	public void handleMouseInput() throws IOException {
 		super.handleMouseInput();
 		this.createFlatWorldListSlotGui.handleMouseInput();
 	}
 
+	@Override
 	public void handleTouchInput() throws IOException {
 		super.handleTouchInput();
 		this.createFlatWorldListSlotGui.handleTouchInput();
@@ -247,6 +257,7 @@ public class GuiCreateFlatWorld extends GuiScreen {
 	 * when the GUI is displayed and when the window resizes, the buttonList is
 	 * cleared beforehand.
 	 */
+	@Override
 	public void initGui() {
 		this.buttonList.clear();
 		this.flatWorldTitle = I18n.format("createWorld.customize.flat.title", new Object[0]);

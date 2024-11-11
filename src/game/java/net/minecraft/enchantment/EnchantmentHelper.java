@@ -26,13 +26,13 @@ import net.minecraft.util.WeightedRandom;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -44,7 +44,7 @@ import net.minecraft.util.WeightedRandom;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EnchantmentHelper {
 	static final class DamageIterator implements EnchantmentHelper.IModifier {
@@ -54,6 +54,7 @@ public class EnchantmentHelper {
 		private DamageIterator() {
 		}
 
+		@Override
 		public void calculateModifier(Enchantment enchantmentIn, int enchantmentLevel) {
 			enchantmentIn.onEntityDamaged(this.user, this.target, enchantmentLevel);
 		}
@@ -66,6 +67,7 @@ public class EnchantmentHelper {
 		private HurtIterator() {
 		}
 
+		@Override
 		public void calculateModifier(Enchantment enchantment, int i) {
 			enchantment.onUserHurt(this.user, this.attacker, i);
 		}
@@ -82,6 +84,7 @@ public class EnchantmentHelper {
 		private ModifierDamage() {
 		}
 
+		@Override
 		public void calculateModifier(Enchantment enchantment, int i) {
 			this.damageModifier += enchantment.calcModifierDamage(i, this.source);
 		}
@@ -94,6 +97,7 @@ public class EnchantmentHelper {
 		private ModifierLiving() {
 		}
 
+		@Override
 		public void calculateModifier(Enchantment enchantment, int i) {
 			this.livingModifier += enchantment.calcDamageByCreature(i, this.entityLiving);
 		}

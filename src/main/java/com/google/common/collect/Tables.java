@@ -39,7 +39,7 @@ import com.google.common.collect.Table.Cell;
 
 /**
  * Provides static methods that involve a {@code Table}.
- * 
+ *
  * <p>
  * See the Guava User Guide article on <a href=
  * "http://code.google.com/p/guava-libraries/wiki/CollectionUtilitiesExplained#Tables">
@@ -578,11 +578,11 @@ public final class Tables {
 	 * Query operations on the returned table "read through" to the specified table,
 	 * and attemps to modify the returned table, whether direct or via its
 	 * collection views, result in an {@code UnsupportedOperationException}.
-	 * 
+	 *
 	 * <p>
 	 * The returned table will be serializable if the specified table is
 	 * serializable.
-	 * 
+	 *
 	 * @param table the row-sorted table for which an unmodifiable view is to be
 	 *              returned
 	 * @return an unmodifiable view of the specified table
@@ -606,7 +606,7 @@ public final class Tables {
 	 * operations on the returned table "read through" to the specified table, and
 	 * attempts to modify the returned table, whether direct or via its collection
 	 * views, result in an {@code UnsupportedOperationException}.
-	 * 
+	 *
 	 * <p>
 	 * The returned table will be serializable if the specified table is
 	 * serializable.
@@ -614,7 +614,7 @@ public final class Tables {
 	 * <p>
 	 * Consider using an {@link ImmutableTable}, which is guaranteed never to
 	 * change.
-	 * 
+	 *
 	 * @param table the table for which an unmodifiable view is to be returned
 	 * @return an unmodifiable view of the specified table
 	 * @since 11.0

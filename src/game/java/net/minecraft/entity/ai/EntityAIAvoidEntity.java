@@ -15,13 +15,13 @@ import net.minecraft.util.Vec3;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,7 +33,7 @@ import net.minecraft.util.Vec3;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityAIAvoidEntity<T extends Entity> extends EntityAIBase {
 	private final Predicate<Entity> canBeSeenSelector;
@@ -55,6 +55,7 @@ public class EntityAIAvoidEntity<T extends Entity> extends EntityAIBase {
 	public EntityAIAvoidEntity(EntityCreature parEntityCreature, Class<T> parClass1, Predicate<? super T> parPredicate,
 			float parFloat1, double parDouble1, double parDouble2) {
 		this.canBeSeenSelector = new Predicate<Entity>() {
+			@Override
 			public boolean apply(Entity entity) {
 				return entity.isEntityAlive() && EntityAIAvoidEntity.this.theEntity.getEntitySenses().canSee(entity);
 			}
@@ -72,6 +73,7 @@ public class EntityAIAvoidEntity<T extends Entity> extends EntityAIBase {
 	/**
 	 * + Returns whether an in-progress EntityAIBase should continue executing
 	 */
+	@Override
 	public boolean continueExecuting() {
 		return !this.entityPathNavigate.noPath();
 	}
@@ -79,6 +81,7 @@ public class EntityAIAvoidEntity<T extends Entity> extends EntityAIBase {
 	/**
 	 * + Resets the task
 	 */
+	@Override
 	public void resetTask() {
 		this.closestLivingEntity = null;
 	}
@@ -86,6 +89,7 @@ public class EntityAIAvoidEntity<T extends Entity> extends EntityAIBase {
 	/**
 	 * + Returns whether the EntityAIBase should begin execution.
 	 */
+	@Override
 	public boolean shouldExecute() {
 		List list = this.theEntity.worldObj.getEntitiesWithinAABB(this.field_181064_i,
 				this.theEntity.getEntityBoundingBox().expand((double) this.avoidDistance, 3.0D,
@@ -113,6 +117,7 @@ public class EntityAIAvoidEntity<T extends Entity> extends EntityAIBase {
 	/**
 	 * + Execute a one shot task or start executing a continuous task
 	 */
+	@Override
 	public void startExecuting() {
 		this.entityPathNavigate.setPath(this.entityPathEntity, this.farSpeed);
 	}
@@ -120,6 +125,7 @@ public class EntityAIAvoidEntity<T extends Entity> extends EntityAIBase {
 	/**
 	 * + Updates the task
 	 */
+	@Override
 	public void updateTask() {
 		if (this.theEntity.getDistanceSqToEntity(this.closestLivingEntity) < 49.0D) {
 			this.theEntity.getNavigator().setSpeed(this.nearSpeed);

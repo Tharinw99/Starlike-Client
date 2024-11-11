@@ -73,7 +73,7 @@ public interface DateParser {
 	 * Equivalent to DateFormat.parse(String).
 	 *
 	 * See {@link java.text.DateFormat#parse(String)} for more information.
-	 * 
+	 *
 	 * @param source A {@code String} whose beginning should be parsed.
 	 * @return A {@code Date} parsed from the string
 	 * @throws ParseException if the beginning of the specified string cannot be

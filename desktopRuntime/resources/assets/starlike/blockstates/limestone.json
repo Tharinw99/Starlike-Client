@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "normal": {
-            "model": "starlike:limestone"
-        }
+  "variants": {
+    "normal": {
+      "model": "starlike:limestone"
     }
+  }
 }

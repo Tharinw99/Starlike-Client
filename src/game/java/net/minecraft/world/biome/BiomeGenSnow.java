@@ -12,13 +12,13 @@ import net.minecraft.world.gen.feature.WorldGenTaiga2;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,7 +30,7 @@ import net.minecraft.world.gen.feature.WorldGenTaiga2;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BiomeGenSnow extends BiomeGenBase {
 	private boolean field_150615_aC;
@@ -47,6 +47,7 @@ public class BiomeGenSnow extends BiomeGenBase {
 		this.spawnableCreatureList.clear();
 	}
 
+	@Override
 	protected BiomeGenBase createMutatedBiome(int i) {
 		BiomeGenBase biomegenbase = (new BiomeGenSnow(i, true)).func_150557_a(13828095, true)
 				.setBiomeName(this.biomeName + " Spikes").setEnableSnow().setTemperatureRainfall(0.0F, 0.5F)
@@ -56,6 +57,7 @@ public class BiomeGenSnow extends BiomeGenBase {
 		return biomegenbase;
 	}
 
+	@Override
 	public void decorate(World world, EaglercraftRandom random, BlockPos blockpos) {
 		if (this.field_150615_aC) {
 			for (int i = 0; i < 3; ++i) {
@@ -74,6 +76,7 @@ public class BiomeGenSnow extends BiomeGenBase {
 		super.decorate(world, random, blockpos);
 	}
 
+	@Override
 	public WorldGenAbstractTree genBigTreeChance(EaglercraftRandom var1) {
 		return new WorldGenTaiga2(false);
 	}

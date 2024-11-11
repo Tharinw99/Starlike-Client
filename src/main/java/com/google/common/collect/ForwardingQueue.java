@@ -83,7 +83,7 @@ public abstract class ForwardingQueue<E> extends ForwardingCollection<E> impleme
 	 * A sensible definition of {@link #offer} in terms of {@link #add}. If you
 	 * override {@link #add}, you may wish to override {@link #offer} to forward to
 	 * this implementation.
-	 * 
+	 *
 	 * @since 7.0
 	 */
 	protected boolean standardOffer(E e) {
@@ -98,7 +98,7 @@ public abstract class ForwardingQueue<E> extends ForwardingCollection<E> impleme
 	 * A sensible definition of {@link #peek} in terms of {@link #element}. If you
 	 * override {@link #element}, you may wish to override {@link #peek} to forward
 	 * to this implementation.
-	 * 
+	 *
 	 * @since 7.0
 	 */
 	protected E standardPeek() {
@@ -113,7 +113,7 @@ public abstract class ForwardingQueue<E> extends ForwardingCollection<E> impleme
 	 * A sensible definition of {@link #poll} in terms of {@link #remove}. If you
 	 * override {@link #remove}, you may wish to override {@link #poll} to forward
 	 * to this implementation.
-	 * 
+	 *
 	 * @since 7.0
 	 */
 	protected E standardPoll() {

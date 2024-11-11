@@ -9,17 +9,18 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.feature.WorldGenAbstractTree;
+import net.starlikeclient.minecraft.init.EntitiesStarlike;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -31,7 +32,7 @@ import net.minecraft.world.gen.feature.WorldGenAbstractTree;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BiomeGenSwamp extends BiomeGenBase {
 	protected BiomeGenSwamp(int parInt1) {
@@ -48,12 +49,16 @@ public class BiomeGenSwamp extends BiomeGenBase {
 		this.theBiomeDecorator.grassPerChunk = 5;
 		this.waterColorMultiplier = 14745518;
 		this.spawnableMonsterList.add(new BiomeGenBase.SpawnListEntry(EntitySlime.class, 1, 1, 1));
+
+		EntitiesStarlike.configEntities(this);
 	}
 
+	@Override
 	public WorldGenAbstractTree genBigTreeChance(EaglercraftRandom var1) {
 		return this.worldGeneratorSwamp;
 	}
 
+	@Override
 	public void genTerrainBlocks(World world, EaglercraftRandom random, ChunkPrimer chunkprimer, int i, int j,
 			double d0) {
 		double d1 = GRASS_COLOR_NOISE.func_151601_a((double) i * 0.25D, (double) j * 0.25D);
@@ -77,16 +82,19 @@ public class BiomeGenSwamp extends BiomeGenBase {
 		this.generateBiomeTerrain(world, random, chunkprimer, i, j, d0);
 	}
 
+	@Override
 	public int getFoliageColorAtPos(BlockPos var1) {
 		return 6975545;
 	}
 
+	@Override
 	public int getGrassColorAtPos(BlockPos blockpos) {
 		double d0 = GRASS_COLOR_NOISE.func_151601_a((double) blockpos.getX() * 0.0225D,
 				(double) blockpos.getZ() * 0.0225D);
 		return d0 < -0.1D ? 5011004 : 6975545;
 	}
 
+	@Override
 	public BlockFlower.EnumFlowerType pickRandomFlower(EaglercraftRandom var1, BlockPos var2) {
 		return BlockFlower.EnumFlowerType.BLUE_ORCHID;
 	}

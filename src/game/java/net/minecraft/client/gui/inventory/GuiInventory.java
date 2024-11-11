@@ -16,13 +16,13 @@ import net.minecraft.entity.player.EntityPlayer;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -34,7 +34,7 @@ import net.minecraft.entity.player.EntityPlayer;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiInventory extends InventoryEffectRenderer {
 	/**
@@ -94,6 +94,7 @@ public class GuiInventory extends InventoryEffectRenderer {
 	 * + Called by the controls from the buttonList when activated. (Mouse pressed
 	 * for buttons)
 	 */
+	@Override
 	protected void actionPerformed(GuiButton parGuiButton) {
 		if (parGuiButton.id == 0) {
 			this.mc.displayGuiScreen(new GuiAchievements(this, this.mc.thePlayer.getStatFileWriter()));
@@ -108,6 +109,7 @@ public class GuiInventory extends InventoryEffectRenderer {
 	/**
 	 * + Args : renderPartialTicks, mouseX, mouseY
 	 */
+	@Override
 	protected void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 		this.mc.getTextureManager().bindTexture(inventoryBackground);
@@ -124,6 +126,7 @@ public class GuiInventory extends InventoryEffectRenderer {
 	 * + Draw the foreground layer for the GuiContainer (everything in front of the
 	 * items). Args : mouseX, mouseY
 	 */
+	@Override
 	protected void drawGuiContainerForegroundLayer(int var1, int var2) {
 		this.fontRendererObj.drawString(I18n.format("container.crafting", new Object[0]), 86, 16, 0xFFFFFF);
 	}
@@ -132,6 +135,7 @@ public class GuiInventory extends InventoryEffectRenderer {
 	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
 	 * renderPartialTicks
 	 */
+	@Override
 	public void drawScreen(int i, int j, float f) {
 		super.drawScreen(i, j, f);
 		this.oldMouseX = (float) i;
@@ -143,6 +147,7 @@ public class GuiInventory extends InventoryEffectRenderer {
 	 * when the GUI is displayed and when the window resizes, the buttonList is
 	 * cleared beforehand.
 	 */
+	@Override
 	public void initGui() {
 		this.buttonList.clear();
 		if (this.mc.playerController.isInCreativeMode()) {
@@ -156,6 +161,7 @@ public class GuiInventory extends InventoryEffectRenderer {
 	/**
 	 * + Called from the main game loop to update the screen.
 	 */
+	@Override
 	public void updateScreen() {
 		if (this.mc.playerController.isInCreativeMode()) {
 			this.mc.displayGuiScreen(new GuiContainerCreative(this.mc.thePlayer));

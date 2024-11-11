@@ -129,7 +129,7 @@ public abstract class Ordering<T> implements Comparator<T> {
 	 *
 	 * <p>
 	 * Example:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *
@@ -804,7 +804,7 @@ public abstract class Ordering<T> implements Comparator<T> {
 	 * function to them, then comparing those results using {@code this}. For
 	 * example, to compare objects by their string forms, in a case-insensitive
 	 * manner, use:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *

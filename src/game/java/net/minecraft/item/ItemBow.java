@@ -12,13 +12,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,21 +30,35 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ItemBow extends Item {
 	public static final String[] bowPullIconNameArray = new String[] { "pulling_0", "pulling_1", "pulling_2" };
+	public double basePower = 1;
+	public int maxDamage = 384;
 
 	public ItemBow() {
 		this.maxStackSize = 1;
-		this.setMaxDamage(384);
+		this.setMaxDamage(maxDamage);
 		this.setCreativeTab(CreativeTabs.tabCombat);
+
+	}
+
+	public ItemBow(double power, int maxDam) {
+		this.maxStackSize = 1;
+		maxDamage = maxDam;
+		this.setMaxDamage(maxDamage);
+		this.setCreativeTab(CreativeTabs.tabStarlike);
+
+		basePower = power;
+
 	}
 
 	/**
-	 * + Return the enchantability factor of the item, most of the time is based on
-	 * material.
+	 * + Return the enchantabpuility factor of the item, most of the time is based
+	 * on material.
 	 */
+	@Override
 	public int getItemEnchantability() {
 		return 1;
 	}
@@ -53,6 +67,7 @@ public class ItemBow extends Item {
 	 * + returns the action that specifies what animation to play when the items is
 	 * being used
 	 */
+	@Override
 	public EnumAction getItemUseAction(ItemStack var1) {
 		return EnumAction.BOW;
 	}
@@ -60,6 +75,7 @@ public class ItemBow extends Item {
 	/**
 	 * + How long it takes to use or consume an item
 	 */
+	@Override
 	public int getMaxItemUseDuration(ItemStack var1) {
 		return 72000;
 	}
@@ -68,6 +84,7 @@ public class ItemBow extends Item {
 	 * + Called whenever this item is equipped and the right mouse button is
 	 * pressed. Args: itemStack, world, entityPlayer
 	 */
+	@Override
 	public ItemStack onItemRightClick(ItemStack itemstack, World var2, EntityPlayer entityplayer) {
 		if (entityplayer.capabilities.isCreativeMode || entityplayer.inventory.hasItem(Items.arrow)) {
 			entityplayer.setItemInUse(itemstack, this.getMaxItemUseDuration(itemstack));
@@ -81,6 +98,7 @@ public class ItemBow extends Item {
 	 * Not called when the player stops using the Item before the action is
 	 * complete.
 	 */
+	@Override
 	public ItemStack onItemUseFinish(ItemStack itemstack, World var2, EntityPlayer var3) {
 		return itemstack;
 	}
@@ -89,6 +107,7 @@ public class ItemBow extends Item {
 	 * + Called when the player stops using an Item (stops holding the right mouse
 	 * button).
 	 */
+	@Override
 	public void onPlayerStoppedUsing(ItemStack stack, World worldIn, EntityPlayer playerIn, int timeLeft) {
 		boolean flag = playerIn.capabilities.isCreativeMode
 				|| EnchantmentHelper.getEnchantmentLevel(Enchantment.infinity.effectId, stack) > 0;
@@ -136,6 +155,9 @@ public class ItemBow extends Item {
 			if (!worldIn.isRemote) {
 				worldIn.spawnEntityInWorld(entityarrow);
 			}
+			// modifier
+			entityarrow.setDamage((entityarrow.getDamage() * basePower));
+
 		}
 
 	}

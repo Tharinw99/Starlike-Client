@@ -33,13 +33,13 @@ import net.minecraft.world.WorldServer;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -51,7 +51,7 @@ import net.minecraft.world.WorldServer;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityFishHook extends Entity {
 	private static final List<WeightedRandomFishable> JUNK = Arrays.asList(new WeightedRandomFishable[] {
@@ -151,6 +151,7 @@ public class EntityFishHook extends Entity {
 		this.handleHookCasting(this.motionX, this.motionY, this.motionZ, 1.5F, 1.0F);
 	}
 
+	@Override
 	protected void entityInit() {
 	}
 
@@ -249,6 +250,7 @@ public class EntityFishHook extends Entity {
 	 * and comparing it to its average edge length * 64 * renderDistanceWeight Args:
 	 * distance
 	 */
+	@Override
 	public boolean isInRangeToRenderDist(double d0) {
 		double d1 = this.getEntityBoundingBox().getAverageEdgeLength() * 4.0D;
 		if (Double.isNaN(d1)) {
@@ -262,6 +264,7 @@ public class EntityFishHook extends Entity {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		super.onUpdate();
 		if (this.fishPosRotationIncrements > 0) {
@@ -536,6 +539,7 @@ public class EntityFishHook extends Entity {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		this.xTile = nbttagcompound.getShort("xTile");
 		this.yTile = nbttagcompound.getShort("yTile");
@@ -553,6 +557,7 @@ public class EntityFishHook extends Entity {
 	/**
 	 * + Will get destroyed next tick.
 	 */
+	@Override
 	public void setDead() {
 		super.setDead();
 		if (this.angler != null) {
@@ -561,6 +566,7 @@ public class EntityFishHook extends Entity {
 
 	}
 
+	@Override
 	public void setPositionAndRotation2(double d0, double d1, double d2, float f, float f1, int i, boolean var10) {
 		this.fishX = d0;
 		this.fishY = d1;
@@ -576,6 +582,7 @@ public class EntityFishHook extends Entity {
 	/**
 	 * + Sets the velocity to the args. Args: x, y, z
 	 */
+	@Override
 	public void setVelocity(double d0, double d1, double d2) {
 		this.clientMotionX = this.motionX = d0;
 		this.clientMotionY = this.motionY = d1;
@@ -585,6 +592,7 @@ public class EntityFishHook extends Entity {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		nbttagcompound.setShort("xTile", (short) this.xTile);
 		nbttagcompound.setShort("yTile", (short) this.yTile);

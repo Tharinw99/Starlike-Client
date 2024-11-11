@@ -9,13 +9,13 @@ import net.minecraft.util.MathHelper;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@ import net.minecraft.util.MathHelper;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ModelRabbit extends ModelBase {
 	ModelRenderer rabbitLeftFoot;
@@ -115,6 +115,7 @@ public class ModelRabbit extends ModelBase {
 	/**
 	 * + Sets the models various rotation angles then renders the model.
 	 */
+	@Override
 	public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
 		this.setRotationAngles(f, f1, f2, f3, f4, f5, entity);
 		if (this.isChild) {
@@ -160,6 +161,7 @@ public class ModelRabbit extends ModelBase {
 	 * float params here are the same second and third as in the setRotationAngles
 	 * method.
 	 */
+	@Override
 	public void setLivingAnimations(EntityLivingBase var1, float var2, float var3, float var4) {
 	}
 
@@ -169,6 +171,7 @@ public class ModelRabbit extends ModelBase {
 	 * time(so that arms and legs swing back and forth) and par2 represents how
 	 * "far" arms and legs can swing at most.
 	 */
+	@Override
 	public void setRotationAngles(float var1, float var2, float f, float f1, float f2, float var6, Entity entity) {
 		float f3 = f - (float) entity.ticksExisted;
 		EntityRabbit entityrabbit = (EntityRabbit) entity;

@@ -17,22 +17,27 @@ public class CommandGm extends CommandBase {
 		this.gmName = gmId == 0 ? "s" : gmId == 1 ? "c" : gmId == 2 ? "a" : gmId == 3 ? "sp" : null;
 	}
 
+	@Override
 	public String getCommandName() {
 		return "gm" + this.gmName;
 	}
 
+	@Override
 	public String getCommandUsage(ICommandSender var1) {
 		return (new ChatComponentTranslation("commands.gm.usage", new Object[] { this.gmName }).getUnformattedText());
 	}
 
+	@Override
 	public int getRequiredPermissionLevel() {
 		return 2;
 	}
 
+	@Override
 	public boolean isUsernameIndex(String[] args, int index) {
 		return index == 1;
 	}
 
+	@Override
 	public void processCommand(ICommandSender parICommandSender, String[] parArrayOfString) throws CommandException {
 		if (parArrayOfString.length < 0) {
 			throw new WrongUsageException("commands.gm.usage", new Object[] { this.gmName });

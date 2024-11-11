@@ -8,13 +8,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -26,19 +26,21 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class EntityFlying extends EntityLiving {
 	public EntityFlying(World worldIn) {
 		super(worldIn);
 	}
 
+	@Override
 	public void fall(float var1, float var2) {
 	}
 
 	/**
 	 * + returns true if this entity is by a ladder, false otherwise
 	 */
+	@Override
 	public boolean isOnLadder() {
 		return false;
 	}
@@ -46,6 +48,7 @@ public abstract class EntityFlying extends EntityLiving {
 	/**
 	 * + Moves the entity based on the specified heading. Args: strafe, forward
 	 */
+	@Override
 	public void moveEntityWithHeading(float strafe, float forward) {
 		if (this.isInWater()) {
 			this.moveFlying(strafe, forward, 0.02F);
@@ -94,6 +97,7 @@ public abstract class EntityFlying extends EntityLiving {
 		this.limbSwing += this.limbSwingAmount;
 	}
 
+	@Override
 	protected void updateFallState(double var1, boolean var3, Block var4, BlockPos var5) {
 	}
 }

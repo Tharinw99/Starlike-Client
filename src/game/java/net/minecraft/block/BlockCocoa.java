@@ -22,13 +22,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -40,7 +40,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockCocoa extends BlockDirectional implements IGrowable {
 	public static final PropertyInteger AGE = PropertyInteger.create("age", 0, 2);
@@ -62,14 +62,17 @@ public class BlockCocoa extends BlockDirectional implements IGrowable {
 	/**
 	 * + Whether this IGrowable can grow
 	 */
+	@Override
 	public boolean canGrow(World var1, BlockPos var2, IBlockState iblockstate, boolean var4) {
 		return ((Integer) iblockstate.getValue(AGE)).intValue() < 2;
 	}
 
+	@Override
 	public boolean canUseBonemeal(World var1, EaglercraftRandom var2, BlockPos var3, IBlockState var4) {
 		return true;
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { FACING, AGE });
 	}
@@ -82,6 +85,7 @@ public class BlockCocoa extends BlockDirectional implements IGrowable {
 	/**
 	 * + Spawns this Block's drops into the World as EntityItems.
 	 */
+	@Override
 	public void dropBlockAsItemWithChance(World world, BlockPos blockpos, IBlockState iblockstate, float var4,
 			int var5) {
 		int i = ((Integer) iblockstate.getValue(AGE)).intValue();
@@ -96,19 +100,23 @@ public class BlockCocoa extends BlockDirectional implements IGrowable {
 
 	}
 
+	@Override
 	public EnumWorldBlockLayer getBlockLayer() {
 		return EnumWorldBlockLayer.CUTOUT;
 	}
 
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox(World world, BlockPos blockpos, IBlockState iblockstate) {
 		this.setBlockBoundsBasedOnState(world, blockpos);
 		return super.getCollisionBoundingBox(world, blockpos, iblockstate);
 	}
 
+	@Override
 	public int getDamageValue(World var1, BlockPos var2) {
 		return EnumDyeColor.BROWN.getDyeDamage();
 	}
 
+	@Override
 	public Item getItem(World var1, BlockPos var2) {
 		return Items.dye;
 	}
@@ -116,6 +124,7 @@ public class BlockCocoa extends BlockDirectional implements IGrowable {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
 		i = i | ((EnumFacing) iblockstate.getValue(FACING)).getHorizontalIndex();
@@ -123,6 +132,7 @@ public class BlockCocoa extends BlockDirectional implements IGrowable {
 		return i;
 	}
 
+	@Override
 	public AxisAlignedBB getSelectedBoundingBox(World world, BlockPos blockpos) {
 		this.setBlockBoundsBasedOnState(world, blockpos);
 		return super.getSelectedBoundingBox(world, blockpos);
@@ -131,17 +141,20 @@ public class BlockCocoa extends BlockDirectional implements IGrowable {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(FACING, EnumFacing.getHorizontal(i)).withProperty(AGE,
 				Integer.valueOf((i & 15) >> 2));
 	}
 
+	@Override
 	public void grow(World world, EaglercraftRandom var2, BlockPos blockpos, IBlockState iblockstate) {
 		world.setBlockState(blockpos,
 				iblockstate.withProperty(AGE, Integer.valueOf(((Integer) iblockstate.getValue(AGE)).intValue() + 1)),
 				2);
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -150,6 +163,7 @@ public class BlockCocoa extends BlockDirectional implements IGrowable {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
@@ -158,6 +172,7 @@ public class BlockCocoa extends BlockDirectional implements IGrowable {
 	 * + Called by ItemBlocks just before a block is actually set in the world, to
 	 * allow for adjustments to the IBlockstate
 	 */
+	@Override
 	public IBlockState onBlockPlaced(World var1, BlockPos var2, EnumFacing enumfacing, float var4, float var5,
 			float var6, int var7, EntityLivingBase var8) {
 		if (!enumfacing.getAxis().isHorizontal()) {
@@ -172,6 +187,7 @@ public class BlockCocoa extends BlockDirectional implements IGrowable {
 	 * + Called by ItemBlocks after a block is set in the world, to allow post-place
 	 * logic
 	 */
+	@Override
 	public void onBlockPlacedBy(World world, BlockPos blockpos, IBlockState iblockstate,
 			EntityLivingBase entitylivingbase, ItemStack var5) {
 		EnumFacing enumfacing = EnumFacing.fromAngle((double) entitylivingbase.rotationYaw);
@@ -181,6 +197,7 @@ public class BlockCocoa extends BlockDirectional implements IGrowable {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block var4) {
 		if (!this.canBlockStay(world, blockpos, iblockstate)) {
 			this.dropBlock(world, blockpos, iblockstate);
@@ -188,6 +205,7 @@ public class BlockCocoa extends BlockDirectional implements IGrowable {
 
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
 		IBlockState iblockstate = iblockaccess.getBlockState(blockpos);
 		EnumFacing enumfacing = (EnumFacing) iblockstate.getValue(FACING);
@@ -215,6 +233,7 @@ public class BlockCocoa extends BlockDirectional implements IGrowable {
 
 	}
 
+	@Override
 	public void updateTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom var4) {
 		if (!this.canBlockStay(world, blockpos, iblockstate)) {
 			this.dropBlock(world, blockpos, iblockstate);

@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "normal": {
-            "model": "starlike:diorite_tiles"
-        }
+  "variants": {
+    "normal": {
+      "model": "starlike:diorite_tiles"
     }
+  }
 }

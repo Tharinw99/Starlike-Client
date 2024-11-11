@@ -102,7 +102,7 @@ public final class Resources {
 	/**
 	 * Given a {@code resourceName} that is relative to {@code contextClass},
 	 * returns a {@code URL} pointing to the named resource.
-	 * 
+	 *
 	 * @throws IllegalArgumentException if the resource is not found
 	 */
 	public static URL getResource(Class<?> contextClass, String resourceName) {
@@ -122,7 +122,7 @@ public final class Resources {
 	 * <p>
 	 * In the unusual case where the context class loader is null, the class loader
 	 * that loaded this class ({@code Resources}) will be used instead.
-	 * 
+	 *
 	 * @throws IllegalArgumentException if the resource is not found
 	 */
 	public static URL getResource(String resourceName) {

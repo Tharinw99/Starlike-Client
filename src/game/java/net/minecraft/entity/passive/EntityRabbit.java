@@ -41,13 +41,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -59,7 +59,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityRabbit extends EntityAnimal {
 	static class AIAvoidEntity<T extends Entity> extends EntityAIAvoidEntity<T> {
@@ -71,6 +71,7 @@ public class EntityRabbit extends EntityAnimal {
 			this.entityInstance = parEntityRabbit;
 		}
 
+		@Override
 		public void updateTask() {
 			super.updateTask();
 		}
@@ -81,6 +82,7 @@ public class EntityRabbit extends EntityAnimal {
 			super(parEntityRabbit, EntityLivingBase.class, 1.4D, true);
 		}
 
+		@Override
 		protected double func_179512_a(EntityLivingBase entitylivingbase) {
 			return (double) (4.0F + entitylivingbase.width);
 		}
@@ -94,6 +96,7 @@ public class EntityRabbit extends EntityAnimal {
 			this.theEntity = parEntityRabbit;
 		}
 
+		@Override
 		public void updateTask() {
 			super.updateTask();
 			this.theEntity.setMovementSpeed(this.speed);
@@ -110,14 +113,17 @@ public class EntityRabbit extends EntityAnimal {
 			this.field_179500_c = parEntityRabbit;
 		}
 
+		@Override
 		public boolean continueExecuting() {
 			return this.field_179499_e && super.continueExecuting();
 		}
 
+		@Override
 		public void resetTask() {
 			super.resetTask();
 		}
 
+		@Override
 		public boolean shouldExecute() {
 			if (this.runDelay <= 0) {
 				if (!this.field_179500_c.worldObj.getGameRules().getBoolean("mobGriefing")) {
@@ -131,6 +137,7 @@ public class EntityRabbit extends EntityAnimal {
 			return super.shouldExecute();
 		}
 
+		@Override
 		protected boolean shouldMoveTo(World world, BlockPos blockpos) {
 			Block block = world.getBlockState(blockpos).getBlock();
 			if (block == Blocks.farmland) {
@@ -147,10 +154,12 @@ public class EntityRabbit extends EntityAnimal {
 			return false;
 		}
 
+		@Override
 		public void startExecuting() {
 			super.startExecuting();
 		}
 
+		@Override
 		public void updateTask() {
 			super.updateTask();
 			this.field_179500_c.getLookHelper().setLookPosition((double) this.destinationBlock.getX() + 0.5D,
@@ -217,6 +226,7 @@ public class EntityRabbit extends EntityAnimal {
 			this.theEntity = rabbit;
 		}
 
+		@Override
 		public void doJump() {
 			if (this.isJumping) {
 				this.theEntity.doMovementAction(EntityRabbit.EnumMoveType.STEP);
@@ -246,6 +256,7 @@ public class EntityRabbit extends EntityAnimal {
 			this.theEntity = parEntityRabbit;
 		}
 
+		@Override
 		public void onUpdateMoveHelper() {
 			if (this.theEntity.onGround && !this.theEntity.func_175523_cj()) {
 				this.theEntity.setMovementSpeed(0.0D);
@@ -305,16 +316,19 @@ public class EntityRabbit extends EntityAnimal {
 	/**
 	 * + Causes this Entity to drop a random item.
 	 */
+	@Override
 	protected void addRandomDrop() {
 		this.entityDropItem(new ItemStack(Items.rabbit_foot, 1), 0.0F);
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(10.0D);
 		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.30000001192092896D);
 	}
 
+	@Override
 	public boolean attackEntityAsMob(Entity entity) {
 		if (this.getRabbitType() == 99) {
 			this.playSound("mob.attack", 1.0F, (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
@@ -327,6 +341,7 @@ public class EntityRabbit extends EntityAnimal {
 	/**
 	 * + Called when the entity is attacked.
 	 */
+	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float f) {
 		return this.isEntityInvulnerable(damagesource) ? false : super.attackEntityFrom(damagesource, f);
 	}
@@ -336,6 +351,7 @@ public class EntityRabbit extends EntityAnimal {
 				/ 3.1415927410125732D) - 90.0F;
 	}
 
+	@Override
 	public EntityRabbit createChild(EntityAgeable entityageable) {
 		EntityRabbit entityrabbit = new EntityRabbit(this.worldObj);
 		if (entityageable instanceof EntityRabbit) {
@@ -364,6 +380,7 @@ public class EntityRabbit extends EntityAnimal {
 	/**
 	 * + Drop 0-2 items of this living's type
 	 */
+	@Override
 	protected void dropFewItems(boolean var1, int i) {
 		int j = this.rand.nextInt(2) + this.rand.nextInt(1 + i);
 
@@ -383,6 +400,7 @@ public class EntityRabbit extends EntityAnimal {
 
 	}
 
+	@Override
 	protected void entityInit() {
 		super.entityInit();
 		this.dataWatcher.addObject(18, Byte.valueOf((byte) 0));
@@ -413,6 +431,7 @@ public class EntityRabbit extends EntityAnimal {
 	/**
 	 * + Returns the sound this mob makes on death.
 	 */
+	@Override
 	protected String getDeathSound() {
 		return "mob.rabbit.death";
 	}
@@ -420,6 +439,7 @@ public class EntityRabbit extends EntityAnimal {
 	/**
 	 * + Returns the sound this mob makes when it is hurt.
 	 */
+	@Override
 	protected String getHurtSound() {
 		return "mob.rabbit.hurt";
 	}
@@ -428,6 +448,7 @@ public class EntityRabbit extends EntityAnimal {
 		return "mob.rabbit.hop";
 	}
 
+	@Override
 	protected float getJumpUpwardsMotion() {
 		return this.moveHelper.isUpdating() && this.moveHelper.getY() > this.posY + 0.5D ? 0.5F
 				: this.moveType.func_180074_b();
@@ -436,6 +457,7 @@ public class EntityRabbit extends EntityAnimal {
 	/**
 	 * + Returns the sound this mob makes while it's alive.
 	 */
+	@Override
 	protected String getLivingSound() {
 		return "mob.rabbit.idle";
 	}
@@ -456,10 +478,12 @@ public class EntityRabbit extends EntityAnimal {
 	 * + Returns the current armor value as determined by a call to
 	 * InventoryPlayer.getTotalArmorValue
 	 */
+	@Override
 	public int getTotalArmorValue() {
 		return this.getRabbitType() == 99 ? 8 : super.getTotalArmorValue();
 	}
 
+	@Override
 	public void handleStatusUpdate(byte b0) {
 		if (b0 == 1) {
 			this.createRunningParticles();
@@ -475,6 +499,7 @@ public class EntityRabbit extends EntityAnimal {
 	 * + Checks if the parameter is an item which this animal can be fed to breed it
 	 * (wheat, carrots or seeds depending on the animal type)
 	 */
+	@Override
 	public boolean isBreedingItem(ItemStack itemstack) {
 		return itemstack != null && this.isRabbitBreedingItem(itemstack.getItem());
 	}
@@ -498,6 +523,7 @@ public class EntityRabbit extends EntityAnimal {
 	 * spawner, natural spawning etc, but not called when entity is reloaded from
 	 * nbt. Mainly used for initializing attributes and inventory
 	 */
+	@Override
 	public IEntityLivingData onInitialSpawn(DifficultyInstance difficultyinstance,
 			IEntityLivingData ientitylivingdata) {
 		ientitylivingdata = super.onInitialSpawn(difficultyinstance, ientitylivingdata);
@@ -523,6 +549,7 @@ public class EntityRabbit extends EntityAnimal {
 	 * required. For example, zombies and skeletons use this to react to sunlight
 	 * and start to burn.
 	 */
+	@Override
 	public void onLivingUpdate() {
 		super.onLivingUpdate();
 		if (this.field_175540_bm != this.field_175535_bn) {
@@ -541,6 +568,7 @@ public class EntityRabbit extends EntityAnimal {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		this.setRabbitType(nbttagcompound.getInteger("RabbitType"));
@@ -590,9 +618,11 @@ public class EntityRabbit extends EntityAnimal {
 	 * + Attempts to create sprinting particles if the entity is sprinting and not
 	 * in water.
 	 */
+	@Override
 	public void spawnRunningParticles() {
 	}
 
+	@Override
 	public void updateAITasks() {
 		if (this.moveHelper.getSpeed() > 0.8D) {
 			this.setMoveType(EntityRabbit.EnumMoveType.SPRINT);
@@ -655,6 +685,7 @@ public class EntityRabbit extends EntityAnimal {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		nbttagcompound.setInteger("RabbitType", this.getRabbitType());

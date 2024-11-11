@@ -114,13 +114,13 @@ import net.minecraft.world.biome.BiomeGenBase;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -132,7 +132,7 @@ import net.minecraft.world.biome.BiomeGenBase;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityRenderer implements IResourceManagerReloadListener {
 	private static final Logger logger = LogManager.getLogger();
@@ -1373,11 +1373,13 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 					CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Rendering screen");
 					CrashReportCategory crashreportcategory = crashreport.makeCategory("Screen render details");
 					crashreportcategory.addCrashSectionCallable("Screen name", new Callable<String>() {
+						@Override
 						public String call() throws Exception {
 							return EntityRenderer.this.mc.currentScreen.getClass().getName();
 						}
 					});
 					crashreportcategory.addCrashSectionCallable("Mouse location", new Callable<String>() {
+						@Override
 						public String call() throws Exception {
 							return HString.format("Scaled: (%d, %d). Absolute: (%d, %d)",
 									new Object[] { Integer.valueOf(j1), Integer.valueOf(k1),
@@ -1386,6 +1388,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 						}
 					});
 					crashreportcategory.addCrashSectionCallable("Screen size", new Callable<String>() {
+						@Override
 						public String call() throws Exception {
 							return HString.format("Scaled: (%d, %d). Absolute: (%d, %d). Scale factor of %d",
 									new Object[] { Integer.valueOf(scaledresolution.getScaledWidth()),
@@ -1396,6 +1399,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 						}
 					});
 					crashreportcategory.addCrashSectionCallable("Eagler Scale", new Callable<String>() {
+						@Override
 						public String call() throws Exception {
 							return "" + ff[0];
 						}
@@ -1480,6 +1484,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 						entity.getEntityBoundingBox().addCoord(vec31.xCoord * d0, vec31.yCoord * d0, vec31.zCoord * d0)
 								.expand((double) f, (double) f, (double) f),
 						Predicates.and(EntitySelectors.NOT_SPECTATING, new Predicate<Entity>() {
+							@Override
 							public boolean apply(Entity entity2) {
 								return entity2.canBeCollidedWith();
 							}
@@ -1598,6 +1603,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 		this.useShader = false;
 	}
 
+	@Override
 	public void onResourceManagerReload(IResourceManager var1) {
 	}
 
@@ -1882,7 +1888,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 			float f1 = (float) this.rendererUpdateCount + partialTicks;
 			worldrenderer.setTranslation(-d0, -d1, -d2);
 			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-			BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+			BlockPos blockpos$mutableblockpos = new BlockPos();
 
 			for (int i1 = k - b0; i1 <= k + b0; ++i1) {
 				for (int j1 = i - b0; j1 <= i + b0; ++j1) {

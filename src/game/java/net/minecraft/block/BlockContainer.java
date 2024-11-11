@@ -11,13 +11,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,7 +29,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class BlockContainer extends Block implements ITileEntityProvider {
 	protected BlockContainer(Material materialIn) {
@@ -41,6 +41,7 @@ public abstract class BlockContainer extends Block implements ITileEntityProvide
 		this.isBlockContainer = true;
 	}
 
+	@Override
 	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
 		super.breakBlock(worldIn, pos, state);
 		worldIn.removeTileEntity(pos);
@@ -61,6 +62,7 @@ public abstract class BlockContainer extends Block implements ITileEntityProvide
 	 * + The type of render function called. 3 for standard block models, 2 for
 	 * TESR's, 1 for liquids, -1 is no render
 	 */
+	@Override
 	public int getRenderType() {
 		return -1;
 	}
@@ -68,6 +70,7 @@ public abstract class BlockContainer extends Block implements ITileEntityProvide
 	/**
 	 * + Called on both Client and Server when World#addBlockEvent is called
 	 */
+	@Override
 	public boolean onBlockEventReceived(World worldIn, BlockPos pos, IBlockState state, int eventID, int eventParam) {
 		super.onBlockEventReceived(worldIn, pos, state, eventID, eventParam);
 		TileEntity tileentity = worldIn.getTileEntity(pos);

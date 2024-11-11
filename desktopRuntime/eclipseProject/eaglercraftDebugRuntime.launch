@@ -7,6 +7,9 @@
     <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
         <listEntry value="1"/>
     </listAttribute>
+    <mapAttribute key="org.eclipse.debug.core.environmentVariables">
+        <mapEntry key="LD_LIBRARY_PATH" value="${project_loc}/../"/>
+    </mapAttribute>
     <listAttribute key="org.eclipse.debug.ui.favoriteGroups">
         <listEntry value="org.eclipse.debug.ui.launchGroup.debug"/>
         <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
@@ -17,6 +20,7 @@
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="net.lax1dude.eaglercraft.v1_8.internal.lwjgl.MainClass"/>
     <stringAttribute key="org.eclipse.jdt.launching.MODULE_NAME" value="eclipseProject"/>
+    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="hide-renderdoc"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="eclipseProject"/>
     <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djava.library.path=."/>
     <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${project_loc}/../"/>

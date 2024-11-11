@@ -11,13 +11,13 @@ import net.minecraft.util.IChatComponent;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,7 +29,7 @@ import net.minecraft.util.IChatComponent;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class PlayerMenuObject implements ISpectatorMenuObject {
 	private final GameProfile profile;
@@ -38,14 +38,17 @@ public class PlayerMenuObject implements ISpectatorMenuObject {
 		this.profile = profileIn;
 	}
 
+	@Override
 	public void func_178661_a(SpectatorMenu menu) {
 		Minecraft.getMinecraft().getNetHandler().addToSendQueue(new C18PacketSpectate(this.profile.getId()));
 	}
 
+	@Override
 	public boolean func_178662_A_() {
 		return true;
 	}
 
+	@Override
 	public void func_178663_a(float alpha, int parInt1) {
 		Minecraft.getMinecraft().getTextureManager().bindTexture(
 				Minecraft.getMinecraft().getNetHandler().getSkinCache().getSkin(profile).getResourceLocation());
@@ -54,6 +57,7 @@ public class PlayerMenuObject implements ISpectatorMenuObject {
 		Gui.drawScaledCustomSizeModalRect(2, 2, 40.0F, 8.0F, 8, 8, 12, 12, 64.0F, 64.0F);
 	}
 
+	@Override
 	public IChatComponent getSpectatorName() {
 		return new ChatComponentText(this.profile.getName());
 	}

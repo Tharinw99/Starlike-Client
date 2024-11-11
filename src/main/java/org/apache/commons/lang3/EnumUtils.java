@@ -42,7 +42,7 @@ public class EnumUtils {
 
 	/**
 	 * Validate {@code enumClass}.
-	 * 
+	 *
 	 * @param <E>       the type of the enumeration
 	 * @param enumClass to check
 	 * @return {@code enumClass}
@@ -59,7 +59,7 @@ public class EnumUtils {
 	/**
 	 * Validate that {@code enumClass} is compatible with representation in a
 	 * {@code long}.
-	 * 
+	 *
 	 * @param <E>       the type of the enumeration
 	 * @param enumClass to check
 	 * @return {@code enumClass}

@@ -18,13 +18,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -36,7 +36,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockNetherWart extends BlockBush {
 	public static final PropertyInteger AGE = PropertyInteger.create("age", 0, 3);
@@ -50,6 +50,7 @@ public class BlockNetherWart extends BlockBush {
 		this.setCreativeTab((CreativeTabs) null);
 	}
 
+	@Override
 	public boolean canBlockStay(World world, BlockPos blockpos, IBlockState var3) {
 		return this.canPlaceBlockOn(world.getBlockState(blockpos.down()).getBlock());
 	}
@@ -57,10 +58,12 @@ public class BlockNetherWart extends BlockBush {
 	/**
 	 * + is the block grass, dirt or farmland
 	 */
+	@Override
 	protected boolean canPlaceBlockOn(Block block) {
 		return block == Blocks.soul_sand;
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { AGE });
 	}
@@ -68,6 +71,7 @@ public class BlockNetherWart extends BlockBush {
 	/**
 	 * + Spawns this Block's drops into the World as EntityItems.
 	 */
+	@Override
 	public void dropBlockAsItemWithChance(World world, BlockPos blockpos, IBlockState iblockstate, float var4, int i) {
 		if (!world.isRemote) {
 			int j = 1;
@@ -84,6 +88,7 @@ public class BlockNetherWart extends BlockBush {
 		}
 	}
 
+	@Override
 	public Item getItem(World var1, BlockPos var2) {
 		return Items.nether_wart;
 	}
@@ -91,6 +96,7 @@ public class BlockNetherWart extends BlockBush {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
 		return null;
 	}
@@ -98,6 +104,7 @@ public class BlockNetherWart extends BlockBush {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		return ((Integer) iblockstate.getValue(AGE)).intValue();
 	}
@@ -105,6 +112,7 @@ public class BlockNetherWart extends BlockBush {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(AGE, Integer.valueOf(i));
 	}
@@ -112,10 +120,12 @@ public class BlockNetherWart extends BlockBush {
 	/**
 	 * + Returns the quantity of items to drop on block destruction.
 	 */
+	@Override
 	public int quantityDropped(EaglercraftRandom var1) {
 		return 0;
 	}
 
+	@Override
 	public void updateTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom random) {
 		int i = ((Integer) iblockstate.getValue(AGE)).intValue();
 		if (i < 3 && random.nextInt(10) == 0) {

@@ -11,13 +11,13 @@ import net.minecraft.world.gen.feature.WorldGenAbstractTree;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,7 +29,7 @@ import net.minecraft.world.gen.feature.WorldGenAbstractTree;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BiomeGenMutated extends BiomeGenBase {
 	protected BiomeGenBase baseBiome;
@@ -59,27 +59,33 @@ public class BiomeGenMutated extends BiomeGenBase {
 		this.maxHeight = biome.maxHeight + 0.2F;
 	}
 
+	@Override
 	public void decorate(World world, EaglercraftRandom random, BlockPos blockpos) {
 		this.baseBiome.theBiomeDecorator.decorate(world, random, this, blockpos);
 	}
 
+	@Override
 	public WorldGenAbstractTree genBigTreeChance(EaglercraftRandom random) {
 		return this.baseBiome.genBigTreeChance(random);
 	}
 
+	@Override
 	public void genTerrainBlocks(World world, EaglercraftRandom random, ChunkPrimer chunkprimer, int i, int j,
 			double d0) {
 		this.baseBiome.genTerrainBlocks(world, random, chunkprimer, i, j, d0);
 	}
 
+	@Override
 	public Class<? extends BiomeGenBase> getBiomeClass() {
 		return this.baseBiome.getBiomeClass();
 	}
 
+	@Override
 	public int getFoliageColorAtPos(BlockPos blockpos) {
 		return this.baseBiome.getFoliageColorAtPos(blockpos);
 	}
 
+	@Override
 	public int getGrassColorAtPos(BlockPos blockpos) {
 		return this.baseBiome.getGrassColorAtPos(blockpos);
 	}
@@ -87,10 +93,12 @@ public class BiomeGenMutated extends BiomeGenBase {
 	/**
 	 * + returns the chance a creature has to spawn.
 	 */
+	@Override
 	public float getSpawningChance() {
 		return this.baseBiome.getSpawningChance();
 	}
 
+	@Override
 	public BiomeGenBase.TempCategory getTempCategory() {
 		return this.baseBiome.getTempCategory();
 	}
@@ -98,6 +106,7 @@ public class BiomeGenMutated extends BiomeGenBase {
 	/**
 	 * + returns true if the biome specified is equal to this biome
 	 */
+	@Override
 	public boolean isEqualTo(BiomeGenBase biomegenbase) {
 		return this.baseBiome.isEqualTo(biomegenbase);
 	}

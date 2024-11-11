@@ -40,7 +40,7 @@ import com.google.common.annotations.GwtCompatible;
  * <p>
  * Another example is an iterator that skips over null elements in a backing
  * iterator. This could be implemented as:
- * 
+ *
  * <pre>
  *    {@code
  *

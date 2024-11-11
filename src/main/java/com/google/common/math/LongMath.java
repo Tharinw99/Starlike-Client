@@ -697,7 +697,7 @@ public final class LongMath {
 		}
 		/*
 		 * Let k be the true value of floor(sqrt(x)), so that
-		 * 
+		 *
 		 * k * k <= x < (k + 1) * (k + 1) (double) (k * k) <= (double) x <= (double) ((k
 		 * + 1) * (k + 1)) since casting to double is nondecreasing. Note that the
 		 * right-hand inequality is no longer strict. Math.sqrt(k * k) <= Math.sqrt(x)
@@ -738,7 +738,7 @@ public final class LongMath {
 			 * We wish to test whether or not x <= (sqrtFloor + 0.5)^2 = halfSquare + 0.25.
 			 * Since both x and halfSquare are integers, this is equivalent to testing
 			 * whether or not x <= halfSquare. (We have to deal with overflow, though.)
-			 * 
+			 *
 			 * If we treat halfSquare as an unsigned long, we know that sqrtFloor^2 <= x <
 			 * (sqrtFloor + 1)^2 halfSquare - sqrtFloor <= x < halfSquare + sqrtFloor + 1 so
 			 * |x - halfSquare| <= sqrtFloor. Therefore, it's safe to treat x - halfSquare

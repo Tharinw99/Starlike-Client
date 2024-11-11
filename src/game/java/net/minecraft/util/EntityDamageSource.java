@@ -8,13 +8,13 @@ import net.minecraft.item.ItemStack;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -26,7 +26,7 @@ import net.minecraft.item.ItemStack;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityDamageSource extends DamageSource {
 	protected Entity damageSourceEntity;
@@ -44,6 +44,7 @@ public class EntityDamageSource extends DamageSource {
 	/**
 	 * + Gets the death message that is displayed when the player dies
 	 */
+	@Override
 	public IChatComponent getDeathMessage(EntityLivingBase entitylivingbase) {
 		ItemStack itemstack = this.damageSourceEntity instanceof EntityLivingBase
 				? ((EntityLivingBase) this.damageSourceEntity).getHeldItem()
@@ -58,6 +59,7 @@ public class EntityDamageSource extends DamageSource {
 						new Object[] { entitylivingbase.getDisplayName(), this.damageSourceEntity.getDisplayName() });
 	}
 
+	@Override
 	public Entity getEntity() {
 		return this.damageSourceEntity;
 	}
@@ -70,6 +72,7 @@ public class EntityDamageSource extends DamageSource {
 	 * + Return whether this damage source will have its damage amount scaled based
 	 * on the current difficulty.
 	 */
+	@Override
 	public boolean isDifficultyScaled() {
 		return this.damageSourceEntity != null && this.damageSourceEntity instanceof EntityLivingBase
 				&& !(this.damageSourceEntity instanceof EntityPlayer);

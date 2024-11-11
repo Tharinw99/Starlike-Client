@@ -21,13 +21,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -39,7 +39,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockJukebox extends BlockContainer {
 	public static class TileEntityJukebox extends TileEntity {
@@ -49,6 +49,7 @@ public class BlockJukebox extends BlockContainer {
 			return this.record;
 		}
 
+		@Override
 		public void readFromNBT(NBTTagCompound compound) {
 			super.readFromNBT(compound);
 			if (compound.hasKey("RecordItem", 10)) {
@@ -64,6 +65,7 @@ public class BlockJukebox extends BlockContainer {
 			this.markDirty();
 		}
 
+		@Override
 		public void writeToNBT(NBTTagCompound compound) {
 			super.writeToNBT(compound);
 			if (this.getRecord() != null) {
@@ -81,11 +83,13 @@ public class BlockJukebox extends BlockContainer {
 		this.setCreativeTab(CreativeTabs.tabDecorations);
 	}
 
+	@Override
 	public void breakBlock(World world, BlockPos blockpos, IBlockState iblockstate) {
 		this.dropRecord(world, blockpos, iblockstate);
 		super.breakBlock(world, blockpos, iblockstate);
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { HAS_RECORD });
 	}
@@ -94,6 +98,7 @@ public class BlockJukebox extends BlockContainer {
 	 * + Returns a new instance of a block's tile entity class. Called on placing
 	 * the block.
 	 */
+	@Override
 	public TileEntity createNewTileEntity(World var1, int var2) {
 		return new BlockJukebox.TileEntityJukebox();
 	}
@@ -101,6 +106,7 @@ public class BlockJukebox extends BlockContainer {
 	/**
 	 * + Spawns this Block's drops into the World as EntityItems.
 	 */
+	@Override
 	public void dropBlockAsItemWithChance(World world, BlockPos blockpos, IBlockState iblockstate, float f, int var5) {
 		if (!world.isRemote) {
 			super.dropBlockAsItemWithChance(world, blockpos, iblockstate, f, 0);
@@ -131,6 +137,7 @@ public class BlockJukebox extends BlockContainer {
 		}
 	}
 
+	@Override
 	public int getComparatorInputOverride(World world, BlockPos blockpos) {
 		TileEntity tileentity = world.getTileEntity(blockpos);
 		if (tileentity instanceof BlockJukebox.TileEntityJukebox) {
@@ -146,6 +153,7 @@ public class BlockJukebox extends BlockContainer {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		return ((Boolean) iblockstate.getValue(HAS_RECORD)).booleanValue() ? 1 : 0;
 	}
@@ -154,6 +162,7 @@ public class BlockJukebox extends BlockContainer {
 	 * + The type of render function called. 3 for standard block models, 2 for
 	 * TESR's, 1 for liquids, -1 is no render
 	 */
+	@Override
 	public int getRenderType() {
 		return 3;
 	}
@@ -161,10 +170,12 @@ public class BlockJukebox extends BlockContainer {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(HAS_RECORD, Boolean.valueOf(i > 0));
 	}
 
+	@Override
 	public boolean hasComparatorInputOverride() {
 		return true;
 	}
@@ -180,6 +191,7 @@ public class BlockJukebox extends BlockContainer {
 		}
 	}
 
+	@Override
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState iblockstate, EntityPlayer var4,
 			EnumFacing var5, float var6, float var7, float var8) {
 		if (((Boolean) iblockstate.getValue(HAS_RECORD)).booleanValue()) {

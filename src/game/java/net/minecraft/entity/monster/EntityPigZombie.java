@@ -22,13 +22,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -40,7 +40,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityPigZombie extends EntityZombie {
 	static class AIHurtByAggressor extends EntityAIHurtByTarget {
@@ -48,6 +48,7 @@ public class EntityPigZombie extends EntityZombie {
 			super(parEntityPigZombie, true, new Class[0]);
 		}
 
+		@Override
 		protected void setEntityAttackTarget(EntityCreature entitycreature, EntityLivingBase entitylivingbase) {
 			super.setEntityAttackTarget(entitycreature, entitylivingbase);
 			if (entitycreature instanceof EntityPigZombie) {
@@ -62,6 +63,7 @@ public class EntityPigZombie extends EntityZombie {
 			super(parEntityPigZombie, EntityPlayer.class, true);
 		}
 
+		@Override
 		public boolean shouldExecute() {
 			return ((EntityPigZombie) this.taskOwner).isAngry() && super.shouldExecute();
 		}
@@ -85,10 +87,12 @@ public class EntityPigZombie extends EntityZombie {
 	/**
 	 * + Causes this Entity to drop a random item.
 	 */
+	@Override
 	protected void addRandomDrop() {
 		this.dropItem(Items.gold_ingot, 1);
 	}
 
+	@Override
 	protected void applyEntityAI() {
 
 		this.targetTasks.addTask(1, new EntityPigZombie.AIHurtByAggressor(this));
@@ -96,6 +100,7 @@ public class EntityPigZombie extends EntityZombie {
 
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(reinforcementChance).setBaseValue(0.0D);
@@ -106,6 +111,7 @@ public class EntityPigZombie extends EntityZombie {
 	/**
 	 * + Called when the entity is attacked.
 	 */
+	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float f) {
 		if (this.isEntityInvulnerable(damagesource)) {
 			return false;
@@ -135,6 +141,7 @@ public class EntityPigZombie extends EntityZombie {
 	/**
 	 * + Drop 0-2 items of this living's type
 	 */
+	@Override
 	protected void dropFewItems(boolean var1, int i) {
 		int j = this.rand.nextInt(2 + i);
 
@@ -154,6 +161,7 @@ public class EntityPigZombie extends EntityZombie {
 	 * + Checks if the entity's current position is a valid location to spawn this
 	 * entity.
 	 */
+	@Override
 	public boolean getCanSpawnHere() {
 		return this.worldObj.getDifficulty() != EnumDifficulty.PEACEFUL;
 	}
@@ -161,6 +169,7 @@ public class EntityPigZombie extends EntityZombie {
 	/**
 	 * + Returns the sound this mob makes on death.
 	 */
+	@Override
 	protected String getDeathSound() {
 		return "mob.zombiepig.zpigdeath";
 	}
@@ -168,6 +177,7 @@ public class EntityPigZombie extends EntityZombie {
 	/**
 	 * + Returns the sound this mob makes when it is hurt.
 	 */
+	@Override
 	protected String getHurtSound() {
 		return "mob.zombiepig.zpighurt";
 	}
@@ -175,6 +185,7 @@ public class EntityPigZombie extends EntityZombie {
 	/**
 	 * + Returns the sound this mob makes while it's alive.
 	 */
+	@Override
 	protected String getLivingSound() {
 		return "mob.zombiepig.zpig";
 	}
@@ -183,6 +194,7 @@ public class EntityPigZombie extends EntityZombie {
 	 * + Called when a player interacts with a mob. e.g. gets milk from a cow, gets
 	 * into the saddle on a pig.
 	 */
+	@Override
 	public boolean interact(EntityPlayer var1) {
 		return false;
 	}
@@ -194,6 +206,7 @@ public class EntityPigZombie extends EntityZombie {
 	/**
 	 * + Checks that the entity is not colliding with any blocks / liquids
 	 */
+	@Override
 	public boolean isNotColliding() {
 		return this.worldObj.checkNoEntityCollision(this.getEntityBoundingBox(), this)
 				&& this.worldObj.getCollidingBoundingBoxes(this, this.getEntityBoundingBox()).isEmpty()
@@ -205,6 +218,7 @@ public class EntityPigZombie extends EntityZombie {
 	 * spawner, natural spawning etc, but not called when entity is reloaded from
 	 * nbt. Mainly used for initializing attributes and inventory
 	 */
+	@Override
 	public IEntityLivingData onInitialSpawn(DifficultyInstance difficultyinstance,
 			IEntityLivingData ientitylivingdata) {
 		super.onInitialSpawn(difficultyinstance, ientitylivingdata);
@@ -215,6 +229,7 @@ public class EntityPigZombie extends EntityZombie {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		super.onUpdate();
 	}
@@ -222,6 +237,7 @@ public class EntityPigZombie extends EntityZombie {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		this.angerLevel = nbttagcompound.getShort("Anger");
@@ -241,10 +257,12 @@ public class EntityPigZombie extends EntityZombie {
 	/**
 	 * + Gives armor or weapon for entity based on given DifficultyInstance
 	 */
+	@Override
 	protected void setEquipmentBasedOnDifficulty(DifficultyInstance var1) {
 		this.setCurrentItemOrArmor(0, new ItemStack(Items.golden_sword));
 	}
 
+	@Override
 	public void setRevengeTarget(EntityLivingBase entitylivingbase) {
 		super.setRevengeTarget(entitylivingbase);
 		if (entitylivingbase != null) {
@@ -253,6 +271,7 @@ public class EntityPigZombie extends EntityZombie {
 
 	}
 
+	@Override
 	protected void updateAITasks() {
 		IAttributeInstance iattributeinstance = this.getEntityAttribute(SharedMonsterAttributes.movementSpeed);
 		if (this.isAngry()) {
@@ -283,6 +302,7 @@ public class EntityPigZombie extends EntityZombie {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		nbttagcompound.setShort("Anger", (short) this.angerLevel);

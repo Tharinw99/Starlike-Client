@@ -15,13 +15,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,7 +33,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityAIEatGrass extends EntityAIBase {
 	private static final Predicate<IBlockState> field_179505_b = BlockStateHelper.forBlock(Blocks.tallgrass)
@@ -51,6 +51,7 @@ public class EntityAIEatGrass extends EntityAIBase {
 	/**
 	 * + Returns whether an in-progress EntityAIBase should continue executing
 	 */
+	@Override
 	public boolean continueExecuting() {
 		return this.eatingGrassTimer > 0;
 	}
@@ -65,6 +66,7 @@ public class EntityAIEatGrass extends EntityAIBase {
 	/**
 	 * + Resets the task
 	 */
+	@Override
 	public void resetTask() {
 		this.eatingGrassTimer = 0;
 	}
@@ -72,6 +74,7 @@ public class EntityAIEatGrass extends EntityAIBase {
 	/**
 	 * + Returns whether the EntityAIBase should begin execution.
 	 */
+	@Override
 	public boolean shouldExecute() {
 		if (this.grassEaterEntity.getRNG().nextInt(this.grassEaterEntity.isChild() ? 50 : 1000) != 0) {
 			return false;
@@ -86,6 +89,7 @@ public class EntityAIEatGrass extends EntityAIBase {
 	/**
 	 * + Execute a one shot task or start executing a continuous task
 	 */
+	@Override
 	public void startExecuting() {
 		this.eatingGrassTimer = 40;
 		this.entityWorld.setEntityState(this.grassEaterEntity, (byte) 10);
@@ -95,6 +99,7 @@ public class EntityAIEatGrass extends EntityAIBase {
 	/**
 	 * + Updates the task
 	 */
+	@Override
 	public void updateTask() {
 		this.eatingGrassTimer = Math.max(0, this.eatingGrassTimer - 1);
 		if (this.eatingGrassTimer == 4) {

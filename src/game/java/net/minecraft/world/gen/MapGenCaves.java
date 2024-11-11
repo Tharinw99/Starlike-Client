@@ -15,13 +15,13 @@ import net.minecraft.world.chunk.ChunkPrimer;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,7 +33,7 @@ import net.minecraft.world.chunk.ChunkPrimer;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class MapGenCaves extends MapGenBase {
 
@@ -203,7 +203,7 @@ public class MapGenCaves extends MapGenBase {
 					}
 
 					if (!flag3) {
-						BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+						BlockPos blockpos$mutableblockpos = new BlockPos();
 
 						for (int j3 = k2; j3 < k; ++j3) {
 							double d10 = ((double) (j3 + parInt1 * 16) + 0.5D - parDouble1) / d2;
@@ -276,6 +276,7 @@ public class MapGenCaves extends MapGenBase {
 	/**
 	 * + Recursively called by generate()
 	 */
+	@Override
 	protected void recursiveGenerate(World var1, int i, int j, int k, int l, ChunkPrimer chunkprimer) {
 		int i1 = this.rand.nextInt(this.rand.nextInt(this.rand.nextInt(15) + 1) + 1);
 		if (this.rand.nextInt(7) != 0) {

@@ -38,13 +38,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -56,7 +56,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityIronGolem extends EntityGolem {
 	static class AINearestAttackableTargetNonCreeper<T extends EntityLivingBase>
@@ -65,6 +65,7 @@ public class EntityIronGolem extends EntityGolem {
 				boolean parFlag, boolean parFlag2, final Predicate<? super T> parPredicate) {
 			super(creature, classTarget, chance, parFlag, parFlag2, parPredicate);
 			this.targetEntitySelector = new Predicate<T>() {
+				@Override
 				public boolean apply(T entitylivingbase) {
 					if (parPredicate != null && !parPredicate.apply(entitylivingbase)) {
 						return false;
@@ -122,12 +123,14 @@ public class EntityIronGolem extends EntityGolem {
 				10, false, true, IMob.VISIBLE_MOB_SELECTOR));
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(100.0D);
 		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.25D);
 	}
 
+	@Override
 	public boolean attackEntityAsMob(Entity entity) {
 		this.attackTimer = 10;
 		this.worldObj.setEntityState(this, (byte) 4);
@@ -144,11 +147,13 @@ public class EntityIronGolem extends EntityGolem {
 	/**
 	 * + Returns true if this entity can attack entities of the specified class.
 	 */
+	@Override
 	public boolean canAttackClass(Class<? extends EntityLivingBase> oclass) {
 		return this.isPlayerCreated() && EntityPlayer.class.isAssignableFrom(oclass) ? false
 				: (oclass == EntityCreeper.class ? false : super.canAttackClass(oclass));
 	}
 
+	@Override
 	protected void collideWithEntity(Entity entity) {
 		if (entity instanceof IMob && !(entity instanceof EntityCreeper) && this.getRNG().nextInt(20) == 0) {
 			this.setAttackTarget((EntityLivingBase) entity);
@@ -160,6 +165,7 @@ public class EntityIronGolem extends EntityGolem {
 	/**
 	 * + Decrements the entity's air supply when underwater
 	 */
+	@Override
 	protected int decreaseAirSupply(int i) {
 		return i;
 	}
@@ -167,6 +173,7 @@ public class EntityIronGolem extends EntityGolem {
 	/**
 	 * + Drop 0-2 items of this living's type
 	 */
+	@Override
 	protected void dropFewItems(boolean var1, int var2) {
 		int i = this.rand.nextInt(3);
 
@@ -183,6 +190,7 @@ public class EntityIronGolem extends EntityGolem {
 
 	}
 
+	@Override
 	protected void entityInit() {
 		super.entityInit();
 		this.dataWatcher.addObject(16, Byte.valueOf((byte) 0));
@@ -195,6 +203,7 @@ public class EntityIronGolem extends EntityGolem {
 	/**
 	 * + Returns the sound this mob makes on death.
 	 */
+	@Override
 	protected String getDeathSound() {
 		return "mob.irongolem.death";
 	}
@@ -206,6 +215,7 @@ public class EntityIronGolem extends EntityGolem {
 	/**
 	 * + Returns the sound this mob makes when it is hurt.
 	 */
+	@Override
 	protected String getHurtSound() {
 		return "mob.irongolem.hit";
 	}
@@ -214,6 +224,7 @@ public class EntityIronGolem extends EntityGolem {
 		return this.villageObj;
 	}
 
+	@Override
 	public void handleStatusUpdate(byte b0) {
 		if (b0 == 4) {
 			this.attackTimer = 10;
@@ -233,6 +244,7 @@ public class EntityIronGolem extends EntityGolem {
 	/**
 	 * + Called when the mob's health reaches 0.
 	 */
+	@Override
 	public void onDeath(DamageSource damagesource) {
 		if (!this.isPlayerCreated() && this.attackingPlayer != null && this.villageObj != null) {
 			this.villageObj.setReputationForPlayer(this.attackingPlayer.getName(), -5);
@@ -246,6 +258,7 @@ public class EntityIronGolem extends EntityGolem {
 	 * required. For example, zombies and skeletons use this to react to sunlight
 	 * and start to burn.
 	 */
+	@Override
 	public void onLivingUpdate() {
 		super.onLivingUpdate();
 		if (this.attackTimer > 0) {
@@ -275,6 +288,7 @@ public class EntityIronGolem extends EntityGolem {
 
 	}
 
+	@Override
 	protected void playStepSound(BlockPos var1, Block var2) {
 		this.playSound("mob.irongolem.walk", 1.0F, 1.0F);
 	}
@@ -282,6 +296,7 @@ public class EntityIronGolem extends EntityGolem {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		this.setPlayerCreated(nbttagcompound.getBoolean("PlayerCreated"));
@@ -302,6 +317,7 @@ public class EntityIronGolem extends EntityGolem {
 
 	}
 
+	@Override
 	protected void updateAITasks() {
 		if (--this.homeCheckTimer <= 0) {
 			this.homeCheckTimer = 70 + this.rand.nextInt(50);
@@ -320,6 +336,7 @@ public class EntityIronGolem extends EntityGolem {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		nbttagcompound.setBoolean("PlayerCreated", this.isPlayerCreated());

@@ -8,6 +8,8 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import net.lax1dude.eaglercraft.v1_8.EagRuntime;
+import net.lax1dude.eaglercraft.v1_8.internal.EnumPlatformType;
 import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
 import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 import net.lax1dude.eaglercraft.v1_8.minecraft.EntityConstructor;
@@ -82,13 +84,13 @@ import net.starlikeclient.minecraft.init.EntitiesStarlike;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -100,7 +102,7 @@ import net.starlikeclient.minecraft.init.EntitiesStarlike;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityList {
 	public static class EntityEggInfo {
@@ -357,11 +359,16 @@ public class EntityList {
 		Set<String> set = stringToClassMapping.keySet();
 		ArrayList arraylist = Lists.newArrayList();
 
-		for (String s : set) {
-			Class oclass = (Class) stringToClassMapping.get(s);
-			if ((oclass.getModifiers() & 1024) != 1024) {
-				arraylist.add(s);
+		// TODO: Eventually TeaVM will support getModifiers
+		if (EagRuntime.getPlatformType() != EnumPlatformType.WASM_GC) {
+			for (String s : set) {
+				Class oclass = (Class) stringToClassMapping.get(s);
+				if ((oclass.getModifiers() & 1024) != 1024) {
+					arraylist.add(s);
+				}
 			}
+		} else {
+			arraylist.addAll(set);
 		}
 
 		arraylist.add("LightningBolt");

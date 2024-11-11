@@ -27,13 +27,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -45,7 +45,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityFallingBlock extends Entity {
 	private IBlockState fallTile;
@@ -75,6 +75,7 @@ public class EntityFallingBlock extends Entity {
 		this.prevPosZ = z;
 	}
 
+	@Override
 	public void addEntityCrashInfo(CrashReportCategory crashreportcategory) {
 		super.addEntityCrashInfo(crashreportcategory);
 		if (this.fallTile != null) {
@@ -90,6 +91,7 @@ public class EntityFallingBlock extends Entity {
 	 * + Returns true if other Entities should be prevented from moving through this
 	 * Entity.
 	 */
+	@Override
 	public boolean canBeCollidedWith() {
 		return !this.isDead;
 	}
@@ -97,6 +99,7 @@ public class EntityFallingBlock extends Entity {
 	/**
 	 * + Return whether this entity should be rendered as on fire.
 	 */
+	@Override
 	public boolean canRenderOnFire() {
 		return false;
 	}
@@ -105,13 +108,16 @@ public class EntityFallingBlock extends Entity {
 	 * + returns if this entity triggers Block.onEntityWalking on the blocks they
 	 * walk on. used for spiders and wolves to prevent them from trampling crops
 	 */
+	@Override
 	protected boolean canTriggerWalking() {
 		return false;
 	}
 
+	@Override
 	protected void entityInit() {
 	}
 
+	@Override
 	public void fall(float f, float var2) {
 		Block block = this.fallTile.getBlock();
 		if (this.hurtEntities) {
@@ -152,6 +158,7 @@ public class EntityFallingBlock extends Entity {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		Block block = this.fallTile.getBlock();
 		if (block.getMaterial() == Material.air) {
@@ -230,6 +237,7 @@ public class EntityFallingBlock extends Entity {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	protected void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		int i = nbttagcompound.getByte("Data") & 255;
 		if (nbttagcompound.hasKey("Block", 8)) {
@@ -271,6 +279,7 @@ public class EntityFallingBlock extends Entity {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	protected void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		Block block = this.fallTile != null ? this.fallTile.getBlock() : Blocks.air;
 		ResourceLocation resourcelocation = (ResourceLocation) Block.blockRegistry.getNameForObject(block);

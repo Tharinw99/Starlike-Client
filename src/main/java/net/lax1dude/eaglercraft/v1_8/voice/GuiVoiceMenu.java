@@ -25,7 +25,7 @@ import net.minecraft.util.ResourceLocation;
 
 /**
  * Copyright (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -37,7 +37,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiVoiceMenu extends Gui {
 
@@ -637,6 +637,7 @@ public class GuiVoiceMenu extends Gui {
 	public void initGui() {
 		this.sliderBlocks = new GuiSlider2(-1, (width - 150) / 2, height / 3 + 20, 150, 20,
 				(VoiceClientController.getVoiceProximity() - 5) / 17.0f, 1.0f) {
+			@Override
 			protected String updateDisplayString() {
 				return (int) ((sliderValue * 17.0f) + 5.0f) + " Blocks";
 			}

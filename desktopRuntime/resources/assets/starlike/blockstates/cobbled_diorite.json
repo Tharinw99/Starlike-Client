@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "normal": {
-            "model": "starlike:cobbled_diorite"
-        }
+  "variants": {
+    "normal": {
+      "model": "starlike:cobbled_diorite"
     }
+  }
 }

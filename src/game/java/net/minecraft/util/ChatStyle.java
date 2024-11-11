@@ -11,13 +11,13 @@ import net.minecraft.event.HoverEvent;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,10 +29,11 @@ import net.minecraft.event.HoverEvent;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ChatStyle {
 	public static class Serializer implements JSONTypeCodec<ChatStyle, JSONObject> {
+		@Override
 		public ChatStyle deserialize(JSONObject jsonobject) throws JSONException {
 			ChatStyle chatstyle = new ChatStyle();
 			if (jsonobject == null) {
@@ -106,6 +107,7 @@ public class ChatStyle {
 			}
 		}
 
+		@Override
 		public JSONObject serialize(ChatStyle chatstyle) {
 			if (chatstyle.isEmpty()) {
 				return null;
@@ -174,6 +176,7 @@ public class ChatStyle {
 		 * + Creates a deep copy of this style. No changes to this instance or its
 		 * parent style will be reflected in the copy.
 		 */
+		@Override
 		public ChatStyle createDeepCopy() {
 			return this;
 		}
@@ -184,6 +187,7 @@ public class ChatStyle {
 		 * WILL be reflected in both this instance and the copy, wherever either does
 		 * not override a value.
 		 */
+		@Override
 		public ChatStyle createShallowCopy() {
 			return this;
 		}
@@ -191,6 +195,7 @@ public class ChatStyle {
 		/**
 		 * + Whether or not text of this ChatStyle should be in bold.
 		 */
+		@Override
 		public boolean getBold() {
 			return false;
 		}
@@ -198,6 +203,7 @@ public class ChatStyle {
 		/**
 		 * + The effective chat click event.
 		 */
+		@Override
 		public ClickEvent getChatClickEvent() {
 			return null;
 		}
@@ -205,6 +211,7 @@ public class ChatStyle {
 		/**
 		 * + The effective chat hover event.
 		 */
+		@Override
 		public HoverEvent getChatHoverEvent() {
 			return null;
 		}
@@ -212,6 +219,7 @@ public class ChatStyle {
 		/**
 		 * + Gets the effective color of this ChatStyle.
 		 */
+		@Override
 		public EnumChatFormatting getColor() {
 			return null;
 		}
@@ -220,6 +228,7 @@ public class ChatStyle {
 		 * + Gets the equivalent text formatting code for this style, without the
 		 * initial section sign (U+00A7) character.
 		 */
+		@Override
 		public String getFormattingCode() {
 			return "";
 		}
@@ -227,6 +236,7 @@ public class ChatStyle {
 		/**
 		 * + Get the text to be inserted into Chat when the component is shift-clicked
 		 */
+		@Override
 		public String getInsertion() {
 			return null;
 		}
@@ -234,6 +244,7 @@ public class ChatStyle {
 		/**
 		 * + Whether or not text of this ChatStyle should be italicized.
 		 */
+		@Override
 		public boolean getItalic() {
 			return false;
 		}
@@ -241,6 +252,7 @@ public class ChatStyle {
 		/**
 		 * + Whether or not text of this ChatStyle should be obfuscated.
 		 */
+		@Override
 		public boolean getObfuscated() {
 			return false;
 		}
@@ -248,6 +260,7 @@ public class ChatStyle {
 		/**
 		 * + Whether or not to format text of this ChatStyle using strikethrough.
 		 */
+		@Override
 		public boolean getStrikethrough() {
 			return false;
 		}
@@ -255,6 +268,7 @@ public class ChatStyle {
 		/**
 		 * + Whether or not text of this ChatStyle should be underlined.
 		 */
+		@Override
 		public boolean getUnderlined() {
 			return false;
 		}
@@ -264,6 +278,7 @@ public class ChatStyle {
 		 * if, e.g., the parent style is bold and you want text of this style to be
 		 * unbolded.
 		 */
+		@Override
 		public ChatStyle setBold(Boolean boldIn) {
 			throw new UnsupportedOperationException();
 		}
@@ -272,6 +287,7 @@ public class ChatStyle {
 		 * + Sets the event that should be run when text of this ChatStyle is clicked
 		 * on.
 		 */
+		@Override
 		public ChatStyle setChatClickEvent(ClickEvent event) {
 			throw new UnsupportedOperationException();
 		}
@@ -280,6 +296,7 @@ public class ChatStyle {
 		 * + Sets the event that should be run when text of this ChatStyle is hovered
 		 * over.
 		 */
+		@Override
 		public ChatStyle setChatHoverEvent(HoverEvent event) {
 			throw new UnsupportedOperationException();
 		}
@@ -288,6 +305,7 @@ public class ChatStyle {
 		 * + Sets the color for this ChatStyle to the given value. Only use color values
 		 * for this; set other values using the specific methods.
 		 */
+		@Override
 		public ChatStyle setColor(EnumChatFormatting color) {
 			throw new UnsupportedOperationException();
 		}
@@ -297,6 +315,7 @@ public class ChatStyle {
 		 * false if, e.g., the parent style is italicized and you want to override that
 		 * for this style.
 		 */
+		@Override
 		public ChatStyle setItalic(Boolean italic) {
 			throw new UnsupportedOperationException();
 		}
@@ -306,6 +325,7 @@ public class ChatStyle {
 		 * false if, e.g., the parent style is obfuscated and you want to override that
 		 * for this style.
 		 */
+		@Override
 		public ChatStyle setObfuscated(Boolean obfuscated) {
 			throw new UnsupportedOperationException();
 		}
@@ -315,6 +335,7 @@ public class ChatStyle {
 		 * value. Without a parent, obvious defaults are used (bold: false, underlined:
 		 * false, etc).
 		 */
+		@Override
 		public ChatStyle setParentStyle(ChatStyle parent) {
 			throw new UnsupportedOperationException();
 		}
@@ -324,6 +345,7 @@ public class ChatStyle {
 		 * Set to false if, e.g., the parent style uses strikethrough and you want to
 		 * override that for this style.
 		 */
+		@Override
 		public ChatStyle setStrikethrough(Boolean strikethrough) {
 			throw new UnsupportedOperationException();
 		}
@@ -333,10 +355,12 @@ public class ChatStyle {
 		 * false if, e.g., the parent style is underlined and you want to override that
 		 * for this style.
 		 */
+		@Override
 		public ChatStyle setUnderlined(Boolean underlined) {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public String toString() {
 			return "Style.ROOT";
 		}
@@ -392,6 +416,7 @@ public class ChatStyle {
 		return chatstyle;
 	}
 
+	@Override
 	public boolean equals(Object object) {
 		if (this == object) {
 			return true;
@@ -549,6 +574,7 @@ public class ChatStyle {
 		return this.underlined == null ? this.getParent().getUnderlined() : this.underlined.booleanValue();
 	}
 
+	@Override
 	public int hashCode() {
 		int i = this.color.hashCode();
 		i = 31 * i + this.bold.hashCode();
@@ -666,6 +692,7 @@ public class ChatStyle {
 		return this;
 	}
 
+	@Override
 	public String toString() {
 		return "Style{hasParent=" + (this.parentStyle != null) + ", color=" + this.color + ", bold=" + this.bold
 				+ ", italic=" + this.italic + ", underlined=" + this.underlined + ", obfuscated=" + this.obfuscated

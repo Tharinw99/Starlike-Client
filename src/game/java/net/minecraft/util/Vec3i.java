@@ -5,13 +5,13 @@ import com.google.common.base.Objects;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -23,7 +23,7 @@ import com.google.common.base.Objects;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class Vec3i implements Comparable<Vec3i> {
 	/**
@@ -44,6 +44,7 @@ public class Vec3i implements Comparable<Vec3i> {
 		this.z = zIn;
 	}
 
+	@Override
 	public int compareTo(Vec3i vec3i) {
 		return this.getY() == vec3i.getY()
 				? (this.getZ() == vec3i.getZ() ? this.getX() - vec3i.getX() : this.getZ() - vec3i.getZ())
@@ -86,6 +87,7 @@ public class Vec3i implements Comparable<Vec3i> {
 		return d0 * d0 + d1 * d1 + d2 * d2;
 	}
 
+	@Override
 	public boolean equals(Object object) {
 		if (this == object) {
 			return true;
@@ -119,10 +121,12 @@ public class Vec3i implements Comparable<Vec3i> {
 		return this.z;
 	}
 
+	@Override
 	public int hashCode() {
 		return (this.getY() + this.getZ() * 31) * 31 + this.getX();
 	}
 
+	@Override
 	public String toString() {
 		return Objects.toStringHelper(this).add("x", this.getX()).add("y", this.getY()).add("z", this.getZ())
 				.toString();

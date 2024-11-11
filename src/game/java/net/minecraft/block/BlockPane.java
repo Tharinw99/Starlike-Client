@@ -23,13 +23,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -41,7 +41,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockPane extends Block {
 	public static final PropertyBool NORTH = PropertyBool.create("north");
@@ -63,6 +63,7 @@ public class BlockPane extends Block {
 	 * + Add all collision boxes of this Block to the list that intersect with the
 	 * given mask.
 	 */
+	@Override
 	public void addCollisionBoxesToList(World world, BlockPos blockpos, IBlockState iblockstate,
 			AxisAlignedBB axisalignedbb, List<AxisAlignedBB> list, Entity entity) {
 		boolean flag = this.canPaneConnectToBlock(world.getBlockState(blockpos.north()).getBlock());
@@ -102,14 +103,17 @@ public class BlockPane extends Block {
 				|| blockIn == Blocks.stained_glass_pane || blockIn instanceof BlockPane;
 	}
 
+	@Override
 	protected boolean canSilkHarvest() {
 		return true;
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { NORTH, EAST, WEST, SOUTH });
 	}
 
+	@Override
 	public boolean eaglerShadersShouldRenderGlassHighlights() {
 		return this == Blocks.glass_pane && DeferredStateManager.isRenderingGlassHighlights();
 	}
@@ -118,6 +122,7 @@ public class BlockPane extends Block {
 	 * + Get the actual Block state of this Block at the given position. This
 	 * applies properties not visible in the metadata, such as fence connections.
 	 */
+	@Override
 	public IBlockState getActualState(IBlockState iblockstate, IBlockAccess iblockaccess, BlockPos blockpos) {
 		return iblockstate
 				.withProperty(NORTH,
@@ -133,6 +138,7 @@ public class BlockPane extends Block {
 						.valueOf(this.canPaneConnectToBlock(iblockaccess.getBlockState(blockpos.east()).getBlock())));
 	}
 
+	@Override
 	public EnumWorldBlockLayer getBlockLayer() {
 		return EnumWorldBlockLayer.CUTOUT_MIPPED;
 	}
@@ -140,6 +146,7 @@ public class BlockPane extends Block {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState iblockstate, EaglercraftRandom random, int i) {
 		return !this.canDrop ? null : super.getItemDropped(iblockstate, random, i);
 	}
@@ -147,10 +154,12 @@ public class BlockPane extends Block {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState var1) {
 		return 0;
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -159,10 +168,12 @@ public class BlockPane extends Block {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
 		float f = 0.4375F;
 		float f1 = 0.5625F;
@@ -200,10 +211,12 @@ public class BlockPane extends Block {
 	/**
 	 * + Sets the block's bounds for rendering it as an item
 	 */
+	@Override
 	public void setBlockBoundsForItemRender() {
 		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
 	}
 
+	@Override
 	public boolean shouldSideBeRendered(IBlockAccess iblockaccess, BlockPos blockpos, EnumFacing enumfacing) {
 		return iblockaccess.getBlockState(blockpos).getBlock() == this ? false
 				: super.shouldSideBeRendered(iblockaccess, blockpos, enumfacing);

@@ -22,7 +22,7 @@ import com.google.common.annotations.GwtCompatible;
  * A constraint that an element must satisfy in order to be added to a
  * collection. For example, {@link Constraints#notNull()}, which prevents a
  * collection from including any null elements, could be implemented like this:
- * 
+ *
  * <pre>
  *    {@code
  *

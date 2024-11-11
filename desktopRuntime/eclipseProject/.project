@@ -16,14 +16,19 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>src_main_java</name>
-			<type>2</type>
-			<locationURI>PARENT-2-PROJECT_LOC../src/main/java</locationURI>
-		</link>
-		<link>
 			<name>src_game_java</name>
 			<type>2</type>
 			<locationURI>PARENT-2-PROJECT_LOC../src/game/java</locationURI>
+		</link>
+		<link>
+			<name>src_lwjgl_java</name>
+			<type>2</type>
+			<locationURI>PARENT-2-PROJECT_LOC../src/lwjgl/java</locationURI>
+		</link>
+		<link>
+			<name>src_main_java</name>
+			<type>2</type>
+			<locationURI>PARENT-2-PROJECT_LOC../src/main/java</locationURI>
 		</link>
 		<link>
 			<name>src_protocol-game_java</name>
@@ -35,10 +40,16 @@
 			<type>2</type>
 			<locationURI>PARENT-2-PROJECT_LOC../src/protocol-relay/java</locationURI>
 		</link>
-		<link>
-			<name>src_lwjgl_java</name>
-			<type>2</type>
-			<locationURI>PARENT-2-PROJECT_LOC../src/lwjgl/java</locationURI>
-		</link>
 	</linkedResources>
+	<filteredResources>
+		<filter>
+			<id>1734217596828</id>
+			<name></name>
+			<type>30</type>
+			<matcher>
+				<id>org.eclipse.core.resources.regexFilterMatcher</id>
+				<arguments>node_modules|\.git|__CREATED_BY_JAVA_LANGUAGE_SERVER__</arguments>
+			</matcher>
+		</filter>
+	</filteredResources>
 </projectDescription>

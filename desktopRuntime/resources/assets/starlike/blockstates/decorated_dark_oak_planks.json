@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "normal": {
-            "model": "starlike:decorated_dark_oak_planks"
-        }
+  "variants": {
+    "normal": {
+      "model": "starlike:decorated_dark_oak_planks"
     }
+  }
 }

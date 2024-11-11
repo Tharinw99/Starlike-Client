@@ -21,13 +21,12 @@ import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.audio.SoundPoolEntry;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ITickable;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 
 /**
  * Copyright (c) 2022-2023 lax1dude, ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -39,11 +38,11 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EaglercraftSoundManager {
 
-	protected static class ActiveSoundEvent {
+	protected class ActiveSoundEvent {
 
 		protected final EaglercraftSoundManager manager;
 
@@ -89,15 +88,12 @@ public class EaglercraftSoundManager {
 				activeZ = z;
 			}
 			if (pitch != activePitch) {
-				soundHandle.pitch(MathHelper.clamp_float(pitch * (float) soundConfig.getPitch(), 0.5f, 2.0f));
+				soundHandle.pitch(EaglercraftSoundManager.this.getNormalizedPitch(soundInstance, soundConfig));
 				activePitch = pitch;
 			}
 			if (gain != activeGain) {
-				float attenuatedGain = gain * manager.categoryVolumes[SoundCategory.MASTER.getCategoryId()]
-						* (soundCategory == SoundCategory.MASTER ? 1.0f
-								: manager.categoryVolumes[soundCategory.getCategoryId()])
-						* (float) soundConfig.getVolume();
-				soundHandle.gain(MathHelper.clamp_float(attenuatedGain, 0.0f, 1.0f));
+				soundHandle.gain(
+						EaglercraftSoundManager.this.getNormalizedVolume(soundInstance, soundConfig, soundCategory));
 				activeGain = gain;
 			}
 		}
@@ -144,6 +140,17 @@ public class EaglercraftSoundManager {
 				settings.getSoundLevel(SoundCategory.PLAYERS), settings.getSoundLevel(SoundCategory.AMBIENT) };
 		activeSounds = new LinkedList<>();
 		queuedSounds = new LinkedList<>();
+	}
+
+	private float getNormalizedPitch(ISound sound, SoundPoolEntry entry) {
+		return MathHelper.clamp_float(sound.getPitch() * (float) entry.getPitch(), 0.5f, 2.0f);
+	}
+
+	private float getNormalizedVolume(ISound sound, SoundPoolEntry entry, SoundCategory category) {
+		return (float) MathHelper.clamp_double((double) sound.getVolume() * entry.getVolume(), 0.0D, 1.0D)
+				* (category.getCategoryId() == SoundCategory.MASTER.getCategoryId() ? 1.0f
+						: categoryVolumes[category.getCategoryId()])
+				* categoryVolumes[SoundCategory.MASTER.getCategoryId()];
 	}
 
 	public boolean isSoundPlaying(ISound sound) {
@@ -206,19 +213,17 @@ public class EaglercraftSoundManager {
 						ActiveSoundEvent newSound = new ActiveSoundEvent(this, sound, accessor.getSoundCategory(), etr,
 								null);
 
-						float pitch = MathHelper.clamp_float(newSound.activePitch * (float) etr.getPitch(), 0.5f, 2.0f);
-						float attenuatedGain = newSound.activeGain
-								* categoryVolumes[SoundCategory.MASTER.getCategoryId()]
-								* (accessor.getSoundCategory() == SoundCategory.MASTER ? 1.0f
-										: categoryVolumes[accessor.getSoundCategory().getCategoryId()])
-								* (float) etr.getVolume();
+						float pitch = getNormalizedPitch(sound, etr);
+						float attenuatedGain = getNormalizedVolume(sound, etr, accessor.getSoundCategory());
+						boolean repeat = sound.canRepeat();
 
 						AttenuationType tp = sound.getAttenuationType();
 						if (tp == AttenuationType.LINEAR) {
 							newSound.soundHandle = PlatformAudio.beginPlayback(trk, newSound.activeX, newSound.activeY,
-									newSound.activeZ, attenuatedGain, pitch);
+									newSound.activeZ, attenuatedGain, pitch, repeat);
 						} else {
-							newSound.soundHandle = PlatformAudio.beginPlaybackStatic(trk, attenuatedGain, pitch);
+							newSound.soundHandle = PlatformAudio.beginPlaybackStatic(trk, attenuatedGain, pitch,
+									repeat);
 						}
 
 						if (newSound.soundHandle == null) {
@@ -277,12 +282,7 @@ public class EaglercraftSoundManager {
 		while (soundItr.hasNext()) {
 			ActiveSoundEvent evt = soundItr.next();
 			if ((category == SoundCategory.MASTER || evt.soundCategory == category) && !evt.soundHandle.shouldFree()) {
-				float newVolume = (evt.activeGain = evt.soundInstance.getVolume())
-						* categoryVolumes[SoundCategory.MASTER.getCategoryId()]
-						* (evt.soundCategory == SoundCategory.MASTER ? 1.0f
-								: categoryVolumes[evt.soundCategory.getCategoryId()])
-						* (float) evt.soundConfig.getVolume();
-				newVolume = MathHelper.clamp_float(newVolume, 0.0f, 1.0f);
+				float newVolume = getNormalizedVolume(evt.soundInstance, evt.soundConfig, evt.soundCategory);
 				if (newVolume > 0.0f) {
 					evt.soundHandle.gain(newVolume);
 				} else {
@@ -332,34 +332,34 @@ public class EaglercraftSoundManager {
 		Iterator<ActiveSoundEvent> soundItr = activeSounds.iterator();
 		while (soundItr.hasNext()) {
 			ActiveSoundEvent evt = soundItr.next();
-			if (!evt.paused && (evt.soundInstance instanceof ITickable)) {
+			boolean persist = false;
+			if (!evt.paused && (evt.soundInstance instanceof ITickableSound)) {
 				boolean destroy = false;
-				try {
-					((ITickable) evt.soundInstance).update();
-					if ((evt.soundInstance instanceof ITickableSound)
-							&& ((ITickableSound) evt.soundInstance).isDonePlaying()) {
+				ITickableSound snd = (ITickableSound) evt.soundInstance;
+				lbl: {
+					try {
+						snd.update();
+						if (snd.isDonePlaying()) {
+							destroy = true;
+							break lbl;
+						}
+						persist = true;
+					} catch (Throwable t) {
+						logger.error("Error ticking sound: {}", t.toString());
+						logger.error(t);
 						destroy = true;
 					}
-				} catch (Throwable t) {
-					logger.error("Error ticking sound: {}", t.toString());
-					logger.error(t);
-					destroy = true;
 				}
 				if (destroy) {
 					if (!evt.soundHandle.shouldFree()) {
 						evt.soundHandle.end();
 					}
 					soundItr.remove();
+					continue;
 				}
 			}
 			if (evt.soundHandle.shouldFree()) {
-				if (evt.soundInstance.canRepeat()) {
-					if (!evt.paused && ++evt.repeatCounter > evt.soundInstance.getRepeatDelay()) {
-						evt.repeatCounter = 0;
-						evt.updateLocation();
-						evt.soundHandle.restart();
-					}
-				} else {
+				if (!persist) {
 					soundItr.remove();
 				}
 			} else {

@@ -31,13 +31,13 @@ import net.minecraft.world.EnumDifficulty;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -49,7 +49,7 @@ import net.minecraft.world.EnumDifficulty;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiOptions extends GuiScreen implements GuiYesNoCallback {
 	private static final GameSettings.Options[] field_146440_f = new GameSettings.Options[] {
@@ -70,6 +70,7 @@ public class GuiOptions extends GuiScreen implements GuiYesNoCallback {
 	 * + Called by the controls from the buttonList when activated. (Mouse pressed
 	 * for buttons)
 	 */
+	@Override
 	protected void actionPerformed(GuiButton parGuiButton) {
 		if (parGuiButton.enabled) {
 			if (parGuiButton.id < 100 && parGuiButton instanceof GuiOptionButton) {
@@ -164,6 +165,7 @@ public class GuiOptions extends GuiScreen implements GuiYesNoCallback {
 		}
 	}
 
+	@Override
 	public void confirmClicked(boolean flag, int i) {
 		this.mc.displayGuiScreen(this);
 		if (i == 109 && flag && this.mc.theWorld != null) {
@@ -180,6 +182,7 @@ public class GuiOptions extends GuiScreen implements GuiYesNoCallback {
 	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
 	 * renderPartialTicks
 	 */
+	@Override
 	public void drawScreen(int i, int j, float f) {
 		this.drawDefaultBackground();
 		this.drawCenteredString(this.fontRendererObj, this.field_146442_a, this.width / 2, 15, 16777215);
@@ -243,6 +246,7 @@ public class GuiOptions extends GuiScreen implements GuiYesNoCallback {
 	 * when the GUI is displayed and when the window resizes, the buttonList is
 	 * cleared beforehand.
 	 */
+	@Override
 	public void initGui() {
 		int i = 0;
 		this.field_146442_a = I18n.format("options.title", new Object[0]);
@@ -321,6 +325,7 @@ public class GuiOptions extends GuiScreen implements GuiYesNoCallback {
 		}
 	}
 
+	@Override
 	protected void mouseClicked(int mx, int my, int button) {
 		super.mouseClicked(mx, my, button);
 		if (mc.theWorld == null && !EagRuntime.getConfiguration().isDemo()) {

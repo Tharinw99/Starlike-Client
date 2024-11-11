@@ -23,13 +23,13 @@ import net.minecraft.util.ITickable;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -41,7 +41,7 @@ import net.minecraft.util.ITickable;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class TileEntityBrewingStand extends TileEntityLockable implements ITickable, ISidedInventory {
 	/**
@@ -131,6 +131,7 @@ public class TileEntityBrewingStand extends TileEntityLockable implements ITicka
 	 * + Returns true if automation can extract the given item in the given slot
 	 * from the given side. Args: slot, item, side
 	 */
+	@Override
 	public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
 		return true;
 	}
@@ -139,10 +140,12 @@ public class TileEntityBrewingStand extends TileEntityLockable implements ITicka
 	 * + Returns true if automation can insert the given item in the given slot from
 	 * the given side. Args: slot, item, side
 	 */
+	@Override
 	public boolean canInsertItem(int index, ItemStack itemStackIn, EnumFacing direction) {
 		return this.isItemValidForSlot(index, itemStackIn);
 	}
 
+	@Override
 	public void clear() {
 		for (int i = 0; i < this.brewingItemStacks.length; ++i) {
 			this.brewingItemStacks[i] = null;
@@ -150,9 +153,11 @@ public class TileEntityBrewingStand extends TileEntityLockable implements ITicka
 
 	}
 
+	@Override
 	public void closeInventory(EntityPlayer var1) {
 	}
 
+	@Override
 	public Container createContainer(InventoryPlayer inventoryplayer, EntityPlayer var2) {
 		return new ContainerBrewingStand(inventoryplayer, this);
 	}
@@ -161,6 +166,7 @@ public class TileEntityBrewingStand extends TileEntityLockable implements ITicka
 	 * + Removes up to a specified number of items from an inventory slot and
 	 * returns them in a new stack.
 	 */
+	@Override
 	public ItemStack decrStackSize(int i, int var2) {
 		if (i >= 0 && i < this.brewingItemStacks.length) {
 			ItemStack itemstack = this.brewingItemStacks[i];
@@ -183,6 +189,7 @@ public class TileEntityBrewingStand extends TileEntityLockable implements ITicka
 		return aboolean;
 	}
 
+	@Override
 	public int getField(int i) {
 		switch (i) {
 		case 0:
@@ -192,10 +199,12 @@ public class TileEntityBrewingStand extends TileEntityLockable implements ITicka
 		}
 	}
 
+	@Override
 	public int getFieldCount() {
 		return 1;
 	}
 
+	@Override
 	public String getGuiID() {
 		return "minecraft:brewing_stand";
 	}
@@ -204,6 +213,7 @@ public class TileEntityBrewingStand extends TileEntityLockable implements ITicka
 	 * + Returns the maximum stack size for a inventory slot. Seems to always be 64,
 	 * possibly will be extended.
 	 */
+	@Override
 	public int getInventoryStackLimit() {
 		return 64;
 	}
@@ -212,6 +222,7 @@ public class TileEntityBrewingStand extends TileEntityLockable implements ITicka
 	 * + Gets the name of this command sender (usually username, but possibly
 	 * "Rcon")
 	 */
+	@Override
 	public String getName() {
 		return this.hasCustomName() ? this.customName : "container.brewing";
 	}
@@ -230,10 +241,12 @@ public class TileEntityBrewingStand extends TileEntityLockable implements ITicka
 	/**
 	 * + Returns the number of slots in the inventory.
 	 */
+	@Override
 	public int getSizeInventory() {
 		return this.brewingItemStacks.length;
 	}
 
+	@Override
 	public int[] getSlotsForFace(EnumFacing side) {
 		return side == EnumFacing.UP ? inputSlots : outputSlots;
 	}
@@ -241,6 +254,7 @@ public class TileEntityBrewingStand extends TileEntityLockable implements ITicka
 	/**
 	 * + Returns the stack in the given slot.
 	 */
+	@Override
 	public ItemStack getStackInSlot(int i) {
 		return i >= 0 && i < this.brewingItemStacks.length ? this.brewingItemStacks[i] : null;
 	}
@@ -248,6 +262,7 @@ public class TileEntityBrewingStand extends TileEntityLockable implements ITicka
 	/**
 	 * + Returns true if this thing is named
 	 */
+	@Override
 	public boolean hasCustomName() {
 		return this.customName != null && this.customName.length() > 0;
 	}
@@ -256,6 +271,7 @@ public class TileEntityBrewingStand extends TileEntityLockable implements ITicka
 	 * + Returns true if automation is allowed to insert the given stack (ignoring
 	 * stack size) into the given slot.
 	 */
+	@Override
 	public boolean isItemValidForSlot(int i, ItemStack itemstack) {
 		return i == 3 ? itemstack.getItem().isPotionIngredient(itemstack)
 				: itemstack.getItem() == Items.potionitem || itemstack.getItem() == Items.glass_bottle;
@@ -265,15 +281,18 @@ public class TileEntityBrewingStand extends TileEntityLockable implements ITicka
 	 * + Do not make give this method the name canInteractWith because it clashes
 	 * with Container
 	 */
+	@Override
 	public boolean isUseableByPlayer(EntityPlayer entityplayer) {
 		return this.worldObj.getTileEntity(this.pos) != this ? false
 				: entityplayer.getDistanceSq((double) this.pos.getX() + 0.5D, (double) this.pos.getY() + 0.5D,
 						(double) this.pos.getZ() + 0.5D) <= 64.0D;
 	}
 
+	@Override
 	public void openInventory(EntityPlayer var1) {
 	}
 
+	@Override
 	public void readFromNBT(NBTTagCompound nbttagcompound) {
 		super.readFromNBT(nbttagcompound);
 		NBTTagList nbttaglist = nbttagcompound.getTagList("Items", 10);
@@ -297,6 +316,7 @@ public class TileEntityBrewingStand extends TileEntityLockable implements ITicka
 	/**
 	 * + Removes a stack from the given slot and returns it.
 	 */
+	@Override
 	public ItemStack removeStackFromSlot(int i) {
 		if (i >= 0 && i < this.brewingItemStacks.length) {
 			ItemStack itemstack = this.brewingItemStacks[i];
@@ -307,6 +327,7 @@ public class TileEntityBrewingStand extends TileEntityLockable implements ITicka
 		}
 	}
 
+	@Override
 	public void setField(int i, int j) {
 		switch (i) {
 		case 0:
@@ -319,6 +340,7 @@ public class TileEntityBrewingStand extends TileEntityLockable implements ITicka
 	 * + Sets the given item stack to the specified slot in the inventory (can be
 	 * crafting or armor sections).
 	 */
+	@Override
 	public void setInventorySlotContents(int i, ItemStack itemstack) {
 		if (i >= 0 && i < this.brewingItemStacks.length) {
 			this.brewingItemStacks[i] = itemstack;
@@ -333,6 +355,7 @@ public class TileEntityBrewingStand extends TileEntityLockable implements ITicka
 	/**
 	 * + Like the old updateEntity(), except more generic.
 	 */
+	@Override
 	public void update() {
 		if (this.brewTime > 0) {
 			--this.brewTime;
@@ -371,6 +394,7 @@ public class TileEntityBrewingStand extends TileEntityLockable implements ITicka
 
 	}
 
+	@Override
 	public void writeToNBT(NBTTagCompound nbttagcompound) {
 		super.writeToNBT(nbttagcompound);
 		nbttagcompound.setShort("BrewTime", (short) this.brewTime);

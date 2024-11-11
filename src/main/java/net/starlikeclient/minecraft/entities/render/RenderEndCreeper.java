@@ -2,23 +2,24 @@ package net.starlikeclient.minecraft.entities.render;
 
 import net.lax1dude.eaglercraft.v1_8.opengl.GlStateManager;
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.DeferredStateManager;
+import net.minecraft.client.model.ModelCreeper;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.starlikeclient.minecraft.entities.entity.EntityEndCreeper;
 import net.starlikeclient.minecraft.entities.layers.LayerEndCreeperCharge;
-import net.starlikeclient.minecraft.entities.model.ModelEndCreeper;
 
 public class RenderEndCreeper extends RenderLiving<EntityEndCreeper> {
-	private static final ResourceLocation EndCreeperTextures = new ResourceLocation(
-			"starlike:textures/entity/endcreeper/creeper.png");
+	private static final ResourceLocation creeperTextures = new ResourceLocation(
+			"starlike:textures/entity/endcreeper/endcreeper.png");
 
 	public RenderEndCreeper(RenderManager renderManagerIn) {
-		super(renderManagerIn, new ModelEndCreeper(), 0.5F);
+		super(renderManagerIn, new ModelCreeper(), 0.5F);
 		this.addLayer(new LayerEndCreeperCharge(this));
 	}
 
+	@Override
 	public void doRender(EntityEndCreeper entityEndCreeper, double d0, double d1, double d2, float f, float f1) {
 		float ff = entityEndCreeper.getCreeperFlashIntensity(f);
 		if ((int) (ff * 10.0F) % 2 != 0) {
@@ -35,6 +36,7 @@ public class RenderEndCreeper extends RenderLiving<EntityEndCreeper> {
 	 * + Returns an ARGB int color back. Args: entityLiving, lightBrightness,
 	 * partialTickTime
 	 */
+	@Override
 	protected int getColorMultiplier(EntityEndCreeper entityEndCreeper, float var2, float f) {
 		float f1 = entityEndCreeper.getCreeperFlashIntensity(f);
 		if ((int) (f1 * 10.0F) % 2 == 0) {
@@ -50,14 +52,16 @@ public class RenderEndCreeper extends RenderLiving<EntityEndCreeper> {
 	 * + Returns the location of an entity's texture. Doesn't seem to be called
 	 * unless you call Render.bindEntityTexture.
 	 */
+	@Override
 	protected ResourceLocation getEntityTexture(EntityEndCreeper var1) {
-		return EndCreeperTextures;
+		return creeperTextures;
 	}
 
 	/**
 	 * + Allows the render to do any OpenGL state modifications necessary before the
 	 * model is rendered. Args: entityLiving, partialTickTime
 	 */
+	@Override
 	protected void preRenderCallback(EntityEndCreeper entityEndCreeper, float f) {
 		float f1 = entityEndCreeper.getCreeperFlashIntensity(f);
 		float f2 = 1.0F + MathHelper.sin(f1 * 100.0F) * f1 * 0.01F;

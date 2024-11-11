@@ -101,13 +101,13 @@ import net.minecraft.world.WorldServer;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -119,7 +119,7 @@ import net.minecraft.world.WorldServer;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 
@@ -176,11 +176,13 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 		return this.netManager;
 	}
 
+	@Override
 	public void handleAnimation(C0APacketAnimation c0apacketanimation) {
 		this.playerEntity.markPlayerActive();
 		this.playerEntity.swingItem();
 	}
 
+	@Override
 	public void handleResourcePackStatus(C19PacketResourcePackStatus var1) {
 	}
 
@@ -191,6 +193,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 		this.serverController.getCommandManager().executeCommand(this.playerEntity, command);
 	}
 
+	@Override
 	public void handleSpectate(C18PacketSpectate c18packetspectate) {
 		if (this.playerEntity.isSpectator()) {
 			Entity entity = null;
@@ -254,6 +257,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 	 * + Invoked when disconnecting, the parameter is a ChatComponent describing the
 	 * reason for termination
 	 */
+	@Override
 	public void onDisconnect(IChatComponent ichatcomponent) {
 		if (!hasDisconnected) {
 			hasDisconnected = true;
@@ -275,6 +279,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 	/**
 	 * + Process chat messages (broadcast back to clients) and commands (executes)
 	 */
+	@Override
 	public void processChatMessage(C01PacketChatMessage c01packetchatmessage) {
 		if (this.playerEntity.getChatVisibility() == EntityPlayer.EnumChatVisibility.HIDDEN) {
 			ChatComponentTranslation chatcomponenttranslation = new ChatComponentTranslation("chat.cannotSend",
@@ -320,6 +325,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 	 * and prevents further manipulation by the player until he confirms that it has
 	 * the same open container/inventory
 	 */
+	@Override
 	public void processClickWindow(C0EPacketClickWindow c0epacketclickwindow) {
 		this.playerEntity.markPlayerActive();
 		if (this.playerEntity.openContainer.windowId == c0epacketclickwindow.getWindowId()
@@ -365,6 +371,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 	 * + Updates serverside copy of client settings: language, render distance, chat
 	 * visibility, chat colours, difficulty, and whether to show the cape
 	 */
+	@Override
 	public void processClientSettings(C15PacketClientSettings c15packetclientsettings) {
 		this.playerEntity.handleClientSettings(c15packetclientsettings);
 	}
@@ -373,6 +380,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 	 * + Processes the client status updates: respawn attempt from player, opening
 	 * statistics or achievements, or acquiring 'open inventory' achievement
 	 */
+	@Override
 	public void processClientStatus(C16PacketClientStatus c16packetclientstatus) {
 		this.playerEntity.markPlayerActive();
 		C16PacketClientStatus.EnumState c16packetclientstatus$enumstate = c16packetclientstatus.getStatus();
@@ -412,6 +420,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 	/**
 	 * + Processes the client closing windows (container)
 	 */
+	@Override
 	public void processCloseWindow(C0DPacketCloseWindow c0dpacketclosewindow) {
 		this.playerEntity.closeContainer();
 	}
@@ -422,6 +431,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 	 * container-slot manipulation. It will unlock the player's ability to
 	 * manipulate the container contents
 	 */
+	@Override
 	public void processConfirmTransaction(C0FPacketConfirmTransaction c0fpacketconfirmtransaction) {
 		Short oshort = (Short) this.field_147372_n.lookup(this.playerEntity.openContainer.windowId);
 		if (oshort != null && c0fpacketconfirmtransaction.getUid() == oshort.shortValue()
@@ -436,6 +446,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 	/**
 	 * + Update the server with an ItemStack in a slot.
 	 */
+	@Override
 	public void processCreativeInventoryAction(C10PacketCreativeInventoryAction c10packetcreativeinventoryaction) {
 		if (this.playerEntity.theItemInWorldManager.isCreative()) {
 			boolean flag = c10packetcreativeinventoryaction.getSlotId() < 0;
@@ -488,6 +499,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 	 * + Enchants the item identified by the packet given some convoluted conditions
 	 * (matching window, which should/shouldn't be in use?)
 	 */
+	@Override
 	public void processEnchantItem(C11PacketEnchantItem c11packetenchantitem) {
 		this.playerEntity.markPlayerActive();
 		if (this.playerEntity.openContainer.windowId == c11packetenchantitem.getWindowId()
@@ -503,6 +515,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 	 * opening the inventory or setting jump height of the horse the player is
 	 * riding
 	 */
+	@Override
 	public void processEntityAction(C0BPacketEntityAction c0bpacketentityaction) {
 		this.playerEntity.markPlayerActive();
 		switch (c0bpacketentityaction.getAction()) {
@@ -541,6 +554,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 	/**
 	 * + Updates which quickbar slot is selected
 	 */
+	@Override
 	public void processHeldItemChange(C09PacketHeldItemChange c09packethelditemchange) {
 		if (c09packethelditemchange.getSlotId() >= 0
 				&& c09packethelditemchange.getSlotId() < InventoryPlayer.getHotbarSize()) {
@@ -555,6 +569,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 	 * + Processes player movement input. Includes walking, strafing, jumping,
 	 * sneaking; excludes riding and toggling flying/sprinting
 	 */
+	@Override
 	public void processInput(C0CPacketInput c0cpacketinput) {
 		this.playerEntity.setEntityActionState(c0cpacketinput.getStrafeSpeed(), c0cpacketinput.getForwardSpeed(),
 				c0cpacketinput.isJumping(), c0cpacketinput.isSneaking());
@@ -563,6 +578,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 	/**
 	 * + Updates a players' ping statistics
 	 */
+	@Override
 	public void processKeepAlive(C00PacketKeepAlive c00packetkeepalive) {
 		if (c00packetkeepalive.getKey() == this.field_147378_h) {
 			int i = (int) (this.currentTimeMillis() - this.lastPingTime);
@@ -574,6 +590,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 	/**
 	 * + Processes clients perspective on player positioning and/or orientation
 	 */
+	@Override
 	public void processPlayer(C03PacketPlayer c03packetplayer) {
 		if (this.func_183006_b(c03packetplayer)) {
 			this.kickPlayerFromServer("Invalid move packet received");
@@ -768,6 +785,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 	/**
 	 * + Processes a player starting/stopping flying
 	 */
+	@Override
 	public void processPlayerAbilities(C13PacketPlayerAbilities c13packetplayerabilities) {
 		this.playerEntity.capabilities.isFlying = c13packetplayerabilities.isFlying()
 				&& this.playerEntity.capabilities.allowFlying;
@@ -776,6 +794,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 	/**
 	 * + Processes block placement and block activation (anvil, furnace, etc.)
 	 */
+	@Override
 	public void processPlayerBlockPlacement(C08PacketPlayerBlockPlacement c08packetplayerblockplacement) {
 		WorldServer worldserver = this.serverController.worldServerForDimension(this.playerEntity.dimension);
 		ItemStack itemstack = this.playerEntity.inventory.getCurrentItem();
@@ -846,6 +865,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 	 * drop item (respectively without or with player control), 5: stopped; x,y,z,
 	 * side clicked on;)
 	 */
+	@Override
 	public void processPlayerDigging(C07PacketPlayerDigging c07packetplayerdigging) {
 		WorldServer worldserver = this.serverController.worldServerForDimension(this.playerEntity.dimension);
 		BlockPos blockpos = c07packetplayerdigging.getPosition();
@@ -912,6 +932,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 	 * + Retrieves possible tab completions for the requested command string and
 	 * sends them to the client
 	 */
+	@Override
 	public void processTabComplete(C14PacketTabComplete c14packettabcomplete) {
 		List<String> lst = this.serverController.getTabCompletions(this.playerEntity, c14packettabcomplete.getMessage(),
 				c14packettabcomplete.getTargetBlock());
@@ -923,6 +944,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 		this.playerEntity.playerNetServerHandler.sendPacket(new S3APacketTabComplete(fuckOff));
 	}
 
+	@Override
 	public void processUpdateSign(C12PacketUpdateSign c12packetupdatesign) {
 		this.playerEntity.markPlayerActive();
 		WorldServer worldserver = this.serverController.worldServerForDimension(this.playerEntity.dimension);
@@ -961,6 +983,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 	 * + Processes interactions ((un)leashing, opening command block GUI) and
 	 * attacks on an entity with players currently equipped item
 	 */
+	@Override
 	public void processUseEntity(C02PacketUseEntity c02packetuseentity) {
 		WorldServer worldserver = this.serverController.worldServerForDimension(this.playerEntity.dimension);
 		Entity entity = c02packetuseentity.getEntityFromWorld(worldserver);
@@ -996,6 +1019,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 	/**
 	 * + Synchronizes serverside and clientside book contents and signing
 	 */
+	@Override
 	public void processVanilla250Packet(C17PacketCustomPayload c17packetcustompayload) {
 		if ("MC|BEdit".equals(c17packetcustompayload.getChannelName())) {
 			PacketBuffer packetbuffer3 = c17packetcustompayload.getBufferData();
@@ -1198,6 +1222,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 			CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Sending packet");
 			CrashReportCategory crashreportcategory = crashreport.makeCategory("Packet being sent");
 			crashreportcategory.addCrashSectionCallable("Packet class", new Callable<String>() {
+				@Override
 				public String call() throws Exception {
 					return packetIn.getClass().getCanonicalName();
 				}
@@ -1250,6 +1275,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 	/**
 	 * + Like the old updateEntity(), except more generic.
 	 */
+	@Override
 	public void update() {
 		this.field_147366_g = false;
 		++this.networkTickCount;

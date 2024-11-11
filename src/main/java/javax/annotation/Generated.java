@@ -75,7 +75,7 @@ import java.lang.annotation.Target;
  * The <code>comment</code> element is a place holder for any comments that the
  * code generator may want to include in the generated code.
  * </p>
- * 
+ *
  * @since 1.6, Common Annotations 1.0
  */
 

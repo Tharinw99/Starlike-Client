@@ -141,7 +141,7 @@ public class TreeMultimap<K, V> extends AbstractSortedKeySortedSetMultimap<K, V>
 	 * Because a {@code TreeMultimap} has unique sorted keys, this method returns a
 	 * {@link NavigableMap}, instead of the {@link java.util.Map} specified in the
 	 * {@link Multimap} interface.
-	 * 
+	 *
 	 * @since 14.0 (present with return type {@code SortedMap} since 2.0)
 	 */
 	@Override
@@ -218,7 +218,7 @@ public class TreeMultimap<K, V> extends AbstractSortedKeySortedSetMultimap<K, V>
 	 * Because a {@code TreeMultimap} has unique sorted keys, this method returns a
 	 * {@link NavigableSet}, instead of the {@link java.util.Set} specified in the
 	 * {@link Multimap} interface.
-	 * 
+	 *
 	 * @since 14.0 (present with return type {@code SortedSet} since 2.0)
 	 */
 	@Override

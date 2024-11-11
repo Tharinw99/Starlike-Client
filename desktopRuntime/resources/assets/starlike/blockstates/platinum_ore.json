@@ -1,5 +1,5 @@
 {
-    "variants": {
-        "normal": { "model": "starlike:platinum_ore" }
-    }
+  "variants": {
+    "normal": { "model": "starlike:platinum_ore" }
+  }
 }

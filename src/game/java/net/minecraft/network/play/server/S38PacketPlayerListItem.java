@@ -18,13 +18,13 @@ import net.minecraft.world.WorldSettings;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -36,7 +36,7 @@ import net.minecraft.world.WorldSettings;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class S38PacketPlayerListItem implements Packet<INetHandlerPlayClient> {
 	public static enum Action {
@@ -73,6 +73,7 @@ public class S38PacketPlayerListItem implements Packet<INetHandlerPlayClient> {
 			return this.profile;
 		}
 
+		@Override
 		public String toString() {
 			return Objects.toStringHelper(this).add("latency", this.ping).add("gameMode", this.gamemode)
 					.add("profile", this.profile).add("displayName", this.displayName == null ? null
@@ -122,6 +123,7 @@ public class S38PacketPlayerListItem implements Packet<INetHandlerPlayClient> {
 	/**
 	 * + Passes this Packet on to the NetHandler for processing.
 	 */
+	@Override
 	public void processPacket(INetHandlerPlayClient inethandlerplayclient) {
 		inethandlerplayclient.handlePlayerListItem(this);
 	}
@@ -129,6 +131,7 @@ public class S38PacketPlayerListItem implements Packet<INetHandlerPlayClient> {
 	/**
 	 * + Reads the raw packet data from the data stream.
 	 */
+	@Override
 	public void readPacketData(PacketBuffer parPacketBuffer) throws IOException {
 		this.action = (S38PacketPlayerListItem.Action) parPacketBuffer
 				.readEnumValue(S38PacketPlayerListItem.Action.class);
@@ -186,6 +189,7 @@ public class S38PacketPlayerListItem implements Packet<INetHandlerPlayClient> {
 
 	}
 
+	@Override
 	public String toString() {
 		return Objects.toStringHelper(this).add("action", this.action).add("entries", this.players).toString();
 	}
@@ -193,6 +197,7 @@ public class S38PacketPlayerListItem implements Packet<INetHandlerPlayClient> {
 	/**
 	 * + Writes the raw packet data to the data stream.
 	 */
+	@Override
 	public void writePacketData(PacketBuffer parPacketBuffer) throws IOException {
 		parPacketBuffer.writeEnumValue(this.action);
 		parPacketBuffer.writeVarIntToBuffer(this.players.size());

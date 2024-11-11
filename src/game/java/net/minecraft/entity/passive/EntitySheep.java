@@ -38,13 +38,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -56,7 +56,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntitySheep extends EntityAnimal {
 	private static final Map<EnumDyeColor, float[]> DYE_TO_RGB = Maps.newEnumMap(EnumDyeColor.class);
@@ -100,6 +100,7 @@ public class EntitySheep extends EntityAnimal {
 	 * corresponding to the fleece color when breeding sheep.
 	 */
 	private final InventoryCrafting inventoryCrafting = new InventoryCrafting(new Container() {
+		@Override
 		public boolean canInteractWith(EntityPlayer var1) {
 			return false;
 		}
@@ -126,12 +127,14 @@ public class EntitySheep extends EntityAnimal {
 		this.inventoryCrafting.setInventorySlotContents(1, new ItemStack(Items.dye, 1, 0));
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(8.0D);
 		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.23000000417232513D);
 	}
 
+	@Override
 	public EntitySheep createChild(EntityAgeable entityageable) {
 		EntitySheep entitysheep = (EntitySheep) entityageable;
 		EntitySheep entitysheep1 = new EntitySheep(this.worldObj);
@@ -142,6 +145,7 @@ public class EntitySheep extends EntityAnimal {
 	/**
 	 * + Drop 0-2 items of this living's type
 	 */
+	@Override
 	protected void dropFewItems(boolean var1, int i) {
 		if (!this.getSheared()) {
 			this.entityDropItem(
@@ -164,6 +168,7 @@ public class EntitySheep extends EntityAnimal {
 	 * + This function applies the benefits of growing back wool and faster growing
 	 * up to the acting entity. (This function is used in the AIEatGrass)
 	 */
+	@Override
 	public void eatGrassBonus() {
 		this.setSheared(false);
 		if (this.isChild()) {
@@ -172,6 +177,7 @@ public class EntitySheep extends EntityAnimal {
 
 	}
 
+	@Override
 	protected void entityInit() {
 		super.entityInit();
 		this.dataWatcher.addObject(16, Byte.valueOf((byte) 0));
@@ -180,10 +186,12 @@ public class EntitySheep extends EntityAnimal {
 	/**
 	 * + Returns the sound this mob makes on death.
 	 */
+	@Override
 	protected String getDeathSound() {
 		return "mob.sheep.say";
 	}
 
+	@Override
 	protected Item getDropItem() {
 		return Item.getItemFromBlock(Blocks.wool);
 	}
@@ -208,6 +216,7 @@ public class EntitySheep extends EntityAnimal {
 		return EnumDyeColor.byDyeDamage(k);
 	}
 
+	@Override
 	public float getEyeHeight() {
 		return 0.95F * this.height;
 	}
@@ -238,6 +247,7 @@ public class EntitySheep extends EntityAnimal {
 	/**
 	 * + Returns the sound this mob makes when it is hurt.
 	 */
+	@Override
 	protected String getHurtSound() {
 		return "mob.sheep.say";
 	}
@@ -245,6 +255,7 @@ public class EntitySheep extends EntityAnimal {
 	/**
 	 * + Returns the sound this mob makes while it's alive.
 	 */
+	@Override
 	protected String getLivingSound() {
 		return "mob.sheep.say";
 	}
@@ -256,6 +267,7 @@ public class EntitySheep extends EntityAnimal {
 		return (this.dataWatcher.getWatchableObjectByte(16) & 16) != 0;
 	}
 
+	@Override
 	public void handleStatusUpdate(byte b0) {
 		if (b0 == 10) {
 			this.sheepTimer = 40;
@@ -269,6 +281,7 @@ public class EntitySheep extends EntityAnimal {
 	 * + Called when a player interacts with a mob. e.g. gets milk from a cow, gets
 	 * into the saddle on a pig.
 	 */
+	@Override
 	public boolean interact(EntityPlayer entityplayer) {
 		ItemStack itemstack = entityplayer.inventory.getCurrentItem();
 		if (itemstack != null && itemstack.getItem() == Items.shears && !this.getSheared() && !this.isChild()) {
@@ -298,6 +311,7 @@ public class EntitySheep extends EntityAnimal {
 	 * spawner, natural spawning etc, but not called when entity is reloaded from
 	 * nbt. Mainly used for initializing attributes and inventory
 	 */
+	@Override
 	public IEntityLivingData onInitialSpawn(DifficultyInstance difficultyinstance,
 			IEntityLivingData ientitylivingdata) {
 		ientitylivingdata = super.onInitialSpawn(difficultyinstance, ientitylivingdata);
@@ -310,6 +324,7 @@ public class EntitySheep extends EntityAnimal {
 	 * required. For example, zombies and skeletons use this to react to sunlight
 	 * and start to burn.
 	 */
+	@Override
 	public void onLivingUpdate() {
 		if (this.worldObj.isRemote) {
 			this.sheepTimer = Math.max(0, this.sheepTimer - 1);
@@ -318,6 +333,7 @@ public class EntitySheep extends EntityAnimal {
 		super.onLivingUpdate();
 	}
 
+	@Override
 	protected void playStepSound(BlockPos var1, Block var2) {
 		this.playSound("mob.sheep.step", 0.15F, 1.0F);
 	}
@@ -325,6 +341,7 @@ public class EntitySheep extends EntityAnimal {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		this.setSheared(nbttagcompound.getBoolean("Sheared"));
@@ -352,6 +369,7 @@ public class EntitySheep extends EntityAnimal {
 
 	}
 
+	@Override
 	protected void updateAITasks() {
 		this.sheepTimer = this.entityAIEatGrass.getEatingGrassTimer();
 		super.updateAITasks();
@@ -360,6 +378,7 @@ public class EntitySheep extends EntityAnimal {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		nbttagcompound.setBoolean("Sheared", this.getSheared());

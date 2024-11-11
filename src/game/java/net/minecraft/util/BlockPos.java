@@ -9,13 +9,13 @@ import net.minecraft.entity.Entity;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,45 +27,9 @@ import net.minecraft.entity.Entity;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockPos extends Vec3i {
-	public static final class MutableBlockPos extends BlockPos {
-
-		public MutableBlockPos() {
-			this(0, 0, 0);
-		}
-
-		public MutableBlockPos(int x_, int y_, int z_) {
-			super(x_, y_, z_);
-		}
-
-		public BlockPos.MutableBlockPos func_181079_c(int parInt1, int parInt2, int parInt3) {
-			this.x = parInt1;
-			this.y = parInt2;
-			this.z = parInt3;
-			return this;
-		}
-
-		public int getX() {
-			return this.x;
-		}
-
-		public int getY() {
-			return this.y;
-		}
-
-		public int getZ() {
-			return this.z;
-		}
-
-		public void setPos(int i, int j, int k) {
-			this.x = i;
-			this.y = j;
-			this.z = k;
-		}
-	}
-
 	/**
 	 * + The BlockPos with all coordinates 0
 	 */
@@ -77,7 +41,6 @@ public class BlockPos extends Vec3i {
 	private static final int X_SHIFT = Y_SHIFT + NUM_Y_BITS;
 	private static final long X_MASK = (1L << NUM_X_BITS) - 1L;
 	private static final long Y_MASK = (1L << NUM_Y_BITS) - 1L;
-
 	private static final long Z_MASK = (1L << NUM_Z_BITS) - 1L;
 
 	/**
@@ -95,15 +58,15 @@ public class BlockPos extends Vec3i {
 	 * given corners
 	 */
 	public static Iterable<BlockPos> getAllInBox(BlockPos from, BlockPos to) {
-		final BlockPos blockpos = new BlockPos(Math.min(from.getX(), to.getX()), Math.min(from.getY(), to.getY()),
-				Math.min(from.getZ(), to.getZ()));
-		final BlockPos blockpos1 = new BlockPos(Math.max(from.getX(), to.getX()), Math.max(from.getY(), to.getY()),
-				Math.max(from.getZ(), to.getZ()));
+		final BlockPos blockpos = new BlockPos(Math.min(from.x, to.x), Math.min(from.y, to.y), Math.min(from.z, to.z));
+		final BlockPos blockpos1 = new BlockPos(Math.max(from.x, to.x), Math.max(from.y, to.y), Math.max(from.z, to.z));
 		return new Iterable<BlockPos>() {
+			@Override
 			public Iterator<BlockPos> iterator() {
 				return new AbstractIterator<BlockPos>() {
 					private BlockPos lastReturned = null;
 
+					@Override
 					protected BlockPos computeNext() {
 						if (this.lastReturned == null) {
 							this.lastReturned = blockpos;
@@ -111,17 +74,17 @@ public class BlockPos extends Vec3i {
 						} else if (this.lastReturned.equals(blockpos1)) {
 							return (BlockPos) this.endOfData();
 						} else {
-							int i = this.lastReturned.getX();
-							int j = this.lastReturned.getY();
-							int k = this.lastReturned.getZ();
-							if (i < blockpos1.getX()) {
+							int i = this.lastReturned.x;
+							int j = this.lastReturned.y;
+							int k = this.lastReturned.z;
+							if (i < blockpos1.x) {
 								++i;
-							} else if (j < blockpos1.getY()) {
-								i = blockpos.getX();
+							} else if (j < blockpos1.y) {
+								i = blockpos.x;
 								++j;
-							} else if (k < blockpos1.getZ()) {
-								i = blockpos.getX();
-								j = blockpos.getY();
+							} else if (k < blockpos1.z) {
+								i = blockpos.x;
+								j = blockpos.y;
 								++k;
 							}
 
@@ -139,35 +102,34 @@ public class BlockPos extends Vec3i {
 	 * method is used, the resulting BlockPos instances can only be used inside the
 	 * iteration loop.
 	 */
-	public static Iterable<BlockPos.MutableBlockPos> getAllInBoxMutable(BlockPos from, BlockPos to) {
-		final BlockPos blockpos = new BlockPos(Math.min(from.getX(), to.getX()), Math.min(from.getY(), to.getY()),
-				Math.min(from.getZ(), to.getZ()));
-		final BlockPos blockpos1 = new BlockPos(Math.max(from.getX(), to.getX()), Math.max(from.getY(), to.getY()),
-				Math.max(from.getZ(), to.getZ()));
-		return new Iterable<BlockPos.MutableBlockPos>() {
-			public Iterator<BlockPos.MutableBlockPos> iterator() {
-				return new AbstractIterator<BlockPos.MutableBlockPos>() {
-					private BlockPos.MutableBlockPos theBlockPos = null;
+	public static Iterable<BlockPos> getAllInBoxMutable(BlockPos from, BlockPos to) {
+		final BlockPos blockpos = new BlockPos(Math.min(from.x, to.x), Math.min(from.y, to.y), Math.min(from.z, to.z));
+		final BlockPos blockpos1 = new BlockPos(Math.max(from.x, to.x), Math.max(from.y, to.y), Math.max(from.z, to.z));
+		return new Iterable<BlockPos>() {
+			@Override
+			public Iterator<BlockPos> iterator() {
+				return new AbstractIterator<BlockPos>() {
+					private BlockPos theBlockPos = null;
 
-					protected BlockPos.MutableBlockPos computeNext() {
+					@Override
+					protected BlockPos computeNext() {
 						if (this.theBlockPos == null) {
-							this.theBlockPos = new BlockPos.MutableBlockPos(blockpos.getX(), blockpos.getY(),
-									blockpos.getZ());
+							this.theBlockPos = new BlockPos(blockpos.x, blockpos.y, blockpos.z);
 							return this.theBlockPos;
 						} else if (this.theBlockPos.equals(blockpos1)) {
-							return (BlockPos.MutableBlockPos) this.endOfData();
+							return (BlockPos) this.endOfData();
 						} else {
-							int i = this.theBlockPos.getX();
-							int j = this.theBlockPos.getY();
-							int k = this.theBlockPos.getZ();
-							if (i < blockpos1.getX()) {
+							int i = this.theBlockPos.x;
+							int j = this.theBlockPos.y;
+							int k = this.theBlockPos.z;
+							if (i < blockpos1.x) {
 								++i;
-							} else if (j < blockpos1.getY()) {
-								i = blockpos.getX();
+							} else if (j < blockpos1.y) {
+								i = blockpos.x;
 								++j;
-							} else if (k < blockpos1.getZ()) {
-								i = blockpos.getX();
-								j = blockpos.getY();
+							} else if (k < blockpos1.z) {
+								i = blockpos.x;
+								j = blockpos.y;
 								++k;
 							}
 
@@ -180,6 +142,10 @@ public class BlockPos extends Vec3i {
 				};
 			}
 		};
+	}
+
+	public BlockPos() {
+		super(0, 0, 0);
 	}
 
 	public BlockPos(double x, double y, double z) {
@@ -199,7 +165,7 @@ public class BlockPos extends Vec3i {
 	}
 
 	public BlockPos(Vec3i source) {
-		this(source.getX(), source.getY(), source.getZ());
+		this(source.x, source.y, source.z);
 	}
 
 	/**
@@ -207,31 +173,44 @@ public class BlockPos extends Vec3i {
 	 */
 	public BlockPos add(double x, double y, double z) {
 		return x == 0.0D && y == 0.0D && z == 0.0D ? this
-				: new BlockPos((double) this.getX() + x, (double) this.getY() + y, (double) this.getZ() + z);
+				: new BlockPos((double) this.x + x, (double) this.y + y, (double) this.z + z);
 	}
 
 	/**
 	 * + Add the given coordinates to the coordinates of this BlockPos
 	 */
 	public BlockPos add(int x, int y, int z) {
-		return x == 0 && y == 0 && z == 0 ? this : new BlockPos(this.getX() + x, this.getY() + y, this.getZ() + z);
+		return x == 0 && y == 0 && z == 0 ? this : new BlockPos(this.x + x, this.y + y, this.z + z);
+	}
+
+	/**
+	 * eagler
+	 */
+	/**
+	 * + Add the given coordinates to the coordinates of this BlockPos
+	 */
+	public BlockPos add(int x, int y, int z, BlockPos dst) {
+		dst.x = this.x + x;
+		dst.y = this.y + y;
+		dst.z = this.z + z;
+		return dst;
 	}
 
 	/**
 	 * + Add the given coordinates to the coordinates of this BlockPos
 	 */
 	public BlockPos add(Vec3i vec) {
-		return vec.getX() == 0 && vec.getY() == 0 && vec.getZ() == 0 ? this
-				: new BlockPos(this.getX() + vec.getX(), this.getY() + vec.getY(), this.getZ() + vec.getZ());
+		return vec.x == 0 && vec.y == 0 && vec.z == 0 ? this
+				: new BlockPos(this.x + vec.x, this.y + vec.y, this.z + vec.z);
 	}
 
 	/**
 	 * + Calculate the cross product of this and the given Vector
 	 */
+	@Override
 	public BlockPos crossProduct(Vec3i vec3i) {
-		return new BlockPos(this.getY() * vec3i.getZ() - this.getZ() * vec3i.getY(),
-				this.getZ() * vec3i.getX() - this.getX() * vec3i.getZ(),
-				this.getX() * vec3i.getY() - this.getY() * vec3i.getX());
+		return new BlockPos(this.y * vec3i.z - this.z * vec3i.y, this.z * vec3i.x - this.x * vec3i.z,
+				this.x * vec3i.y - this.y * vec3i.x);
 	}
 
 	/**
@@ -288,6 +267,13 @@ public class BlockPos extends Vec3i {
 		return this.offset(EnumFacing.EAST, n);
 	}
 
+	public BlockPos func_181079_c(int x, int y, int z) {
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		return this;
+	}
+
 	/**
 	 * + Offset this BlockPos 1 block in northern direction
 	 */
@@ -342,9 +328,9 @@ public class BlockPos extends Vec3i {
 	}
 
 	public BlockPos offsetFaster(EnumFacing facing, BlockPos ret) {
-		ret.x = this.getX() + facing.getFrontOffsetX();
-		ret.y = this.getY() + facing.getFrontOffsetY();
-		ret.z = this.getZ() + facing.getFrontOffsetZ();
+		ret.x = this.x + facing.getFrontOffsetX();
+		ret.y = this.y + facing.getFrontOffsetY();
+		ret.z = this.z + facing.getFrontOffsetZ();
 		return ret;
 	}
 
@@ -379,16 +365,16 @@ public class BlockPos extends Vec3i {
 	 * + Subtract the given Vector from this BlockPos
 	 */
 	public BlockPos subtract(Vec3i vec) {
-		return vec.getX() == 0 && vec.getY() == 0 && vec.getZ() == 0 ? this
-				: new BlockPos(this.getX() - vec.getX(), this.getY() - vec.getY(), this.getZ() - vec.getZ());
+		return vec.x == 0 && vec.y == 0 && vec.z == 0 ? this
+				: new BlockPos(this.x - vec.x, this.y - vec.y, this.z - vec.z);
 	}
 
 	/**
 	 * + Serialize this BlockPos into a long value
 	 */
 	public long toLong() {
-		return ((long) this.getX() & X_MASK) << X_SHIFT | ((long) this.getY() & Y_MASK) << Y_SHIFT
-				| ((long) this.getZ() & Z_MASK) << 0;
+		return ((long) this.x & X_MASK) << X_SHIFT | ((long) this.y & Y_MASK) << Y_SHIFT
+				| ((long) this.z & Z_MASK) << 0;
 	}
 
 	/**
@@ -444,4 +430,5 @@ public class BlockPos extends Vec3i {
 	public BlockPos west(int n) {
 		return this.offset(EnumFacing.WEST, n);
 	}
+
 }

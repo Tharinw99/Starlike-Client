@@ -6,13 +6,13 @@ import net.minecraft.entity.item.EntityArmorStand;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -24,7 +24,7 @@ import net.minecraft.entity.item.EntityArmorStand;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ModelArmorStandArmor extends ModelBiped {
 	public ModelArmorStandArmor() {
@@ -45,6 +45,7 @@ public class ModelArmorStandArmor extends ModelBiped {
 	 * time(so that arms and legs swing back and forth) and par2 represents how
 	 * "far" arms and legs can swing at most.
 	 */
+	@Override
 	public void setRotationAngles(float entityIn, float parFloat2, float parFloat3, float parFloat4, float parFloat5,
 			float parFloat6, Entity parEntity) {
 		if (parEntity instanceof EntityArmorStand) {

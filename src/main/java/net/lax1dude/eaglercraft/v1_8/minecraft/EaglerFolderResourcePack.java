@@ -29,7 +29,7 @@ import net.minecraft.client.resources.AbstractResourcePack;
 
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -41,7 +41,7 @@ import net.minecraft.client.resources.AbstractResourcePack;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EaglerFolderResourcePack extends AbstractResourcePack {
 
@@ -218,7 +218,7 @@ public class EaglerFolderResourcePack extends AbstractResourcePack {
 									i += j;
 								}
 							} else {
-								buffer = EaglerInputStream.inputStreamToBytes(ziss);
+								buffer = EaglerInputStream.inputStreamToBytesNoClose(ziss);
 							}
 							(new VFile2(prefix, folderName, fn.substring(prefixLen))).setAllBytes(buffer);
 							totalSize += buffer.length;
@@ -295,7 +295,7 @@ public class EaglerFolderResourcePack extends AbstractResourcePack {
 				return;
 			}
 		}
-		PlatformRuntime.downloadRemoteURIByteArray(url, arr -> {
+		PlatformRuntime.downloadRemoteURIByteArray(url, true, arr -> {
 			ast.accept(() -> {
 				if (arr == null) {
 					cb.accept(null);

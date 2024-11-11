@@ -28,13 +28,13 @@ import net.minecraft.world.chunk.Chunk;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -46,7 +46,7 @@ import net.minecraft.world.chunk.Chunk;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntitySlime extends EntityLiving implements IMob {
 	static class AISlimeAttack extends EntityAIBase {
@@ -58,6 +58,7 @@ public class EntitySlime extends EntityLiving implements IMob {
 			this.setMutexBits(2);
 		}
 
+		@Override
 		public boolean continueExecuting() {
 			EntityLivingBase entitylivingbase = this.slime.getAttackTarget();
 			return entitylivingbase == null ? false
@@ -67,6 +68,7 @@ public class EntitySlime extends EntityLiving implements IMob {
 											: --this.field_179465_b > 0));
 		}
 
+		@Override
 		public boolean shouldExecute() {
 			EntityLivingBase entitylivingbase = this.slime.getAttackTarget();
 			return entitylivingbase == null ? false
@@ -75,11 +77,13 @@ public class EntitySlime extends EntityLiving implements IMob {
 									|| !((EntityPlayer) entitylivingbase).capabilities.disableDamage);
 		}
 
+		@Override
 		public void startExecuting() {
 			this.field_179465_b = 300;
 			super.startExecuting();
 		}
 
+		@Override
 		public void updateTask() {
 			this.slime.faceEntity(this.slime.getAttackTarget(), 10.0F, 10.0F);
 			((EntitySlime.SlimeMoveHelper) this.slime.getMoveHelper()).func_179920_a(this.slime.rotationYaw,
@@ -97,11 +101,13 @@ public class EntitySlime extends EntityLiving implements IMob {
 			this.setMutexBits(2);
 		}
 
+		@Override
 		public boolean shouldExecute() {
 			return this.slime.getAttackTarget() == null
 					&& (this.slime.onGround || this.slime.isInWater() || this.slime.isInLava());
 		}
 
+		@Override
 		public void updateTask() {
 			if (--this.field_179460_c <= 0) {
 				this.field_179460_c = 40 + this.slime.getRNG().nextInt(60);
@@ -121,10 +127,12 @@ public class EntitySlime extends EntityLiving implements IMob {
 			((PathNavigateGround) parEntitySlime.getNavigator()).setCanSwim(true);
 		}
 
+		@Override
 		public boolean shouldExecute() {
 			return this.slime.isInWater() || this.slime.isInLava();
 		}
 
+		@Override
 		public void updateTask() {
 			if (this.slime.getRNG().nextFloat() < 0.8F) {
 				this.slime.getJumpHelper().setJumping();
@@ -142,10 +150,12 @@ public class EntitySlime extends EntityLiving implements IMob {
 			this.setMutexBits(5);
 		}
 
+		@Override
 		public boolean shouldExecute() {
 			return true;
 		}
 
+		@Override
 		public void updateTask() {
 			((EntitySlime.SlimeMoveHelper) this.slime.getMoveHelper()).setSpeed(1.0D);
 		}
@@ -167,6 +177,7 @@ public class EntitySlime extends EntityLiving implements IMob {
 			this.field_179923_j = parFlag;
 		}
 
+		@Override
 		public void onUpdateMoveHelper() {
 			this.entity.rotationYaw = this.limitAngle(this.entity.rotationYaw, this.field_179922_g, 30.0F);
 			this.entity.rotationYawHead = this.entity.rotationYaw;
@@ -235,6 +246,7 @@ public class EntitySlime extends EntityLiving implements IMob {
 	 * + Applies a velocity to each of the entities pushing them away from each
 	 * other. Args: entity
 	 */
+	@Override
 	public void applyEntityCollision(Entity entity) {
 		super.applyEntityCollision(entity);
 		if (entity instanceof EntityIronGolem && this.canDamagePlayer()) {
@@ -255,6 +267,7 @@ public class EntitySlime extends EntityLiving implements IMob {
 		return new EntitySlime(this.worldObj);
 	}
 
+	@Override
 	protected void entityInit() {
 		super.entityInit();
 		this.dataWatcher.addObject(16, Byte.valueOf((byte) 1));
@@ -283,6 +296,7 @@ public class EntitySlime extends EntityLiving implements IMob {
 	 * + Checks if the entity's current position is a valid location to spawn this
 	 * entity.
 	 */
+	@Override
 	public boolean getCanSpawnHere() {
 		BlockPos blockpos = new BlockPos(MathHelper.floor_double(this.posX), 0, MathHelper.floor_double(this.posZ));
 		Chunk chunk = this.worldObj.getChunkFromBlockCoords(blockpos);
@@ -311,14 +325,17 @@ public class EntitySlime extends EntityLiving implements IMob {
 	/**
 	 * + Returns the sound this mob makes on death.
 	 */
+	@Override
 	protected String getDeathSound() {
 		return "mob.slime." + (this.getSlimeSize() > 1 ? "big" : "small");
 	}
 
+	@Override
 	protected Item getDropItem() {
 		return this.getSlimeSize() == 1 ? Items.slime_ball : null;
 	}
 
+	@Override
 	public float getEyeHeight() {
 		return 0.625F * this.height;
 	}
@@ -326,6 +343,7 @@ public class EntitySlime extends EntityLiving implements IMob {
 	/**
 	 * + Returns the sound this mob makes when it is hurt.
 	 */
+	@Override
 	protected String getHurtSound() {
 		return "mob.slime." + (this.getSlimeSize() > 1 ? "big" : "small");
 	}
@@ -358,6 +376,7 @@ public class EntitySlime extends EntityLiving implements IMob {
 	/**
 	 * + Returns the volume for the sounds this mob makes.
 	 */
+	@Override
 	protected float getSoundVolume() {
 		return 0.4F * (float) this.getSlimeSize();
 	}
@@ -366,6 +385,7 @@ public class EntitySlime extends EntityLiving implements IMob {
 	 * + The speed it takes to move the entityliving's rotationPitch through the
 	 * faceEntity method. This is only currently use in wolves.
 	 */
+	@Override
 	public int getVerticalFaceSpeed() {
 		return 0;
 	}
@@ -373,6 +393,7 @@ public class EntitySlime extends EntityLiving implements IMob {
 	/**
 	 * + Causes this entity to do an upwards motion (jumping).
 	 */
+	@Override
 	protected void jump() {
 		this.motionY = 0.41999998688697815D;
 		this.isAirBorne = true;
@@ -397,6 +418,7 @@ public class EntitySlime extends EntityLiving implements IMob {
 	/**
 	 * + Called by a player entity when they collide with an entity
 	 */
+	@Override
 	public void onCollideWithPlayer(EntityPlayer entityplayer) {
 		if (this.canDamagePlayer()) {
 			this.func_175451_e(entityplayer);
@@ -404,6 +426,7 @@ public class EntitySlime extends EntityLiving implements IMob {
 
 	}
 
+	@Override
 	public void onDataWatcherUpdate(int i) {
 		if (i == 16) {
 			int j = this.getSlimeSize();
@@ -423,6 +446,7 @@ public class EntitySlime extends EntityLiving implements IMob {
 	 * spawner, natural spawning etc, but not called when entity is reloaded from
 	 * nbt. Mainly used for initializing attributes and inventory
 	 */
+	@Override
 	public IEntityLivingData onInitialSpawn(DifficultyInstance difficultyinstance,
 			IEntityLivingData ientitylivingdata) {
 		int i = this.rand.nextInt(3);
@@ -438,6 +462,7 @@ public class EntitySlime extends EntityLiving implements IMob {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		if (!this.worldObj.isRemote && this.worldObj.getDifficulty() == EnumDifficulty.PEACEFUL
 				&& this.getSlimeSize() > 0) {
@@ -480,6 +505,7 @@ public class EntitySlime extends EntityLiving implements IMob {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		int i = nbttagcompound.getInteger("Size");
@@ -494,6 +520,7 @@ public class EntitySlime extends EntityLiving implements IMob {
 	/**
 	 * + Will get destroyed next tick.
 	 */
+	@Override
 	public void setDead() {
 		int i = this.getSlimeSize();
 		if (!this.worldObj.isRemote && i > 1 && this.getHealth() <= 0.0F) {
@@ -535,6 +562,7 @@ public class EntitySlime extends EntityLiving implements IMob {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		nbttagcompound.setInteger("Size", this.getSlimeSize() - 1);

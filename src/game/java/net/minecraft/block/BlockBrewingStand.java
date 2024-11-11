@@ -30,13 +30,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -48,7 +48,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockBrewingStand extends BlockContainer {
 	public static final PropertyBool[] HAS_BOTTLE = new PropertyBool[] { PropertyBool.create("has_bottle_0"),
@@ -65,6 +65,7 @@ public class BlockBrewingStand extends BlockContainer {
 	 * + Add all collision boxes of this Block to the list that intersect with the
 	 * given mask.
 	 */
+	@Override
 	public void addCollisionBoxesToList(World world, BlockPos blockpos, IBlockState iblockstate,
 			AxisAlignedBB axisalignedbb, List<AxisAlignedBB> list, Entity entity) {
 		this.setBlockBounds(0.4375F, 0.0F, 0.4375F, 0.5625F, 0.875F, 0.5625F);
@@ -73,6 +74,7 @@ public class BlockBrewingStand extends BlockContainer {
 		super.addCollisionBoxesToList(world, blockpos, iblockstate, axisalignedbb, list, entity);
 	}
 
+	@Override
 	public void breakBlock(World world, BlockPos blockpos, IBlockState iblockstate) {
 		TileEntity tileentity = world.getTileEntity(blockpos);
 		if (tileentity instanceof TileEntityBrewingStand) {
@@ -82,6 +84,7 @@ public class BlockBrewingStand extends BlockContainer {
 		super.breakBlock(world, blockpos, iblockstate);
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { HAS_BOTTLE[0], HAS_BOTTLE[1], HAS_BOTTLE[2] });
 	}
@@ -90,18 +93,22 @@ public class BlockBrewingStand extends BlockContainer {
 	 * + Returns a new instance of a block's tile entity class. Called on placing
 	 * the block.
 	 */
+	@Override
 	public TileEntity createNewTileEntity(World var1, int var2) {
 		return new TileEntityBrewingStand();
 	}
 
+	@Override
 	public EnumWorldBlockLayer getBlockLayer() {
 		return EnumWorldBlockLayer.CUTOUT;
 	}
 
+	@Override
 	public int getComparatorInputOverride(World world, BlockPos blockpos) {
 		return Container.calcRedstone(world.getTileEntity(blockpos));
 	}
 
+	@Override
 	public Item getItem(World var1, BlockPos var2) {
 		return Items.brewing_stand;
 	}
@@ -109,6 +116,7 @@ public class BlockBrewingStand extends BlockContainer {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
 		return Items.brewing_stand;
 	}
@@ -116,6 +124,7 @@ public class BlockBrewingStand extends BlockContainer {
 	/**
 	 * + Gets the localized name of this block. Used for the statistics page.
 	 */
+	@Override
 	public String getLocalizedName() {
 		return StatCollector.translateToLocal("item.brewingStand.name");
 	}
@@ -123,6 +132,7 @@ public class BlockBrewingStand extends BlockContainer {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
 
@@ -139,6 +149,7 @@ public class BlockBrewingStand extends BlockContainer {
 	 * + The type of render function called. 3 for standard block models, 2 for
 	 * TESR's, 1 for liquids, -1 is no render
 	 */
+	@Override
 	public int getRenderType() {
 		return 3;
 	}
@@ -146,6 +157,7 @@ public class BlockBrewingStand extends BlockContainer {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		IBlockState iblockstate = this.getDefaultState();
 
@@ -156,10 +168,12 @@ public class BlockBrewingStand extends BlockContainer {
 		return iblockstate;
 	}
 
+	@Override
 	public boolean hasComparatorInputOverride() {
 		return true;
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -168,10 +182,12 @@ public class BlockBrewingStand extends BlockContainer {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
 
+	@Override
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState var3, EntityPlayer entityplayer,
 			EnumFacing var5, float var6, float var7, float var8) {
 		if (!world.isRemote) {
@@ -188,6 +204,7 @@ public class BlockBrewingStand extends BlockContainer {
 	 * + Called by ItemBlocks after a block is set in the world, to allow post-place
 	 * logic
 	 */
+	@Override
 	public void onBlockPlacedBy(World world, BlockPos blockpos, IBlockState var3, EntityLivingBase var4,
 			ItemStack itemstack) {
 		if (itemstack.hasDisplayName()) {
@@ -199,6 +216,7 @@ public class BlockBrewingStand extends BlockContainer {
 
 	}
 
+	@Override
 	public void randomDisplayTick(World world, BlockPos blockpos, IBlockState var3, EaglercraftRandom random) {
 		double d0 = (double) ((float) blockpos.getX() + 0.4F + random.nextFloat() * 0.2F);
 		double d1 = (double) ((float) blockpos.getY() + 0.7F + random.nextFloat() * 0.3F);
@@ -209,6 +227,7 @@ public class BlockBrewingStand extends BlockContainer {
 	/**
 	 * + Sets the block's bounds for rendering it as an item
 	 */
+	@Override
 	public void setBlockBoundsForItemRender() {
 		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.125F, 1.0F);
 	}

@@ -12,13 +12,13 @@ import net.minecraft.world.chunk.Chunk;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,7 +30,7 @@ import net.minecraft.world.chunk.Chunk;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ChunkCache implements IBlockAccess {
 	protected int chunkX;
@@ -68,14 +68,17 @@ public class ChunkCache implements IBlockAccess {
 	/**
 	 * + set by !chunk.getAreLevelsEmpty
 	 */
+	@Override
 	public boolean extendedLevelsInChunkCache() {
 		return this.hasExtendedLevels;
 	}
 
+	@Override
 	public BiomeGenBase getBiomeGenForCoords(BlockPos blockpos) {
 		return this.worldObj.getBiomeGenForCoords(blockpos);
 	}
 
+	@Override
 	public IBlockState getBlockState(BlockPos blockpos) {
 		if (blockpos.getY() >= 0 && blockpos.getY() < 256) {
 			int i = (blockpos.getX() >> 4) - this.chunkX;
@@ -91,6 +94,7 @@ public class ChunkCache implements IBlockAccess {
 		return Blocks.air.getDefaultState();
 	}
 
+	@Override
 	public int getCombinedLight(BlockPos blockpos, int i) {
 		int j = this.getLightForExt(EnumSkyBlock.SKY, blockpos);
 		int k = this.getLightForExt(EnumSkyBlock.BLOCK, blockpos);
@@ -142,17 +146,20 @@ public class ChunkCache implements IBlockAccess {
 		}
 	}
 
+	@Override
 	public int getStrongPower(BlockPos blockpos, EnumFacing enumfacing) {
 		IBlockState iblockstate = this.getBlockState(blockpos);
 		return iblockstate.getBlock().getStrongPower(this, blockpos, iblockstate, enumfacing);
 	}
 
+	@Override
 	public TileEntity getTileEntity(BlockPos blockpos) {
 		int i = (blockpos.getX() >> 4) - this.chunkX;
 		int j = (blockpos.getZ() >> 4) - this.chunkZ;
 		return this.chunkArray[i][j].getTileEntity(blockpos, Chunk.EnumCreateEntityType.IMMEDIATE);
 	}
 
+	@Override
 	public WorldType getWorldType() {
 		return this.worldObj.getWorldType();
 	}
@@ -162,6 +169,7 @@ public class ChunkCache implements IBlockAccess {
 	 * this only checks to see if the blocks material is set to air, meaning it is
 	 * possible for non-vanilla blocks to still pass this check.
 	 */
+	@Override
 	public boolean isAirBlock(BlockPos blockpos) {
 		return this.getBlockState(blockpos).getBlock().getMaterial() == Material.air;
 	}

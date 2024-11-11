@@ -13,13 +13,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -31,7 +31,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ContainerWorkbench extends Container {
 	/**
@@ -67,6 +67,7 @@ public class ContainerWorkbench extends Container {
 		this.onCraftMatrixChanged(this.craftMatrix);
 	}
 
+	@Override
 	public boolean canInteractWith(EntityPlayer entityplayer) {
 		return this.worldObj.getBlockState(this.pos).getBlock() != Blocks.crafting_table ? false
 				: entityplayer.getDistanceSq((double) this.pos.getX() + 0.5D, (double) this.pos.getY() + 0.5D,
@@ -78,6 +79,7 @@ public class ContainerWorkbench extends Container {
 	 * (double-click) code. The stack passed in is null for the initial slot that
 	 * was double-clicked.
 	 */
+	@Override
 	public boolean canMergeSlot(ItemStack itemstack, Slot slot) {
 		return slot.inventory != this.craftResult && super.canMergeSlot(itemstack, slot);
 	}
@@ -85,6 +87,7 @@ public class ContainerWorkbench extends Container {
 	/**
 	 * + Called when the container is closed.
 	 */
+	@Override
 	public void onContainerClosed(EntityPlayer entityplayer) {
 		super.onContainerClosed(entityplayer);
 		if (!this.worldObj.isRemote) {
@@ -104,6 +107,7 @@ public class ContainerWorkbench extends Container {
 	/**
 	 * + Callback for when the crafting matrix is changed.
 	 */
+	@Override
 	public void onCraftMatrixChanged(IInventory var1) {
 		this.craftResult.setInventorySlotContents(0,
 				CraftingManager.getInstance().findMatchingRecipe(this.craftMatrix, this.worldObj));
@@ -112,6 +116,7 @@ public class ContainerWorkbench extends Container {
 	/**
 	 * + Take a stack from the specified inventory slot.
 	 */
+	@Override
 	public ItemStack transferStackInSlot(EntityPlayer entityplayer, int i) {
 		ItemStack itemstack = null;
 		Slot slot = (Slot) this.inventorySlots.get(i);

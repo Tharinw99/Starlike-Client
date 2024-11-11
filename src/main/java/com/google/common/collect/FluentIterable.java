@@ -54,7 +54,7 @@ import com.google.common.base.Predicate;
  * Here is an example that merges the lists returned by two separate database
  * calls, transforms it by invoking {@code toString()} on each element, and
  * returns the first 10 elements as an {@code ImmutableList}:
- * 
+ *
  * <pre>
  *    {@code
  *

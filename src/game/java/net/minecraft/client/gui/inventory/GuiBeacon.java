@@ -25,13 +25,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -43,7 +43,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiBeacon extends GuiContainer {
 	static class Button extends GuiButton {
@@ -60,6 +60,7 @@ public class GuiBeacon extends GuiContainer {
 			this.field_146143_q = parInt5;
 		}
 
+		@Override
 		public void drawButton(Minecraft minecraft, int i, int j) {
 			if (this.visible) {
 				minecraft.getTextureManager().bindTexture(GuiBeacon.beaconGuiTextures);
@@ -100,6 +101,7 @@ public class GuiBeacon extends GuiContainer {
 			super(parInt1, parInt2, parInt3, GuiBeacon.beaconGuiTextures, 112, 220);
 		}
 
+		@Override
 		public void drawButtonForegroundLayer(int i, int j) {
 			if (this.enabled)
 				Mouse.showCursor(EnumCursorType.HAND);
@@ -112,6 +114,7 @@ public class GuiBeacon extends GuiContainer {
 			super(parInt1, parInt2, parInt3, GuiBeacon.beaconGuiTextures, 90, 220);
 		}
 
+		@Override
 		public void drawButtonForegroundLayer(int i, int j) {
 			if (this.enabled)
 				Mouse.showCursor(EnumCursorType.HAND);
@@ -131,6 +134,7 @@ public class GuiBeacon extends GuiContainer {
 			this.field_146148_q = parInt5;
 		}
 
+		@Override
 		public void drawButtonForegroundLayer(int i, int j) {
 			if (this.enabled)
 				Mouse.showCursor(EnumCursorType.HAND);
@@ -164,6 +168,7 @@ public class GuiBeacon extends GuiContainer {
 	 * + Called by the controls from the buttonList when activated. (Mouse pressed
 	 * for buttons)
 	 */
+	@Override
 	protected void actionPerformed(GuiButton parGuiButton) {
 		if (parGuiButton.id == -2) {
 			this.mc.displayGuiScreen((GuiScreen) null);
@@ -198,6 +203,7 @@ public class GuiBeacon extends GuiContainer {
 	/**
 	 * + Args : renderPartialTicks, mouseX, mouseY
 	 */
+	@Override
 	protected void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 		this.mc.getTextureManager().bindTexture(beaconGuiTextures);
@@ -217,6 +223,7 @@ public class GuiBeacon extends GuiContainer {
 	 * + Draw the foreground layer for the GuiContainer (everything in front of the
 	 * items). Args : mouseX, mouseY
 	 */
+	@Override
 	protected void drawGuiContainerForegroundLayer(int i, int j) {
 		RenderHelper.disableStandardItemLighting();
 		this.drawCenteredString(this.fontRendererObj, I18n.format("tile.beacon.primary", new Object[0]), 62, 10,
@@ -240,6 +247,7 @@ public class GuiBeacon extends GuiContainer {
 	 * when the GUI is displayed and when the window resizes, the buttonList is
 	 * cleared beforehand.
 	 */
+	@Override
 	public void initGui() {
 		super.initGui();
 		this.buttonList
@@ -252,6 +260,7 @@ public class GuiBeacon extends GuiContainer {
 	/**
 	 * + Called from the main game loop to update the screen.
 	 */
+	@Override
 	public void updateScreen() {
 		super.updateScreen();
 		int i = this.tileBeacon.getField(0);

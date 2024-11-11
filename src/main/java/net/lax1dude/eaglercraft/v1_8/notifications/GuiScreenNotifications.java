@@ -15,7 +15,7 @@ import net.minecraft.client.resources.I18n;
 
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@ import net.minecraft.client.resources.I18n;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiScreenNotifications extends GuiScreen {
 
@@ -54,6 +54,7 @@ public class GuiScreenNotifications extends GuiScreen {
 		this.parent = parent;
 	}
 
+	@Override
 	public void actionPerformed(GuiButton btn) {
 		switch (btn.id) {
 		case 0:
@@ -78,6 +79,7 @@ public class GuiScreenNotifications extends GuiScreen {
 		}
 	}
 
+	@Override
 	public void drawScreen(int par1, int par2, float par3) {
 		if (mc.thePlayer == null)
 			return;
@@ -86,16 +88,19 @@ public class GuiScreenNotifications extends GuiScreen {
 		super.drawScreen(par1, par2, par3);
 	}
 
+	@Override
 	public void handleMouseInput() throws IOException {
 		super.handleMouseInput();
 		slots.handleMouseInput();
 	}
 
+	@Override
 	public void handleTouchInput() throws IOException {
 		super.handleTouchInput();
 		slots.handleTouchInput();
 	}
 
+	@Override
 	public void initGui() {
 		selected = -1;
 		buttonList.clear();
@@ -112,6 +117,7 @@ public class GuiScreenNotifications extends GuiScreen {
 		updateButtons();
 	}
 
+	@Override
 	public void onGuiClosed() {
 		if (mc.thePlayer != null) {
 			mc.thePlayer.sendQueue.getNotifManager().commitUnreadFlag();
@@ -161,6 +167,7 @@ public class GuiScreenNotifications extends GuiScreen {
 		}
 	}
 
+	@Override
 	public void updateScreen() {
 		if (mc.thePlayer == null) {
 			mc.displayGuiScreen(parent);

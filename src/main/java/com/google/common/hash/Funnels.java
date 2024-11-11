@@ -34,6 +34,7 @@ public final class Funnels {
 	private enum ByteArrayFunnel implements Funnel<byte[]> {
 		INSTANCE;
 
+		@Override
 		public void funnel(byte[] from, PrimitiveSink into) {
 			into.putBytes(from);
 		}
@@ -47,6 +48,7 @@ public final class Funnels {
 	private enum IntegerFunnel implements Funnel<Integer> {
 		INSTANCE;
 
+		@Override
 		public void funnel(Integer from, PrimitiveSink into) {
 			into.putInt(from);
 		}
@@ -60,6 +62,7 @@ public final class Funnels {
 	private enum LongFunnel implements Funnel<Long> {
 		INSTANCE;
 
+		@Override
 		public void funnel(Long from, PrimitiveSink into) {
 			into.putLong(from);
 		}
@@ -86,6 +89,7 @@ public final class Funnels {
 			return false;
 		}
 
+		@Override
 		public void funnel(Iterable<? extends E> from, PrimitiveSink into) {
 			for (E e : from) {
 				elementFunnel.funnel(e, into);
@@ -161,6 +165,7 @@ public final class Funnels {
 			return false;
 		}
 
+		@Override
 		public void funnel(CharSequence from, PrimitiveSink into) {
 			into.putString(from, charset);
 		}
@@ -183,6 +188,7 @@ public final class Funnels {
 	private enum UnencodedCharsFunnel implements Funnel<CharSequence> {
 		INSTANCE;
 
+		@Override
 		public void funnel(CharSequence from, PrimitiveSink into) {
 			into.putUnencodedChars(from);
 		}
@@ -197,11 +203,11 @@ public final class Funnels {
 	 * Wraps a {@code PrimitiveSink} as an {@link OutputStream}, so it is easy to
 	 * {@link Funnel#funnel funnel} an object to a {@code PrimitiveSink} if there is
 	 * already a way to write the contents of the object to an {@code OutputStream}.
-	 * 
+	 *
 	 * <p>
 	 * The {@code close} and {@code flush} methods of the returned
 	 * {@code OutputStream} do nothing, and no method throws {@code IOException}.
-	 * 
+	 *
 	 * @since 13.0
 	 */
 	public static OutputStream asOutputStream(PrimitiveSink sink) {
@@ -226,7 +232,7 @@ public final class Funnels {
 
 	/**
 	 * Returns a funnel for longs.
-	 * 
+	 *
 	 * @since 13.0
 	 */
 	public static Funnel<Long> longFunnel() {

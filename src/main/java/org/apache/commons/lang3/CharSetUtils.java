@@ -30,7 +30,7 @@ package org.apache.commons.lang3;
  * <p>
  * #ThreadSafe#
  * </p>
- * 
+ *
  * @see CharSet
  * @since 1.0
  */

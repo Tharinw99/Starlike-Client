@@ -15,7 +15,7 @@ import net.minecraft.world.storage.WorldInfo;
 
 /**
  * Copyright (c) 2023-2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@ import net.minecraft.world.storage.WorldInfo;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EaglerSaveFormat extends SaveFormatOld {
 
@@ -80,10 +80,12 @@ public class EaglerSaveFormat extends SaveFormatOld {
 		return renameWorld(newFolderName, displayName);
 	}
 
+	@Override
 	public String getName() {
 		return "eagler";
 	}
 
+	@Override
 	public List<SaveFormatComparator> getSaveList() {
 		ArrayList<SaveFormatComparator> arraylist = Lists.newArrayList();
 		if (worldsList.exists()) {
@@ -107,6 +109,7 @@ public class EaglerSaveFormat extends SaveFormatOld {
 		return arraylist;
 	}
 
+	@Override
 	public ISaveHandler getSaveLoader(String s, boolean flag) {
 		return new EaglerSaveHandler(this.savesDirectory, s);
 	}

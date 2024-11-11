@@ -12,18 +12,19 @@ import net.lax1dude.eaglercraft.v1_8.internal.PlatformRuntime;
 
 /**
  * Copyright (c) 2022-2024 lax1dude. All Rights Reserved.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class TeaVMWebSocketClient extends AbstractWebSocketClient {
 
@@ -59,7 +60,7 @@ public class TeaVMWebSocketClient extends AbstractWebSocketClient {
 		TeaVMUtils.addEventListener(sock, "error", new EventListener<Event>() {
 			@Override
 			public void handleEvent(Event evt) {
-				if(sockIsConnecting) {
+				if (sockIsConnecting) {
 					sockIsFailed = true;
 					sockIsConnecting = false;
 				}
@@ -68,11 +69,18 @@ public class TeaVMWebSocketClient extends AbstractWebSocketClient {
 	}
 
 	@Override
+	public void close() {
+		sockIsConnecting = false;
+		sockIsConnected = false;
+		sock.close();
+	}
+
+	@Override
 	public boolean connectBlocking(int timeoutMS) {
 		long startTime = PlatformRuntime.steadyTimeMillis();
-		while(!sockIsConnected && !sockIsFailed) {
+		while (!sockIsConnected && !sockIsFailed) {
 			EagUtils.sleep(50);
-			if(PlatformRuntime.steadyTimeMillis() - startTime > timeoutMS * 1000) {
+			if (PlatformRuntime.steadyTimeMillis() - startTime > timeoutMS * 1000) {
 				break;
 			}
 		}
@@ -87,33 +95,26 @@ public class TeaVMWebSocketClient extends AbstractWebSocketClient {
 	}
 
 	@Override
-	public boolean isOpen() {
-		return sockIsConnected;
-	}
-
-	@Override
 	public boolean isClosed() {
 		return !sockIsConnecting && !sockIsConnected;
 	}
 
 	@Override
-	public void close() {
-		sockIsConnecting = false;
-		sockIsConnected = false;
-		sock.close();
-	}
-
-	@Override
-	public void send(String str) {
-		if(sockIsConnected) {
-			sock.send(str);
-		}
+	public boolean isOpen() {
+		return sockIsConnected;
 	}
 
 	@Override
 	public void send(byte[] bytes) {
-		if(sockIsConnected) {
+		if (sockIsConnected) {
 			sock.send(TeaVMUtils.unwrapArrayBuffer(bytes));
+		}
+	}
+
+	@Override
+	public void send(String str) {
+		if (sockIsConnected) {
+			sock.send(str);
 		}
 	}
 

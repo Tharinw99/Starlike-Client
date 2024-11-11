@@ -9,13 +9,13 @@ import net.minecraft.world.pathfinder.SwimNodeProcessor;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@ import net.minecraft.world.pathfinder.SwimNodeProcessor;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class PathNavigateSwimmer extends PathNavigate {
 	public PathNavigateSwimmer(EntityLiving entitylivingIn, World worldIn) {
@@ -37,15 +37,18 @@ public class PathNavigateSwimmer extends PathNavigate {
 	/**
 	 * + If on ground or swimming and can swim
 	 */
+	@Override
 	protected boolean canNavigate() {
 		return this.isInLiquid();
 	}
 
+	@Override
 	protected Vec3 getEntityPosition() {
 		return new Vec3(this.theEntity.posX, this.theEntity.posY + (double) this.theEntity.height * 0.5D,
 				this.theEntity.posZ);
 	}
 
+	@Override
 	protected PathFinder getPathFinder() {
 		return new PathFinder(new SwimNodeProcessor());
 	}
@@ -55,6 +58,7 @@ public class PathNavigateSwimmer extends PathNavigate {
 	 * straight line between the two points. Args: pos1, pos2, entityXSize,
 	 * entityYSize, entityZSize
 	 */
+	@Override
 	protected boolean isDirectPathBetweenPoints(Vec3 vec3, Vec3 vec31, int var3, int var4, int var5) {
 		MovingObjectPosition movingobjectposition = this.worldObj.rayTraceBlocks(vec3,
 				new Vec3(vec31.xCoord, vec31.yCoord + (double) this.theEntity.height * 0.5D, vec31.zCoord), false, true,
@@ -63,6 +67,7 @@ public class PathNavigateSwimmer extends PathNavigate {
 				|| movingobjectposition.typeOfHit == MovingObjectPosition.MovingObjectType.MISS;
 	}
 
+	@Override
 	protected void pathFollow() {
 		Vec3 vec3 = this.getEntityPosition();
 		float f = this.theEntity.width * this.theEntity.width;
@@ -87,6 +92,7 @@ public class PathNavigateSwimmer extends PathNavigate {
 	/**
 	 * + Trims path data from the end to the first sun covered block
 	 */
+	@Override
 	protected void removeSunnyPath() {
 		super.removeSunnyPath();
 	}

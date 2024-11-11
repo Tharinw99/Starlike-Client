@@ -1,24 +1,24 @@
 /* -*-mode:java; c-basic-offset:2; indent-tabs-mode:nil -*- */
 /* JOrbis
  * Copyright (C) 2000 ymnk, JCraft,Inc.
- *  
+ *
  * Written by: 2000 ymnk<ymnk@jcraft.com>
- *   
- * Many thanks to 
- *   Monty <monty@xiph.org> and 
+ *
+ * Many thanks to
+ *   Monty <monty@xiph.org> and
  *   The XIPHOPHORUS Company http://www.xiph.org/ .
  * JOrbis has been based on their awesome works, Vorbis codec.
- *   
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public License
  * as published by the Free Software Foundation; either version 2 of
  * the License, or (at your option) any later version.
-   
+
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -69,6 +69,151 @@ public class StreamState {
 		init(serialno);
 	}
 
+	void body_expand(int needed) {
+		if (body_storage <= body_fill + needed) {
+			body_storage += (needed + 1024);
+			byte[] foo = new byte[body_storage];
+			System.arraycopy(body_data, 0, foo, 0, body_data.length);
+			body_data = foo;
+		}
+	}
+
+	public void clear() {
+		body_data = null;
+		lacing_vals = null;
+		granule_vals = null;
+	}
+
+	void destroy() {
+		clear();
+	}
+
+	public int eof() {
+		return e_o_s;
+	}
+
+	public int flush(Page og) {
+
+		int i;
+		int vals = 0;
+		int maxvals = (lacing_fill > 255 ? 255 : lacing_fill);
+		int bytes = 0;
+		int acc = 0;
+		long granule_pos = granule_vals[0];
+
+		if (maxvals == 0)
+			return (0);
+
+		/* construct a page */
+		/* decide how many segments to include */
+
+		/*
+		 * If this is the initial header case, the first page must only include the
+		 * initial header packet
+		 */
+		if (b_o_s == 0) { /* 'initial header page' case */
+			granule_pos = 0;
+			for (vals = 0; vals < maxvals; vals++) {
+				if ((lacing_vals[vals] & 0x0ff) < 255) {
+					vals++;
+					break;
+				}
+			}
+		} else {
+			for (vals = 0; vals < maxvals; vals++) {
+				if (acc > 4096)
+					break;
+				acc += (lacing_vals[vals] & 0x0ff);
+				granule_pos = granule_vals[vals];
+			}
+		}
+
+		/* construct the header in temp storage */
+		System.arraycopy("OggS".getBytes(), 0, header, 0, 4);
+
+		/* stream structure version */
+		header[4] = 0x00;
+
+		/* continued packet flag? */
+		header[5] = 0x00;
+		if ((lacing_vals[0] & 0x100) == 0)
+			header[5] |= 0x01;
+		/* first page flag? */
+		if (b_o_s == 0)
+			header[5] |= 0x02;
+		/* last page flag? */
+		if (e_o_s != 0 && lacing_fill == vals)
+			header[5] |= 0x04;
+		b_o_s = 1;
+
+		/* 64 bits of PCM position */
+		for (i = 6; i < 14; i++) {
+			header[i] = (byte) granule_pos;
+			granule_pos >>>= 8;
+		}
+
+		/* 32 bits of stream serial number */
+		{
+			int _serialno = serialno;
+			for (i = 14; i < 18; i++) {
+				header[i] = (byte) _serialno;
+				_serialno >>>= 8;
+			}
+		}
+
+		/*
+		 * 32 bits of page counter (we have both counter and page header because this
+		 * val can roll over)
+		 */
+		if (pageno == -1)
+			pageno = 0; /*
+						 * because someone called stream_reset; this would be a strange thing to do in
+						 * an encode stream, but it has plausible uses
+						 */
+		{
+			int _pageno = pageno++;
+			for (i = 18; i < 22; i++) {
+				header[i] = (byte) _pageno;
+				_pageno >>>= 8;
+			}
+		}
+
+		/* zero for computation; filled in later */
+		header[22] = 0;
+		header[23] = 0;
+		header[24] = 0;
+		header[25] = 0;
+
+		/* segment table */
+		header[26] = (byte) vals;
+		for (i = 0; i < vals; i++) {
+			header[i + 27] = (byte) lacing_vals[i];
+			bytes += (header[i + 27] & 0xff);
+		}
+
+		/* set pointers in the ogg_page struct */
+		og.header_base = header;
+		og.header = 0;
+		og.header_len = header_fill = vals + 27;
+		og.body_base = body_data;
+		og.body = body_returned;
+		og.body_len = bytes;
+
+		/* advance the lacing data and set the body_returned pointer */
+
+		lacing_fill -= vals;
+		System.arraycopy(lacing_vals, vals, lacing_vals, 0, lacing_fill * 4);
+		System.arraycopy(granule_vals, vals, granule_vals, 0, lacing_fill * 8);
+		body_returned += bytes;
+
+		/* calculate the checksum */
+
+		og.checksum();
+
+		/* done */
+		return (1);
+	}
+
 	void init() {
 		body_storage = 16 * 1024;
 		body_data = new byte[body_storage];
@@ -91,25 +236,6 @@ public class StreamState {
 		this.serialno = serialno;
 	}
 
-	public void clear() {
-		body_data = null;
-		lacing_vals = null;
-		granule_vals = null;
-	}
-
-	void destroy() {
-		clear();
-	}
-
-	void body_expand(int needed) {
-		if (body_storage <= body_fill + needed) {
-			body_storage += (needed + 1024);
-			byte[] foo = new byte[body_storage];
-			System.arraycopy(body_data, 0, foo, 0, body_data.length);
-			body_data = foo;
-		}
-	}
-
 	void lacing_expand(int needed) {
 		if (lacing_storage <= lacing_fill + needed) {
 			lacing_storage += (needed + 32);
@@ -122,6 +248,9 @@ public class StreamState {
 			granule_vals = bar;
 		}
 	}
+
+	// add the incoming page to the stream state; we decompose the page
+	// into packet segments here as well.
 
 	/* submit data to the internal buffer of the framing engine */
 	public int packetin(Packet op) {
@@ -174,6 +303,21 @@ public class StreamState {
 			e_o_s = 1;
 		return (0);
 	}
+
+	/*
+	 * This will flush remaining packets into a page (returning nonzero), even if
+	 * there is not enough data to trigger a flush normally (undersized page). If
+	 * there are no packets or partial packets to flush, ogg_stream_flush returns 0.
+	 * Note that ogg_stream_flush will try to flush a normal sized page like
+	 * ogg_stream_pageout; a call to ogg_stream_flush does not gurantee that all
+	 * packets have flushed. Only a return value of 0 from ogg_stream_flush
+	 * indicates all packet data is flushed into pages.
+	 *
+	 * ogg_stream_page will flush the last page in a stream even if it's undersized;
+	 * you almost certainly want to use ogg_stream_pageout (and *not*
+	 * ogg_stream_flush) unless you need to flush an undersized page in the middle
+	 * of a stream for some reason.
+	 */
 
 	public int packetout(Packet op) {
 
@@ -230,9 +374,6 @@ public class StreamState {
 		packetno++;
 		return (1);
 	}
-
-	// add the incoming page to the stream state; we decompose the page
-	// into packet segments here as well.
 
 	public int pagein(Page og) {
 		byte[] header_base = og.header_base;
@@ -363,143 +504,6 @@ public class StreamState {
 	}
 
 	/*
-	 * This will flush remaining packets into a page (returning nonzero), even if
-	 * there is not enough data to trigger a flush normally (undersized page). If
-	 * there are no packets or partial packets to flush, ogg_stream_flush returns 0.
-	 * Note that ogg_stream_flush will try to flush a normal sized page like
-	 * ogg_stream_pageout; a call to ogg_stream_flush does not gurantee that all
-	 * packets have flushed. Only a return value of 0 from ogg_stream_flush
-	 * indicates all packet data is flushed into pages.
-	 * 
-	 * ogg_stream_page will flush the last page in a stream even if it's undersized;
-	 * you almost certainly want to use ogg_stream_pageout (and *not*
-	 * ogg_stream_flush) unless you need to flush an undersized page in the middle
-	 * of a stream for some reason.
-	 */
-
-	public int flush(Page og) {
-
-		int i;
-		int vals = 0;
-		int maxvals = (lacing_fill > 255 ? 255 : lacing_fill);
-		int bytes = 0;
-		int acc = 0;
-		long granule_pos = granule_vals[0];
-
-		if (maxvals == 0)
-			return (0);
-
-		/* construct a page */
-		/* decide how many segments to include */
-
-		/*
-		 * If this is the initial header case, the first page must only include the
-		 * initial header packet
-		 */
-		if (b_o_s == 0) { /* 'initial header page' case */
-			granule_pos = 0;
-			for (vals = 0; vals < maxvals; vals++) {
-				if ((lacing_vals[vals] & 0x0ff) < 255) {
-					vals++;
-					break;
-				}
-			}
-		} else {
-			for (vals = 0; vals < maxvals; vals++) {
-				if (acc > 4096)
-					break;
-				acc += (lacing_vals[vals] & 0x0ff);
-				granule_pos = granule_vals[vals];
-			}
-		}
-
-		/* construct the header in temp storage */
-		System.arraycopy("OggS".getBytes(), 0, header, 0, 4);
-
-		/* stream structure version */
-		header[4] = 0x00;
-
-		/* continued packet flag? */
-		header[5] = 0x00;
-		if ((lacing_vals[0] & 0x100) == 0)
-			header[5] |= 0x01;
-		/* first page flag? */
-		if (b_o_s == 0)
-			header[5] |= 0x02;
-		/* last page flag? */
-		if (e_o_s != 0 && lacing_fill == vals)
-			header[5] |= 0x04;
-		b_o_s = 1;
-
-		/* 64 bits of PCM position */
-		for (i = 6; i < 14; i++) {
-			header[i] = (byte) granule_pos;
-			granule_pos >>>= 8;
-		}
-
-		/* 32 bits of stream serial number */
-		{
-			int _serialno = serialno;
-			for (i = 14; i < 18; i++) {
-				header[i] = (byte) _serialno;
-				_serialno >>>= 8;
-			}
-		}
-
-		/*
-		 * 32 bits of page counter (we have both counter and page header because this
-		 * val can roll over)
-		 */
-		if (pageno == -1)
-			pageno = 0; /*
-						 * because someone called stream_reset; this would be a strange thing to do in
-						 * an encode stream, but it has plausible uses
-						 */
-		{
-			int _pageno = pageno++;
-			for (i = 18; i < 22; i++) {
-				header[i] = (byte) _pageno;
-				_pageno >>>= 8;
-			}
-		}
-
-		/* zero for computation; filled in later */
-		header[22] = 0;
-		header[23] = 0;
-		header[24] = 0;
-		header[25] = 0;
-
-		/* segment table */
-		header[26] = (byte) vals;
-		for (i = 0; i < vals; i++) {
-			header[i + 27] = (byte) lacing_vals[i];
-			bytes += (header[i + 27] & 0xff);
-		}
-
-		/* set pointers in the ogg_page struct */
-		og.header_base = header;
-		og.header = 0;
-		og.header_len = header_fill = vals + 27;
-		og.body_base = body_data;
-		og.body = body_returned;
-		og.body_len = bytes;
-
-		/* advance the lacing data and set the body_returned pointer */
-
-		lacing_fill -= vals;
-		System.arraycopy(lacing_vals, vals, lacing_vals, 0, lacing_fill * 4);
-		System.arraycopy(granule_vals, vals, granule_vals, 0, lacing_fill * 8);
-		body_returned += bytes;
-
-		/* calculate the checksum */
-
-		og.checksum();
-
-		/* done */
-		return (1);
-	}
-
-	/*
 	 * This constructs pages from buffered packet segments. The pointers returned
 	 * are to static buffers; do not free. The returned buffers are good only until
 	 * the next call (using the same ogg_stream_state)
@@ -512,10 +516,6 @@ public class StreamState {
 			return flush(og);
 		}
 		return 0;
-	}
-
-	public int eof() {
-		return e_o_s;
 	}
 
 	public int reset() {

@@ -27,7 +27,7 @@ import com.google.common.collect.Multisets.UnmodifiableMultiset;
  * {@link Multisets#unmodifiableSortedMultiset(SortedMultiset)}, split out into
  * its own file so it can be GWT emulated (to deal with the differing
  * elementSet() types in GWT and non-GWT).
- * 
+ *
  * @author Louis Wasserman
  */
 @GwtCompatible(emulated = true)

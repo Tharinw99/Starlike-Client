@@ -17,13 +17,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -35,7 +35,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityMinecartFurnace extends EntityMinecart {
 	private int fuel;
@@ -50,6 +50,7 @@ public class EntityMinecartFurnace extends EntityMinecart {
 		super(worldIn, parDouble1, parDouble2, parDouble3);
 	}
 
+	@Override
 	protected void applyDrag() {
 		double d0 = this.pushX * this.pushX + this.pushZ * this.pushZ;
 		if (d0 > 1.0E-4D) {
@@ -71,11 +72,13 @@ public class EntityMinecartFurnace extends EntityMinecart {
 		super.applyDrag();
 	}
 
+	@Override
 	protected void entityInit() {
 		super.entityInit();
 		this.dataWatcher.addObject(16, Byte.valueOf((byte) 0));
 	}
 
+	@Override
 	protected void func_180460_a(BlockPos blockpos, IBlockState iblockstate) {
 		super.func_180460_a(blockpos, iblockstate);
 		double d0 = this.pushX * this.pushX + this.pushZ * this.pushZ;
@@ -95,6 +98,7 @@ public class EntityMinecartFurnace extends EntityMinecart {
 
 	}
 
+	@Override
 	public IBlockState getDefaultDisplayTile() {
 		return (this.isMinecartPowered() ? Blocks.lit_furnace : Blocks.furnace).getDefaultState()
 				.withProperty(BlockFurnace.FACING, EnumFacing.NORTH);
@@ -103,10 +107,12 @@ public class EntityMinecartFurnace extends EntityMinecart {
 	/**
 	 * + Get's the maximum speed for a minecart
 	 */
+	@Override
 	protected double getMaximumSpeed() {
 		return 0.2D;
 	}
 
+	@Override
 	public EntityMinecart.EnumMinecartType getMinecartType() {
 		return EntityMinecart.EnumMinecartType.FURNACE;
 	}
@@ -114,6 +120,7 @@ public class EntityMinecartFurnace extends EntityMinecart {
 	/**
 	 * + First layer of player interaction
 	 */
+	@Override
 	public boolean interactFirst(EntityPlayer entityplayer) {
 		ItemStack itemstack = entityplayer.inventory.getCurrentItem();
 		if (itemstack != null && itemstack.getItem() == Items.coal) {
@@ -133,6 +140,7 @@ public class EntityMinecartFurnace extends EntityMinecart {
 		return (this.dataWatcher.getWatchableObjectByte(16) & 1) != 0;
 	}
 
+	@Override
 	public void killMinecart(DamageSource damagesource) {
 		super.killMinecart(damagesource);
 		if (!damagesource.isExplosion() && this.worldObj.getGameRules().getBoolean("doEntityDrops")) {
@@ -144,6 +152,7 @@ public class EntityMinecartFurnace extends EntityMinecart {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		super.onUpdate();
 		if (this.fuel > 0) {
@@ -165,6 +174,7 @@ public class EntityMinecartFurnace extends EntityMinecart {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	protected void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		this.pushX = nbttagcompound.getDouble("PushX");
@@ -184,6 +194,7 @@ public class EntityMinecartFurnace extends EntityMinecart {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	protected void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		nbttagcompound.setDouble("PushX", this.pushX);

@@ -23,13 +23,13 @@ import net.minecraft.world.gen.MapGenBase;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -41,7 +41,7 @@ import net.minecraft.world.gen.MapGenBase;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class MapGenStructure extends MapGenBase {
 	private MapGenStructureData structureData;
@@ -216,6 +216,7 @@ public abstract class MapGenStructure extends MapGenBase {
 	/**
 	 * + Recursively called by generate()
 	 */
+	@Override
 	protected final void recursiveGenerate(World world, final int i, final int j, int var4, int var5,
 			ChunkPrimer var6) {
 		this.func_143027_a(world);
@@ -234,6 +235,7 @@ public abstract class MapGenStructure extends MapGenBase {
 						"Exception preparing structure feature");
 				CrashReportCategory crashreportcategory = crashreport.makeCategory("Feature being prepared");
 				crashreportcategory.addCrashSectionCallable("Is feature chunk", new Callable<String>() {
+					@Override
 					public String call() throws Exception {
 						return MapGenStructure.this.canSpawnStructureAtCoords(i, j) ? "True" : "False";
 					}
@@ -241,11 +243,13 @@ public abstract class MapGenStructure extends MapGenBase {
 				crashreportcategory.addCrashSection("Chunk location",
 						HString.format("%d,%d", new Object[] { Integer.valueOf(i), Integer.valueOf(j) }));
 				crashreportcategory.addCrashSectionCallable("Chunk pos hash", new Callable<String>() {
+					@Override
 					public String call() throws Exception {
 						return String.valueOf(ChunkCoordIntPair.chunkXZ2Int(i, j));
 					}
 				});
 				crashreportcategory.addCrashSectionCallable("Structure type", new Callable<String>() {
+					@Override
 					public String call() throws Exception {
 						return MapGenStructure.this.getClass().getCanonicalName();
 					}

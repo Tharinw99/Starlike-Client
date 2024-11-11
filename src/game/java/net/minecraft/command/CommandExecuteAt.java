@@ -14,13 +14,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -32,13 +32,14 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class CommandExecuteAt extends CommandBase {
 
 	/**
 	 * + Return a list of options when the user types TAB
 	 */
+	@Override
 	public List<String> addTabCompletionOptions(ICommandSender var1, String[] astring, BlockPos blockpos) {
 		return astring.length == 1
 				? getListOfStringsMatchingLastWord(astring, MinecraftServer.getServer().getAllUsernames())
@@ -53,6 +54,7 @@ public class CommandExecuteAt extends CommandBase {
 	/**
 	 * + Gets the name of the command
 	 */
+	@Override
 	public String getCommandName() {
 		return "execute";
 	}
@@ -60,6 +62,7 @@ public class CommandExecuteAt extends CommandBase {
 	/**
 	 * + Gets the usage string for the command.
 	 */
+	@Override
 	public String getCommandUsage(ICommandSender var1) {
 		return "commands.execute.usage";
 	}
@@ -67,6 +70,7 @@ public class CommandExecuteAt extends CommandBase {
 	/**
 	 * + Return the required permission level for this command.
 	 */
+	@Override
 	public int getRequiredPermissionLevel() {
 		return 2;
 	}
@@ -75,6 +79,7 @@ public class CommandExecuteAt extends CommandBase {
 	 * + Return whether the specified command parameter index is a username
 	 * parameter.
 	 */
+	@Override
 	public boolean isUsernameIndex(String[] var1, int i) {
 		return i == 0;
 	}
@@ -82,6 +87,7 @@ public class CommandExecuteAt extends CommandBase {
 	/**
 	 * + Callback when the command is invoked
 	 */
+	@Override
 	public void processCommand(final ICommandSender parICommandSender, String[] parArrayOfString)
 			throws CommandException {
 		if (parArrayOfString.length < 5) {
@@ -112,44 +118,54 @@ public class CommandExecuteAt extends CommandBase {
 
 			String s = buildString(parArrayOfString, b0);
 			ICommandSender icommandsender = new ICommandSender() {
+				@Override
 				public void addChatMessage(IChatComponent component) {
 					parICommandSender.addChatMessage(component);
 				}
 
+				@Override
 				public boolean canCommandSenderUseCommand(int permLevel, String commandName) {
 					return parICommandSender.canCommandSenderUseCommand(permLevel, commandName);
 				}
 
+				@Override
 				public Entity getCommandSenderEntity() {
 					return entity;
 				}
 
+				@Override
 				public IChatComponent getDisplayName() {
 					return entity.getDisplayName();
 				}
 
+				@Override
 				public World getEntityWorld() {
 					return entity.worldObj;
 				}
 
+				@Override
 				public String getName() {
 					return entity.getName();
 				}
 
+				@Override
 				public BlockPos getPosition() {
 					return blockpos;
 				}
 
+				@Override
 				public Vec3 getPositionVector() {
 					return new Vec3(d0, d1, d2);
 				}
 
+				@Override
 				public boolean sendCommandFeedback() {
 					MinecraftServer minecraftserver = MinecraftServer.getServer();
 					return minecraftserver == null
 							|| minecraftserver.worldServers[0].getGameRules().getBoolean("commandBlockOutput");
 				}
 
+				@Override
 				public void setCommandStat(CommandResultStats.Type type, int amount) {
 					entity.setCommandStat(type, amount);
 				}

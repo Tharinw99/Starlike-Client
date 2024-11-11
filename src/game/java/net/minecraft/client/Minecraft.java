@@ -49,6 +49,8 @@ import net.lax1dude.eaglercraft.v1_8.minecraft.EaglerFolderResourcePack;
 import net.lax1dude.eaglercraft.v1_8.minecraft.EaglerFontRenderer;
 import net.lax1dude.eaglercraft.v1_8.minecraft.EnumInputEvent;
 import net.lax1dude.eaglercraft.v1_8.minecraft.GuiScreenGenericErrorMessage;
+import net.lax1dude.eaglercraft.v1_8.minecraft.GuiScreenVSyncReEnabled;
+import net.lax1dude.eaglercraft.v1_8.minecraft.GuiScreenVideoSettingsWarning;
 import net.lax1dude.eaglercraft.v1_8.notifications.ServerNotificationRenderer;
 import net.lax1dude.eaglercraft.v1_8.opengl.EaglerMeshLoader;
 import net.lax1dude.eaglercraft.v1_8.opengl.EaglercraftGPU;
@@ -64,7 +66,6 @@ import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.texture.EmissiveItems;
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.texture.MetalsLUT;
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.texture.PBRTextureMapUtils;
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.texture.TemperaturesLUT;
-import net.lax1dude.eaglercraft.v1_8.profanity_filter.GuiScreenContentWarning;
 import net.lax1dude.eaglercraft.v1_8.profile.EaglerProfile;
 import net.lax1dude.eaglercraft.v1_8.profile.GuiScreenEditProfile;
 import net.lax1dude.eaglercraft.v1_8.profile.SkinPreviewRenderer;
@@ -203,17 +204,18 @@ import net.minecraft.world.WorldProviderEnd;
 import net.minecraft.world.WorldProviderHell;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.storage.ISaveFormat;
+import net.starlikeclient.StarlikeClient;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -225,7 +227,7 @@ import net.minecraft.world.storage.ISaveFormat;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class Minecraft implements IThreadListener {
 	private static final Logger logger = LogManager.getLogger();
@@ -439,88 +441,105 @@ public class Minecraft implements IThreadListener {
 	 */
 	public CrashReport addGraphicsAndWorldToCrashReport(CrashReport theCrash) {
 		theCrash.getCategory().addCrashSectionCallable("Launched Version", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return Minecraft.this.launchedVersion;
 			}
 		});
 		theCrash.getCategory().addCrashSectionCallable("LWJGL", new Callable<String>() {
+			@Override
 			public String call() {
 				return EagRuntime.getVersion();
 			}
 		});
 		theCrash.getCategory().addCrashSectionCallable("OpenGL", new Callable<String>() {
+			@Override
 			public String call() {
 				return EaglercraftGPU.glGetString(7937) + " GL version " + EaglercraftGPU.glGetString(7938) + ", "
 						+ EaglercraftGPU.glGetString(7936);
 			}
 		});
 		theCrash.getCategory().addCrashSectionCallable("Is Eagler Shaders", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return Minecraft.this.gameSettings.shaders ? "Yes" : "No";
 			}
 		});
 		theCrash.getCategory().addCrashSectionCallable("Is Dynamic Lights", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return !Minecraft.this.gameSettings.shaders && Minecraft.this.gameSettings.enableDynamicLights ? "Yes"
 						: "No";
 			}
 		});
 		theCrash.getCategory().addCrashSectionCallable("In Ext. Pipeline", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return GlStateManager.isExtensionPipeline() ? "Yes" : "No";
 			}
 		});
 		theCrash.getCategory().addCrashSectionCallable("GPU Shader5 Capable", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return EaglercraftGPU.checkShader5Capable() ? "Yes" : "No";
 			}
 		});
 		theCrash.getCategory().addCrashSectionCallable("GPU TexStorage Capable", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return EaglercraftGPU.checkTexStorageCapable() ? "Yes" : "No";
 			}
 		});
 		theCrash.getCategory().addCrashSectionCallable("GPU TextureLOD Capable", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return EaglercraftGPU.checkTextureLODCapable() ? "Yes" : "No";
 			}
 		});
 		theCrash.getCategory().addCrashSectionCallable("GPU Instancing Capable", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return EaglercraftGPU.checkInstancingCapable() ? "Yes" : "No";
 			}
 		});
 		theCrash.getCategory().addCrashSectionCallable("GPU VAO Capable", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return EaglercraftGPU.checkVAOCapable() ? "Yes" : "No";
 			}
 		});
 		theCrash.getCategory().addCrashSectionCallable("Is Software VAOs", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return EaglercraftGPU.areVAOsEmulated() ? "Yes" : "No";
 			}
 		});
 		theCrash.getCategory().addCrashSectionCallable("GPU Render-to-MipMap", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return EaglercraftGPU.checkFBORenderMipmapCapable() ? "Yes" : "No";
 			}
 		});
 		theCrash.getCategory().addCrashSectionCallable("Touch Mode", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return PointerInputAbstraction.isTouchMode() ? "Yes" : "No";
 			}
 		});
 		theCrash.getCategory().addCrashSectionCallable("Is Modded", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return "Definitely Not; You're an eagler";
 			}
 		});
 		theCrash.getCategory().addCrashSectionCallable("Type", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return "Client (map_client.txt)";
 			}
 		});
 		theCrash.getCategory().addCrashSectionCallable("Resource Packs", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				StringBuilder stringbuilder = new StringBuilder();
 
@@ -539,11 +558,13 @@ public class Minecraft implements IThreadListener {
 			}
 		});
 		theCrash.getCategory().addCrashSectionCallable("Current Language", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return Minecraft.this.mcLanguageManager.getCurrentLanguage().toString();
 			}
 		});
 		theCrash.getCategory().addCrashSectionCallable("Profiler Position", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return "N/A (disabled)";
 			}
@@ -555,6 +576,7 @@ public class Minecraft implements IThreadListener {
 		return theCrash;
 	}
 
+	@Override
 	public void addScheduledTask(Runnable runnableToSchedule) {
 		this.addScheduledTaskFuture(Executors.callable(runnableToSchedule));
 	}
@@ -1379,7 +1401,6 @@ public class Minecraft implements IThreadListener {
 
 	public void run() {
 		this.running = true;
-
 		try {
 			this.startGame();
 		} catch (Throwable throwable) {
@@ -1388,6 +1409,8 @@ public class Minecraft implements IThreadListener {
 			this.displayCrashReport(this.addGraphicsAndWorldToCrashReport(crashreport));
 			return;
 		}
+
+		StarlikeClient.init();
 
 		try {
 			while (true) {
@@ -1513,6 +1536,8 @@ public class Minecraft implements IThreadListener {
 	 * + Runs the current tick.
 	 */
 	public void runTick() throws IOException {
+		StarlikeClient.runTick();
+
 		if (this.rightClickDelayTimer > 0) {
 			--this.rightClickDelayTimer;
 		}
@@ -1530,6 +1555,11 @@ public class Minecraft implements IThreadListener {
 
 		if (wasPaused != isGamePaused) {
 			SingleplayerServerController.setPaused(this.isGamePaused);
+			if (isGamePaused) {
+				mcSoundHandler.pauseSounds();
+			} else {
+				mcSoundHandler.resumeSounds();
+			}
 			wasPaused = isGamePaused;
 		}
 
@@ -1617,6 +1647,7 @@ public class Minecraft implements IThreadListener {
 				CrashReport crashreport = CrashReport.makeCrashReport(throwable1, "Updating screen events");
 				CrashReportCategory crashreportcategory = crashreport.makeCategory("Affected screen");
 				crashreportcategory.addCrashSectionCallable("Screen name", new Callable<String>() {
+					@Override
 					public String call() throws Exception {
 						return Minecraft.this.currentScreen.getClass().getName();
 					}
@@ -1631,6 +1662,7 @@ public class Minecraft implements IThreadListener {
 					CrashReport crashreport1 = CrashReport.makeCrashReport(throwable, "Ticking screen");
 					CrashReportCategory crashreportcategory1 = crashreport1.makeCategory("Affected screen");
 					crashreportcategory1.addCrashSectionCallable("Screen name", new Callable<String>() {
+						@Override
 						public String call() throws Exception {
 							return Minecraft.this.currentScreen.getClass().getName();
 						}
@@ -1912,8 +1944,9 @@ public class Minecraft implements IThreadListener {
 				this.displayGuiScreen(new GuiChat("/"));
 			}
 
-			boolean miningTouch = isMiningTouch();
-			boolean useTouch = thePlayer.getItemShouldUseOnTouchEagler();
+			boolean touchMode = PointerInputAbstraction.isTouchMode();
+			boolean miningTouch = touchMode && isMiningTouch();
+			boolean useTouch = touchMode && thePlayer.getItemShouldUseOnTouchEagler();
 			if (this.thePlayer.isUsingItem()) {
 				if (!this.gameSettings.keyBindUseItem.isKeyDown() && !miningTouch) {
 					this.playerController.onStoppedUsingItem(this.thePlayer);
@@ -2112,6 +2145,7 @@ public class Minecraft implements IThreadListener {
 
 	public ListenableFuture<Object> scheduleResourcesRefresh() {
 		return this.addScheduledTaskFuture(new Runnable() {
+			@Override
 			public void run() {
 				Minecraft.this.loadingScreen.eaglerShow(I18n.format("resourcePack.load.refreshing"),
 						I18n.format("resourcePack.load.pleaseWait"));
@@ -2320,6 +2354,7 @@ public class Minecraft implements IThreadListener {
 		this.mcResourceManager.registerReloadListener(new BlockVertexIDs());
 		this.mcResourceManager.registerReloadListener(new EaglerMeshLoader());
 		AchievementList.openInventory.setStatStringFormatter(new IStatStringFormat() {
+			@Override
 			public String formatString(String parString1) {
 				try {
 					return HString.format(parString1, new Object[] { GameSettings
@@ -2399,7 +2434,23 @@ public class Minecraft implements IThreadListener {
 		}
 
 		if (!EagRuntime.getConfiguration().isForceProfanityFilter() && !gameSettings.hasShownProfanityFilter) {
-			mainMenu = new GuiScreenContentWarning(mainMenu);
+			// mainMenu = new GuiScreenContentWarning(mainMenu);
+		}
+
+		boolean vsyncScreen = false;
+		if (EagRuntime.getConfiguration().isEnforceVSync() && Display.isVSyncSupported() && !gameSettings.enableVsync) {
+			gameSettings.enableVsync = true;
+			gameSettings.saveOptions();
+			vsyncScreen = true;
+		}
+
+		int vidIssues = gameSettings.checkBadVideoSettings();
+		if (vidIssues != 0) {
+			mainMenu = new GuiScreenVideoSettingsWarning(mainMenu, vidIssues);
+		}
+
+		if (vsyncScreen) {
+			mainMenu = new GuiScreenVSyncReEnabled(mainMenu);
 		}
 
 		this.displayGuiScreen(mainMenu);

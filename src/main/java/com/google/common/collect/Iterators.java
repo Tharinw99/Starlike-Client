@@ -1069,7 +1069,7 @@ public final class Iterators {
 	 * next} do not affect the iteration, and hence return the same object each
 	 * time. A subsequent call to {@code next} is guaranteed to return the same
 	 * object again. For example:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *

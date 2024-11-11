@@ -31,7 +31,7 @@ import com.google.common.base.Predicates;
 
 /**
  * Implementation for {@link FilteredMultimap#values()}.
- * 
+ *
  * @author Louis Wasserman
  */
 @GwtCompatible

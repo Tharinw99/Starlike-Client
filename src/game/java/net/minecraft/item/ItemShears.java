@@ -11,13 +11,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,7 +29,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ItemShears extends Item {
 	public ItemShears() {
@@ -41,10 +41,12 @@ public class ItemShears extends Item {
 	/**
 	 * + Check whether this Item can harvest the given Block
 	 */
+	@Override
 	public boolean canHarvestBlock(Block block) {
 		return block == Blocks.web || block == Blocks.redstone_wire || block == Blocks.tripwire;
 	}
 
+	@Override
 	public float getStrVsBlock(ItemStack itemstack, Block block) {
 		return block != Blocks.web && block.getMaterial() != Material.leaves
 				? (block == Blocks.wool ? 5.0F : super.getStrVsBlock(itemstack, block))
@@ -55,6 +57,7 @@ public class ItemShears extends Item {
 	 * + Called when a Block is destroyed using this Item. Return true to trigger
 	 * the "Use Item" statistic.
 	 */
+	@Override
 	public boolean onBlockDestroyed(ItemStack stack, World worldIn, Block blockIn, BlockPos pos,
 			EntityLivingBase playerIn) {
 		if (blockIn.getMaterial() != Material.leaves && blockIn != Blocks.web && blockIn != Blocks.tallgrass

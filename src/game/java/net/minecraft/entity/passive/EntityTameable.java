@@ -17,13 +17,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -35,7 +35,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class EntityTameable extends EntityAnimal implements IEntityOwnable {
 
@@ -46,6 +46,7 @@ public abstract class EntityTameable extends EntityAnimal implements IEntityOwna
 		this.setupTamedAI();
 	}
 
+	@Override
 	protected void entityInit() {
 		super.entityInit();
 		this.dataWatcher.addObject(16, Byte.valueOf((byte) 0));
@@ -59,6 +60,7 @@ public abstract class EntityTameable extends EntityAnimal implements IEntityOwna
 		return this.aiSit;
 	}
 
+	@Override
 	public EntityLivingBase getOwner() {
 		String ownerName = this.getOwnerId();
 		if (StringUtils.isEmpty(ownerName)) {
@@ -72,10 +74,12 @@ public abstract class EntityTameable extends EntityAnimal implements IEntityOwna
 		}
 	}
 
+	@Override
 	public String getOwnerId() {
 		return this.dataWatcher.getWatchableObjectString(17);
 	}
 
+	@Override
 	public Team getTeam() {
 		if (this.isTamed()) {
 			EntityLivingBase entitylivingbase = this.getOwner();
@@ -87,6 +91,7 @@ public abstract class EntityTameable extends EntityAnimal implements IEntityOwna
 		return super.getTeam();
 	}
 
+	@Override
 	public void handleStatusUpdate(byte b0) {
 		if (b0 == 7) {
 			this.playTameEffect(true);
@@ -98,6 +103,7 @@ public abstract class EntityTameable extends EntityAnimal implements IEntityOwna
 
 	}
 
+	@Override
 	public boolean isOnSameTeam(EntityLivingBase entitylivingbase) {
 		if (this.isTamed()) {
 			EntityLivingBase entitylivingbase1 = this.getOwner();
@@ -128,6 +134,7 @@ public abstract class EntityTameable extends EntityAnimal implements IEntityOwna
 	/**
 	 * + Called when the mob's health reaches 0.
 	 */
+	@Override
 	public void onDeath(DamageSource damagesource) {
 		if (!this.worldObj.isRemote && this.worldObj.getGameRules().getBoolean("showDeathMessages")
 				&& this.hasCustomName() && this.getOwner() instanceof EntityPlayerMP) {
@@ -162,6 +169,7 @@ public abstract class EntityTameable extends EntityAnimal implements IEntityOwna
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		String s = "";
@@ -219,6 +227,7 @@ public abstract class EntityTameable extends EntityAnimal implements IEntityOwna
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		if (worldObj.isRemote && !SingleplayerServerController.isClientInEaglerSingleplayerOrLAN()) {

@@ -21,6 +21,7 @@ import javax.annotation.meta.When;
 public @interface Nonnegative {
 	class Checker implements TypeQualifierValidator<Nonnegative> {
 
+		@Override
 		public When forConstantValue(Nonnegative annotation, Object v) {
 			if (!(v instanceof Number))
 				return When.NEVER;

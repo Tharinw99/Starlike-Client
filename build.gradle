@@ -58,15 +58,16 @@ teavm.js {
 
 tasks.named("generateJavaScript") {
     doLast {
-    
+        delete file(folder + "/js")
+
         // NOTE: This step may break at any time, and is not required for 99% of browsers
-        
+
         def phile = file(folder + "/" + name)
         def dest = phile.getText("UTF-8")
         def i = dest.substring(0, dest.indexOf("=\$rt_globals.Symbol('jsoClass');")).lastIndexOf("let ")
         dest = dest.substring(0, i) + "var" + dest.substring(i + 3)
         def j = dest.indexOf("function(\$rt_globals,\$rt_exports){")
-        dest = dest.substring(0, j + 34) + "\n" + file(folder + "/ES6ShimScript.txt").getText("UTF-8") + "\n" + dest.substring(j + 34)
+        dest = dest.substring(0, j + 34) + "\n" + file("desktopRuntime/resources/ES6ShimScript.txt").getText("UTF-8") + "\n" + dest.substring(j + 34)
         phile.write(dest, "UTF-8")
     }
 }

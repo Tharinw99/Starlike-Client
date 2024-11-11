@@ -17,13 +17,13 @@ import net.minecraft.util.ReportedException;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -35,7 +35,7 @@ import net.minecraft.util.ReportedException;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class CrashReport {
 	private static final Logger logger = LogManager.getLogger();
@@ -77,6 +77,9 @@ public class CrashReport {
 	private String[] stacktrace;
 
 	public CrashReport(String descriptionIn, Throwable causeThrowable) {
+		if (causeThrowable == null) {
+			throw new NullPointerException("Crash report created for null throwable!");
+		}
 		this.description = descriptionIn;
 		this.cause = causeThrowable;
 		this.stacktrace = EagRuntime.getStackTraceElements(causeThrowable);
@@ -238,29 +241,34 @@ public class CrashReport {
 	 */
 	private void populateEnvironment() {
 		this.theReportCategory.addCrashSectionCallable("Minecraft Version", new Callable<String>() {
+			@Override
 			public String call() {
 				return "1.8.8";
 			}
 		});
 		this.theReportCategory.addCrashSectionCallable("Operating System", new Callable<String>() {
+			@Override
 			public String call() {
 				return System.getProperty("os.name") + " (" + System.getProperty("os.arch") + ") version "
 						+ System.getProperty("os.version");
 			}
 		});
 		this.theReportCategory.addCrashSectionCallable("Java Version", new Callable<String>() {
+			@Override
 			public String call() {
 				return System.getProperty("java.version") + ", " + System.getProperty("java.vendor");
 			}
 		});
 		this.theReportCategory.addCrashSectionCallable("Java VM Version", new Callable<String>() {
+			@Override
 			public String call() {
 				return System.getProperty("java.vm.name") + " (" + System.getProperty("java.vm.info") + "), "
 						+ System.getProperty("java.vm.vendor");
 			}
 		});
-		if (EagRuntime.getPlatformType() != EnumPlatformType.JAVASCRIPT) {
+		if (EagRuntime.getPlatformType() == EnumPlatformType.DESKTOP) {
 			this.theReportCategory.addCrashSectionCallable("Memory", new Callable<String>() {
+				@Override
 				public String call() {
 					long i = EagRuntime.maxMemory();
 					long j = EagRuntime.totalMemory();

@@ -19,7 +19,7 @@ import net.minecraft.util.ResourceLocation;
 
 /**
  * Copyright (c) 2022-2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -31,7 +31,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiScreenEditCape extends GuiScreen {
 
@@ -55,6 +55,7 @@ public class GuiScreenEditCape extends GuiScreen {
 		this.parent = parent;
 	}
 
+	@Override
 	protected void actionPerformed(GuiButton par1GuiButton) {
 		if (!dropDownOpen) {
 			if (par1GuiButton.id == 0) {
@@ -71,6 +72,7 @@ public class GuiScreenEditCape extends GuiScreen {
 		}
 	}
 
+	@Override
 	public void drawScreen(int mx, int my, float partialTicks) {
 		drawDefaultBackground();
 		drawCenteredString(fontRendererObj, screenTitle, width / 2, 15, 16777215);
@@ -208,6 +210,7 @@ public class GuiScreenEditCape extends GuiScreen {
 		SkinPreviewRenderer.renderPreview(xx, yy, mx, my, true, model, skinTexture, capeTexture);
 	}
 
+	@Override
 	public void handleMouseInput() throws IOException {
 		super.handleMouseInput();
 		if (dropDownOpen) {
@@ -224,6 +227,7 @@ public class GuiScreenEditCape extends GuiScreen {
 		}
 	}
 
+	@Override
 	public void initGui() {
 		Keyboard.enableRepeatEvents(true);
 		screenTitle = I18n.format("editCape.title");
@@ -236,6 +240,7 @@ public class GuiScreenEditCape extends GuiScreen {
 		updateOptions();
 	}
 
+	@Override
 	protected void keyTyped(char c, int k) {
 		if (k == 200 && selectedSlot > 0) {
 			--selectedSlot;
@@ -247,6 +252,7 @@ public class GuiScreenEditCape extends GuiScreen {
 		}
 	}
 
+	@Override
 	protected void mouseClicked(int mx, int my, int button) {
 		if (button == 0) {
 			if (!EagRuntime.getConfiguration().isDemo()) {
@@ -297,6 +303,7 @@ public class GuiScreenEditCape extends GuiScreen {
 		super.mouseClicked(mx, my, button);
 	}
 
+	@Override
 	public void onGuiClosed() {
 		Keyboard.enableRepeatEvents(false);
 	}
@@ -325,6 +332,7 @@ public class GuiScreenEditCape extends GuiScreen {
 		dropDownOptions = n;
 	}
 
+	@Override
 	public void updateScreen() {
 		if (EagRuntime.fileChooserHasResult()) {
 			FileChooserResult result = EagRuntime.getFileChooserResult();

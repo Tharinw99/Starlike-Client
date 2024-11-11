@@ -17,13 +17,13 @@ import net.minecraft.world.biome.BiomeGenBase;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -35,7 +35,7 @@ import net.minecraft.world.biome.BiomeGenBase;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class MapGenStronghold extends MapGenStructure {
 	public static class Start extends StructureStart {
@@ -105,6 +105,7 @@ public class MapGenStronghold extends MapGenStructure {
 
 	}
 
+	@Override
 	protected boolean canSpawnStructureAtCoords(int i, int j) {
 		if (!this.ranBiomeCheck) {
 			EaglercraftRandom random = new EaglercraftRandom(!this.worldObj.getWorldInfo().isOldEaglercraftRandom());
@@ -148,6 +149,7 @@ public class MapGenStronghold extends MapGenStructure {
 	 * + Returns a list of other locations at which the structure generation has
 	 * been run, or null if not relevant to this structure generator.
 	 */
+	@Override
 	protected List<BlockPos> getCoordList() {
 		ArrayList arraylist = Lists.newArrayList();
 
@@ -161,10 +163,12 @@ public class MapGenStronghold extends MapGenStructure {
 		return arraylist;
 	}
 
+	@Override
 	public String getStructureName() {
 		return "Stronghold";
 	}
 
+	@Override
 	protected StructureStart getStructureStart(int i, int j) {
 		MapGenStronghold.Start mapgenstronghold$start;
 		for (mapgenstronghold$start = new MapGenStronghold.Start(this.worldObj, this.rand, i, j); mapgenstronghold$start

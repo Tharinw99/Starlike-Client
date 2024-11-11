@@ -24,13 +24,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -42,7 +42,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class StructureMineshaftPieces {
 	public static class Corridor extends StructureComponent {
@@ -102,6 +102,7 @@ public class StructureMineshaftPieces {
 
 		}
 
+		@Override
 		public boolean addComponentParts(World worldIn, EaglercraftRandom randomIn,
 				StructureBoundingBox structureBoundingBoxIn) {
 			if (this.isLiquidInStructureBoundingBox(worldIn, structureBoundingBoxIn)) {
@@ -218,6 +219,7 @@ public class StructureMineshaftPieces {
 			}
 		}
 
+		@Override
 		public void buildComponent(StructureComponent componentIn, List<StructureComponent> listIn,
 				EaglercraftRandom rand) {
 			int i = this.getComponentType();
@@ -312,6 +314,7 @@ public class StructureMineshaftPieces {
 
 		}
 
+		@Override
 		protected boolean generateChestContents(World worldIn, StructureBoundingBox boundingBoxIn,
 				EaglercraftRandom rand, int x, int y, int z, List<WeightedRandomChestContent> listIn, int max) {
 			BlockPos blockpos = new BlockPos(this.getXWithOffset(x, z), this.getYWithOffset(y),
@@ -332,6 +335,7 @@ public class StructureMineshaftPieces {
 			}
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound tagCompound) {
 			this.hasRails = tagCompound.getBoolean("hr");
 			this.hasSpiders = tagCompound.getBoolean("sc");
@@ -339,6 +343,7 @@ public class StructureMineshaftPieces {
 			this.sectionCount = tagCompound.getInteger("Num");
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound tagCompound) {
 			tagCompound.setBoolean("hr", this.hasRails);
 			tagCompound.setBoolean("sc", this.hasSpiders);
@@ -395,6 +400,7 @@ public class StructureMineshaftPieces {
 			this.isMultipleFloors = structurebb.getYSize() > 3;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			if (this.isLiquidInStructureBoundingBox(world, structureboundingbox)) {
@@ -461,6 +467,7 @@ public class StructureMineshaftPieces {
 			}
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
 				EaglercraftRandom random) {
 			int i = this.getComponentType();
@@ -522,11 +529,13 @@ public class StructureMineshaftPieces {
 
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			this.isMultipleFloors = nbttagcompound.getBoolean("tf");
 			this.corridorDirection = EnumFacing.getHorizontal(nbttagcompound.getInteger("D"));
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			nbttagcompound.setBoolean("tf", this.isMultipleFloors);
 			nbttagcompound.setInteger("D", this.corridorDirection.getHorizontalIndex());
@@ -545,6 +554,7 @@ public class StructureMineshaftPieces {
 					z + 7 + rand.nextInt(6));
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			if (this.isLiquidInStructureBoundingBox(world, structureboundingbox)) {
@@ -572,6 +582,7 @@ public class StructureMineshaftPieces {
 			}
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
 				EaglercraftRandom random) {
 			int i = this.getComponentType();
@@ -651,6 +662,7 @@ public class StructureMineshaftPieces {
 
 		}
 
+		@Override
 		public void func_181138_a(int parInt1, int parInt2, int parInt3) {
 			super.func_181138_a(parInt1, parInt2, parInt3);
 
@@ -660,6 +672,7 @@ public class StructureMineshaftPieces {
 
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			NBTTagList nbttaglist = nbttagcompound.getTagList("Entrances", 11);
 
@@ -669,6 +682,7 @@ public class StructureMineshaftPieces {
 
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			NBTTagList nbttaglist = new NBTTagList();
 
@@ -715,6 +729,7 @@ public class StructureMineshaftPieces {
 			this.boundingBox = structurebb;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			if (this.isLiquidInStructureBoundingBox(world, structureboundingbox)) {
@@ -734,6 +749,7 @@ public class StructureMineshaftPieces {
 			}
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
 				EaglercraftRandom random) {
 			int i = this.getComponentType();
@@ -759,9 +775,11 @@ public class StructureMineshaftPieces {
 
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound var1) {
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound var1) {
 		}
 	}

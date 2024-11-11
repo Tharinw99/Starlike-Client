@@ -33,7 +33,7 @@ package net.lax1dude.eaglercraft.v1_8.vector;
 
 /**
  * Writable interface to Vector3fs
- * 
+ *
  * @author $author$
  * @version $revision$ $Id$
  */
@@ -41,7 +41,7 @@ public interface WritableVector3f extends WritableVector2f {
 
 	/**
 	 * Set the X,Y,Z values
-	 * 
+	 *
 	 * @param x
 	 * @param y
 	 * @param z
@@ -50,7 +50,7 @@ public interface WritableVector3f extends WritableVector2f {
 
 	/**
 	 * Set the Z value
-	 * 
+	 *
 	 * @param z
 	 */
 	void setZ(float z);

@@ -18,13 +18,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -36,7 +36,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockMycelium extends Block {
 	public static final PropertyBool SNOWY = PropertyBool.create("snowy");
@@ -48,6 +48,7 @@ public class BlockMycelium extends Block {
 		this.setCreativeTab(CreativeTabs.tabBlock);
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { SNOWY });
 	}
@@ -56,6 +57,7 @@ public class BlockMycelium extends Block {
 	 * + Get the actual Block state of this Block at the given position. This
 	 * applies properties not visible in the metadata, such as fence connections.
 	 */
+	@Override
 	public IBlockState getActualState(IBlockState iblockstate, IBlockAccess iblockaccess, BlockPos blockpos) {
 		Block block = iblockaccess.getBlockState(blockpos.up()).getBlock();
 		return iblockstate.withProperty(SNOWY, Boolean.valueOf(block == Blocks.snow || block == Blocks.snow_layer));
@@ -64,6 +66,7 @@ public class BlockMycelium extends Block {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom random, int i) {
 		return Blocks.dirt.getItemDropped(
 				Blocks.dirt.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.DIRT), random, i);
@@ -72,10 +75,12 @@ public class BlockMycelium extends Block {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState var1) {
 		return 0;
 	}
 
+	@Override
 	public void randomDisplayTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom random) {
 		super.randomDisplayTick(world, blockpos, iblockstate, random);
 		if (random.nextInt(10) == 0) {
@@ -86,6 +91,7 @@ public class BlockMycelium extends Block {
 
 	}
 
+	@Override
 	public void updateTick(World world, BlockPos blockpos, IBlockState var3, EaglercraftRandom random) {
 		if (!world.isRemote) {
 			if (world.getLightFromNeighbors(blockpos.up()) < 4

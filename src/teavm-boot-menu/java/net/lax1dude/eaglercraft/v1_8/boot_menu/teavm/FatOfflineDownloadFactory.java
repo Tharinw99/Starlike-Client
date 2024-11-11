@@ -24,22 +24,48 @@ import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class FatOfflineDownloadFactory {
 
 	private static final Logger logger = LogManager.getLogger("FatOfflineDownloadFactory");
+
+	private static boolean cacheLoad(Map<EaglercraftUUID, byte[]> loadedBlobs,
+			Map<EaglercraftUUID, Supplier<byte[]>> loaders, EaglercraftUUID uuid) {
+		if (!loadedBlobs.containsKey(uuid)) {
+			Supplier<byte[]> getter = loaders.get(uuid);
+			if (getter != null) {
+				byte[] dat = getter.get();
+				if (dat != null) {
+					loadedBlobs.put(uuid, dat);
+					return true;
+				} else {
+					return false;
+				}
+			} else {
+				return false;
+			}
+		} else {
+			return true;
+		}
+	}
+
+	private static void doUpdateMessage(IProgressMsgCallback cb, String str) {
+		logger.info(str);
+		cb.updateMessage(str);
+	}
 
 	public static void downloadOffline(List<BootableClientEntry> lst, IProgressMsgCallback cb) {
 		Map<EaglercraftUUID, byte[]> loadedBlobs = new HashMap<>();
@@ -47,30 +73,32 @@ public class FatOfflineDownloadFactory {
 		Set<EaglercraftUUID> manifestClientDatasSet = new HashSet<>();
 		JSONArray manifestLaunchDatas = new JSONArray();
 		Set<EaglercraftUUID> manifestLaunchDatasSet = new HashSet<>();
-		for(BootableClientEntry etr : lst) {
+		for (BootableClientEntry etr : lst) {
 			ClientDataEntry clientData = etr.bootAdapter.getClientDataEntry();
 			LaunchConfigEntry launchConf = etr.bootAdapter.getLaunchConfigEntry();
-			if(launchConf.uuid.equals(BootMenuConstants.UUID_CLIENT_LAUNCH_ORIGIN)) {
+			if (launchConf.uuid.equals(BootMenuConstants.UUID_CLIENT_LAUNCH_ORIGIN)) {
 				logger.warn("Cannot export origin launch configuration to fat offline!");
 				continue;
 			}
-			if(manifestLaunchDatasSet.add(launchConf.uuid)) {
+			if (manifestLaunchDatasSet.add(launchConf.uuid)) {
 				JSONObject obj = new JSONObject();
 				launchConf.writeJSON(obj);
 				manifestLaunchDatas.put(obj);
-				if(!clientData.uuid.equals(BootMenuConstants.UUID_CLIENT_DATA_ORIGIN) && manifestClientDatasSet.add(clientData.uuid)) {
+				if (!clientData.uuid.equals(BootMenuConstants.UUID_CLIENT_DATA_ORIGIN)
+						&& manifestClientDatasSet.add(clientData.uuid)) {
 					obj = new JSONObject();
 					clientData.writeJSON(obj);
 					manifestClientDatas.put(obj);
 					Map<EaglercraftUUID, Supplier<byte[]>> loaders = etr.bootAdapter.getBlobLoaders();
-					for(EaglercraftUUID uuid : clientData.getReferencedBlobs()) {
+					for (EaglercraftUUID uuid : clientData.getReferencedBlobs()) {
 						doUpdateMessage(cb, "Resolving data for \"" + launchConf.displayName + "\" (" + uuid + ")");
-						if(!cacheLoad(loadedBlobs, loaders, uuid)) {
-							throw new NullPointerException("Blob for configuration \"" + launchConf.displayName + "\" is missing: " + uuid);
+						if (!cacheLoad(loadedBlobs, loaders, uuid)) {
+							throw new NullPointerException(
+									"Blob for configuration \"" + launchConf.displayName + "\" is missing: " + uuid);
 						}
 					}
 				}
-			}else {
+			} else {
 				logger.warn("Skipping duplicate launch config uuid: {}", launchConf.uuid);
 			}
 		}
@@ -80,10 +108,10 @@ public class FatOfflineDownloadFactory {
 		String manifestStr = manifest.toString().replace(StringUtils.reverse(">elyts/<"), "<_style>");
 		boolean isSigned = BootMenuEntryPoint.isSignedClient();
 		String template;
-		if(isSigned) {
+		if (isSigned) {
 			doUpdateMessage(cb, "Loading offline_template_eaglercraftX_1_8_fat_signed.html");
 			template = OfflineDownloadFactory.loadTemplate("offline_template_eaglercraftX_1_8_fat_signed.html");
-		}else {
+		} else {
 			doUpdateMessage(cb, "Loading offline_template_eaglercraftX_1_8_fat_offline.html");
 			template = OfflineDownloadFactory.loadTemplate("offline_template_eaglercraftX_1_8_fat_offline.html");
 		}
@@ -101,41 +129,45 @@ public class FatOfflineDownloadFactory {
 				null, null, optsStr, false)).writeJSON(launchConfJSON);
 		template = template.replace("${launch_conf_json}", launchConfJSON.toString());
 		int relayIdCount = RelayRandomizeHelper.countRelayMacro(optsStr);
-		if(relayIdCount > 0) {
+		if (relayIdCount > 0) {
 			optsStr = RelayRandomizeHelper.replaceRelayMacroWithEqRelayId(optsStr);
 		}
 		template = template.replace("${relayId_max}", Integer.toString(relayIdCount));
 		template = template.replace("${launch_opts}", optsStr);
-		if(isSigned) {
+		if (isSigned) {
 			doUpdateMessage(cb, "Retrieving origin client signature and payload");
-			template = template.replace("${client_signature}", Base64.encodeBase64String(BootMenuEntryPoint.getSignedClientSignature()));
-			template = template.replace("${client_bundle}", Base64.encodeBase64String(BootMenuEntryPoint.getSignedClientBundle()));
-		}else {
+			template = template.replace("${client_signature}",
+					Base64.encodeBase64String(BootMenuEntryPoint.getSignedClientSignature()));
+			template = template.replace("${client_bundle}",
+					Base64.encodeBase64String(BootMenuEntryPoint.getSignedClientBundle()));
+		} else {
 			doUpdateMessage(cb, "Retrieving origin client classes.js");
 			byte[] classesJS = BootMenuEntryPoint.getUnsignedClientClassesJS();
-			if(classesJS == null) {
+			if (classesJS == null) {
 				throw new NullPointerException("Could not load classes.js!");
 			}
-			template = template.replace(StringUtils.reverse("}sj_sessalc{$"), new String(OfflineDownloadFactory.removeUseStrict(classesJS), StandardCharsets.UTF_8));
+			template = template.replace(StringUtils.reverse("}sj_sessalc{$"),
+					new String(OfflineDownloadFactory.removeUseStrict(classesJS), StandardCharsets.UTF_8));
 			UnsignedClientEPKLoader epkLoader = BootMenuEntryPoint.getUnsignedClientAssetsEPK();
 			String assetsEPKVal;
 			int epkNum = epkLoader.list.size();
-			if(epkNum > 1 || !StringUtils.isEmpty(epkLoader.list.get(0).extractTo)) {
+			if (epkNum > 1 || !StringUtils.isEmpty(epkLoader.list.get(0).extractTo)) {
 				StringBuilder assetsEPKBuilder = new StringBuilder("[ ");
-				for(int i = 0; i < epkNum; ++i) {
+				for (int i = 0; i < epkNum; ++i) {
 					EPKDataEntry epk = epkLoader.list.get(i);
 					doUpdateMessage(cb, "Resolving assets.epk (" + epk.dataUUID + ", path: /" + epk.extractTo + ")");
 					Supplier<byte[]> epkDataGetter = epkLoader.loaders.get(epk.dataUUID);
 					byte[] epkData = null;
-					if(epkDataGetter != null) {
+					if (epkDataGetter != null) {
 						epkData = epkDataGetter.get();
 					}
-					if(epkData == null) {
-						String msg = "Could not resolve assets.epk! (" + epk.dataUUID + ", path: /" + epk.extractTo + ")";
+					if (epkData == null) {
+						String msg = "Could not resolve assets.epk! (" + epk.dataUUID + ", path: /" + epk.extractTo
+								+ ")";
 						logger.error(msg);
 						throw new NullPointerException(msg);
 					}
-					if(i > 0) {
+					if (i > 0) {
 						assetsEPKBuilder.append(", ");
 					}
 					assetsEPKBuilder.append("{ url: \"data:application/octet-stream;base64,");
@@ -146,62 +178,40 @@ public class FatOfflineDownloadFactory {
 				}
 				assetsEPKBuilder.append(" ]");
 				assetsEPKVal = assetsEPKBuilder.toString();
-			}else {
+			} else {
 				EPKDataEntry epk = epkLoader.list.get(0);
 				doUpdateMessage(cb, "Resolving assets.epk (" + epk.dataUUID + ", path: /)");
 				Supplier<byte[]> epkDataGetter = epkLoader.loaders.get(epk.dataUUID);
 				byte[] epkData = null;
-				if(epkDataGetter != null) {
+				if (epkDataGetter != null) {
 					epkData = epkDataGetter.get();
 				}
-				if(epkData == null) {
+				if (epkData == null) {
 					String msg = "Could not resolve assets.epk! (" + epk.dataUUID + ", path: /)";
 					logger.error(msg);
 					throw new NullPointerException(msg);
 				}
 				assetsEPKVal = "\"data:application/octet-stream;base64," + Base64.encodeBase64String(epkData) + "\"";
 			}
-			
+
 			template = template.replace(StringUtils.reverse("}kpe_stessa{$"), assetsEPKVal);
 		}
 		doUpdateMessage(cb, "Embedding additional clients as base64");
 		StringBuilder fatOfflineDataBuilder = new StringBuilder();
-		fatOfflineDataBuilder.append(StringUtils.reverse(">\"1v_tsefinam_enilffOtaFrelgae_\"=di \"tfarcrelgae\"=epyt elyts<"));
+		fatOfflineDataBuilder
+				.append(StringUtils.reverse(">\"1v_tsefinam_enilffOtaFrelgae_\"=di \"tfarcrelgae\"=epyt elyts<"));
 		fatOfflineDataBuilder.append(manifestStr);
 		fatOfflineDataBuilder.append(StringUtils.reverse("\n>elyts/<"));
-		for(Entry<EaglercraftUUID, byte[]> etr : loadedBlobs.entrySet()) {
-			fatOfflineDataBuilder.append(StringUtils.reverse("_enilffOtaFrelgae_\"=di \"tfarcrelgae\"=epyt elyts<") + etr.getKey().toString() + "\">");
+		for (Entry<EaglercraftUUID, byte[]> etr : loadedBlobs.entrySet()) {
+			fatOfflineDataBuilder.append(StringUtils.reverse("_enilffOtaFrelgae_\"=di \"tfarcrelgae\"=epyt elyts<")
+					+ etr.getKey().toString() + "\">");
 			fatOfflineDataBuilder.append(Base64.encodeBase64String(etr.getValue()));
 			fatOfflineDataBuilder.append(StringUtils.reverse("\n>elyts/<"));
 		}
 		template = template.replace(StringUtils.reverse("}atad_enilffo_taf{$"), fatOfflineDataBuilder.toString());
 		doUpdateMessage(cb, "Downloading file...");
-		EagRuntime.downloadFileWithName("EaglercraftX_1.8_Fat_Offline_Download.html", template.getBytes(StandardCharsets.UTF_8));
-	}
-
-	private static void doUpdateMessage(IProgressMsgCallback cb, String str) {
-		logger.info(str);
-		cb.updateMessage(str);
-	}
-
-	private static boolean cacheLoad(Map<EaglercraftUUID, byte[]> loadedBlobs,
-			Map<EaglercraftUUID, Supplier<byte[]>> loaders, EaglercraftUUID uuid) {
-		if(!loadedBlobs.containsKey(uuid)) {
-			Supplier<byte[]> getter = loaders.get(uuid);
-			if(getter != null) {
-				byte[] dat = getter.get();
-				if(dat != null) {
-					loadedBlobs.put(uuid, dat);
-					return true;
-				}else {
-					return false;
-				}
-			}else {
-				return false;
-			}
-		}else {
-			return true;
-		}
+		EagRuntime.downloadFileWithName("EaglercraftX_1.8_Fat_Offline_Download.html",
+				template.getBytes(StandardCharsets.UTF_8));
 	}
 
 }

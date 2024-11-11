@@ -27,13 +27,13 @@ import net.starlikeclient.minecraft.init.RecipesStarlike;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -45,7 +45,7 @@ import net.starlikeclient.minecraft.init.RecipesStarlike;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class CraftingManager {
 	private static CraftingManager instance;
@@ -73,13 +73,13 @@ public class CraftingManager {
 		(new RecipesCrafting()).addRecipes(this);
 		(new RecipesArmor()).addRecipes(this);
 		(new RecipesDyes()).addRecipes(this);
-		this.recipes.add(new RecipesArmorDyes());
-		this.recipes.add(new RecipeBookCloning());
-		this.recipes.add(new RecipesMapCloning());
-		this.recipes.add(new RecipesMapExtending());
-		this.recipes.add(new RecipeFireworks());
-		this.recipes.add(new RecipeRepairItem());
 		(new RecipesBanners()).addRecipes(this);
+		this.addRecipe(new RecipesArmorDyes());
+		this.addRecipe(new RecipeBookCloning());
+		this.addRecipe(new RecipesMapCloning());
+		this.addRecipe(new RecipesMapExtending());
+		this.addRecipe(new RecipeFireworks());
+		this.addRecipe(new RecipeRepairItem());
 		this.addRecipe(new ItemStack(Items.paper, 3), new Object[] { "###", Character.valueOf('#'), Items.reeds });
 		this.addShapelessRecipe(new ItemStack(Items.book, 1),
 				new Object[] { Items.paper, Items.paper, Items.paper, Items.leather });
@@ -381,6 +381,7 @@ public class CraftingManager {
 		RecipesStarlike.addCraftingRecipes(this);
 
 		Collections.sort(this.recipes, new Comparator<IRecipe>() {
+			@Override
 			public int compare(IRecipe parIRecipe, IRecipe parIRecipe2) {
 				return parIRecipe instanceof ShapelessRecipes && parIRecipe2 instanceof ShapedRecipes ? 1
 						: (parIRecipe2 instanceof ShapelessRecipes && parIRecipe instanceof ShapedRecipes ? -1

@@ -33,13 +33,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -51,7 +51,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class RenderChunk {
 	public static enum ShadowFrustumState {
@@ -169,7 +169,11 @@ public class RenderChunk {
 	}
 
 	public void rebuildChunk(float x, float y, float z, ChunkCompileTaskGenerator generator) {
-		CompiledChunk compiledchunk = new CompiledChunk();
+		if (compiledChunk == CompiledChunk.DUMMY) {
+			compiledChunk = new CompiledChunk(this);
+		} else {
+			compiledChunk.reset();
+		}
 		boolean flag = true;
 		BlockPos blockpos = this.position;
 		BlockPos blockpos1 = blockpos.add(15, 15, 15);
@@ -180,7 +184,7 @@ public class RenderChunk {
 		}
 
 		regionrendercache = new RegionRenderCache(this.world, blockpos.add(-1, -1, -1), blockpos1.add(1, 1, 1), 1);
-		generator.setCompiledChunk(compiledchunk);
+		generator.setCompiledChunk(compiledChunk);
 
 		VisGraph visgraph = new VisGraph();
 		HashSet hashset = Sets.newHashSet();
@@ -189,7 +193,7 @@ public class RenderChunk {
 			boolean[] aboolean = new boolean[EnumWorldBlockLayer._VALUES.length];
 			BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
 
-			for (BlockPos blockpos$mutableblockpos : BlockPos.getAllInBox(blockpos, blockpos1)) {
+			for (BlockPos blockpos$mutableblockpos : BlockPos.getAllInBoxMutable(blockpos, blockpos1)) {
 				IBlockState iblockstate = regionrendercache.getBlockStateFaster(blockpos$mutableblockpos);
 				Block block = iblockstate.getBlock();
 				if (block.isOpaqueCube()) {
@@ -201,7 +205,7 @@ public class RenderChunk {
 					TileEntitySpecialRenderer tileentityspecialrenderer = TileEntityRendererDispatcher.instance
 							.getSpecialRenderer(tileentity);
 					if (tileentity != null && tileentityspecialrenderer != null) {
-						compiledchunk.addTileEntity(tileentity);
+						compiledChunk.addTileEntity(tileentity);
 						if (tileentityspecialrenderer.func_181055_a()) {
 							hashset.add(tileentity);
 						}
@@ -212,8 +216,8 @@ public class RenderChunk {
 				int i = enumworldblocklayer1.ordinal();
 				if (block.getRenderType() != -1) {
 					WorldRenderer worldrenderer = generator.getRegionRenderCacheBuilder().getWorldRendererByLayerId(i);
-					if (!compiledchunk.isLayerStarted(enumworldblocklayer1)) {
-						compiledchunk.setLayerStarted(enumworldblocklayer1);
+					if (!compiledChunk.isLayerStarted(enumworldblocklayer1)) {
+						compiledChunk.setLayerStarted(enumworldblocklayer1);
 						this.preRenderBlocks(worldrenderer, blockpos);
 					}
 
@@ -224,8 +228,8 @@ public class RenderChunk {
 						enumworldblocklayer1 = EnumWorldBlockLayer.GLASS_HIGHLIGHTS;
 						worldrenderer = generator.getRegionRenderCacheBuilder()
 								.getWorldRendererByLayerId(enumworldblocklayer1.ordinal());
-						if (!compiledchunk.isLayerStarted(enumworldblocklayer1)) {
-							compiledchunk.setLayerStarted(enumworldblocklayer1);
+						if (!compiledChunk.isLayerStarted(enumworldblocklayer1)) {
+							compiledChunk.setLayerStarted(enumworldblocklayer1);
 							this.preRenderBlocks(worldrenderer, blockpos);
 						}
 
@@ -239,18 +243,18 @@ public class RenderChunk {
 			for (int i = 0; i < layers.length; ++i) {
 				EnumWorldBlockLayer enumworldblocklayer = layers[i];
 				if (aboolean[enumworldblocklayer.ordinal()]) {
-					compiledchunk.setLayerUsed(enumworldblocklayer);
+					compiledChunk.setLayerUsed(enumworldblocklayer);
 				}
 
-				if (compiledchunk.isLayerStarted(enumworldblocklayer)) {
+				if (compiledChunk.isLayerStarted(enumworldblocklayer)) {
 					this.postRenderBlocks(enumworldblocklayer, x, y, z,
 							generator.getRegionRenderCacheBuilder().getWorldRendererByLayer(enumworldblocklayer),
-							compiledchunk);
+							compiledChunk);
 				}
 			}
 		}
 
-		compiledchunk.setVisibility(visgraph.computeVisibility());
+		compiledChunk.setVisibility(visgraph.computeVisibility());
 
 		HashSet hashset1 = Sets.newHashSet(hashset);
 		HashSet hashset2 = Sets.newHashSet(this.field_181056_j);
@@ -285,10 +289,6 @@ public class RenderChunk {
 		}
 	}
 
-	public void setCompiledChunk(CompiledChunk compiledChunkIn) {
-		this.compiledChunk = compiledChunkIn;
-	}
-
 	public boolean setFrameIndex(int frameIndexIn) {
 		if (this.frameIndex == frameIndexIn) {
 			return false;
@@ -317,6 +317,10 @@ public class RenderChunk {
 
 	public void stopCompileTask() {
 		this.finishCompileTask();
-		this.compiledChunk = CompiledChunk.DUMMY;
+		if (this.compiledChunk != CompiledChunk.DUMMY) {
+			this.compiledChunk.setState(null);
+			this.compiledChunk.setStateRealisticWater(null);
+			this.compiledChunk = CompiledChunk.DUMMY;
+		}
 	}
 }

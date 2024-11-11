@@ -12,20 +12,19 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.MinecraftException;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.chunk.storage.IChunkLoader;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -37,7 +36,7 @@ import net.minecraft.world.chunk.storage.IChunkLoader;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class SaveHandler implements ISaveHandler, IPlayerFileData {
 	private static final Logger logger = LogManager.getLogger();
@@ -60,20 +59,16 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData {
 	}
 
 	/**
-	 * + Checks the session lock to prevent save collisions
-	 */
-	public void checkSessionLock() throws MinecraftException {
-	}
-
-	/**
 	 * + Called to flush all changes to disk, waiting for them to complete.
 	 */
+	@Override
 	public void flush() {
 	}
 
 	/**
 	 * + Returns an array of usernames for which player.dat exists for.
 	 */
+	@Override
 	public String[] getAvailablePlayerDat() {
 		List<String> astring = this.playersDirectory.listFilenames(false);
 
@@ -90,6 +85,7 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData {
 	/**
 	 * + initializes and returns the chunk loader for the specified world provider
 	 */
+	@Override
 	public IChunkLoader getChunkLoader(WorldProvider var1) {
 		throw new RuntimeException("eagler");
 	}
@@ -97,10 +93,12 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData {
 	/**
 	 * + Gets the file location of the given map
 	 */
+	@Override
 	public VFile2 getMapFileFromName(String mapName) {
 		return WorldsDB.newVFile(this.mapDataDir, mapName + ".dat");
 	}
 
+	@Override
 	public IPlayerFileData getPlayerNBTManager() {
 		return this;
 	}
@@ -108,6 +106,7 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData {
 	/**
 	 * + Gets the File object corresponding to the base directory of this world.
 	 */
+	@Override
 	public VFile2 getWorldDirectory() {
 		return this.worldDirectory;
 	}
@@ -115,6 +114,7 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData {
 	/**
 	 * + Returns the name of the directory where world information is saved.
 	 */
+	@Override
 	public String getWorldDirectoryName() {
 		return this.saveDirectoryName;
 	}
@@ -122,6 +122,7 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData {
 	/**
 	 * + Loads and returns the world info
 	 */
+	@Override
 	public WorldInfo loadWorldInfo() {
 		VFile2 file1 = WorldsDB.newVFile(this.worldDirectory, "level.dat");
 		if (file1.exists()) {
@@ -153,6 +154,7 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData {
 	/**
 	 * + Reads the player data from disk into the specified PlayerEntityMP.
 	 */
+	@Override
 	public NBTTagCompound readPlayerData(EntityPlayer player) {
 		NBTTagCompound nbttagcompound = null;
 
@@ -178,6 +180,7 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData {
 	/**
 	 * + used to update level.dat from old format to MCRegion format
 	 */
+	@Override
 	public void saveWorldInfo(WorldInfo worldInformation) {
 		NBTTagCompound nbttagcompound = worldInformation.getNBTTagCompound();
 		NBTTagCompound nbttagcompound1 = new NBTTagCompound();
@@ -213,6 +216,7 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData {
 	/**
 	 * + Saves the given World Info with the given NBTTagCompound as the Player.
 	 */
+	@Override
 	public void saveWorldInfoWithPlayer(WorldInfo worldinfo, NBTTagCompound nbttagcompound) {
 		NBTTagCompound nbttagcompound1 = worldinfo.cloneNBTCompound(nbttagcompound);
 		NBTTagCompound nbttagcompound2 = new NBTTagCompound();
@@ -248,6 +252,7 @@ public class SaveHandler implements ISaveHandler, IPlayerFileData {
 	/**
 	 * + Writes the player data to disk from the specified PlayerEntityMP.
 	 */
+	@Override
 	public void writePlayerData(EntityPlayer player) {
 		try {
 			NBTTagCompound nbttagcompound = new NBTTagCompound();

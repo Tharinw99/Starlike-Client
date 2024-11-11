@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
 import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -23,13 +24,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -41,7 +42,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityItem extends Entity {
 	private static final Logger logger = LogManager.getLogger();
@@ -82,11 +83,15 @@ public class EntityItem extends Entity {
 	/**
 	 * + Called when the entity is attacked.
 	 */
+	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float f) {
 		if (this.isEntityInvulnerable(damagesource)) {
 			return false;
 		} else if (this.getEntityItem() != null && this.getEntityItem().getItem() == Items.nether_star
 				&& damagesource.isExplosion()) {
+			return false;
+		} else if (this.getEntityItem() != null && this.getEntityItem().getItem().isImmuneToFire()
+				&& damagesource.isFireDamage()) {
 			return false;
 		} else {
 			this.setBeenAttacked();
@@ -102,6 +107,7 @@ public class EntityItem extends Entity {
 	/**
 	 * + If returns false, the item will not inflict any damage against entities.
 	 */
+	@Override
 	public boolean canAttackWithItem() {
 		return false;
 	}
@@ -114,6 +120,7 @@ public class EntityItem extends Entity {
 	 * + returns if this entity triggers Block.onEntityWalking on the blocks they
 	 * walk on. used for spiders and wolves to prevent them from trampling crops
 	 */
+	@Override
 	protected boolean canTriggerWalking() {
 		return false;
 	}
@@ -170,10 +177,14 @@ public class EntityItem extends Entity {
 	 * + Will deal the specified amount of damage to the entity if the entity isn't
 	 * immune to fire damage. Args: amountDamage
 	 */
+	@Override
 	protected void dealFireDamage(int i) {
-		this.attackEntityFrom(DamageSource.inFire, (float) i);
+		if (!this.isImmuneToFire) {
+			this.attackEntityFrom(DamageSource.inFire, (float) i);
+		}
 	}
 
+	@Override
 	protected void entityInit() {
 		this.getDataWatcher().addObjectByDataType(10, 5);
 	}
@@ -187,6 +198,7 @@ public class EntityItem extends Entity {
 		return this.age;
 	}
 
+	@Override
 	protected float getEaglerDynamicLightsValueSimple(float partialTicks) {
 		float f = super.getEaglerDynamicLightsValueSimple(partialTicks);
 		ItemStack itm = this.getEntityItem();
@@ -221,6 +233,7 @@ public class EntityItem extends Entity {
 	 * + Gets the name of this command sender (usually username, but possibly
 	 * "Rcon")
 	 */
+	@Override
 	public String getName() {
 		return this.hasCustomName() ? this.getCustomNameTag()
 				: StatCollector.translateToLocal("item." + this.getEntityItem().getUnlocalizedName());
@@ -238,6 +251,7 @@ public class EntityItem extends Entity {
 	 * + Returns if this entity is in water and will end up adding the waters
 	 * velocity to the entity
 	 */
+	@Override
 	public boolean handleWaterMovement() {
 		if (this.worldObj.handleMaterialAcceleration(this.getEntityBoundingBox(), Material.water, this)) {
 			if (!this.inWater && !this.firstUpdate) {
@@ -255,6 +269,7 @@ public class EntityItem extends Entity {
 	/**
 	 * + Called by a player entity when they collide with an entity
 	 */
+	@Override
 	public void onCollideWithPlayer(EntityPlayer entityplayer) {
 		if (!this.worldObj.isRemote) {
 			ItemStack itemstack = this.getEntityItem();
@@ -306,6 +321,7 @@ public class EntityItem extends Entity {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		if (this.getEntityItem() == null) {
 			this.setDead();
@@ -325,11 +341,17 @@ public class EntityItem extends Entity {
 			boolean flag = (int) this.prevPosX != (int) this.posX || (int) this.prevPosY != (int) this.posY
 					|| (int) this.prevPosZ != (int) this.posZ;
 			if (flag || this.ticksExisted % 25 == 0) {
-				if (this.worldObj.getBlockState(new BlockPos(this)).getBlock().getMaterial() == Material.lava) {
+				Block block = this.worldObj.getBlockState(new BlockPos(this)).getBlock();
+				if (block.getMaterial() == Material.lava && !this.isImmuneToFire) {
 					this.motionY = 0.20000000298023224D;
 					this.motionX = (double) ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F);
 					this.motionZ = (double) ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F);
 					this.playSound("random.fizz", 0.4F, 2.0F + this.rand.nextFloat() * 0.4F);
+				} else if ((block.getMaterial() == Material.lava
+						|| block.getBlockState() == Blocks.flowing_lava.getBlockState()
+						|| block.getBlockState() == Blocks.lava.getBlockState()) && this.isImmuneToFire) {
+					this.motionY = 0.20000000298023224D;
+					this.motionX = (double) ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.00001D);
 				}
 
 				if (!this.worldObj.isRemote) {
@@ -359,13 +381,13 @@ public class EntityItem extends Entity {
 			if (!this.worldObj.isRemote && this.age >= 6000) {
 				this.setDead();
 			}
-
 		}
 	}
 
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		this.health = nbttagcompound.getShort("Health") & 255;
 		this.age = nbttagcompound.getShort("Age");
@@ -389,6 +411,7 @@ public class EntityItem extends Entity {
 
 	}
 
+	@Override
 	protected void renderDynamicLightsEaglerAt(double entityX, double entityY, double entityZ, double renderX,
 			double renderY, double renderZ, float partialTicks, boolean isInFrustum) {
 		super.renderDynamicLightsEaglerAt(entityX, entityY, entityZ, renderX, renderY, renderZ, partialTicks,
@@ -425,6 +448,7 @@ public class EntityItem extends Entity {
 	 * + Sets the ItemStack for this entity
 	 */
 	public void setEntityItemStack(ItemStack stack) {
+		this.isImmuneToFire = stack.getItem().isImmuneToFire();
 		this.getDataWatcher().updateObject(10, stack);
 		this.getDataWatcher().setObjectWatched(10);
 	}
@@ -457,6 +481,7 @@ public class EntityItem extends Entity {
 	 * + Teleports the entity to another dimension. Params: Dimension number to
 	 * teleport to
 	 */
+	@Override
 	public void travelToDimension(int i) {
 		super.travelToDimension(i);
 		if (!this.worldObj.isRemote) {
@@ -468,6 +493,7 @@ public class EntityItem extends Entity {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		nbttagcompound.setShort("Health", (short) ((byte) this.health));
 		nbttagcompound.setShort("Age", (short) this.age);

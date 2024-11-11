@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "normal": {
-            "model": "starlike:cracked_blackstone"
-        }
+  "variants": {
+    "normal": {
+      "model": "starlike:cracked_blackstone"
     }
+  }
 }

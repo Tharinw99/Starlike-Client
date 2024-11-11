@@ -12,7 +12,7 @@ import net.minecraft.client.resources.I18n;
 
 /**
  * Copyright (c) 2022-2023 lax1dude, ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -24,7 +24,7 @@ import net.minecraft.client.resources.I18n;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiAuthenticationScreen extends GuiScreen {
 
@@ -62,6 +62,7 @@ public class GuiAuthenticationScreen extends GuiScreen {
 		this.message = message;
 	}
 
+	@Override
 	protected void actionPerformed(GuiButton parGuiButton) {
 		if (parGuiButton.id == 1) {
 			this.mc.displayGuiScreen(new GuiConnecting(retAfterAuthScreen, password.getText()));
@@ -70,6 +71,7 @@ public class GuiAuthenticationScreen extends GuiScreen {
 		}
 	}
 
+	@Override
 	public void drawScreen(int i, int j, float var3) {
 		drawBackground(0);
 		this.password.drawTextBox();
@@ -84,6 +86,7 @@ public class GuiAuthenticationScreen extends GuiScreen {
 		password.fireInputEvent(event, param);
 	}
 
+	@Override
 	public void initGui() {
 		if (authTypeForWarning != Integer.MAX_VALUE) {
 			GuiScreen scr = ConnectionHandshake.displayAuthProtocolConfirm(authTypeForWarning, parent, this);
@@ -107,6 +110,7 @@ public class GuiAuthenticationScreen extends GuiScreen {
 		this.password.setCanLoseFocus(false);
 	}
 
+	@Override
 	protected void keyTyped(char parChar1, int parInt1) {
 		String pass = password.getText();
 		if (parInt1 == KeyboardConstants.KEY_RETURN && pass.length() > 0) {
@@ -117,11 +121,13 @@ public class GuiAuthenticationScreen extends GuiScreen {
 		}
 	}
 
+	@Override
 	protected void mouseClicked(int parInt1, int parInt2, int parInt3) {
 		super.mouseClicked(parInt1, parInt2, parInt3);
 		this.password.mouseClicked(parInt1, parInt2, parInt3);
 	}
 
+	@Override
 	public void onGuiClosed() {
 		Keyboard.enableRepeatEvents(false);
 	}

@@ -49,7 +49,7 @@ public class Matrix3f extends Matrix implements Serializable {
 
 	/**
 	 * Add two matrices together and place the result in a third matrix.
-	 * 
+	 *
 	 * @param left  The left source matrix
 	 * @param right The right source matrix
 	 * @param dest  The destination matrix, or null if a new one is to be created
@@ -79,7 +79,7 @@ public class Matrix3f extends Matrix implements Serializable {
 
 	/**
 	 * Invert the source matrix and put the result into the destination matrix
-	 * 
+	 *
 	 * @param src  The source matrix to be inverted
 	 * @param dest The destination matrix, or null if a new one is to be created
 	 * @return The inverted matrix if successful, null otherwise
@@ -126,7 +126,7 @@ public class Matrix3f extends Matrix implements Serializable {
 
 	/**
 	 * Copy source matrix to destination matrix
-	 * 
+	 *
 	 * @param src  The source matrix
 	 * @param dest The destination matrix, or null of a new matrix is to be created
 	 * @return The copied matrix
@@ -150,7 +150,7 @@ public class Matrix3f extends Matrix implements Serializable {
 
 	/**
 	 * Multiply the right matrix by the left and place the result in a third matrix.
-	 * 
+	 *
 	 * @param left  The left source matrix
 	 * @param right The right source matrix
 	 * @param dest  The destination matrix, or null if a new one is to be created
@@ -185,7 +185,7 @@ public class Matrix3f extends Matrix implements Serializable {
 
 	/**
 	 * Negate the source matrix and place the result in the destination matrix.
-	 * 
+	 *
 	 * @param src  The source matrix
 	 * @param dest The destination matrix, or null if a new matrix is to be created
 	 * @return the negated matrix
@@ -208,7 +208,7 @@ public class Matrix3f extends Matrix implements Serializable {
 
 	/**
 	 * Set the matrix to be the identity matrix.
-	 * 
+	 *
 	 * @param m The matrix to be set to the identity
 	 * @return m
 	 */
@@ -227,7 +227,7 @@ public class Matrix3f extends Matrix implements Serializable {
 
 	/**
 	 * Set the matrix matrix to 0.
-	 * 
+	 *
 	 * @param m The matrix to be set to 0
 	 * @return m
 	 */
@@ -247,7 +247,7 @@ public class Matrix3f extends Matrix implements Serializable {
 	/**
 	 * Subtract the right matrix from the left and place the result in a third
 	 * matrix.
-	 * 
+	 *
 	 * @param left  The left source matrix
 	 * @param right The right source matrix
 	 * @param dest  The destination matrix, or null if a new one is to be created
@@ -272,7 +272,7 @@ public class Matrix3f extends Matrix implements Serializable {
 
 	/**
 	 * Transform a Vector by a matrix and return the result in a destination vector.
-	 * 
+	 *
 	 * @param left  The left matrix
 	 * @param right The right vector
 	 * @param dest  The destination vector, or null if a new one is to be created
@@ -295,7 +295,7 @@ public class Matrix3f extends Matrix implements Serializable {
 
 	/**
 	 * Transpose the source matrix and place the result into the destination matrix
-	 * 
+	 *
 	 * @param src  The source matrix to be transposed
 	 * @param dest The destination matrix or null if a new matrix is to be created
 	 * @return the transposed matrix
@@ -338,20 +338,23 @@ public class Matrix3f extends Matrix implements Serializable {
 	/**
 	 * @return the determinant of the matrix
 	 */
+	@Override
 	public float determinant() {
 		float f = m00 * (m11 * m22 - m12 * m21) + m01 * (m12 * m20 - m10 * m22) + m02 * (m10 * m21 - m11 * m20);
 		return f;
 	}
 
+	@Override
 	public boolean equals(Object m) {
 		return (m instanceof Matrix3f) && equal(this, (Matrix3f) m);
 	}
 
 	/**
 	 * Invert this matrix
-	 * 
+	 *
 	 * @return this if successful, null otherwise
 	 */
+	@Override
 	public Matrix invert() {
 		return invert(this, this);
 	}
@@ -363,6 +366,7 @@ public class Matrix3f extends Matrix implements Serializable {
 	 * @param buf A float buffer to read from
 	 * @return this
 	 */
+	@Override
 	public Matrix load(FloatBuffer buf) {
 
 		m00 = buf.get();
@@ -380,7 +384,7 @@ public class Matrix3f extends Matrix implements Serializable {
 
 	/**
 	 * Load from another matrix
-	 * 
+	 *
 	 * @param src The source matrix
 	 * @return this
 	 */
@@ -395,6 +399,7 @@ public class Matrix3f extends Matrix implements Serializable {
 	 * @param buf A float buffer to read from
 	 * @return this
 	 */
+	@Override
 	public Matrix loadTranspose(FloatBuffer buf) {
 
 		m00 = buf.get();
@@ -412,16 +417,17 @@ public class Matrix3f extends Matrix implements Serializable {
 
 	/**
 	 * Negate this matrix
-	 * 
+	 *
 	 * @return this
 	 */
+	@Override
 	public Matrix negate() {
 		return negate(this);
 	}
 
 	/**
 	 * Negate this matrix and place the result in a destination matrix.
-	 * 
+	 *
 	 * @param dest The destination matrix, or null if a new matrix is to be created
 	 * @return the negated matrix
 	 */
@@ -431,18 +437,20 @@ public class Matrix3f extends Matrix implements Serializable {
 
 	/**
 	 * Set this matrix to be the identity matrix.
-	 * 
+	 *
 	 * @return this
 	 */
+	@Override
 	public Matrix setIdentity() {
 		return setIdentity(this);
 	}
 
 	/**
 	 * Set this matrix to 0.
-	 * 
+	 *
 	 * @return this
 	 */
+	@Override
 	public Matrix setZero() {
 		return setZero(this);
 	}
@@ -463,9 +471,10 @@ public class Matrix3f extends Matrix implements Serializable {
 	/**
 	 * Store this matrix in a float buffer. The matrix is stored in column major
 	 * (openGL) order.
-	 * 
+	 *
 	 * @param buf The buffer to store this matrix in
 	 */
+	@Override
 	public Matrix store(FloatBuffer buf) {
 		buf.put(m00);
 		buf.put(m01);
@@ -482,9 +491,10 @@ public class Matrix3f extends Matrix implements Serializable {
 	/**
 	 * Store this matrix in a float buffer. The matrix is stored in row major
 	 * (maths) order.
-	 * 
+	 *
 	 * @param buf The buffer to store this matrix in
 	 */
+	@Override
 	public Matrix storeTranspose(FloatBuffer buf) {
 		buf.put(m00);
 		buf.put(m10);
@@ -501,6 +511,7 @@ public class Matrix3f extends Matrix implements Serializable {
 	/**
 	 * Returns a string representation of this matrix
 	 */
+	@Override
 	public String toString() {
 		StringBuilder buf = new StringBuilder();
 		buf.append(m00).append(' ').append(m10).append(' ').append(m20).append(' ').append('\n');
@@ -511,16 +522,17 @@ public class Matrix3f extends Matrix implements Serializable {
 
 	/**
 	 * Transpose this matrix
-	 * 
+	 *
 	 * @return this
 	 */
+	@Override
 	public Matrix transpose() {
 		return transpose(this, this);
 	}
 
 	/**
 	 * Transpose this matrix and place the result in another matrix
-	 * 
+	 *
 	 * @param dest The destination matrix or null if a new matrix is to be created
 	 * @return the transposed matrix
 	 */

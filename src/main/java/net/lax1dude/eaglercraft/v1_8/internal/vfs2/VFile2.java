@@ -14,7 +14,7 @@ import net.lax1dude.eaglercraft.v1_8.internal.buffer.ByteBuffer;
 
 /**
  * Copyright (c) 2023-2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -26,7 +26,7 @@ import net.lax1dude.eaglercraft.v1_8.internal.buffer.ByteBuffer;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class VFile2 {
 
@@ -161,6 +161,7 @@ public class VFile2 {
 		return !isRelative() && getFS().eaglerDelete(path);
 	}
 
+	@Override
 	public boolean equals(Object o) {
 		return path != null && o != null && (o instanceof VFile2) && path.equals(((VFile2) o).path);
 	}
@@ -245,6 +246,7 @@ public class VFile2 {
 		return path.equals("unnamed") ? null : path;
 	}
 
+	@Override
 	public int hashCode() {
 		return path == null ? 0 : path.hashCode();
 	}
@@ -308,6 +310,7 @@ public class VFile2 {
 		setAllBytes(bytes.getBytes(StandardCharsets.UTF_8));
 	}
 
+	@Override
 	public String toString() {
 		return path;
 	}

@@ -16,73 +16,21 @@ import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class TeaVMClientConfigAdapterHooks implements IClientConfigAdapterHooks {
-
-	private static final Logger logger = LogManager.getLogger("TeaVMClientConfigAdapterHooks");
-
-	private LocalStorageSaveHook saveHook = null;
-	private LocalStorageLoadHook loadHook = null;
-	private CrashReportHook crashHook = null;
-	private ScreenChangeHook screenChangedHook = null;
-
-	@JSFunctor
-	private static interface LocalStorageSaveHook extends JSObject {
-		void call(String key, String base64);
-	}
-
-	@Override
-	public void callLocalStorageSavedHook(String key, String base64) {
-		if(saveHook != null) {
-			callHookSafe("localStorageSaved", () -> {
-				saveHook.call(key, base64);
-			});
-		}
-	}
-
-	@JSFunctor
-	private static interface LocalStorageLoadHook extends JSObject {
-		String call(String key);
-	}
-
-	@Override
-	public String callLocalStorageLoadHook(String key) {
-		if(loadHook != null) {
-			return (String)callHookSafeWithReturn("localStorageLoaded", () -> {
-				return loadHook.call(key);
-			});
-		}else {
-			return null;
-		}
-	}
-
-	@JSFunctor
-	private static interface ScreenChangeHook extends JSObject {
-		String call(String screenName, int scaledWidth, int scaledHeight, int realWidth, int realHeight,
-				int scaleFactor);
-	}
-
-	@Override
-	public void callScreenChangedHook(String screenName, int scaledWidth, int scaledHeight, int realWidth,
-			int realHeight, int scaleFactor) {
-		if(screenChangedHook != null) {
-			callHookSafe("screenChanged", () -> {
-				screenChangedHook.call(screenName, scaledWidth, scaledHeight, realWidth, realHeight, scaleFactor);
-			});
-		}
-	}
 
 	@JSFunctor
 	private static interface CrashReportHook extends JSObject {
@@ -94,20 +42,29 @@ public class TeaVMClientConfigAdapterHooks implements IClientConfigAdapterHooks 
 		void call(String msg);
 	}
 
-	@Override
-	public void callCrashReportHook(String crashReport, Consumer<String> customMessageCB) {
-		if(crashHook != null) {
-			callHookSafeSync("crashReportShow", () -> {
-				crashHook.call(crashReport, (msg) -> customMessageCB.accept(msg));
-			});
-		}
+	@JSFunctor
+	private static interface LocalStorageLoadHook extends JSObject {
+		String call(String key);
 	}
+
+	@JSFunctor
+	private static interface LocalStorageSaveHook extends JSObject {
+		void call(String key, String base64);
+	}
+
+	@JSFunctor
+	private static interface ScreenChangeHook extends JSObject {
+		String call(String screenName, int scaledWidth, int scaledHeight, int realWidth, int realHeight,
+				int scaleFactor);
+	}
+
+	private static final Logger logger = LogManager.getLogger("TeaVMClientConfigAdapterHooks");
 
 	private static void callHookSafe(String identifer, Runnable hooker) {
 		Window.setTimeout(() -> {
 			try {
 				hooker.run();
-			}catch(Throwable t) {
+			} catch (Throwable t) {
 				logger.error("Caught exception while invoking eaglercraftXOpts \"{}\" hook!", identifer);
 				logger.error(t);
 			}
@@ -121,10 +78,10 @@ public class TeaVMClientConfigAdapterHooks implements IClientConfigAdapterHooks 
 		Window.setTimeout(() -> {
 			try {
 				hooker.run();
-			}catch(Throwable t) {
+			} catch (Throwable t) {
 				logger.error("Caught exception while invoking eaglercraftXOpts \"{}\" hook!", identifer);
 				logger.error(t);
-			}finally {
+			} finally {
 				cb.complete(null);
 			}
 		}, 0);
@@ -133,25 +90,73 @@ public class TeaVMClientConfigAdapterHooks implements IClientConfigAdapterHooks 
 	@Async
 	private static native Object callHookSafeWithReturn(String identifer, Supplier<Object> hooker);
 
-	private static void callHookSafeWithReturn(String identifer, Supplier<Object> hooker, final AsyncCallback<Object> cb) {
+	private static void callHookSafeWithReturn(String identifer, Supplier<Object> hooker,
+			final AsyncCallback<Object> cb) {
 		Window.setTimeout(() -> {
 			Object res = null;
 			try {
 				res = hooker.get();
-			}catch(Throwable t) {
+			} catch (Throwable t) {
 				logger.error("Caught exception while invoking eaglercraftXOpts \"{}\" hook!", identifer);
 				logger.error(t);
-			}finally {
+			} finally {
 				cb.complete(res);
 			}
 		}, 0);
 	}
 
+	private LocalStorageSaveHook saveHook = null;
+
+	private LocalStorageLoadHook loadHook = null;
+
+	private CrashReportHook crashHook = null;
+
+	private ScreenChangeHook screenChangedHook = null;
+
+	@Override
+	public void callCrashReportHook(String crashReport, Consumer<String> customMessageCB) {
+		if (crashHook != null) {
+			callHookSafeSync("crashReportShow", () -> {
+				crashHook.call(crashReport, (msg) -> customMessageCB.accept(msg));
+			});
+		}
+	}
+
+	@Override
+	public String callLocalStorageLoadHook(String key) {
+		if (loadHook != null) {
+			return (String) callHookSafeWithReturn("localStorageLoaded", () -> {
+				return loadHook.call(key);
+			});
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public void callLocalStorageSavedHook(String key, String base64) {
+		if (saveHook != null) {
+			callHookSafe("localStorageSaved", () -> {
+				saveHook.call(key, base64);
+			});
+		}
+	}
+
+	@Override
+	public void callScreenChangedHook(String screenName, int scaledWidth, int scaledHeight, int realWidth,
+			int realHeight, int scaleFactor) {
+		if (screenChangedHook != null) {
+			callHookSafe("screenChanged", () -> {
+				screenChangedHook.call(screenName, scaledWidth, scaledHeight, realWidth, realHeight, scaleFactor);
+			});
+		}
+	}
+
 	public void loadHooks(JSEaglercraftXOptsHooks hooks) {
-		saveHook = (LocalStorageSaveHook)hooks.getLocalStorageSavedHook();
-		loadHook = (LocalStorageLoadHook)hooks.getLocalStorageLoadedHook();
-		crashHook = (CrashReportHook)hooks.getCrashReportHook();
-		screenChangedHook = (ScreenChangeHook)hooks.getScreenChangedHook();
+		saveHook = (LocalStorageSaveHook) hooks.getLocalStorageSavedHook();
+		loadHook = (LocalStorageLoadHook) hooks.getLocalStorageLoadedHook();
+		crashHook = (CrashReportHook) hooks.getCrashReportHook();
+		screenChangedHook = (ScreenChangeHook) hooks.getScreenChangedHook();
 	}
 
 }

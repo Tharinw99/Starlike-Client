@@ -9,23 +9,24 @@ import net.lax1dude.eaglercraft.v1_8.opengl.GlStateManager;
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.DeferredStateManager;
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.ShadersRenderPassFuture;
 import net.lax1dude.eaglercraft.v1_8.vector.Matrix4f;
+import net.minecraft.client.model.ModelCreeper;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.util.ResourceLocation;
 import net.starlikeclient.minecraft.entities.entity.EntityEndCreeper;
-import net.starlikeclient.minecraft.entities.model.ModelEndCreeper;
 import net.starlikeclient.minecraft.entities.render.RenderEndCreeper;
 
 public class LayerEndCreeperCharge implements LayerRenderer<EntityEndCreeper> {
 	private static final ResourceLocation LIGHTNING_TEXTURE = new ResourceLocation(
-			"textures/entity/EndCreeper/EndCreeper_armor.png");
+			"textures/entity/creeper/creeper_armor.png");
 	private final RenderEndCreeper EndCreeperRenderer;
-	private final ModelEndCreeper EndCreeperModel = new ModelEndCreeper(2.0F);
+	private final ModelCreeper EndCreeperModel = new ModelCreeper(2.0F);
 
 	public LayerEndCreeperCharge(RenderEndCreeper EndCreeperRendererIn) {
 		this.EndCreeperRenderer = EndCreeperRendererIn;
 	}
 
+	@Override
 	public void doRenderLayer(EntityEndCreeper entityEndCreeper, float f, float f1, float f2, float f3, float f4,
 			float f5, float f6) {
 		if (entityEndCreeper.getPowered()) {
@@ -56,7 +57,7 @@ public class LayerEndCreeperCharge implements LayerRenderer<EntityEndCreeper> {
 							GlStateManager.matrixMode(GL_TEXTURE);
 							GlStateManager.pushMatrix();
 							GlStateManager.loadIdentity();
-							float f7 = (float) entityEndCreeper.ticksExisted + f2;
+							float f7 = entityEndCreeper.ticksExisted + f2;
 							GlStateManager.translate(f7 * 0.01F, f7 * 0.01F, 0.0F);
 							GlStateManager.matrixMode(GL_MODELVIEW);
 							LayerEndCreeperCharge.this.EndCreeperRenderer.bindTexture(LIGHTNING_TEXTURE);
@@ -87,7 +88,7 @@ public class LayerEndCreeperCharge implements LayerRenderer<EntityEndCreeper> {
 			this.EndCreeperRenderer.bindTexture(LIGHTNING_TEXTURE);
 			GlStateManager.matrixMode(GL_TEXTURE);
 			GlStateManager.loadIdentity();
-			float f7 = (float) entityEndCreeper.ticksExisted + f2;
+			float f7 = entityEndCreeper.ticksExisted + f2;
 			GlStateManager.translate(f7 * 0.01F, f7 * 0.01F, 0.0F);
 			GlStateManager.matrixMode(GL_MODELVIEW);
 			GlStateManager.enableBlend();
@@ -108,6 +109,7 @@ public class LayerEndCreeperCharge implements LayerRenderer<EntityEndCreeper> {
 		}
 	}
 
+	@Override
 	public boolean shouldCombineTextures() {
 		return false;
 	}

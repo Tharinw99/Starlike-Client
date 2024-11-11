@@ -28,7 +28,7 @@ import com.google.common.annotations.GwtCompatible;
  * assertions</a>, except that they are always enabled. These methods should be
  * used instead of Java assertions whenever there is a chance the check may fail
  * "in real life". Example:
- * 
+ *
  * <pre>
  * {
  * 	&#64;code
@@ -74,7 +74,7 @@ import com.google.common.annotations.GwtCompatible;
  * eagerly, and autoboxing and varargs array creation may happen as well, even
  * when the verification succeeds and the message ends up unneeded.
  * Performance-sensitive verification checks should continue to use usual form:
- * 
+ *
  * <pre>
  * {
  * 	&#64;code

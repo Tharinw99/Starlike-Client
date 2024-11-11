@@ -25,13 +25,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -43,7 +43,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockTallGrass extends BlockBush implements IGrowable {
 	public static enum EnumType implements IStringSerializable {
@@ -79,10 +79,12 @@ public class BlockTallGrass extends BlockBush implements IGrowable {
 			return this.meta;
 		}
 
+		@Override
 		public String getName() {
 			return this.name;
 		}
 
+		@Override
 		public String toString() {
 			return this.name;
 		}
@@ -101,6 +103,7 @@ public class BlockTallGrass extends BlockBush implements IGrowable {
 		this.setBlockBounds(0.5F - f, 0.0F, 0.5F - f, 0.5F + f, 0.8F, 0.5F + f);
 	}
 
+	@Override
 	public boolean canBlockStay(World world, BlockPos blockpos, IBlockState var3) {
 		return this.canPlaceBlockOn(world.getBlockState(blockpos.down()).getBlock());
 	}
@@ -108,26 +111,32 @@ public class BlockTallGrass extends BlockBush implements IGrowable {
 	/**
 	 * + Whether this IGrowable can grow
 	 */
+	@Override
 	public boolean canGrow(World var1, BlockPos var2, IBlockState iblockstate, boolean var4) {
 		return iblockstate.getValue(TYPE) != BlockTallGrass.EnumType.DEAD_BUSH;
 	}
 
+	@Override
 	public boolean canUseBonemeal(World var1, EaglercraftRandom var2, BlockPos var3, IBlockState var4) {
 		return true;
 	}
 
+	@Override
 	public int colorMultiplier(IBlockAccess iblockaccess, BlockPos blockpos, int var3) {
 		return iblockaccess.getBiomeGenForCoords(blockpos).getGrassColorAtPos(blockpos);
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { TYPE });
 	}
 
+	@Override
 	public int getBlockColor() {
 		return ColorizerGrass.getGrassColor(0.5D, 1.0D);
 	}
 
+	@Override
 	public int getDamageValue(World world, BlockPos blockpos) {
 		IBlockState iblockstate = world.getBlockState(blockpos);
 		return iblockstate.getBlock().getMetaFromState(iblockstate);
@@ -136,6 +145,7 @@ public class BlockTallGrass extends BlockBush implements IGrowable {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom random, int var3) {
 		return random.nextInt(8) == 0 ? Items.wheat_seeds : null;
 	}
@@ -143,6 +153,7 @@ public class BlockTallGrass extends BlockBush implements IGrowable {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		return ((BlockTallGrass.EnumType) iblockstate.getValue(TYPE)).getMeta();
 	}
@@ -151,10 +162,12 @@ public class BlockTallGrass extends BlockBush implements IGrowable {
 	 * + Get the OffsetType for this Block. Determines if the model is rendered
 	 * slightly offset.
 	 */
+	@Override
 	public Block.EnumOffsetType getOffsetType() {
 		return Block.EnumOffsetType.XYZ;
 	}
 
+	@Override
 	public int getRenderColor(IBlockState iblockstate) {
 		if (iblockstate.getBlock() != this) {
 			return super.getRenderColor(iblockstate);
@@ -168,6 +181,7 @@ public class BlockTallGrass extends BlockBush implements IGrowable {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(TYPE, BlockTallGrass.EnumType.byMetadata(i));
 	}
@@ -176,6 +190,7 @@ public class BlockTallGrass extends BlockBush implements IGrowable {
 	 * + returns a list of blocks with the same ID, but different meta (eg: wood
 	 * returns 4 blocks)
 	 */
+	@Override
 	public void getSubBlocks(Item item, CreativeTabs var2, List<ItemStack> list) {
 		for (int i = 1; i < 3; ++i) {
 			list.add(new ItemStack(item, 1, i));
@@ -183,6 +198,7 @@ public class BlockTallGrass extends BlockBush implements IGrowable {
 
 	}
 
+	@Override
 	public void grow(World world, EaglercraftRandom var2, BlockPos blockpos, IBlockState iblockstate) {
 		BlockDoublePlant.EnumPlantType blockdoubleplant$enumplanttype = BlockDoublePlant.EnumPlantType.GRASS;
 		if (iblockstate.getValue(TYPE) == BlockTallGrass.EnumType.FERN) {
@@ -195,6 +211,7 @@ public class BlockTallGrass extends BlockBush implements IGrowable {
 
 	}
 
+	@Override
 	public void harvestBlock(World world, EntityPlayer entityplayer, BlockPos blockpos, IBlockState iblockstate,
 			TileEntity tileentity) {
 		if (!world.isRemote && entityplayer.getCurrentEquippedItem() != null
@@ -212,6 +229,7 @@ public class BlockTallGrass extends BlockBush implements IGrowable {
 	 * + Whether this Block can be replaced directly by other blocks (true for e.g.
 	 * tall grass)
 	 */
+	@Override
 	public boolean isReplaceable(World var1, BlockPos var2) {
 		return true;
 	}
@@ -219,6 +237,7 @@ public class BlockTallGrass extends BlockBush implements IGrowable {
 	/**
 	 * + Get the quantity dropped based on the given fortune level
 	 */
+	@Override
 	public int quantityDroppedWithBonus(int i, EaglercraftRandom random) {
 		return 1 + random.nextInt(i * 2 + 1);
 	}

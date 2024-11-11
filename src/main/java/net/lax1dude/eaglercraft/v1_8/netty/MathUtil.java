@@ -34,7 +34,7 @@ public final class MathUtil {
 
 	/**
 	 * Compare two {@code long} values.
-	 * 
+	 *
 	 * @param x the first {@code long} to compare.
 	 * @param y the second {@code long} to compare.
 	 * @return
@@ -67,7 +67,7 @@ public final class MathUtil {
 	/**
 	 * Determine if the requested {@code index} and {@code length} will fit within
 	 * {@code capacity}.
-	 * 
+	 *
 	 * @param index    The starting index.
 	 * @param length   The length which will be utilized (starting from
 	 *                 {@code index}).
@@ -87,7 +87,7 @@ public final class MathUtil {
 	 * <p>
 	 * This method will do runtime bounds checking and call
 	 * {@link #findNextPositivePowerOfTwo(int)} if within a valid range.
-	 * 
+	 *
 	 * @param value from which to search for next power of 2
 	 * @return The next power of 2 or the value itself if it is a power of 2.
 	 *         <p>

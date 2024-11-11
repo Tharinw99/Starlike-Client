@@ -5,13 +5,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -23,7 +23,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class PositionedSound implements ISound {
 	protected final ResourceLocation positionedSoundLocation;
@@ -33,48 +33,48 @@ public abstract class PositionedSound implements ISound {
 	protected float yPosF;
 	protected float zPosF;
 	protected boolean repeat = false;
-	/**
-	 * + The number of ticks between repeating the sound
-	 */
-	protected int repeatDelay = 0;
 	protected ISound.AttenuationType attenuationType = ISound.AttenuationType.LINEAR;
 
 	protected PositionedSound(ResourceLocation soundResource) {
 		this.positionedSoundLocation = soundResource;
 	}
 
+	@Override
 	public boolean canRepeat() {
 		return this.repeat;
 	}
 
+	@Override
 	public ISound.AttenuationType getAttenuationType() {
 		return this.attenuationType;
 	}
 
+	@Override
 	public float getPitch() {
 		return this.pitch;
 	}
 
-	public int getRepeatDelay() {
-		return this.repeatDelay;
-	}
-
+	@Override
 	public ResourceLocation getSoundLocation() {
 		return this.positionedSoundLocation;
 	}
 
+	@Override
 	public float getVolume() {
 		return this.volume;
 	}
 
+	@Override
 	public float getXPosF() {
 		return this.xPosF;
 	}
 
+	@Override
 	public float getYPosF() {
 		return this.yPosF;
 	}
 
+	@Override
 	public float getZPosF() {
 		return this.zPosF;
 	}

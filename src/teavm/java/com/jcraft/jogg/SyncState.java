@@ -1,24 +1,24 @@
 /* -*-mode:java; c-basic-offset:2; indent-tabs-mode:nil -*- */
 /* JOrbis
  * Copyright (C) 2000 ymnk, JCraft,Inc.
- *  
+ *
  * Written by: 2000 ymnk<ymnk@jcraft.com>
- *   
- * Many thanks to 
- *   Monty <monty@xiph.org> and 
+ *
+ * Many thanks to
+ *   Monty <monty@xiph.org> and
  *   The XIPHOPHORUS Company http://www.xiph.org/ .
  * JOrbis has been based on their awesome works, Vorbis codec.
- *   
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public License
  * as published by the Free Software Foundation; either version 2 of
  * the License, or (at your option) any later version.
-   
+
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -53,10 +53,16 @@ public class SyncState {
 	int headerbytes;
 	int bodybytes;
 
-	public int clear() {
-		data = null;
-		return (0);
-	}
+	// sync the stream. This is meant to be useful for finding page
+	// boundaries.
+	//
+	// return values for this:
+	// -n) skipped n bytes
+	// 0) page not ready; more data (no bytes skipped)
+	// n) page synced at current location; page length n bytes
+	private Page pageseek = new Page();
+
+	private byte[] chksum = new byte[4];
 
 	public int buffer(int size) {
 		// first, clear out any space that has been previously returned
@@ -84,22 +90,57 @@ public class SyncState {
 		return (fill);
 	}
 
-	public int wrote(int bytes) {
-		if (fill + bytes > storage)
-			return (-1);
-		fill += bytes;
+	public int clear() {
+		data = null;
 		return (0);
 	}
 
-	// sync the stream. This is meant to be useful for finding page
-	// boundaries.
+	public int getBufferOffset() {
+		return fill;
+	}
+
+	public int getDataOffset() {
+		return returned;
+	}
+
+	// sync the stream and get a page. Keep trying until we find a page.
+	// Supress 'sync errors' after reporting the first.
 	//
-	// return values for this:
-	// -n) skipped n bytes
-	// 0) page not ready; more data (no bytes skipped)
-	// n) page synced at current location; page length n bytes
-	private Page pageseek = new Page();
-	private byte[] chksum = new byte[4];
+	// return values:
+	// -1) recapture (hole in data)
+	// 0) need more data
+	// 1) page returned
+	//
+	// Returns pointers into buffered data; invalidated by next call to
+	// _stream, _clear, _init, or _buffer
+
+	public void init() {
+	}
+
+	public int pageout(Page og) {
+		// all we need to do is verify a page at the head of the stream
+		// buffer. If it doesn't verify, we look for the next potential
+		// frame
+
+		while (true) {
+			int ret = pageseek(og);
+			if (ret > 0) {
+				// have a page
+				return (1);
+			}
+			if (ret == 0) {
+				// need more data
+				return (0);
+			}
+
+			// head did not start a synced page... skipped some bytes
+			if (unsynced == 0) {
+				unsynced = 1;
+				return (-1);
+			}
+			// loop. keep looking
+		}
+	}
 
 	public int pageseek(Page og) {
 		int page = returned;
@@ -214,42 +255,6 @@ public class SyncState {
 		}
 	}
 
-	// sync the stream and get a page. Keep trying until we find a page.
-	// Supress 'sync errors' after reporting the first.
-	//
-	// return values:
-	// -1) recapture (hole in data)
-	// 0) need more data
-	// 1) page returned
-	//
-	// Returns pointers into buffered data; invalidated by next call to
-	// _stream, _clear, _init, or _buffer
-
-	public int pageout(Page og) {
-		// all we need to do is verify a page at the head of the stream
-		// buffer. If it doesn't verify, we look for the next potential
-		// frame
-
-		while (true) {
-			int ret = pageseek(og);
-			if (ret > 0) {
-				// have a page
-				return (1);
-			}
-			if (ret == 0) {
-				// need more data
-				return (0);
-			}
-
-			// head did not start a synced page... skipped some bytes
-			if (unsynced == 0) {
-				unsynced = 1;
-				return (-1);
-			}
-			// loop. keep looking
-		}
-	}
-
 	// clear things to an initial state. Good to call, eg, before seeking
 	public int reset() {
 		fill = 0;
@@ -260,14 +265,10 @@ public class SyncState {
 		return (0);
 	}
 
-	public void init() {
-	}
-
-	public int getDataOffset() {
-		return returned;
-	}
-
-	public int getBufferOffset() {
-		return fill;
+	public int wrote(int bytes) {
+		if (fill + bytes > storage)
+			return (-1);
+		fill += bytes;
+		return (0);
 	}
 }

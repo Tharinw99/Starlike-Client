@@ -22,13 +22,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -40,7 +40,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockFence extends Block {
 	/**
@@ -76,6 +76,7 @@ public class BlockFence extends Block {
 	 * + Add all collision boxes of this Block to the list that intersect with the
 	 * given mask.
 	 */
+	@Override
 	public void addCollisionBoxesToList(World world, BlockPos blockpos, IBlockState iblockstate,
 			AxisAlignedBB axisalignedbb, List<AxisAlignedBB> list, Entity entity) {
 		boolean flag = this.canConnectTo(world, blockpos.north());
@@ -136,6 +137,7 @@ public class BlockFence extends Block {
 								: true);
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { NORTH, EAST, WEST, SOUTH });
 	}
@@ -144,6 +146,7 @@ public class BlockFence extends Block {
 	 * + Get the actual Block state of this Block at the given position. This
 	 * applies properties not visible in the metadata, such as fence connections.
 	 */
+	@Override
 	public IBlockState getActualState(IBlockState iblockstate, IBlockAccess iblockaccess, BlockPos blockpos) {
 		return iblockstate.withProperty(NORTH, Boolean.valueOf(this.canConnectTo(iblockaccess, blockpos.north())))
 				.withProperty(EAST, Boolean.valueOf(this.canConnectTo(iblockaccess, blockpos.east())))
@@ -154,10 +157,12 @@ public class BlockFence extends Block {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState var1) {
 		return 0;
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -166,19 +171,23 @@ public class BlockFence extends Block {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
 
+	@Override
 	public boolean isPassable(IBlockAccess var1, BlockPos var2) {
 		return false;
 	}
 
+	@Override
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState var3, EntityPlayer entityplayer,
 			EnumFacing var5, float var6, float var7, float var8) {
 		return world.isRemote ? true : ItemLead.attachToFence(entityplayer, world, blockpos);
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
 		boolean flag = this.canConnectTo(iblockaccess, blockpos.north());
 		boolean flag1 = this.canConnectTo(iblockaccess, blockpos.south());
@@ -207,6 +216,7 @@ public class BlockFence extends Block {
 		this.setBlockBounds(f, 0.0F, f2, f1, 1.0F, f3);
 	}
 
+	@Override
 	public boolean shouldSideBeRendered(IBlockAccess var1, BlockPos var2, EnumFacing var3) {
 		return true;
 	}

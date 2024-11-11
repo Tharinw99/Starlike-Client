@@ -19,13 +19,13 @@ import net.minecraft.world.biome.BiomeColorHelper;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -37,7 +37,7 @@ import net.minecraft.world.biome.BiomeColorHelper;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockGrass extends Block implements IGrowable {
 	public static final PropertyBool SNOWY = PropertyBool.create("snowy");
@@ -52,18 +52,22 @@ public class BlockGrass extends Block implements IGrowable {
 	/**
 	 * + Whether this IGrowable can grow
 	 */
+	@Override
 	public boolean canGrow(World var1, BlockPos var2, IBlockState var3, boolean var4) {
 		return true;
 	}
 
+	@Override
 	public boolean canUseBonemeal(World var1, EaglercraftRandom var2, BlockPos var3, IBlockState var4) {
 		return true;
 	}
 
+	@Override
 	public int colorMultiplier(IBlockAccess iblockaccess, BlockPos blockpos, int var3) {
 		return BiomeColorHelper.getGrassColorAtPos(iblockaccess, blockpos);
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { SNOWY });
 	}
@@ -72,15 +76,18 @@ public class BlockGrass extends Block implements IGrowable {
 	 * + Get the actual Block state of this Block at the given position. This
 	 * applies properties not visible in the metadata, such as fence connections.
 	 */
+	@Override
 	public IBlockState getActualState(IBlockState iblockstate, IBlockAccess iblockaccess, BlockPos blockpos) {
 		Block block = iblockaccess.getBlockState(blockpos.up()).getBlock();
 		return iblockstate.withProperty(SNOWY, Boolean.valueOf(block == Blocks.snow || block == Blocks.snow_layer));
 	}
 
+	@Override
 	public int getBlockColor() {
 		return ColorizerGrass.getGrassColor(0.5D, 1.0D);
 	}
 
+	@Override
 	public EnumWorldBlockLayer getBlockLayer() {
 		return EnumWorldBlockLayer.CUTOUT_MIPPED;
 	}
@@ -88,6 +95,7 @@ public class BlockGrass extends Block implements IGrowable {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom random, int i) {
 		return Blocks.dirt.getItemDropped(
 				Blocks.dirt.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.DIRT), random, i);
@@ -96,14 +104,17 @@ public class BlockGrass extends Block implements IGrowable {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState var1) {
 		return 0;
 	}
 
+	@Override
 	public int getRenderColor(IBlockState var1) {
 		return this.getBlockColor();
 	}
 
+	@Override
 	public void grow(World world, EaglercraftRandom random, BlockPos blockpos, IBlockState var4) {
 		BlockPos blockpos1 = blockpos.up();
 
@@ -147,21 +158,25 @@ public class BlockGrass extends Block implements IGrowable {
 
 	}
 
+	@Override
 	public void updateTick(World world, BlockPos blockpos, IBlockState var3, EaglercraftRandom random) {
 		if (!world.isRemote) {
-			if (world.getLightFromNeighbors(blockpos.up()) < 4
-					&& world.getBlockState(blockpos.up()).getBlock().getLightOpacity() > 2) {
+			BlockPos tmp = new BlockPos();
+			if (world.getLightFromNeighbors(blockpos.up(tmp)) < 4
+					&& world.getBlockState(blockpos.up(tmp)).getBlock().getLightOpacity() > 2) {
 				world.setBlockState(blockpos, Blocks.dirt.getDefaultState());
 			} else {
-				if (world.getLightFromNeighbors(blockpos.up()) >= 9) {
+				if (world.getLightFromNeighbors(blockpos.up(tmp)) >= 9) {
+					BlockPos tmp2 = new BlockPos();
 					for (int i = 0; i < 4; ++i) {
 						BlockPos blockpos1 = blockpos.add(random.nextInt(3) - 1, random.nextInt(5) - 3,
-								random.nextInt(3) - 1);
-						Block block = world.getBlockState(blockpos1.up()).getBlock();
+								random.nextInt(3) - 1, tmp2);
+						Block block = world.getBlockState(blockpos1.up(tmp)).getBlock();
 						IBlockState iblockstate = world.getBlockState(blockpos1);
 						if (iblockstate.getBlock() == Blocks.dirt
 								&& iblockstate.getValue(BlockDirt.VARIANT) == BlockDirt.DirtType.DIRT
-								&& world.getLightFromNeighbors(blockpos1.up()) >= 4 && block.getLightOpacity() <= 2) {
+								&& world.getLightFromNeighbors(blockpos1.up(tmp)) >= 4
+								&& block.getLightOpacity() <= 2) {
 							world.setBlockState(blockpos1, Blocks.grass.getDefaultState());
 						}
 					}

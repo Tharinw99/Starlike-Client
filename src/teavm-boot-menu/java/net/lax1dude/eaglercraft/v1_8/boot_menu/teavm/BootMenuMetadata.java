@@ -18,22 +18,46 @@ import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BootMenuMetadata {
 
-	protected static final Logger logger = LogManager.getLogger("BootMenuMetadata");
+	public static class DefaultLaunchTemplate {
+
+		public final String templateName;
+		public final Set<EnumClientFormatType> supportedFormats;
+		public final Set<EnumOfflineParseType> parseTypes;
+		public final LaunchTemplate templateState;
+
+		protected DefaultLaunchTemplate(String templateName, Set<EnumClientFormatType> supportedFormats,
+				Set<EnumOfflineParseType> parseTypes, LaunchTemplate templateState) {
+			this.templateName = templateName;
+			this.supportedFormats = supportedFormats;
+			this.parseTypes = parseTypes;
+			this.templateState = templateState;
+		}
+
+		public LaunchConfigEntry createLaunchConfig(EaglercraftUUID uuid, EaglercraftUUID clientDataUUID) {
+			return templateState.createLaunchConfig(uuid, clientDataUUID, templateName);
+		}
+
+		@Override
+		public String toString() {
+			return templateName;
+		}
+	}
 
 	public static class LaunchTemplate {
 
@@ -70,21 +94,8 @@ public class BootMenuMetadata {
 			launchOpts = null;
 		}
 
-		protected LaunchTemplate mutateOpts(String newOpts) {
-			if(newOpts == launchOpts) {
-				return this;
-			}
-			return new LaunchTemplate(type, joinServer, launchOptsVar, launchOptsAssetsURIVar, launchOptsContainerVar,
-					mainFunction, newOpts, clearCookiedBeforeLaunch);
-		}
-
-		public LaunchConfigEntry createLaunchConfig(EaglercraftUUID uuid, EaglercraftUUID clientDataUUID, String displayName) {
-			return new LaunchConfigEntry(uuid, clientDataUUID, displayName, type, joinServer, launchOptsVar,
-					launchOptsAssetsURIVar, launchOptsContainerVar, mainFunction, launchOpts, clearCookiedBeforeLaunch);
-		}
-
 		public void configureLaunchConfig(LaunchConfigEntry etr) {
-			switch(type) {
+			switch (type) {
 			case STANDARD_OFFLINE_V1:
 				etr.launchOpts = launchOpts;
 				etr.launchOptsVar = launchOptsVar;
@@ -107,41 +118,32 @@ public class BootMenuMetadata {
 				break;
 			case PEYTON_V1:
 				break;
-			default: //?
+			default: // ?
 				break;
 			}
 		}
 
+		public LaunchConfigEntry createLaunchConfig(EaglercraftUUID uuid, EaglercraftUUID clientDataUUID,
+				String displayName) {
+			return new LaunchConfigEntry(uuid, clientDataUUID, displayName, type, joinServer, launchOptsVar,
+					launchOptsAssetsURIVar, launchOptsContainerVar, mainFunction, launchOpts, clearCookiedBeforeLaunch);
+		}
+
+		protected LaunchTemplate mutateOpts(String newOpts) {
+			if (newOpts == launchOpts) {
+				return this;
+			}
+			return new LaunchTemplate(type, joinServer, launchOptsVar, launchOptsAssetsURIVar, launchOptsContainerVar,
+					mainFunction, newOpts, clearCookiedBeforeLaunch);
+		}
+
 	}
 
-	public static class DefaultLaunchTemplate {
-
-		public final String templateName;
-		public final Set<EnumClientFormatType> supportedFormats;
-		public final Set<EnumOfflineParseType> parseTypes;
-		public final LaunchTemplate templateState;
-
-		protected DefaultLaunchTemplate(String templateName, Set<EnumClientFormatType> supportedFormats,
-				Set<EnumOfflineParseType> parseTypes, LaunchTemplate templateState) {
-			this.templateName = templateName;
-			this.supportedFormats = supportedFormats;
-			this.parseTypes = parseTypes;
-			this.templateState = templateState;
-		}
-
-		public LaunchConfigEntry createLaunchConfig(EaglercraftUUID uuid, EaglercraftUUID clientDataUUID) {
-			return templateState.createLaunchConfig(uuid, clientDataUUID, templateName);
-		}
-
-		@Override
-		public String toString() {
-			return templateName;
-		}
-	}
+	protected static final Logger logger = LogManager.getLogger("BootMenuMetadata");
 
 	public final String basePath;
 
-	public final Map<EnumClientLaunchType,LaunchTemplate> formatDefaultOptsMap = new HashMap<>();
+	public final Map<EnumClientLaunchType, LaunchTemplate> formatDefaultOptsMap = new HashMap<>();
 	public final List<DefaultLaunchTemplate> defaultLaunchTemplates = new ArrayList<>();
 
 	public BootMenuMetadata(String basePath) {
@@ -149,50 +151,10 @@ public class BootMenuMetadata {
 		this.loadAllData();
 	}
 
-	protected void loadAllData() {
-		logger.info("Loading client templates and default settings...");
-		formatDefaultOptsMap.clear();
-		defaultLaunchTemplates.clear();
-		EaglerLoadingCache<String, String> optsFileLoader = new EaglerLoadingCache<>(this::loadDataFileString);
-		EaglerLoadingCache<String, LaunchTemplate> templateFileLoader = new EaglerLoadingCache<>(this::loadDataFileLaunchTemplate);
-		byte[] data = BootMenuAssets.loadResourceBytes(basePath + "meta_opts_templates.json");
-		if(data == null) {
-			throw new RuntimeException("Missing metadata file: meta_opts_templates.json");
-		}
-		JSONObject jsonObject = new JSONObject(new String(data, StandardCharsets.UTF_8));
-		JSONObject defaults = jsonObject.getJSONObject("defaults");
-		for(String str : defaults.keySet()) {
-			EnumClientLaunchType fmt = EnumClientLaunchType.valueOf(str);
-			JSONObject etr = defaults.getJSONObject(str);
-			LaunchTemplate launchTemplateBase = templateFileLoader.get(etr.getString("conf"));
-			String optsFileName = etr.optString("opts", null);
-			String eagOpts = optsFileName != null ? optsFileLoader.get(optsFileName) : null;
-			formatDefaultOptsMap.put(fmt, launchTemplateBase.mutateOpts(eagOpts));
-		}
-		JSONArray templates = jsonObject.getJSONArray("templates");
-		for(int i = 0, l = templates.length(); i < l; ++i) {
-			JSONObject obj = templates.getJSONObject(i);
-			LaunchTemplate launchTemplateBase = templateFileLoader.get(obj.getString("conf"));
-			String optsFileName = obj.optString("opts", null);
-			String eagOpts = optsFileName != null ? optsFileLoader.get(optsFileName) : null;
-			JSONArray allowList = obj.getJSONArray("allow");
-			Set<EnumClientFormatType> toAllow = new HashSet<>(allowList.length());
-			for(int j = 0, m = allowList.length(); j < m; ++j) {
-				toAllow.add(EnumClientFormatType.valueOf(allowList.getString(j)));
-			}
-			JSONArray parseTypesList = obj.getJSONArray("parseTypes");
-			Set<EnumOfflineParseType> toParseTypes = new HashSet<>(parseTypesList.length());
-			for(int j = 0, m = parseTypesList.length(); j < m; ++j) {
-				toParseTypes.add(EnumOfflineParseType.valueOf(parseTypesList.getString(j)));
-			}
-			defaultLaunchTemplates.add(new DefaultLaunchTemplate(obj.getString("name"), toAllow, toParseTypes, launchTemplateBase.mutateOpts(eagOpts)));
-		}
-	}
-
 	public List<DefaultLaunchTemplate> getTemplatesForClientData(EnumClientFormatType formatType) {
 		List<DefaultLaunchTemplate> ret = new ArrayList<>();
-		for(DefaultLaunchTemplate template : defaultLaunchTemplates) {
-			if(template.supportedFormats.contains(formatType)) {
+		for (DefaultLaunchTemplate template : defaultLaunchTemplates) {
+			if (template.supportedFormats.contains(formatType)) {
 				ret.add(template);
 			}
 		}
@@ -201,24 +163,66 @@ public class BootMenuMetadata {
 
 	public List<DefaultLaunchTemplate> getTemplatesForParseType(EnumOfflineParseType parseType) {
 		List<DefaultLaunchTemplate> ret = new ArrayList<>();
-		for(DefaultLaunchTemplate template : defaultLaunchTemplates) {
-			if(template.parseTypes.contains(parseType)) {
+		for (DefaultLaunchTemplate template : defaultLaunchTemplates) {
+			if (template.parseTypes.contains(parseType)) {
 				ret.add(template);
 			}
 		}
 		return ret;
 	}
 
-	protected String loadDataFileString(String name) {
-		byte[] data = BootMenuAssets.loadResourceBytes(basePath + name);
-		if(data == null) {
-			throw new RuntimeException("Missing metadata file: " + name);
+	protected void loadAllData() {
+		logger.info("Loading client templates and default settings...");
+		formatDefaultOptsMap.clear();
+		defaultLaunchTemplates.clear();
+		EaglerLoadingCache<String, String> optsFileLoader = new EaglerLoadingCache<>(this::loadDataFileString);
+		EaglerLoadingCache<String, LaunchTemplate> templateFileLoader = new EaglerLoadingCache<>(
+				this::loadDataFileLaunchTemplate);
+		byte[] data = BootMenuAssets.loadResourceBytes(basePath + "meta_opts_templates.json");
+		if (data == null) {
+			throw new RuntimeException("Missing metadata file: meta_opts_templates.json");
 		}
-		return new String(data, StandardCharsets.UTF_8);
+		JSONObject jsonObject = new JSONObject(new String(data, StandardCharsets.UTF_8));
+		JSONObject defaults = jsonObject.getJSONObject("defaults");
+		for (String str : defaults.keySet()) {
+			EnumClientLaunchType fmt = EnumClientLaunchType.valueOf(str);
+			JSONObject etr = defaults.getJSONObject(str);
+			LaunchTemplate launchTemplateBase = templateFileLoader.get(etr.getString("conf"));
+			String optsFileName = etr.optString("opts", null);
+			String eagOpts = optsFileName != null ? optsFileLoader.get(optsFileName) : null;
+			formatDefaultOptsMap.put(fmt, launchTemplateBase.mutateOpts(eagOpts));
+		}
+		JSONArray templates = jsonObject.getJSONArray("templates");
+		for (int i = 0, l = templates.length(); i < l; ++i) {
+			JSONObject obj = templates.getJSONObject(i);
+			LaunchTemplate launchTemplateBase = templateFileLoader.get(obj.getString("conf"));
+			String optsFileName = obj.optString("opts", null);
+			String eagOpts = optsFileName != null ? optsFileLoader.get(optsFileName) : null;
+			JSONArray allowList = obj.getJSONArray("allow");
+			Set<EnumClientFormatType> toAllow = new HashSet<>(allowList.length());
+			for (int j = 0, m = allowList.length(); j < m; ++j) {
+				toAllow.add(EnumClientFormatType.valueOf(allowList.getString(j)));
+			}
+			JSONArray parseTypesList = obj.getJSONArray("parseTypes");
+			Set<EnumOfflineParseType> toParseTypes = new HashSet<>(parseTypesList.length());
+			for (int j = 0, m = parseTypesList.length(); j < m; ++j) {
+				toParseTypes.add(EnumOfflineParseType.valueOf(parseTypesList.getString(j)));
+			}
+			defaultLaunchTemplates.add(new DefaultLaunchTemplate(obj.getString("name"), toAllow, toParseTypes,
+					launchTemplateBase.mutateOpts(eagOpts)));
+		}
 	}
 
 	protected LaunchTemplate loadDataFileLaunchTemplate(String name) {
 		return new LaunchTemplate(new JSONObject(loadDataFileString(name)));
+	}
+
+	protected String loadDataFileString(String name) {
+		byte[] data = BootMenuAssets.loadResourceBytes(basePath + name);
+		if (data == null) {
+			throw new RuntimeException("Missing metadata file: " + name);
+		}
+		return new String(data, StandardCharsets.UTF_8);
 	}
 
 }

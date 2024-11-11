@@ -14,7 +14,7 @@ import net.minecraft.util.MathHelper;
 
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -26,7 +26,7 @@ import net.minecraft.util.MathHelper;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiScreenRecordingSettings extends GuiScreen {
 
@@ -48,6 +48,7 @@ public class GuiScreenRecordingSettings extends GuiScreen {
 		this.parent = parent;
 	}
 
+	@Override
 	protected void actionPerformed(GuiButton parGuiButton) {
 		if (parGuiButton.id == 0) {
 			if (dirty) {
@@ -76,6 +77,7 @@ public class GuiScreenRecordingSettings extends GuiScreen {
 		}
 	}
 
+	@Override
 	public void drawScreen(int i, int j, float var3) {
 		drawDefaultBackground();
 		drawCenteredString(fontRendererObj, I18n.format("options.screenRecording.title"), this.width / 2, 15, 16777215);
@@ -118,6 +120,7 @@ public class GuiScreenRecordingSettings extends GuiScreen {
 		}
 	}
 
+	@Override
 	public void initGui() {
 		buttonList.clear();
 		buttonList.add(new GuiButton(0, this.width / 2 - 100, this.height / 6 + 168, I18n.format("gui.done")));

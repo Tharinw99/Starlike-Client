@@ -13,7 +13,7 @@ import net.minecraft.client.resources.I18n;
 
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -25,7 +25,7 @@ import net.minecraft.client.resources.I18n;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiScreenRevokeSessionToken extends GuiScreen {
 	class List extends GuiSlot {
@@ -39,20 +39,24 @@ public class GuiScreenRevokeSessionToken extends GuiScreen {
 			Collections.sort(cookieNames);
 		}
 
+		@Override
 		protected void drawBackground() {
 			GuiScreenRevokeSessionToken.this.drawDefaultBackground();
 		}
 
+		@Override
 		protected void drawSlot(int i, int var2, int j, int var4, int var5, int var6) {
 			GuiScreenRevokeSessionToken.this.drawCenteredString(GuiScreenRevokeSessionToken.this.fontRendererObj,
 					this.cookieNames.get(i), this.width / 2, j + 1, 16777215);
 		}
 
+		@Override
 		protected void elementClicked(int i, boolean var2, int var3, int var4) {
 			selectedElement = i;
 			GuiScreenRevokeSessionToken.this.updateButtons();
 		}
 
+		@Override
 		protected int getContentHeight() {
 			return this.getSize() * 18;
 		}
@@ -61,10 +65,12 @@ public class GuiScreenRevokeSessionToken extends GuiScreen {
 			return selectedElement == -1 ? null : cookieNames.get(selectedElement);
 		}
 
+		@Override
 		protected int getSize() {
 			return this.cookieNames.size();
 		}
 
+		@Override
 		protected boolean isSelected(int i) {
 			return selectedElement == i;
 		}
@@ -80,6 +86,7 @@ public class GuiScreenRevokeSessionToken extends GuiScreen {
 		this.parentScreen = parent;
 	}
 
+	@Override
 	protected void actionPerformed(GuiButton parGuiButton) {
 		if (parGuiButton.enabled) {
 			switch (parGuiButton.id) {
@@ -115,6 +122,7 @@ public class GuiScreenRevokeSessionToken extends GuiScreen {
 		}
 	}
 
+	@Override
 	public void drawScreen(int i, int j, float f) {
 		this.list.drawScreen(i, j, f);
 		this.drawCenteredString(this.fontRendererObj, I18n.format("revokeSessionToken.title"), this.width / 2, 16,
@@ -126,16 +134,19 @@ public class GuiScreenRevokeSessionToken extends GuiScreen {
 		super.drawScreen(i, j, f);
 	}
 
+	@Override
 	public void handleMouseInput() throws IOException {
 		super.handleMouseInput();
 		this.list.handleMouseInput();
 	}
 
+	@Override
 	public void handleTouchInput() throws IOException {
 		super.handleTouchInput();
 		this.list.handleTouchInput();
 	}
 
+	@Override
 	public void initGui() {
 		this.buttonList.clear();
 		this.buttonList.add(this.inspectButton = new GuiButton(10, this.width / 2 - 154, this.height - 38, 100, 20,

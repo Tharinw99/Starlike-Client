@@ -84,7 +84,7 @@ import net.lax1dude.eaglercraft.v1_8.sp.server.internal.ServerPlatformSingleplay
 
 /**
  * Copyright (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -96,7 +96,7 @@ import net.lax1dude.eaglercraft.v1_8.sp.server.internal.ServerPlatformSingleplay
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class PlatformRuntime {
 
@@ -168,8 +168,8 @@ public class PlatformRuntime {
 	private static EnumPlatformOS currentPlatformOS = null;
 
 	private static EnumPlatformANGLE requestedANGLEPlatform = EnumPlatformANGLE.DEFAULT;
-
 	private static int requestedGLVersion = 300;
+	private static boolean requestedDisableKHRDebug = false;
 
 	private static final Random seedProvider = new Random();
 
@@ -397,83 +397,86 @@ public class PlatformRuntime {
 
 		glfwSwapInterval(0);
 
-		KHRDebug.glDebugMessageCallbackKHR(new GLDebugMessageKHRCallbackI() {
-			@Override
-			public void invoke(int source, int type, int id, int severity, int length, long message, long userParam) {
-				StringBuilder b = new StringBuilder();
-				b.append("[KHR DEBUG #");
-				b.append(id);
-				b.append("] ");
+		if (!requestedDisableKHRDebug) {
+			KHRDebug.glDebugMessageCallbackKHR(new GLDebugMessageKHRCallbackI() {
+				@Override
+				public void invoke(int source, int type, int id, int severity, int length, long message,
+						long userParam) {
+					StringBuilder b = new StringBuilder();
+					b.append("[KHR DEBUG #");
+					b.append(id);
+					b.append("] ");
 
-				switch (source) {
-				case KHRDebug.GL_DEBUG_SOURCE_API_KHR:
-					b.append("[API - ");
-					break;
-				case KHRDebug.GL_DEBUG_SOURCE_APPLICATION_KHR:
-					b.append("[APPLICATION - ");
-					break;
-				case KHRDebug.GL_DEBUG_SOURCE_SHADER_COMPILER_KHR:
-					b.append("[SHADER COMPILER - ");
-					break;
-				case KHRDebug.GL_DEBUG_SOURCE_THIRD_PARTY_KHR:
-					b.append("[THIRD PARTY - ");
-					break;
-				case KHRDebug.GL_DEBUG_SOURCE_OTHER_KHR:
-				default:
-					b.append("[OTHER - ");
-					break;
+					switch (source) {
+					case KHRDebug.GL_DEBUG_SOURCE_API_KHR:
+						b.append("[API - ");
+						break;
+					case KHRDebug.GL_DEBUG_SOURCE_APPLICATION_KHR:
+						b.append("[APPLICATION - ");
+						break;
+					case KHRDebug.GL_DEBUG_SOURCE_SHADER_COMPILER_KHR:
+						b.append("[SHADER COMPILER - ");
+						break;
+					case KHRDebug.GL_DEBUG_SOURCE_THIRD_PARTY_KHR:
+						b.append("[THIRD PARTY - ");
+						break;
+					case KHRDebug.GL_DEBUG_SOURCE_OTHER_KHR:
+					default:
+						b.append("[OTHER - ");
+						break;
+					}
+
+					switch (type) {
+					case KHRDebug.GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR_KHR:
+						b.append("DEPRECATED BEHAVIOR] ");
+						break;
+					case KHRDebug.GL_DEBUG_TYPE_ERROR_KHR:
+						b.append("ERROR] ");
+						break;
+					default:
+					case KHRDebug.GL_DEBUG_TYPE_OTHER_KHR:
+						b.append("OTHER] ");
+						break;
+					case KHRDebug.GL_DEBUG_TYPE_PERFORMANCE_KHR:
+						b.append("PERFORMANCE] ");
+						break;
+					case KHRDebug.GL_DEBUG_TYPE_PORTABILITY_KHR:
+						b.append("PORTABILITY] ");
+						break;
+					case KHRDebug.GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR_KHR:
+						b.append("UNDEFINED BEHAVIOR] ");
+						break;
+					}
+
+					switch (severity) {
+					default:
+					case KHRDebug.GL_DEBUG_SEVERITY_LOW_KHR:
+						b.append("[LOW Severity] ");
+						break;
+					case KHRDebug.GL_DEBUG_SEVERITY_MEDIUM_KHR:
+						b.append("[MEDIUM Severity] ");
+						break;
+					case KHRDebug.GL_DEBUG_SEVERITY_HIGH_KHR:
+						b.append("[SEVERE] ");
+						break;
+					}
+
+					String message2 = GLDebugMessageKHRCallback.getMessage(length, message);
+					if (message2.contains("GPU stall due to ReadPixels"))
+						return;
+					b.append(message2);
+					logger.error(b.toString());
+
+					StackTraceElement[] ex = new RuntimeException().getStackTrace();
+					for (int i = 0; i < ex.length; ++i) {
+						logger.error("    at {}", ex[i]);
+					}
 				}
+			}, 0l);
 
-				switch (type) {
-				case KHRDebug.GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR_KHR:
-					b.append("DEPRECATED BEHAVIOR] ");
-					break;
-				case KHRDebug.GL_DEBUG_TYPE_ERROR_KHR:
-					b.append("ERROR] ");
-					break;
-				default:
-				case KHRDebug.GL_DEBUG_TYPE_OTHER_KHR:
-					b.append("OTHER] ");
-					break;
-				case KHRDebug.GL_DEBUG_TYPE_PERFORMANCE_KHR:
-					b.append("PERFORMANCE] ");
-					break;
-				case KHRDebug.GL_DEBUG_TYPE_PORTABILITY_KHR:
-					b.append("PORTABILITY] ");
-					break;
-				case KHRDebug.GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR_KHR:
-					b.append("UNDEFINED BEHAVIOR] ");
-					break;
-				}
-
-				switch (severity) {
-				default:
-				case KHRDebug.GL_DEBUG_SEVERITY_LOW_KHR:
-					b.append("[LOW Severity] ");
-					break;
-				case KHRDebug.GL_DEBUG_SEVERITY_MEDIUM_KHR:
-					b.append("[MEDIUM Severity] ");
-					break;
-				case KHRDebug.GL_DEBUG_SEVERITY_HIGH_KHR:
-					b.append("[SEVERE] ");
-					break;
-				}
-
-				String message2 = GLDebugMessageKHRCallback.getMessage(length, message);
-				if (message2.contains("GPU stall due to ReadPixels"))
-					return;
-				b.append(message2);
-				logger.error(b.toString());
-
-				StackTraceElement[] ex = new RuntimeException().getStackTrace();
-				for (int i = 0; i < ex.length; ++i) {
-					logger.error("    at {}", ex[i]);
-				}
-			}
-		}, 0l);
-
-		GLES30.glEnable(KHRDebug.GL_DEBUG_OUTPUT_KHR);
-		GLES30.glEnable(KHRDebug.GL_DEBUG_OUTPUT_SYNCHRONOUS_KHR);
+			GLES30.glEnable(KHRDebug.GL_DEBUG_OUTPUT_KHR);
+			GLES30.glEnable(KHRDebug.GL_DEBUG_OUTPUT_SYNCHRONOUS_KHR);
+		}
 
 		logger.info("Initializing Audio...");
 		PlatformAudio.platformInitialize();
@@ -495,6 +498,11 @@ public class PlatformRuntime {
 		EGL.destroy();
 		glfwDestroyWindow(windowHandle);
 		glfwTerminate();
+	}
+
+	public static void downloadRemoteURIByteArray(String assetPackageURI, boolean forceCache,
+			final Consumer<byte[]> cb) {
+		downloadRemoteURIByteArray(assetPackageURI, cb);
 	}
 
 	public static void downloadRemoteURIByteArray(String assetPackageURI, final Consumer<byte[]> cb) {
@@ -636,8 +644,7 @@ public class PlatformRuntime {
 	private static boolean probablyGLES2(String glVersion) {
 		if (glVersion == null)
 			return false;
-		glVersion = glVersion.toLowerCase();
-		return glVersion.contains("opengl es 2.0") || glVersion.contains("ES 2.0");
+		return glVersion.toLowerCase().contains("opengl es 2.0") || glVersion.contains("ES 2.0");
 	}
 
 	public static long randomSeed() {
@@ -648,6 +655,10 @@ public class PlatformRuntime {
 
 	public static void requestANGLE(EnumPlatformANGLE plaf) {
 		requestedANGLEPlatform = plaf;
+	}
+
+	public static void requestDisableKHRDebug(boolean dis) {
+		requestedDisableKHRDebug = dis;
 	}
 
 	public static void requestGL(int i) {
@@ -699,6 +710,10 @@ public class PlatformRuntime {
 			return;
 		}
 		PlatformRuntime.logger.fatal("Crash report was written to: {}", file2.getAbsolutePath());
+	}
+
+	public static boolean immediateContinueSupported() {
+		return false;
 	}
 
 }

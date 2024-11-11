@@ -62,7 +62,7 @@ public final class HashingInputStream extends FilterInputStream {
 
 	/**
 	 * mark() is not supported for HashingInputStream
-	 * 
+	 *
 	 * @return {@code false} always
 	 */
 	@Override
@@ -98,7 +98,7 @@ public final class HashingInputStream extends FilterInputStream {
 
 	/**
 	 * reset() is not supported for HashingInputStream.
-	 * 
+	 *
 	 * @throws IOException this operation is not supported
 	 */
 	@Override

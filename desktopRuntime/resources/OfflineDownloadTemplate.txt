@@ -3,14 +3,19 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<meta name="description" content="Starlike Client is the ultimate modded Eaglercraft experience, featuring unique blocks, items, mobs, new dimensions, and more. Play now for an unforgettable adventure!" />
-		<meta name="keywords" content="eaglercraft, eaglercraftx, minecraft, 1.8, 1.8.8, starlike, starlike client, modded, modded minecraft, mods" />
+		<meta name="description" content="Starlike Client is the ultimate modded Eaglercraft client, featuring unique blocks, items, and more. Play now!" />
+		<meta name="keywords" content="eaglercraft, eaglercraftx, minecraft, 1.8, 1.8.8, starlike, starlike client, modded, modded minecraft, modded eaglercraft, mods" />
 		<meta property="og:title" content="Starlike Client Offline" />
 		<meta property="og:type" content="website" />
 		<meta property="og:image" content="https://raw.githubusercontent.com/zumbiepig/Starlike/main/logo.png" />
 		<meta property="og:url" content="https://www.starlikeclient.com/" />
-		<meta property="og:description" content="Starlike Client is the ultimate modded Eaglercraft experience, featuring unique blocks, items, mobs, new dimensions, and more. Play now for an unforgettable adventure!" />
+		<meta property="og:description" content="Starlike Client is the ultimate modded Eaglercraft client, featuring unique blocks, items, and more. Play now!" />
 		<meta property="og:locale" content="en_US" />
+		<!-- JSPI Origin Trial for https://starlike.zumbiepig.dev -->
+		<!-- Google Chrome, expires 04/14/2024 -->
+		<meta http-equiv="origin-trial" content="ApMZZkeOq5anKcCzDkNZWXmBTyMhuJJ+/qW8JPeixa1jh+zJwzTRgeM9/m1r6+3EBXKF6OymNQS9HVs3pvGooQAAAABveyJvcmlnaW4iOiJodHRwczovL3N0YXJsaWtlLnp1bWJpZXBpZy5kZXY6NDQzIiwiZmVhdHVyZSI6IldlYkFzc2VtYmx5SlNQcm9taXNlSW50ZWdyYXRpb24iLCJleHBpcnkiOjE3NDQ2NzUyMDB9">
+		<!-- Microsoft Edge, expires 01/19/2024 -->
+		<meta http-equiv="origin-trial" content="A83x3ruakrC8sGtPDOSx42EQEDyX3ty8IzpJyHWHLXgM7pHHiSVrs5FusADaVEyQaXtlQWX7EsFvupAYz9uN68QAAABveyJvcmlnaW4iOiJodHRwczovL3N0YXJsaWtlLnp1bWJpZXBpZy5kZXY6NDQzIiwiZmVhdHVyZSI6IldlYkFzc2VtYmx5SlNQcm9taXNlSW50ZWdyYXRpb24iLCJleHBpcnkiOjE3MzczMTQzMTR9">
 		<title>Starlike Client Offline</title>
 		<link
 			rel="icon"
@@ -55,7 +60,7 @@
 				margin: 0;
 				font-family: Inter;
 				font-size: 3.5vh;
-				color: #fff;
+				color: #ffffff;
 			}
 			.header > h3 > span {
 				color: #f5deb3;
@@ -135,9 +140,10 @@
 				timeoutReference: null,
 			};
 			function playGame() {
-				if (window.location.protocol !== 'file:') {
+				if (!['file:', 'data:', 'blob:'].includes(window.location.protocol)) {
 					alert('This is the offline download, please use the web version for better performance');
-				} else if (document.readyState !== 'complete') {
+				}
+				if (document.readyState !== 'complete') {
 					alert('Please wait for the game to finish loading.');
 				} else {
 					clearTimeout(textData.timeoutReference);
@@ -145,8 +151,8 @@
 					document.body.innerHTML = '';
 					document.head.querySelector('meta[name="viewport"]').setAttribute('content', 'width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0');
 					document.documentElement.removeAttribute('lang');
-					document.documentElement.setAttribute('style', 'width:100%;height:100%;background-color:black;');
-					document.body.setAttribute('style', 'margin:0px;width:100%;height:100%;overflow:hidden;background-color:black;');
+					document.documentElement.setAttribute('style', 'width:100%;height:100%;background-color:#000000;');
+					document.body.setAttribute('style', 'margin:0px;width:100%;height:100%;overflow:hidden;background-color:#000000;');
 					document.body.setAttribute('id', 'game_frame');
 					window.main();
 				}

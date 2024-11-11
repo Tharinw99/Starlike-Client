@@ -54,6 +54,7 @@ final class EmptyContiguousSet<C extends Comparable> extends ContiguousSet<C> {
 		return ImmutableList.of();
 	}
 
+	@Override
 	@GwtIncompatible("NavigableSet")
 	ImmutableSortedSet<C> createDescendingSet() {
 		return new EmptyImmutableSortedSet<C>(Ordering.natural().reverse());

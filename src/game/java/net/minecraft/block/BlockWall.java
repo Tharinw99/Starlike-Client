@@ -23,13 +23,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -41,7 +41,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockWall extends Block {
 	public static enum EnumType implements IStringSerializable {
@@ -80,6 +80,7 @@ public class BlockWall extends Block {
 			return this.meta;
 		}
 
+		@Override
 		public String getName() {
 			return this.name;
 		}
@@ -88,6 +89,7 @@ public class BlockWall extends Block {
 			return this.unlocalizedName;
 		}
 
+		@Override
 		public String toString() {
 			return this.name;
 		}
@@ -126,6 +128,7 @@ public class BlockWall extends Block {
 						: true);
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { UP, NORTH, EAST, WEST, SOUTH, VARIANT });
 	}
@@ -135,6 +138,7 @@ public class BlockWall extends Block {
 	 * when the block gets destroyed. It returns the metadata of the dropped item
 	 * based on the old metadata of the block.
 	 */
+	@Override
 	public int damageDropped(IBlockState iblockstate) {
 		return ((BlockWall.EnumType) iblockstate.getValue(VARIANT)).getMetadata();
 	}
@@ -143,6 +147,7 @@ public class BlockWall extends Block {
 	 * + Get the actual Block state of this Block at the given position. This
 	 * applies properties not visible in the metadata, such as fence connections.
 	 */
+	@Override
 	public IBlockState getActualState(IBlockState iblockstate, IBlockAccess iblockaccess, BlockPos blockpos) {
 		return iblockstate.withProperty(UP, Boolean.valueOf(!iblockaccess.isAirBlock(blockpos.up())))
 				.withProperty(NORTH, Boolean.valueOf(this.canConnectTo(iblockaccess, blockpos.north())))
@@ -151,6 +156,7 @@ public class BlockWall extends Block {
 				.withProperty(WEST, Boolean.valueOf(this.canConnectTo(iblockaccess, blockpos.west())));
 	}
 
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox(World world, BlockPos blockpos, IBlockState iblockstate) {
 		this.setBlockBoundsBasedOnState(world, blockpos);
 		this.maxY = 1.5D;
@@ -160,6 +166,7 @@ public class BlockWall extends Block {
 	/**
 	 * + Gets the localized name of this block. Used for the statistics page.
 	 */
+	@Override
 	public String getLocalizedName() {
 		return StatCollector.translateToLocal(
 				this.getUnlocalizedName() + "." + BlockWall.EnumType.NORMAL.getUnlocalizedName() + ".name");
@@ -168,6 +175,7 @@ public class BlockWall extends Block {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		return ((BlockWall.EnumType) iblockstate.getValue(VARIANT)).getMetadata();
 	}
@@ -175,6 +183,7 @@ public class BlockWall extends Block {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(VARIANT, BlockWall.EnumType.byMetadata(i));
 	}
@@ -183,6 +192,7 @@ public class BlockWall extends Block {
 	 * + returns a list of blocks with the same ID, but different meta (eg: wood
 	 * returns 4 blocks)
 	 */
+	@Override
 	public void getSubBlocks(Item item, CreativeTabs var2, List<ItemStack> list) {
 		BlockWall.EnumType[] types = BlockWall.EnumType.META_LOOKUP;
 		for (int i = 0; i < types.length; ++i) {
@@ -191,6 +201,7 @@ public class BlockWall extends Block {
 
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -199,14 +210,17 @@ public class BlockWall extends Block {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
 
+	@Override
 	public boolean isPassable(IBlockAccess var1, BlockPos var2) {
 		return false;
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
 		boolean flag = this.canConnectTo(iblockaccess, blockpos.north());
 		boolean flag1 = this.canConnectTo(iblockaccess, blockpos.south());
@@ -246,6 +260,7 @@ public class BlockWall extends Block {
 		this.setBlockBounds(f, 0.0F, f2, f1, f4, f3);
 	}
 
+	@Override
 	public boolean shouldSideBeRendered(IBlockAccess iblockaccess, BlockPos blockpos, EnumFacing enumfacing) {
 		return enumfacing == EnumFacing.DOWN ? super.shouldSideBeRendered(iblockaccess, blockpos, enumfacing) : true;
 	}

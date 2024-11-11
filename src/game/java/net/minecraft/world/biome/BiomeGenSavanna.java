@@ -14,13 +14,13 @@ import net.minecraft.world.gen.feature.WorldGenSavannaTree;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -32,7 +32,7 @@ import net.minecraft.world.gen.feature.WorldGenSavannaTree;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BiomeGenSavanna extends BiomeGenBase {
 
@@ -44,10 +44,12 @@ public class BiomeGenSavanna extends BiomeGenBase {
 			this.theBiomeDecorator.grassPerChunk = 5;
 		}
 
+		@Override
 		public void decorate(World world, EaglercraftRandom random, BlockPos blockpos) {
 			this.theBiomeDecorator.decorate(world, random, this, blockpos);
 		}
 
+		@Override
 		public void genTerrainBlocks(World world, EaglercraftRandom random, ChunkPrimer chunkprimer, int i, int j,
 				double d0) {
 			this.topBlock = Blocks.grass.getDefaultState();
@@ -74,6 +76,7 @@ public class BiomeGenSavanna extends BiomeGenBase {
 		this.theBiomeDecorator.grassPerChunk = 20;
 	}
 
+	@Override
 	protected BiomeGenBase createMutatedBiome(int i) {
 		BiomeGenSavanna.Mutated biomegensavanna$mutated = new BiomeGenSavanna.Mutated(i, this);
 		biomegensavanna$mutated.temperature = (this.temperature + 1.0F) * 0.5F;
@@ -82,6 +85,7 @@ public class BiomeGenSavanna extends BiomeGenBase {
 		return biomegensavanna$mutated;
 	}
 
+	@Override
 	public void decorate(World world, EaglercraftRandom random, BlockPos blockpos) {
 		DOUBLE_PLANT_GENERATOR.setPlantType(BlockDoublePlant.EnumPlantType.GRASS);
 
@@ -95,6 +99,7 @@ public class BiomeGenSavanna extends BiomeGenBase {
 		super.decorate(world, random, blockpos);
 	}
 
+	@Override
 	public WorldGenAbstractTree genBigTreeChance(EaglercraftRandom random) {
 		return (WorldGenAbstractTree) (random.nextInt(5) > 0 ? field_150627_aC : this.worldGeneratorTrees);
 	}

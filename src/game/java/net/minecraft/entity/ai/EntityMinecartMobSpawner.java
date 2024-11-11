@@ -11,13 +11,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,21 +29,24 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityMinecartMobSpawner extends EntityMinecart {
 	/**
 	 * + Mob spawner logic for this spawner minecart.
 	 */
 	private final MobSpawnerBaseLogic mobSpawnerLogic = new MobSpawnerBaseLogic() {
+		@Override
 		public void func_98267_a(int i) {
 			EntityMinecartMobSpawner.this.worldObj.setEntityState(EntityMinecartMobSpawner.this, (byte) i);
 		}
 
+		@Override
 		public BlockPos getSpawnerPosition() {
 			return new BlockPos(EntityMinecartMobSpawner.this);
 		}
 
+		@Override
 		public World getSpawnerWorld() {
 			return EntityMinecartMobSpawner.this.worldObj;
 		}
@@ -61,14 +64,17 @@ public class EntityMinecartMobSpawner extends EntityMinecart {
 		return this.mobSpawnerLogic;
 	}
 
+	@Override
 	public IBlockState getDefaultDisplayTile() {
 		return Blocks.mob_spawner.getDefaultState();
 	}
 
+	@Override
 	public EntityMinecart.EnumMinecartType getMinecartType() {
 		return EntityMinecart.EnumMinecartType.SPAWNER;
 	}
 
+	@Override
 	public void handleStatusUpdate(byte b0) {
 		this.mobSpawnerLogic.setDelayToMin(b0);
 	}
@@ -76,6 +82,7 @@ public class EntityMinecartMobSpawner extends EntityMinecart {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		super.onUpdate();
 		this.mobSpawnerLogic.updateSpawner();
@@ -84,6 +91,7 @@ public class EntityMinecartMobSpawner extends EntityMinecart {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	protected void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		this.mobSpawnerLogic.readFromNBT(nbttagcompound);
@@ -92,6 +100,7 @@ public class EntityMinecartMobSpawner extends EntityMinecart {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	protected void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		this.mobSpawnerLogic.writeToNBT(nbttagcompound);

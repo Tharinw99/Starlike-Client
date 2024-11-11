@@ -579,7 +579,7 @@ public final class ByteBufUtil {
 	 * Encode a {@link CharSequence} in
 	 * <a href="http://en.wikipedia.org/wiki/UTF-8">UTF-8</a> and write it to a
 	 * {@link ByteBuf} allocated with {@code alloc}.
-	 * 
+	 *
 	 * @param alloc The allocator used to allocate a new {@link ByteBuf}.
 	 * @param seq   The characters to write into a buffer.
 	 * @return The {@link ByteBuf} which contains the

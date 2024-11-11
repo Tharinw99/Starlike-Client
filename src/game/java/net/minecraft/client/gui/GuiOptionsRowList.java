@@ -11,13 +11,13 @@ import net.minecraft.client.settings.GameSettings;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,7 +29,7 @@ import net.minecraft.client.settings.GameSettings;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiOptionsRowList extends GuiListExtended {
 	public static class Row implements GuiListExtended.IGuiListEntry {
@@ -42,6 +42,7 @@ public class GuiOptionsRowList extends GuiListExtended {
 			this.field_148324_c = parGuiButton2;
 		}
 
+		@Override
 		public void drawEntry(int var1, int var2, int i, int var4, int var5, int j, int k, boolean var8) {
 			if (this.field_148323_b != null) {
 				this.field_148323_b.yPosition = i;
@@ -55,6 +56,7 @@ public class GuiOptionsRowList extends GuiListExtended {
 
 		}
 
+		@Override
 		public boolean mousePressed(int var1, int i, int j, int var4, int var5, int var6) {
 			if (var4 != 0 && var4 != 12345)
 				return false;
@@ -85,6 +87,7 @@ public class GuiOptionsRowList extends GuiListExtended {
 			}
 		}
 
+		@Override
 		public void mouseReleased(int var1, int i, int j, int var4, int var5, int var6) {
 			if (var4 != 0 && var4 != 12345)
 				return;
@@ -101,6 +104,7 @@ public class GuiOptionsRowList extends GuiListExtended {
 
 		}
 
+		@Override
 		public void setSelected(int var1, int var2, int var3) {
 		}
 	}
@@ -159,6 +163,7 @@ public class GuiOptionsRowList extends GuiListExtended {
 	/**
 	 * + Gets the IGuiListEntry object for the given index
 	 */
+	@Override
 	public GuiOptionsRowList.Row getListEntry(int i) {
 		return (GuiOptionsRowList.Row) this.field_148184_k.get(i);
 	}
@@ -166,14 +171,17 @@ public class GuiOptionsRowList extends GuiListExtended {
 	/**
 	 * + Gets the width of the list
 	 */
+	@Override
 	public int getListWidth() {
 		return 400;
 	}
 
+	@Override
 	protected int getScrollBarX() {
 		return super.getScrollBarX() + 32;
 	}
 
+	@Override
 	protected int getSize() {
 		return this.field_148184_k.size();
 	}

@@ -45,7 +45,7 @@ public abstract class ImmutableBiMap<K, V> extends ImmutableMap<K, V> implements
 	/**
 	 * A builder for creating immutable bimap instances, especially {@code public
 	 * static final} bimaps ("constant bimaps"). Example:
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 * 	&#64;code

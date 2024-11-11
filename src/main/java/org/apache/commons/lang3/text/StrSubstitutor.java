@@ -37,7 +37,7 @@ import org.apache.commons.lang3.StringUtils;
  * <p>
  * The simplest example is to use this class to replace Java System properties.
  * For example:
- * 
+ *
  * <pre>
  * StrSubstitutor
  * 		.replaceSystemProperties("You are running with java.version = ${java.version} and os.name = ${os.name}.");
@@ -51,7 +51,7 @@ import org.apache.commons.lang3.StringUtils;
  * for interpolation. In the returned text all variable references (as long as
  * their values are known) will be resolved. The following example demonstrates
  * this:
- * 
+ *
  * <pre>
  * Map valuesMap = HashMap();
  * valuesMap.put(&quot;animal&quot;, &quot;quick brown fox&quot;);
@@ -60,9 +60,9 @@ import org.apache.commons.lang3.StringUtils;
  * StrSubstitutor sub = new StrSubstitutor(valuesMap);
  * String resolvedString = sub.replace(templateString);
  * </pre>
- * 
+ *
  * yielding:
- * 
+ *
  * <pre>
  *      The quick brown fox jumps over the lazy dog.
  * </pre>
@@ -76,7 +76,7 @@ import org.apache.commons.lang3.StringUtils;
  * {@link #setValueDelimiterMatcher(StrMatcher)},
  * {@link #setValueDelimiter(char)} or {@link #setValueDelimiter(String)}. The
  * following shows an example with variable default value settings:
- * 
+ *
  * <pre>
  * Map valuesMap = HashMap();
  * valuesMap.put(&quot;animal&quot;, &quot;quick brown fox&quot;);
@@ -85,9 +85,9 @@ import org.apache.commons.lang3.StringUtils;
  * StrSubstitutor sub = new StrSubstitutor(valuesMap);
  * String resolvedString = sub.replace(templateString);
  * </pre>
- * 
+ *
  * yielding:
- * 
+ *
  * <pre>
  *      The quick brown fox jumps over the lazy dog. 1234567890.
  * </pre>
@@ -104,36 +104,36 @@ import org.apache.commons.lang3.StringUtils;
  * <p>
  * Sometimes the interpolation's result must contain a variable prefix. As an
  * example take the following source text:
- * 
+ *
  * <pre>
  *   The variable ${${name}} must be used.
  * </pre>
- * 
+ *
  * Here only the variable's name referred to in the text should be replaced
  * resulting in the text (assuming that the value of the {@code name} variable
  * is {@code x}):
- * 
+ *
  * <pre>
  *   The variable ${x} must be used.
  * </pre>
- * 
+ *
  * To achieve this effect there are two possibilities: Either set a different
  * prefix and suffix for variables which do not conflict with the result text
  * you want to produce. The other possibility is to use the escape character, by
  * default '$'. If this character is placed before a variable reference, this
  * reference is ignored and won't be replaced. For example:
- * 
+ *
  * <pre>
  *   The variable $${${name}} must be used.
  * </pre>
  * <p>
  * In some complex scenarios you might even want to perform substitution in the
  * names of variables, for instance
- * 
+ *
  * <pre>
  * ${jre-${java.specification.version}}
  * </pre>
- * 
+ *
  * {@code StrSubstitutor} supports this recursive substitution in variable
  * names, but it has to be enabled explicitly by setting the
  * {@link #setEnableSubstitutionInVariables(boolean)
@@ -164,7 +164,7 @@ public class StrSubstitutor {
 	public static final StrMatcher DEFAULT_SUFFIX = StrMatcher.stringMatcher("}");
 	/**
 	 * Constant for the default value delimiter of a variable.
-	 * 
+	 *
 	 * @since 3.2
 	 */
 	public static final StrMatcher DEFAULT_VALUE_DELIMITER = StrMatcher.stringMatcher(":-");

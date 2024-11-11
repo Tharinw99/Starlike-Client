@@ -234,7 +234,7 @@ class RegularImmutableBiMap<K, V> extends ImmutableBiMap<K, V> {
 	 * Constructor for RegularImmutableBiMap that takes as input an array of
 	 * {@code TerminalEntry} entries. Assumes that these entries have already been
 	 * checked for null.
-	 * 
+	 *
 	 * <p>
 	 * This allows reuse of the entry objects from the array in the actual
 	 * implementation.

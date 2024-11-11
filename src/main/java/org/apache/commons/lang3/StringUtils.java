@@ -119,7 +119,7 @@ import net.lax1dude.eaglercraft.v1_8.HString;
  * <p>
  * #ThreadSafe#
  * </p>
- * 
+ *
  * @see java.lang.String
  * @since 1.0
  */
@@ -153,7 +153,7 @@ public class StringUtils {
 
 	/**
 	 * The empty String {@code ""}.
-	 * 
+	 *
 	 * @since 2.0
 	 */
 	public static final String EMPTY = "";
@@ -180,7 +180,7 @@ public class StringUtils {
 
 	/**
 	 * Represents a failed index search.
-	 * 
+	 *
 	 * @since 2.1
 	 */
 	public static final int INDEX_NOT_FOUND = -1;
@@ -775,11 +775,11 @@ public class StringUtils {
 	 * This is a {@code null} safe version of :
 	 * </p>
 	 * <blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * str1.compareTo(str2)
 	 * </pre>
-	 * 
+	 *
 	 * </blockquote>
 	 *
 	 * <p>
@@ -826,11 +826,11 @@ public class StringUtils {
 	 * This is a {@code null} safe version of :
 	 * </p>
 	 * <blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * str1.compareTo(str2)
 	 * </pre>
-	 * 
+	 *
 	 * </blockquote>
 	 *
 	 * <p>
@@ -889,11 +889,11 @@ public class StringUtils {
 	 * This is a {@code null} safe version of :
 	 * </p>
 	 * <blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * str1.compareToIgnoreCase(str2)
 	 * </pre>
-	 * 
+	 *
 	 * </blockquote>
 	 *
 	 * <p>
@@ -942,11 +942,11 @@ public class StringUtils {
 	 * This is a {@code null} safe version of :
 	 * </p>
 	 * <blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * str1.compareToIgnoreCase(str2)
 	 * </pre>
-	 * 
+	 *
 	 * </blockquote>
 	 *
 	 * <p>
@@ -1603,7 +1603,7 @@ public class StringUtils {
 	 * StringUtils.defaultIfBlank("bat", "NULL") = "bat"
 	 * StringUtils.defaultIfBlank("", null)      = null
 	 * </pre>
-	 * 
+	 *
 	 * @param <T>        the specific kind of CharSequence
 	 * @param str        the CharSequence to check, may be null
 	 * @param defaultStr the default CharSequence to return if the input is
@@ -1628,7 +1628,7 @@ public class StringUtils {
 	 * StringUtils.defaultIfEmpty("bat", "NULL") = "bat"
 	 * StringUtils.defaultIfEmpty("", null)      = null
 	 * </pre>
-	 * 
+	 *
 	 * @param <T>        the specific kind of CharSequence
 	 * @param str        the CharSequence to check, may be null
 	 * @param defaultStr the default CharSequence to return if the input is empty
@@ -2380,7 +2380,7 @@ public class StringUtils {
 	 * StringUtils.getIfBlank("", null)             = null
 	 * }
 	 * </pre>
-	 * 
+	 *
 	 * @param <T>             the specific kind of CharSequence
 	 * @param str             the CharSequence to check, may be null
 	 * @param defaultSupplier the supplier of default CharSequence to return if the
@@ -2415,7 +2415,7 @@ public class StringUtils {
 	 * StringUtils.getIfEmpty("", null)              = null
 	 * }
 	 * </pre>
-	 * 
+	 *
 	 * @param <T>             the specific kind of CharSequence
 	 * @param str             the CharSequence to check, may be null
 	 * @param defaultSupplier the supplier of default CharSequence to return if the
@@ -2649,33 +2649,33 @@ public class StringUtils {
 		 * of the cost table. It is also possible to use this to compute the unbounded
 		 * Levenshtein distance by starting the threshold at 1 and doubling each time
 		 * until the distance is found; this is O(dm), where d is the distance.
-		 * 
+		 *
 		 * One subtlety comes from needing to ignore entries on the border of our stripe
 		 * eg. p[] = |#|#|#|* d[] = *|#|#|#| We must ignore the entry to the left of the
 		 * leftmost member We must ignore the entry above the rightmost member
-		 * 
+		 *
 		 * Another subtlety comes from our stripe running off the matrix if the strings
 		 * aren't of the same size. Since string s is always swapped to be the shorter
 		 * of the two, the stripe will always run off to the upper right instead of the
 		 * lower left of the matrix.
-		 * 
+		 *
 		 * As a concrete example, suppose s is of length 5, t is of length 7, and our
 		 * threshold is 1. In this case we're going to walk a stripe of length 3. The
 		 * matrix would look like so:
-		 * 
+		 *
 		 * 1 2 3 4 5 1 |#|#| | | | 2 |#|#|#| | | 3 | |#|#|#| | 4 | | |#|#|#| 5 | | |
 		 * |#|#| 6 | | | | |#| 7 | | | | | |
-		 * 
+		 *
 		 * Note how the stripe leads off the table as there is no possible way to turn a
 		 * string of length 5 into one of length 7 in edit distance of 1.
-		 * 
+		 *
 		 * Additionally, this implementation decreases memory usage by using two
 		 * single-dimensional arrays and swapping them back and forth instead of
 		 * allocating an entire n by m matrix. This requires a few minor changes, such
 		 * as immediately returning when it's detected that the stripe has run off the
 		 * matrix and initially filling the arrays with large values so that entries we
 		 * don't compute are ignored.
-		 * 
+		 *
 		 * See Algorithms on Strings, Trees and Sequences by Dan Gusfield for some
 		 * discussion.
 		 */
@@ -2850,18 +2850,18 @@ public class StringUtils {
 	 * then the index (in Unicode code units) of the first such occurrence is
 	 * returned. For values of {@code searchChar} in the range from 0 to 0xFFFF
 	 * (inclusive), this is the smallest value <i>k</i> such that: <blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * this.charAt(<i>k</i>) == searchChar
 	 * </pre>
-	 * 
+	 *
 	 * </blockquote> is true. For other values of {@code searchChar}, it is the
 	 * smallest value <i>k</i> such that: <blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * this.codePointAt(<i>k</i>) == searchChar
 	 * </pre>
-	 * 
+	 *
 	 * </blockquote> is true. In either case, if no such character occurs in
 	 * {@code seq}, then {@code INDEX_NOT_FOUND (-1)} is returned.
 	 *
@@ -2904,18 +2904,18 @@ public class StringUtils {
 	 * smaller than {@code startPos}, then the index of the first such occurrence is
 	 * returned. For values of {@code searchChar} in the range from 0 to 0xFFFF
 	 * (inclusive), this is the smallest value <i>k</i> such that: <blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * (this.charAt(<i>k</i>) == searchChar) &amp;&amp; (<i>k</i> &gt;= startPos)
 	 * </pre>
-	 * 
+	 *
 	 * </blockquote> is true. For other values of {@code searchChar}, it is the
 	 * smallest value <i>k</i> such that: <blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * (this.codePointAt(<i>k</i>) == searchChar) &amp;&amp; (<i>k</i> &gt;= startPos)
 	 * </pre>
-	 * 
+	 *
 	 * </blockquote> is true. In either case, if no such character occurs in
 	 * {@code seq} at or after position {@code startPos}, then {@code -1} is
 	 * returned.
@@ -3124,7 +3124,7 @@ public class StringUtils {
 	 * StringUtils.indexOfAnyBut("zzabyycdxx", new char[] {'z', 'a'} ) = 3
 	 * StringUtils.indexOfAnyBut("aba", new char[] {'z'} )             = 0
 	 * StringUtils.indexOfAnyBut("aba", new char[] {'a', 'b'} )        = -1
-	 * 
+	 *
 	 * </pre>
 	 *
 	 * @param cs          the CharSequence to check, may be null
@@ -5344,18 +5344,18 @@ public class StringUtils {
 	 * character. For values of {@code searchChar} in the range from 0 to 0xFFFF
 	 * (inclusive), the index (in Unicode code units) returned is the largest value
 	 * <i>k</i> such that: <blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * this.charAt(<i>k</i>) == searchChar
 	 * </pre>
-	 * 
+	 *
 	 * </blockquote> is true. For other values of {@code searchChar}, it is the
 	 * largest value <i>k</i> such that: <blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * this.codePointAt(<i>k</i>) == searchChar
 	 * </pre>
-	 * 
+	 *
 	 * </blockquote> is true. In either case, if no such character occurs in this
 	 * string, then {@code -1} is returned. Furthermore, a {@code null} or empty
 	 * ("") {@code CharSequence} will return {@code -1}. The {@code seq}
@@ -5391,18 +5391,18 @@ public class StringUtils {
 	 * character, searching backward starting at the specified index. For values of
 	 * {@code searchChar} in the range from 0 to 0xFFFF (inclusive), the index
 	 * returned is the largest value <i>k</i> such that: <blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * (this.charAt(<i>k</i>) == searchChar) &amp;&amp; (<i>k</i> &lt;= startPos)
 	 * </pre>
-	 * 
+	 *
 	 * </blockquote> is true. For other values of {@code searchChar}, it is the
 	 * largest value <i>k</i> such that: <blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * (this.codePointAt(<i>k</i>) == searchChar) &amp;&amp; (<i>k</i> &lt;= startPos)
 	 * </pre>
-	 * 
+	 *
 	 * </blockquote> is true. In either case, if no such character occurs in
 	 * {@code seq} at or before position {@code startPos}, then {@code -1} is
 	 * returned. Furthermore, a {@code null} or empty ("") {@code CharSequence} will
@@ -6079,7 +6079,7 @@ public class StringUtils {
 	 * <p>
 	 * Matches may overlap:
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * StringUtils.ordinalIndexOf("ababab", "aba", 1)   = 0
 	 * StringUtils.ordinalIndexOf("ababab", "aba", 2)   = 2
@@ -6263,7 +6263,7 @@ public class StringUtils {
 	 * <p>
 	 * With additional prefixes,
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * StringUtils.prependIfMissing(null, null, null) = null
 	 * StringUtils.prependIfMissing("abc", null, null) = "abc"
@@ -6304,7 +6304,7 @@ public class StringUtils {
 	 * <p>
 	 * With additional prefixes,
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * StringUtils.prependIfMissingIgnoreCase(null, null, null) = null
 	 * StringUtils.prependIfMissingIgnoreCase("abc", null, null) = "abc"
@@ -8080,7 +8080,7 @@ public class StringUtils {
 	 * Splits a String by Character type as returned by
 	 * {@code java.lang.Character.getType(char)}. Groups of contiguous characters of
 	 * the same type are returned as complete tokens.
-	 * 
+	 *
 	 * <pre>
 	 * StringUtils.splitByCharacterType(null)         = null
 	 * StringUtils.splitByCharacterType("")           = []
@@ -8092,7 +8092,7 @@ public class StringUtils {
 	 * StringUtils.splitByCharacterType("foo200Bar")  = ["foo", "200", "B", "ar"]
 	 * StringUtils.splitByCharacterType("ASFRules")   = ["ASFR", "ules"]
 	 * </pre>
-	 * 
+	 *
 	 * @param str the String to split, may be {@code null}
 	 * @return an array of parsed Strings, {@code null} if null String input
 	 * @since 2.4
@@ -8111,7 +8111,7 @@ public class StringUtils {
 	 * type {@code Character.LOWERCASE_LETTER} will belong to the following token
 	 * rather than to the preceding, if any, {@code Character.UPPERCASE_LETTER}
 	 * token.
-	 * 
+	 *
 	 * @param str       the String to split, may be {@code null}
 	 * @param camelCase whether to use so-called "camel-case" for letter types
 	 * @return an array of parsed Strings, {@code null} if null String input
@@ -8158,7 +8158,7 @@ public class StringUtils {
 	 * preceding a token of type {@code Character.LOWERCASE_LETTER} will belong to
 	 * the following token rather than to the preceding, if any,
 	 * {@code Character.UPPERCASE_LETTER} token.
-	 * 
+	 *
 	 * <pre>
 	 * StringUtils.splitByCharacterTypeCamelCase(null)         = null
 	 * StringUtils.splitByCharacterTypeCamelCase("")           = []
@@ -8170,7 +8170,7 @@ public class StringUtils {
 	 * StringUtils.splitByCharacterTypeCamelCase("foo200Bar")  = ["foo", "200", "Bar"]
 	 * StringUtils.splitByCharacterTypeCamelCase("ASFRules")   = ["ASF", "Rules"]
 	 * </pre>
-	 * 
+	 *
 	 * @param str the String to split, may be {@code null}
 	 * @return an array of parsed Strings, {@code null} if null String input
 	 * @since 2.4

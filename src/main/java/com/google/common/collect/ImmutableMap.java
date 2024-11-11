@@ -67,7 +67,7 @@ public abstract class ImmutableMap<K, V> implements Map<K, V>, Serializable {
 	/**
 	 * A builder for creating immutable map instances, especially {@code public
 	 * static final} maps ("constant maps"). Example:
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 * 	&#64;code

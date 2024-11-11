@@ -54,17 +54,18 @@ import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ResourceLocation;
+import net.starlikeclient.StarlikeClient;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -76,7 +77,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class GuiScreen extends Gui implements GuiYesNoCallback {
 	private static final Logger LOGGER = LogManager.getLogger();
@@ -194,6 +195,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback {
 		return true;
 	}
 
+	@Override
 	public void confirmClicked(boolean flag, int i) {
 		if (i == 31102009) {
 			if (flag) {
@@ -219,6 +221,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback {
 	 */
 	public void drawBackground(int tint) {
 		GlStateManager.disableLighting();
+
 		GlStateManager.disableFog();
 		Tessellator tessellator = Tessellator.getInstance();
 		WorldRenderer worldrenderer = tessellator.getWorldRenderer();
@@ -340,6 +343,13 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback {
 	 * renderPartialTicks
 	 */
 	public void drawScreen(int i, int j, float var3) {
+		if (StarlikeClient.Config.General.isDevBuild) {
+			drawRect(0, 0, this.width, 12, 0xAAFFFF00);
+			fontRendererObj.drawStringWithShadow(StarlikeClient.Config.General.devBuildWarning,
+					(this.width - fontRendererObj.getStringWidth(StarlikeClient.Config.General.devBuildWarning)) / 2, 2,
+					0xFFFFFF);
+		}
+
 		for (int k = 0, l = this.buttonList.size(); k < l; ++k) {
 			((GuiButton) this.buttonList.get(k)).drawButton(this.mc, i, j);
 		}
@@ -350,7 +360,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback {
 
 		long millis = EagRuntime.steadyTimeMillis();
 		long closeKeyTimeout = millis - showingCloseKey;
-		if (closeKeyTimeout < 3000l) {
+		if (closeKeyTimeout < 3000l && showingCloseKey != 0l) {
 			int alpha1 = 0xC0000000;
 			int alpha2 = 0xFF000000;
 			if (closeKeyTimeout > 2500l) {
@@ -687,10 +697,11 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback {
 			}
 			i = applyEaglerScale(scaleFac, i * this.width / this.mc.displayWidth, this.width);
 			j = applyEaglerScale(scaleFac, this.height - j * this.height / this.mc.displayHeight - 1, this.height);
-			float si = Touch.getEventTouchRadiusX(t) * this.width / this.mc.displayWidth / scaleFac;
+			float rad = Touch.getEventTouchRadiusMixed(t);
+			float si = rad * this.width / this.mc.displayWidth / scaleFac;
 			if (si < 1.0f)
 				si = 1.0f;
-			float sj = Touch.getEventTouchRadiusY(t) * this.height / this.mc.displayHeight / scaleFac;
+			float sj = rad * this.height / this.mc.displayHeight / scaleFac;
 			if (sj < 1.0f)
 				sj = 1.0f;
 			int[] ck = touchStarts.remove(u);

@@ -45,7 +45,7 @@ import com.google.common.annotations.GwtIncompatible;
  *
  * <p>
  * For example, this expression:
- * 
+ *
  * <pre>
  *    {@code
  *
@@ -59,7 +59,7 @@ import com.google.common.annotations.GwtIncompatible;
  * <p>
  * By default, {@code Splitter}'s behavior is simplistic and unassuming. The
  * following expression:
- * 
+ *
  * <pre>
  *    {@code
  *
@@ -70,7 +70,7 @@ import com.google.common.annotations.GwtIncompatible;
  * ... yields the substrings {@code [" foo", "", "", "  bar ", ""]}. If this is
  * not the desired behavior, use configuration methods to obtain a <i>new</i>
  * splitter instance with modified behavior:
- * 
+ *
  * <pre>
  * {
  * 	&#64;code
@@ -88,7 +88,7 @@ import com.google.common.annotations.GwtIncompatible;
  * <b>Warning:</b> Splitter instances are immutable. Invoking a configuration
  * method has no effect on the receiving instance; you must store and use the
  * new splitter instance it returns instead.
- * 
+ *
  * <pre>
  * {
  * 	&#64;code

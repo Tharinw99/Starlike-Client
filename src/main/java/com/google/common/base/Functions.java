@@ -33,7 +33,7 @@ import com.google.common.annotations.GwtCompatible;
  * <p>
  * All methods return serializable functions as long as they're given
  * serializable parameters.
- * 
+ *
  * <p>
  * See the Guava User Guide article on <a href=
  * "http://code.google.com/p/guava-libraries/wiki/FunctionalExplained">the use
@@ -366,7 +366,7 @@ public final class Functions {
 	 * Returns a function that always returns the result of invoking
 	 * {@link Supplier#get} on {@code
 	 * supplier}, regardless of its input.
-	 * 
+	 *
 	 * @since 10.0
 	 */
 	@Beta

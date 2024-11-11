@@ -21,13 +21,13 @@ import net.minecraft.util.ITickable;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -39,7 +39,7 @@ import net.minecraft.util.ITickable;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class TileEntityChest extends TileEntityLockable implements ITickable, IInventory {
 	private ItemStack[] chestContents = new ItemStack[27];
@@ -77,6 +77,7 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
 		}
 	}
 
+	@Override
 	public void clear() {
 		for (int i = 0; i < this.chestContents.length; ++i) {
 			this.chestContents[i] = null;
@@ -84,6 +85,7 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
 
 	}
 
+	@Override
 	public void closeInventory(EntityPlayer entityplayer) {
 		if (!entityplayer.isSpectator() && this.getBlockType() instanceof BlockChest) {
 			--this.numPlayersUsing;
@@ -94,6 +96,7 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
 
 	}
 
+	@Override
 	public Container createContainer(InventoryPlayer inventoryplayer, EntityPlayer entityplayer) {
 		return new ContainerChest(inventoryplayer, this, entityplayer);
 	}
@@ -102,6 +105,7 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
 	 * + Removes up to a specified number of items from an inventory slot and
 	 * returns them in a new stack.
 	 */
+	@Override
 	public ItemStack decrStackSize(int i, int j) {
 		if (this.chestContents[i] != null) {
 			if (this.chestContents[i].stackSize <= j) {
@@ -178,14 +182,17 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
 		return this.cachedChestType;
 	}
 
+	@Override
 	public int getField(int var1) {
 		return 0;
 	}
 
+	@Override
 	public int getFieldCount() {
 		return 0;
 	}
 
+	@Override
 	public String getGuiID() {
 		return "minecraft:chest";
 	}
@@ -194,6 +201,7 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
 	 * + Returns the maximum stack size for a inventory slot. Seems to always be 64,
 	 * possibly will be extended.
 	 */
+	@Override
 	public int getInventoryStackLimit() {
 		return 64;
 	}
@@ -202,6 +210,7 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
 	 * + Gets the name of this command sender (usually username, but possibly
 	 * "Rcon")
 	 */
+	@Override
 	public String getName() {
 		return this.hasCustomName() ? this.customName : "container.chest";
 	}
@@ -209,6 +218,7 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
 	/**
 	 * + Returns the number of slots in the inventory.
 	 */
+	@Override
 	public int getSizeInventory() {
 		return 27;
 	}
@@ -216,6 +226,7 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
 	/**
 	 * + Returns the stack in the given slot.
 	 */
+	@Override
 	public ItemStack getStackInSlot(int i) {
 		return this.chestContents[i];
 	}
@@ -223,6 +234,7 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
 	/**
 	 * + Returns true if this thing is named
 	 */
+	@Override
 	public boolean hasCustomName() {
 		return this.customName != null && this.customName.length() > 0;
 	}
@@ -230,6 +242,7 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
 	/**
 	 * + invalidates a tile entity
 	 */
+	@Override
 	public void invalidate() {
 		super.invalidate();
 		this.updateContainingBlockInfo();
@@ -249,6 +262,7 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
 	 * + Returns true if automation is allowed to insert the given stack (ignoring
 	 * stack size) into the given slot.
 	 */
+	@Override
 	public boolean isItemValidForSlot(int var1, ItemStack var2) {
 		return true;
 	}
@@ -257,12 +271,14 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
 	 * + Do not make give this method the name canInteractWith because it clashes
 	 * with Container
 	 */
+	@Override
 	public boolean isUseableByPlayer(EntityPlayer entityplayer) {
 		return this.worldObj.getTileEntity(this.pos) != this ? false
 				: entityplayer.getDistanceSq((double) this.pos.getX() + 0.5D, (double) this.pos.getY() + 0.5D,
 						(double) this.pos.getZ() + 0.5D) <= 64.0D;
 	}
 
+	@Override
 	public void openInventory(EntityPlayer entityplayer) {
 		if (!entityplayer.isSpectator()) {
 			if (this.numPlayersUsing < 0) {
@@ -277,6 +293,7 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
 
 	}
 
+	@Override
 	public void readFromNBT(NBTTagCompound nbttagcompound) {
 		super.readFromNBT(nbttagcompound);
 		NBTTagList nbttaglist = nbttagcompound.getTagList("Items", 10);
@@ -295,6 +312,7 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
 
 	}
 
+	@Override
 	public boolean receiveClientEvent(int i, int j) {
 		if (i == 1) {
 			this.numPlayersUsing = j;
@@ -307,6 +325,7 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
 	/**
 	 * + Removes a stack from the given slot and returns it.
 	 */
+	@Override
 	public ItemStack removeStackFromSlot(int i) {
 		if (this.chestContents[i] != null) {
 			ItemStack itemstack = this.chestContents[i];
@@ -321,6 +340,7 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
 		this.customName = name;
 	}
 
+	@Override
 	public void setField(int var1, int var2) {
 	}
 
@@ -328,6 +348,7 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
 	 * + Sets the given item stack to the specified slot in the inventory (can be
 	 * crafting or armor sections).
 	 */
+	@Override
 	public void setInventorySlotContents(int i, ItemStack itemstack) {
 		this.chestContents[i] = itemstack;
 		if (itemstack != null && itemstack.stackSize > this.getInventoryStackLimit()) {
@@ -340,6 +361,7 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
 	/**
 	 * + Like the old updateEntity(), except more generic.
 	 */
+	@Override
 	public void update() {
 		this.checkForAdjacentChests();
 		int i = this.pos.getX();
@@ -419,11 +441,13 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
 
 	}
 
+	@Override
 	public void updateContainingBlockInfo() {
 		super.updateContainingBlockInfo();
 		this.adjacentChestChecked = false;
 	}
 
+	@Override
 	public void writeToNBT(NBTTagCompound nbttagcompound) {
 		super.writeToNBT(nbttagcompound);
 		NBTTagList nbttaglist = new NBTTagList();

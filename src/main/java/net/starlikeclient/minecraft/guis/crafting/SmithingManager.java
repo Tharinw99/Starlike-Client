@@ -20,8 +20,9 @@ public class SmithingManager {
 	}
 
 	public void addSmithingRecipe(ItemStack input, ItemStack output) {
-		if (getSmithingResult(input) != null)
+		if (getSmithingResult(input) != null) {
 			return;
+		}
 		smithingList.put(input, output);
 	}
 

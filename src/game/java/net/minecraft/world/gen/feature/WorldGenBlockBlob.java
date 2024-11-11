@@ -9,13 +9,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class WorldGenBlockBlob extends WorldGenerator {
 	private final Block field_150545_a;
@@ -39,6 +39,7 @@ public class WorldGenBlockBlob extends WorldGenerator {
 		this.field_150544_b = parInt1;
 	}
 
+	@Override
 	public boolean generate(World world, EaglercraftRandom random, BlockPos blockpos) {
 		while (true) {
 			label0: {
@@ -65,7 +66,8 @@ public class WorldGenBlockBlob extends WorldGenerator {
 					int l = i1 + random.nextInt(2);
 					float f = (float) (j + k + l) * 0.333F + 0.5F;
 
-					for (BlockPos blockpos1 : BlockPos.getAllInBox(blockpos.add(-j, -k, -l), blockpos.add(j, k, l))) {
+					for (BlockPos blockpos1 : BlockPos.getAllInBoxMutable(blockpos.add(-j, -k, -l),
+							blockpos.add(j, k, l))) {
 						if (blockpos1.distanceSq(blockpos) <= (double) (f * f)) {
 							world.setBlockState(blockpos1, this.field_150545_a.getDefaultState(), 4);
 						}

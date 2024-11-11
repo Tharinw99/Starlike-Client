@@ -6,10 +6,11 @@ import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiScreenServerList;
 import net.minecraft.client.resources.I18n;
+import net.starlikeclient.StarlikeClient;
 
 /**
  * Copyright (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -21,7 +22,7 @@ import net.minecraft.client.resources.I18n;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiScreenConnectOption extends GuiScreen {
 
@@ -36,6 +37,7 @@ public class GuiScreenConnectOption extends GuiScreen {
 		this.relaysButton = new GuiNetworkSettingsButton(this);
 	}
 
+	@Override
 	protected void actionPerformed(GuiButton par1GuiButton) {
 		if (par1GuiButton.id == 0) {
 			guiScreen.cancelDirectConnect();
@@ -52,6 +54,7 @@ public class GuiScreenConnectOption extends GuiScreen {
 		}
 	}
 
+	@Override
 	public void drawScreen(int par1, int par2, float par3) {
 		this.drawDefaultBackground();
 		this.drawCenteredString(this.fontRendererObj, title, this.width / 2, this.height / 4 - 60 + 20, 16777215);
@@ -60,6 +63,7 @@ public class GuiScreenConnectOption extends GuiScreen {
 		relaysButton.drawScreen(par1, par2);
 	}
 
+	@Override
 	public void initGui() {
 		title = I18n.format("selectServer.direct");
 		prompt = I18n.format("directConnect.prompt");
@@ -67,7 +71,7 @@ public class GuiScreenConnectOption extends GuiScreen {
 		buttonList.add(new GuiButton(1, this.width / 2 - 100, this.height / 4 - 60 + 90,
 				I18n.format("directConnect.serverJoin")) {
 			{
-				enabled = false;
+				enabled = StarlikeClient.Config.Features.enableMultiplayer;
 			}
 		});
 		buttonList.add(new GuiButton(2, this.width / 2 - 100, this.height / 4 - 60 + 115,
@@ -75,6 +79,7 @@ public class GuiScreenConnectOption extends GuiScreen {
 		buttonList.add(new GuiButton(0, this.width / 2 - 100, this.height / 4 - 60 + 155, I18n.format("gui.cancel")));
 	}
 
+	@Override
 	protected void mouseClicked(int par1, int par2, int par3) {
 		relaysButton.mouseClicked(par1, par2, par3);
 		super.mouseClicked(par1, par2, par3);

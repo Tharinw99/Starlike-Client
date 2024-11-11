@@ -41,13 +41,13 @@ import net.minecraft.world.WorldServer;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -59,7 +59,7 @@ import net.minecraft.world.WorldServer;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class EntityLiving extends EntityLivingBase {
 	public static enum SpawnPlacementType {
@@ -195,6 +195,7 @@ public abstract class EntityLiving extends EntityLivingBase {
 		return !this.getLeashed() && !(this instanceof IMob);
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getAttributeMap().registerAttribute(SharedMonsterAttributes.followRange).setBaseValue(16.0D);
@@ -276,6 +277,7 @@ public abstract class EntityLiving extends EntityLivingBase {
 	/**
 	 * + Drop the equipment for this entity.
 	 */
+	@Override
 	protected void dropEquipment(boolean flag, int i) {
 		for (int j = 0; j < this.getInventory().length; ++j) {
 			ItemStack itemstack = this.getEquipmentInSlot(j);
@@ -305,6 +307,7 @@ public abstract class EntityLiving extends EntityLivingBase {
 	/**
 	 * + Drop 0-2 items of this living's type
 	 */
+	@Override
 	protected void dropFewItems(boolean var1, int i) {
 		Item item = this.getDropItem();
 		if (item != null) {
@@ -334,6 +337,7 @@ public abstract class EntityLiving extends EntityLivingBase {
 		this.persistenceRequired = true;
 	}
 
+	@Override
 	protected void entityInit() {
 		super.entityInit();
 		this.dataWatcher.addObject(15, Byte.valueOf((byte) 0));
@@ -363,6 +367,7 @@ public abstract class EntityLiving extends EntityLivingBase {
 		this.rotationYaw = this.updateRotation(this.rotationYaw, f, parFloat1);
 	}
 
+	@Override
 	protected float func_110146_f(float var1, float f) {
 		this.bodyHelper.updateRenderAngles();
 		return f;
@@ -387,6 +392,7 @@ public abstract class EntityLiving extends EntityLivingBase {
 		return true;
 	}
 
+	@Override
 	public ItemStack getCurrentArmor(int i) {
 		return this.equipment[i + 1];
 	}
@@ -405,6 +411,7 @@ public abstract class EntityLiving extends EntityLivingBase {
 	/**
 	 * + 0: Tool in Hand; 1-4: Armor
 	 */
+	@Override
 	public ItemStack getEquipmentInSlot(int i) {
 		return this.equipment[i];
 	}
@@ -412,6 +419,7 @@ public abstract class EntityLiving extends EntityLivingBase {
 	/**
 	 * + Get the experience points the entity currently has.
 	 */
+	@Override
 	protected int getExperiencePoints(EntityPlayer var1) {
 		if (this.experienceValue > 0) {
 			int i = this.experienceValue;
@@ -432,6 +440,7 @@ public abstract class EntityLiving extends EntityLivingBase {
 	/**
 	 * + Returns the item that this EntityLiving is holding, if any.
 	 */
+	@Override
 	public ItemStack getHeldItem() {
 		return this.equipment[0];
 	}
@@ -439,6 +448,7 @@ public abstract class EntityLiving extends EntityLivingBase {
 	/**
 	 * + returns the inventory of this entity (only used in EntityPlayerMP it seems)
 	 */
+	@Override
 	public ItemStack[] getInventory() {
 		return this.equipment;
 	}
@@ -470,6 +480,7 @@ public abstract class EntityLiving extends EntityLivingBase {
 	 * + The maximum height from where the entity is alowed to jump (used in
 	 * pathfinder)
 	 */
+	@Override
 	public int getMaxFallHeight() {
 		if (this.getAttackTarget() == null) {
 			return 3;
@@ -529,6 +540,7 @@ public abstract class EntityLiving extends EntityLivingBase {
 		return 40;
 	}
 
+	@Override
 	public void handleStatusUpdate(byte b0) {
 		if (b0 == 20) {
 			this.spawnExplosionParticle();
@@ -549,6 +561,7 @@ public abstract class EntityLiving extends EntityLivingBase {
 	/**
 	 * + First layer of player interaction
 	 */
+	@Override
 	public final boolean interactFirst(EntityPlayer entityplayer) {
 		if (this.getLeashed() && this.getLeashedToEntity() == entityplayer) {
 			this.clearLeashed(true, !entityplayer.capabilities.isCreativeMode);
@@ -600,6 +613,7 @@ public abstract class EntityLiving extends EntityLivingBase {
 	/**
 	 * + Returns whether the entity is in a server world
 	 */
+	@Override
 	public boolean isServerWorld() {
 		return super.isServerWorld() && !this.isAIDisabled();
 	}
@@ -607,6 +621,7 @@ public abstract class EntityLiving extends EntityLivingBase {
 	/**
 	 * + Gets called every tick from main Entity class
 	 */
+	@Override
 	public void onEntityUpdate() {
 		super.onEntityUpdate();
 		if (this.isEntityAlive() && this.rand.nextInt(1000) < this.livingSoundTime++) {
@@ -631,6 +646,7 @@ public abstract class EntityLiving extends EntityLivingBase {
 	 * required. For example, zombies and skeletons use this to react to sunlight
 	 * and start to burn.
 	 */
+	@Override
 	public void onLivingUpdate() {
 		super.onLivingUpdate();
 		if (!this.worldObj.isRemote && this.canPickUpLoot() && !this.dead
@@ -649,6 +665,7 @@ public abstract class EntityLiving extends EntityLivingBase {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		super.onUpdate();
 		if (!this.worldObj.isRemote) {
@@ -671,6 +688,7 @@ public abstract class EntityLiving extends EntityLivingBase {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		if (nbttagcompound.hasKey("CanPickUpLoot", 1)) {
@@ -704,9 +722,11 @@ public abstract class EntityLiving extends EntityLivingBase {
 
 	private void recreateLeash() {
 		if (this.isLeashed && this.leashNBTTag != null) {
-			if (this.leashNBTTag.hasKey("UUIDMost", 4) && this.leashNBTTag.hasKey("UUIDLeast", 4)) {
-				EaglercraftUUID uuid = new EaglercraftUUID(this.leashNBTTag.getLong("UUIDMost"),
-						this.leashNBTTag.getLong("UUIDLeast"));
+			if (this.leashNBTTag.hasKey("UUID", 12)
+					|| (this.leashNBTTag.hasKey("UUIDMost", 4) && this.leashNBTTag.hasKey("UUIDLeast", 4))) {
+				long[] uuidArray = this.leashNBTTag.hasKey("UUID", 12) ? this.leashNBTTag.getLongArray("UUID")
+						: new long[] { this.leashNBTTag.getLong("UUIDMost"), this.leashNBTTag.getLong("UUIDLeast") };
+				EaglercraftUUID uuid = new EaglercraftUUID(uuidArray[0], uuidArray[1]);
 
 				List<EntityLivingBase> entities = this.worldObj.getEntitiesWithinAABB(EntityLivingBase.class,
 						this.getEntityBoundingBox().expand(10.0D, 10.0D, 10.0D));
@@ -735,6 +755,7 @@ public abstract class EntityLiving extends EntityLivingBase {
 		this.leashNBTTag = null;
 	}
 
+	@Override
 	public boolean replaceItemInInventory(int i, ItemStack itemstack) {
 		int j;
 		if (i == 99) {
@@ -758,6 +779,7 @@ public abstract class EntityLiving extends EntityLivingBase {
 	/**
 	 * + set the movespeed used for the new AI system
 	 */
+	@Override
 	public void setAIMoveSpeed(float f) {
 		super.setAIMoveSpeed(f);
 		this.setMoveForward(f);
@@ -778,6 +800,7 @@ public abstract class EntityLiving extends EntityLivingBase {
 	 * + Sets the held item, or an armor slot. Slot 0 is held item. Slot 1-4 is
 	 * armor. Params: Item, slot
 	 */
+	@Override
 	public void setCurrentItemOrArmor(int i, ItemStack itemstack) {
 		this.equipment[i] = itemstack;
 	}
@@ -892,6 +915,7 @@ public abstract class EntityLiving extends EntityLivingBase {
 	protected void updateAITasks() {
 	}
 
+	@Override
 	protected final void updateEntityActionState() {
 		++this.entityAge;
 		this.despawnEntity();
@@ -1010,6 +1034,7 @@ public abstract class EntityLiving extends EntityLivingBase {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		nbttagcompound.setBoolean("CanPickUpLoot", this.canPickUpLoot());
@@ -1037,8 +1062,9 @@ public abstract class EntityLiving extends EntityLivingBase {
 		if (this.leashedToEntity != null) {
 			NBTTagCompound nbttagcompound2 = new NBTTagCompound();
 			if (this.leashedToEntity instanceof EntityLivingBase) {
-				nbttagcompound2.setLong("UUIDMost", this.leashedToEntity.getUniqueID().getMostSignificantBits());
-				nbttagcompound2.setLong("UUIDLeast", this.leashedToEntity.getUniqueID().getLeastSignificantBits());
+				nbttagcompound2.setLongArray("UUID",
+						new long[] { this.leashedToEntity.getUniqueID().getMostSignificantBits(),
+								this.leashedToEntity.getUniqueID().getLeastSignificantBits() });
 			} else if (this.leashedToEntity instanceof EntityHanging) {
 				BlockPos blockpos = ((EntityHanging) this.leashedToEntity).getHangingPosition();
 				nbttagcompound2.setInteger("X", blockpos.getX());

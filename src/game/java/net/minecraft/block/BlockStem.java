@@ -23,13 +23,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -41,11 +41,12 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockStem extends BlockBush implements IGrowable {
 	public static final PropertyInteger AGE = PropertyInteger.create("age", 0, 7);
 	public static final PropertyDirection FACING = PropertyDirection.create("facing", new Predicate<EnumFacing>() {
+		@Override
 		public boolean apply(EnumFacing enumfacing) {
 			return enumfacing != EnumFacing.DOWN;
 		}
@@ -65,6 +66,7 @@ public class BlockStem extends BlockBush implements IGrowable {
 	/**
 	 * + Whether this IGrowable can grow
 	 */
+	@Override
 	public boolean canGrow(World var1, BlockPos var2, IBlockState iblockstate, boolean var4) {
 		return ((Integer) iblockstate.getValue(AGE)).intValue() != 7;
 	}
@@ -72,18 +74,22 @@ public class BlockStem extends BlockBush implements IGrowable {
 	/**
 	 * + is the block grass, dirt or farmland
 	 */
+	@Override
 	protected boolean canPlaceBlockOn(Block block) {
 		return block == Blocks.farmland;
 	}
 
+	@Override
 	public boolean canUseBonemeal(World var1, EaglercraftRandom var2, BlockPos var3, IBlockState var4) {
 		return true;
 	}
 
+	@Override
 	public int colorMultiplier(IBlockAccess iblockaccess, BlockPos blockpos, int var3) {
 		return this.getRenderColor(iblockaccess.getBlockState(blockpos));
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { AGE, FACING });
 	}
@@ -91,6 +97,7 @@ public class BlockStem extends BlockBush implements IGrowable {
 	/**
 	 * + Spawns this Block's drops into the World as EntityItems.
 	 */
+	@Override
 	public void dropBlockAsItemWithChance(World world, BlockPos blockpos, IBlockState iblockstate, float f, int i) {
 		super.dropBlockAsItemWithChance(world, blockpos, iblockstate, f, i);
 		if (!world.isRemote) {
@@ -112,6 +119,7 @@ public class BlockStem extends BlockBush implements IGrowable {
 	 * + Get the actual Block state of this Block at the given position. This
 	 * applies properties not visible in the metadata, such as fence connections.
 	 */
+	@Override
 	public IBlockState getActualState(IBlockState iblockstate, IBlockAccess iblockaccess, BlockPos blockpos) {
 		iblockstate = iblockstate.withProperty(FACING, EnumFacing.UP);
 
@@ -128,6 +136,7 @@ public class BlockStem extends BlockBush implements IGrowable {
 		return iblockstate;
 	}
 
+	@Override
 	public Item getItem(World var1, BlockPos var2) {
 		Item item = this.getSeedItem();
 		return item != null ? item : null;
@@ -136,6 +145,7 @@ public class BlockStem extends BlockBush implements IGrowable {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
 		return null;
 	}
@@ -143,10 +153,12 @@ public class BlockStem extends BlockBush implements IGrowable {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		return ((Integer) iblockstate.getValue(AGE)).intValue();
 	}
 
+	@Override
 	public int getRenderColor(IBlockState iblockstate) {
 		if (iblockstate.getBlock() != this) {
 			return super.getRenderColor(iblockstate);
@@ -167,10 +179,12 @@ public class BlockStem extends BlockBush implements IGrowable {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(AGE, Integer.valueOf(i));
 	}
 
+	@Override
 	public void grow(World world, EaglercraftRandom var2, BlockPos blockpos, IBlockState iblockstate) {
 		this.growStem(world, blockpos, iblockstate);
 	}
@@ -180,6 +194,7 @@ public class BlockStem extends BlockBush implements IGrowable {
 		worldIn.setBlockState(pos, state.withProperty(AGE, Integer.valueOf(Math.min(7, i))), 2);
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
 		this.maxY = (double) ((float) (((Integer) iblockaccess.getBlockState(blockpos).getValue(AGE)).intValue() * 2
 				+ 2) / 16.0F);
@@ -190,11 +205,13 @@ public class BlockStem extends BlockBush implements IGrowable {
 	/**
 	 * + Sets the block's bounds for rendering it as an item
 	 */
+	@Override
 	public void setBlockBoundsForItemRender() {
 		float f = 0.125F;
 		this.setBlockBounds(0.5F - f, 0.0F, 0.5F - f, 0.5F + f, 0.25F, 0.5F + f);
 	}
 
+	@Override
 	public void updateTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom random) {
 		super.updateTick(world, blockpos, iblockstate, random);
 		if (world.getLightFromNeighbors(blockpos.up()) >= 9) {

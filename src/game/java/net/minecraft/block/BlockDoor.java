@@ -26,13 +26,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -44,16 +44,18 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockDoor extends Block {
 	public static enum EnumDoorHalf implements IStringSerializable {
 		UPPER, LOWER;
 
+		@Override
 		public String getName() {
 			return this == UPPER ? "upper" : "lower";
 		}
 
+		@Override
 		public String toString() {
 			return this.getName();
 		}
@@ -62,10 +64,12 @@ public class BlockDoor extends Block {
 	public static enum EnumHingePosition implements IStringSerializable {
 		LEFT, RIGHT;
 
+		@Override
 		public String getName() {
 			return this == LEFT ? "left" : "right";
 		}
 
+		@Override
 		public String toString() {
 			return this.getName();
 		}
@@ -134,6 +138,7 @@ public class BlockDoor extends Block {
 				.withProperty(POWERED, Boolean.valueOf(false)).withProperty(HALF, BlockDoor.EnumDoorHalf.LOWER));
 	}
 
+	@Override
 	public boolean canPlaceBlockAt(World world, BlockPos blockpos) {
 		return blockpos.getY() >= 255 ? false
 				: World.doesBlockHaveSolidTopSurface(world, blockpos.down()) && super.canPlaceBlockAt(world, blockpos)
@@ -144,11 +149,13 @@ public class BlockDoor extends Block {
 	 * + Ray traces through the blocks collision from start vector to end vector
 	 * returning a ray trace hit.
 	 */
+	@Override
 	public MovingObjectPosition collisionRayTrace(World world, BlockPos blockpos, Vec3 vec3, Vec3 vec31) {
 		this.setBlockBoundsBasedOnState(world, blockpos);
 		return super.collisionRayTrace(world, blockpos, vec3, vec31);
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { HALF, FACING, OPEN, HINGE, POWERED });
 	}
@@ -157,6 +164,7 @@ public class BlockDoor extends Block {
 	 * + Get the actual Block state of this Block at the given position. This
 	 * applies properties not visible in the metadata, such as fence connections.
 	 */
+	@Override
 	public IBlockState getActualState(IBlockState iblockstate, IBlockAccess iblockaccess, BlockPos blockpos) {
 		if (iblockstate.getValue(HALF) == BlockDoor.EnumDoorHalf.LOWER) {
 			IBlockState iblockstate1 = iblockaccess.getBlockState(blockpos.up());
@@ -175,10 +183,12 @@ public class BlockDoor extends Block {
 		return iblockstate;
 	}
 
+	@Override
 	public EnumWorldBlockLayer getBlockLayer() {
 		return EnumWorldBlockLayer.CUTOUT;
 	}
 
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox(World world, BlockPos blockpos, IBlockState iblockstate) {
 		this.setBlockBoundsBasedOnState(world, blockpos);
 		return super.getCollisionBoundingBox(world, blockpos, iblockstate);
@@ -194,6 +204,7 @@ public class BlockDoor extends Block {
 														: Items.oak_door)))));
 	}
 
+	@Override
 	public Item getItem(World var1, BlockPos var2) {
 		return this.getItem();
 	}
@@ -201,6 +212,7 @@ public class BlockDoor extends Block {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState iblockstate, EaglercraftRandom var2, int var3) {
 		return iblockstate.getValue(HALF) == BlockDoor.EnumDoorHalf.UPPER ? null : this.getItem();
 	}
@@ -208,6 +220,7 @@ public class BlockDoor extends Block {
 	/**
 	 * + Gets the localized name of this block. Used for the statistics page.
 	 */
+	@Override
 	public String getLocalizedName() {
 		return StatCollector.translateToLocal((this.getUnlocalizedName() + ".name").replaceAll("tile", "item"));
 	}
@@ -215,6 +228,7 @@ public class BlockDoor extends Block {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
 		if (iblockstate.getValue(HALF) == BlockDoor.EnumDoorHalf.UPPER) {
@@ -236,10 +250,12 @@ public class BlockDoor extends Block {
 		return i;
 	}
 
+	@Override
 	public int getMobilityFlag() {
 		return 1;
 	}
 
+	@Override
 	public AxisAlignedBB getSelectedBoundingBox(World world, BlockPos blockpos) {
 		this.setBlockBoundsBasedOnState(world, blockpos);
 		return super.getSelectedBoundingBox(world, blockpos);
@@ -248,6 +264,7 @@ public class BlockDoor extends Block {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return (i & 8) > 0
 				? this.getDefaultState().withProperty(HALF, BlockDoor.EnumDoorHalf.UPPER)
@@ -259,6 +276,7 @@ public class BlockDoor extends Block {
 						.withProperty(OPEN, Boolean.valueOf((i & 4) > 0));
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -267,14 +285,17 @@ public class BlockDoor extends Block {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
 
+	@Override
 	public boolean isPassable(IBlockAccess iblockaccess, BlockPos blockpos) {
 		return isOpen(combineMetadata(iblockaccess, blockpos));
 	}
 
+	@Override
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState iblockstate, EntityPlayer entityplayer,
 			EnumFacing var5, float var6, float var7, float var8) {
 		if (this.blockMaterial == Material.iron) {
@@ -296,6 +317,7 @@ public class BlockDoor extends Block {
 		}
 	}
 
+	@Override
 	public void onBlockHarvested(World world, BlockPos blockpos, IBlockState iblockstate, EntityPlayer entityplayer) {
 		BlockPos blockpos1 = blockpos.down();
 		if (entityplayer.capabilities.isCreativeMode && iblockstate.getValue(HALF) == BlockDoor.EnumDoorHalf.UPPER
@@ -308,6 +330,7 @@ public class BlockDoor extends Block {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block block) {
 		if (iblockstate.getValue(HALF) == BlockDoor.EnumDoorHalf.UPPER) {
 			BlockPos blockpos1 = blockpos.down();
@@ -354,6 +377,7 @@ public class BlockDoor extends Block {
 
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
 		this.setBoundBasedOnMeta(combineMetadata(iblockaccess, blockpos));
 	}

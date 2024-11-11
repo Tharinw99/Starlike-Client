@@ -7,13 +7,13 @@ import net.minecraft.block.Block;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -25,7 +25,7 @@ import net.minecraft.block.Block;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ItemMultiTexture extends ItemBlock {
 	protected final Block theBlock;
@@ -41,6 +41,7 @@ public class ItemMultiTexture extends ItemBlock {
 
 	public ItemMultiTexture(Block block, Block block2, final String[] namesByMeta) {
 		this(block, block2, new Function<ItemStack, String>() {
+			@Override
 			public String apply(ItemStack parItemStack) {
 				int i = parItemStack.getMetadata();
 				if (i < 0 || i >= namesByMeta.length) {
@@ -57,6 +58,7 @@ public class ItemMultiTexture extends ItemBlock {
 	 * placed in the world when this Item is placed as a Block (mostly used with
 	 * ItemBlocks).
 	 */
+	@Override
 	public int getMetadata(int i) {
 		return i;
 	}
@@ -66,6 +68,7 @@ public class ItemMultiTexture extends ItemBlock {
 	 * ItemStack so different stacks can have different names based on their damage
 	 * or NBT.
 	 */
+	@Override
 	public String getUnlocalizedName(ItemStack itemstack) {
 		return super.getUnlocalizedName() + "." + (String) this.nameFunction.apply(itemstack);
 	}

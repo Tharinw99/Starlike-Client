@@ -1,5 +1,6 @@
 package net.minecraft.client.renderer.chunk;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -12,13 +13,13 @@ import net.minecraft.util.EnumWorldBlockLayer;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,22 +31,26 @@ import net.minecraft.util.EnumWorldBlockLayer;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class CompiledChunk {
-	public static final CompiledChunk DUMMY = new CompiledChunk() {
+	public static final CompiledChunk DUMMY = new CompiledChunk(null) {
+		@Override
 		public boolean isVisible(EnumFacing facing, EnumFacing facing2) {
 			return true;
 		}
 
+		@Override
 		public void setLayerStarted(EnumWorldBlockLayer layer) {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		protected void setLayerUsed(EnumWorldBlockLayer layer) {
 			throw new UnsupportedOperationException();
 		}
 	};
+	private final RenderChunk chunk;
 	private final boolean[] layersUsed = new boolean[EnumWorldBlockLayer._VALUES.length];
 	private final boolean[] layersStarted = new boolean[EnumWorldBlockLayer._VALUES.length];
 	private boolean empty = true;
@@ -53,6 +58,10 @@ public class CompiledChunk {
 	private SetVisibility setVisibility = new SetVisibility();
 	private WorldRenderer.State state;
 	private WorldRenderer.State stateWater;
+
+	public CompiledChunk(RenderChunk chunk) {
+		this.chunk = chunk;
+	}
 
 	public void addTileEntity(TileEntity tileEntityIn) {
 		this.tileEntities.add(tileEntityIn);
@@ -86,6 +95,16 @@ public class CompiledChunk {
 		return this.setVisibility.isVisible(enumfacing, enumfacing1);
 	}
 
+	public void reset() {
+		Arrays.fill(layersUsed, false);
+		Arrays.fill(layersStarted, false);
+		empty = true;
+		tileEntities.clear();
+		setVisibility.setAllVisible(false);
+		setState(null);
+		setStateRealisticWater(null);
+	}
+
 	public void setLayerStarted(EnumWorldBlockLayer enumworldblocklayer) {
 		this.layersStarted[enumworldblocklayer.ordinal()] = true;
 	}
@@ -96,10 +115,16 @@ public class CompiledChunk {
 	}
 
 	public void setState(WorldRenderer.State stateIn) {
+		if (this.state != stateIn && this.state != null) {
+			this.state.release();
+		}
 		this.state = stateIn;
 	}
 
 	public void setStateRealisticWater(WorldRenderer.State stateIn) {
+		if (this.stateWater != stateIn && this.stateWater != null) {
+			this.stateWater.release();
+		}
 		this.stateWater = stateIn;
 	}
 

@@ -15,13 +15,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,7 +33,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class BlockRedstoneDiode extends BlockDirectional {
 	public static boolean isRedstoneRepeaterBlockID(Block blockIn) {
@@ -67,6 +67,7 @@ public abstract class BlockRedstoneDiode extends BlockDirectional {
 		return World.doesBlockHaveSolidTopSurface(worldIn, pos.down());
 	}
 
+	@Override
 	public boolean canPlaceBlockAt(World world, BlockPos blockpos) {
 		return World.doesBlockHaveSolidTopSurface(world, blockpos.down()) ? super.canPlaceBlockAt(world, blockpos)
 				: false;
@@ -80,6 +81,7 @@ public abstract class BlockRedstoneDiode extends BlockDirectional {
 	 * + Can this block provide power. Only wire currently seems to have this change
 	 * based on its state.
 	 */
+	@Override
 	public boolean canProvidePower() {
 		return true;
 	}
@@ -88,6 +90,7 @@ public abstract class BlockRedstoneDiode extends BlockDirectional {
 		return 15;
 	}
 
+	@Override
 	public EnumWorldBlockLayer getBlockLayer() {
 		return EnumWorldBlockLayer.CUTOUT;
 	}
@@ -113,6 +116,7 @@ public abstract class BlockRedstoneDiode extends BlockDirectional {
 				this.getPowerOnSide(worldIn, pos.offset(enumfacing2), enumfacing2));
 	}
 
+	@Override
 	public int getStrongPower(IBlockAccess iblockaccess, BlockPos blockpos, IBlockState iblockstate,
 			EnumFacing enumfacing) {
 		return this.getWeakPower(iblockaccess, blockpos, iblockstate, enumfacing);
@@ -124,6 +128,7 @@ public abstract class BlockRedstoneDiode extends BlockDirectional {
 
 	protected abstract IBlockState getUnpoweredState(IBlockState var1);
 
+	@Override
 	public int getWeakPower(IBlockAccess iblockaccess, BlockPos blockpos, IBlockState iblockstate,
 			EnumFacing enumfacing) {
 		return !this.isPowered(iblockstate) ? 0
@@ -137,6 +142,7 @@ public abstract class BlockRedstoneDiode extends BlockDirectional {
 				|| other == this.getUnpoweredState(this.getDefaultState()).getBlock();
 	}
 
+	@Override
 	public boolean isAssociatedBlock(Block block) {
 		return this.isAssociated(block);
 	}
@@ -149,6 +155,7 @@ public abstract class BlockRedstoneDiode extends BlockDirectional {
 				: false;
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -161,6 +168,7 @@ public abstract class BlockRedstoneDiode extends BlockDirectional {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
@@ -176,6 +184,7 @@ public abstract class BlockRedstoneDiode extends BlockDirectional {
 		worldIn.notifyNeighborsOfStateExcept(blockpos, this, enumfacing);
 	}
 
+	@Override
 	public void onBlockAdded(World world, BlockPos blockpos, IBlockState iblockstate) {
 		this.notifyNeighbors(world, blockpos, iblockstate);
 	}
@@ -183,6 +192,7 @@ public abstract class BlockRedstoneDiode extends BlockDirectional {
 	/**
 	 * + Called when a player destroys this Block
 	 */
+	@Override
 	public void onBlockDestroyedByPlayer(World world, BlockPos blockpos, IBlockState iblockstate) {
 		if (this.isRepeaterPowered) {
 			EnumFacing[] facings = EnumFacing._VALUES;
@@ -199,6 +209,7 @@ public abstract class BlockRedstoneDiode extends BlockDirectional {
 	 * + Called by ItemBlocks just before a block is actually set in the world, to
 	 * allow for adjustments to the IBlockstate
 	 */
+	@Override
 	public IBlockState onBlockPlaced(World var1, BlockPos var2, EnumFacing var3, float var4, float var5, float var6,
 			int var7, EntityLivingBase entitylivingbase) {
 		return this.getDefaultState().withProperty(FACING, entitylivingbase.getHorizontalFacing().getOpposite());
@@ -208,6 +219,7 @@ public abstract class BlockRedstoneDiode extends BlockDirectional {
 	 * + Called by ItemBlocks after a block is set in the world, to allow post-place
 	 * logic
 	 */
+	@Override
 	public void onBlockPlacedBy(World world, BlockPos blockpos, IBlockState iblockstate, EntityLivingBase var4,
 			ItemStack var5) {
 		if (this.shouldBePowered(world, blockpos, iblockstate)) {
@@ -219,6 +231,7 @@ public abstract class BlockRedstoneDiode extends BlockDirectional {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block var4) {
 		if (this.canBlockStay(world, blockpos)) {
 			this.updateState(world, blockpos, iblockstate);
@@ -239,6 +252,7 @@ public abstract class BlockRedstoneDiode extends BlockDirectional {
 	 * + Called randomly when setTickRandomly is set to true (used by e.g. crops to
 	 * grow, etc.)
 	 */
+	@Override
 	public void randomTick(World var1, BlockPos var2, IBlockState var3, EaglercraftRandom var4) {
 	}
 
@@ -246,6 +260,7 @@ public abstract class BlockRedstoneDiode extends BlockDirectional {
 		return this.calculateInputStrength(world, blockpos, iblockstate) > 0;
 	}
 
+	@Override
 	public boolean shouldSideBeRendered(IBlockAccess var1, BlockPos var2, EnumFacing enumfacing) {
 		return enumfacing.getAxis() != EnumFacing.Axis.Y;
 	}
@@ -268,6 +283,7 @@ public abstract class BlockRedstoneDiode extends BlockDirectional {
 		}
 	}
 
+	@Override
 	public void updateTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom var4) {
 		if (!this.isLocked(world, blockpos, iblockstate)) {
 			boolean flag = this.shouldBePowered(world, blockpos, iblockstate);

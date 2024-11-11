@@ -129,7 +129,7 @@ final class RegularImmutableMap<K, V> extends ImmutableMap<K, V> {
 	 * Constructor for RegularImmutableMap that takes as input an array of
 	 * {@code TerminalEntry} entries. Assumes that these entries have already been
 	 * checked for null.
-	 * 
+	 *
 	 * <p>
 	 * This allows reuse of the entry objects from the array in the actual
 	 * implementation.

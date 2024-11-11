@@ -84,7 +84,7 @@ import com.google.common.annotations.GwtCompatible;
  * wish to use {@link com.google.common.util.concurrent.AtomicLongMap} instead.
  * Note, however, that unlike {@code Multiset}, {@code AtomicLongMap} does not
  * automatically remove zeros.
- * 
+ *
  * <p>
  * See the Guava User Guide article on <a href=
  * "http://code.google.com/p/guava-libraries/wiki/NewCollectionTypesExplained#Multiset">
@@ -116,7 +116,7 @@ public interface Multiset<E> extends Collection<E> {
 		 * Returns {@code true} if the given object is also a multiset entry and the two
 		 * entries represent the same element and count. That is, two entries {@code a}
 		 * and {@code b} are equal if:
-		 * 
+		 *
 		 * <pre>
 		 *    {@code
 		 *
@@ -154,7 +154,7 @@ public interface Multiset<E> extends Collection<E> {
 		 * <p>
 		 * The hash code of a multiset entry for element {@code element} and count
 		 * {@code count} is defined as:
-		 * 
+		 *
 		 * <pre>
 		 *    {@code
 		 *
@@ -339,7 +339,7 @@ public interface Multiset<E> extends Collection<E> {
 
 	/**
 	 * Returns the hash code for this multiset. This is defined as the sum of
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *
@@ -403,7 +403,7 @@ public interface Multiset<E> extends Collection<E> {
 	 * {@code c}, and only cares whether or not an element appears at all. If you
 	 * wish to remove one occurrence in this multiset for every occurrence in
 	 * {@code c}, see {@link Multisets#removeOccurrences(Multiset, Multiset)}.
-	 * 
+	 *
 	 * <p>
 	 * This method refines {@link Collection#removeAll} to further specify that it
 	 * <b>may not</b> throw an exception in response to any of {@code elements}
@@ -420,12 +420,12 @@ public interface Multiset<E> extends Collection<E> {
 	 * {@code c}, and only cares whether or not an element appears at all. If you
 	 * wish to remove one occurrence in this multiset for every occurrence in
 	 * {@code c}, see {@link Multisets#retainOccurrences(Multiset, Multiset)}.
-	 * 
+	 *
 	 * <p>
 	 * This method refines {@link Collection#retainAll} to further specify that it
 	 * <b>may not</b> throw an exception in response to any of {@code elements}
 	 * being null or of the wrong type.
-	 * 
+	 *
 	 * @see Multisets#retainOccurrences(Multiset, Multiset)
 	 */
 	@Override

@@ -16,13 +16,13 @@ import net.minecraft.world.IInteractionObject;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -34,7 +34,7 @@ import net.minecraft.world.IInteractionObject;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class TileEntityEnchantmentTable extends TileEntity implements ITickable, IInteractionObject {
 	private static EaglercraftRandom rand = new EaglercraftRandom();
@@ -50,6 +50,7 @@ public class TileEntityEnchantmentTable extends TileEntity implements ITickable,
 	public float field_145924_q;
 	private String customName;
 
+	@Override
 	public Container createContainer(InventoryPlayer inventoryplayer, EntityPlayer var2) {
 		return new ContainerEnchantment(inventoryplayer, this.worldObj, this.pos);
 	}
@@ -58,11 +59,13 @@ public class TileEntityEnchantmentTable extends TileEntity implements ITickable,
 	 * + Get the formatted ChatComponent that will be used for the sender's username
 	 * in chat
 	 */
+	@Override
 	public IChatComponent getDisplayName() {
 		return (IChatComponent) (this.hasCustomName() ? new ChatComponentText(this.getName())
 				: new ChatComponentTranslation(this.getName(), new Object[0]));
 	}
 
+	@Override
 	public String getGuiID() {
 		return "minecraft:enchanting_table";
 	}
@@ -71,6 +74,7 @@ public class TileEntityEnchantmentTable extends TileEntity implements ITickable,
 	 * + Gets the name of this command sender (usually username, but possibly
 	 * "Rcon")
 	 */
+	@Override
 	public String getName() {
 		return this.hasCustomName() ? this.customName : "container.enchant";
 	}
@@ -78,10 +82,12 @@ public class TileEntityEnchantmentTable extends TileEntity implements ITickable,
 	/**
 	 * + Returns true if this thing is named
 	 */
+	@Override
 	public boolean hasCustomName() {
 		return this.customName != null && this.customName.length() > 0;
 	}
 
+	@Override
 	public void readFromNBT(NBTTagCompound nbttagcompound) {
 		super.readFromNBT(nbttagcompound);
 		if (nbttagcompound.hasKey("CustomName", 8)) {
@@ -97,6 +103,7 @@ public class TileEntityEnchantmentTable extends TileEntity implements ITickable,
 	/**
 	 * + Like the old updateEntity(), except more generic.
 	 */
+	@Override
 	public void update() {
 		this.bookSpreadPrev = this.bookSpread;
 		this.bookRotationPrev = this.bookRotation;
@@ -158,6 +165,7 @@ public class TileEntityEnchantmentTable extends TileEntity implements ITickable,
 		this.pageFlip += this.field_145929_l;
 	}
 
+	@Override
 	public void writeToNBT(NBTTagCompound nbttagcompound) {
 		super.writeToNBT(nbttagcompound);
 		if (this.hasCustomName()) {

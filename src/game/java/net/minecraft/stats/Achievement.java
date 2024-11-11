@@ -14,13 +14,13 @@ import net.minecraft.util.StatCollector;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -32,7 +32,7 @@ import net.minecraft.util.StatCollector;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class Achievement extends StatBase {
 	public final int displayColumn;
@@ -77,6 +77,7 @@ public class Achievement extends StatBase {
 		this.parentAchievement = parent;
 	}
 
+	@Override
 	public Achievement func_150953_b(Class<? extends IJsonSerializable> parClass1,
 			Supplier<? extends IJsonSerializable> ctor) {
 		return (Achievement) super.func_150953_b(parClass1, ctor);
@@ -100,6 +101,7 @@ public class Achievement extends StatBase {
 		return this.isSpecial;
 	}
 
+	@Override
 	public IChatComponent getStatName() {
 		IChatComponent ichatcomponent = super.getStatName();
 		ichatcomponent.getChatStyle()
@@ -111,6 +113,7 @@ public class Achievement extends StatBase {
 	 * + Initializes the current stat as independent (i.e., lacking prerequisites
 	 * for being updated) and returns the current instance.
 	 */
+	@Override
 	public Achievement initIndependentStat() {
 		this.isIndependent = true;
 		return this;
@@ -120,6 +123,7 @@ public class Achievement extends StatBase {
 	 * + Returns whether or not the StatBase-derived class is a statistic (running
 	 * counter) or an achievement (one-shot).
 	 */
+	@Override
 	public boolean isAchievement() {
 		return true;
 	}
@@ -127,6 +131,7 @@ public class Achievement extends StatBase {
 	/**
 	 * + Register the stat into StatList.
 	 */
+	@Override
 	public Achievement registerStat() {
 		super.registerStat();
 		AchievementList.achievementList.add(this);

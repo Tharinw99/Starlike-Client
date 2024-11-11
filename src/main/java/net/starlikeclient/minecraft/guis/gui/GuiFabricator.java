@@ -24,6 +24,7 @@ public class GuiFabricator extends GuiContainer {
 	/**
 	 * + Args : renderPartialTicks, mouseX, mouseY
 	 */
+	@Override
 	protected void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 		this.mc.getTextureManager().bindTexture(craftingTableGuiTextures);
@@ -36,6 +37,7 @@ public class GuiFabricator extends GuiContainer {
 	 * + Draw the foreground layer for the GuiContainer (everything in front of the
 	 * items). Args : mouseX, mouseY
 	 */
+	@Override
 	protected void drawGuiContainerForegroundLayer(int var1, int var2) {
 		this.fontRendererObj.drawString(I18n.format("container.crafting", new Object[0]), 28, 6, 4210752);
 		this.fontRendererObj.drawString(I18n.format("container.inventory", new Object[0]), 8, this.ySize - 96 + 2,

@@ -160,7 +160,7 @@ import net.minecraft.util.ResourceLocation;
 
 /**
  * Copyright (c) 2023-2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -172,7 +172,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EaglerDeferredPipeline {
 
@@ -2747,11 +2747,15 @@ public class EaglerDeferredPipeline {
 			GlStateManager.enableDepth();
 			GlStateManager.depthFunc(GL_ALWAYS);
 			GlStateManager.depthMask(true);
+			GlStateManager.colorMask(false, false, false, false);
+			_wglDrawBuffers(GL_NONE);
 			GlStateManager.bindTexture(lightingHDRFramebufferDepthTexture);
 			TextureCopyUtil.blitTextureDepth();
 			GlStateManager.disableDepth();
 			GlStateManager.depthFunc(GL_LEQUAL);
 			GlStateManager.depthMask(false);
+			GlStateManager.colorMask(true, true, true, true);
+			_wglDrawBuffers(GL_BACK);
 		} else {
 			_wglBindFramebuffer(_GL_READ_FRAMEBUFFER, lightingHDRFramebuffer);
 			_wglBindFramebuffer(_GL_DRAW_FRAMEBUFFER, null);

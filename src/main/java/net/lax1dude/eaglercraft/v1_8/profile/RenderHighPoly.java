@@ -27,7 +27,7 @@ import net.minecraft.util.MathHelper;
 
 /**
  * Copyright (c) 2022-2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -39,7 +39,7 @@ import net.minecraft.util.MathHelper;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class RenderHighPoly extends RenderPlayer {
 
@@ -51,6 +51,7 @@ public class RenderHighPoly extends RenderPlayer {
 		super(renderManager, fallbackModel, fallbackScale);
 	}
 
+	@Override
 	public void doRender(AbstractClientPlayer abstractclientplayer, double d0, double d1, double d2, float f,
 			float f1) {
 		if (!abstractclientplayer.isUser() || this.renderManager.livingPlayer == abstractclientplayer) {
@@ -488,10 +489,12 @@ public class RenderHighPoly extends RenderPlayer {
 		}
 	}
 
+	@Override
 	public void renderLeftArm(AbstractClientPlayer clientPlayer) {
 
 	}
 
+	@Override
 	public void renderLivingAt(AbstractClientPlayer abstractclientplayer, double d0, double d1, double d2) {
 		if (abstractclientplayer.isEntityAlive() && abstractclientplayer.isPlayerSleeping()) {
 			super.renderLivingAt(abstractclientplayer, d0 - (double) abstractclientplayer.renderOffsetX,
@@ -501,6 +504,7 @@ public class RenderHighPoly extends RenderPlayer {
 		}
 	}
 
+	@Override
 	public void renderRightArm(AbstractClientPlayer clientPlayer) {
 
 	}

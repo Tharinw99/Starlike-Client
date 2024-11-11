@@ -12,13 +12,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,7 +30,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ArmorStandRenderer extends RendererLivingEntity<EntityArmorStand> {
 	/**
@@ -43,6 +43,7 @@ public class ArmorStandRenderer extends RendererLivingEntity<EntityArmorStand> {
 	public ArmorStandRenderer(RenderManager parRenderManager) {
 		super(parRenderManager, new ModelArmorStand(), 0.0F);
 		LayerBipedArmor layerbipedarmor = new LayerBipedArmor(this) {
+			@Override
 			protected void initArmor() {
 				this.field_177189_c = new ModelArmorStandArmor(0.5F);
 				this.field_177186_d = new ModelArmorStandArmor(1.0F);
@@ -53,6 +54,7 @@ public class ArmorStandRenderer extends RendererLivingEntity<EntityArmorStand> {
 		this.addLayer(new LayerCustomHead(this.getMainModel().bipedHead));
 	}
 
+	@Override
 	protected boolean canRenderName(EntityArmorStand entityarmorstand) {
 		return entityarmorstand.getAlwaysRenderNameTag();
 	}
@@ -61,14 +63,17 @@ public class ArmorStandRenderer extends RendererLivingEntity<EntityArmorStand> {
 	 * + Returns the location of an entity's texture. Doesn't seem to be called
 	 * unless you call Render.bindEntityTexture.
 	 */
+	@Override
 	protected ResourceLocation getEntityTexture(EntityArmorStand var1) {
 		return TEXTURE_ARMOR_STAND;
 	}
 
+	@Override
 	public ModelArmorStand getMainModel() {
 		return (ModelArmorStand) super.getMainModel();
 	}
 
+	@Override
 	protected void rotateCorpse(EntityArmorStand var1, float var2, float f, float var4) {
 		GlStateManager.rotate(180.0F - f, 0.0F, 1.0F, 0.0F);
 	}

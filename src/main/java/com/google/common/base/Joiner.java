@@ -36,7 +36,7 @@ import com.google.common.annotations.GwtCompatible;
  * {@link Iterable}, varargs or even a {@link Map}) with a separator. It either
  * appends the results to an {@link Appendable} or returns them as a
  * {@link String}. Example:
- * 
+ *
  * <pre>
  *    {@code
  *
@@ -62,7 +62,7 @@ import com.google.common.annotations.GwtCompatible;
  * and use the new joiner instance returned by the method. This makes joiners
  * thread-safe, and safe to store as {@code
  * static final} constants.
- * 
+ *
  * <pre>
  * {
  * 	&#64;code
@@ -73,7 +73,7 @@ import com.google.common.annotations.GwtCompatible;
  * 	return joiner.join("wrong", null, "wrong");
  * }
  * </pre>
- * 
+ *
  * <p>
  * See the Guava User Guide article on <a href=
  * "http://code.google.com/p/guava-libraries/wiki/StringsExplained#Joiner">{@code Joiner}</a>.

@@ -3426,7 +3426,7 @@ public final class Maps {
 	 * <p>
 	 * It is imperative that the user manually synchronize on the returned map when
 	 * accessing any of its collection views:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *
@@ -3468,7 +3468,7 @@ public final class Maps {
 	 * map when iterating over any of its collection views, or the collections views
 	 * of any of its {@code descendingMap}, {@code subMap}, {@code headMap} or
 	 * {@code tailMap} views.
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 * 	&#64;code
@@ -3489,7 +3489,7 @@ public final class Maps {
 	 *
 	 * <p>
 	 * or:
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 * 	&#64;code
@@ -3586,7 +3586,7 @@ public final class Maps {
 	 * <p>
 	 * All other properties of the transformed map, such as iteration order, are
 	 * left intact. For example, the code:
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 * 	&#64;code
@@ -3654,7 +3654,7 @@ public final class Maps {
 	 * <p>
 	 * All other properties of the transformed map, such as iteration order, are
 	 * left intact. For example, the code:
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 * 	&#64;code
@@ -3721,7 +3721,7 @@ public final class Maps {
 	 * <p>
 	 * All other properties of the transformed map, such as iteration order, are
 	 * left intact. For example, the code:
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 * 	&#64;code
@@ -3806,7 +3806,7 @@ public final class Maps {
 	 * Returns a view of a map where each value is transformed by a function. All
 	 * other properties of the map, such as iteration order, are left intact. For
 	 * example, the code:
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 * 	&#64;code
@@ -3855,7 +3855,7 @@ public final class Maps {
 	 * Returns a view of a navigable map where each value is transformed by a
 	 * function. All other properties of the map, such as iteration order, are left
 	 * intact. For example, the code:
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 * 	&#64;code
@@ -3909,7 +3909,7 @@ public final class Maps {
 	 * Returns a view of a sorted map where each value is transformed by a function.
 	 * All other properties of the map, such as iteration order, are left intact.
 	 * For example, the code:
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 * 	&#64;code

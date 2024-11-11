@@ -16,13 +16,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -34,7 +34,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ItemSword extends Item {
 	private float attackDamage;
@@ -51,6 +51,7 @@ public class ItemSword extends Item {
 	/**
 	 * + Check whether this Item can harvest the given Block
 	 */
+	@Override
 	public boolean canHarvestBlock(Block block) {
 		return block == Blocks.web;
 	}
@@ -66,10 +67,12 @@ public class ItemSword extends Item {
 	/**
 	 * + Return whether this item is repairable in an anvil.
 	 */
+	@Override
 	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
 		return this.material.getRepairItem() == repair.getItem() ? true : super.getIsRepairable(toRepair, repair);
 	}
 
+	@Override
 	public Multimap<String, AttributeModifier> getItemAttributeModifiers() {
 		Multimap multimap = super.getItemAttributeModifiers();
 		multimap.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(),
@@ -81,6 +84,7 @@ public class ItemSword extends Item {
 	 * + Return the enchantability factor of the item, most of the time is based on
 	 * material.
 	 */
+	@Override
 	public int getItemEnchantability() {
 		return this.material.getEnchantability();
 	}
@@ -89,6 +93,7 @@ public class ItemSword extends Item {
 	 * + returns the action that specifies what animation to play when the items is
 	 * being used
 	 */
+	@Override
 	public EnumAction getItemUseAction(ItemStack var1) {
 		return EnumAction.BLOCK;
 	}
@@ -96,10 +101,12 @@ public class ItemSword extends Item {
 	/**
 	 * + How long it takes to use or consume an item
 	 */
+	@Override
 	public int getMaxItemUseDuration(ItemStack var1) {
 		return 72000;
 	}
 
+	@Override
 	public float getStrVsBlock(ItemStack var1, Block block) {
 		if (block == Blocks.web) {
 			return 15.0F;
@@ -121,6 +128,7 @@ public class ItemSword extends Item {
 	 * + Current implementations of this method in child classes do not use the
 	 * entry argument beside ev. They just raise the damage on the stack.
 	 */
+	@Override
 	public boolean hitEntity(ItemStack itemstack, EntityLivingBase var2, EntityLivingBase entitylivingbase) {
 		itemstack.damageItem(1, entitylivingbase);
 		return true;
@@ -129,6 +137,7 @@ public class ItemSword extends Item {
 	/**
 	 * + Returns True is the item is renderer in full 3D when hold.
 	 */
+	@Override
 	public boolean isFull3D() {
 		return true;
 	}
@@ -137,6 +146,7 @@ public class ItemSword extends Item {
 	 * + Called when a Block is destroyed using this Item. Return true to trigger
 	 * the "Use Item" statistic.
 	 */
+	@Override
 	public boolean onBlockDestroyed(ItemStack itemstack, World world, Block block, BlockPos blockpos,
 			EntityLivingBase entitylivingbase) {
 		if ((double) block.getBlockHardness(world, blockpos) != 0.0D) {
@@ -150,6 +160,7 @@ public class ItemSword extends Item {
 	 * + Called whenever this item is equipped and the right mouse button is
 	 * pressed. Args: itemStack, world, entityPlayer
 	 */
+	@Override
 	public ItemStack onItemRightClick(ItemStack itemstack, World var2, EntityPlayer entityplayer) {
 		entityplayer.setItemInUse(itemstack, this.getMaxItemUseDuration(itemstack));
 		return itemstack;

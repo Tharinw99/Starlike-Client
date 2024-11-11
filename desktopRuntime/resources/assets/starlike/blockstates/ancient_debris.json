@@ -1,7 +1,7 @@
 {
   "variants": {
-      "normal": {
-          "model": "starlike:ancient_debris"
-      }
+    "normal": {
+      "model": "starlike:ancient_debris"
+    }
   }
 }

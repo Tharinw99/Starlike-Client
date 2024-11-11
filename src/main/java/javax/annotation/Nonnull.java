@@ -22,6 +22,7 @@ import javax.annotation.meta.When;
 public @interface Nonnull {
 	class Checker implements TypeQualifierValidator<Nonnull> {
 
+		@Override
 		public When forConstantValue(Nonnull qualifierArgument, Object value) {
 			if (value == null)
 				return When.NEVER;

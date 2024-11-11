@@ -11,13 +11,13 @@ import net.minecraft.village.MerchantRecipeList;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,7 +29,7 @@ import net.minecraft.village.MerchantRecipeList;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class NpcMerchant implements IMerchant {
 	private InventoryMerchant theMerchantInventory;
@@ -43,6 +43,7 @@ public class NpcMerchant implements IMerchant {
 		this.theMerchantInventory = new InventoryMerchant(parEntityPlayer, this);
 	}
 
+	@Override
 	public EntityPlayer getCustomer() {
 		return this.customer;
 	}
@@ -51,22 +52,27 @@ public class NpcMerchant implements IMerchant {
 	 * + Get the formatted ChatComponent that will be used for the sender's username
 	 * in chat
 	 */
+	@Override
 	public IChatComponent getDisplayName() {
 		return (IChatComponent) (this.field_175548_d != null ? this.field_175548_d
 				: new ChatComponentTranslation("entity.Villager.name", new Object[0]));
 	}
 
+	@Override
 	public MerchantRecipeList getRecipes(EntityPlayer var1) {
 		return this.recipeList;
 	}
 
+	@Override
 	public void setCustomer(EntityPlayer var1) {
 	}
 
+	@Override
 	public void setRecipes(MerchantRecipeList merchantrecipelist) {
 		this.recipeList = merchantrecipelist;
 	}
 
+	@Override
 	public void useRecipe(MerchantRecipe merchantrecipe) {
 		merchantrecipe.incrementToolUses();
 	}
@@ -76,6 +82,7 @@ public class NpcMerchant implements IMerchant {
 	 * Usually, this is just a sound byte being played depending if the suggested
 	 * itemstack is not null.
 	 */
+	@Override
 	public void verifySellingItem(ItemStack var1) {
 	}
 }

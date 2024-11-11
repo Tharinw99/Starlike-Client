@@ -11,13 +11,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,7 +29,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class RenderGiantZombie extends RenderLiving<EntityGiantZombie> {
 	private static final ResourceLocation zombieTextures = new ResourceLocation("textures/entity/zombie/zombie.png");
@@ -40,6 +40,7 @@ public class RenderGiantZombie extends RenderLiving<EntityGiantZombie> {
 		this.scale = scaleIn;
 		this.addLayer(new LayerHeldItem(this));
 		this.addLayer(new LayerBipedArmor(this) {
+			@Override
 			protected void initArmor() {
 				this.field_177189_c = new ModelZombie(0.5F, false);
 				this.field_177186_d = new ModelZombie(1.0F, false);
@@ -51,6 +52,7 @@ public class RenderGiantZombie extends RenderLiving<EntityGiantZombie> {
 	 * + Returns the location of an entity's texture. Doesn't seem to be called
 	 * unless you call Render.bindEntityTexture.
 	 */
+	@Override
 	protected ResourceLocation getEntityTexture(EntityGiantZombie var1) {
 		return zombieTextures;
 	}
@@ -59,10 +61,12 @@ public class RenderGiantZombie extends RenderLiving<EntityGiantZombie> {
 	 * + Allows the render to do any OpenGL state modifications necessary before the
 	 * model is rendered. Args: entityLiving, partialTickTime
 	 */
+	@Override
 	protected void preRenderCallback(EntityGiantZombie var1, float var2) {
 		GlStateManager.scale(this.scale, this.scale, this.scale);
 	}
 
+	@Override
 	public void transformHeldFull3DItemLayer() {
 		GlStateManager.translate(0.0F, 0.1875F, 0.0F);
 	}

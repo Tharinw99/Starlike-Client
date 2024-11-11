@@ -20,13 +20,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,7 +38,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockStainedGlass extends BlockBreakable {
 	public static final PropertyEnum<EnumDyeColor> COLOR = PropertyEnum.<EnumDyeColor>create("color",
@@ -50,16 +50,19 @@ public class BlockStainedGlass extends BlockBreakable {
 		this.setCreativeTab(CreativeTabs.tabBlock);
 	}
 
+	@Override
 	public void breakBlock(World world, BlockPos blockpos, IBlockState var3) {
 		if (!world.isRemote) {
 			BlockBeacon.updateColorAsync(world, blockpos);
 		}
 	}
 
+	@Override
 	protected boolean canSilkHarvest() {
 		return true;
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { COLOR });
 	}
@@ -69,10 +72,12 @@ public class BlockStainedGlass extends BlockBreakable {
 	 * when the block gets destroyed. It returns the metadata of the dropped item
 	 * based on the old metadata of the block.
 	 */
+	@Override
 	public int damageDropped(IBlockState iblockstate) {
 		return ((EnumDyeColor) iblockstate.getValue(COLOR)).getMetadata();
 	}
 
+	@Override
 	public EnumWorldBlockLayer getBlockLayer() {
 		return EnumWorldBlockLayer.TRANSLUCENT;
 	}
@@ -80,6 +85,7 @@ public class BlockStainedGlass extends BlockBreakable {
 	/**
 	 * + Get the MapColor for this Block and the given BlockState
 	 */
+	@Override
 	public MapColor getMapColor(IBlockState iblockstate) {
 		return ((EnumDyeColor) iblockstate.getValue(COLOR)).getMapColor();
 	}
@@ -87,6 +93,7 @@ public class BlockStainedGlass extends BlockBreakable {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		return ((EnumDyeColor) iblockstate.getValue(COLOR)).getMetadata();
 	}
@@ -94,6 +101,7 @@ public class BlockStainedGlass extends BlockBreakable {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(COLOR, EnumDyeColor.byMetadata(i));
 	}
@@ -102,6 +110,7 @@ public class BlockStainedGlass extends BlockBreakable {
 	 * + returns a list of blocks with the same ID, but different meta (eg: wood
 	 * returns 4 blocks)
 	 */
+	@Override
 	public void getSubBlocks(Item item, CreativeTabs var2, List<ItemStack> list) {
 		EnumDyeColor[] colors = EnumDyeColor.META_LOOKUP;
 		for (int i = 0; i < colors.length; ++i) {
@@ -110,10 +119,12 @@ public class BlockStainedGlass extends BlockBreakable {
 
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
 
+	@Override
 	public void onBlockAdded(World world, BlockPos blockpos, IBlockState var3) {
 		if (!world.isRemote) {
 			BlockBeacon.updateColorAsync(world, blockpos);
@@ -123,6 +134,7 @@ public class BlockStainedGlass extends BlockBreakable {
 	/**
 	 * + Returns the quantity of items to drop on block destruction.
 	 */
+	@Override
 	public int quantityDropped(EaglercraftRandom var1) {
 		return 0;
 	}

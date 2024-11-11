@@ -14,13 +14,13 @@ import net.minecraft.block.properties.IProperty;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -32,11 +32,12 @@ import net.minecraft.block.properties.IProperty;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class BlockStateBase implements IBlockState {
 	private static final Joiner COMMA_JOINER = Joiner.on(',');
 	private static final Function<Entry<IProperty, Comparable>, String> MAP_ENTRY_TO_STRING = new Function<Entry<IProperty, Comparable>, String>() {
+		@Override
 		public String apply(Entry<IProperty, Comparable> entry) {
 			if (entry == null) {
 				return "<NULL>";
@@ -63,11 +64,13 @@ public abstract class BlockStateBase implements IBlockState {
 		return (T) iterator.next();
 	}
 
+	@Override
 	public <T extends Comparable<T>> IBlockState cycleProperty(IProperty<T> property) {
 		return this.withProperty(property,
 				(T) cyclePropertyValue(property.getAllowedValues(), this.getValue(property)));
 	}
 
+	@Override
 	public String toString() {
 		StringBuilder stringbuilder = new StringBuilder();
 		stringbuilder.append(Block.blockRegistry.getNameForObject(this.getBlock()));

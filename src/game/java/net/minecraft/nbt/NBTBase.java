@@ -7,13 +7,13 @@ import java.io.IOException;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -25,7 +25,7 @@ import java.io.IOException;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class NBTBase {
 	public abstract static class NBTPrimitive extends NBTBase {
@@ -43,7 +43,7 @@ public abstract class NBTBase {
 	}
 
 	public static final String[] NBT_TYPES = new String[] { "END", "BYTE", "SHORT", "INT", "LONG", "FLOAT", "DOUBLE",
-			"BYTE[]", "STRING", "LIST", "COMPOUND", "INT[]" };
+			"BYTE[]", "STRING", "LIST", "COMPOUND", "INT[]", "LONG[]" };
 
 	/**
 	 * + Creates a new NBTBase object that corresponds with the passed in id.
@@ -74,6 +74,8 @@ public abstract class NBTBase {
 			return new NBTTagCompound();
 		case 11:
 			return new NBTTagIntArray();
+		case 12:
+			return new NBTTagLongArray();
 		default:
 			return null;
 		}
@@ -81,6 +83,7 @@ public abstract class NBTBase {
 
 	public abstract NBTBase copy();
 
+	@Override
 	public boolean equals(Object object) {
 		if (!(object instanceof NBTBase)) {
 			return false;
@@ -96,6 +99,7 @@ public abstract class NBTBase {
 		return this.toString();
 	}
 
+	@Override
 	public int hashCode() {
 		return this.getId();
 	}
@@ -109,6 +113,7 @@ public abstract class NBTBase {
 
 	abstract void read(DataInput var1, int var2, NBTSizeTracker var3) throws IOException;
 
+	@Override
 	public abstract String toString();
 
 	abstract void write(DataOutput var1) throws IOException;

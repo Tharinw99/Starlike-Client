@@ -1,6 +1,6 @@
 {
-    "parent": "block/cube_all",
-    "textures": {
-        "all": "starlike:blocks/gilded_blackstone"
-    }
+  "parent": "block/cube_all",
+  "textures": {
+    "all": "starlike:blocks/gilded_blackstone"
+  }
 }

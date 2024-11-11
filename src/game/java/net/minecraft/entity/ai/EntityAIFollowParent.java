@@ -7,13 +7,13 @@ import net.minecraft.entity.passive.EntityAnimal;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -25,7 +25,7 @@ import net.minecraft.entity.passive.EntityAnimal;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityAIFollowParent extends EntityAIBase {
 	EntityAnimal childAnimal;
@@ -41,6 +41,7 @@ public class EntityAIFollowParent extends EntityAIBase {
 	/**
 	 * + Returns whether an in-progress EntityAIBase should continue executing
 	 */
+	@Override
 	public boolean continueExecuting() {
 		if (this.childAnimal.getGrowingAge() >= 0) {
 			return false;
@@ -55,6 +56,7 @@ public class EntityAIFollowParent extends EntityAIBase {
 	/**
 	 * + Resets the task
 	 */
+	@Override
 	public void resetTask() {
 		this.parentAnimal = null;
 	}
@@ -62,6 +64,7 @@ public class EntityAIFollowParent extends EntityAIBase {
 	/**
 	 * + Returns whether the EntityAIBase should begin execution.
 	 */
+	@Override
 	public boolean shouldExecute() {
 		if (this.childAnimal.getGrowingAge() >= 0) {
 			return false;
@@ -96,6 +99,7 @@ public class EntityAIFollowParent extends EntityAIBase {
 	/**
 	 * + Execute a one shot task or start executing a continuous task
 	 */
+	@Override
 	public void startExecuting() {
 		this.delayCounter = 0;
 	}
@@ -103,6 +107,7 @@ public class EntityAIFollowParent extends EntityAIBase {
 	/**
 	 * + Updates the task
 	 */
+	@Override
 	public void updateTask() {
 		if (--this.delayCounter <= 0) {
 			this.delayCounter = 10;

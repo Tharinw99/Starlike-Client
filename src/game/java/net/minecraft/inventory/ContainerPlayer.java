@@ -14,13 +14,13 @@ import net.minecraft.network.play.server.S30PacketWindowItems;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -32,7 +32,7 @@ import net.minecraft.network.play.server.S30PacketWindowItems;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ContainerPlayer extends Container {
 	/**
@@ -59,14 +59,17 @@ public class ContainerPlayer extends Container {
 			final int k2 = k;
 			this.addSlotToContainer(
 					new Slot(playerInventory, playerInventory.getSizeInventory() - 1 - k, 8, 8 + k * 18) {
+						@Override
 						public int getSlotStackLimit() {
 							return 1;
 						}
 
+						@Override
 						public String getSlotTexture() {
 							return ItemArmor.EMPTY_SLOT_NAMES[k2];
 						}
 
+						@Override
 						public boolean isItemValid(ItemStack itemstack) {
 							return itemstack == null ? false
 									: (itemstack.getItem() instanceof ItemArmor
@@ -90,6 +93,7 @@ public class ContainerPlayer extends Container {
 		this.onCraftMatrixChanged(this.craftMatrix);
 	}
 
+	@Override
 	public boolean canInteractWith(EntityPlayer var1) {
 		return true;
 	}
@@ -99,6 +103,7 @@ public class ContainerPlayer extends Container {
 	 * (double-click) code. The stack passed in is null for the initial slot that
 	 * was double-clicked.
 	 */
+	@Override
 	public boolean canMergeSlot(ItemStack itemstack, Slot slot) {
 		return slot.inventory != this.craftResult && super.canMergeSlot(itemstack, slot);
 	}
@@ -106,6 +111,7 @@ public class ContainerPlayer extends Container {
 	/**
 	 * + Called when the container is closed.
 	 */
+	@Override
 	public void onContainerClosed(EntityPlayer entityplayer) {
 		super.onContainerClosed(entityplayer);
 
@@ -129,6 +135,7 @@ public class ContainerPlayer extends Container {
 	/**
 	 * + Callback for when the crafting matrix is changed.
 	 */
+	@Override
 	public void onCraftMatrixChanged(IInventory var1) {
 		this.craftResult.setInventorySlotContents(0,
 				CraftingManager.getInstance().findMatchingRecipe(this.craftMatrix, this.thePlayer.worldObj));
@@ -137,6 +144,7 @@ public class ContainerPlayer extends Container {
 	/**
 	 * + Take a stack from the specified inventory slot.
 	 */
+	@Override
 	public ItemStack transferStackInSlot(EntityPlayer entityplayer, int i) {
 		ItemStack itemstack = null;
 		Slot slot = (Slot) this.inventorySlots.get(i);

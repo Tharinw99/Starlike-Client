@@ -304,7 +304,7 @@ public abstract class Equivalence<T> {
 	/**
 	 * Returns a predicate that evaluates to true if and only if the input is
 	 * equivalent to {@code target} according to this equivalence relation.
-	 * 
+	 *
 	 * @since 10.0
 	 */
 	@Beta
@@ -356,10 +356,10 @@ public abstract class Equivalence<T> {
 	 * 	Equivalence<Person> SAME_AGE = Equivalence.equals().onResultOf(GET_PERSON_AGE);
 	 * }
 	 * </pre>
-	 * 
+	 *
 	 * <p>
 	 * {@code function} will never be invoked with a null value.
-	 * 
+	 *
 	 * <p>
 	 * Note that {@code function} must be consistent according to {@code this}
 	 * equivalence relation. That is, invoking {@link Function#apply} multiple times
@@ -367,7 +367,7 @@ public abstract class Equivalence<T> {
 	 * {@code Equivalence.identity().onResultOf(Functions.toStringFunction())} is
 	 * broken because it's not guaranteed that {@link Object#toString}) always
 	 * returns the same string instance.
-	 * 
+	 *
 	 * @since 10.0
 	 */
 	public final <F> Equivalence<F> onResultOf(Function<F, ? extends T> function) {
@@ -380,7 +380,7 @@ public abstract class Equivalence<T> {
 	 * both contain the same number of elements, and each pair of corresponding
 	 * elements is equivalent according to {@code this}. Null iterables are
 	 * equivalent to one another.
-	 * 
+	 *
 	 * <p>
 	 * Note that this method performs a similar function for equivalences as
 	 * {@link com.google.common.collect.Ordering#lexicographical} does for
@@ -401,7 +401,7 @@ public abstract class Equivalence<T> {
 	 * Returns a wrapper of {@code reference} that implements
 	 * {@link Wrapper#equals(Object) Object.equals()} such that
 	 * {@code wrap(a).equals(wrap(b))} if and only if {@code equivalent(a, b)}.
-	 * 
+	 *
 	 * @since 10.0
 	 */
 	public final <S extends T> Wrapper<S> wrap(@Nullable S reference) {

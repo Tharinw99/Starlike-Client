@@ -24,13 +24,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -42,7 +42,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockPistonExtension extends Block {
 	public static enum EnumPistonType implements IStringSerializable {
@@ -54,10 +54,12 @@ public class BlockPistonExtension extends Block {
 			this.VARIANT = name;
 		}
 
+		@Override
 		public String getName() {
 			return this.VARIANT;
 		}
 
+		@Override
 		public String toString() {
 			return this.VARIANT;
 		}
@@ -91,6 +93,7 @@ public class BlockPistonExtension extends Block {
 	 * + Add all collision boxes of this Block to the list that intersect with the
 	 * given mask.
 	 */
+	@Override
 	public void addCollisionBoxesToList(World world, BlockPos blockpos, IBlockState iblockstate,
 			AxisAlignedBB axisalignedbb, List<AxisAlignedBB> list, Entity entity) {
 		this.applyHeadBounds(iblockstate);
@@ -155,6 +158,7 @@ public class BlockPistonExtension extends Block {
 		}
 	}
 
+	@Override
 	public void breakBlock(World world, BlockPos blockpos, IBlockState iblockstate) {
 		super.breakBlock(world, blockpos, iblockstate);
 		EnumFacing enumfacing = ((EnumFacing) iblockstate.getValue(FACING)).getOpposite();
@@ -168,6 +172,7 @@ public class BlockPistonExtension extends Block {
 
 	}
 
+	@Override
 	public boolean canPlaceBlockAt(World var1, BlockPos var2) {
 		return false;
 	}
@@ -175,14 +180,17 @@ public class BlockPistonExtension extends Block {
 	/**
 	 * + Check whether this Block can be placed on the given side
 	 */
+	@Override
 	public boolean canPlaceBlockOnSide(World var1, BlockPos var2, EnumFacing var3) {
 		return false;
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { FACING, TYPE, SHORT });
 	}
 
+	@Override
 	public Item getItem(World world, BlockPos blockpos) {
 		return world.getBlockState(blockpos).getValue(TYPE) == BlockPistonExtension.EnumPistonType.STICKY
 				? Item.getItemFromBlock(Blocks.sticky_piston)
@@ -192,6 +200,7 @@ public class BlockPistonExtension extends Block {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
 		i = i | ((EnumFacing) iblockstate.getValue(FACING)).getIndex();
@@ -205,11 +214,13 @@ public class BlockPistonExtension extends Block {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(FACING, getFacing(i)).withProperty(TYPE,
 				(i & 8) > 0 ? BlockPistonExtension.EnumPistonType.STICKY : BlockPistonExtension.EnumPistonType.DEFAULT);
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -218,10 +229,12 @@ public class BlockPistonExtension extends Block {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
 
+	@Override
 	public void onBlockHarvested(World world, BlockPos blockpos, IBlockState iblockstate, EntityPlayer entityplayer) {
 		if (entityplayer.capabilities.isCreativeMode) {
 			EnumFacing enumfacing = (EnumFacing) iblockstate.getValue(FACING);
@@ -240,6 +253,7 @@ public class BlockPistonExtension extends Block {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block block) {
 		EnumFacing enumfacing = (EnumFacing) iblockstate.getValue(FACING);
 		BlockPos blockpos1 = blockpos.offset(enumfacing.getOpposite());
@@ -255,14 +269,17 @@ public class BlockPistonExtension extends Block {
 	/**
 	 * + Returns the quantity of items to drop on block destruction.
 	 */
+	@Override
 	public int quantityDropped(EaglercraftRandom var1) {
 		return 0;
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
 		this.applyHeadBounds(iblockaccess.getBlockState(blockpos));
 	}
 
+	@Override
 	public boolean shouldSideBeRendered(IBlockAccess var1, BlockPos var2, EnumFacing var3) {
 		return true;
 	}

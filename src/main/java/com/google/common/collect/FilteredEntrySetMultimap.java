@@ -24,7 +24,7 @@ import com.google.common.base.Predicate;
 
 /**
  * Implementation of {@link Multimaps#filterEntries(SetMultimap, Predicate)}.
- * 
+ *
  * @author Louis Wasserman
  */
 @GwtCompatible

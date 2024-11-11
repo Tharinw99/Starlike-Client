@@ -19,13 +19,13 @@ import net.minecraft.server.MinecraftServer;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -37,7 +37,7 @@ import net.minecraft.server.MinecraftServer;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ServerScoreboard extends Scoreboard {
 
@@ -52,6 +52,7 @@ public class ServerScoreboard extends Scoreboard {
 	/**
 	 * + Adds a player to the given team
 	 */
+	@Override
 	public boolean addPlayerToTeam(String s, String s1) {
 		if (super.addPlayerToTeam(s, s1)) {
 			ScorePlayerTeam scoreplayerteam = this.getTeam(s1);
@@ -68,6 +69,7 @@ public class ServerScoreboard extends Scoreboard {
 	 * + This packet will notify the players that this team is created, and that
 	 * will register it on the client
 	 */
+	@Override
 	public void broadcastTeamCreated(ScorePlayerTeam scoreplayerteam) {
 		super.broadcastTeamCreated(scoreplayerteam);
 		this.scoreboardMCServer.getConfigurationManager()
@@ -75,6 +77,7 @@ public class ServerScoreboard extends Scoreboard {
 		this.func_96551_b();
 	}
 
+	@Override
 	public void func_178820_a(String s, ScoreObjective scoreobjective) {
 		super.func_178820_a(s, scoreobjective);
 		this.scoreboardMCServer.getConfigurationManager()
@@ -82,6 +85,7 @@ public class ServerScoreboard extends Scoreboard {
 		this.func_96551_b();
 	}
 
+	@Override
 	public void func_96513_c(ScorePlayerTeam scoreplayerteam) {
 		super.func_96513_c(scoreplayerteam);
 		this.scoreboardMCServer.getConfigurationManager()
@@ -89,12 +93,14 @@ public class ServerScoreboard extends Scoreboard {
 		this.func_96551_b();
 	}
 
+	@Override
 	public void func_96516_a(String s) {
 		super.func_96516_a(s);
 		this.scoreboardMCServer.getConfigurationManager().sendPacketToAllPlayers(new S3CPacketUpdateScore(s));
 		this.func_96551_b();
 	}
 
+	@Override
 	public void func_96532_b(ScoreObjective scoreobjective) {
 		super.func_96532_b(scoreobjective);
 		if (this.field_96553_b.contains(scoreobjective)) {
@@ -105,6 +111,7 @@ public class ServerScoreboard extends Scoreboard {
 		this.func_96551_b();
 	}
 
+	@Override
 	public void func_96533_c(ScoreObjective scoreobjective) {
 		super.func_96533_c(scoreobjective);
 		if (this.field_96553_b.contains(scoreobjective)) {
@@ -114,6 +121,7 @@ public class ServerScoreboard extends Scoreboard {
 		this.func_96551_b();
 	}
 
+	@Override
 	public void func_96536_a(Score score) {
 		super.func_96536_a(score);
 		if (this.field_96553_b.contains(score.getObjective())) {
@@ -207,6 +215,7 @@ public class ServerScoreboard extends Scoreboard {
 	/**
 	 * + Called when a score objective is added
 	 */
+	@Override
 	public void onScoreObjectiveAdded(ScoreObjective scoreobjective) {
 		super.onScoreObjectiveAdded(scoreobjective);
 		this.func_96551_b();
@@ -216,6 +225,7 @@ public class ServerScoreboard extends Scoreboard {
 	 * + Removes the given username from the given ScorePlayerTeam. If the player is
 	 * not on the team then an IllegalStateException is thrown.
 	 */
+	@Override
 	public void removePlayerFromTeam(String s, ScorePlayerTeam scoreplayerteam) {
 		super.removePlayerFromTeam(s, scoreplayerteam);
 		this.scoreboardMCServer.getConfigurationManager()
@@ -226,6 +236,7 @@ public class ServerScoreboard extends Scoreboard {
 	/**
 	 * + This packet will notify the players that this team is updated
 	 */
+	@Override
 	public void sendTeamUpdate(ScorePlayerTeam scoreplayerteam) {
 		super.sendTeamUpdate(scoreplayerteam);
 		this.scoreboardMCServer.getConfigurationManager()
@@ -236,6 +247,7 @@ public class ServerScoreboard extends Scoreboard {
 	/**
 	 * + 0 is tab menu, 1 is sidebar, 2 is below name
 	 */
+	@Override
 	public void setObjectiveInDisplaySlot(int i, ScoreObjective scoreobjective) {
 		ScoreObjective scoreobjective1 = this.getObjectiveInDisplaySlot(i);
 		super.setObjectiveInDisplaySlot(i, scoreobjective);

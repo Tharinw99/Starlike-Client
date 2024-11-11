@@ -132,7 +132,7 @@ public class LibraryLWJGLOpenAL extends Library {
 		/**
 		 * Constructor: Generates a standard "unknown error" exception with the
 		 * specified message.
-		 * 
+		 *
 		 * @param message A brief description of the problem that occurred.
 		 */
 		public Exception(String message) {
@@ -142,7 +142,7 @@ public class LibraryLWJGLOpenAL extends Library {
 		/**
 		 * Constructor: Generates an exception of the specified type, with the specified
 		 * message.
-		 * 
+		 *
 		 * @param message A brief description of the problem that occurred.
 		 * @param type    Identifier indicating they type of error.
 		 */
@@ -174,7 +174,7 @@ public class LibraryLWJGLOpenAL extends Library {
 
 	/**
 	 * Whether or not the AL_PITCH control is supported.
-	 * 
+	 *
 	 * @return True if AL_PITCH is supported.
 	 */
 	public static boolean alPitchSupported() {
@@ -183,7 +183,7 @@ public class LibraryLWJGLOpenAL extends Library {
 
 	/**
 	 * Sets or returns the value of boolean 'alPitchSupported'.
-	 * 
+	 *
 	 * @param action Action to perform (GET or SET).
 	 * @param value  New value if action is SET, otherwise XXX.
 	 * @return value of boolean 'alPitchSupported'.
@@ -196,7 +196,7 @@ public class LibraryLWJGLOpenAL extends Library {
 
 	/**
 	 * Returns a longer description of this library type.
-	 * 
+	 *
 	 * @return A longer description.
 	 */
 	public static String getDescription() {
@@ -205,7 +205,7 @@ public class LibraryLWJGLOpenAL extends Library {
 
 	/**
 	 * Returns the short title of this library type.
-	 * 
+	 *
 	 * @return A short title.
 	 */
 	public static String getTitle() {
@@ -214,7 +214,7 @@ public class LibraryLWJGLOpenAL extends Library {
 
 	/**
 	 * Checks if the OpenAL library type is compatible.
-	 * 
+	 *
 	 * @return True or false.
 	 */
 	public static boolean libraryCompatible() {
@@ -257,7 +257,7 @@ public class LibraryLWJGLOpenAL extends Library {
 
 	/**
 	 * Checks for OpenAL errors, and prints a message if there is an error.
-	 * 
+	 *
 	 * @return True if there was an error, False if not.
 	 */
 	private boolean checkALError() {
@@ -324,7 +324,7 @@ public class LibraryLWJGLOpenAL extends Library {
 
 	/**
 	 * Creates sources based on the source map provided.
-	 * 
+	 *
 	 * @param srcMap Sources to copy.
 	 */
 	@Override
@@ -372,7 +372,7 @@ public class LibraryLWJGLOpenAL extends Library {
 	 * Creates a new channel of the specified type (normal or streaming). Possible
 	 * values for channel type can be found in the
 	 * {@link paulscode.sound.SoundSystemConfig SoundSystemConfig} class.
-	 * 
+	 *
 	 * @param type Type of channel.
 	 */
 	@Override
@@ -410,7 +410,7 @@ public class LibraryLWJGLOpenAL extends Library {
 
 	/**
 	 * Returns the name of the class.
-	 * 
+	 *
 	 * @return "Library" + library title.
 	 */
 	@Override
@@ -509,7 +509,7 @@ public class LibraryLWJGLOpenAL extends Library {
 
 	/**
 	 * Pre-loads a sound into memory.
-	 * 
+	 *
 	 * @param filenameURL Filename/URL of the sound file to load.
 	 * @return True if the sound loaded properly.
 	 */
@@ -606,7 +606,7 @@ public class LibraryLWJGLOpenAL extends Library {
 	 * Saves the specified sample data, under the specified identifier. This
 	 * identifier can be later used in place of 'filename' parameters to reference
 	 * the sample data.
-	 * 
+	 *
 	 * @param buffer     the sample data and audio format to save.
 	 * @param identifier What to call the sample.
 	 * @return True if there weren't any problems.
@@ -686,7 +686,7 @@ public class LibraryLWJGLOpenAL extends Library {
 
 	/**
 	 * Creates a new source and places it into the source map.
-	 * 
+	 *
 	 * @param priority    Setting this to true will prevent other sounds from
 	 *                    overriding this one.
 	 * @param toStream    Setting this to true will load the sound in pieces rather
@@ -757,7 +757,7 @@ public class LibraryLWJGLOpenAL extends Library {
 
 	/**
 	 * Creates and immediately plays a new source.
-	 * 
+	 *
 	 * @param priority    Setting this to true will prevent other sounds from
 	 *                    overriding this one.
 	 * @param toStream    Setting this to true will load the sound in pieces rather
@@ -827,7 +827,7 @@ public class LibraryLWJGLOpenAL extends Library {
 
 	/**
 	 * Opens a direct line for streaming audio data.
-	 * 
+	 *
 	 * @param audioFormat Format that the data will be in.
 	 * @param priority    Setting this to true will prevent other sounds from
 	 *                    overriding this one.
@@ -850,7 +850,7 @@ public class LibraryLWJGLOpenAL extends Library {
 	/**
 	 * Changes the listeners orientation to the specified 'angle' radians
 	 * counterclockwise around the y-Axis.
-	 * 
+	 *
 	 * @param angle Radians.
 	 */
 	@Override
@@ -869,7 +869,7 @@ public class LibraryLWJGLOpenAL extends Library {
 	/**
 	 * Changes the listeners position and orientation using the specified listener
 	 * data.
-	 * 
+	 *
 	 * @param l Listener data to use.
 	 */
 	@Override
@@ -900,7 +900,7 @@ public class LibraryLWJGLOpenAL extends Library {
 
 	/**
 	 * Changes the listeners orientation using the specified coordinates.
-	 * 
+	 *
 	 * @param lookX X element of the look-at direction.
 	 * @param lookY Y element of the look-at direction.
 	 * @param lookZ Z element of the look-at direction.
@@ -923,7 +923,7 @@ public class LibraryLWJGLOpenAL extends Library {
 
 	/**
 	 * Changes the listener's position.
-	 * 
+	 *
 	 * @param x Destination X coordinate.
 	 * @param y Destination Y coordinate.
 	 * @param z Destination Z coordinate.
@@ -944,7 +944,7 @@ public class LibraryLWJGLOpenAL extends Library {
 
 	/**
 	 * Sets the listener's velocity, for use in Doppler effect.
-	 * 
+	 *
 	 * @param x Velocity along world x-axis.
 	 * @param y Velocity along world y-axis.
 	 * @param z Velocity along world z-axis.
@@ -961,7 +961,7 @@ public class LibraryLWJGLOpenAL extends Library {
 
 	/**
 	 * Sets the overall volume to the specified value, affecting all sources.
-	 * 
+	 *
 	 * @param value New volume, float value ( 0.0f - 1.0f ).
 	 */
 	@Override
@@ -977,7 +977,7 @@ public class LibraryLWJGLOpenAL extends Library {
 	 * freeing up memory after a large sound file is no longer needed. NOTE: the
 	 * source will remain in memory after this method has been called, for as long
 	 * as the sound is attached to an existing source.
-	 * 
+	 *
 	 * @param filename Filename/identifier of the sound file to unload.
 	 */
 	@Override

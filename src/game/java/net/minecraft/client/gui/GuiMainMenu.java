@@ -56,13 +56,13 @@ import net.minecraft.world.storage.ISaveFormat;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -74,7 +74,7 @@ import net.minecraft.world.storage.ISaveFormat;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
 	private static final Logger logger = LogManager.getLogger();
@@ -183,6 +183,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
 	 * + Called by the controls from the buttonList when activated. (Mouse pressed
 	 * for buttons)
 	 */
+	@Override
 	protected void actionPerformed(GuiButton parGuiButton) {
 		if (parGuiButton.id == 0) {
 			this.mc.displayGuiScreen(new GuiOptions(this, this.mc.gameSettings));
@@ -264,6 +265,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
 		}
 	}
 
+	@Override
 	public void confirmClicked(boolean flag, int i) {
 		if (flag && i == 12) {
 			this.mc.gameSettings.hasCreatedDemoWorld = false;
@@ -281,6 +283,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
 	 * + Returns true if this GUI should pause the game when it is displayed in
 	 * single-player
 	 */
+	@Override
 	public boolean doesGuiPauseGame() {
 		return false;
 	}
@@ -377,6 +380,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
 	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
 	 * renderPartialTicks
 	 */
+	@Override
 	public void drawScreen(int i, int j, float f) {
 		GlStateManager.disableAlpha();
 		if (enableBlur) {
@@ -435,30 +439,24 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
 		this.drawCenteredString(this.fontRendererObj, this.splashText, 0, -8, -256);
 		GlStateManager.popMatrix();
 
-		String s = EaglercraftVersion.mainMenuStringA;
-		if (this.mc.isDemo()) {
-			s += " Demo";
+		for (int i1 = 0; i1 < EaglercraftVersion.mainMenuStringLeft.length; ++i1) {
+			String s = EaglercraftVersion.mainMenuStringLeft[i1];
+			this.drawString(this.fontRendererObj, s, 2,
+					this.height - (EaglercraftVersion.mainMenuStringLeft.length - i1) * 10, -1);
 		}
-		this.drawString(this.fontRendererObj, s, 2, this.height - 20, -1);
-		s = EaglercraftVersion.mainMenuStringB;
-		this.drawString(this.fontRendererObj, s, 2, this.height - 10, -1);
 
-		String s1 = EaglercraftVersion.mainMenuStringC;
-		this.drawString(this.fontRendererObj, s1, this.width - this.fontRendererObj.getStringWidth(s1) - 2,
-				this.height - 20, -1);
-		s1 = EaglercraftVersion.mainMenuStringD;
-		if (this.mc.isDemo()) {
-			s1 = "Copyright Mojang AB. Do not distribute!";
+		for (int i1 = 0; i1 < EaglercraftVersion.mainMenuStringRight.length; ++i1) {
+			String s = EaglercraftVersion.mainMenuStringRight[i1];
+			this.drawString(this.fontRendererObj, s, this.width - this.fontRendererObj.getStringWidth(s) - 2,
+					this.height - (EaglercraftVersion.mainMenuStringRight.length - i1) * 10, -1);
 		}
-		this.drawString(this.fontRendererObj, s1, this.width - this.fontRendererObj.getStringWidth(s1) - 2,
-				this.height - 10, -1);
 
 		if (!this.mc.isDemo()) {
 			GlStateManager.pushMatrix();
 			GlStateManager.scale(0.75f, 0.75f, 0.75f);
 			int www = 0;
 			int hhh = 0;
-			s1 = EaglercraftVersion.mainMenuStringG;
+			String s1 = EaglercraftVersion.mainMenuStringG;
 			if (s1 != null) {
 				www = this.fontRendererObj.getStringWidth(s1);
 				hhh += 10;
@@ -528,6 +526,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
 	 * when the GUI is displayed and when the window resizes, the buttonList is
 	 * cleared beforehand.
 	 */
+	@Override
 	public void initGui() {
 		if (viewportTexture == null) {
 			viewportTexture = new DynamicTexture(256, 256);
@@ -586,12 +585,14 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
 	 * the equivalent of KeyListener.keyTyped(KeyEvent e). Args : character
 	 * (character on the key), keyCode (lwjgl Keyboard key code)
 	 */
+	@Override
 	protected void keyTyped(char parChar1, int parInt1) {
 	}
 
 	/**
 	 * + Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
 	 */
+	@Override
 	protected void mouseClicked(int par1, int par2, int par3) {
 		if (par3 == 0) {
 			String lbl = "CREDITS.txt";
@@ -729,6 +730,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
 	/**
 	 * + Called from the main game loop to update the screen.
 	 */
+	@Override
 	public void updateScreen() {
 		++this.panoramaTimer;
 		if (downloadOfflineButton != null) {

@@ -25,13 +25,13 @@ import net.minecraft.world.WorldProviderEnd;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -43,7 +43,7 @@ import net.minecraft.world.WorldProviderEnd;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockFire extends Block {
 	public static final PropertyInteger AGE = PropertyInteger.create("age", 0, 15);
@@ -132,6 +132,7 @@ public class BlockFire extends Block {
 		return false;
 	}
 
+	@Override
 	public boolean canPlaceBlockAt(World world, BlockPos blockpos) {
 		return World.doesBlockHaveSolidTopSurface(world, blockpos.down()) || this.canNeighborCatchFire(world, blockpos);
 	}
@@ -159,6 +160,7 @@ public class BlockFire extends Block {
 
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { AGE, NORTH, EAST, SOUTH, WEST, UPPER, FLIP, ALT });
 	}
@@ -167,6 +169,7 @@ public class BlockFire extends Block {
 	 * + Get the actual Block state of this Block at the given position. This
 	 * applies properties not visible in the metadata, such as fence connections.
 	 */
+	@Override
 	public IBlockState getActualState(IBlockState iblockstate, IBlockAccess iblockaccess, BlockPos blockpos) {
 		int i = blockpos.getX();
 		int j = blockpos.getY();
@@ -191,10 +194,12 @@ public class BlockFire extends Block {
 		}
 	}
 
+	@Override
 	public EnumWorldBlockLayer getBlockLayer() {
 		return EnumWorldBlockLayer.CUTOUT;
 	}
 
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox(World var1, BlockPos var2, IBlockState var3) {
 		return null;
 	}
@@ -212,6 +217,7 @@ public class BlockFire extends Block {
 	/**
 	 * + Get the MapColor for this Block and the given BlockState
 	 */
+	@Override
 	public MapColor getMapColor(IBlockState var1) {
 		return MapColor.tntColor;
 	}
@@ -219,6 +225,7 @@ public class BlockFire extends Block {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		return ((Integer) iblockstate.getValue(AGE)).intValue();
 	}
@@ -241,6 +248,7 @@ public class BlockFire extends Block {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(AGE, Integer.valueOf(i));
 	}
@@ -248,10 +256,12 @@ public class BlockFire extends Block {
 	/**
 	 * + Returns if this block is collidable (only used by Fire). Args: x, y, z
 	 */
+	@Override
 	public boolean isCollidable() {
 		return false;
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -260,10 +270,12 @@ public class BlockFire extends Block {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
 
+	@Override
 	public void onBlockAdded(World world, BlockPos blockpos, IBlockState var3) {
 		if (world.provider.getDimensionId() > 0 || !Blocks.portal.func_176548_d(world, blockpos)) {
 			if (!World.doesBlockHaveSolidTopSurface(world, blockpos.down())
@@ -278,6 +290,7 @@ public class BlockFire extends Block {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState var3, Block var4) {
 		if (!World.doesBlockHaveSolidTopSurface(world, blockpos.down())
 				&& !this.canNeighborCatchFire(world, blockpos)) {
@@ -289,10 +302,12 @@ public class BlockFire extends Block {
 	/**
 	 * + Returns the quantity of items to drop on block destruction.
 	 */
+	@Override
 	public int quantityDropped(EaglercraftRandom var1) {
 		return 0;
 	}
 
+	@Override
 	public void randomDisplayTick(World world, BlockPos blockpos, IBlockState var3, EaglercraftRandom random) {
 		if (random.nextInt(24) == 0) {
 			world.playSound((double) ((float) blockpos.getX() + 0.5F), (double) ((float) blockpos.getY() + 0.5F),
@@ -357,6 +372,7 @@ public class BlockFire extends Block {
 
 	}
 
+	@Override
 	public boolean requiresUpdates() {
 		return false;
 	}
@@ -369,10 +385,12 @@ public class BlockFire extends Block {
 	/**
 	 * + How many world ticks before ticking
 	 */
+	@Override
 	public int tickRate(World var1) {
 		return 30;
 	}
 
+	@Override
 	public void updateTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom random) {
 		if (world.getGameRules().getBoolean("doFireTick")) {
 			if (!this.canPlaceBlockAt(world, blockpos)) {

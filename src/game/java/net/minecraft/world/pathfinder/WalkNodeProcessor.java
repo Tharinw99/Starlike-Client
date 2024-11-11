@@ -17,13 +17,13 @@ import net.minecraft.world.IBlockAccess;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -35,14 +35,14 @@ import net.minecraft.world.IBlockAccess;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class WalkNodeProcessor extends NodeProcessor {
 	public static int func_176170_a(IBlockAccess blockaccessIn, Entity entityIn, int x, int y, int z, int sizeX,
 			int sizeY, int sizeZ, boolean avoidWater, boolean breakDoors, boolean enterDoors) {
 		boolean flag = false;
 		BlockPos blockpos = new BlockPos(entityIn);
-		BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+		BlockPos blockpos$mutableblockpos = new BlockPos();
 
 		for (int i = x; i < x + sizeX; ++i) {
 			for (int j = y; j < y + sizeY; ++j) {
@@ -108,6 +108,7 @@ public class WalkNodeProcessor extends NodeProcessor {
 
 	private boolean shouldAvoidWater;
 
+	@Override
 	public int findPathOptions(PathPoint[] apathpoint, Entity entity, PathPoint pathpoint, PathPoint pathpoint1,
 			float f) {
 		int i = 0;
@@ -154,12 +155,13 @@ public class WalkNodeProcessor extends NodeProcessor {
 	/**
 	 * + Returns given entity's position as PathPoint
 	 */
+	@Override
 	public PathPoint getPathPointTo(Entity entity) {
 		int i;
 		if (this.canSwim && entity.isInWater()) {
 			i = (int) entity.getEntityBoundingBox().minY;
-			BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos(
-					MathHelper.floor_double(entity.posX), i, MathHelper.floor_double(entity.posZ));
+			BlockPos blockpos$mutableblockpos = new BlockPos(MathHelper.floor_double(entity.posX), i,
+					MathHelper.floor_double(entity.posZ));
 
 			for (Block block = this.blockaccess.getBlockState(blockpos$mutableblockpos)
 					.getBlock(); block == Blocks.flowing_water
@@ -182,6 +184,7 @@ public class WalkNodeProcessor extends NodeProcessor {
 	/**
 	 * + Returns PathPoint for given coordinates
 	 */
+	@Override
 	public PathPoint getPathPointToCoords(Entity entity, double d0, double d1, double d2) {
 		return this.openPoint(MathHelper.floor_double(d0 - (double) (entity.width / 2.0F)), MathHelper.floor_double(d1),
 				MathHelper.floor_double(d2 - (double) (entity.width / 2.0F)));
@@ -250,6 +253,7 @@ public class WalkNodeProcessor extends NodeProcessor {
 				this.avoidsWater, this.canBreakDoors, this.canEnterDoors);
 	}
 
+	@Override
 	public void initProcessor(IBlockAccess iblockaccess, Entity entity) {
 		super.initProcessor(iblockaccess, entity);
 		this.shouldAvoidWater = this.avoidsWater;
@@ -262,6 +266,7 @@ public class WalkNodeProcessor extends NodeProcessor {
 	 * {@link net.minecraft.world.pathfinder.WalkNodeProcessor#avoidsWater
 	 * avoidsWater}
 	 */
+	@Override
 	public void postProcess() {
 		super.postProcess();
 		this.avoidsWater = this.shouldAvoidWater;

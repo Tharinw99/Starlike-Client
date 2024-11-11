@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "normal": {
-            "model": "starlike:decorated_birch_log"
-        }
+  "variants": {
+    "normal": {
+      "model": "starlike:decorated_birch_log"
     }
+  }
 }

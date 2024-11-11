@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import net.lax1dude.eaglercraft.v1_8.EagRuntime;
 import net.lax1dude.eaglercraft.v1_8.internal.EnumEaglerConnectionState;
+import net.lax1dude.eaglercraft.v1_8.internal.EnumPlatformType;
 import net.lax1dude.eaglercraft.v1_8.internal.IPCPacketData;
 import net.lax1dude.eaglercraft.v1_8.internal.PlatformApplication;
 import net.lax1dude.eaglercraft.v1_8.internal.PlatformWebRTC;
@@ -61,7 +62,7 @@ import net.minecraft.world.storage.WorldInfo;
 
 /**
  * Copyright (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -73,7 +74,7 @@ import net.minecraft.world.storage.WorldInfo;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class SingleplayerServerController implements ISaveFormat {
 
@@ -357,7 +358,7 @@ public class SingleplayerServerController implements ISaveFormat {
 	}
 
 	public static boolean isChannelNameAllowed(String ch) {
-		return !IPC_CHANNEL.equals(ch) && !PLAYER_CHANNEL.equals(ch);
+		return !ch.startsWith("~!");
 	}
 
 	public static boolean isChannelOpen(String ch) {
@@ -464,7 +465,6 @@ public class SingleplayerServerController implements ISaveFormat {
 		} else {
 			openLANChannels.add(ch);
 			sendIPCPacket(new IPCPacket0CPlayerChannel(ch, true));
-			PlatformWebRTC.serverLANCreatePeer(ch);
 		}
 	}
 
@@ -490,15 +490,21 @@ public class SingleplayerServerController implements ISaveFormat {
 								packetData.contents.length);
 					}
 				} else {
+					// logger.warn("Recieved packet on IPC channel '{}', forwarding to
+					// PlatformWebRTC even though the channel should be mapped",
+					// packetData.channel);
+					// just to be safe
 					PlatformWebRTC.serverLANWritePacket(packetData.channel, packetData.contents);
 				}
 			}
 		}
 
-		boolean logWindowState = PlatformApplication.isShowingDebugConsole();
-		if (loggingState != logWindowState) {
-			loggingState = logWindowState;
-			sendIPCPacket(new IPCPacket1BEnableLogging(logWindowState));
+		if (EagRuntime.getPlatformType() == EnumPlatformType.JAVASCRIPT) {
+			boolean logWindowState = PlatformApplication.isShowingDebugConsole();
+			if (loggingState != logWindowState) {
+				loggingState = logWindowState;
+				sendIPCPacket(new IPCPacket1BEnableLogging(logWindowState));
+			}
 		}
 
 		if (ClientPlatformSingleplayer.isRunningSingleThreadMode()) {
@@ -553,6 +559,7 @@ public class SingleplayerServerController implements ISaveFormat {
 			issuesDetected.clear();
 			statusState = IntegratedServerState.WORLD_WORKER_BOOTING;
 			loggingState = true;
+			callFailed = false;
 			boolean singleThreadSupport = ClientPlatformSingleplayer.isSingleThreadModeSupported();
 			if (!singleThreadSupport && forceSingleThread) {
 				throw new UnsupportedOperationException("Single thread mode is not supported!");

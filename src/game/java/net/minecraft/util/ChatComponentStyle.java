@@ -10,13 +10,13 @@ import com.google.common.collect.Lists;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@ import com.google.common.collect.Lists;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class ChatComponentStyle implements IChatComponent {
 	/**
@@ -39,11 +39,13 @@ public abstract class ChatComponentStyle implements IChatComponent {
 	public static Iterator<IChatComponent> createDeepCopyIterator(Iterable<IChatComponent> components) {
 		Iterator iterator = Iterators.concat(
 				Iterators.transform(components.iterator(), new Function<IChatComponent, Iterator<IChatComponent>>() {
+					@Override
 					public Iterator<IChatComponent> apply(IChatComponent ichatcomponent) {
 						return ichatcomponent.iterator();
 					}
 				}));
 		iterator = Iterators.transform(iterator, new Function<IChatComponent, IChatComponent>() {
+			@Override
 			public IChatComponent apply(IChatComponent ichatcomponent) {
 				IChatComponent ichatcomponent1 = ichatcomponent.createCopy();
 				ichatcomponent1.setChatStyle(ichatcomponent1.getChatStyle().createDeepCopy());
@@ -65,6 +67,7 @@ public abstract class ChatComponentStyle implements IChatComponent {
 	/**
 	 * + Appends the given component to the end of this one.
 	 */
+	@Override
 	public IChatComponent appendSibling(IChatComponent component) {
 		component.getChatStyle().setParentStyle(this.getChatStyle());
 		this.siblings.add(component);
@@ -74,10 +77,12 @@ public abstract class ChatComponentStyle implements IChatComponent {
 	/**
 	 * + Appends the given text to the end of this component.
 	 */
+	@Override
 	public IChatComponent appendText(String text) {
 		return this.appendSibling(new ChatComponentText(text));
 	}
 
+	@Override
 	public boolean equals(Object object) {
 		if (this == object) {
 			return true;
@@ -90,6 +95,7 @@ public abstract class ChatComponentStyle implements IChatComponent {
 		}
 	}
 
+	@Override
 	public ChatStyle getChatStyle() {
 		if (this.style == null) {
 			this.style = new ChatStyle();
@@ -109,6 +115,7 @@ public abstract class ChatComponentStyle implements IChatComponent {
 	/**
 	 * + Gets the text of this component, with formatting codes added for rendering.
 	 */
+	@Override
 	public final String getFormattedText() {
 		StringBuilder stringbuilder = new StringBuilder();
 
@@ -124,6 +131,7 @@ public abstract class ChatComponentStyle implements IChatComponent {
 	/**
 	 * + Gets the sibling components of this one.
 	 */
+	@Override
 	public List<IChatComponent> getSiblings() {
 		return this.siblings;
 	}
@@ -132,6 +140,7 @@ public abstract class ChatComponentStyle implements IChatComponent {
 	 * + Get the text of this component, <em>and all child components</em>, with all
 	 * special formatting codes removed.
 	 */
+	@Override
 	public final String getUnformattedText() {
 		StringBuilder stringbuilder = new StringBuilder();
 
@@ -142,15 +151,18 @@ public abstract class ChatComponentStyle implements IChatComponent {
 		return stringbuilder.toString();
 	}
 
+	@Override
 	public int hashCode() {
 		return 31 * this.style.hashCode() + this.siblings.hashCode();
 	}
 
+	@Override
 	public Iterator<IChatComponent> iterator() {
 		return Iterators.concat(Iterators.forArray(new ChatComponentStyle[] { this }),
 				createDeepCopyIterator(this.siblings));
 	}
 
+	@Override
 	public IChatComponent setChatStyle(ChatStyle style) {
 		this.style = style;
 
@@ -161,6 +173,7 @@ public abstract class ChatComponentStyle implements IChatComponent {
 		return this;
 	}
 
+	@Override
 	public String toString() {
 		return "BaseComponent{style=" + this.style + ", siblings=" + this.siblings + '}';
 	}

@@ -32,7 +32,7 @@ import com.google.common.annotations.GwtCompatible;
  * Like any other {@code Map<Class, Object>}, this map may contain entries for
  * primitive types, and a primitive type and its corresponding wrapper type may
  * map to different values.
- * 
+ *
  * <p>
  * See the Guava User Guide article on <a href=
  * "http://code.google.com/p/guava-libraries/wiki/NewCollectionTypesExplained#ClassToInstanceMap">

@@ -11,13 +11,13 @@ import net.minecraft.item.ItemStack;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,7 +29,7 @@ import net.minecraft.item.ItemStack;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class CreativeCrafting implements ICrafting {
 	private final Minecraft mc;
@@ -38,6 +38,7 @@ public class CreativeCrafting implements ICrafting {
 		this.mc = mc;
 	}
 
+	@Override
 	public void func_175173_a(Container var1, IInventory var2) {
 	}
 
@@ -47,6 +48,7 @@ public class CreativeCrafting implements ICrafting {
 	 * int identifies which variable to update, and the second contains the new
 	 * value. Both are truncated to shorts in non-local SMP.
 	 */
+	@Override
 	public void sendProgressBarUpdate(Container var1, int var2, int var3) {
 	}
 
@@ -55,6 +57,7 @@ public class CreativeCrafting implements ICrafting {
 	 * doesn't have to match the actual contents of that slot. Args: Container, slot
 	 * number, slot contents
 	 */
+	@Override
 	public void sendSlotContents(Container var1, int i, ItemStack itemstack) {
 		this.mc.playerController.sendSlotPacket(itemstack, i);
 	}
@@ -62,6 +65,7 @@ public class CreativeCrafting implements ICrafting {
 	/**
 	 * + update the crafting window inventory with the items in the list
 	 */
+	@Override
 	public void updateCraftingInventory(Container var1, List<ItemStack> var2) {
 	}
 }

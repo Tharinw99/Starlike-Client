@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "normal": {
-            "model": "starlike:ghast_chiseled_quartz_block"
-        }
+  "variants": {
+    "normal": {
+      "model": "starlike:ghast_chiseled_quartz_block"
     }
+  }
 }

@@ -32,7 +32,7 @@ import com.google.common.annotations.GwtIncompatible;
  * A {@code BiMap} backed by two {@code EnumMap} instances. Null keys and values
  * are not permitted. An {@code EnumBiMap} and its inverse are both
  * serializable.
- * 
+ *
  * <p>
  * See the Guava User Guide article on <a href=
  * "http://code.google.com/p/guava-libraries/wiki/NewCollectionTypesExplained#BiMap">

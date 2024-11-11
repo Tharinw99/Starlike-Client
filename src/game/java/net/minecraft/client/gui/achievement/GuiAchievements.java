@@ -32,13 +32,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -50,7 +50,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiAchievements extends GuiScreen implements IProgressMeter {
 	private static final int field_146572_y = AchievementList.minDisplayColumn * 24 - 112;
@@ -90,6 +90,7 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter {
 	 * + Called by the controls from the buttonList when activated. (Mouse pressed
 	 * for buttons)
 	 */
+	@Override
 	protected void actionPerformed(GuiButton parGuiButton) {
 		if (!this.loadingAchievements) {
 			if (parGuiButton.id == 1) {
@@ -103,10 +104,12 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter {
 	 * + Returns true if this GUI should pause the game when it is displayed in
 	 * single-player
 	 */
+	@Override
 	public boolean doesGuiPauseGame() {
 		return !this.loadingAchievements;
 	}
 
+	@Override
 	public void doneLoading() {
 		if (this.loadingAchievements) {
 			this.loadingAchievements = false;
@@ -366,6 +369,7 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter {
 	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
 	 * renderPartialTicks
 	 */
+	@Override
 	public void drawScreen(int i, int j, float f) {
 		if (this.loadingAchievements) {
 			this.drawDefaultBackground();
@@ -457,6 +461,7 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter {
 				.getTexture(parBlock.getDefaultState());
 	}
 
+	@Override
 	protected int getCloseKey() {
 		return this.mc.gameSettings.keyBindInventory.getKeyCode();
 	}
@@ -466,6 +471,7 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter {
 	 * when the GUI is displayed and when the window resizes, the buttonList is
 	 * cleared beforehand.
 	 */
+	@Override
 	public void initGui() {
 		this.mc.getNetHandler()
 				.addToSendQueue(new C16PacketClientStatus(C16PacketClientStatus.EnumState.REQUEST_STATS));
@@ -477,6 +483,7 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter {
 	/**
 	 * + Called from the main game loop to update the screen.
 	 */
+	@Override
 	public void updateScreen() {
 		if (!this.loadingAchievements) {
 			this.field_146569_s = this.field_146567_u;

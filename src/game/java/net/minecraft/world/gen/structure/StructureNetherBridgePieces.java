@@ -19,13 +19,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -37,7 +37,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class StructureNetherBridgePieces {
 	public static class Corridor extends StructureNetherBridgePieces.Piece {
@@ -66,6 +66,7 @@ public class StructureNetherBridgePieces {
 			this.field_111021_b = parRandom.nextInt(3) == 0;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			this.fillWithBlocks(world, structureboundingbox, 0, 0, 0, 4, 1, 4, Blocks.nether_brick.getDefaultState(),
@@ -106,16 +107,19 @@ public class StructureNetherBridgePieces {
 			return true;
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
 				EaglercraftRandom random) {
 			this.getNextComponentX((StructureNetherBridgePieces.Start) structurecomponent, list, random, 0, 1, true);
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			super.readStructureFromNBT(nbttagcompound);
 			this.field_111021_b = nbttagcompound.getBoolean("Chest");
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			super.writeStructureToNBT(nbttagcompound);
 			nbttagcompound.setBoolean("Chest", this.field_111021_b);
@@ -148,6 +152,7 @@ public class StructureNetherBridgePieces {
 			this.field_111020_b = parRandom.nextInt(3) == 0;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			this.fillWithBlocks(world, structureboundingbox, 0, 0, 0, 4, 1, 4, Blocks.nether_brick.getDefaultState(),
@@ -188,16 +193,19 @@ public class StructureNetherBridgePieces {
 			return true;
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
 				EaglercraftRandom random) {
 			this.getNextComponentZ((StructureNetherBridgePieces.Start) structurecomponent, list, random, 0, 1, true);
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			super.readStructureFromNBT(nbttagcompound);
 			this.field_111020_b = nbttagcompound.getBoolean("Chest");
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			super.writeStructureToNBT(nbttagcompound);
 			nbttagcompound.setBoolean("Chest", this.field_111020_b);
@@ -227,6 +235,7 @@ public class StructureNetherBridgePieces {
 			this.boundingBox = parStructureBoundingBox;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			int i = this.getMetadataWithOffset(Blocks.nether_brick_stairs, 2);
@@ -272,6 +281,7 @@ public class StructureNetherBridgePieces {
 			return true;
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
 				EaglercraftRandom random) {
 			this.getNextComponentNormal((StructureNetherBridgePieces.Start) structurecomponent, list, random, 1, 0,
@@ -302,6 +312,7 @@ public class StructureNetherBridgePieces {
 			this.boundingBox = parStructureBoundingBox;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			this.fillWithBlocks(world, structureboundingbox, 0, 0, 0, 8, 1, 8, Blocks.nether_brick.getDefaultState(),
@@ -353,6 +364,7 @@ public class StructureNetherBridgePieces {
 			return true;
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
 				EaglercraftRandom random) {
 			byte b0 = 1;
@@ -390,6 +402,7 @@ public class StructureNetherBridgePieces {
 			this.boundingBox = parStructureBoundingBox;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			this.fillWithBlocks(world, structureboundingbox, 0, 0, 0, 4, 1, 4, Blocks.nether_brick.getDefaultState(),
@@ -421,6 +434,7 @@ public class StructureNetherBridgePieces {
 			return true;
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
 				EaglercraftRandom random) {
 			this.getNextComponentNormal((StructureNetherBridgePieces.Start) structurecomponent, list, random, 1, 0,
@@ -451,6 +465,7 @@ public class StructureNetherBridgePieces {
 			this.boundingBox = parStructureBoundingBox;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			this.fillWithBlocks(world, structureboundingbox, 0, 0, 0, 6, 1, 6, Blocks.nether_brick.getDefaultState(),
@@ -500,6 +515,7 @@ public class StructureNetherBridgePieces {
 			return true;
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
 				EaglercraftRandom random) {
 			this.getNextComponentNormal((StructureNetherBridgePieces.Start) structurecomponent, list, random, 2, 0,
@@ -532,6 +548,7 @@ public class StructureNetherBridgePieces {
 			this.boundingBox = parStructureBoundingBox;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			this.fillWithBlocks(world, structureboundingbox, 0, 0, 0, 4, 1, 4, Blocks.nether_brick.getDefaultState(),
@@ -559,6 +576,7 @@ public class StructureNetherBridgePieces {
 			return true;
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
 				EaglercraftRandom random) {
 			this.getNextComponentNormal((StructureNetherBridgePieces.Start) structurecomponent, list, random, 1, 0,
@@ -607,6 +625,7 @@ public class StructureNetherBridgePieces {
 			this.boundingBox = parStructureBoundingBox;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			this.fillWithBlocks(world, structureboundingbox, 7, 3, 0, 11, 4, 18, Blocks.nether_brick.getDefaultState(),
@@ -672,6 +691,7 @@ public class StructureNetherBridgePieces {
 			return true;
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
 				EaglercraftRandom random) {
 			this.getNextComponentNormal((StructureNetherBridgePieces.Start) structurecomponent, list, random, 8, 3,
@@ -707,6 +727,7 @@ public class StructureNetherBridgePieces {
 			this.fillSeed = parRandom.nextInt();
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			EaglercraftRandom random = new EaglercraftRandom((long) this.fillSeed);
@@ -743,11 +764,13 @@ public class StructureNetherBridgePieces {
 			return true;
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			super.readStructureFromNBT(nbttagcompound);
 			this.fillSeed = nbttagcompound.getInteger("Seed");
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			super.writeStructureToNBT(nbttagcompound);
 			nbttagcompound.setInteger("Seed", this.fillSeed);
@@ -777,6 +800,7 @@ public class StructureNetherBridgePieces {
 			this.boundingBox = parStructureBoundingBox;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			this.fillWithBlocks(world, structureboundingbox, 0, 3, 0, 12, 4, 12, Blocks.nether_brick.getDefaultState(),
@@ -891,6 +915,7 @@ public class StructureNetherBridgePieces {
 			return true;
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
 				EaglercraftRandom random) {
 			this.getNextComponentNormal((StructureNetherBridgePieces.Start) structurecomponent, list, random, 5, 3,
@@ -921,6 +946,7 @@ public class StructureNetherBridgePieces {
 			this.boundingBox = parStructureBoundingBox;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			this.fillWithBlocks(world, structureboundingbox, 0, 3, 0, 12, 4, 12, Blocks.nether_brick.getDefaultState(),
@@ -1086,6 +1112,7 @@ public class StructureNetherBridgePieces {
 			return true;
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
 				EaglercraftRandom random) {
 			this.getNextComponentNormal((StructureNetherBridgePieces.Start) structurecomponent, list, random, 5, 3,
@@ -1283,9 +1310,11 @@ public class StructureNetherBridgePieces {
 			return flag ? i : -1;
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound var1) {
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound var1) {
 		}
 	}
@@ -1341,6 +1370,7 @@ public class StructureNetherBridgePieces {
 			this.boundingBox = parStructureBoundingBox;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			this.fillWithBlocks(world, structureboundingbox, 0, 0, 0, 6, 1, 6, Blocks.nether_brick.getDefaultState(),
@@ -1391,6 +1421,7 @@ public class StructureNetherBridgePieces {
 			return true;
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
 				EaglercraftRandom random) {
 			this.getNextComponentZ((StructureNetherBridgePieces.Start) structurecomponent, list, random, 6, 2, false);
@@ -1424,10 +1455,12 @@ public class StructureNetherBridgePieces {
 
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			super.readStructureFromNBT(nbttagcompound);
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			super.writeStructureToNBT(nbttagcompound);
 		}
@@ -1456,6 +1489,7 @@ public class StructureNetherBridgePieces {
 			this.boundingBox = parStructureBoundingBox;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			this.fillWithBlocks(world, structureboundingbox, 0, 3, 0, 4, 4, 18, Blocks.nether_brick.getDefaultState(),
@@ -1503,6 +1537,7 @@ public class StructureNetherBridgePieces {
 			return true;
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
 				EaglercraftRandom random) {
 			this.getNextComponentNormal((StructureNetherBridgePieces.Start) structurecomponent, list, random, 1, 3,
@@ -1535,6 +1570,7 @@ public class StructureNetherBridgePieces {
 			this.boundingBox = parStructureBoundingBox;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			this.fillWithBlocks(world, structureboundingbox, 0, 2, 0, 6, 7, 7, Blocks.air.getDefaultState(),
@@ -1594,11 +1630,13 @@ public class StructureNetherBridgePieces {
 			return true;
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			super.readStructureFromNBT(nbttagcompound);
 			this.hasSpawner = nbttagcompound.getBoolean("Mob");
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			super.writeStructureToNBT(nbttagcompound);
 			nbttagcompound.setBoolean("Mob", this.hasSpawner);

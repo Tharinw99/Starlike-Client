@@ -10,14 +10,13 @@ import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.ChunkCoordIntPair;
-import net.minecraft.world.MinecraftException;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 
 /**
  * Copyright (c) 2023-2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,7 +28,7 @@ import net.minecraft.world.chunk.storage.AnvilChunkLoader;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EaglerChunkLoader extends AnvilChunkLoader {
 
@@ -94,7 +93,7 @@ public class EaglerChunkLoader extends AnvilChunkLoader {
 	}
 
 	@Override
-	public void saveChunk(World var1, Chunk var2) throws IOException, MinecraftException {
+	public void saveChunk(World var1, Chunk var2) throws IOException {
 		NBTTagCompound chunkData = new NBTTagCompound();
 		this.writeChunkToNBT(var2, var1, chunkData);
 		NBTTagCompound fileData = new NBTTagCompound();

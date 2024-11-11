@@ -33,7 +33,7 @@ import com.google.common.annotations.GwtCompatible;
  * The {@link #get}, {@link #removeAll}, and {@link #replaceValues} methods each
  * return a {@link List} of values. Though the method signature doesn't say so
  * explicitly, the map returned by {@link #asMap} has {@code List} values.
- * 
+ *
  * <p>
  * See the Guava User Guide article on <a href=
  * "http://code.google.com/p/guava-libraries/wiki/NewCollectionTypesExplained#Multimap">

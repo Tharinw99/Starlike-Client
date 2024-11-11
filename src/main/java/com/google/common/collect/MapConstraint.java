@@ -26,7 +26,7 @@ import com.google.common.annotations.GwtCompatible;
  * {@code Multimap}. For example, {@link MapConstraints#notNull()}, which
  * prevents a map from including any null keys or values, could be implemented
  * like this:
- * 
+ *
  * <pre>
  *    {@code
  *

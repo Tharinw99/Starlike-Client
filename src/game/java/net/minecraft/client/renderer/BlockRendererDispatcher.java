@@ -20,13 +20,13 @@ import net.minecraft.world.IBlockAccess;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,7 +38,7 @@ import net.minecraft.world.IBlockAccess;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockRendererDispatcher implements IResourceManagerReloadListener {
 	private BlockModelShapes blockModelShapes;
@@ -94,6 +94,7 @@ public class BlockRendererDispatcher implements IResourceManagerReloadListener {
 		}
 	}
 
+	@Override
 	public void onResourceManagerReload(IResourceManager var1) {
 		this.fluidRenderer.initAtlasSprites();
 	}
@@ -101,22 +102,28 @@ public class BlockRendererDispatcher implements IResourceManagerReloadListener {
 	public boolean renderBlock(IBlockState state, BlockPos pos, IBlockAccess blockAccess,
 			WorldRenderer worldRendererIn) {
 		try {
+			boolean res;
 			int i = state.getBlock().getRenderType();
 			if (i == -1) {
-				return false;
+				res = false;
 			} else {
 				switch (i) {
 				case 1:
-					return this.fluidRenderer.renderFluid(blockAccess, state, pos, worldRendererIn);
+					res = this.fluidRenderer.renderFluid(blockAccess, state, pos, worldRendererIn);
+					break;
 				case 2:
-					return false;
+					res = false;
+					break;
 				case 3:
 					IBakedModel ibakedmodel = this.getModelFromBlockState(state, blockAccess, pos);
-					return this.blockModelRenderer.renderModel(blockAccess, ibakedmodel, state, pos, worldRendererIn);
+					res = this.blockModelRenderer.renderModel(blockAccess, ibakedmodel, state, pos, worldRendererIn);
+					break;
 				default:
-					return false;
+					res = false;
+					break;
 				}
 			}
+			return res;
 		} catch (Throwable throwable) {
 			CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Tesselating block in world");
 			CrashReportCategory crashreportcategory = crashreport.makeCategory("Block being tesselated");

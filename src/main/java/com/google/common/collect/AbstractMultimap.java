@@ -32,7 +32,7 @@ import com.google.common.annotations.GwtCompatible;
 /**
  * A skeleton {@code Multimap} implementation, not necessarily in terms of a
  * {@code Map}.
- * 
+ *
  * @author Louis Wasserman
  */
 @GwtCompatible

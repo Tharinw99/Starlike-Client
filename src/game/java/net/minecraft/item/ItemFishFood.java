@@ -15,13 +15,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,7 +33,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ItemFishFood extends ItemFood {
 	public static enum FishType {
@@ -132,18 +132,21 @@ public class ItemFishFood extends ItemFood {
 		this.cooked = cooked;
 	}
 
+	@Override
 	public int getHealAmount(ItemStack stack) {
 		ItemFishFood.FishType itemfishfood$fishtype = ItemFishFood.FishType.byItemStack(stack);
 		return this.cooked && itemfishfood$fishtype.canCook() ? itemfishfood$fishtype.getCookedHealAmount()
 				: itemfishfood$fishtype.getUncookedHealAmount();
 	}
 
+	@Override
 	public String getPotionEffect(ItemStack stack) {
 		return ItemFishFood.FishType.byItemStack(stack) == ItemFishFood.FishType.PUFFERFISH
 				? PotionHelper.pufferfishEffect
 				: null;
 	}
 
+	@Override
 	public float getSaturationModifier(ItemStack stack) {
 		ItemFishFood.FishType itemfishfood$fishtype = ItemFishFood.FishType.byItemStack(stack);
 		return this.cooked && itemfishfood$fishtype.canCook() ? itemfishfood$fishtype.getCookedSaturationModifier()
@@ -154,6 +157,7 @@ public class ItemFishFood extends ItemFood {
 	 * + returns a list of items with the same ID, but different meta (eg: dye
 	 * returns 16 items)
 	 */
+	@Override
 	public void getSubItems(Item var1, CreativeTabs var2, List<ItemStack> list) {
 		ItemFishFood.FishType[] types = ItemFishFood.FishType.values();
 		for (int i = 0; i < types.length; ++i) {
@@ -170,12 +174,14 @@ public class ItemFishFood extends ItemFood {
 	 * ItemStack so different stacks can have different names based on their damage
 	 * or NBT.
 	 */
+	@Override
 	public String getUnlocalizedName(ItemStack itemstack) {
 		ItemFishFood.FishType itemfishfood$fishtype = ItemFishFood.FishType.byItemStack(itemstack);
 		return this.getUnlocalizedName() + "." + itemfishfood$fishtype.getUnlocalizedName() + "."
 				+ (this.cooked && itemfishfood$fishtype.canCook() ? "cooked" : "raw");
 	}
 
+	@Override
 	protected void onFoodEaten(ItemStack stack, World worldIn, EntityPlayer player) {
 		ItemFishFood.FishType itemfishfood$fishtype = ItemFishFood.FishType.byItemStack(stack);
 		if (itemfishfood$fishtype == ItemFishFood.FishType.PUFFERFISH) {

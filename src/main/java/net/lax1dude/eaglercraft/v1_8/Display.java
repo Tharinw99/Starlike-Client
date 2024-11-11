@@ -4,7 +4,7 @@ import net.lax1dude.eaglercraft.v1_8.internal.PlatformInput;
 
 /**
  * Copyright (c) 2022-2023 lax1dude, ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -16,15 +16,12 @@ import net.lax1dude.eaglercraft.v1_8.internal.PlatformInput;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class Display {
 
-	private static long lastSwap = 0l;
 	private static long lastDPIUpdate = -250l;
 	private static float cacheDPI = 1.0f;
-
-	private static final long[] defaultSyncPtr = new long[1];
 
 	public static boolean contextLost() {
 		return PlatformInput.contextLost();
@@ -93,39 +90,6 @@ public class Display {
 
 	public static boolean supportsFullscreen() {
 		return PlatformInput.supportsFullscreen();
-	}
-
-	public static void sync(int limitFramerate) {
-		sync(limitFramerate, defaultSyncPtr);
-	}
-
-	public static boolean sync(int limitFramerate, long[] timerPtr) {
-		boolean limitFPS = limitFramerate > 0 && limitFramerate < 1000;
-		boolean blocked = false;
-
-		if (limitFPS) {
-			if (timerPtr[0] == 0l) {
-				timerPtr[0] = EagRuntime.steadyTimeMillis();
-			} else {
-				long millis = EagRuntime.steadyTimeMillis();
-				long frameMillis = (1000l / limitFramerate);
-				long frameTime = millis - timerPtr[0];
-				if (frameTime > 2000l || frameTime < 0l) {
-					frameTime = frameMillis;
-					timerPtr[0] = millis;
-				} else {
-					timerPtr[0] += frameMillis;
-				}
-				if (frameTime >= 0l && frameTime < frameMillis) {
-					EagUtils.sleep(frameMillis - frameTime);
-					blocked = true;
-				}
-			}
-		} else {
-			timerPtr[0] = 0l;
-		}
-
-		return blocked;
 	}
 
 	public static void toggleFullscreen() {

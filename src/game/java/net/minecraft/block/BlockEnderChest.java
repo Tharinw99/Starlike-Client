@@ -24,13 +24,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -42,7 +42,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockEnderChest extends BlockContainer {
 	public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
@@ -54,10 +54,12 @@ public class BlockEnderChest extends BlockContainer {
 		this.setBlockBounds(0.0625F, 0.0F, 0.0625F, 0.9375F, 0.875F, 0.9375F);
 	}
 
+	@Override
 	protected boolean canSilkHarvest() {
 		return true;
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { FACING });
 	}
@@ -66,6 +68,7 @@ public class BlockEnderChest extends BlockContainer {
 	 * + Returns a new instance of a block's tile entity class. Called on placing
 	 * the block.
 	 */
+	@Override
 	public TileEntity createNewTileEntity(World var1, int var2) {
 		return new TileEntityEnderChest();
 	}
@@ -73,6 +76,7 @@ public class BlockEnderChest extends BlockContainer {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
 		return Item.getItemFromBlock(Blocks.obsidian);
 	}
@@ -80,6 +84,7 @@ public class BlockEnderChest extends BlockContainer {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		return ((EnumFacing) iblockstate.getValue(FACING)).getIndex();
 	}
@@ -88,6 +93,7 @@ public class BlockEnderChest extends BlockContainer {
 	 * + The type of render function called. 3 for standard block models, 2 for
 	 * TESR's, 1 for liquids, -1 is no render
 	 */
+	@Override
 	public int getRenderType() {
 		return 2;
 	}
@@ -95,6 +101,7 @@ public class BlockEnderChest extends BlockContainer {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		EnumFacing enumfacing = EnumFacing.getFront(i);
 		if (enumfacing.getAxis() == EnumFacing.Axis.Y) {
@@ -104,6 +111,7 @@ public class BlockEnderChest extends BlockContainer {
 		return this.getDefaultState().withProperty(FACING, enumfacing);
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -112,10 +120,12 @@ public class BlockEnderChest extends BlockContainer {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
 
+	@Override
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState var3, EntityPlayer entityplayer,
 			EnumFacing var5, float var6, float var7, float var8) {
 		InventoryEnderChest inventoryenderchest = entityplayer.getInventoryEnderChest();
@@ -140,6 +150,7 @@ public class BlockEnderChest extends BlockContainer {
 	 * + Called by ItemBlocks just before a block is actually set in the world, to
 	 * allow for adjustments to the IBlockstate
 	 */
+	@Override
 	public IBlockState onBlockPlaced(World var1, BlockPos var2, EnumFacing var3, float var4, float var5, float var6,
 			int var7, EntityLivingBase entitylivingbase) {
 		return this.getDefaultState().withProperty(FACING, entitylivingbase.getHorizontalFacing().getOpposite());
@@ -149,6 +160,7 @@ public class BlockEnderChest extends BlockContainer {
 	 * + Called by ItemBlocks after a block is set in the world, to allow post-place
 	 * logic
 	 */
+	@Override
 	public void onBlockPlacedBy(World world, BlockPos blockpos, IBlockState iblockstate,
 			EntityLivingBase entitylivingbase, ItemStack var5) {
 		world.setBlockState(blockpos,
@@ -158,10 +170,12 @@ public class BlockEnderChest extends BlockContainer {
 	/**
 	 * + Returns the quantity of items to drop on block destruction.
 	 */
+	@Override
 	public int quantityDropped(EaglercraftRandom var1) {
 		return 8;
 	}
 
+	@Override
 	public void randomDisplayTick(World world, BlockPos blockpos, IBlockState var3, EaglercraftRandom random) {
 		for (int i = 0; i < 3; ++i) {
 			int j = random.nextInt(2) * 2 - 1;

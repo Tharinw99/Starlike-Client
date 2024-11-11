@@ -9,13 +9,13 @@ import com.google.common.collect.Sets;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@ import com.google.common.collect.Sets;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class PropertyInteger extends PropertyHelper<Integer> {
 	public static PropertyInteger create(String name, int min, int max) {
@@ -53,6 +53,7 @@ public class PropertyInteger extends PropertyHelper<Integer> {
 		}
 	}
 
+	@Override
 	public boolean equals(Object object) {
 		if (this == object) {
 			return true;
@@ -68,6 +69,7 @@ public class PropertyInteger extends PropertyHelper<Integer> {
 		}
 	}
 
+	@Override
 	public Collection<Integer> getAllowedValues() {
 		return this.allowedValues;
 	}
@@ -75,10 +77,12 @@ public class PropertyInteger extends PropertyHelper<Integer> {
 	/**
 	 * + Get the name for the given value.
 	 */
+	@Override
 	public String getName(Object integer) {
 		return integer.toString();
 	}
 
+	@Override
 	public int hashCode() {
 		int i = super.hashCode();
 		i = 31 * i + this.allowedValues.hashCode();

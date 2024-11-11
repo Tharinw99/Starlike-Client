@@ -30,13 +30,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -48,7 +48,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiIngameMenu extends GuiScreen {
 
@@ -71,6 +71,7 @@ public class GuiIngameMenu extends GuiScreen {
 	 * + Called by the controls from the buttonList when activated. (Mouse pressed
 	 * for buttons)
 	 */
+	@Override
 	protected void actionPerformed(GuiButton parGuiButton) {
 		switch (parGuiButton.id) {
 		case 0:
@@ -158,6 +159,7 @@ public class GuiIngameMenu extends GuiScreen {
 
 	}
 
+	@Override
 	public void confirmClicked(boolean par1, int par2) {
 		mc.displayGuiScreen(this);
 		LANServerController.closeLANNoKick();
@@ -173,6 +175,7 @@ public class GuiIngameMenu extends GuiScreen {
 	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
 	 * renderPartialTicks
 	 */
+	@Override
 	public void drawScreen(int i, int j, float f) {
 		this.drawDefaultBackground();
 		String titleStr = I18n.format("menu.game", new Object[0]);
@@ -258,6 +261,7 @@ public class GuiIngameMenu extends GuiScreen {
 	 * when the GUI is displayed and when the window resizes, the buttonList is
 	 * cleared beforehand.
 	 */
+	@Override
 	public void initGui() {
 		this.buttonList.clear();
 		this.updateCheckerOverlay.setResolution(mc, width, height);
@@ -315,10 +319,12 @@ public class GuiIngameMenu extends GuiScreen {
 		}
 	}
 
+	@Override
 	protected boolean isPartOfPauseMenu() {
 		return true;
 	}
 
+	@Override
 	protected void keyTyped(char par1, int par2) {
 		try {
 			if (EagRuntime.getConfiguration().isAllowVoiceClient()
@@ -330,6 +336,7 @@ public class GuiIngameMenu extends GuiScreen {
 		}
 	}
 
+	@Override
 	protected void mouseClicked(int par1, int par2, int par3) {
 		try {
 			if (EagRuntime.getConfiguration().isAllowVoiceClient()
@@ -369,6 +376,7 @@ public class GuiIngameMenu extends GuiScreen {
 		super.mouseClicked(par1, par2, par3);
 	}
 
+	@Override
 	protected void mouseReleased(int par1, int par2, int par3) {
 		try {
 			if (EagRuntime.getConfiguration().isAllowVoiceClient()
@@ -380,6 +388,7 @@ public class GuiIngameMenu extends GuiScreen {
 		}
 	}
 
+	@Override
 	public void setWorldAndResolution(Minecraft par1Minecraft, int par2, int par3) {
 		super.setWorldAndResolution(par1Minecraft, par2, par3);
 		if (EagRuntime.getConfiguration().isAllowVoiceClient()) {
@@ -390,6 +399,7 @@ public class GuiIngameMenu extends GuiScreen {
 	/**
 	 * + Called from the main game loop to update the screen.
 	 */
+	@Override
 	public void updateScreen() {
 		super.updateScreen();
 		if (EagRuntime.getConfiguration().isAllowVoiceClient()

@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "normal": {
-            "model": "starlike:green_terracotta_bricks"
-        }
+  "variants": {
+    "normal": {
+      "model": "starlike:green_terracotta_bricks"
     }
+  }
 }

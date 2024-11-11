@@ -16,13 +16,13 @@ import net.minecraft.village.VillageDoorInfo;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -34,7 +34,7 @@ import net.minecraft.village.VillageDoorInfo;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityAIMoveThroughVillage extends EntityAIBase {
 	private EntityCreature theEntity;
@@ -57,6 +57,7 @@ public class EntityAIMoveThroughVillage extends EntityAIBase {
 	/**
 	 * + Returns whether an in-progress EntityAIBase should continue executing
 	 */
+	@Override
 	public boolean continueExecuting() {
 		if (this.theEntity.getNavigator().noPath()) {
 			return false;
@@ -98,6 +99,7 @@ public class EntityAIMoveThroughVillage extends EntityAIBase {
 	/**
 	 * + Resets the task
 	 */
+	@Override
 	public void resetTask() {
 		if (this.theEntity.getNavigator().noPath()
 				|| this.theEntity.getDistanceSq(this.doorInfo.getDoorBlockPos()) < 16.0D) {
@@ -116,6 +118,7 @@ public class EntityAIMoveThroughVillage extends EntityAIBase {
 	/**
 	 * + Returns whether the EntityAIBase should begin execution.
 	 */
+	@Override
 	public boolean shouldExecute() {
 		this.resizeDoorList();
 		if (this.isNocturnal && this.theEntity.worldObj.isDaytime()) {
@@ -160,6 +163,7 @@ public class EntityAIMoveThroughVillage extends EntityAIBase {
 	/**
 	 * + Execute a one shot task or start executing a continuous task
 	 */
+	@Override
 	public void startExecuting() {
 		this.theEntity.getNavigator().setPath(this.entityPathNavigate, this.movementSpeed);
 	}

@@ -60,7 +60,7 @@ public class BlockCustomDropOre extends BlockCustomDrop {
 	@Override
 	public int quantityDroppedWithBonus(int i, EaglercraftRandom random) {
 		if (i > 0 && Item.getItemFromBlock(this) != this
-				.getItemDropped((IBlockState) this.getBlockState().getValidStates().iterator().next(), random, i)) {
+				.getItemDropped(this.getBlockState().getValidStates().iterator().next(), random, i)) {
 			int j = random.nextInt(i + 2) - 1;
 			if (j < 0) {
 				j = 0;

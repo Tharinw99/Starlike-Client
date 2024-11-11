@@ -79,18 +79,18 @@ public class CharSequenceUtils {
 	 * {@code start}, then the index of the first such occurrence is returned. For
 	 * values of {@code searchChar} in the range from 0 to 0xFFFF (inclusive), this
 	 * is the smallest value <i>k</i> such that: <blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * (this.charAt(<i>k</i>) == searchChar) &amp;&amp; (<i>k</i> &gt;= start)
 	 * </pre>
-	 * 
+	 *
 	 * </blockquote> is true. For other values of {@code searchChar}, it is the
 	 * smallest value <i>k</i> such that: <blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * (this.codePointAt(<i>k</i>) == searchChar) &amp;&amp; (<i>k</i> &gt;= start)
 	 * </pre>
-	 * 
+	 *
 	 * </blockquote> is true. In either case, if no such character occurs inm
 	 * {@code cs} at or after position {@code start}, then {@code -1} is returned.
 	 *
@@ -217,18 +217,18 @@ public class CharSequenceUtils {
 	 * character, searching backward starting at the specified index. For values of
 	 * {@code searchChar} in the range from 0 to 0xFFFF (inclusive), the index
 	 * returned is the largest value <i>k</i> such that: <blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * (this.charAt(<i>k</i>) == searchChar) &amp;&amp; (<i>k</i> &lt;= start)
 	 * </pre>
-	 * 
+	 *
 	 * </blockquote> is true. For other values of {@code searchChar}, it is the
 	 * largest value <i>k</i> such that: <blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * (this.codePointAt(<i>k</i>) == searchChar) &amp;&amp; (<i>k</i> &lt;= start)
 	 * </pre>
-	 * 
+	 *
 	 * </blockquote> is true. In either case, if no such character occurs in
 	 * {@code cs} at or before position {@code start}, then {@code -1} is returned.
 	 *

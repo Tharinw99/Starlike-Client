@@ -15,13 +15,13 @@ import net.minecraft.util.IJsonSerializable;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,17 +33,19 @@ import net.minecraft.util.IJsonSerializable;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class StatBase {
 	private static NumberFormat numberFormat = NumberFormat.getIntegerInstance(Locale.US);
 	public static IStatType simpleStatType = new IStatType() {
+		@Override
 		public String format(int parInt1) {
 			return StatBase.numberFormat.format((long) parInt1);
 		}
 	};
 	private static DecimalFormat decimalFormat = new DecimalFormat("########0.00");
 	public static IStatType timeStatType = new IStatType() {
+		@Override
 		public String format(int i) {
 			double d0 = (double) i / 20.0D;
 			double d1 = d0 / 60.0D;
@@ -57,6 +59,7 @@ public class StatBase {
 		}
 	};
 	public static IStatType distanceStatType = new IStatType() {
+		@Override
 		public String format(int i) {
 			double d0 = (double) i / 100.0D;
 			double d1 = d0 / 1000.0D;
@@ -65,6 +68,7 @@ public class StatBase {
 		}
 	};
 	public static IStatType field_111202_k = new IStatType() {
+		@Override
 		public String format(int i) {
 			return StatBase.decimalFormat.format((double) i * 0.1D);
 		}
@@ -89,6 +93,7 @@ public class StatBase {
 		IScoreObjectiveCriteria.INSTANCES.put(this.field_150957_c.getName(), this.field_150957_c);
 	}
 
+	@Override
 	public boolean equals(Object object) {
 		if (this == object) {
 			return true;
@@ -138,6 +143,7 @@ public class StatBase {
 		return ichatcomponent;
 	}
 
+	@Override
 	public int hashCode() {
 		return this.statId.hashCode();
 	}
@@ -174,6 +180,7 @@ public class StatBase {
 		}
 	}
 
+	@Override
 	public String toString() {
 		return "Stat{id=" + this.statId + ", nameId=" + this.statName + ", awardLocallyOnly=" + this.isIndependent
 				+ ", formatter=" + this.type + ", objectiveCriteria=" + this.field_150957_c + '}';

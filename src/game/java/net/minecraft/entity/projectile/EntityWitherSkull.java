@@ -16,13 +16,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -34,7 +34,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityWitherSkull extends EntityFireball {
 	public EntityWitherSkull(World worldIn) {
@@ -55,6 +55,7 @@ public class EntityWitherSkull extends EntityFireball {
 	/**
 	 * + Called when the entity is attacked.
 	 */
+	@Override
 	public boolean attackEntityFrom(DamageSource var1, float var2) {
 		return false;
 	}
@@ -63,10 +64,12 @@ public class EntityWitherSkull extends EntityFireball {
 	 * + Returns true if other Entities should be prevented from moving through this
 	 * Entity.
 	 */
+	@Override
 	public boolean canBeCollidedWith() {
 		return false;
 	}
 
+	@Override
 	protected void entityInit() {
 		this.dataWatcher.addObject(10, Byte.valueOf((byte) 0));
 	}
@@ -74,6 +77,7 @@ public class EntityWitherSkull extends EntityFireball {
 	/**
 	 * + Explosion resistance of a block relative to this entity
 	 */
+	@Override
 	public float getExplosionResistance(Explosion explosion, World world, BlockPos blockpos, IBlockState iblockstate) {
 		float f = super.getExplosionResistance(explosion, world, blockpos, iblockstate);
 		Block block = iblockstate.getBlock();
@@ -88,6 +92,7 @@ public class EntityWitherSkull extends EntityFireball {
 	 * + Return the motion factor for this projectile. The factor is multiplied by
 	 * the original motion.
 	 */
+	@Override
 	protected float getMotionFactor() {
 		return this.isInvulnerable() ? 0.73F : super.getMotionFactor();
 	}
@@ -96,6 +101,7 @@ public class EntityWitherSkull extends EntityFireball {
 	 * + Returns true if the entity is on fire. Used by render to add the fire
 	 * effect on rendering.
 	 */
+	@Override
 	public boolean isBurning() {
 		return false;
 	}
@@ -110,6 +116,7 @@ public class EntityWitherSkull extends EntityFireball {
 	/**
 	 * + Called when this EntityFireball hits a block or entity.
 	 */
+	@Override
 	protected void onImpact(MovingObjectPosition movingobjectposition) {
 		if (!this.worldObj.isRemote) {
 			if (movingobjectposition.entityHit != null) {

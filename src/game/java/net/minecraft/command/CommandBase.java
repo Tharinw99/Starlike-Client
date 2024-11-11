@@ -25,13 +25,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -43,7 +43,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class CommandBase implements ICommand {
 
@@ -609,6 +609,7 @@ public abstract class CommandBase implements ICommand {
 	/**
 	 * + Return a list of options when the user types TAB
 	 */
+	@Override
 	public List<String> addTabCompletionOptions(ICommandSender var1, String[] var2, BlockPos var3) {
 		return null;
 	}
@@ -616,10 +617,12 @@ public abstract class CommandBase implements ICommand {
 	/**
 	 * + Returns true if the given command sender is allowed to use this command.
 	 */
+	@Override
 	public boolean canCommandSenderUseCommand(ICommandSender icommandsender) {
 		return icommandsender.canCommandSenderUseCommand(this.getRequiredPermissionLevel(), this.getCommandName());
 	}
 
+	@Override
 	public int compareTo(ICommand icommand) {
 		return this.getCommandName().compareTo(icommand.getCommandName());
 	}
@@ -627,6 +630,7 @@ public abstract class CommandBase implements ICommand {
 	/**
 	 * + Gets a list of aliases for this command
 	 */
+	@Override
 	public List<String> getCommandAliases() {
 		return Collections.emptyList();
 	}
@@ -642,6 +646,7 @@ public abstract class CommandBase implements ICommand {
 	 * + Return whether the specified command parameter index is a username
 	 * parameter.
 	 */
+	@Override
 	public boolean isUsernameIndex(String[] var1, int var2) {
 		return false;
 	}

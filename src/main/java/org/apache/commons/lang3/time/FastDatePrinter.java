@@ -1167,7 +1167,7 @@ public class FastDatePrinter implements DatePrinter, Serializable {
 	/**
 	 * Creates a String representation of the given Calendar by applying the rules
 	 * of this printer to it.
-	 * 
+	 *
 	 * @param c the Calender to apply the rules to.
 	 * @return a String representation of the given Calendar.
 	 */
@@ -1196,7 +1196,7 @@ public class FastDatePrinter implements DatePrinter, Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.apache.commons.lang3.time.DatePrinter#format(java.util.Calendar)
 	 */
 	@Override
@@ -1206,7 +1206,7 @@ public class FastDatePrinter implements DatePrinter, Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.apache.commons.lang3.time.DatePrinter#format(java.util.Calendar,
 	 * java.lang.Appendable)
 	 */
@@ -1223,7 +1223,7 @@ public class FastDatePrinter implements DatePrinter, Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.apache.commons.lang3.time.DatePrinter#format(java.util.Calendar,
 	 * java.lang.StringBuffer)
 	 */
@@ -1236,7 +1236,7 @@ public class FastDatePrinter implements DatePrinter, Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.apache.commons.lang3.time.DatePrinter#format(java.util.Date)
 	 */
 	@Override
@@ -1248,7 +1248,7 @@ public class FastDatePrinter implements DatePrinter, Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.apache.commons.lang3.time.DatePrinter#format(java.util.Date,
 	 * java.lang.Appendable)
 	 */
@@ -1261,7 +1261,7 @@ public class FastDatePrinter implements DatePrinter, Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.apache.commons.lang3.time.DatePrinter#format(java.util.Date,
 	 * java.lang.StringBuffer)
 	 */
@@ -1274,7 +1274,7 @@ public class FastDatePrinter implements DatePrinter, Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.apache.commons.lang3.time.DatePrinter#format(long)
 	 */
 	@Override
@@ -1286,7 +1286,7 @@ public class FastDatePrinter implements DatePrinter, Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.apache.commons.lang3.time.DatePrinter#format(long,
 	 * java.lang.Appendable)
 	 */
@@ -1299,7 +1299,7 @@ public class FastDatePrinter implements DatePrinter, Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.apache.commons.lang3.time.DatePrinter#format(long,
 	 * java.lang.StringBuffer)
 	 */
@@ -1315,7 +1315,7 @@ public class FastDatePrinter implements DatePrinter, Serializable {
 	 * Formats a {@code Date}, {@code Calendar} or {@code Long} (milliseconds)
 	 * object.
 	 * </p>
-	 * 
+	 *
 	 * @since 3.5
 	 * @param obj the object to format
 	 * @return The formatted value.
@@ -1339,7 +1339,7 @@ public class FastDatePrinter implements DatePrinter, Serializable {
 	 * Formats a {@code Date}, {@code Calendar} or {@code Long} (milliseconds)
 	 * object.
 	 * </p>
-	 * 
+	 *
 	 * @deprecated Use {{@link #format(Date)}, {{@link #format(Calendar)},
 	 *             {{@link #format(long)}, or {{@link #format(Object)}
 	 * @param obj        the object to format
@@ -1363,7 +1363,7 @@ public class FastDatePrinter implements DatePrinter, Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.apache.commons.lang3.time.DatePrinter#getLocale()
 	 */
 	@Override
@@ -1392,7 +1392,7 @@ public class FastDatePrinter implements DatePrinter, Serializable {
 	// -----------------------------------------------------------------------
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.apache.commons.lang3.time.DatePrinter#getPattern()
 	 */
 	@Override
@@ -1402,7 +1402,7 @@ public class FastDatePrinter implements DatePrinter, Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.apache.commons.lang3.time.DatePrinter#getTimeZone()
 	 */
 	@Override
@@ -1443,7 +1443,7 @@ public class FastDatePrinter implements DatePrinter, Serializable {
 
 	/**
 	 * Creation method for new calender instances.
-	 * 
+	 *
 	 * @return a new Calendar instance.
 	 */
 	private Calendar newCalendar() {

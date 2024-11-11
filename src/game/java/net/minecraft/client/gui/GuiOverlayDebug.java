@@ -43,17 +43,19 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
+import net.starlikeclient.Culling;
+import net.starlikeclient.StarlikeClient;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -65,7 +67,7 @@ import net.minecraft.world.chunk.Chunk;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiOverlayDebug extends Gui {
 	public static final int ticksAtMidnight = 18000;
@@ -173,6 +175,16 @@ public class GuiOverlayDebug extends Gui {
 				BlockPos blockpos1 = this.mc.objectMouseOver.getBlockPos();
 				arraylist.add(HString.format("Looking at: %d %d %d", new Object[] { Integer.valueOf(blockpos1.getX()),
 						Integer.valueOf(blockpos1.getY()), Integer.valueOf(blockpos1.getZ()) }));
+			}
+
+			if (StarlikeClient.Config.Culling.enableCulling && !this.mc.thePlayer.isSpectator()) {
+				Culling culling = Culling.getInstance();
+				arraylist.add("");
+				arraylist.add("[Culling] Last pass: " + culling.lastPass + "ms");
+				arraylist.add("[Culling] Rendered Entities: " + culling.renderedEntities + " Skipped: "
+						+ culling.culledEntities);
+				arraylist.add("[Culling] Rendered Block Entities: " + culling.renderedBlockEntities + " Skipped: "
+						+ culling.culledBlockEntities);
 			}
 
 			return arraylist;
@@ -410,7 +422,7 @@ public class GuiOverlayDebug extends Gui {
 
 	protected List<String> getDebugInfoRight() {
 		ArrayList arraylist;
-		if (EagRuntime.getPlatformType() != EnumPlatformType.JAVASCRIPT) {
+		if (EagRuntime.getPlatformType() == EnumPlatformType.DESKTOP) {
 			long i = EagRuntime.maxMemory();
 			long j = EagRuntime.totalMemory();
 			long k = EagRuntime.freeMemory();

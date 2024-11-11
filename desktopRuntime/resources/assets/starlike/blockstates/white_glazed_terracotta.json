@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "normal": {
-            "model": "starlike:white_glazed_terracotta"
-        }
+  "variants": {
+    "normal": {
+      "model": "starlike:white_glazed_terracotta"
     }
+  }
 }

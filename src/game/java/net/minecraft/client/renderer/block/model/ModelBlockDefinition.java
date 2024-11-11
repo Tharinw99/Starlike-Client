@@ -21,13 +21,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -39,11 +39,12 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ModelBlockDefinition {
 
 	public static class Deserializer implements JSONTypeDeserializer<JSONObject, ModelBlockDefinition> {
+		@Override
 		public ModelBlockDefinition deserialize(JSONObject jsonobject) throws JSONException {
 			List list = this.parseVariantsList(jsonobject);
 			return new ModelBlockDefinition((Collection<ModelBlockDefinition.Variants>) list);
@@ -79,6 +80,7 @@ public class ModelBlockDefinition {
 
 	public static class Variant {
 		public static class Deserializer implements JSONTypeDeserializer<JSONObject, ModelBlockDefinition.Variant> {
+			@Override
 			public ModelBlockDefinition.Variant deserialize(JSONObject jsonobject) throws JSONException {
 				String s = this.parseModel(jsonobject);
 				ModelRotation modelrotation = this.parseRotation(jsonobject);
@@ -132,6 +134,7 @@ public class ModelBlockDefinition {
 			this.weight = weightIn;
 		}
 
+		@Override
 		public boolean equals(Object object) {
 			if (this == object) {
 				return true;
@@ -157,6 +160,7 @@ public class ModelBlockDefinition {
 			return this.weight;
 		}
 
+		@Override
 		public int hashCode() {
 			int i = this.modelLocation.hashCode();
 			i = 31 * i + (this.modelRotation != null ? this.modelRotation.hashCode() : 0);
@@ -178,6 +182,7 @@ public class ModelBlockDefinition {
 			this.listVariants = listVariantsIn;
 		}
 
+		@Override
 		public boolean equals(Object object) {
 			if (this == object) {
 				return true;
@@ -194,6 +199,7 @@ public class ModelBlockDefinition {
 			return this.listVariants;
 		}
 
+		@Override
 		public int hashCode() {
 			int i = this.name.hashCode();
 			i = 31 * i + this.listVariants.hashCode();
@@ -221,6 +227,7 @@ public class ModelBlockDefinition {
 
 	}
 
+	@Override
 	public boolean equals(Object object) {
 		if (this == object) {
 			return true;
@@ -242,6 +249,7 @@ public class ModelBlockDefinition {
 		}
 	}
 
+	@Override
 	public int hashCode() {
 		return this.mapVariants.hashCode();
 	}

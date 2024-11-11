@@ -22,7 +22,7 @@ import java.lang.annotation.Target;
 public @interface JSONPropertyName {
 	/**
 	 * The value of the JSON property.
-	 * 
+	 *
 	 * @return The name of the property as to be used in the JSON Object.
 	 */
 	String value();

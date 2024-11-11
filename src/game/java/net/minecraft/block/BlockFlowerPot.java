@@ -27,13 +27,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -45,7 +45,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockFlowerPot extends BlockContainer {
 	public static enum EnumFlowerType implements IStringSerializable {
@@ -62,10 +62,12 @@ public class BlockFlowerPot extends BlockContainer {
 			this.name = name;
 		}
 
+		@Override
 		public String getName() {
 			return this.name;
 		}
 
+		@Override
 		public String toString() {
 			return this.name;
 		}
@@ -86,6 +88,7 @@ public class BlockFlowerPot extends BlockContainer {
 		this.setBlockBoundsForItemRender();
 	}
 
+	@Override
 	public void breakBlock(World world, BlockPos blockpos, IBlockState iblockstate) {
 		TileEntityFlowerPot tileentityflowerpot = this.getTileEntity(world, blockpos);
 		if (tileentityflowerpot != null && tileentityflowerpot.getFlowerPotItem() != null) {
@@ -104,10 +107,12 @@ public class BlockFlowerPot extends BlockContainer {
 						: true;
 	}
 
+	@Override
 	public boolean canPlaceBlockAt(World world, BlockPos blockpos) {
 		return super.canPlaceBlockAt(world, blockpos) && World.doesBlockHaveSolidTopSurface(world, blockpos.down());
 	}
 
+	@Override
 	public int colorMultiplier(IBlockAccess iblockaccess, BlockPos blockpos, int i) {
 		TileEntity tileentity = iblockaccess.getTileEntity(blockpos);
 		if (tileentity instanceof TileEntityFlowerPot) {
@@ -120,6 +125,7 @@ public class BlockFlowerPot extends BlockContainer {
 		return 16777215;
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { CONTENTS, LEGACY_DATA });
 	}
@@ -128,6 +134,7 @@ public class BlockFlowerPot extends BlockContainer {
 	 * + Returns a new instance of a block's tile entity class. Called on placing
 	 * the block.
 	 */
+	@Override
 	public TileEntity createNewTileEntity(World var1, int i) {
 		Object object = null;
 		int j = 0;
@@ -187,6 +194,7 @@ public class BlockFlowerPot extends BlockContainer {
 	 * + Get the actual Block state of this Block at the given position. This
 	 * applies properties not visible in the metadata, such as fence connections.
 	 */
+	@Override
 	public IBlockState getActualState(IBlockState iblockstate, IBlockAccess iblockaccess, BlockPos blockpos) {
 		BlockFlowerPot.EnumFlowerType blockflowerpot$enumflowertype = BlockFlowerPot.EnumFlowerType.EMPTY;
 		TileEntity tileentity = iblockaccess.getTileEntity(blockpos);
@@ -279,10 +287,12 @@ public class BlockFlowerPot extends BlockContainer {
 		return iblockstate.withProperty(CONTENTS, blockflowerpot$enumflowertype);
 	}
 
+	@Override
 	public EnumWorldBlockLayer getBlockLayer() {
 		return EnumWorldBlockLayer.CUTOUT;
 	}
 
+	@Override
 	public int getDamageValue(World world, BlockPos blockpos) {
 		TileEntityFlowerPot tileentityflowerpot = this.getTileEntity(world, blockpos);
 		return tileentityflowerpot != null && tileentityflowerpot.getFlowerPotItem() != null
@@ -290,6 +300,7 @@ public class BlockFlowerPot extends BlockContainer {
 				: 0;
 	}
 
+	@Override
 	public Item getItem(World world, BlockPos blockpos) {
 		TileEntityFlowerPot tileentityflowerpot = this.getTileEntity(world, blockpos);
 		return tileentityflowerpot != null && tileentityflowerpot.getFlowerPotItem() != null
@@ -300,6 +311,7 @@ public class BlockFlowerPot extends BlockContainer {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
 		return Items.flower_pot;
 	}
@@ -307,6 +319,7 @@ public class BlockFlowerPot extends BlockContainer {
 	/**
 	 * + Gets the localized name of this block. Used for the statistics page.
 	 */
+	@Override
 	public String getLocalizedName() {
 		return StatCollector.translateToLocal("item.flowerPot.name");
 	}
@@ -314,6 +327,7 @@ public class BlockFlowerPot extends BlockContainer {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		return ((Integer) iblockstate.getValue(LEGACY_DATA)).intValue();
 	}
@@ -322,6 +336,7 @@ public class BlockFlowerPot extends BlockContainer {
 	 * + The type of render function called. 3 for standard block models, 2 for
 	 * TESR's, 1 for liquids, -1 is no render
 	 */
+	@Override
 	public int getRenderType() {
 		return 3;
 	}
@@ -334,10 +349,12 @@ public class BlockFlowerPot extends BlockContainer {
 	/**
 	 * + Returns true only if block is flowerPot
 	 */
+	@Override
 	public boolean isFlowerPot() {
 		return true;
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -346,10 +363,12 @@ public class BlockFlowerPot extends BlockContainer {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
 
+	@Override
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState var3, EntityPlayer entityplayer,
 			EnumFacing var5, float var6, float var7, float var8) {
 		ItemStack itemstack = entityplayer.inventory.getCurrentItem();
@@ -381,6 +400,7 @@ public class BlockFlowerPot extends BlockContainer {
 		}
 	}
 
+	@Override
 	public void onBlockHarvested(World world, BlockPos blockpos, IBlockState iblockstate, EntityPlayer entityplayer) {
 		super.onBlockHarvested(world, blockpos, iblockstate, entityplayer);
 		if (entityplayer.capabilities.isCreativeMode) {
@@ -395,6 +415,7 @@ public class BlockFlowerPot extends BlockContainer {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block var4) {
 		if (!World.doesBlockHaveSolidTopSurface(world, blockpos.down())) {
 			this.dropBlockAsItem(world, blockpos, iblockstate, 0);
@@ -406,6 +427,7 @@ public class BlockFlowerPot extends BlockContainer {
 	/**
 	 * + Sets the block's bounds for rendering it as an item
 	 */
+	@Override
 	public void setBlockBoundsForItemRender() {
 		float f = 0.375F;
 		float f1 = f / 2.0F;

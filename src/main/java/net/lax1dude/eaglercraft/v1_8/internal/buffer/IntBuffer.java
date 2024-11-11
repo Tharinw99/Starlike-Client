@@ -2,7 +2,7 @@ package net.lax1dude.eaglercraft.v1_8.internal.buffer;
 
 /**
  * Copyright (c) 2022 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -14,16 +14,19 @@ package net.lax1dude.eaglercraft.v1_8.internal.buffer;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public interface IntBuffer extends Buffer {
 
+	@Override
 	int[] array();
 
+	@Override
 	IntBuffer clear();
 
 	IntBuffer duplicate();
 
+	@Override
 	IntBuffer flip();
 
 	int get();
@@ -36,12 +39,16 @@ public interface IntBuffer extends Buffer {
 
 	int getElement(int index);
 
+	@Override
 	boolean isDirect();
 
+	@Override
 	IntBuffer limit(int newLimit);
 
+	@Override
 	IntBuffer mark();
 
+	@Override
 	IntBuffer position(int newPosition);
 
 	IntBuffer put(int b);
@@ -56,8 +63,10 @@ public interface IntBuffer extends Buffer {
 
 	void putElement(int index, int value);
 
+	@Override
 	IntBuffer reset();
 
+	@Override
 	IntBuffer rewind();
 
 }

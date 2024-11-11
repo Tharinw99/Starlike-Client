@@ -29,13 +29,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -47,7 +47,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityArrow extends Entity implements IProjectile {
 	private int xTile = -1;
@@ -131,6 +131,7 @@ public class EntityArrow extends Entity implements IProjectile {
 	/**
 	 * + If returns false, the item will not inflict any damage against entities.
 	 */
+	@Override
 	public boolean canAttackWithItem() {
 		return false;
 	}
@@ -139,10 +140,12 @@ public class EntityArrow extends Entity implements IProjectile {
 	 * + returns if this entity triggers Block.onEntityWalking on the blocks they
 	 * walk on. used for spiders and wolves to prevent them from trampling crops
 	 */
+	@Override
 	protected boolean canTriggerWalking() {
 		return false;
 	}
 
+	@Override
 	protected void entityInit() {
 		this.dataWatcher.addObject(16, Byte.valueOf((byte) 0));
 	}
@@ -151,6 +154,7 @@ public class EntityArrow extends Entity implements IProjectile {
 		return this.damage;
 	}
 
+	@Override
 	public float getEyeHeight() {
 		return 0.0F;
 	}
@@ -166,6 +170,7 @@ public class EntityArrow extends Entity implements IProjectile {
 	/**
 	 * + Called by a player entity when they collide with an entity
 	 */
+	@Override
 	public void onCollideWithPlayer(EntityPlayer entityplayer) {
 		if (!this.worldObj.isRemote && this.inGround && this.arrowShake <= 0) {
 			boolean flag = this.canBePickedUp == 1
@@ -188,6 +193,7 @@ public class EntityArrow extends Entity implements IProjectile {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		super.onUpdate();
 		if (isChair) {
@@ -438,6 +444,7 @@ public class EntityArrow extends Entity implements IProjectile {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		this.xTile = nbttagcompound.getShort("xTile");
 		this.yTile = nbttagcompound.getShort("yTile");
@@ -488,6 +495,7 @@ public class EntityArrow extends Entity implements IProjectile {
 		this.knockbackStrength = knockbackStrengthIn;
 	}
 
+	@Override
 	public void setPositionAndRotation2(double d0, double d1, double d2, float f, float f1, int var9, boolean var10) {
 		this.setPosition(d0, d1, d2);
 		this.setRotation(f, f1);
@@ -497,6 +505,7 @@ public class EntityArrow extends Entity implements IProjectile {
 	 * + Similar to setArrowHeading, it's point the throwable entity to a x, y, z
 	 * direction.
 	 */
+	@Override
 	public void setThrowableHeading(double x, double y, double z, float velocity, float inaccuracy) {
 		float f = MathHelper.sqrt_double(x * x + y * y + z * z);
 		x = x / (double) f;
@@ -525,6 +534,7 @@ public class EntityArrow extends Entity implements IProjectile {
 	/**
 	 * + Sets the velocity to the args. Args: x, y, z
 	 */
+	@Override
 	public void setVelocity(double d0, double d1, double d2) {
 		this.motionX = d0;
 		this.motionY = d1;
@@ -546,6 +556,7 @@ public class EntityArrow extends Entity implements IProjectile {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		nbttagcompound.setShort("xTile", (short) this.xTile);
 		nbttagcompound.setShort("yTile", (short) this.yTile);

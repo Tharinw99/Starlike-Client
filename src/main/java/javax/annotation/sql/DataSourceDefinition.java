@@ -70,7 +70,7 @@ import java.lang.annotation.Target;
  * annotation element, the precedence order is undefined and implementation
  * specific:
  * <p>
- * 
+ *
  * <pre>
  *   &#064;DataSourceDefinition(name="java:global/MyApp/MyDataSource",
  *      className="org.apache.derby.jdbc.ClientDataSource",
@@ -92,7 +92,7 @@ import java.lang.annotation.Target;
  * annotation element, the annotation element value takes precedence. For
  * example:
  * <p>
- * 
+ *
  * <pre>
  *   &#064;DataSourceDefinition(name="java:global/MyApp/MyDataSource",
  *      className="org.apache.derby.jdbc.ClientDataSource",
@@ -129,7 +129,7 @@ import java.lang.annotation.Target;
  * configuration property may be ignored.
  * <p>
  * Examples: <br>
- * 
+ *
  * <pre>
  *   &#064;DataSourceDefinition(name="java:global/MyApp/MyDataSource",
  *      className="com.foobar.MyDataSource",
@@ -138,11 +138,11 @@ import java.lang.annotation.Target;
  *      user="lance",
  *      password="secret"
  *   )
- * 
+ *
  * </pre>
  * <p>
  * Using a <code>URL</code>: <br>
- * 
+ *
  * <pre>
  *  &#064;DataSourceDefinition(name="java:global/MyApp/MyDataSource",
  *    className="org.apache.derby.jdbc.ClientDataSource",
@@ -153,7 +153,7 @@ import java.lang.annotation.Target;
  * </pre>
  * <p>
  * An example lookup of the DataSource from an EJB:
- * 
+ *
  * <pre>
  * &#064;Stateless
  * public class MyStatelessEJB {
@@ -163,7 +163,7 @@ import java.lang.annotation.Target;
  * }
  * </pre>
  * <p>
- * 
+ *
  * @see javax.sql.DataSource
  * @see javax.sql.XADataSource
  * @see javax.sql.ConnectionPoolDataSource
@@ -178,21 +178,21 @@ public @interface DataSourceDefinition {
 	 * Name of a DataSource class that implements <code>javax.sql.DataSource</code>
 	 * or <code>javax.sql.XADataSource</code> or
 	 * <code>javax.sql.ConnectionPoolDataSource</code>.
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	String className();
 
 	/**
 	 * Name of a database on a server.
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	String databaseName() default "";
 
 	/**
 	 * Description of this data source
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	String description() default "";
@@ -202,7 +202,7 @@ public @interface DataSourceDefinition {
 	 * initialized.
 	 * <p>
 	 * Default is vendor-specific
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	int initialPoolSize() default -1;
@@ -220,7 +220,7 @@ public @interface DataSourceDefinition {
 	 * </ul>
 	 * <p>
 	 * Default is vendor-specific.
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	int isolationLevel() default -1;
@@ -232,7 +232,7 @@ public @interface DataSourceDefinition {
 	 * specifies that there is no timeout.
 	 * <p>
 	 * Default is vendor-specific.
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	int loginTimeout() default 0;
@@ -242,7 +242,7 @@ public @interface DataSourceDefinition {
 	 * pool before the connection is closed for a connection pool.
 	 * <p>
 	 * Default is vendor-specific
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	int maxIdleTime() default -1;
@@ -252,7 +252,7 @@ public @interface DataSourceDefinition {
 	 * connection pool.
 	 * <p>
 	 * Default is vendor-specific.
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	int maxPoolSize() default -1;
@@ -263,7 +263,7 @@ public @interface DataSourceDefinition {
 	 * connection pool.
 	 * <p>
 	 * Default is vendor-specific
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	int maxStatements() default -1;
@@ -272,28 +272,28 @@ public @interface DataSourceDefinition {
 	 * Minimum number of connections that should be allocated for a connection pool.
 	 * <p>
 	 * Default is vendor-specific.
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	int minPoolSize() default -1;
 
 	/**
 	 * JNDI name by which the data source will be registered.
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	String name();
 
 	/**
 	 * Password to use for connection authentication.
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	String password() default "";
 
 	/**
 	 * Port number where a server is listening for requests.
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	int portNumber() default -1;
@@ -315,14 +315,14 @@ public @interface DataSourceDefinition {
 	 * If a DataSource property is specified in the <code>properties</code> element
 	 * and the annotation element for the property is also specified, the annotation
 	 * element value takes precedence.
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	String[] properties() default {};
 
 	/**
 	 * Database server name.
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	String serverName() default "localhost";
@@ -332,7 +332,7 @@ public @interface DataSourceDefinition {
 	 * transactions.
 	 * <p>
 	 * Default is to enlist in a transaction when one is active or becomes active.
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	boolean transactional() default true;
@@ -341,14 +341,14 @@ public @interface DataSourceDefinition {
 	 * A JDBC URL. If the <code>url</code> annotation element contains a DataSource
 	 * property that was also specified using the corresponding annotation element,
 	 * the precedence order is undefined and implementation specific.
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	String url() default "";
 
 	/**
 	 * User name to use for connection authentication.
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	String user() default "";

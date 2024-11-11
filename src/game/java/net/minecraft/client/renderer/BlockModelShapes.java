@@ -62,13 +62,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -80,7 +80,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockModelShapes {
 	private final Map<IBlockState, IBakedModel> bakedModelStore = Maps.newIdentityHashMap();
@@ -260,6 +260,7 @@ public class BlockModelShapes {
 		this.registerBlockWithStateMapper(Blocks.flower_pot,
 				(new StateMap.Builder()).ignore(new IProperty[] { BlockFlowerPot.LEGACY_DATA }).build());
 		this.registerBlockWithStateMapper(Blocks.quartz_block, new StateMapperBase() {
+			@Override
 			protected ModelResourceLocation getModelResourceLocation(IBlockState state) {
 				BlockQuartz.EnumType blockquartz$enumtype = (BlockQuartz.EnumType) state.getValue(BlockQuartz.VARIANT);
 				switch (blockquartz$enumtype) {
@@ -278,11 +279,13 @@ public class BlockModelShapes {
 			}
 		});
 		this.registerBlockWithStateMapper(Blocks.deadbush, new StateMapperBase() {
+			@Override
 			protected ModelResourceLocation getModelResourceLocation(IBlockState var1) {
 				return new ModelResourceLocation("dead_bush", "normal");
 			}
 		});
 		this.registerBlockWithStateMapper(Blocks.pumpkin_stem, new StateMapperBase() {
+			@Override
 			protected ModelResourceLocation getModelResourceLocation(IBlockState iblockstate) {
 				LinkedHashMap linkedhashmap = Maps.newLinkedHashMap(iblockstate.getProperties());
 				if (iblockstate.getValue(BlockStem.FACING) != EnumFacing.UP) {
@@ -295,6 +298,7 @@ public class BlockModelShapes {
 			}
 		});
 		this.registerBlockWithStateMapper(Blocks.melon_stem, new StateMapperBase() {
+			@Override
 			protected ModelResourceLocation getModelResourceLocation(IBlockState iblockstate) {
 				LinkedHashMap linkedhashmap = Maps.newLinkedHashMap(iblockstate.getProperties());
 				if (iblockstate.getValue(BlockStem.FACING) != EnumFacing.UP) {
@@ -307,6 +311,7 @@ public class BlockModelShapes {
 			}
 		});
 		this.registerBlockWithStateMapper(Blocks.dirt, new StateMapperBase() {
+			@Override
 			protected ModelResourceLocation getModelResourceLocation(IBlockState iblockstate) {
 				LinkedHashMap linkedhashmap = Maps.newLinkedHashMap(iblockstate.getProperties());
 				String s = BlockDirt.VARIANT.getName((BlockDirt.DirtType) linkedhashmap.remove(BlockDirt.VARIANT));
@@ -318,6 +323,7 @@ public class BlockModelShapes {
 			}
 		});
 		this.registerBlockWithStateMapper(Blocks.double_stone_slab, new StateMapperBase() {
+			@Override
 			protected ModelResourceLocation getModelResourceLocation(IBlockState iblockstate) {
 				LinkedHashMap linkedhashmap = Maps.newLinkedHashMap(iblockstate.getProperties());
 				String s = BlockStoneSlab.VARIANT
@@ -328,6 +334,7 @@ public class BlockModelShapes {
 			}
 		});
 		this.registerBlockWithStateMapper(Blocks.double_stone_slab2, new StateMapperBase() {
+			@Override
 			protected ModelResourceLocation getModelResourceLocation(IBlockState iblockstate) {
 				LinkedHashMap linkedhashmap = Maps.newLinkedHashMap(iblockstate.getProperties());
 				String s = BlockStoneSlabNew.VARIANT

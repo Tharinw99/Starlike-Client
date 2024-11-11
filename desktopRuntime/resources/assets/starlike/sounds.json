@@ -1,8 +1,6 @@
 {
   "random.chisel": {
     "category": "player",
-    "sounds": [
-      "starlike:random/chisel"
-    ]
+    "sounds": ["starlike:random/chisel"]
   }
 }

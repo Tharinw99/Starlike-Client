@@ -33,19 +33,18 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.starlikeclient.StarlikeSettings;
 import net.starlikeclient.minecraft.init.ItemsStarlike;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -57,7 +56,7 @@ import net.starlikeclient.minecraft.init.ItemsStarlike;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class Block {
 	public static enum EnumOffsetType {
@@ -116,10 +115,12 @@ public class Block {
 	public static final Block.SoundType soundTypePiston = new Block.SoundType("stone", 1.0F, 1.0F);
 	public static final Block.SoundType soundTypeMetal = new Block.SoundType("stone", 1.0F, 1.5F);
 	public static final Block.SoundType soundTypeGlass = new Block.SoundType("stone", 1.0F, 1.0F) {
+		@Override
 		public String getBreakSound() {
 			return "dig.glass";
 		}
 
+		@Override
 		public String getPlaceSound() {
 			return "step.stone";
 		}
@@ -128,28 +129,34 @@ public class Block {
 	public static final Block.SoundType soundTypeSand = new Block.SoundType("sand", 1.0F, 1.0F);
 	public static final Block.SoundType soundTypeSnow = new Block.SoundType("snow", 1.0F, 1.0F);
 	public static final Block.SoundType soundTypeLadder = new Block.SoundType("ladder", 1.0F, 1.0F) {
+		@Override
 		public String getBreakSound() {
 			return "dig.wood";
 		}
 	};
 	public static final Block.SoundType soundTypeAnvil = new Block.SoundType("anvil", 0.3F, 1.0F) {
+		@Override
 		public String getBreakSound() {
 			return "dig.stone";
 		}
 
+		@Override
 		public String getPlaceSound() {
 			return "random.anvil_land";
 		}
 	};
 	public static final Block.SoundType SLIME_SOUND = new Block.SoundType("slime", 1.0F, 1.0F) {
+		@Override
 		public String getBreakSound() {
 			return "mob.slime.big";
 		}
 
+		@Override
 		public String getPlaceSound() {
 			return "mob.slime.big";
 		}
 
+		@Override
 		public String getStepSound() {
 			return "mob.slime.small";
 		}
@@ -224,7 +231,7 @@ public class Block {
 	 * + Get a BlockState by it's ID (see getStateId)
 	 */
 	public static IBlockState getStateById(int id) {
-		int i = id & (StarlikeSettings.blockIdLimit - 1);
+		int i = id & 4095;
 		int j = id >> 12 & 15;
 		return getBlockById(i).getStateFromMeta(j);
 	}
@@ -1670,6 +1677,7 @@ public class Block {
 		return 10;
 	}
 
+	@Override
 	public String toString() {
 		return "Block{" + blockRegistry.getNameForObject(this) + "}";
 	}

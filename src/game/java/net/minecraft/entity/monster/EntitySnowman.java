@@ -24,13 +24,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -42,7 +42,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntitySnowman extends EntityGolem implements IRangedAttackMob {
 	public EntitySnowman(World worldIn) {
@@ -57,6 +57,7 @@ public class EntitySnowman extends EntityGolem implements IRangedAttackMob {
 				new EntityAINearestAttackableTarget(this, EntityLiving.class, 10, true, false, IMob.mobSelector));
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(4.0D);
@@ -66,6 +67,7 @@ public class EntitySnowman extends EntityGolem implements IRangedAttackMob {
 	/**
 	 * + Attack the specified entity using a ranged attack.
 	 */
+	@Override
 	public void attackEntityWithRangedAttack(EntityLivingBase parEntityLivingBase, float parFloat1) {
 		EntitySnowball entitysnowball = new EntitySnowball(this.worldObj, this);
 		double d0 = parEntityLivingBase.posY + (double) parEntityLivingBase.getEyeHeight() - 1.100000023841858D;
@@ -81,6 +83,7 @@ public class EntitySnowman extends EntityGolem implements IRangedAttackMob {
 	/**
 	 * + Drop 0-2 items of this living's type
 	 */
+	@Override
 	protected void dropFewItems(boolean var1, int var2) {
 		int i = this.rand.nextInt(16);
 
@@ -90,10 +93,12 @@ public class EntitySnowman extends EntityGolem implements IRangedAttackMob {
 
 	}
 
+	@Override
 	protected Item getDropItem() {
 		return Items.snowball;
 	}
 
+	@Override
 	public float getEyeHeight() {
 		return 1.7F;
 	}
@@ -103,6 +108,7 @@ public class EntitySnowman extends EntityGolem implements IRangedAttackMob {
 	 * required. For example, zombies and skeletons use this to react to sunlight
 	 * and start to burn.
 	 */
+	@Override
 	public void onLivingUpdate() {
 		super.onLivingUpdate();
 		if (!this.worldObj.isRemote) {

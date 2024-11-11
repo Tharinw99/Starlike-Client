@@ -28,7 +28,7 @@ import com.google.common.annotations.GwtCompatible;
  * method throws an unchecked exception, which helps the calling method
  * communicate to <i>its</i> caller that <i>that</i> caller has made a mistake.
  * Example:
- * 
+ *
  * <pre>
  *    {@code
  *
@@ -62,7 +62,7 @@ import com.google.common.annotations.GwtCompatible;
  * production). In some circumstances these wasted CPU cycles and allocations
  * can add up to a real problem. Performance-sensitive precondition checks can
  * always be converted to the customary form:
- * 
+ *
  * <pre>
  *    {@code
  *

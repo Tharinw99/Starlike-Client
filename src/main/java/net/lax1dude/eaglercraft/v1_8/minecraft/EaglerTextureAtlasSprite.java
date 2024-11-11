@@ -24,7 +24,7 @@ import net.minecraft.util.ResourceLocation;
 
 /**
  * Copyright (c) 2022 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -36,7 +36,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EaglerTextureAtlasSprite {
 
@@ -150,6 +150,7 @@ public class EaglerTextureAtlasSprite {
 					CrashReportCategory crashreportcategory = crashreport.makeCategory("Frame being iterated");
 					crashreportcategory.addCrashSection("Frame index", Integer.valueOf(i));
 					crashreportcategory.addCrashSectionCallable("Frame sizes", new Callable<String>() {
+						@Override
 						public String call() throws Exception {
 							StringBuilder stringbuilder = new StringBuilder();
 
@@ -341,6 +342,7 @@ public class EaglerTextureAtlasSprite {
 		this.width = newWidth;
 	}
 
+	@Override
 	public String toString() {
 		return "TextureAtlasSprite{name=\'" + this.iconName + '\'' + ", frameCount=" + this.framesTextureData.size()
 				+ ", rotated=" + this.rotated + ", x=" + this.originX + ", y=" + this.originY + ", height="

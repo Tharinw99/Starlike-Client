@@ -25,13 +25,13 @@ import net.minecraft.world.storage.MapData;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -43,7 +43,7 @@ import net.minecraft.world.storage.MapData;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ItemMap extends ItemMapBase {
 	public static MapData loadMapData(int mapId, World worldIn) {
@@ -65,6 +65,7 @@ public class ItemMap extends ItemMapBase {
 	 * + allows items to add custom lines of information to the mouseover
 	 * description
 	 */
+	@Override
 	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
 		MapData mapdata = this.getMapData(stack, playerIn.worldObj);
 		if (advanced) {
@@ -78,6 +79,7 @@ public class ItemMap extends ItemMapBase {
 
 	}
 
+	@Override
 	public Packet createMapDataPacket(ItemStack stack, World worldIn, EntityPlayer player) {
 		return this.getMapData(stack, worldIn).getMapPacket(stack, worldIn, player);
 	}
@@ -103,6 +105,7 @@ public class ItemMap extends ItemMapBase {
 	/**
 	 * + Called when item is crafted/smelted. Used only by maps so far.
 	 */
+	@Override
 	public void onCreated(ItemStack stack, World worldIn, EntityPlayer playerIn) {
 		if (stack.hasTagCompound() && stack.getTagCompound().getBoolean("map_is_scaling")) {
 			MapData mapdata = Items.filled_map.getMapData(stack, worldIn);
@@ -125,6 +128,7 @@ public class ItemMap extends ItemMapBase {
 	 * + Called each tick as long the item is on a player inventory. Uses by maps to
 	 * check if is on a player hand and update it's contents.
 	 */
+	@Override
 	public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
 		if (!worldIn.isRemote) {
 			MapData mapdata = this.getMapData(stack, worldIn);
@@ -190,7 +194,7 @@ public class ItemMap extends ItemMapBase {
 
 									d1 = 100.0D;
 								} else {
-									BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+									BlockPos blockpos$mutableblockpos = new BlockPos();
 
 									for (int i4 = 0; i4 < i; ++i4) {
 										for (int j4 = 0; j4 < i; ++j4) {

@@ -10,13 +10,13 @@ import net.minecraft.util.IChatComponent;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,10 +28,11 @@ import net.minecraft.util.IChatComponent;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class PackMetadataSectionSerializer extends BaseMetadataSectionSerializer<PackMetadataSection>
 		implements JSONTypeSerializer<PackMetadataSection, JSONObject> {
+	@Override
 	public PackMetadataSection deserialize(JSONObject jsonobject) throws JSONException {
 		IChatComponent ichatcomponent = JSONTypeProvider.deserialize(jsonobject.get("description"),
 				IChatComponent.class);
@@ -46,10 +47,12 @@ public class PackMetadataSectionSerializer extends BaseMetadataSectionSerializer
 	/**
 	 * + The name of this section type as it appears in JSON.
 	 */
+	@Override
 	public String getSectionName() {
 		return "pack";
 	}
 
+	@Override
 	public JSONObject serialize(PackMetadataSection packmetadatasection) {
 		JSONObject jsonobject = new JSONObject();
 		jsonobject.put("pack_format", packmetadatasection.getPackFormat());

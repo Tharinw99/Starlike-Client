@@ -59,7 +59,7 @@ public final class Range<T> implements Serializable {
 
 	/**
 	 * Serialization version.
-	 * 
+	 *
 	 * @see java.io.Serializable
 	 */
 	private static final long serialVersionUID = 1L;
@@ -317,7 +317,7 @@ public final class Range<T> implements Serializable {
 	 * Fits the given element into this range by returning the given element or, if
 	 * out of bounds, the range minimum if below, or the range maximum if above.
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * Range&lt;Integer&gt; range = Range.between(16, 64);
 	 * range.fit(-9) --&gt;  16
@@ -330,7 +330,7 @@ public final class Range<T> implements Serializable {
 	 * range.fit(64) --&gt;  64
 	 * range.fit(99) --&gt;  64
 	 * </pre>
-	 * 
+	 *
 	 * @param element the element to check for, not null
 	 * @return the minimum, the element, or the maximum depending on the element's
 	 *         location relative to the range
@@ -408,7 +408,7 @@ public final class Range<T> implements Serializable {
 
 	/**
 	 * Calculate the intersection of {@code this} and an overlapping Range.
-	 * 
+	 *
 	 * @param other overlapping Range
 	 * @return range representing the intersection of {@code this} and {@code other}
 	 *         ({@code this} if equal)

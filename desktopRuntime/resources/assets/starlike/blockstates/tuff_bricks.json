@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "normal": {
-            "model": "starlike:tuff_bricks"
-        }
+  "variants": {
+    "normal": {
+      "model": "starlike:tuff_bricks"
     }
+  }
 }

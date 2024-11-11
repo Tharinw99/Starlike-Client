@@ -15,13 +15,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,7 +33,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class EntityMob extends EntityCreature implements IMob {
 	public EntityMob(World worldIn) {
@@ -41,11 +41,13 @@ public abstract class EntityMob extends EntityCreature implements IMob {
 		this.experienceValue = 5;
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getAttributeMap().registerAttribute(SharedMonsterAttributes.attackDamage);
 	}
 
+	@Override
 	public boolean attackEntityAsMob(Entity entity) {
 		float f = (float) this.getEntityAttribute(SharedMonsterAttributes.attackDamage).getAttributeValue();
 		int i = 0;
@@ -79,6 +81,7 @@ public abstract class EntityMob extends EntityCreature implements IMob {
 	/**
 	 * + Called when the entity is attacked.
 	 */
+	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float f) {
 		if (this.isEntityInvulnerable(damagesource)) {
 			return false;
@@ -93,10 +96,12 @@ public abstract class EntityMob extends EntityCreature implements IMob {
 	/**
 	 * + Entity won't drop items or experience points if this returns false
 	 */
+	@Override
 	protected boolean canDropLoot() {
 		return true;
 	}
 
+	@Override
 	public float getBlockPathWeight(BlockPos blockpos) {
 		return 0.5F - this.worldObj.getLightBrightness(blockpos);
 	}
@@ -105,6 +110,7 @@ public abstract class EntityMob extends EntityCreature implements IMob {
 	 * + Checks if the entity's current position is a valid location to spawn this
 	 * entity.
 	 */
+	@Override
 	public boolean getCanSpawnHere() {
 		return this.worldObj.getDifficulty() != EnumDifficulty.PEACEFUL && this.isValidLightLevel()
 				&& super.getCanSpawnHere();
@@ -113,10 +119,12 @@ public abstract class EntityMob extends EntityCreature implements IMob {
 	/**
 	 * + Returns the sound this mob makes on death.
 	 */
+	@Override
 	protected String getDeathSound() {
 		return "game.hostile.die";
 	}
 
+	@Override
 	protected String getFallSoundString(int i) {
 		return i > 4 ? "game.hostile.hurt.fall.big" : "game.hostile.hurt.fall.small";
 	}
@@ -124,14 +132,17 @@ public abstract class EntityMob extends EntityCreature implements IMob {
 	/**
 	 * + Returns the sound this mob makes when it is hurt.
 	 */
+	@Override
 	protected String getHurtSound() {
 		return "game.hostile.hurt";
 	}
 
+	@Override
 	protected String getSplashSound() {
 		return "game.hostile.swim.splash";
 	}
 
+	@Override
 	protected String getSwimSound() {
 		return "game.hostile.swim";
 	}
@@ -161,6 +172,7 @@ public abstract class EntityMob extends EntityCreature implements IMob {
 	 * required. For example, zombies and skeletons use this to react to sunlight
 	 * and start to burn.
 	 */
+	@Override
 	public void onLivingUpdate() {
 		this.updateArmSwingProgress();
 		float f = this.getBrightness(1.0F);
@@ -174,6 +186,7 @@ public abstract class EntityMob extends EntityCreature implements IMob {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		super.onUpdate();
 		if (!this.worldObj.isRemote && this.worldObj.getDifficulty() == EnumDifficulty.PEACEFUL) {

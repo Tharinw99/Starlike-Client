@@ -21,13 +21,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -39,7 +39,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockTNT extends Block {
 	public static final PropertyBool EXPLODE = PropertyBool.create("explode");
@@ -53,10 +53,12 @@ public class BlockTNT extends Block {
 	/**
 	 * + Return whether this block can drop from an explosion.
 	 */
+	@Override
 	public boolean canDropFromExplosion(Explosion var1) {
 		return false;
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { EXPLODE });
 	}
@@ -75,6 +77,7 @@ public class BlockTNT extends Block {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		return ((Boolean) iblockstate.getValue(EXPLODE)).booleanValue() ? 1 : 0;
 	}
@@ -82,10 +85,12 @@ public class BlockTNT extends Block {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(EXPLODE, Boolean.valueOf((i & 1) > 0));
 	}
 
+	@Override
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState iblockstate, EntityPlayer entityplayer,
 			EnumFacing enumfacing, float f, float f1, float f2) {
 		if (entityplayer.getCurrentEquippedItem() != null) {
@@ -106,6 +111,7 @@ public class BlockTNT extends Block {
 		return super.onBlockActivated(world, blockpos, iblockstate, entityplayer, enumfacing, f, f1, f2);
 	}
 
+	@Override
 	public void onBlockAdded(World world, BlockPos blockpos, IBlockState iblockstate) {
 		super.onBlockAdded(world, blockpos, iblockstate);
 		if (world.isBlockPowered(blockpos)) {
@@ -118,6 +124,7 @@ public class BlockTNT extends Block {
 	/**
 	 * + Called when this Block is destroyed by an Explosion
 	 */
+	@Override
 	public void onBlockDestroyedByExplosion(World world, BlockPos blockpos, Explosion explosion) {
 		if (!world.isRemote) {
 			EntityTNTPrimed entitytntprimed = new EntityTNTPrimed(world, (double) ((float) blockpos.getX() + 0.5F),
@@ -131,6 +138,7 @@ public class BlockTNT extends Block {
 	/**
 	 * + Called when a player destroys this Block
 	 */
+	@Override
 	public void onBlockDestroyedByPlayer(World world, BlockPos blockpos, IBlockState iblockstate) {
 		this.explode(world, blockpos, iblockstate, (EntityLivingBase) null);
 	}
@@ -138,6 +146,7 @@ public class BlockTNT extends Block {
 	/**
 	 * + Called When an Entity Collided with the Block
 	 */
+	@Override
 	public void onEntityCollidedWithBlock(World world, BlockPos blockpos, IBlockState var3, Entity entity) {
 		if (!world.isRemote && entity instanceof EntityArrow) {
 			EntityArrow entityarrow = (EntityArrow) entity;
@@ -156,6 +165,7 @@ public class BlockTNT extends Block {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block var4) {
 		if (world.isBlockPowered(blockpos)) {
 			this.onBlockDestroyedByPlayer(world, blockpos, iblockstate.withProperty(EXPLODE, Boolean.valueOf(true)));

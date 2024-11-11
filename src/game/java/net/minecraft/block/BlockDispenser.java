@@ -31,13 +31,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -49,7 +49,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockDispenser extends BlockContainer {
 	public static final PropertyDirection FACING = PropertyDirection.create("facing");
@@ -85,6 +85,7 @@ public class BlockDispenser extends BlockContainer {
 		this.setCreativeTab(CreativeTabs.tabRedstone);
 	}
 
+	@Override
 	public void breakBlock(World world, BlockPos blockpos, IBlockState iblockstate) {
 		TileEntity tileentity = world.getTileEntity(blockpos);
 		if (tileentity instanceof TileEntityDispenser) {
@@ -95,6 +96,7 @@ public class BlockDispenser extends BlockContainer {
 		super.breakBlock(world, blockpos, iblockstate);
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { FACING, TRIGGERED });
 	}
@@ -103,6 +105,7 @@ public class BlockDispenser extends BlockContainer {
 	 * + Returns a new instance of a block's tile entity class. Called on placing
 	 * the block.
 	 */
+	@Override
 	public TileEntity createNewTileEntity(World var1, int var2) {
 		return new TileEntityDispenser();
 	}
@@ -130,6 +133,7 @@ public class BlockDispenser extends BlockContainer {
 		return (IBehaviorDispenseItem) dispenseBehaviorRegistry.getObject(stack == null ? null : stack.getItem());
 	}
 
+	@Override
 	public int getComparatorInputOverride(World world, BlockPos blockpos) {
 		return Container.calcRedstone(world.getTileEntity(blockpos));
 	}
@@ -137,6 +141,7 @@ public class BlockDispenser extends BlockContainer {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
 		i = i | ((EnumFacing) iblockstate.getValue(FACING)).getIndex();
@@ -151,6 +156,7 @@ public class BlockDispenser extends BlockContainer {
 	 * + The type of render function called. 3 for standard block models, 2 for
 	 * TESR's, 1 for liquids, -1 is no render
 	 */
+	@Override
 	public int getRenderType() {
 		return 3;
 	}
@@ -159,6 +165,7 @@ public class BlockDispenser extends BlockContainer {
 	 * + Possibly modify the given BlockState before rendering it on an Entity
 	 * (Minecarts, Endermen, ...)
 	 */
+	@Override
 	public IBlockState getStateForEntityRender(IBlockState var1) {
 		return this.getDefaultState().withProperty(FACING, EnumFacing.SOUTH);
 	}
@@ -166,15 +173,18 @@ public class BlockDispenser extends BlockContainer {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(FACING, getFacing(i)).withProperty(TRIGGERED,
 				Boolean.valueOf((i & 8) > 0));
 	}
 
+	@Override
 	public boolean hasComparatorInputOverride() {
 		return true;
 	}
 
+	@Override
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState var3, EntityPlayer entityplayer,
 			EnumFacing var5, float var6, float var7, float var8) {
 		if (!world.isRemote) {
@@ -191,6 +201,7 @@ public class BlockDispenser extends BlockContainer {
 		return true;
 	}
 
+	@Override
 	public void onBlockAdded(World world, BlockPos blockpos, IBlockState iblockstate) {
 		super.onBlockAdded(world, blockpos, iblockstate);
 		this.setDefaultDirection(world, blockpos, iblockstate);
@@ -200,6 +211,7 @@ public class BlockDispenser extends BlockContainer {
 	 * + Called by ItemBlocks just before a block is actually set in the world, to
 	 * allow for adjustments to the IBlockstate
 	 */
+	@Override
 	public IBlockState onBlockPlaced(World world, BlockPos blockpos, EnumFacing var3, float var4, float var5,
 			float var6, int var7, EntityLivingBase entitylivingbase) {
 		return this.getDefaultState()
@@ -211,6 +223,7 @@ public class BlockDispenser extends BlockContainer {
 	 * + Called by ItemBlocks after a block is set in the world, to allow post-place
 	 * logic
 	 */
+	@Override
 	public void onBlockPlacedBy(World world, BlockPos blockpos, IBlockState iblockstate,
 			EntityLivingBase entitylivingbase, ItemStack itemstack) {
 		world.setBlockState(blockpos, iblockstate.withProperty(FACING,
@@ -227,6 +240,7 @@ public class BlockDispenser extends BlockContainer {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block var4) {
 		boolean flag = world.isBlockPowered(blockpos) || world.isBlockPowered(blockpos.up());
 		boolean flag1 = ((Boolean) iblockstate.getValue(TRIGGERED)).booleanValue();
@@ -266,10 +280,12 @@ public class BlockDispenser extends BlockContainer {
 	/**
 	 * + How many world ticks before ticking
 	 */
+	@Override
 	public int tickRate(World var1) {
 		return 4;
 	}
 
+	@Override
 	public void updateTick(World world, BlockPos blockpos, IBlockState var3, EaglercraftRandom var4) {
 		if (!world.isRemote) {
 			this.dispense(world, blockpos);

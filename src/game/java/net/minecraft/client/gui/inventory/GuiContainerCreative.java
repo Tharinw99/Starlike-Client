@@ -40,13 +40,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -58,7 +58,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiContainerCreative extends InventoryEffectRenderer {
 	static class ContainerCreative extends Container {
@@ -81,15 +81,18 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 			this.scrollTo(0.0F);
 		}
 
+		@Override
 		public boolean canDragIntoSlot(Slot parSlot) {
 			return parSlot.inventory instanceof InventoryPlayer
 					|| parSlot.yDisplayPosition > 90 && parSlot.xDisplayPosition <= 162;
 		}
 
+		@Override
 		public boolean canInteractWith(EntityPlayer playerIn) {
 			return true;
 		}
 
+		@Override
 		public boolean canMergeSlot(ItemStack stack, Slot parSlot) {
 			return parSlot.yDisplayPosition > 90;
 		}
@@ -98,6 +101,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 			return this.itemList.size() > 45;
 		}
 
+		@Override
 		protected void retrySlotClick(int slotId, int clickedButton, boolean mode, EntityPlayer playerIn) {
 		}
 
@@ -122,6 +126,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 
 		}
 
+		@Override
 		public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
 			if (index >= this.inventorySlots.size() - 9 && index < this.inventorySlots.size()) {
 				Slot slot = (Slot) this.inventorySlots.get(index);
@@ -142,46 +147,57 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 			this.slot = parSlot;
 		}
 
+		@Override
 		public ItemStack decrStackSize(int amount) {
 			return this.slot.decrStackSize(amount);
 		}
 
+		@Override
 		public boolean getHasStack() {
 			return this.slot.getHasStack();
 		}
 
+		@Override
 		public int getItemStackLimit(ItemStack stack) {
 			return this.slot.getItemStackLimit(stack);
 		}
 
+		@Override
 		public int getSlotStackLimit() {
 			return this.slot.getSlotStackLimit();
 		}
 
+		@Override
 		public String getSlotTexture() {
 			return this.slot.getSlotTexture();
 		}
 
+		@Override
 		public ItemStack getStack() {
 			return this.slot.getStack();
 		}
 
+		@Override
 		public boolean isHere(IInventory inv, int slotIn) {
 			return this.slot.isHere(inv, slotIn);
 		}
 
+		@Override
 		public boolean isItemValid(ItemStack stack) {
 			return this.slot.isItemValid(stack);
 		}
 
+		@Override
 		public void onPickupFromSlot(EntityPlayer playerIn, ItemStack stack) {
 			this.slot.onPickupFromSlot(playerIn, stack);
 		}
 
+		@Override
 		public void onSlotChanged() {
 			this.slot.onSlotChanged();
 		}
 
+		@Override
 		public void putStack(ItemStack stack) {
 			this.slot.putStack(stack);
 		}
@@ -220,6 +236,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 	 * + Called by the controls from the buttonList when activated. (Mouse pressed
 	 * for buttons)
 	 */
+	@Override
 	protected void actionPerformed(GuiButton parGuiButton) {
 		if (parGuiButton.id == 0) {
 			this.mc.displayGuiScreen(new GuiAchievements(this, this.mc.thePlayer.getStatFileWriter()));
@@ -231,6 +248,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 
 	}
 
+	@Override
 	public boolean blockPTTKey() {
 		return searchField.isFocused();
 	}
@@ -238,6 +256,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 	/**
 	 * + Args : renderPartialTicks, mouseX, mouseY
 	 */
+	@Override
 	protected void drawGuiContainerBackgroundLayer(float var1, int i, int j) {
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderHelper.enableGUIStandardItemLighting();
@@ -277,6 +296,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 	 * + Draw the foreground layer for the GuiContainer (everything in front of the
 	 * items). Args : mouseX, mouseY
 	 */
+	@Override
 	protected void drawGuiContainerForegroundLayer(int var1, int var2) {
 		CreativeTabs creativetabs = CreativeTabs.creativeTabArray[selectedTabIndex];
 		if (creativetabs.drawInForegroundOfTab()) {
@@ -290,6 +310,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
 	 * renderPartialTicks
 	 */
+	@Override
 	public void drawScreen(int i, int j, float f) {
 		boolean flag = PointerInputAbstraction.getVCursorButtonDown(0);
 		int k = this.guiLeft;
@@ -398,6 +419,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 		this.zLevel = 0.0F;
 	}
 
+	@Override
 	protected int getCloseKey() {
 		return selectedTabIndex != CreativeTabs.tabAllSearch.getTabIndex() ? super.getCloseKey()
 				: mc.gameSettings.keyBindClose.getKeyCode();
@@ -410,6 +432,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 	/**
 	 * + Called when the mouse is clicked over a slot or outside the gui.
 	 */
+	@Override
 	protected void handleMouseClick(Slot slot, int i, int j, int k) {
 		this.field_147057_D = true;
 		boolean flag = k == 1;
@@ -528,6 +551,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 	/**
 	 * + Handles mouse input.
 	 */
+	@Override
 	public void handleMouseInput() throws IOException {
 		super.handleMouseInput();
 		int i = Mouse.getEventDWheel();
@@ -553,6 +577,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 	 * when the GUI is displayed and when the window resizes, the buttonList is
 	 * cleared beforehand.
 	 */
+	@Override
 	public void initGui() {
 		if (this.mc.playerController.isInCreativeMode()) {
 			super.initGui();
@@ -580,6 +605,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 	 * the equivalent of KeyListener.keyTyped(KeyEvent e). Args : character
 	 * (character on the key), keyCode (lwjgl Keyboard key code)
 	 */
+	@Override
 	protected void keyTyped(char parChar1, int parInt1) {
 		if (selectedTabIndex != CreativeTabs.tabAllSearch.getTabIndex()) {
 			if (GameSettings.isKeyDown(this.mc.gameSettings.keyBindChat)) {
@@ -610,6 +636,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 	/**
 	 * + Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
 	 */
+	@Override
 	protected void mouseClicked(int parInt1, int parInt2, int parInt3) {
 		if (parInt3 == 0) {
 			int i = parInt1 - this.guiLeft;
@@ -629,6 +656,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 	 * + Called when a mouse button is released. Args : mouseX, mouseY,
 	 * releaseButton
 	 */
+	@Override
 	protected void mouseReleased(int i, int j, int k) {
 		if (k == 0) {
 			int l = i - this.guiLeft;
@@ -659,6 +687,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 	/**
 	 * + Called when the screen is unloaded. Used to disable keyboard repeat events
 	 */
+	@Override
 	public void onGuiClosed() {
 		super.onGuiClosed();
 		if (this.mc.thePlayer != null && this.mc.thePlayer.inventory != null) {
@@ -698,6 +727,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 		}
 	}
 
+	@Override
 	protected void renderToolTip(ItemStack itemstack, int i, int j) {
 		if (selectedTabIndex == CreativeTabs.tabAllSearch.getTabIndex()) {
 			List list = itemstack.getTooltipProfanityFilter(this.mc.thePlayer,
@@ -826,6 +856,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 		super.touchTapped(touchX, touchY, uid);
 	}
 
+	@Override
 	protected void updateActivePotionEffects() {
 		int i = this.guiLeft;
 		super.updateActivePotionEffects();
@@ -879,6 +910,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
 	/**
 	 * + Called from the main game loop to update the screen.
 	 */
+	@Override
 	public void updateScreen() {
 		if (!this.mc.playerController.isInCreativeMode()) {
 			this.mc.displayGuiScreen(new GuiInventory(this.mc.thePlayer));

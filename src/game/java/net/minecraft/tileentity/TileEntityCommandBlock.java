@@ -14,13 +14,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -32,48 +32,57 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class TileEntityCommandBlock extends TileEntity {
 	private final CommandBlockLogic commandBlockLogic = new CommandBlockLogic() {
+		@Override
 		public int func_145751_f() {
 			return 0;
 		}
 
+		@Override
 		public void func_145757_a(ByteBuf bytebuf) {
 			bytebuf.writeInt(TileEntityCommandBlock.this.pos.getX());
 			bytebuf.writeInt(TileEntityCommandBlock.this.pos.getY());
 			bytebuf.writeInt(TileEntityCommandBlock.this.pos.getZ());
 		}
 
+		@Override
 		public Entity getCommandSenderEntity() {
 			return null;
 		}
 
+		@Override
 		public World getEntityWorld() {
 			return TileEntityCommandBlock.this.getWorld();
 		}
 
+		@Override
 		public BlockPos getPosition() {
 			return TileEntityCommandBlock.this.pos;
 		}
 
+		@Override
 		public Vec3 getPositionVector() {
 			return new Vec3((double) TileEntityCommandBlock.this.pos.getX() + 0.5D,
 					(double) TileEntityCommandBlock.this.pos.getY() + 0.5D,
 					(double) TileEntityCommandBlock.this.pos.getZ() + 0.5D);
 		}
 
+		@Override
 		public void setCommand(String s) {
 			super.setCommand(s);
 			TileEntityCommandBlock.this.markDirty();
 		}
 
+		@Override
 		public void updateCommand() {
 			TileEntityCommandBlock.this.getWorld().markBlockForUpdate(TileEntityCommandBlock.this.pos);
 		}
 	};
 
+	@Override
 	public boolean func_183000_F() {
 		return true;
 	}
@@ -91,17 +100,20 @@ public class TileEntityCommandBlock extends TileEntity {
 	 * used to sync tile entity data from the server to the client easily. For
 	 * example this is used by signs to synchronise the text to be displayed.
 	 */
+	@Override
 	public Packet getDescriptionPacket() {
 		NBTTagCompound nbttagcompound = new NBTTagCompound();
 		this.writeToNBT(nbttagcompound);
 		return new S35PacketUpdateTileEntity(this.pos, 2, nbttagcompound);
 	}
 
+	@Override
 	public void readFromNBT(NBTTagCompound nbttagcompound) {
 		super.readFromNBT(nbttagcompound);
 		this.commandBlockLogic.readDataFromNBT(nbttagcompound);
 	}
 
+	@Override
 	public void writeToNBT(NBTTagCompound nbttagcompound) {
 		super.writeToNBT(nbttagcompound);
 		this.commandBlockLogic.writeDataToNBT(nbttagcompound);

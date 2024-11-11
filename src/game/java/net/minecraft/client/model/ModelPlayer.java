@@ -9,13 +9,13 @@ import net.minecraft.entity.Entity;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@ import net.minecraft.entity.Entity;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ModelPlayer extends ModelBiped {
 	public ModelRenderer bipedLeftArmwear;
@@ -86,6 +86,7 @@ public class ModelPlayer extends ModelBiped {
 		this.bipedBodyWear.setRotationPoint(0.0F, 0.0F, 0.0F);
 	}
 
+	@Override
 	public void postRenderArm(float f) {
 		if (this.smallArms) {
 			++this.bipedRightArm.rotationPointX;
@@ -100,6 +101,7 @@ public class ModelPlayer extends ModelBiped {
 	/**
 	 * + Sets the models various rotation angles then renders the model.
 	 */
+	@Override
 	public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
 		super.render(entity, f, f1, f2, f3, f4, f5);
 		GlStateManager.pushMatrix();
@@ -155,6 +157,7 @@ public class ModelPlayer extends ModelBiped {
 		this.bipedRightArmwear.render(0.0625F);
 	}
 
+	@Override
 	public void setInvisible(boolean flag) {
 		super.setInvisible(flag);
 		this.bipedLeftArmwear.showModel = flag;
@@ -172,6 +175,7 @@ public class ModelPlayer extends ModelBiped {
 	 * time(so that arms and legs swing back and forth) and par2 represents how
 	 * "far" arms and legs can swing at most.
 	 */
+	@Override
 	public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5, Entity entity) {
 		super.setRotationAngles(f, f1, f2, f3, f4, f5, entity);
 		copyModelAngles(this.bipedLeftLeg, this.bipedLeftLegwear);

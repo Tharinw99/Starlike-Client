@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "normal": {
-            "model": "starlike:cobbled_andesite"
-        }
+  "variants": {
+    "normal": {
+      "model": "starlike:cobbled_andesite"
     }
+  }
 }

@@ -42,13 +42,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -60,7 +60,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityWolf extends EntityTameable {
 	private float headRotationCourse;
@@ -89,6 +89,7 @@ public class EntityWolf extends EntityTameable {
 		this.targetTasks.addTask(3, new EntityAIHurtByTarget(this, true, new Class[0]));
 		this.targetTasks.addTask(4,
 				new EntityAITargetNonTamed(this, EntityAnimal.class, false, new Predicate<Entity>() {
+					@Override
 					public boolean apply(Entity entity) {
 						return entity instanceof EntitySheep || entity instanceof EntityRabbit;
 					}
@@ -97,10 +98,12 @@ public class EntityWolf extends EntityTameable {
 		this.setTamed(false);
 	}
 
+	@Override
 	public boolean allowLeashing() {
 		return !this.isAngry() && super.allowLeashing();
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.30000001192092896D);
@@ -114,6 +117,7 @@ public class EntityWolf extends EntityTameable {
 		this.getEntityAttribute(SharedMonsterAttributes.attackDamage).setBaseValue(2.0D);
 	}
 
+	@Override
 	public boolean attackEntityAsMob(Entity entity) {
 		boolean flag = entity.attackEntityFrom(DamageSource.causeMobDamage(this),
 				(float) ((int) this.getEntityAttribute(SharedMonsterAttributes.attackDamage).getAttributeValue()));
@@ -127,6 +131,7 @@ public class EntityWolf extends EntityTameable {
 	/**
 	 * + Called when the entity is attacked.
 	 */
+	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float f) {
 		if (this.isEntityInvulnerable(damagesource)) {
 			return false;
@@ -144,6 +149,7 @@ public class EntityWolf extends EntityTameable {
 	/**
 	 * + Determines if an entity can be despawned, used on idle far away entities
 	 */
+	@Override
 	protected boolean canDespawn() {
 		return !this.isTamed() && this.ticksExisted > 2400;
 	}
@@ -151,6 +157,7 @@ public class EntityWolf extends EntityTameable {
 	/**
 	 * + Returns true if the mob is currently able to mate with the specified mob.
 	 */
+	@Override
 	public boolean canMateWith(EntityAnimal entityanimal) {
 		if (entityanimal == this) {
 			return false;
@@ -165,6 +172,7 @@ public class EntityWolf extends EntityTameable {
 		}
 	}
 
+	@Override
 	public EntityWolf createChild(EntityAgeable var1) {
 		EntityWolf entitywolf = new EntityWolf(this.worldObj);
 		String s = this.getOwnerId();
@@ -176,6 +184,7 @@ public class EntityWolf extends EntityTameable {
 		return entitywolf;
 	}
 
+	@Override
 	protected void entityInit() {
 		super.entityInit();
 		this.dataWatcher.addObject(18, Float.valueOf(this.getHealth()));
@@ -190,14 +199,17 @@ public class EntityWolf extends EntityTameable {
 	/**
 	 * + Returns the sound this mob makes on death.
 	 */
+	@Override
 	protected String getDeathSound() {
 		return "mob.wolf.death";
 	}
 
+	@Override
 	protected Item getDropItem() {
 		return Item.getItemById(-1);
 	}
 
+	@Override
 	public float getEyeHeight() {
 		return this.height * 0.8F;
 	}
@@ -205,6 +217,7 @@ public class EntityWolf extends EntityTameable {
 	/**
 	 * + Returns the sound this mob makes when it is hurt.
 	 */
+	@Override
 	protected String getHurtSound() {
 		return "mob.wolf.hurt";
 	}
@@ -217,6 +230,7 @@ public class EntityWolf extends EntityTameable {
 	/**
 	 * + Returns the sound this mob makes while it's alive.
 	 */
+	@Override
 	protected String getLivingSound() {
 		return this.isAngry() ? "mob.wolf.growl"
 				: (this.rand.nextInt(3) == 0
@@ -228,6 +242,7 @@ public class EntityWolf extends EntityTameable {
 	/**
 	 * + Will return how many at most can spawn in a chunk at once.
 	 */
+	@Override
 	public int getMaxSpawnedInChunk() {
 		return 8;
 	}
@@ -255,6 +270,7 @@ public class EntityWolf extends EntityTameable {
 	/**
 	 * + Returns the volume for the sounds this mob makes.
 	 */
+	@Override
 	protected float getSoundVolume() {
 		return 0.4F;
 	}
@@ -270,10 +286,12 @@ public class EntityWolf extends EntityTameable {
 	 * + The speed it takes to move the entityliving's rotationPitch through the
 	 * faceEntity method. This is only currently use in wolves.
 	 */
+	@Override
 	public int getVerticalFaceSpeed() {
 		return this.isSitting() ? 20 : super.getVerticalFaceSpeed();
 	}
 
+	@Override
 	public void handleStatusUpdate(byte b0) {
 		if (b0 == 8) {
 			this.isShaking = true;
@@ -289,6 +307,7 @@ public class EntityWolf extends EntityTameable {
 	 * + Called when a player interacts with a mob. e.g. gets milk from a cow, gets
 	 * into the saddle on a pig.
 	 */
+	@Override
 	public boolean interact(EntityPlayer entityplayer) {
 		ItemStack itemstack = entityplayer.inventory.getCurrentItem();
 		if (this.isTamed()) {
@@ -374,6 +393,7 @@ public class EntityWolf extends EntityTameable {
 	 * + Checks if the parameter is an item which this animal can be fed to breed it
 	 * (wheat, carrots or seeds depending on the animal type)
 	 */
+	@Override
 	public boolean isBreedingItem(ItemStack itemstack) {
 		return itemstack == null ? false
 				: (!(itemstack.getItem() instanceof ItemFood) ? false
@@ -392,6 +412,7 @@ public class EntityWolf extends EntityTameable {
 	 * required. For example, zombies and skeletons use this to react to sunlight
 	 * and start to burn.
 	 */
+	@Override
 	public void onLivingUpdate() {
 		super.onLivingUpdate();
 		if (!this.worldObj.isRemote && this.isWet && !this.isShaking && !this.hasPath() && this.onGround) {
@@ -410,6 +431,7 @@ public class EntityWolf extends EntityTameable {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		super.onUpdate();
 		this.headRotationCourseOld = this.headRotationCourse;
@@ -455,6 +477,7 @@ public class EntityWolf extends EntityTameable {
 
 	}
 
+	@Override
 	protected void playStepSound(BlockPos var1, Block var2) {
 		this.playSound("mob.wolf.step", 0.15F, 1.0F);
 	}
@@ -462,6 +485,7 @@ public class EntityWolf extends EntityTameable {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		this.setAngry(nbttagcompound.getBoolean("Angry"));
@@ -487,6 +511,7 @@ public class EntityWolf extends EntityTameable {
 	/**
 	 * + Sets the active target the Task system uses for tracking
 	 */
+	@Override
 	public void setAttackTarget(EntityLivingBase entitylivingbase) {
 		super.setAttackTarget(entitylivingbase);
 		if (entitylivingbase == null) {
@@ -510,6 +535,7 @@ public class EntityWolf extends EntityTameable {
 		this.dataWatcher.updateObject(20, Byte.valueOf((byte) (collarcolor.getDyeDamage() & 15)));
 	}
 
+	@Override
 	public void setTamed(boolean flag) {
 		super.setTamed(flag);
 		if (flag) {
@@ -521,6 +547,7 @@ public class EntityWolf extends EntityTameable {
 		this.getEntityAttribute(SharedMonsterAttributes.attackDamage).setBaseValue(4.0D);
 	}
 
+	@Override
 	public boolean shouldAttackEntity(EntityLivingBase entitylivingbase, EntityLivingBase entitylivingbase1) {
 		if (!(entitylivingbase instanceof EntityCreeper) && !(entitylivingbase instanceof EntityGhast)) {
 			if (entitylivingbase instanceof EntityWolf) {
@@ -538,6 +565,7 @@ public class EntityWolf extends EntityTameable {
 		}
 	}
 
+	@Override
 	protected void updateAITasks() {
 		this.dataWatcher.updateObject(18, Float.valueOf(this.getHealth()));
 	}
@@ -545,6 +573,7 @@ public class EntityWolf extends EntityTameable {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		nbttagcompound.setBoolean("Angry", this.isAngry());

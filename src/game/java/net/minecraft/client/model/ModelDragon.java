@@ -12,13 +12,13 @@ import net.minecraft.entity.boss.EntityDragon;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,7 +30,7 @@ import net.minecraft.entity.boss.EntityDragon;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ModelDragon extends ModelBase {
 	private ModelRenderer head;
@@ -128,6 +128,7 @@ public class ModelDragon extends ModelBase {
 	/**
 	 * + Sets the models various rotation angles then renders the model.
 	 */
+	@Override
 	public void render(Entity entity, float var2, float var3, float var4, float var5, float var6, float f) {
 		GlStateManager.pushMatrix();
 		EntityDragon entitydragon = (EntityDragon) entity;
@@ -240,6 +241,7 @@ public class ModelDragon extends ModelBase {
 	 * float params here are the same second and third as in the setRotationAngles
 	 * method.
 	 */
+	@Override
 	public void setLivingAnimations(EntityLivingBase var1, float var2, float var3, float f) {
 		this.partialTicks = f;
 	}

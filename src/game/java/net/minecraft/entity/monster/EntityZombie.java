@@ -47,13 +47,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -65,7 +65,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityZombie extends EntityMob {
 	class GroupData implements IEntityLivingData {
@@ -117,6 +117,7 @@ public class EntityZombie extends EntityMob {
 	/**
 	 * + Causes this Entity to drop a random item.
 	 */
+	@Override
 	protected void addRandomDrop() {
 		switch (this.rand.nextInt(3)) {
 		case 0:
@@ -141,6 +142,7 @@ public class EntityZombie extends EntityMob {
 		this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityIronGolem.class, true));
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.followRange).setBaseValue(35.0D);
@@ -150,6 +152,7 @@ public class EntityZombie extends EntityMob {
 				.setBaseValue(this.rand.nextDouble() * 0.10000000149011612D);
 	}
 
+	@Override
 	public boolean attackEntityAsMob(Entity entity) {
 		boolean flag = super.attackEntityAsMob(entity);
 		if (flag) {
@@ -165,6 +168,7 @@ public class EntityZombie extends EntityMob {
 	/**
 	 * + Called when the entity is attacked.
 	 */
+	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float f) {
 		if (super.attackEntityFrom(damagesource, f)) {
 			EntityLivingBase entitylivingbase = this.getAttackTarget();
@@ -221,6 +225,7 @@ public class EntityZombie extends EntityMob {
 	/**
 	 * + Determines if an entity can be despawned, used on idle far away entities
 	 */
+	@Override
 	protected boolean canDespawn() {
 		return !this.isConverting();
 	}
@@ -251,6 +256,7 @@ public class EntityZombie extends EntityMob {
 				new BlockPos((int) this.posX, (int) this.posY, (int) this.posZ), 0);
 	}
 
+	@Override
 	protected void entityInit() {
 		super.entityInit();
 		this.getDataWatcher().addObject(12, Byte.valueOf((byte) 0));
@@ -258,6 +264,7 @@ public class EntityZombie extends EntityMob {
 		this.getDataWatcher().addObject(14, Byte.valueOf((byte) 0));
 	}
 
+	@Override
 	protected boolean func_175448_a(ItemStack itemstack) {
 		return itemstack.getItem() == Items.egg && this.isChild() && this.isRiding() ? false
 				: super.func_175448_a(itemstack);
@@ -270,7 +277,7 @@ public class EntityZombie extends EntityMob {
 		int i = 1;
 		if (this.rand.nextFloat() < 0.01F) {
 			int j = 0;
-			BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+			BlockPos blockpos$mutableblockpos = new BlockPos();
 
 			for (int k = (int) this.posX - 4; k < (int) this.posX + 4 && j < 14; ++k) {
 				for (int l = (int) this.posY - 4; l < (int) this.posY + 4 && j < 14; ++l) {
@@ -295,6 +302,7 @@ public class EntityZombie extends EntityMob {
 	/**
 	 * + Get this Entity's EnumCreatureAttribute
 	 */
+	@Override
 	public EnumCreatureAttribute getCreatureAttribute() {
 		return EnumCreatureAttribute.UNDEAD;
 	}
@@ -302,10 +310,12 @@ public class EntityZombie extends EntityMob {
 	/**
 	 * + Returns the sound this mob makes on death.
 	 */
+	@Override
 	protected String getDeathSound() {
 		return "mob.zombie.death";
 	}
 
+	@Override
 	protected Item getDropItem() {
 		return Items.rotten_flesh;
 	}
@@ -313,6 +323,7 @@ public class EntityZombie extends EntityMob {
 	/**
 	 * + Get the experience points the entity currently has.
 	 */
+	@Override
 	protected int getExperiencePoints(EntityPlayer entityplayer) {
 		if (this.isChild()) {
 			this.experienceValue = (int) ((float) this.experienceValue * 2.5F);
@@ -321,6 +332,7 @@ public class EntityZombie extends EntityMob {
 		return super.getExperiencePoints(entityplayer);
 	}
 
+	@Override
 	public float getEyeHeight() {
 		float f = 1.74F;
 		if (this.isChild()) {
@@ -333,6 +345,7 @@ public class EntityZombie extends EntityMob {
 	/**
 	 * + Returns the sound this mob makes when it is hurt.
 	 */
+	@Override
 	protected String getHurtSound() {
 		return "mob.zombie.hurt";
 	}
@@ -340,6 +353,7 @@ public class EntityZombie extends EntityMob {
 	/**
 	 * + Returns the sound this mob makes while it's alive.
 	 */
+	@Override
 	protected String getLivingSound() {
 		return "mob.zombie.say";
 	}
@@ -348,6 +362,7 @@ public class EntityZombie extends EntityMob {
 	 * + Returns the current armor value as determined by a call to
 	 * InventoryPlayer.getTotalArmorValue
 	 */
+	@Override
 	public int getTotalArmorValue() {
 		int i = super.getTotalArmorValue() + 2;
 		if (i > 20) {
@@ -360,10 +375,12 @@ public class EntityZombie extends EntityMob {
 	/**
 	 * + Returns the Y Offset of this entity.
 	 */
+	@Override
 	public double getYOffset() {
 		return this.isChild() ? 0.0D : -0.35D;
 	}
 
+	@Override
 	public void handleStatusUpdate(byte b0) {
 		if (b0 == 16) {
 			if (!this.isSilent()) {
@@ -380,6 +397,7 @@ public class EntityZombie extends EntityMob {
 	 * + Called when a player interacts with a mob. e.g. gets milk from a cow, gets
 	 * into the saddle on a pig.
 	 */
+	@Override
 	public boolean interact(EntityPlayer entityplayer) {
 		ItemStack itemstack = entityplayer.getCurrentEquippedItem();
 		if (itemstack != null && itemstack.getItem() == Items.golden_apple && itemstack.getMetadata() == 0
@@ -409,6 +427,7 @@ public class EntityZombie extends EntityMob {
 	/**
 	 * + If Animal, checks if the age timer is negative
 	 */
+	@Override
 	public boolean isChild() {
 		return this.getDataWatcher().getWatchableObjectByte(12) == 1;
 	}
@@ -437,6 +456,7 @@ public class EntityZombie extends EntityMob {
 	/**
 	 * + Called when the mob's health reaches 0.
 	 */
+	@Override
 	public void onDeath(DamageSource damagesource) {
 		super.onDeath(damagesource);
 		if (damagesource.getEntity() instanceof EntityCreeper && !(this instanceof EntityPigZombie)
@@ -453,6 +473,7 @@ public class EntityZombie extends EntityMob {
 	 * spawner, natural spawning etc, but not called when entity is reloaded from
 	 * nbt. Mainly used for initializing attributes and inventory
 	 */
+	@Override
 	public IEntityLivingData onInitialSpawn(DifficultyInstance difficultyinstance,
 			IEntityLivingData ientitylivingdata) {
 		ientitylivingdata = super.onInitialSpawn(difficultyinstance, ientitylivingdata);
@@ -524,6 +545,7 @@ public class EntityZombie extends EntityMob {
 	/**
 	 * + This method gets called when the entity kills another one.
 	 */
+	@Override
 	public void onKillEntity(EntityLivingBase entitylivingbase) {
 		super.onKillEntity(entitylivingbase);
 		if ((this.worldObj.getDifficulty() == EnumDifficulty.NORMAL
@@ -562,6 +584,7 @@ public class EntityZombie extends EntityMob {
 	 * required. For example, zombies and skeletons use this to react to sunlight
 	 * and start to burn.
 	 */
+	@Override
 	public void onLivingUpdate() {
 		if (this.worldObj.isDaytime() && !this.worldObj.isRemote && !this.isChild()) {
 			float f = this.getBrightness(1.0F);
@@ -597,6 +620,7 @@ public class EntityZombie extends EntityMob {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		if (!this.worldObj.isRemote && this.isConverting()) {
 			int i = this.getConversionTimeBoost();
@@ -609,6 +633,7 @@ public class EntityZombie extends EntityMob {
 		super.onUpdate();
 	}
 
+	@Override
 	protected void playStepSound(BlockPos var1, Block var2) {
 		this.playSound("mob.zombie.step", 0.15F, 1.0F);
 	}
@@ -616,6 +641,7 @@ public class EntityZombie extends EntityMob {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		if (nbttagcompound.getBoolean("IsBaby")) {
@@ -674,6 +700,7 @@ public class EntityZombie extends EntityMob {
 	/**
 	 * + Gives armor or weapon for entity based on given DifficultyInstance
 	 */
+	@Override
 	protected void setEquipmentBasedOnDifficulty(DifficultyInstance difficultyinstance) {
 		super.setEquipmentBasedOnDifficulty(difficultyinstance);
 		if (this.rand.nextFloat() < (this.worldObj.getDifficulty() == EnumDifficulty.HARD ? 0.05F : 0.01F)) {
@@ -690,6 +717,7 @@ public class EntityZombie extends EntityMob {
 	/**
 	 * + Sets the width and height of the entity. Args: width, height
 	 */
+	@Override
 	protected final void setSize(float f, float f1) {
 		boolean flag = this.zombieWidth > 0.0F && this.zombieHeight > 0.0F;
 		this.zombieWidth = f;
@@ -723,6 +751,7 @@ public class EntityZombie extends EntityMob {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		if (this.isChild()) {

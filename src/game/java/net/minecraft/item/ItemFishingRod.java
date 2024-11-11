@@ -9,13 +9,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ItemFishingRod extends Item {
 	public ItemFishingRod() {
@@ -40,6 +40,7 @@ public class ItemFishingRod extends Item {
 	 * + Return the enchantability factor of the item, most of the time is based on
 	 * material.
 	 */
+	@Override
 	public int getItemEnchantability() {
 		return 1;
 	}
@@ -47,6 +48,7 @@ public class ItemFishingRod extends Item {
 	/**
 	 * + Returns True is the item is renderer in full 3D when hold.
 	 */
+	@Override
 	public boolean isFull3D() {
 		return true;
 	}
@@ -54,6 +56,7 @@ public class ItemFishingRod extends Item {
 	/**
 	 * + Checks isDamagable and if it cannot be stacked
 	 */
+	@Override
 	public boolean isItemTool(ItemStack itemstack) {
 		return super.isItemTool(itemstack);
 	}
@@ -62,6 +65,7 @@ public class ItemFishingRod extends Item {
 	 * + Called whenever this item is equipped and the right mouse button is
 	 * pressed. Args: itemStack, world, entityPlayer
 	 */
+	@Override
 	public ItemStack onItemRightClick(ItemStack itemstack, World world, EntityPlayer entityplayer) {
 		if (entityplayer.fishEntity != null) {
 			int i = entityplayer.fishEntity.handleHookRetraction();
@@ -84,6 +88,7 @@ public class ItemFishingRod extends Item {
 	 * + Returns true if this item should be rotated by 180 degrees around the Y
 	 * axis when being held in an entities hands.
 	 */
+	@Override
 	public boolean shouldRotateAroundWhenRendering() {
 		return true;
 	}

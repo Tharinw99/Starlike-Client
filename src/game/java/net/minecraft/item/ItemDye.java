@@ -20,13 +20,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,7 +38,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ItemDye extends Item {
 	public static final int[] dyeColors = new int[] { 1973019, 11743532, 3887386, 5320730, 2437522, 8073150, 2651799,
@@ -96,6 +96,7 @@ public class ItemDye extends Item {
 	 * + returns a list of items with the same ID, but different meta (eg: dye
 	 * returns 16 items)
 	 */
+	@Override
 	public void getSubItems(Item item, CreativeTabs var2, List<ItemStack> list) {
 		for (int i = 0; i < 16; ++i) {
 			list.add(new ItemStack(item, 1, i));
@@ -108,6 +109,7 @@ public class ItemDye extends Item {
 	 * ItemStack so different stacks can have different names based on their damage
 	 * or NBT.
 	 */
+	@Override
 	public String getUnlocalizedName(ItemStack itemstack) {
 		int i = itemstack.getMetadata();
 		return super.getUnlocalizedName() + "." + EnumDyeColor.byDyeDamage(i).getUnlocalizedName();
@@ -117,6 +119,7 @@ public class ItemDye extends Item {
 	 * + Returns true if the item can be used on the given entity, e.g. shears on
 	 * sheep.
 	 */
+	@Override
 	public boolean itemInteractionForEntity(ItemStack itemstack, EntityPlayer var2, EntityLivingBase entitylivingbase) {
 		if (entitylivingbase instanceof EntitySheep) {
 			EntitySheep entitysheep = (EntitySheep) entitylivingbase;
@@ -135,6 +138,7 @@ public class ItemDye extends Item {
 	/**
 	 * + Called when a Block is right-clicked with this Item
 	 */
+	@Override
 	public boolean onItemUse(ItemStack itemstack, EntityPlayer entityplayer, World world, BlockPos blockpos,
 			EnumFacing enumfacing, float f, float f1, float f2) {
 		if (!entityplayer.canPlayerEdit(blockpos.offset(enumfacing), enumfacing, itemstack)) {

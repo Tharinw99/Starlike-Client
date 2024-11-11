@@ -41,13 +41,13 @@ import net.minecraft.world.WorldSettings;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -59,7 +59,7 @@ import net.minecraft.world.WorldSettings;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class PlayerSelector {
 	/**
@@ -123,6 +123,7 @@ public class PlayerSelector {
 				final AxisAlignedBB axisalignedbb = func_179661_a(position, i, j, k);
 				if (flag && flag2 && !flag1) {
 					Predicate predicate2 = new Predicate<Entity>() {
+						@Override
 						public boolean apply(Entity entity) {
 							return entity.posX >= axisalignedbb.minX && entity.posY >= axisalignedbb.minY
 									&& entity.posZ >= axisalignedbb.minZ
@@ -158,6 +159,7 @@ public class PlayerSelector {
 		if (s != null) {
 			final String ss = s;
 			arraylist.add(new Predicate<Entity>() {
+				@Override
 				public boolean apply(Entity entity) {
 					return entity.getName().equals(ss) != flag;
 				}
@@ -173,6 +175,7 @@ public class PlayerSelector {
 		final int j = parseIntWithDefault(parMap, "l", -1);
 		if (i > -1 || j > -1) {
 			arraylist.add(new Predicate<Entity>() {
+				@Override
 				public boolean apply(Entity entity) {
 					if (!(entity instanceof EntityPlayerMP)) {
 						return false;
@@ -193,6 +196,7 @@ public class PlayerSelector {
 		final int i = parseIntWithDefault(parMap, "m", WorldSettings.GameType.NOT_SET.getID());
 		if (i != WorldSettings.GameType.NOT_SET.getID()) {
 			arraylist.add(new Predicate<Entity>() {
+				@Override
 				public boolean apply(Entity entity) {
 					if (!(entity instanceof EntityPlayerMP)) {
 						return false;
@@ -229,6 +233,7 @@ public class PlayerSelector {
 		final Map map = func_96560_a(parMap);
 		if (map != null && map.size() > 0) {
 			arraylist.add(new Predicate<Entity>() {
+				@Override
 				public boolean apply(Entity entity) {
 					Scoreboard scoreboard = MinecraftServer.getServer().worldServerForDimension(0).getScoreboard();
 
@@ -280,6 +285,7 @@ public class PlayerSelector {
 			}
 		} else if (parBlockPos != null) {
 			Collections.sort((List) parList, new Comparator<Entity>() {
+				@Override
 				public int compare(Entity entity1, Entity entity2) {
 					return ComparisonChain.start()
 							.compare(entity1.getDistanceSq(parBlockPos), entity2.getDistanceSq(parBlockPos)).result();
@@ -315,6 +321,7 @@ public class PlayerSelector {
 		if (s != null) {
 			final String ss = s;
 			arraylist.add(new Predicate<Entity>() {
+				@Override
 				public boolean apply(Entity entity) {
 					if (!(entity instanceof EntityLivingBase)) {
 						return false;
@@ -350,6 +357,7 @@ public class PlayerSelector {
 			final int i = func_179650_a(parseIntWithDefault(parMap, "rym", 0));
 			final int j = func_179650_a(parseIntWithDefault(parMap, "ry", 359));
 			arraylist.add(new Predicate<Entity>() {
+				@Override
 				public boolean apply(Entity entity) {
 					int i1 = PlayerSelector.func_179650_a((int) Math.floor((double) entity.rotationYaw));
 					return i > j ? i1 >= i || i1 <= j : i1 >= i && i1 <= j;
@@ -361,6 +369,7 @@ public class PlayerSelector {
 			final int k = func_179650_a(parseIntWithDefault(parMap, "rxm", 0));
 			final int l = func_179650_a(parseIntWithDefault(parMap, "rx", 359));
 			arraylist.add(new Predicate<Entity>() {
+				@Override
 				public boolean apply(Entity entity) {
 					int i1 = PlayerSelector.func_179650_a((int) Math.floor((double) entity.rotationPitch));
 					return k > l ? i1 >= k || i1 <= l : i1 >= k && i1 <= l;
@@ -384,6 +393,7 @@ public class PlayerSelector {
 		if ((s == null || !parString1.equals("e")) && !flag2) {
 			if (flag1) {
 				arraylist.add(new Predicate<Entity>() {
+					@Override
 					public boolean apply(Entity entity) {
 						return entity instanceof EntityPlayer;
 					}
@@ -392,6 +402,7 @@ public class PlayerSelector {
 		} else {
 			final String ss = s;
 			arraylist.add(new Predicate<Entity>() {
+				@Override
 				public boolean apply(Entity entity) {
 					return EntityList.isStringEntityName(entity, ss) != flag;
 				}
@@ -425,6 +436,7 @@ public class PlayerSelector {
 			final int k = i * i;
 			final int l = j * j;
 			arraylist.add(new Predicate<Entity>() {
+				@Override
 				public boolean apply(Entity entity) {
 					int i1 = (int) entity.getDistanceSqToCenter(parBlockPos);
 					return (i < 0 || i1 >= k) && (j < 0 || i1 <= l);

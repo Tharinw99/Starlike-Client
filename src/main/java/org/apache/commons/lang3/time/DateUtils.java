@@ -137,27 +137,27 @@ public class DateUtils {
 
 	/**
 	 * Number of milliseconds in a standard second.
-	 * 
+	 *
 	 * @since 2.1
 	 */
 	public static final long MILLIS_PER_SECOND = 1000;
 	/**
 	 * Number of milliseconds in a standard minute.
-	 * 
+	 *
 	 * @since 2.1
 	 */
 	public static final long MILLIS_PER_MINUTE = 60 * MILLIS_PER_SECOND;
 
 	/**
 	 * Number of milliseconds in a standard hour.
-	 * 
+	 *
 	 * @since 2.1
 	 */
 	public static final long MILLIS_PER_HOUR = 60 * MILLIS_PER_MINUTE;
 
 	/**
 	 * Number of milliseconds in a standard day.
-	 * 
+	 *
 	 * @since 2.1
 	 */
 	public static final long MILLIS_PER_DAY = 24 * MILLIS_PER_HOUR;
@@ -1834,7 +1834,7 @@ public class DateUtils {
 	// -----------------------------------------------------------------------
 	/**
 	 * Converts a {@code Date} of a given {@code TimeZone} into a {@code Calendar}
-	 * 
+	 *
 	 * @param date the date to convert to a Calendar
 	 * @param tz   the time zone of the {@code date}
 	 * @return the created Calendar

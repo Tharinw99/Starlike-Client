@@ -1,5 +1,5 @@
 {
-    "variants": {
-        "normal": { "model": "starlike:steel_block" }
-    }
+  "variants": {
+    "normal": { "model": "starlike:steel_block" }
+  }
 }

@@ -51,7 +51,7 @@ public abstract class ImmutableTable<R, C, V> extends AbstractTable<R, C, V> {
 	/**
 	 * A builder for creating immutable table instances, especially {@code public
 	 * static final} tables ("constant tables"). Example:
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 * 	&#64;code

@@ -17,13 +17,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -35,7 +35,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockDeadBush extends BlockBush {
 	protected BlockDeadBush() {
@@ -47,6 +47,7 @@ public class BlockDeadBush extends BlockBush {
 	/**
 	 * + is the block grass, dirt or farmland
 	 */
+	@Override
 	protected boolean canPlaceBlockOn(Block block) {
 		return block == Blocks.sand || block == Blocks.hardened_clay || block == Blocks.stained_hardened_clay
 				|| block == Blocks.dirt;
@@ -55,6 +56,7 @@ public class BlockDeadBush extends BlockBush {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
 		return null;
 	}
@@ -62,10 +64,12 @@ public class BlockDeadBush extends BlockBush {
 	/**
 	 * + Get the MapColor for this Block and the given BlockState
 	 */
+	@Override
 	public MapColor getMapColor(IBlockState var1) {
 		return MapColor.woodColor;
 	}
 
+	@Override
 	public void harvestBlock(World world, EntityPlayer entityplayer, BlockPos blockpos, IBlockState iblockstate,
 			TileEntity tileentity) {
 		if (!world.isRemote && entityplayer.getCurrentEquippedItem() != null
@@ -82,6 +86,7 @@ public class BlockDeadBush extends BlockBush {
 	 * + Whether this Block can be replaced directly by other blocks (true for e.g.
 	 * tall grass)
 	 */
+	@Override
 	public boolean isReplaceable(World var1, BlockPos var2) {
 		return true;
 	}

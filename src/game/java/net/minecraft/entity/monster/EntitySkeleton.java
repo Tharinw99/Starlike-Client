@@ -43,13 +43,13 @@ import net.minecraft.world.WorldProviderHell;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -61,7 +61,7 @@ import net.minecraft.world.WorldProviderHell;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntitySkeleton extends EntityMob implements IRangedAttackMob {
 	private EntityAIArrowAttack aiArrowAttack = new EntityAIArrowAttack(this, 1.0D, 20, 60, 15.0F);
@@ -89,6 +89,7 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob {
 	/**
 	 * + Causes this Entity to drop a random item.
 	 */
+	@Override
 	protected void addRandomDrop() {
 		if (this.getSkeletonType() == 1) {
 			this.entityDropItem(new ItemStack(Items.skull, 1, 1), 0.0F);
@@ -96,11 +97,13 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob {
 
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.25D);
 	}
 
+	@Override
 	public boolean attackEntityAsMob(Entity entity) {
 		if (super.attackEntityAsMob(entity)) {
 			if (this.getSkeletonType() == 1 && entity instanceof EntityLivingBase) {
@@ -116,6 +119,7 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob {
 	/**
 	 * + Attack the specified entity using a ranged attack.
 	 */
+	@Override
 	public void attackEntityWithRangedAttack(EntityLivingBase entitylivingbase, float f) {
 		EntityArrow entityarrow = new EntityArrow(this.worldObj, this, entitylivingbase, 1.6F,
 				(float) (14 - this.worldObj.getDifficulty().getDifficultyId() * 4));
@@ -143,6 +147,7 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob {
 	/**
 	 * + Drop 0-2 items of this living's type
 	 */
+	@Override
 	protected void dropFewItems(boolean var1, int i) {
 		if (this.getSkeletonType() == 1) {
 			int j = this.rand.nextInt(3 + i) - 1;
@@ -166,6 +171,7 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob {
 
 	}
 
+	@Override
 	protected void entityInit() {
 		super.entityInit();
 		this.dataWatcher.addObject(13, Byte.valueOf((byte) 0));
@@ -174,6 +180,7 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob {
 	/**
 	 * + Get this Entity's EnumCreatureAttribute
 	 */
+	@Override
 	public EnumCreatureAttribute getCreatureAttribute() {
 		return EnumCreatureAttribute.UNDEAD;
 	}
@@ -181,14 +188,17 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob {
 	/**
 	 * + Returns the sound this mob makes on death.
 	 */
+	@Override
 	protected String getDeathSound() {
 		return "mob.skeleton.death";
 	}
 
+	@Override
 	protected Item getDropItem() {
 		return Items.arrow;
 	}
 
+	@Override
 	public float getEyeHeight() {
 		return this.getSkeletonType() == 1 ? super.getEyeHeight() : 1.74F;
 	}
@@ -196,6 +206,7 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob {
 	/**
 	 * + Returns the sound this mob makes when it is hurt.
 	 */
+	@Override
 	protected String getHurtSound() {
 		return "mob.skeleton.hurt";
 	}
@@ -203,6 +214,7 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob {
 	/**
 	 * + Returns the sound this mob makes while it's alive.
 	 */
+	@Override
 	protected String getLivingSound() {
 		return "mob.skeleton.say";
 	}
@@ -217,6 +229,7 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob {
 	/**
 	 * + Returns the Y Offset of this entity.
 	 */
+	@Override
 	public double getYOffset() {
 		return this.isChild() ? 0.0D : -0.35D;
 	}
@@ -224,6 +237,7 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob {
 	/**
 	 * + Called when the mob's health reaches 0.
 	 */
+	@Override
 	public void onDeath(DamageSource damagesource) {
 		super.onDeath(damagesource);
 		if (damagesource.getSourceOfDamage() instanceof EntityArrow
@@ -248,6 +262,7 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob {
 	 * spawner, natural spawning etc, but not called when entity is reloaded from
 	 * nbt. Mainly used for initializing attributes and inventory
 	 */
+	@Override
 	public IEntityLivingData onInitialSpawn(DifficultyInstance difficultyinstance,
 			IEntityLivingData ientitylivingdata) {
 		ientitylivingdata = super.onInitialSpawn(difficultyinstance, ientitylivingdata);
@@ -280,6 +295,7 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob {
 	 * required. For example, zombies and skeletons use this to react to sunlight
 	 * and start to burn.
 	 */
+	@Override
 	public void onLivingUpdate() {
 		if (this.worldObj.isDaytime() && !this.worldObj.isRemote) {
 			float f = this.getBrightness(1.0F);
@@ -312,6 +328,7 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob {
 		super.onLivingUpdate();
 	}
 
+	@Override
 	protected void playStepSound(BlockPos var1, Block var2) {
 		this.playSound("mob.skeleton.step", 0.15F, 1.0F);
 	}
@@ -319,6 +336,7 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		if (nbttagcompound.hasKey("SkeletonType", 99)) {
@@ -348,6 +366,7 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob {
 	 * + Sets the held item, or an armor slot. Slot 0 is held item. Slot 1-4 is
 	 * armor. Params: Item, slot
 	 */
+	@Override
 	public void setCurrentItemOrArmor(int i, ItemStack itemstack) {
 		super.setCurrentItemOrArmor(i, itemstack);
 		if (!this.worldObj.isRemote && i == 0) {
@@ -359,6 +378,7 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob {
 	/**
 	 * + Gives armor or weapon for entity based on given DifficultyInstance
 	 */
+	@Override
 	protected void setEquipmentBasedOnDifficulty(DifficultyInstance difficultyinstance) {
 		super.setEquipmentBasedOnDifficulty(difficultyinstance);
 		this.setCurrentItemOrArmor(0, new ItemStack(Items.bow));
@@ -381,6 +401,7 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob {
 	/**
 	 * + Handles updating while being ridden by an entity
 	 */
+	@Override
 	public void updateRidden() {
 		super.updateRidden();
 		if (this.ridingEntity instanceof EntityCreature) {
@@ -393,6 +414,7 @@ public class EntitySkeleton extends EntityMob implements IRangedAttackMob {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		nbttagcompound.setByte("SkeletonType", (byte) this.getSkeletonType());

@@ -12,13 +12,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,7 +30,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityOtherPlayerMP extends AbstractClientPlayer {
 	private boolean isItemInUse;
@@ -52,6 +52,7 @@ public class EntityOtherPlayerMP extends AbstractClientPlayer {
 	/**
 	 * + Send a chat message to the CommandSender
 	 */
+	@Override
 	public void addChatMessage(IChatComponent ichatcomponent) {
 		Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(ichatcomponent);
 	}
@@ -59,6 +60,7 @@ public class EntityOtherPlayerMP extends AbstractClientPlayer {
 	/**
 	 * + Called when the entity is attacked.
 	 */
+	@Override
 	public boolean attackEntityFrom(DamageSource var1, float var2) {
 		return true;
 	}
@@ -67,6 +69,7 @@ public class EntityOtherPlayerMP extends AbstractClientPlayer {
 	 * + Returns {@code true} if the CommandSender is allowed to execute the
 	 * command, {@code false} if not
 	 */
+	@Override
 	public boolean canCommandSenderUseCommand(int var1, String var2) {
 		return false;
 	}
@@ -75,6 +78,7 @@ public class EntityOtherPlayerMP extends AbstractClientPlayer {
 	 * + Get the position in the world. <b>{@code null} is not allowed!</b> If you
 	 * are not an entity in the world, return the coordinates 0, 0, 0
 	 */
+	@Override
 	public BlockPos getPosition() {
 		return new BlockPos(this.posX + 0.5D, this.posY + 0.5D, this.posZ + 0.5D);
 	}
@@ -84,6 +88,7 @@ public class EntityOtherPlayerMP extends AbstractClientPlayer {
 	 * required. For example, zombies and skeletons use this to react to sunlight
 	 * and start to burn.
 	 */
+	@Override
 	public void onLivingUpdate() {
 		if (this.otherPlayerMPPosRotationIncrements > 0) {
 			double d0 = this.posX
@@ -135,6 +140,7 @@ public class EntityOtherPlayerMP extends AbstractClientPlayer {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		this.renderOffsetY = 0.0F;
 		super.onUpdate();
@@ -164,6 +170,7 @@ public class EntityOtherPlayerMP extends AbstractClientPlayer {
 	 * + Sets the held item, or an armor slot. Slot 0 is held item. Slot 1-4 is
 	 * armor. Params: Item, slot
 	 */
+	@Override
 	public void setCurrentItemOrArmor(int slotIn, ItemStack stack) {
 		if (slotIn == 0) {
 			this.inventory.mainInventory[this.inventory.currentItem] = stack;
@@ -173,6 +180,7 @@ public class EntityOtherPlayerMP extends AbstractClientPlayer {
 
 	}
 
+	@Override
 	public void setPositionAndRotation2(double x, double y, double z, float yaw, float pitch, int posRotationIncrements,
 			boolean parFlag) {
 		this.otherPlayerMPX = x;

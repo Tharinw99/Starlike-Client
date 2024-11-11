@@ -15,18 +15,18 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
-import net.starlikeclient.StarlikeSettings;
+import net.starlikeclient.StarlikeClient;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,13 +38,14 @@ import net.starlikeclient.StarlikeSettings;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class CommandFill extends CommandBase {
 
 	/**
 	 * + Return a list of options when the user types TAB
 	 */
+	@Override
 	public List<String> addTabCompletionOptions(ICommandSender var1, String[] astring, BlockPos blockpos) {
 		return astring.length > 0
 				&& astring.length <= 3
@@ -65,6 +66,7 @@ public class CommandFill extends CommandBase {
 	/**
 	 * + Gets the name of the command
 	 */
+	@Override
 	public String getCommandName() {
 		return "fill";
 	}
@@ -72,6 +74,7 @@ public class CommandFill extends CommandBase {
 	/**
 	 * + Gets the usage string for the command.
 	 */
+	@Override
 	public String getCommandUsage(ICommandSender var1) {
 		return "commands.fill.usage";
 	}
@@ -79,6 +82,7 @@ public class CommandFill extends CommandBase {
 	/**
 	 * + Return the required permission level for this command.
 	 */
+	@Override
 	public int getRequiredPermissionLevel() {
 		return 2;
 	}
@@ -86,6 +90,7 @@ public class CommandFill extends CommandBase {
 	/**
 	 * + Callback when the command is invoked
 	 */
+	@Override
 	public void processCommand(ICommandSender parICommandSender, String[] parArrayOfString) throws CommandException {
 		if (parArrayOfString.length < 7) {
 			throw new WrongUsageException("commands.fill.usage", new Object[0]);
@@ -105,9 +110,9 @@ public class CommandFill extends CommandBase {
 					Math.max(blockpos.getY(), blockpos1.getY()), Math.max(blockpos.getZ(), blockpos1.getZ()));
 			int j = (blockpos3.getX() - blockpos2.getX() + 1) * (blockpos3.getY() - blockpos2.getY() + 1)
 					* (blockpos3.getZ() - blockpos2.getZ() + 1);
-			if (j > StarlikeSettings.commandModificationBlockLimit) {
+			if (j > StarlikeClient.Config.Commands.commandModificationBlockLimit) {
 				throw new CommandException("commands.fill.tooManyBlocks", new Object[] { Integer.valueOf(j),
-						Integer.valueOf(StarlikeSettings.commandModificationBlockLimit) });
+						Integer.valueOf(StarlikeClient.Config.Commands.commandModificationBlockLimit) });
 			} else if (blockpos2.getY() >= 0 && blockpos3.getY() < 256) {
 				World world = parICommandSender.getEntityWorld();
 

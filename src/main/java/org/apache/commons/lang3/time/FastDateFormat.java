@@ -704,7 +704,7 @@ public class FastDateFormat extends Format implements DateParser, DatePrinter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see DateParser#parse(java.lang.String)
 	 */
 	@Override
@@ -714,7 +714,7 @@ public class FastDateFormat extends Format implements DateParser, DatePrinter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see DateParser#parse(java.lang.String, java.text.ParsePosition)
 	 */
 	@Override
@@ -724,7 +724,7 @@ public class FastDateFormat extends Format implements DateParser, DatePrinter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.apache.commons.lang3.time.DateParser#parse(java.lang.String,
 	 * java.text.ParsePosition, java.util.Calendar)
 	 */
@@ -735,7 +735,7 @@ public class FastDateFormat extends Format implements DateParser, DatePrinter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.text.Format#parseObject(java.lang.String, java.text.ParsePosition)
 	 */
 	@Override

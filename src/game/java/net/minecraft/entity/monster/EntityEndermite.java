@@ -20,13 +20,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,7 +38,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityEndermite extends EntityMob {
 	private int lifetime = 0;
@@ -57,6 +57,7 @@ public class EntityEndermite extends EntityMob {
 		this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityPlayer.class, true));
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(8.0D);
@@ -68,6 +69,7 @@ public class EntityEndermite extends EntityMob {
 	 * + returns if this entity triggers Block.onEntityWalking on the blocks they
 	 * walk on. used for spiders and wolves to prevent them from trampling crops
 	 */
+	@Override
 	protected boolean canTriggerWalking() {
 		return false;
 	}
@@ -76,6 +78,7 @@ public class EntityEndermite extends EntityMob {
 	 * + Checks if the entity's current position is a valid location to spawn this
 	 * entity.
 	 */
+	@Override
 	public boolean getCanSpawnHere() {
 		if (super.getCanSpawnHere()) {
 			EntityPlayer entityplayer = this.worldObj.getClosestPlayerToEntity(this, 5.0D);
@@ -88,6 +91,7 @@ public class EntityEndermite extends EntityMob {
 	/**
 	 * + Get this Entity's EnumCreatureAttribute
 	 */
+	@Override
 	public EnumCreatureAttribute getCreatureAttribute() {
 		return EnumCreatureAttribute.ARTHROPOD;
 	}
@@ -95,14 +99,17 @@ public class EntityEndermite extends EntityMob {
 	/**
 	 * + Returns the sound this mob makes on death.
 	 */
+	@Override
 	protected String getDeathSound() {
 		return "mob.silverfish.kill";
 	}
 
+	@Override
 	protected Item getDropItem() {
 		return null;
 	}
 
+	@Override
 	public float getEyeHeight() {
 		return 0.1F;
 	}
@@ -110,6 +117,7 @@ public class EntityEndermite extends EntityMob {
 	/**
 	 * + Returns the sound this mob makes when it is hurt.
 	 */
+	@Override
 	protected String getHurtSound() {
 		return "mob.silverfish.hit";
 	}
@@ -117,6 +125,7 @@ public class EntityEndermite extends EntityMob {
 	/**
 	 * + Returns the sound this mob makes while it's alive.
 	 */
+	@Override
 	protected String getLivingSound() {
 		return "mob.silverfish.say";
 	}
@@ -128,6 +137,7 @@ public class EntityEndermite extends EntityMob {
 	/**
 	 * + Checks to make sure the light is not too bright where the mob is spawning
 	 */
+	@Override
 	protected boolean isValidLightLevel() {
 		return true;
 	}
@@ -137,6 +147,7 @@ public class EntityEndermite extends EntityMob {
 	 * required. For example, zombies and skeletons use this to react to sunlight
 	 * and start to burn.
 	 */
+	@Override
 	public void onLivingUpdate() {
 		super.onLivingUpdate();
 		if (this.worldObj.isRemote) {
@@ -163,11 +174,13 @@ public class EntityEndermite extends EntityMob {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		this.renderYawOffset = this.rotationYaw;
 		super.onUpdate();
 	}
 
+	@Override
 	protected void playStepSound(BlockPos var1, Block var2) {
 		this.playSound("mob.silverfish.step", 0.15F, 1.0F);
 	}
@@ -175,6 +188,7 @@ public class EntityEndermite extends EntityMob {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		this.lifetime = nbttagcompound.getInteger("Lifetime");
@@ -191,6 +205,7 @@ public class EntityEndermite extends EntityMob {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		nbttagcompound.setInteger("Lifetime", this.lifetime);

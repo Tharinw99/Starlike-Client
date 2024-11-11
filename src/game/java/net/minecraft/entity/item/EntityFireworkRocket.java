@@ -10,13 +10,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityFireworkRocket extends Entity {
 	private int fireworkAge;
@@ -63,10 +63,12 @@ public class EntityFireworkRocket extends Entity {
 	/**
 	 * + If returns false, the item will not inflict any damage against entities.
 	 */
+	@Override
 	public boolean canAttackWithItem() {
 		return false;
 	}
 
+	@Override
 	protected void entityInit() {
 		this.dataWatcher.addObjectByDataType(8, 5);
 	}
@@ -74,18 +76,22 @@ public class EntityFireworkRocket extends Entity {
 	/**
 	 * + Gets how bright this entity is.
 	 */
+	@Override
 	public float getBrightness(float f) {
 		return super.getBrightness(f);
 	}
 
+	@Override
 	public int getBrightnessForRender(float f) {
 		return super.getBrightnessForRender(f);
 	}
 
+	@Override
 	protected float getEaglerDynamicLightsValueSimple(float partialTicks) {
 		return 1.0f;
 	}
 
+	@Override
 	public void handleStatusUpdate(byte b0) {
 		if (b0 == 17 && this.worldObj.isRemote) {
 			ItemStack itemstack = this.dataWatcher.getWatchableObjectItemStack(8);
@@ -106,6 +112,7 @@ public class EntityFireworkRocket extends Entity {
 	 * and comparing it to its average edge length * 64 * renderDistanceWeight Args:
 	 * distance
 	 */
+	@Override
 	public boolean isInRangeToRenderDist(double d0) {
 		return d0 < 4096.0D;
 	}
@@ -113,6 +120,7 @@ public class EntityFireworkRocket extends Entity {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		this.lastTickPosX = this.posX;
 		this.lastTickPosY = this.posY;
@@ -167,6 +175,7 @@ public class EntityFireworkRocket extends Entity {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		this.fireworkAge = nbttagcompound.getInteger("Life");
 		this.lifetime = nbttagcompound.getInteger("LifeTime");
@@ -183,6 +192,7 @@ public class EntityFireworkRocket extends Entity {
 	/**
 	 * + Sets the velocity to the args. Args: x, y, z
 	 */
+	@Override
 	public void setVelocity(double d0, double d1, double d2) {
 		this.motionX = d0;
 		this.motionY = d1;
@@ -200,6 +210,7 @@ public class EntityFireworkRocket extends Entity {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		nbttagcompound.setInteger("Life", this.fireworkAge);
 		nbttagcompound.setInteger("LifeTime", this.lifetime);

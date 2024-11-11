@@ -25,7 +25,7 @@ import net.minecraft.util.ResourceLocation;
 
 /**
  * Copyright (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -37,7 +37,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiScreenEditProfile extends GuiScreen {
 
@@ -64,6 +64,7 @@ public class GuiScreenEditProfile extends GuiScreen {
 		this.parent = parent;
 	}
 
+	@Override
 	protected void actionPerformed(GuiButton par1GuiButton) {
 		if (!dropDownOpen) {
 			if (par1GuiButton.id == 0) {
@@ -87,6 +88,7 @@ public class GuiScreenEditProfile extends GuiScreen {
 		}
 	}
 
+	@Override
 	public void drawScreen(int mx, int my, float partialTicks) {
 		drawDefaultBackground();
 		drawCenteredString(fontRendererObj, screenTitle, width / 2, 15, 16777215);
@@ -301,6 +303,7 @@ public class GuiScreenEditProfile extends GuiScreen {
 		usernameField.fireInputEvent(event, param);
 	}
 
+	@Override
 	public void handleMouseInput() throws IOException {
 		super.handleMouseInput();
 		if (dropDownOpen) {
@@ -317,6 +320,7 @@ public class GuiScreenEditProfile extends GuiScreen {
 		}
 	}
 
+	@Override
 	public void initGui() {
 		Keyboard.enableRepeatEvents(true);
 		screenTitle = I18n.format("editProfile.title");
@@ -333,6 +337,7 @@ public class GuiScreenEditProfile extends GuiScreen {
 		updateOptions();
 	}
 
+	@Override
 	protected void keyTyped(char c, int k) {
 		usernameField.textboxKeyTyped(c, k);
 
@@ -352,6 +357,7 @@ public class GuiScreenEditProfile extends GuiScreen {
 		}
 	}
 
+	@Override
 	protected void mouseClicked(int mx, int my, int button) {
 		usernameField.mouseClicked(mx, my, button);
 		if (button == 0) {
@@ -458,6 +464,7 @@ public class GuiScreenEditProfile extends GuiScreen {
 		super.mouseClicked(mx, my, button);
 	}
 
+	@Override
 	public void onGuiClosed() {
 		Keyboard.enableRepeatEvents(false);
 	}
@@ -505,6 +512,7 @@ public class GuiScreenEditProfile extends GuiScreen {
 		dropDownOptions = n;
 	}
 
+	@Override
 	public void updateScreen() {
 		usernameField.updateCursorCounter();
 		if (EagRuntime.fileChooserHasResult()) {

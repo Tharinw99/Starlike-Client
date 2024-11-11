@@ -62,13 +62,13 @@ import net.minecraft.world.biome.BiomeGenBase;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -80,7 +80,7 @@ import net.minecraft.world.biome.BiomeGenBase;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class Bootstrap {
 	private static final PrintStream SYSOUT = System.out;
@@ -137,6 +137,7 @@ public class Bootstrap {
 
 	static void registerDispenserBehaviors() {
 		BlockDispenser.dispenseBehaviorRegistry.putObject(Items.arrow, new BehaviorProjectileDispense() {
+			@Override
 			protected IProjectile getProjectileEntity(World world, IPosition iposition) {
 				EntityArrow entityarrow = new EntityArrow(world, iposition.getX(), iposition.getY(), iposition.getZ());
 				entityarrow.canBePickedUp = 1;
@@ -144,24 +145,29 @@ public class Bootstrap {
 			}
 		});
 		BlockDispenser.dispenseBehaviorRegistry.putObject(Items.egg, new BehaviorProjectileDispense() {
+			@Override
 			protected IProjectile getProjectileEntity(World world, IPosition iposition) {
 				return new EntityEgg(world, iposition.getX(), iposition.getY(), iposition.getZ());
 			}
 		});
 		BlockDispenser.dispenseBehaviorRegistry.putObject(Items.snowball, new BehaviorProjectileDispense() {
+			@Override
 			protected IProjectile getProjectileEntity(World world, IPosition iposition) {
 				return new EntitySnowball(world, iposition.getX(), iposition.getY(), iposition.getZ());
 			}
 		});
 		BlockDispenser.dispenseBehaviorRegistry.putObject(Items.experience_bottle, new BehaviorProjectileDispense() {
+			@Override
 			protected float func_82498_a() {
 				return super.func_82498_a() * 0.5F;
 			}
 
+			@Override
 			protected float func_82500_b() {
 				return super.func_82500_b() * 1.25F;
 			}
 
+			@Override
 			protected IProjectile getProjectileEntity(World world, IPosition iposition) {
 				return new EntityExpBottle(world, iposition.getX(), iposition.getY(), iposition.getZ());
 			}
@@ -169,16 +175,20 @@ public class Bootstrap {
 		BlockDispenser.dispenseBehaviorRegistry.putObject(Items.potionitem, new IBehaviorDispenseItem() {
 			private final BehaviorDefaultDispenseItem field_150843_b = new BehaviorDefaultDispenseItem();
 
+			@Override
 			public ItemStack dispense(IBlockSource iblocksource, final ItemStack itemstack) {
 				return ItemPotion.isSplash(itemstack.getMetadata()) ? (new BehaviorProjectileDispense() {
+					@Override
 					protected float func_82498_a() {
 						return super.func_82498_a() * 0.5F;
 					}
 
+					@Override
 					protected float func_82500_b() {
 						return super.func_82500_b() * 1.25F;
 					}
 
+					@Override
 					protected IProjectile getProjectileEntity(World world, IPosition iposition) {
 						return new EntityPotion(world, iposition.getX(), iposition.getY(), iposition.getZ(),
 								itemstack.copy());
@@ -187,6 +197,7 @@ public class Bootstrap {
 			}
 		});
 		BlockDispenser.dispenseBehaviorRegistry.putObject(Items.spawn_egg, new BehaviorDefaultDispenseItem() {
+			@Override
 			public ItemStack dispenseStack(IBlockSource iblocksource, ItemStack itemstack) {
 				EnumFacing enumfacing = BlockDispenser.getFacing(iblocksource.getBlockMetadata());
 				double d0 = iblocksource.getX() + (double) enumfacing.getFrontOffsetX();
@@ -203,6 +214,7 @@ public class Bootstrap {
 			}
 		});
 		BlockDispenser.dispenseBehaviorRegistry.putObject(Items.fireworks, new BehaviorDefaultDispenseItem() {
+			@Override
 			public ItemStack dispenseStack(IBlockSource iblocksource, ItemStack itemstack) {
 				EnumFacing enumfacing = BlockDispenser.getFacing(iblocksource.getBlockMetadata());
 				double d0 = iblocksource.getX() + (double) enumfacing.getFrontOffsetX();
@@ -215,11 +227,13 @@ public class Bootstrap {
 				return itemstack;
 			}
 
+			@Override
 			protected void playDispenseSound(IBlockSource iblocksource) {
 				iblocksource.getWorld().playAuxSFX(1002, iblocksource.getBlockPos(), 0);
 			}
 		});
 		BlockDispenser.dispenseBehaviorRegistry.putObject(Items.fire_charge, new BehaviorDefaultDispenseItem() {
+			@Override
 			public ItemStack dispenseStack(IBlockSource iblocksource, ItemStack itemstack) {
 				EnumFacing enumfacing = BlockDispenser.getFacing(iblocksource.getBlockMetadata());
 				IPosition iposition = BlockDispenser.getDispensePosition(iblocksource);
@@ -236,6 +250,7 @@ public class Bootstrap {
 				return itemstack;
 			}
 
+			@Override
 			protected void playDispenseSound(IBlockSource iblocksource) {
 				iblocksource.getWorld().playAuxSFX(1009, iblocksource.getBlockPos(), 0);
 			}
@@ -243,6 +258,7 @@ public class Bootstrap {
 		BlockDispenser.dispenseBehaviorRegistry.putObject(Items.boat, new BehaviorDefaultDispenseItem() {
 			private final BehaviorDefaultDispenseItem field_150842_b = new BehaviorDefaultDispenseItem();
 
+			@Override
 			public ItemStack dispenseStack(IBlockSource iblocksource, ItemStack itemstack) {
 				EnumFacing enumfacing = BlockDispenser.getFacing(iblocksource.getBlockMetadata());
 				World world = iblocksource.getWorld();
@@ -269,6 +285,7 @@ public class Bootstrap {
 				return itemstack;
 			}
 
+			@Override
 			protected void playDispenseSound(IBlockSource iblocksource) {
 				iblocksource.getWorld().playAuxSFX(1000, iblocksource.getBlockPos(), 0);
 			}
@@ -276,6 +293,7 @@ public class Bootstrap {
 		BehaviorDefaultDispenseItem behaviordefaultdispenseitem = new BehaviorDefaultDispenseItem() {
 			private final BehaviorDefaultDispenseItem field_150841_b = new BehaviorDefaultDispenseItem();
 
+			@Override
 			public ItemStack dispenseStack(IBlockSource iblocksource, ItemStack itemstack) {
 				ItemBucket itembucket = (ItemBucket) itemstack.getItem();
 				BlockPos blockpos = iblocksource.getBlockPos()
@@ -294,6 +312,7 @@ public class Bootstrap {
 		BlockDispenser.dispenseBehaviorRegistry.putObject(Items.bucket, new BehaviorDefaultDispenseItem() {
 			private final BehaviorDefaultDispenseItem field_150840_b = new BehaviorDefaultDispenseItem();
 
+			@Override
 			public ItemStack dispenseStack(IBlockSource iblocksource, ItemStack itemstack) {
 				World world = iblocksource.getWorld();
 				BlockPos blockpos = iblocksource.getBlockPos()
@@ -329,6 +348,7 @@ public class Bootstrap {
 		BlockDispenser.dispenseBehaviorRegistry.putObject(Items.flint_and_steel, new BehaviorDefaultDispenseItem() {
 			private boolean field_150839_b = true;
 
+			@Override
 			protected ItemStack dispenseStack(IBlockSource iblocksource, ItemStack itemstack) {
 				World world = iblocksource.getWorld();
 				BlockPos blockpos = iblocksource.getBlockPos()
@@ -349,6 +369,7 @@ public class Bootstrap {
 				return itemstack;
 			}
 
+			@Override
 			protected void playDispenseSound(IBlockSource iblocksource) {
 				if (this.field_150839_b) {
 					iblocksource.getWorld().playAuxSFX(1000, iblocksource.getBlockPos(), 0);
@@ -361,6 +382,7 @@ public class Bootstrap {
 		BlockDispenser.dispenseBehaviorRegistry.putObject(Items.dye, new BehaviorDefaultDispenseItem() {
 			private boolean field_150838_b = true;
 
+			@Override
 			protected ItemStack dispenseStack(IBlockSource iblocksource, ItemStack itemstack) {
 				if (EnumDyeColor.WHITE == EnumDyeColor.byDyeDamage(itemstack.getMetadata())) {
 					World world = iblocksource.getWorld();
@@ -378,6 +400,7 @@ public class Bootstrap {
 				}
 			}
 
+			@Override
 			protected void playDispenseSound(IBlockSource iblocksource) {
 				if (this.field_150838_b) {
 					iblocksource.getWorld().playAuxSFX(1000, iblocksource.getBlockPos(), 0);
@@ -389,6 +412,7 @@ public class Bootstrap {
 		});
 		BlockDispenser.dispenseBehaviorRegistry.putObject(Item.getItemFromBlock(Blocks.tnt),
 				new BehaviorDefaultDispenseItem() {
+					@Override
 					protected ItemStack dispenseStack(IBlockSource iblocksource, ItemStack itemstack) {
 						World world = iblocksource.getWorld();
 						BlockPos blockpos = iblocksource.getBlockPos()
@@ -404,6 +428,7 @@ public class Bootstrap {
 		BlockDispenser.dispenseBehaviorRegistry.putObject(Items.skull, new BehaviorDefaultDispenseItem() {
 			private boolean field_179240_b = true;
 
+			@Override
 			protected ItemStack dispenseStack(IBlockSource iblocksource, ItemStack itemstack) {
 				World world = iblocksource.getWorld();
 				EnumFacing enumfacing = BlockDispenser.getFacing(iblocksource.getBlockMetadata());
@@ -449,6 +474,7 @@ public class Bootstrap {
 				return itemstack;
 			}
 
+			@Override
 			protected void playDispenseSound(IBlockSource iblocksource) {
 				if (this.field_179240_b) {
 					iblocksource.getWorld().playAuxSFX(1000, iblocksource.getBlockPos(), 0);
@@ -462,6 +488,7 @@ public class Bootstrap {
 				new BehaviorDefaultDispenseItem() {
 					private boolean field_179241_b = true;
 
+					@Override
 					protected ItemStack dispenseStack(IBlockSource iblocksource, ItemStack itemstack) {
 						World world = iblocksource.getWorld();
 						BlockPos blockpos = iblocksource.getBlockPos()
@@ -477,6 +504,7 @@ public class Bootstrap {
 						return itemstack;
 					}
 
+					@Override
 					protected void playDispenseSound(IBlockSource iblocksource) {
 						if (this.field_179241_b) {
 							iblocksource.getWorld().playAuxSFX(1000, iblocksource.getBlockPos(), 0);

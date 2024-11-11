@@ -20,13 +20,13 @@ import net.minecraft.util.IProgressUpdate;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,14 +38,14 @@ import net.minecraft.util.IProgressUpdate;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class SaveFormatOld implements ISaveFormat {
 	private static final Logger logger = LogManager.getLogger();
 
 	/**
 	 * +
-	 * 
+	 *
 	 * @args: Takes one argument - the list of files and directories to
 	 *        delete. @desc: Deletes the files and directory listed in the list
 	 *        recursively.
@@ -80,6 +80,7 @@ public class SaveFormatOld implements ISaveFormat {
 	/**
 	 * + Return whether the given world can be loaded.
 	 */
+	@Override
 	public boolean canLoadWorld(String parString1) {
 		return (WorldsDB.newVFile(this.savesDirectory, parString1, "level.dat")).exists()
 				|| (WorldsDB.newVFile(this.savesDirectory, parString1, "level.dat_old")).exists();
@@ -88,17 +89,19 @@ public class SaveFormatOld implements ISaveFormat {
 	/**
 	 * + converts the map to mcRegion
 	 */
+	@Override
 	public boolean convertMapFormat(String var1, IProgressUpdate var2) {
 		return false;
 	}
 
 	/**
 	 * +
-	 * 
+	 *
 	 * @args: Takes one argument - the name of the directory of the world to
 	 *        delete. @desc: Delete the world by deleting the associated directory
 	 *        recursively.
 	 */
+	@Override
 	public boolean deleteWorldDirectory(String parString1) {
 		VFile2 file1 = WorldsDB.newVFile(this.savesDirectory, parString1);
 		logger.info("Deleting level " + parString1);
@@ -118,13 +121,16 @@ public class SaveFormatOld implements ISaveFormat {
 		return false;
 	}
 
+	@Override
 	public void flushCache() {
 	}
 
+	@Override
 	public boolean func_154334_a(String var1) {
 		return false;
 	}
 
+	@Override
 	public boolean func_154335_d(String parString1) {
 		return !canLoadWorld(parString1);
 	}
@@ -132,10 +138,12 @@ public class SaveFormatOld implements ISaveFormat {
 	/**
 	 * + Returns the name of the save format.
 	 */
+	@Override
 	public String getName() {
 		return "Old Format";
 	}
 
+	@Override
 	public List<SaveFormatComparator> getSaveList() {
 		ArrayList arraylist = Lists.newArrayList();
 
@@ -155,6 +163,7 @@ public class SaveFormatOld implements ISaveFormat {
 	/**
 	 * + Returns back a loader for the specified save directory
 	 */
+	@Override
 	public ISaveHandler getSaveLoader(String s, boolean flag) {
 		return new SaveHandler(this.savesDirectory, s);
 	}
@@ -162,6 +171,7 @@ public class SaveFormatOld implements ISaveFormat {
 	/**
 	 * + Returns the world's WorldInfo object
 	 */
+	@Override
 	public WorldInfo getWorldInfo(String saveName) {
 		VFile2 file1 = WorldsDB.newVFile(this.savesDirectory, saveName);
 		if (!file1.exists()) {
@@ -202,6 +212,7 @@ public class SaveFormatOld implements ISaveFormat {
 	/**
 	 * + gets if the map is old chunk saving (true) or McRegion (false)
 	 */
+	@Override
 	public boolean isOldMapFormat(String var1) {
 		return false;
 	}
@@ -210,6 +221,7 @@ public class SaveFormatOld implements ISaveFormat {
 	 * + Renames the world by storing the new name in level.dat. It does *not*
 	 * rename the directory containing the world data.
 	 */
+	@Override
 	public boolean renameWorld(String dirName, String newName) {
 		VFile2 file1 = WorldsDB.newVFile(this.savesDirectory, dirName);
 		VFile2 file2 = WorldsDB.newVFile(file1, "level.dat");

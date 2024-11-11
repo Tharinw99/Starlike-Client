@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 /**
  * Copyright (c) 2022-2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -20,7 +20,7 @@ import java.util.Arrays;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EaglerInputStream extends InputStream {
 
@@ -46,6 +46,16 @@ public class EaglerInputStream extends InputStream {
 		}
 	}
 
+	public static byte[] inputStreamToBytesNoClose(InputStream is) throws IOException {
+		EaglerOutputStream os = new EaglerOutputStream(1024);
+		byte[] buf = new byte[1024];
+		int i;
+		while ((i = is.read(buf)) != -1) {
+			os.write(buf, 0, i);
+		}
+		return os.toByteArray();
+	}
+
 	public static byte[] inputStreamToBytesQuiet(InputStream is) {
 		if (is == null) {
 			return null;
@@ -58,6 +68,7 @@ public class EaglerInputStream extends InputStream {
 	}
 
 	protected byte buf[];
+
 	protected int pos;
 
 	protected int mark = 0;
@@ -77,6 +88,7 @@ public class EaglerInputStream extends InputStream {
 		this.count = buf.length;
 	}
 
+	@Override
 	public int available() {
 		return count - pos;
 	}
@@ -85,6 +97,7 @@ public class EaglerInputStream extends InputStream {
 		return pos == 0 && count == buf.length;
 	}
 
+	@Override
 	public void close() throws IOException {
 	}
 
@@ -110,18 +123,22 @@ public class EaglerInputStream extends InputStream {
 		return pos;
 	}
 
+	@Override
 	public void mark(int readAheadLimit) {
 		mark = pos;
 	}
 
+	@Override
 	public boolean markSupported() {
 		return true;
 	}
 
+	@Override
 	public int read() {
 		return (pos < count) ? (buf[pos++] & 0xff) : -1;
 	}
 
+	@Override
 	public int read(byte b[], int off, int len) {
 		if (pos >= count) {
 			return -1;
@@ -139,21 +156,25 @@ public class EaglerInputStream extends InputStream {
 		return len;
 	}
 
+	@Override
 	public byte[] readAllBytes() {
 		byte[] result = Arrays.copyOfRange(buf, pos, count);
 		pos = count;
 		return result;
 	}
 
+	@Override
 	public int readNBytes(byte[] b, int off, int len) {
 		int n = read(b, off, len);
 		return n == -1 ? 0 : n;
 	}
 
+	@Override
 	public void reset() {
 		pos = mark;
 	}
 
+	@Override
 	public long skip(long n) {
 		long k = count - pos;
 		if (n < k) {
@@ -164,6 +185,7 @@ public class EaglerInputStream extends InputStream {
 		return k;
 	}
 
+	@Override
 	public long transferTo(OutputStream out) throws IOException {
 		int len = count - pos;
 		out.write(buf, pos, len);

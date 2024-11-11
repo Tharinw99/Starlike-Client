@@ -19,13 +19,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -37,7 +37,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockCactus extends Block {
 	public static final PropertyInteger AGE = PropertyInteger.create("age", 0, 15);
@@ -62,18 +62,22 @@ public class BlockCactus extends Block {
 		return block == Blocks.cactus || block == Blocks.sand;
 	}
 
+	@Override
 	public boolean canPlaceBlockAt(World world, BlockPos blockpos) {
 		return super.canPlaceBlockAt(world, blockpos) ? this.canBlockStay(world, blockpos) : false;
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { AGE });
 	}
 
+	@Override
 	public EnumWorldBlockLayer getBlockLayer() {
 		return EnumWorldBlockLayer.CUTOUT;
 	}
 
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox(World var1, BlockPos blockpos, IBlockState var3) {
 		float f = 0.0625F;
 		return new AxisAlignedBB((double) ((float) blockpos.getX() + f), (double) blockpos.getY(),
@@ -84,10 +88,12 @@ public class BlockCactus extends Block {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		return ((Integer) iblockstate.getValue(AGE)).intValue();
 	}
 
+	@Override
 	public AxisAlignedBB getSelectedBoundingBox(World var1, BlockPos blockpos) {
 		float f = 0.0625F;
 		return new AxisAlignedBB((double) ((float) blockpos.getX() + f), (double) blockpos.getY(),
@@ -98,10 +104,12 @@ public class BlockCactus extends Block {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(AGE, Integer.valueOf(i));
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -110,6 +118,7 @@ public class BlockCactus extends Block {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
@@ -117,6 +126,7 @@ public class BlockCactus extends Block {
 	/**
 	 * + Called When an Entity Collided with the Block
 	 */
+	@Override
 	public void onEntityCollidedWithBlock(World var1, BlockPos var2, IBlockState var3, Entity entity) {
 		entity.attackEntityFrom(DamageSource.cactus, 1.0F);
 	}
@@ -124,6 +134,7 @@ public class BlockCactus extends Block {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState var3, Block var4) {
 		if (!this.canBlockStay(world, blockpos)) {
 			world.destroyBlock(blockpos, true);
@@ -131,6 +142,7 @@ public class BlockCactus extends Block {
 
 	}
 
+	@Override
 	public void updateTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom var4) {
 		BlockPos blockpos1 = blockpos.up();
 		if (world.isAirBlock(blockpos1)) {

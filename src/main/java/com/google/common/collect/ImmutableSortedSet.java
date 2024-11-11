@@ -64,7 +64,7 @@ import com.google.common.annotations.GwtIncompatible;
  * use {@link Object#equals} to determine if two elements are equivalent.
  * Instead, with an explicit comparator, the following relation determines
  * whether elements {@code x} and {@code y} are equivalent:
- * 
+ *
  * <pre>
  *    {@code
  *
@@ -74,7 +74,7 @@ import com.google.common.annotations.GwtIncompatible;
  * <p>
  * With natural ordering of elements, the following relation determines whether
  * two elements are equivalent:
- * 
+ *
  * <pre>
  *    {@code
  *
@@ -112,7 +112,7 @@ public abstract class ImmutableSortedSet<E> extends ImmutableSortedSetFauxveride
 	 * A builder for creating immutable sorted set instances, especially {@code
 	 * public static final} sets ("constant sets"), with a given comparator.
 	 * Example:
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 * 	&#64;code
@@ -395,7 +395,7 @@ public abstract class ImmutableSortedSet<E> extends ImmutableSortedSetFauxveride
 	 * {@link #copyOfSorted} instead. This method iterates over {@code elements} at
 	 * most once.
 	 *
-	 * 
+	 *
 	 * <p>
 	 * Note that if {@code s} is a {@code Set<String>}, then {@code
 	 * ImmutableSortedSet.copyOf(s)} returns an {@code ImmutableSortedSet<String>}

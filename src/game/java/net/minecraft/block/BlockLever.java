@@ -19,13 +19,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -37,7 +37,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockLever extends Block {
 	public static enum EnumOrientation implements IStringSerializable {
@@ -117,10 +117,12 @@ public class BlockLever extends Block {
 			return this.meta;
 		}
 
+		@Override
 		public String getName() {
 			return this.name;
 		}
 
+		@Override
 		public String toString() {
 			return this.name;
 		}
@@ -164,6 +166,7 @@ public class BlockLever extends Block {
 		this.setCreativeTab(CreativeTabs.tabRedstone);
 	}
 
+	@Override
 	public void breakBlock(World world, BlockPos blockpos, IBlockState iblockstate) {
 		if (((Boolean) iblockstate.getValue(POWERED)).booleanValue()) {
 			world.notifyNeighborsOfStateChange(blockpos, this);
@@ -174,6 +177,7 @@ public class BlockLever extends Block {
 		super.breakBlock(world, blockpos, iblockstate);
 	}
 
+	@Override
 	public boolean canPlaceBlockAt(World world, BlockPos blockpos) {
 		EnumFacing[] facings = EnumFacing._VALUES;
 		for (int i = 0; i < facings.length; ++i) {
@@ -189,6 +193,7 @@ public class BlockLever extends Block {
 	/**
 	 * + Check whether this Block can be placed on the given side
 	 */
+	@Override
 	public boolean canPlaceBlockOnSide(World world, BlockPos blockpos, EnumFacing enumfacing) {
 		return func_181090_a(world, blockpos, enumfacing.getOpposite());
 	}
@@ -197,10 +202,12 @@ public class BlockLever extends Block {
 	 * + Can this block provide power. Only wire currently seems to have this change
 	 * based on its state.
 	 */
+	@Override
 	public boolean canProvidePower() {
 		return true;
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { FACING, POWERED });
 	}
@@ -215,6 +222,7 @@ public class BlockLever extends Block {
 		}
 	}
 
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox(World var1, BlockPos var2, IBlockState var3) {
 		return null;
 	}
@@ -222,6 +230,7 @@ public class BlockLever extends Block {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
 		i = i | ((BlockLever.EnumOrientation) iblockstate.getValue(FACING)).getMetadata();
@@ -235,20 +244,24 @@ public class BlockLever extends Block {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(FACING, BlockLever.EnumOrientation.byMetadata(i & 7))
 				.withProperty(POWERED, Boolean.valueOf((i & 8) > 0));
 	}
 
+	@Override
 	public int getStrongPower(IBlockAccess var1, BlockPos var2, IBlockState iblockstate, EnumFacing enumfacing) {
 		return !((Boolean) iblockstate.getValue(POWERED)).booleanValue() ? 0
 				: (((BlockLever.EnumOrientation) iblockstate.getValue(FACING)).getFacing() == enumfacing ? 15 : 0);
 	}
 
+	@Override
 	public int getWeakPower(IBlockAccess var1, BlockPos var2, IBlockState iblockstate, EnumFacing var4) {
 		return ((Boolean) iblockstate.getValue(POWERED)).booleanValue() ? 15 : 0;
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -257,10 +270,12 @@ public class BlockLever extends Block {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
 
+	@Override
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState iblockstate, EntityPlayer var4,
 			EnumFacing var5, float var6, float var7, float var8) {
 		if (world.isRemote) {
@@ -282,6 +297,7 @@ public class BlockLever extends Block {
 	 * + Called by ItemBlocks just before a block is actually set in the world, to
 	 * allow for adjustments to the IBlockstate
 	 */
+	@Override
 	public IBlockState onBlockPlaced(World world, BlockPos blockpos, EnumFacing enumfacing, float var4, float var5,
 			float var6, int var7, EntityLivingBase entitylivingbase) {
 		IBlockState iblockstate = this.getDefaultState().withProperty(POWERED, Boolean.valueOf(false));
@@ -310,6 +326,7 @@ public class BlockLever extends Block {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block var4) {
 		if (this.func_181091_e(world, blockpos, iblockstate) && !func_181090_a(world, blockpos,
 				((BlockLever.EnumOrientation) iblockstate.getValue(FACING)).getFacing().getOpposite())) {
@@ -319,6 +336,7 @@ public class BlockLever extends Block {
 
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
 		float f = 0.1875F;
 		switch ((BlockLever.EnumOrientation) iblockaccess.getBlockState(blockpos).getValue(FACING)) {

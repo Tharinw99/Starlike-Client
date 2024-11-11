@@ -19,13 +19,13 @@ import net.minecraft.util.MathHelper;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -37,7 +37,7 @@ import net.minecraft.util.MathHelper;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class Container {
 	/**
@@ -265,6 +265,8 @@ public abstract class Container {
 	 * container/player inventor between minIndex (included) and maxIndex
 	 * (excluded). Args : stack, minIndex, maxIndex, negativDirection. /!\ the
 	 * Container implementation do not check if the item is valid for the slot
+	 *
+	 * + Starlike: added isItemValid check
 	 */
 	protected boolean mergeItemStack(ItemStack stack, int startIndex, int endIndex, boolean reverseDirection) {
 		boolean flag = false;
@@ -277,7 +279,7 @@ public abstract class Container {
 			while (stack.stackSize > 0 && (!reverseDirection && i < endIndex || reverseDirection && i >= startIndex)) {
 				Slot slot = (Slot) this.inventorySlots.get(i);
 				ItemStack itemstack = slot.getStack();
-				if (itemstack != null && itemstack.getItem() == stack.getItem()
+				if (itemstack != null && slot.isItemValid(stack) && itemstack.getItem() == stack.getItem()
 						&& (!stack.getHasSubtypes() || stack.getMetadata() == itemstack.getMetadata())
 						&& ItemStack.areItemStackTagsEqual(stack, itemstack)) {
 					int j = itemstack.stackSize + stack.stackSize;
@@ -312,7 +314,7 @@ public abstract class Container {
 			while (!reverseDirection && i < endIndex || reverseDirection && i >= startIndex) {
 				Slot slot1 = (Slot) this.inventorySlots.get(i);
 				ItemStack itemstack1 = slot1.getStack();
-				if (itemstack1 == null) {
+				if (itemstack1 == null && slot1.isItemValid(stack)) {
 					slot1.putStack(stack.copy());
 					slot1.onSlotChanged();
 					stack.stackSize = 0;

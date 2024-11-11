@@ -11,13 +11,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,7 +29,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiHopper extends GuiContainer {
 	/**
@@ -51,6 +51,7 @@ public class GuiHopper extends GuiContainer {
 	/**
 	 * + Args : renderPartialTicks, mouseX, mouseY
 	 */
+	@Override
 	protected void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 		this.mc.getTextureManager().bindTexture(HOPPER_GUI_TEXTURE);
@@ -63,6 +64,7 @@ public class GuiHopper extends GuiContainer {
 	 * + Draw the foreground layer for the GuiContainer (everything in front of the
 	 * items). Args : mouseX, mouseY
 	 */
+	@Override
 	protected void drawGuiContainerForegroundLayer(int var1, int var2) {
 		this.fontRendererObj.drawString(this.hopperInventory.getDisplayName().getUnformattedText(), 8, 6, 4210752);
 		this.fontRendererObj.drawString(this.playerInventory.getDisplayName().getUnformattedText(), 8,

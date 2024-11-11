@@ -12,13 +12,14 @@ import java.util.Set;
 import net.lax1dude.eaglercraft.v1_8.EagRuntime;
 import net.lax1dude.eaglercraft.v1_8.internal.PlatformWebRTC;
 import net.lax1dude.eaglercraft.v1_8.sp.relay.RelayManager;
+import net.lax1dude.eaglercraft.v1_8.sp.relay.RelayQueryDispatch;
 import net.lax1dude.eaglercraft.v1_8.sp.relay.RelayServer;
 import net.lax1dude.eaglercraft.v1_8.sp.relay.RelayWorldsQuery;
 import net.lax1dude.eaglercraft.v1_8.sp.relay.pkt.RelayPacket07LocalWorlds;
 
 /**
  * Copyright (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,7 +31,7 @@ import net.lax1dude.eaglercraft.v1_8.sp.relay.pkt.RelayPacket07LocalWorlds;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class LANServerList {
 
@@ -90,7 +91,7 @@ public class LANServerList {
 			for (int i = 0, l = RelayManager.relayManager.count(); i < l; ++i) {
 				RelayServer srv = RelayManager.relayManager.get(i);
 				if (!lanServersQueryList.containsKey(srv.address) && !deadURIs.contains(srv.address)) {
-					lanServersQueryList.put(srv.address, PlatformWebRTC.openRelayWorldsQuery(srv.address));
+					lanServersQueryList.put(srv.address, RelayQueryDispatch.openRelayWorldsQuery(srv.address));
 				}
 			}
 		}

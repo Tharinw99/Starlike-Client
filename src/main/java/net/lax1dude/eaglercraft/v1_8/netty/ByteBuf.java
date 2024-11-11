@@ -376,7 +376,7 @@ public abstract class ByteBuf implements Comparable<ByteBuf> {
 	 * The reader and writer marks will not be duplicated. Also be aware that this
 	 * method will NOT call {@link #retain()} and so the reference count will NOT be
 	 * increased.
-	 * 
+	 *
 	 * @return A buffer whose readable content is equivalent to the buffer returned
 	 *         by {@link #slice()}. However this buffer will share the capacity of
 	 *         the underlying buffer, and therefore allows access to all of the

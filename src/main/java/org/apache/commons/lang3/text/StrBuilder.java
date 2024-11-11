@@ -1213,14 +1213,14 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
 	 * <p>
 	 * This method is useful for adding a separator each time around the loop except
 	 * the first.
-	 * 
+	 *
 	 * <pre>
 	 * for (Iterator it = list.iterator(); it.hasNext();) {
 	 * 	appendSeparator(',');
 	 * 	append(it.next());
 	 * }
 	 * </pre>
-	 * 
+	 *
 	 * Note that for this simple example, you should use
 	 * {@link #appendWithSeparators(Iterable, String)}.
 	 *
@@ -1241,7 +1241,7 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
 	 * the standard-separator
 	 *
 	 * The separator is appended using {@link #append(char)}.
-	 * 
+	 *
 	 * @param standard       the separator if builder is not empty
 	 * @param defaultIfEmpty the separator if builder is empty
 	 * @return this, to enable chaining
@@ -1263,14 +1263,14 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
 	 * This method is useful for adding a separator each time around the loop except
 	 * the first.
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * for (int i = 0; i &lt; list.size(); i++) {
 	 * 	appendSeparator(",", i);
 	 * 	append(list.get(i));
 	 * }
 	 * </pre>
-	 * 
+	 *
 	 * Note that for this simple example, you should use
 	 * {@link #appendWithSeparators(Iterable, String)}.
 	 *
@@ -1294,14 +1294,14 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
 	 * <p>
 	 * This method is useful for adding a separator each time around the loop except
 	 * the first.
-	 * 
+	 *
 	 * <pre>
 	 * for (Iterator it = list.iterator(); it.hasNext();) {
 	 * 	appendSeparator(",");
 	 * 	append(it.next());
 	 * }
 	 * </pre>
-	 * 
+	 *
 	 * Note that for this simple example, you should use
 	 * {@link #appendWithSeparators(Iterable, String)}.
 	 *
@@ -1321,14 +1321,14 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
 	 * This method is useful for adding a separator each time around the loop except
 	 * the first.
 	 * </p>
-	 * 
+	 *
 	 * <pre>
 	 * for (int i = 0; i &lt; list.size(); i++) {
 	 * 	appendSeparator(",", i);
 	 * 	append(list.get(i));
 	 * }
 	 * </pre>
-	 * 
+	 *
 	 * Note that for this simple example, you should use
 	 * {@link #appendWithSeparators(Iterable, String)}.
 	 *
@@ -1353,7 +1353,7 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
 	 * using {@link #append(String)}.
 	 * <p>
 	 * This method is for example useful for constructing queries
-	 * 
+	 *
 	 * <pre>
 	 * StrBuilder whereClause = new StrBuilder();
 	 * if (searchCommand.getPriority() != null) {
@@ -1513,7 +1513,7 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
 	 * synchronization. Once the tokenizer has been used once, it must be
 	 * {@link StrTokenizer#reset() reset} to pickup the latest changes in the
 	 * builder. For example:
-	 * 
+	 *
 	 * <pre>
 	 * StrBuilder b = new StrBuilder();
 	 * b.append("a b ");
@@ -1524,7 +1524,7 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
 	 * t.reset(); // reset causes builder changes to be picked up
 	 * String[] tokens3 = t.getTokenArray(); // returns a,b,c,d
 	 * </pre>
-	 * 
+	 *
 	 * In addition to simply intermixing appends and tokenization, you can also call
 	 * the set methods on the tokenizer to alter how it tokenizes. Just remember to
 	 * call reset when you want to pickup builder changes.
@@ -1566,7 +1566,7 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
 
 	/**
 	 * Implement the {@link Builder} interface.
-	 * 
+	 *
 	 * @return the builder as a String
 	 * @since 3.2
 	 * @see #toString()
@@ -2329,6 +2329,7 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
 	 *
 	 * @return {@code true} if the size is {@code 0}.
 	 */
+	@Override
 	public boolean isEmpty() {
 		return size == 0;
 	}
@@ -2958,7 +2959,7 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
 	// -----------------------------------------------------------------------
 	/**
 	 * {@inheritDoc}
-	 * 
+	 *
 	 * @since 3.0
 	 */
 	@Override

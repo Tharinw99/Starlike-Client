@@ -16,13 +16,13 @@ import net.minecraft.util.IChatComponent;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -34,26 +34,30 @@ import net.minecraft.util.IChatComponent;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class SpectatorMenu {
 	static class EndSpectatorObject implements ISpectatorMenuObject {
 		private EndSpectatorObject() {
 		}
 
+		@Override
 		public void func_178661_a(SpectatorMenu spectatormenu) {
 			spectatormenu.func_178641_d();
 		}
 
+		@Override
 		public boolean func_178662_A_() {
 			return true;
 		}
 
+		@Override
 		public void func_178663_a(float var1, int var2) {
 			Minecraft.getMinecraft().getTextureManager().bindTexture(GuiSpectator.field_175269_a);
 			Gui.drawModalRectWithCustomSizedTexture(0, 0, 128.0F, 0.0F, 16, 16, 256.0F, 256.0F);
 		}
 
+		@Override
 		public IChatComponent getSpectatorName() {
 			return new ChatComponentText("Close menu");
 		}
@@ -68,14 +72,17 @@ public class SpectatorMenu {
 			this.field_178665_b = parFlag;
 		}
 
+		@Override
 		public void func_178661_a(SpectatorMenu spectatormenu) {
 			spectatormenu.field_178658_j = this.field_178666_a;
 		}
 
+		@Override
 		public boolean func_178662_A_() {
 			return this.field_178665_b;
 		}
 
+		@Override
 		public void func_178663_a(float var1, int var2) {
 			Minecraft.getMinecraft().getTextureManager().bindTexture(GuiSpectator.field_175269_a);
 			if (this.field_178666_a < 0) {
@@ -86,6 +93,7 @@ public class SpectatorMenu {
 
 		}
 
+		@Override
 		public IChatComponent getSpectatorName() {
 			return this.field_178666_a < 0 ? new ChatComponentText("Previous Page")
 					: new ChatComponentText("Next Page");
@@ -97,16 +105,20 @@ public class SpectatorMenu {
 	private static final ISpectatorMenuObject field_178653_d = new SpectatorMenu.MoveMenuObject(1, true);
 	private static final ISpectatorMenuObject field_178654_e = new SpectatorMenu.MoveMenuObject(1, false);
 	public static final ISpectatorMenuObject field_178657_a = new ISpectatorMenuObject() {
+		@Override
 		public void func_178661_a(SpectatorMenu var1) {
 		}
 
+		@Override
 		public boolean func_178662_A_() {
 			return false;
 		}
 
+		@Override
 		public void func_178663_a(float var1, int var2) {
 		}
 
+		@Override
 		public IChatComponent getSpectatorName() {
 			return new ChatComponentText("");
 		}

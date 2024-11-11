@@ -34,7 +34,7 @@ import net.minecraft.util.IChatComponent;
 
 /**
  * Copyright (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -46,7 +46,7 @@ import net.minecraft.util.IChatComponent;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class LANClientNetworkManager extends EaglercraftNetworkManager {
 
@@ -155,7 +155,7 @@ public class LANClientNetworkManager extends EaglercraftNetworkManager {
 
 							}
 							EagUtils.sleep(20);
-						} while (EagRuntime.steadyTimeMillis() - lm < 5000l);
+						} while (EagRuntime.steadyTimeMillis() - lm < 10000l);
 
 						// no channel was opened
 						sock.writePacket(new RelayPacket06ClientFailure(ipkt.peerId));
@@ -195,7 +195,7 @@ public class LANClientNetworkManager extends EaglercraftNetworkManager {
 								continue mainLoop;
 							}
 							EagUtils.sleep(20);
-						} while (EagRuntime.steadyTimeMillis() - lm < 5000l);
+						} while (EagRuntime.steadyTimeMillis() - lm < 10000l);
 
 						// no ice candidates were sent
 						sock.close();

@@ -23,13 +23,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -41,7 +41,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityBlaze extends EntityMob {
 	static class AIFireballAttack extends EntityAIBase {
@@ -54,19 +54,23 @@ public class EntityBlaze extends EntityMob {
 			this.setMutexBits(3);
 		}
 
+		@Override
 		public void resetTask() {
 			this.blaze.setOnFire(false);
 		}
 
+		@Override
 		public boolean shouldExecute() {
 			EntityLivingBase entitylivingbase = this.blaze.getAttackTarget();
 			return entitylivingbase != null && entitylivingbase.isEntityAlive();
 		}
 
+		@Override
 		public void startExecuting() {
 			this.field_179467_b = 0;
 		}
 
+		@Override
 		public void updateTask() {
 			--this.field_179468_c;
 			EntityLivingBase entitylivingbase = this.blaze.getAttackTarget();
@@ -143,6 +147,7 @@ public class EntityBlaze extends EntityMob {
 		this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityPlayer.class, true));
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.attackDamage).setBaseValue(6.0D);
@@ -153,6 +158,7 @@ public class EntityBlaze extends EntityMob {
 	/**
 	 * + Drop 0-2 items of this living's type
 	 */
+	@Override
 	protected void dropFewItems(boolean flag, int i) {
 		if (flag) {
 			int j = this.rand.nextInt(2 + i);
@@ -164,11 +170,13 @@ public class EntityBlaze extends EntityMob {
 
 	}
 
+	@Override
 	protected void entityInit() {
 		super.entityInit();
 		this.dataWatcher.addObject(16, Byte.valueOf((byte) 0));
 	}
 
+	@Override
 	public void fall(float var1, float var2) {
 	}
 
@@ -179,10 +187,12 @@ public class EntityBlaze extends EntityMob {
 	/**
 	 * + Gets how bright this entity is.
 	 */
+	@Override
 	public float getBrightness(float var1) {
 		return 1.0F;
 	}
 
+	@Override
 	public int getBrightnessForRender(float var1) {
 		return 15728880;
 	}
@@ -190,14 +200,17 @@ public class EntityBlaze extends EntityMob {
 	/**
 	 * + Returns the sound this mob makes on death.
 	 */
+	@Override
 	protected String getDeathSound() {
 		return "mob.blaze.death";
 	}
 
+	@Override
 	protected Item getDropItem() {
 		return Items.blaze_rod;
 	}
 
+	@Override
 	protected float getEaglerDynamicLightsValueSimple(float partialTicks) {
 		return 1.0f;
 	}
@@ -205,6 +218,7 @@ public class EntityBlaze extends EntityMob {
 	/**
 	 * + Returns the sound this mob makes when it is hurt.
 	 */
+	@Override
 	protected String getHurtSound() {
 		return "mob.blaze.hit";
 	}
@@ -212,6 +226,7 @@ public class EntityBlaze extends EntityMob {
 	/**
 	 * + Returns the sound this mob makes while it's alive.
 	 */
+	@Override
 	protected String getLivingSound() {
 		return "mob.blaze.breathe";
 	}
@@ -220,6 +235,7 @@ public class EntityBlaze extends EntityMob {
 	 * + Returns true if the entity is on fire. Used by render to add the fire
 	 * effect on rendering.
 	 */
+	@Override
 	public boolean isBurning() {
 		return this.func_70845_n();
 	}
@@ -227,6 +243,7 @@ public class EntityBlaze extends EntityMob {
 	/**
 	 * + Checks to make sure the light is not too bright where the mob is spawning
 	 */
+	@Override
 	protected boolean isValidLightLevel() {
 		return true;
 	}
@@ -236,6 +253,7 @@ public class EntityBlaze extends EntityMob {
 	 * required. For example, zombies and skeletons use this to react to sunlight
 	 * and start to burn.
 	 */
+	@Override
 	public void onLivingUpdate() {
 		if (!this.onGround && this.motionY < 0.0D) {
 			this.motionY *= 0.6D;
@@ -259,6 +277,7 @@ public class EntityBlaze extends EntityMob {
 		super.onLivingUpdate();
 	}
 
+	@Override
 	protected void renderDynamicLightsEaglerAt(double entityX, double entityY, double entityZ, double renderX,
 			double renderY, double renderZ, float partialTicks, boolean isInFrustum) {
 		float mag = 5.0f;
@@ -277,6 +296,7 @@ public class EntityBlaze extends EntityMob {
 		this.dataWatcher.updateObject(16, Byte.valueOf(b0));
 	}
 
+	@Override
 	protected void updateAITasks() {
 		if (this.isWet()) {
 			this.attackEntityFrom(DamageSource.drown, 1.0F);

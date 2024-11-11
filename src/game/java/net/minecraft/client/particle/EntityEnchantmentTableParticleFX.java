@@ -5,13 +5,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -23,10 +23,11 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityEnchantmentTableParticleFX extends EntityFX {
 	public static class EnchantmentTable implements IParticleFactory {
+		@Override
 		public EntityFX getEntityFX(int var1, World world, double d0, double d1, double d2, double d3, double d4,
 				double d5, int... var15) {
 			return new EntityEnchantmentTableParticleFX(world, d0, d1, d2, d3, d4, d5);
@@ -64,6 +65,7 @@ public class EntityEnchantmentTableParticleFX extends EntityFX {
 	/**
 	 * + Gets how bright this entity is.
 	 */
+	@Override
 	public float getBrightness(float f) {
 		float f1 = super.getBrightness(f);
 		float f2 = (float) this.particleAge / (float) this.particleMaxAge;
@@ -72,6 +74,7 @@ public class EntityEnchantmentTableParticleFX extends EntityFX {
 		return f1 * (1.0F - f2) + f2;
 	}
 
+	@Override
 	public int getBrightnessForRender(float f) {
 		int i = super.getBrightnessForRender(f);
 		float f1 = (float) this.particleAge / (float) this.particleMaxAge;
@@ -90,6 +93,7 @@ public class EntityEnchantmentTableParticleFX extends EntityFX {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		this.prevPosX = this.posX;
 		this.prevPosY = this.posY;

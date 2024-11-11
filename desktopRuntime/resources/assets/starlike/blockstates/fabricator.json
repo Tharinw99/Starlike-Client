@@ -1,5 +1,5 @@
 {
-    "variants": {
-        "normal": { "model": "starlike:fabricator" }
-    }
+  "variants": {
+    "normal": { "model": "starlike:fabricator" }
+  }
 }

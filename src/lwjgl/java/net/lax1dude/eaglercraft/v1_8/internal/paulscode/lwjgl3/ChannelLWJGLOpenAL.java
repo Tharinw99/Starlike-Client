@@ -100,7 +100,7 @@ public class ChannelLWJGLOpenAL extends Channel {
 	 * IntBuffer identifier to use for this channel. Possible values for channel
 	 * type can be found in the {@link paulscode.sound.SoundSystemConfig
 	 * SoundSystemConfig} class.
-	 * 
+	 *
 	 * @param type Type of channel (normal or streaming).
 	 * @param src  Handle to the OpenAL source identifier.
 	 */
@@ -113,7 +113,7 @@ public class ChannelLWJGLOpenAL extends Channel {
 	/**
 	 * Attaches an OpenAL sound-buffer identifier for the sound data to be played
 	 * back for a normal source.
-	 * 
+	 *
 	 * @param buf Intbuffer identifier for the sound data to play.
 	 * @return False if an error occurred.
 	 */
@@ -137,7 +137,7 @@ public class ChannelLWJGLOpenAL extends Channel {
 
 	/**
 	 * Returns the number of queued byte[] buffers that have finished playing.
-	 * 
+	 *
 	 * @return Number of buffers processed.
 	 */
 	@Override
@@ -159,7 +159,7 @@ public class ChannelLWJGLOpenAL extends Channel {
 
 	/**
 	 * Checks for OpenAL errors, and prints a message if there is an error.
-	 * 
+	 *
 	 * @return True if there was an error, False if not.
 	 */
 	private boolean checkALError() {
@@ -230,7 +230,7 @@ public class ChannelLWJGLOpenAL extends Channel {
 
 	/**
 	 * Feeds raw data to the stream.
-	 * 
+	 *
 	 * @param buffer Buffer containing raw audio data to stream.
 	 * @return Number of prior buffers that have been processed., or -1 if error.
 	 */
@@ -324,7 +324,7 @@ public class ChannelLWJGLOpenAL extends Channel {
 
 	/**
 	 * Calculates the number of milliseconds since the channel began playing.
-	 * 
+	 *
 	 * @return Milliseconds, or -1 if unable to calculate.
 	 */
 	@Override
@@ -362,7 +362,7 @@ public class ChannelLWJGLOpenAL extends Channel {
 
 	/**
 	 * Returns the number of milliseconds of audio contained in specified buffer.
-	 * 
+	 *
 	 * @return milliseconds, or 0 if unable to calculate.
 	 */
 	public float millisInBuffer(int alBufferi) {
@@ -394,7 +394,7 @@ public class ChannelLWJGLOpenAL extends Channel {
 	 * Used to determine if a channel is actively playing a source. This method will
 	 * return false if the channel is paused or stopped and when no data is queued
 	 * to be streamed.
-	 * 
+	 *
 	 * @return True if this channel is playing a source.
 	 */
 	@Override
@@ -408,7 +408,7 @@ public class ChannelLWJGLOpenAL extends Channel {
 
 	/**
 	 * Queues up the initial byte[] buffers of data to be streamed.
-	 * 
+	 *
 	 * @param bufferList List of the first buffers to be played for a streaming
 	 *                   source.
 	 * @return False if problem occurred or if end of stream was reached.
@@ -494,7 +494,7 @@ public class ChannelLWJGLOpenAL extends Channel {
 
 	/**
 	 * Queues up a byte[] buffer of data to be streamed.
-	 * 
+	 *
 	 * @param buffer The next buffer to be played for a streaming source.
 	 * @return False if an error occurred or if the channel is shutting down.
 	 */
@@ -546,7 +546,7 @@ public class ChannelLWJGLOpenAL extends Channel {
 
 	/**
 	 * Sets the channel up to receive the specified audio format.
-	 * 
+	 *
 	 * @param audioFormat Format to use when playing the stream data.
 	 */
 	@Override
@@ -581,7 +581,7 @@ public class ChannelLWJGLOpenAL extends Channel {
 	/**
 	 * Sets the channel up to receive the specified OpenAL audio format and sample
 	 * rate.
-	 * 
+	 *
 	 * @param format Format to use.
 	 * @param rate   Sample rate (speed) to use.
 	 */

@@ -1,6 +1,6 @@
 {
-    "parent": "block/cube_all",
-    "textures": {
-        "all": "starlike:blocks/decorated_oak_log"
-    }
+  "parent": "block/cube_all",
+  "textures": {
+    "all": "starlike:blocks/decorated_oak_log"
+  }
 }

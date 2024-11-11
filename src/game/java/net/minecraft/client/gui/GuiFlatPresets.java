@@ -27,13 +27,13 @@ import net.minecraft.world.gen.FlatLayerInfo;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -45,7 +45,7 @@ import net.minecraft.world.gen.FlatLayerInfo;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiFlatPresets extends GuiScreen {
 	static class LayerItem {
@@ -70,9 +70,11 @@ public class GuiFlatPresets extends GuiScreen {
 					GuiFlatPresets.this.height - 37, 24);
 		}
 
+		@Override
 		protected void drawBackground() {
 		}
 
+		@Override
 		protected void drawSlot(int i, int j, int k, int var4, int var5, int var6) {
 			GuiFlatPresets.LayerItem guiflatpresets$layeritem = (GuiFlatPresets.LayerItem) GuiFlatPresets.FLAT_WORLD_PRESETS
 					.get(i);
@@ -81,6 +83,7 @@ public class GuiFlatPresets extends GuiScreen {
 					16777215);
 		}
 
+		@Override
 		protected void elementClicked(int i, boolean var2, int var3, int var4) {
 			this.field_148175_k = i;
 			GuiFlatPresets.this.func_146426_g();
@@ -127,10 +130,12 @@ public class GuiFlatPresets extends GuiScreen {
 			GlStateManager.disableRescaleNormal();
 		}
 
+		@Override
 		protected int getSize() {
 			return GuiFlatPresets.FLAT_WORLD_PRESETS.size();
 		}
 
+		@Override
 		protected boolean isSelected(int i) {
 			return i == this.field_148175_k;
 		}
@@ -227,6 +232,7 @@ public class GuiFlatPresets extends GuiScreen {
 	 * + Called by the controls from the buttonList when activated. (Mouse pressed
 	 * for buttons)
 	 */
+	@Override
 	protected void actionPerformed(GuiButton parGuiButton) {
 		if (parGuiButton.id == 0 && this.func_146430_p()) {
 			this.parentScreen.func_146383_a(this.field_146433_u.getText());
@@ -241,6 +247,7 @@ public class GuiFlatPresets extends GuiScreen {
 	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
 	 * renderPartialTicks
 	 */
+	@Override
 	public void drawScreen(int i, int j, float f) {
 		this.drawDefaultBackground();
 		this.field_146435_s.drawScreen(i, j, f);
@@ -269,11 +276,13 @@ public class GuiFlatPresets extends GuiScreen {
 	/**
 	 * + Handles mouse input.
 	 */
+	@Override
 	public void handleMouseInput() throws IOException {
 		super.handleMouseInput();
 		this.field_146435_s.handleMouseInput();
 	}
 
+	@Override
 	public void handleTouchInput() throws IOException {
 		super.handleTouchInput();
 		this.field_146435_s.handleTouchInput();
@@ -284,6 +293,7 @@ public class GuiFlatPresets extends GuiScreen {
 	 * when the GUI is displayed and when the window resizes, the buttonList is
 	 * cleared beforehand.
 	 */
+	@Override
 	public void initGui() {
 		this.buttonList.clear();
 		Keyboard.enableRepeatEvents(true);
@@ -306,6 +316,7 @@ public class GuiFlatPresets extends GuiScreen {
 	 * the equivalent of KeyListener.keyTyped(KeyEvent e). Args : character
 	 * (character on the key), keyCode (lwjgl Keyboard key code)
 	 */
+	@Override
 	protected void keyTyped(char parChar1, int parInt1) {
 		if (!this.field_146433_u.textboxKeyTyped(parChar1, parInt1)) {
 			super.keyTyped(parChar1, parInt1);
@@ -316,6 +327,7 @@ public class GuiFlatPresets extends GuiScreen {
 	/**
 	 * + Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
 	 */
+	@Override
 	protected void mouseClicked(int parInt1, int parInt2, int parInt3) {
 		this.field_146433_u.mouseClicked(parInt1, parInt2, parInt3);
 		super.mouseClicked(parInt1, parInt2, parInt3);
@@ -324,6 +336,7 @@ public class GuiFlatPresets extends GuiScreen {
 	/**
 	 * + Called when the screen is unloaded. Used to disable keyboard repeat events
 	 */
+	@Override
 	public void onGuiClosed() {
 		Keyboard.enableRepeatEvents(false);
 	}
@@ -336,6 +349,7 @@ public class GuiFlatPresets extends GuiScreen {
 	/**
 	 * + Called from the main game loop to update the screen.
 	 */
+	@Override
 	public void updateScreen() {
 		this.field_146433_u.updateCursorCounter();
 		super.updateScreen();

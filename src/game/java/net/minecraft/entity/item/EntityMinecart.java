@@ -36,13 +36,13 @@ import net.minecraft.world.WorldServer;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -54,7 +54,7 @@ import net.minecraft.world.WorldServer;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class EntityMinecart extends Entity implements IWorldNameable {
 	public static enum EnumMinecartType {
@@ -175,6 +175,7 @@ public abstract class EntityMinecart extends Entity implements IWorldNameable {
 	 * + Applies a velocity to each of the entities pushing them away from each
 	 * other. Args: entity
 	 */
+	@Override
 	public void applyEntityCollision(Entity entity) {
 		if (!this.worldObj.isRemote) {
 			if (!entity.noClip && !this.noClip) {
@@ -259,6 +260,7 @@ public abstract class EntityMinecart extends Entity implements IWorldNameable {
 	/**
 	 * + Called when the entity is attacked.
 	 */
+	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float f) {
 		if (!this.worldObj.isRemote && !this.isDead) {
 			if (this.isEntityInvulnerable(damagesource)) {
@@ -293,6 +295,7 @@ public abstract class EntityMinecart extends Entity implements IWorldNameable {
 	 * + Returns true if other Entities should be prevented from moving through this
 	 * Entity.
 	 */
+	@Override
 	public boolean canBeCollidedWith() {
 		return !this.isDead;
 	}
@@ -301,6 +304,7 @@ public abstract class EntityMinecart extends Entity implements IWorldNameable {
 	 * + Returns true if this entity should push and be pushed by other entities
 	 * when colliding.
 	 */
+	@Override
 	public boolean canBePushed() {
 		return true;
 	}
@@ -309,10 +313,12 @@ public abstract class EntityMinecart extends Entity implements IWorldNameable {
 	 * + returns if this entity triggers Block.onEntityWalking on the blocks they
 	 * walk on. used for spiders and wolves to prevent them from trampling crops
 	 */
+	@Override
 	protected boolean canTriggerWalking() {
 		return false;
 	}
 
+	@Override
 	protected void entityInit() {
 		this.dataWatcher.addObject(17, Integer.valueOf(0));
 		this.dataWatcher.addObject(18, Integer.valueOf(1));
@@ -583,6 +589,7 @@ public abstract class EntityMinecart extends Entity implements IWorldNameable {
 	/**
 	 * + Returns the collision bounding box for this entity
 	 */
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox() {
 		return null;
 	}
@@ -592,10 +599,12 @@ public abstract class EntityMinecart extends Entity implements IWorldNameable {
 	 * blocks. This enables the entity to be pushable on contact, like boats or
 	 * minecarts.
 	 */
+	@Override
 	public AxisAlignedBB getCollisionBox(Entity entity) {
 		return entity.canBePushed() ? entity.getEntityBoundingBox() : null;
 	}
 
+	@Override
 	public String getCustomNameTag() {
 		return this.entityName;
 	}
@@ -620,6 +629,7 @@ public abstract class EntityMinecart extends Entity implements IWorldNameable {
 	 * + Get the formatted ChatComponent that will be used for the sender's username
 	 * in chat
 	 */
+	@Override
 	public IChatComponent getDisplayName() {
 		if (this.hasCustomName()) {
 			ChatComponentText chatcomponenttext = new ChatComponentText(this.entityName);
@@ -635,6 +645,7 @@ public abstract class EntityMinecart extends Entity implements IWorldNameable {
 		}
 	}
 
+	@Override
 	public IChatComponent getDisplayNameProfanityFilter() {
 		/**
 		 * + Get the formatted ChatComponent that will be used for the sender's username
@@ -666,6 +677,7 @@ public abstract class EntityMinecart extends Entity implements IWorldNameable {
 	 * + Returns the Y offset from the entity's position for any entity riding this
 	 * one.
 	 */
+	@Override
 	public double getMountedYOffset() {
 		return 0.0D;
 	}
@@ -674,10 +686,12 @@ public abstract class EntityMinecart extends Entity implements IWorldNameable {
 	 * + Gets the name of this command sender (usually username, but possibly
 	 * "Rcon")
 	 */
+	@Override
 	public String getName() {
 		return this.entityName != null ? this.entityName : super.getName();
 	}
 
+	@Override
 	public String getNameProfanityFilter() {
 		/**
 		 * + Gets the name of this command sender (usually username, but possibly
@@ -704,6 +718,7 @@ public abstract class EntityMinecart extends Entity implements IWorldNameable {
 	/**
 	 * + Returns true if this thing is named
 	 */
+	@Override
 	public boolean hasCustomName() {
 		return this.entityName != null;
 	}
@@ -757,6 +772,7 @@ public abstract class EntityMinecart extends Entity implements IWorldNameable {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		if (this.getRollingAmplitude() > 0) {
 			this.setRollingAmplitude(this.getRollingAmplitude() - 1);
@@ -890,6 +906,7 @@ public abstract class EntityMinecart extends Entity implements IWorldNameable {
 	 * + Setups the entity to do the hurt animation. Only used by packets in
 	 * multiplayer.
 	 */
+	@Override
 	public void performHurtAnimation() {
 		this.setRollingDirection(-this.getRollingDirection());
 		this.setRollingAmplitude(10);
@@ -899,6 +916,7 @@ public abstract class EntityMinecart extends Entity implements IWorldNameable {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	protected void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		if (nbttagcompound.getBoolean("CustomDisplayTile")) {
 			int i = nbttagcompound.getInteger("DisplayData");
@@ -930,6 +948,7 @@ public abstract class EntityMinecart extends Entity implements IWorldNameable {
 	/**
 	 * + Sets the custom name tag for this entity
 	 */
+	@Override
 	public void setCustomNameTag(String s) {
 		this.entityName = s;
 	}
@@ -945,6 +964,7 @@ public abstract class EntityMinecart extends Entity implements IWorldNameable {
 	/**
 	 * + Will get destroyed next tick.
 	 */
+	@Override
 	public void setDead() {
 		super.setDead();
 	}
@@ -962,6 +982,7 @@ public abstract class EntityMinecart extends Entity implements IWorldNameable {
 	 * + Sets the x,y,z of the entity from the given parameters. Also seems to set
 	 * up a bounding box.
 	 */
+	@Override
 	public void setPosition(double d0, double d1, double d2) {
 		this.posX = d0;
 		this.posY = d1;
@@ -972,6 +993,7 @@ public abstract class EntityMinecart extends Entity implements IWorldNameable {
 				d1 + (double) f1, d2 + (double) f));
 	}
 
+	@Override
 	public void setPositionAndRotation2(double d0, double d1, double d2, float f, float f1, int i, boolean var10) {
 		this.minecartX = d0;
 		this.minecartY = d1;
@@ -1002,6 +1024,7 @@ public abstract class EntityMinecart extends Entity implements IWorldNameable {
 	/**
 	 * + Sets the velocity to the args. Args: x, y, z
 	 */
+	@Override
 	public void setVelocity(double d0, double d1, double d2) {
 		this.velocityX = this.motionX = d0;
 		this.velocityY = this.motionY = d1;
@@ -1011,6 +1034,7 @@ public abstract class EntityMinecart extends Entity implements IWorldNameable {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	protected void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		if (this.hasDisplayTile()) {
 			nbttagcompound.setBoolean("CustomDisplayTile", true);

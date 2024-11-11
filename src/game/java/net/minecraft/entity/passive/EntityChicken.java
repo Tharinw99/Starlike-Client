@@ -24,13 +24,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -42,7 +42,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityChicken extends EntityAnimal {
 	public float wingRotation;
@@ -67,6 +67,7 @@ public class EntityChicken extends EntityAnimal {
 		this.tasks.addTask(7, new EntityAILookIdle(this));
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(4.0D);
@@ -76,10 +77,12 @@ public class EntityChicken extends EntityAnimal {
 	/**
 	 * + Determines if an entity can be despawned, used on idle far away entities
 	 */
+	@Override
 	protected boolean canDespawn() {
 		return this.isChickenJockey() && this.riddenByEntity == null;
 	}
 
+	@Override
 	public EntityChicken createChild(EntityAgeable var1) {
 		return new EntityChicken(this.worldObj);
 	}
@@ -87,6 +90,7 @@ public class EntityChicken extends EntityAnimal {
 	/**
 	 * + Drop 0-2 items of this living's type
 	 */
+	@Override
 	protected void dropFewItems(boolean var1, int i) {
 		int j = this.rand.nextInt(3) + this.rand.nextInt(1 + i);
 
@@ -102,16 +106,19 @@ public class EntityChicken extends EntityAnimal {
 
 	}
 
+	@Override
 	public void fall(float var1, float var2) {
 	}
 
 	/**
 	 * + Returns the sound this mob makes on death.
 	 */
+	@Override
 	protected String getDeathSound() {
 		return "mob.chicken.hurt";
 	}
 
+	@Override
 	protected Item getDropItem() {
 		return Items.feather;
 	}
@@ -119,10 +126,12 @@ public class EntityChicken extends EntityAnimal {
 	/**
 	 * + Get the experience points the entity currently has.
 	 */
+	@Override
 	protected int getExperiencePoints(EntityPlayer entityplayer) {
 		return this.isChickenJockey() ? 10 : super.getExperiencePoints(entityplayer);
 	}
 
+	@Override
 	public float getEyeHeight() {
 		return this.height;
 	}
@@ -130,6 +139,7 @@ public class EntityChicken extends EntityAnimal {
 	/**
 	 * + Returns the sound this mob makes when it is hurt.
 	 */
+	@Override
 	protected String getHurtSound() {
 		return "mob.chicken.hurt";
 	}
@@ -137,6 +147,7 @@ public class EntityChicken extends EntityAnimal {
 	/**
 	 * + Returns the sound this mob makes while it's alive.
 	 */
+	@Override
 	protected String getLivingSound() {
 		return "mob.chicken.say";
 	}
@@ -145,6 +156,7 @@ public class EntityChicken extends EntityAnimal {
 	 * + Checks if the parameter is an item which this animal can be fed to breed it
 	 * (wheat, carrots or seeds depending on the animal type)
 	 */
+	@Override
 	public boolean isBreedingItem(ItemStack itemstack) {
 		return itemstack != null && itemstack.getItem() == Items.wheat_seeds;
 	}
@@ -161,6 +173,7 @@ public class EntityChicken extends EntityAnimal {
 	 * required. For example, zombies and skeletons use this to react to sunlight
 	 * and start to burn.
 	 */
+	@Override
 	public void onLivingUpdate() {
 		super.onLivingUpdate();
 		this.field_70888_h = this.wingRotation;
@@ -185,6 +198,7 @@ public class EntityChicken extends EntityAnimal {
 
 	}
 
+	@Override
 	protected void playStepSound(BlockPos var1, Block var2) {
 		this.playSound("mob.chicken.step", 0.15F, 1.0F);
 	}
@@ -192,6 +206,7 @@ public class EntityChicken extends EntityAnimal {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		this.chickenJockey = nbttagcompound.getBoolean("IsChickenJockey");
@@ -208,6 +223,7 @@ public class EntityChicken extends EntityAnimal {
 		this.chickenJockey = jockey;
 	}
 
+	@Override
 	public void updateRiderPosition() {
 		super.updateRiderPosition();
 		float f = MathHelper.sin(this.renderYawOffset * 3.1415927F / 180.0F);
@@ -226,6 +242,7 @@ public class EntityChicken extends EntityAnimal {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		nbttagcompound.setBoolean("IsChickenJockey", this.chickenJockey);

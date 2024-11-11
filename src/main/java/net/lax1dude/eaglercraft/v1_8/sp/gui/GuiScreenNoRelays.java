@@ -6,7 +6,7 @@ import net.minecraft.client.resources.I18n;
 
 /**
  * Copyright (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -18,7 +18,7 @@ import net.minecraft.client.resources.I18n;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiScreenNoRelays extends GuiScreen {
 
@@ -41,6 +41,7 @@ public class GuiScreenNoRelays extends GuiScreen {
 		this.title3 = title3;
 	}
 
+	@Override
 	protected void actionPerformed(GuiButton par1GuiButton) {
 		if (par1GuiButton.id == 0) {
 			mc.displayGuiScreen(parent);
@@ -49,6 +50,7 @@ public class GuiScreenNoRelays extends GuiScreen {
 		}
 	}
 
+	@Override
 	public void drawScreen(int par1, int par2, float par3) {
 		this.drawDefaultBackground();
 		this.drawCenteredString(this.fontRendererObj, I18n.format(title1), this.width / 2, this.height / 4 - 60 + 70,
@@ -64,6 +66,7 @@ public class GuiScreenNoRelays extends GuiScreen {
 		super.drawScreen(par1, par2, par3);
 	}
 
+	@Override
 	public void initGui() {
 		buttonList.clear();
 		buttonList.add(new GuiButton(0, this.width / 2 - 100, this.height / 4 - 60 + 145, I18n.format("gui.cancel")));

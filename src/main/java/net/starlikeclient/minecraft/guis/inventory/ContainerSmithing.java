@@ -11,15 +11,13 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.server.S30PacketWindowItems;
-import net.minecraft.util.BlockPos;
-import net.minecraft.world.World;
 import net.starlikeclient.minecraft.guis.crafting.SmithingManager;
 
 public class ContainerSmithing extends Container {
 	private final IInventory smithingInventory;
 
-	public ContainerSmithing(InventoryPlayer playerInventory, World worldIn, BlockPos posIn) {
-		this.smithingInventory = new InventoryBasic("Smithing", true, 3);
+	public ContainerSmithing(InventoryPlayer inventoryplayer) {
+		this.smithingInventory = new InventoryBasic("container.smithing", false, 3);
 
 		this.addSlotToContainer(new Slot(smithingInventory, 0, 27, 47) {
 			@Override
@@ -49,25 +47,25 @@ public class ContainerSmithing extends Container {
 			}
 
 			@Override
-			public void onPickupFromSlot(EntityPlayer playerIn, ItemStack itemstack) {
-				super.onPickupFromSlot(playerIn, itemstack);
+			public void onPickupFromSlot(EntityPlayer entityplayer, ItemStack itemstack) {
+				super.onPickupFromSlot(entityplayer, itemstack);
 				ContainerSmithing.this.decrementInputItems();
 			}
 		});
 
 		for (int i = 0; i < 3; ++i) {
 			for (int j = 0; j < 9; ++j) {
-				this.addSlotToContainer(new Slot(playerInventory, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
+				this.addSlotToContainer(new Slot(inventoryplayer, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
 			}
 		}
 
 		for (int k = 0; k < 9; ++k) {
-			this.addSlotToContainer(new Slot(playerInventory, k, 8 + k * 18, 142));
+			this.addSlotToContainer(new Slot(inventoryplayer, k, 8 + k * 18, 142));
 		}
 	}
 
 	@Override
-	public boolean canInteractWith(EntityPlayer playerIn) {
+	public boolean canInteractWith(EntityPlayer var1) {
 		return true;
 	}
 
@@ -118,15 +116,15 @@ public class ContainerSmithing extends Container {
 	}
 
 	@Override
-	public void onCraftMatrixChanged(IInventory inventoryIn) {
-		super.onCraftMatrixChanged(inventoryIn);
+	public void onCraftMatrixChanged(IInventory iinventory) {
+		super.onCraftMatrixChanged(iinventory);
 		this.updateCraftingResult();
 	}
 
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer entityplayer, int i) {
 		ItemStack itemstack = null;
-		Slot slot = (Slot) this.inventorySlots.get(i);
+		Slot slot = this.inventorySlots.get(i);
 		if (slot != null && slot.getHasStack()) {
 			ItemStack itemstack1 = slot.getStack();
 			itemstack = itemstack1.copy();
@@ -178,6 +176,9 @@ public class ContainerSmithing extends Container {
 				result.setItemDamage(input.getItemDamage());
 				if (input.hasTagCompound()) {
 					result.setTagCompound((NBTTagCompound) input.getTagCompound().copy());
+				}
+				if (input.hasDisplayName()) {
+					result.setStackDisplayName(input.getDisplayName());
 				}
 				this.smithingInventory.setInventorySlotContents(2, result);
 			} else {

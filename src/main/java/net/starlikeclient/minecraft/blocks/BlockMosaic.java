@@ -63,6 +63,7 @@ public class BlockMosaic extends Block {
 			return this.meta;
 		}
 
+		@Override
 		public String getName() {
 			return this.name;
 		}
@@ -104,7 +105,7 @@ public class BlockMosaic extends Block {
 	 */
 	@Override
 	public int damageDropped(IBlockState iblockstate) {
-		return ((BlockMosaic.EnumType) iblockstate.getValue(VARIANT)).getMetadata();
+		return iblockstate.getValue(VARIANT).getMetadata();
 	}
 
 	/**
@@ -112,7 +113,7 @@ public class BlockMosaic extends Block {
 	 */
 	@Override
 	public MapColor getMapColor(IBlockState iblockstate) {
-		return ((BlockMosaic.EnumType) iblockstate.getValue(VARIANT)).func_181070_c();
+		return iblockstate.getValue(VARIANT).func_181070_c();
 	}
 
 	/**
@@ -120,7 +121,7 @@ public class BlockMosaic extends Block {
 	 */
 	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
-		return ((BlockMosaic.EnumType) iblockstate.getValue(VARIANT)).getMetadata();
+		return iblockstate.getValue(VARIANT).getMetadata();
 	}
 
 	/**
@@ -138,9 +139,8 @@ public class BlockMosaic extends Block {
 	@Override
 	public void getSubBlocks(Item item, CreativeTabs var2, List<ItemStack> list) {
 		BlockMosaic.EnumType[] types = BlockMosaic.EnumType.META_LOOKUP;
-		for (int i = 0; i < types.length; ++i) {
-			list.add(new ItemStack(item, 1, types[i].getMetadata()));
+		for (EnumType type : types) {
+			list.add(new ItemStack(item, 1, type.getMetadata()));
 		}
-
 	}
 }

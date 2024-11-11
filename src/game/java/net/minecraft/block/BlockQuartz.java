@@ -20,13 +20,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,7 +38,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockQuartz extends Block {
 	public static enum EnumType implements IStringSerializable {
@@ -78,10 +78,12 @@ public class BlockQuartz extends Block {
 			return this.meta;
 		}
 
+		@Override
 		public String getName() {
 			return this.field_176805_h;
 		}
 
+		@Override
 		public String toString() {
 			return this.unlocalizedName;
 		}
@@ -99,10 +101,12 @@ public class BlockQuartz extends Block {
 		this.setCreativeTab(CreativeTabs.tabBlock);
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { VARIANT });
 	}
 
+	@Override
 	protected ItemStack createStackedBlock(IBlockState iblockstate) {
 		BlockQuartz.EnumType blockquartz$enumtype = (BlockQuartz.EnumType) iblockstate.getValue(VARIANT);
 		return blockquartz$enumtype != BlockQuartz.EnumType.LINES_X
@@ -115,6 +119,7 @@ public class BlockQuartz extends Block {
 	 * when the block gets destroyed. It returns the metadata of the dropped item
 	 * based on the old metadata of the block.
 	 */
+	@Override
 	public int damageDropped(IBlockState iblockstate) {
 		BlockQuartz.EnumType blockquartz$enumtype = (BlockQuartz.EnumType) iblockstate.getValue(VARIANT);
 		return blockquartz$enumtype != BlockQuartz.EnumType.LINES_X
@@ -125,6 +130,7 @@ public class BlockQuartz extends Block {
 	/**
 	 * + Get the MapColor for this Block and the given BlockState
 	 */
+	@Override
 	public MapColor getMapColor(IBlockState var1) {
 		return MapColor.quartzColor;
 	}
@@ -132,6 +138,7 @@ public class BlockQuartz extends Block {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		return ((BlockQuartz.EnumType) iblockstate.getValue(VARIANT)).getMetadata();
 	}
@@ -139,6 +146,7 @@ public class BlockQuartz extends Block {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(VARIANT, BlockQuartz.EnumType.byMetadata(i));
 	}
@@ -147,6 +155,7 @@ public class BlockQuartz extends Block {
 	 * + returns a list of blocks with the same ID, but different meta (eg: wood
 	 * returns 4 blocks)
 	 */
+	@Override
 	public void getSubBlocks(Item item, CreativeTabs var2, List<ItemStack> list) {
 		list.add(new ItemStack(item, 1, BlockQuartz.EnumType.DEFAULT.getMetadata()));
 		list.add(new ItemStack(item, 1, BlockQuartz.EnumType.CHISELED.getMetadata()));
@@ -157,6 +166,7 @@ public class BlockQuartz extends Block {
 	 * + Called by ItemBlocks just before a block is actually set in the world, to
 	 * allow for adjustments to the IBlockstate
 	 */
+	@Override
 	public IBlockState onBlockPlaced(World var1, BlockPos var2, EnumFacing enumfacing, float var4, float var5,
 			float var6, int i, EntityLivingBase var8) {
 		if (i == BlockQuartz.EnumType.LINES_Y.getMetadata()) {

@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "normal": {
-            "model": "starlike:decorated_spruce_planks"
-        }
+  "variants": {
+    "normal": {
+      "model": "starlike:decorated_spruce_planks"
     }
+  }
 }

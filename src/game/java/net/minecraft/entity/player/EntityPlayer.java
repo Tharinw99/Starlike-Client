@@ -81,13 +81,13 @@ import net.minecraft.world.WorldSettings;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -99,7 +99,7 @@ import net.minecraft.world.WorldSettings;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class EntityPlayer extends EntityLivingBase implements ICommandSender {
 	public static enum EnumChatVisibility {
@@ -389,6 +389,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	 * + Adds a value to the player score. Currently not actually used and the
 	 * entity passed in does nothing. Args: entity, scoreToAdd
 	 */
+	@Override
 	public void addToPlayerScore(Entity entity, int i) {
 		this.addScore(i);
 		Collection<ScoreObjective> collection = this.getWorldScoreboard()
@@ -409,6 +410,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getAttributeMap().registerAttribute(SharedMonsterAttributes.attackDamage).setBaseValue(1.0D);
@@ -418,6 +420,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	/**
 	 * + Called when the entity is attacked.
 	 */
+	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float f) {
 		if (this.isEntityInvulnerable(damagesource)) {
 			return false;
@@ -622,6 +625,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	 * + returns if this entity triggers Block.onEntityWalking on the blocks they
 	 * walk on. used for spiders and wolves to prevent them from trampling crops
 	 */
+	@Override
 	protected boolean canTriggerWalking() {
 		return !this.capabilities.isFlying;
 	}
@@ -675,6 +679,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 		parEntity.onCollideWithPlayer(this);
 	}
 
+	@Override
 	protected void damageArmor(float f) {
 		this.inventory.damageArmor(f);
 	}
@@ -684,6 +689,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	 * from the armor first and then health second with the reduced value. Args:
 	 * damageAmount
 	 */
+	@Override
 	protected void damageEntity(DamageSource damagesource, float f) {
 		if (!this.isEntityInvulnerable(damagesource)) {
 			if (!damagesource.isUnblockable() && this.isBlocking() && f > 0.0F) {
@@ -795,6 +801,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 		return this.dropItem(itemStackIn, false, false);
 	}
 
+	@Override
 	protected void entityInit() {
 		super.entityInit();
 		this.dataWatcher.addObject(16, Byte.valueOf((byte) 0));
@@ -803,6 +810,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 		this.dataWatcher.addObject(10, Byte.valueOf((byte) 0));
 	}
 
+	@Override
 	public void fall(float f, float f1) {
 		if (!this.capabilities.allowFlying) {
 			if (f >= 2.0F) {
@@ -859,6 +867,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	public void func_175145_a(StatBase var1) {
 	}
 
+	@Override
 	public float getAbsorptionAmount() {
 		return this.getDataWatcher().getWatchableObjectFloat(17);
 	}
@@ -866,10 +875,12 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	/**
 	 * + the movespeed used for the new AI system
 	 */
+	@Override
 	public float getAIMoveSpeed() {
 		return (float) this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue();
 	}
 
+	@Override
 	public boolean getAlwaysRenderNameTagForRender() {
 		return true;
 	}
@@ -917,6 +928,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 		return 0.0F;
 	}
 
+	@Override
 	public ItemStack getCurrentArmor(int i) {
 		return this.inventory.armorItemInSlot(i);
 	}
@@ -931,6 +943,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	/**
 	 * + Returns the sound this mob makes on death.
 	 */
+	@Override
 	protected String getDeathSound() {
 		return "game.player.die";
 	}
@@ -939,6 +952,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	 * + Get the formatted ChatComponent that will be used for the sender's username
 	 * in chat
 	 */
+	@Override
 	public IChatComponent getDisplayName() {
 		ChatComponentText chatcomponenttext = new ChatComponentText(
 				ScorePlayerTeam.formatPlayerName(this.getTeam(), this.getName()));
@@ -952,6 +966,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	/**
 	 * + 0: Tool in Hand; 1-4: Armor
 	 */
+	@Override
 	public ItemStack getEquipmentInSlot(int i) {
 		return i == 0 ? this.inventory.getCurrentItem() : this.inventory.armorInventory[i - 1];
 	}
@@ -959,6 +974,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	/**
 	 * + Get the experience points the entity currently has.
 	 */
+	@Override
 	protected int getExperiencePoints(EntityPlayer var1) {
 		if (this.worldObj.getGameRules().getBoolean("keepInventory")) {
 			return 0;
@@ -968,6 +984,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 		}
 	}
 
+	@Override
 	public float getEyeHeight() {
 		float f = 1.62F;
 		if (this.isPlayerSleeping()) {
@@ -981,6 +998,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 		return f;
 	}
 
+	@Override
 	protected String getFallSoundString(int i) {
 		return i > 4 ? "game.player.hurt.fall.big" : "game.player.hurt.fall.small";
 	}
@@ -1002,6 +1020,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	/**
 	 * + Returns the item that this EntityLiving is holding, if any.
 	 */
+	@Override
 	public ItemStack getHeldItem() {
 		return this.inventory.getCurrentItem();
 	}
@@ -1009,6 +1028,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	/**
 	 * + Returns the sound this mob makes when it is hurt.
 	 */
+	@Override
 	protected String getHurtSound() {
 		return "game.player.hurt";
 	}
@@ -1016,6 +1036,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	/**
 	 * + returns the inventory of this entity (only used in EntityPlayerMP it seems)
 	 */
+	@Override
 	public ItemStack[] getInventory() {
 		return this.inventory.armorInventory;
 	}
@@ -1061,6 +1082,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	 * + Return the amount of time this entity should stay in a portal before being
 	 * transported.
 	 */
+	@Override
 	public int getMaxInPortalTime() {
 		return this.capabilities.disableDamage ? 0 : 80;
 	}
@@ -1069,6 +1091,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	 * + Gets the name of this command sender (usually username, but possibly
 	 * "Rcon")
 	 */
+	@Override
 	public String getName() {
 		return this.gameProfile.getName();
 	}
@@ -1076,6 +1099,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	/**
 	 * + Return the amount of cooldown before this entity can use a portal again.
 	 */
+	@Override
 	public int getPortalCooldown() {
 		return 10;
 	}
@@ -1088,14 +1112,17 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 		return this.sleepTimer;
 	}
 
+	@Override
 	protected String getSplashSound() {
 		return "game.player.swim.splash";
 	}
 
+	@Override
 	protected String getSwimSound() {
 		return "game.player.swim";
 	}
 
+	@Override
 	public Team getTeam() {
 		return this.getWorldScoreboard().getPlayersTeam(this.getName());
 	}
@@ -1153,6 +1180,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	 * + Returns the current armor value as determined by a call to
 	 * InventoryPlayer.getTotalArmorValue
 	 */
+	@Override
 	public int getTotalArmorValue() {
 		return this.inventory.getTotalArmorValue();
 	}
@@ -1168,10 +1196,12 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	/**
 	 * + Returns the Y Offset of this entity.
 	 */
+	@Override
 	public double getYOffset() {
 		return -0.35D;
 	}
 
+	@Override
 	public void handleStatusUpdate(byte b0) {
 		if (b0 == 9) {
 			this.onItemUseFinish();
@@ -1254,6 +1284,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	/**
 	 * + Checks if this entity is inside of an opaque block
 	 */
+	@Override
 	public boolean isEntityInsideOpaqueBlock() {
 		return !this.sleeping && super.isEntityInsideOpaqueBlock();
 	}
@@ -1268,6 +1299,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	 * invisible.\nFor EntityLivingBase subclasses, returning false when invisible
 	 * will render the entity semitransparent.
 	 */
+	@Override
 	public boolean isInvisibleToPlayer(EntityPlayer entityplayer) {
 		if (!this.isInvisible()) {
 			return false;
@@ -1283,6 +1315,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	/**
 	 * + Dead and sleeping entities cannot move
 	 */
+	@Override
 	protected boolean isMovementBlocked() {
 		return this.getHealth() <= 0.0F || this.isPlayerSleeping();
 	}
@@ -1291,6 +1324,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	 * + Only use is to identify if class is an instance of player for experience
 	 * dropping
 	 */
+	@Override
 	protected boolean isPlayer() {
 		return true;
 	}
@@ -1305,10 +1339,12 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	/**
 	 * + Returns whether player is sleeping or not
 	 */
+	@Override
 	public boolean isPlayerSleeping() {
 		return this.sleeping;
 	}
 
+	@Override
 	public boolean isPushedByWater() {
 		return !this.capabilities.isFlying;
 	}
@@ -1349,6 +1385,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	/**
 	 * + Causes this entity to do an upwards motion (jumping).
 	 */
+	@Override
 	public void jump() {
 		super.jump();
 		this.triggerAchievement(StatList.jumpStat);
@@ -1363,6 +1400,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	/**
 	 * + Moves the entity based on the specified heading. Args: strafe, forward
 	 */
+	@Override
 	public void moveEntityWithHeading(float f, float f1) {
 		double d0 = this.posX;
 		double d1 = this.posY;
@@ -1391,6 +1429,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	/**
 	 * + Called when the mob's health reaches 0.
 	 */
+	@Override
 	public void onDeath(DamageSource damagesource) {
 		super.onDeath(damagesource);
 		this.setSize(0.2F, 0.2F);
@@ -1443,6 +1482,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	/**
 	 * + This method gets called when the entity kills another one.
 	 */
+	@Override
 	public void onKillEntity(EntityLivingBase entitylivingbase) {
 		if (entitylivingbase instanceof IMob) {
 			this.triggerAchievement(AchievementList.killEnemy);
@@ -1461,6 +1501,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	 * required. For example, zombies and skeletons use this to react to sunlight
 	 * and start to burn.
 	 */
+	@Override
 	public void onLivingUpdate() {
 		if (this.flyToggleTimer > 0) {
 			--this.flyToggleTimer;
@@ -1531,6 +1572,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		this.noClip = this.isSpectator();
 		if (this.isSpectator()) {
@@ -1647,6 +1689,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	public void openEditSign(TileEntitySign var1) {
 	}
 
+	@Override
 	public void playSound(String s, float f, float f1) {
 		this.worldObj.playSoundToNearExcept(this, s, f, f1);
 	}
@@ -1656,6 +1699,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	 * requirements for this entity to be spawned (only actually used on players
 	 * though its also on Entity)
 	 */
+	@Override
 	public void preparePlayerToSpawn() {
 		this.setSize(0.6F, 1.8F);
 		super.preparePlayerToSpawn();
@@ -1666,6 +1710,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		this.entityUniqueID = getUUID(this.gameProfile);
@@ -1715,6 +1760,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 		this.xpSeed = this.rand.nextInt();
 	}
 
+	@Override
 	public boolean replaceItemInInventory(int i, ItemStack itemstack) {
 		if (i >= 0 && i < this.inventory.mainInventory.length) {
 			this.inventory.setInventorySlotContents(i, itemstack);
@@ -1752,6 +1798,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	 * + sets the players height back to normal after doing things like sleeping and
 	 * dieing
 	 */
+	@Override
 	protected void resetHeight() {
 		if (!this.isSpectator()) {
 			super.resetHeight();
@@ -1766,6 +1813,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	 * + Returns true if the command sender should be sent feedback about executed
 	 * commands
 	 */
+	@Override
 	public boolean sendCommandFeedback() {
 		return MinecraftServer.getServer().worldServers[0].getGameRules().getBoolean("sendCommandFeedback");
 	}
@@ -1776,6 +1824,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	public void sendPlayerAbilities() {
 	}
 
+	@Override
 	public void setAbsorptionAmount(float f) {
 		if (f < 0.0F) {
 			f = 0.0F;
@@ -1788,6 +1837,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	 * + Sets the held item, or an armor slot. Slot 0 is held item. Slot 1-4 is
 	 * armor. Params: Item, slot
 	 */
+	@Override
 	public void setCurrentItemOrArmor(int i, ItemStack itemstack) {
 		this.inventory.armorInventory[i] = itemstack;
 	}
@@ -1795,6 +1845,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	/**
 	 * + Will get destroyed next tick.
 	 */
+	@Override
 	public void setDead() {
 		super.setDead();
 		this.inventoryContainer.onContainerClosed(this);
@@ -1813,6 +1864,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	/**
 	 * + Sets the Entity inside a web block.
 	 */
+	@Override
 	public void setInWeb() {
 		if (!this.capabilities.isFlying) {
 			super.setInWeb();
@@ -1953,6 +2005,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 		return EntityPlayer.EnumStatus.OK;
 	}
 
+	@Override
 	protected void updateEntityActionState() {
 		super.updateEntityActionState();
 		this.updateArmSwingProgress();
@@ -2002,6 +2055,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	/**
 	 * + Handles updating while being ridden by an entity
 	 */
+	@Override
 	public void updateRidden() {
 		if (!this.worldObj.isRemote && this.isSneaking()) {
 			this.mountEntity((Entity) null);
@@ -2058,6 +2112,7 @@ public abstract class EntityPlayer extends EntityLivingBase implements ICommandS
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		nbttagcompound.setTag("Inventory", this.inventory.writeToNBT(new NBTTagList()));

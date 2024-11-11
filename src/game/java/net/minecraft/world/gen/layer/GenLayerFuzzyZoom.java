@@ -3,13 +3,13 @@ package net.minecraft.world.gen.layer;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -21,7 +21,7 @@ package net.minecraft.world.gen.layer;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GenLayerFuzzyZoom extends GenLayerZoom {
 	public GenLayerFuzzyZoom(long parLong1, GenLayer parGenLayer) {
@@ -32,6 +32,7 @@ public class GenLayerFuzzyZoom extends GenLayerZoom {
 	 * + returns the most frequently occurring number of the set, or a random number
 	 * from those provided
 	 */
+	@Override
 	protected int selectModeOrRandom(int parInt1, int parInt2, int parInt3, int parInt4) {
 		return this.selectRandom(new int[] { parInt1, parInt2, parInt3, parInt4 });
 	}

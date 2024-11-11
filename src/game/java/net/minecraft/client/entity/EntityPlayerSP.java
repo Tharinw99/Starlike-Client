@@ -54,17 +54,18 @@ import net.minecraft.util.MovementInput;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IInteractionObject;
 import net.minecraft.world.World;
+import net.starlikeclient.minecraft.guis.GuisStarlike;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -76,7 +77,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityPlayerSP extends AbstractClientPlayer {
 	public final NetHandlerPlayClient sendQueue;
@@ -113,6 +114,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 		this.statWriter = statWriter;
 	}
 
+	@Override
 	public void addChatComponentMessage(IChatComponent chatComponent) {
 		this.mc.ingameGUI.getChatGUI().printChatMessage(chatComponent);
 	}
@@ -120,6 +122,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 	/**
 	 * + Send a chat message to the CommandSender
 	 */
+	@Override
 	public void addChatMessage(IChatComponent ichatcomponent) {
 		this.mc.ingameGUI.getChatGUI().printChatMessage(ichatcomponent);
 	}
@@ -127,6 +130,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 	/**
 	 * + Adds a value to a statistic field.
 	 */
+	@Override
 	public void addStat(StatBase stat, int amount) {
 		if (stat != null) {
 			if (stat.isIndependent) {
@@ -139,6 +143,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 	/**
 	 * + Called when the entity is attacked.
 	 */
+	@Override
 	public boolean attackEntityFrom(DamageSource source, float amount) {
 		return false;
 	}
@@ -147,6 +152,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 	 * + Returns {@code true} if the CommandSender is allowed to execute the
 	 * command, {@code false} if not
 	 */
+	@Override
 	public boolean canCommandSenderUseCommand(int i, String var2) {
 		return i <= 0;
 	}
@@ -154,6 +160,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 	/**
 	 * + set current crafting inventory back to the 2x2 square
 	 */
+	@Override
 	public void closeScreen() {
 		this.sendQueue.addToSendQueue(new C0DPacketCloseWindow(this.openContainer.windowId));
 		this.closeScreenAndDropStack();
@@ -170,12 +177,14 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 	 * from the armor first and then health second with the reduced value. Args:
 	 * damageAmount
 	 */
+	@Override
 	protected void damageEntity(DamageSource damageSrc, float damageAmount) {
 		if (!this.isEntityInvulnerable(damageSrc)) {
 			this.setHealth(this.getHealth() - damageAmount);
 		}
 	}
 
+	@Override
 	public void displayGui(IInteractionObject guiOwner) {
 		String s = guiOwner.getGuiID();
 		if ("minecraft:crafting_table".equals(s)) {
@@ -184,13 +193,15 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 			this.mc.displayGuiScreen(new GuiEnchantment(this.inventory, this.worldObj, guiOwner));
 		} else if ("minecraft:anvil".equals(s)) {
 			this.mc.displayGuiScreen(new GuiRepair(this.inventory, this.worldObj));
+		} else {
+			GuisStarlike.displayGui(guiOwner, this);
 		}
-
 	}
 
 	/**
 	 * + Displays the GUI for interacting with a book.
 	 */
+	@Override
 	public void displayGUIBook(ItemStack bookStack) {
 		Item item = bookStack.getItem();
 		if (item == Items.writable_book) {
@@ -203,6 +214,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 	 * + Displays the GUI for interacting with a chest inventory. Args:
 	 * chestInventory
 	 */
+	@Override
 	public void displayGUIChest(IInventory chestInventory) {
 		String s = chestInventory instanceof IInteractionObject ? ((IInteractionObject) chestInventory).getGuiID()
 				: "minecraft:container";
@@ -216,18 +228,19 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 			this.mc.displayGuiScreen(new GuiBrewingStand(this.inventory, chestInventory));
 		} else if ("minecraft:beacon".equals(s)) {
 			this.mc.displayGuiScreen(new GuiBeacon(this.inventory, chestInventory));
-		} else if (!"minecraft:dispenser".equals(s) && !"minecraft:dropper".equals(s)) {
-			this.mc.displayGuiScreen(new GuiChest(this.inventory, chestInventory));
-		} else {
+		} else if ("minecraft:dispenser".equals(s) || "minecraft:dropper".equals(s)) {
 			this.mc.displayGuiScreen(new GuiDispenser(this.inventory, chestInventory));
+		} else {
+			this.mc.displayGuiScreen(new GuiChest(this.inventory, chestInventory));
 		}
-
 	}
 
+	@Override
 	public void displayGUIHorse(EntityHorse horse, IInventory horseInventory) {
 		this.mc.displayGuiScreen(new GuiScreenHorseInventory(this.inventory, horseInventory, horse));
 	}
 
+	@Override
 	public void displayVillagerTradeGui(IMerchant villager) {
 		this.mc.displayGuiScreen(new GuiMerchant(this.inventory, villager, this.worldObj));
 	}
@@ -235,6 +248,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 	/**
 	 * + Called when player presses the drop item key
 	 */
+	@Override
 	public EntityItem dropOneItem(boolean dropAll) {
 		C07PacketPlayerDigging.Action c07packetplayerdigging$action = dropAll
 				? C07PacketPlayerDigging.Action.DROP_ALL_ITEMS
@@ -256,6 +270,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 	 * + Get the position in the world. <b>{@code null} is not allowed!</b> If you
 	 * are not an entity in the world, return the coordinates 0, 0, 0
 	 */
+	@Override
 	public BlockPos getPosition() {
 		return new BlockPos(this.posX + 0.5D, this.posY + 0.5D, this.posZ + 0.5D);
 	}
@@ -267,6 +282,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 	/**
 	 * + Heal living entity (param: amount of half-hearts)
 	 */
+	@Override
 	public void heal(float healAmount) {
 	}
 
@@ -291,6 +307,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 	/**
 	 * + Returns whether the entity is in a server world
 	 */
+	@Override
 	public boolean isServerWorld() {
 		return true;
 	}
@@ -298,6 +315,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 	/**
 	 * + Returns if this entity is sneaking.
 	 */
+	@Override
 	public boolean isSneaking() {
 		boolean flag = this.movementInput != null ? this.movementInput.sneak : false;
 		return flag && !this.sleeping;
@@ -306,6 +324,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 	/**
 	 * + returns true if this is an EntityPlayerSP, or the logged in player.
 	 */
+	@Override
 	public boolean isUser() {
 		return true;
 	}
@@ -313,12 +332,14 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 	/**
 	 * + Joins the passed in entity item with the world. Args: entityItem
 	 */
+	@Override
 	protected void joinEntityItemWithWorld(EntityItem itemIn) {
 	}
 
 	/**
 	 * + Called when a player mounts an entity. e.g. mounts a pig, mounts a boat.
 	 */
+	@Override
 	public void mountEntity(Entity entityIn) {
 		super.mountEntity(entityIn);
 		if (entityIn instanceof EntityMinecart) {
@@ -331,10 +352,12 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 	 * + Called when the player performs a critical hit on the Entity. Args: entity
 	 * that was hit critically
 	 */
+	@Override
 	public void onCriticalHit(Entity entityHit) {
 		this.mc.effectRenderer.emitParticleAtEntity(entityHit, EnumParticleTypes.CRIT);
 	}
 
+	@Override
 	public void onEnchantmentCritical(Entity entityHit) {
 		this.mc.effectRenderer.emitParticleAtEntity(entityHit, EnumParticleTypes.CRIT_MAGIC);
 	}
@@ -344,6 +367,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 	 * required. For example, zombies and skeletons use this to react to sunlight
 	 * and start to burn.
 	 */
+	@Override
 	public void onLivingUpdate() {
 		if (this.sprintingTicksLeft > 0) {
 			--this.sprintingTicksLeft;
@@ -495,6 +519,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		if (this.worldObj.isBlockLoaded(new BlockPos(this.posX, 0.0D, this.posZ))) {
 			super.onUpdate();
@@ -585,18 +610,22 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 
 	}
 
+	@Override
 	public void openEditCommandBlock(CommandBlockLogic cmdBlockLogic) {
 		this.mc.displayGuiScreen(new GuiCommandBlock(cmdBlockLogic));
 	}
 
+	@Override
 	public void openEditSign(TileEntitySign signTile) {
 		this.mc.displayGuiScreen(new GuiEditSign(signTile));
 	}
 
+	@Override
 	public void playSound(String name, float volume, float pitch) {
 		this.worldObj.playSound(this.posX, this.posY, this.posZ, name, volume, pitch, false);
 	}
 
+	@Override
 	protected boolean pushOutOfBlocks(double x, double y, double z) {
 		if (this.noClip) {
 			return false;
@@ -649,6 +678,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 		}
 	}
 
+	@Override
 	public void respawnPlayer() {
 		this.sendQueue.addToSendQueue(new C16PacketClientStatus(C16PacketClientStatus.EnumState.PERFORM_RESPAWN));
 	}
@@ -678,6 +708,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 	/**
 	 * + Sends the player's abilities to the server (if there is one).
 	 */
+	@Override
 	public void sendPlayerAbilities() {
 		this.sendQueue.addToSendQueue(new C13PacketPlayerAbilities(this.capabilities));
 	}
@@ -714,6 +745,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 	/**
 	 * + Set sprinting switch for Entity.
 	 */
+	@Override
 	public void setSprinting(boolean sprinting) {
 		super.setSprinting(sprinting);
 		this.sprintingTicksLeft = sprinting ? 600 : 0;
@@ -731,11 +763,13 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 	/**
 	 * + Swings the item the player is holding.
 	 */
+	@Override
 	public void swingItem() {
 		super.swingItem();
 		this.sendQueue.addToSendQueue(new C0APacketAnimation());
 	}
 
+	@Override
 	public void updateEntityActionState() {
 		super.updateEntityActionState();
 		if (this.isCurrentViewEntity()) {

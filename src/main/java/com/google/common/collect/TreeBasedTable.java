@@ -332,7 +332,7 @@ public class TreeBasedTable<R, C, V> extends StandardRowSortedTable<R, C, V> {
 	 * Because a {@code TreeBasedTable} has unique sorted values for a given row,
 	 * this method returns a {@link SortedMap}, instead of the {@link Map} specified
 	 * in the {@link Table} interface.
-	 * 
+	 *
 	 * @since 10.0
 	 *        (<a href="http://code.google.com/p/guava-libraries/wiki/Compatibility"
 	 *        >mostly source-compatible</a> since 7.0)

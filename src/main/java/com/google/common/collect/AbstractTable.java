@@ -28,7 +28,7 @@ import com.google.common.annotations.GwtCompatible;
 /**
  * Skeletal, implementation-agnostic implementation of the {@link Table}
  * interface.
- * 
+ *
  * @author Louis Wasserman
  */
 @GwtCompatible

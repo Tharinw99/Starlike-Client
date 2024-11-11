@@ -17,13 +17,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -35,7 +35,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class EntityHanging extends Entity {
 	private int tickCounter1;
@@ -55,6 +55,7 @@ public abstract class EntityHanging extends Entity {
 	/**
 	 * + Adds to the current velocity of the entity. Args: x, y, z
 	 */
+	@Override
 	public void addVelocity(double d0, double d1, double d2) {
 		if (!this.worldObj.isRemote && !this.isDead && d0 * d0 + d1 * d1 + d2 * d2 > 0.0D) {
 			this.setDead();
@@ -66,6 +67,7 @@ public abstract class EntityHanging extends Entity {
 	/**
 	 * + Called when the entity is attacked.
 	 */
+	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float var2) {
 		if (this.isEntityInvulnerable(damagesource)) {
 			return false;
@@ -84,10 +86,12 @@ public abstract class EntityHanging extends Entity {
 	 * + Returns true if other Entities should be prevented from moving through this
 	 * Entity.
 	 */
+	@Override
 	public boolean canBeCollidedWith() {
 		return true;
 	}
 
+	@Override
 	protected void entityInit() {
 	}
 
@@ -101,6 +105,7 @@ public abstract class EntityHanging extends Entity {
 
 	public abstract int getHeightPixels();
 
+	@Override
 	public EnumFacing getHorizontalFacing() {
 		return this.facingDirection;
 	}
@@ -111,6 +116,7 @@ public abstract class EntityHanging extends Entity {
 	 * + Called when a player attacks an entity. If this returns true the attack
 	 * will not happen.
 	 */
+	@Override
 	public boolean hitByEntity(Entity entity) {
 		return entity instanceof EntityPlayer
 				? this.attackEntityFrom(DamageSource.causePlayerDamage((EntityPlayer) entity), 0.0F)
@@ -120,6 +126,7 @@ public abstract class EntityHanging extends Entity {
 	/**
 	 * + Tries to moves the entity by the passed in displacement. Args: x, y, z
 	 */
+	@Override
 	public void moveEntity(double d0, double d1, double d2) {
 		if (!this.worldObj.isRemote && !this.isDead && d0 * d0 + d1 * d1 + d2 * d2 > 0.0D) {
 			this.setDead();
@@ -133,6 +140,7 @@ public abstract class EntityHanging extends Entity {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		this.prevPosX = this.posX;
 		this.prevPosY = this.posY;
@@ -183,6 +191,7 @@ public abstract class EntityHanging extends Entity {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		this.hangingPosition = new BlockPos(nbttagcompound.getInteger("TileX"), nbttagcompound.getInteger("TileY"),
 				nbttagcompound.getInteger("TileZ"));
@@ -203,6 +212,7 @@ public abstract class EntityHanging extends Entity {
 	 * + Sets the x,y,z of the entity from the given parameters. Also seems to set
 	 * up a bounding box.
 	 */
+	@Override
 	public void setPosition(double d0, double d1, double d2) {
 		this.posX = d0;
 		this.posY = d1;
@@ -216,6 +226,7 @@ public abstract class EntityHanging extends Entity {
 
 	}
 
+	@Override
 	protected boolean shouldSetPosAfterLoading() {
 		return false;
 	}
@@ -270,6 +281,7 @@ public abstract class EntityHanging extends Entity {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		nbttagcompound.setByte("Facing", (byte) this.facingDirection.getHorizontalIndex());
 		nbttagcompound.setInteger("TileX", this.getHangingPosition().getX());

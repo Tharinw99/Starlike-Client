@@ -17,13 +17,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -35,7 +35,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityPainting extends EntityHanging {
 	public static enum EnumArt {
@@ -109,10 +109,12 @@ public class EntityPainting extends EntityHanging {
 		this.updateFacingWithBoundingBox(facing);
 	}
 
+	@Override
 	public int getHeightPixels() {
 		return this.art.sizeY;
 	}
 
+	@Override
 	public int getWidthPixels() {
 		return this.art.sizeX;
 	}
@@ -120,6 +122,7 @@ public class EntityPainting extends EntityHanging {
 	/**
 	 * + Called when this entity is broken. Entity parameter may be null.
 	 */
+	@Override
 	public void onBroken(Entity entity) {
 		if (this.worldObj.getGameRules().getBoolean("doEntityDrops")) {
 			if (entity instanceof EntityPlayer) {
@@ -136,6 +139,7 @@ public class EntityPainting extends EntityHanging {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		String s = nbttagcompound.getString("Motive");
 
@@ -157,11 +161,13 @@ public class EntityPainting extends EntityHanging {
 	/**
 	 * + Sets the location and Yaw/Pitch of an entity in the world
 	 */
+	@Override
 	public void setLocationAndAngles(double d0, double d1, double d2, float var7, float var8) {
 		BlockPos blockpos = this.hangingPosition.add(d0 - this.posX, d1 - this.posY, d2 - this.posZ);
 		this.setPosition((double) blockpos.getX(), (double) blockpos.getY(), (double) blockpos.getZ());
 	}
 
+	@Override
 	public void setPositionAndRotation2(double d0, double d1, double d2, float var7, float var8, int var9,
 			boolean var10) {
 		BlockPos blockpos = this.hangingPosition.add(d0 - this.posX, d1 - this.posY, d2 - this.posZ);
@@ -171,6 +177,7 @@ public class EntityPainting extends EntityHanging {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		nbttagcompound.setString("Motive", this.art.title);
 		super.writeEntityToNBT(nbttagcompound);

@@ -74,7 +74,7 @@ public final class Throwables {
 	 * Returns the innermost cause of {@code throwable}. The first throwable in a
 	 * chain provides context from when the error or exception was initially
 	 * detected. Example usage:
-	 * 
+	 *
 	 * <pre>
 	 * assertEquals("Unable to assign a customer id", Throwables.getRootCause(e).getMessage());
 	 * </pre>
@@ -106,7 +106,7 @@ public final class Throwables {
 	 * This method always throws an exception. The {@code RuntimeException} return
 	 * type is only for client code to make Java type system happy in case a return
 	 * value is required by the enclosing method. Example usage:
-	 * 
+	 *
 	 * <pre>
 	 * T doSomething() {
 	 * 	try {
@@ -131,7 +131,7 @@ public final class Throwables {
 	/**
 	 * Propagates {@code throwable} exactly as-is, if and only if it is an instance
 	 * of {@code declaredType}. Example usage:
-	 * 
+	 *
 	 * <pre>
 	 * try {
 	 * 	someMethodThatCouldThrowAnything();
@@ -155,7 +155,7 @@ public final class Throwables {
 	/**
 	 * Propagates {@code throwable} exactly as-is, if and only if it is an instance
 	 * of {@link RuntimeException} or {@link Error}. Example usage:
-	 * 
+	 *
 	 * <pre>
 	 * try {
 	 * 	someMethodThatCouldThrowAnything();
@@ -176,7 +176,7 @@ public final class Throwables {
 	 * Propagates {@code throwable} exactly as-is, if and only if it is an instance
 	 * of {@link RuntimeException}, {@link Error}, or {@code declaredType}. Example
 	 * usage:
-	 * 
+	 *
 	 * <pre>
 	 * try {
 	 * 	someMethodThatCouldThrowAnything();

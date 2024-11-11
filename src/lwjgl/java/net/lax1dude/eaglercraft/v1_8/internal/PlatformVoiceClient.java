@@ -1,12 +1,11 @@
 package net.lax1dude.eaglercraft.v1_8.internal;
 
 import net.lax1dude.eaglercraft.v1_8.EaglercraftUUID;
-import net.lax1dude.eaglercraft.v1_8.voice.EnumVoiceChannelPeerState;
 import net.lax1dude.eaglercraft.v1_8.voice.EnumVoiceChannelReadyState;
 
 /**
  * Copyright (c) 2022-2024 ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -18,32 +17,12 @@ import net.lax1dude.eaglercraft.v1_8.voice.EnumVoiceChannelReadyState;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class PlatformVoiceClient {
 
 	public static void activateVoice(boolean talk) {
 
-	}
-
-	public static EnumVoiceChannelPeerState getPeerState() {
-		return EnumVoiceChannelPeerState.LOADING;
-	}
-
-	public static EnumVoiceChannelPeerState getPeerStateConnect() {
-		return EnumVoiceChannelPeerState.LOADING;
-	}
-
-	public static EnumVoiceChannelPeerState getPeerStateDesc() {
-		return EnumVoiceChannelPeerState.LOADING;
-	}
-
-	public static EnumVoiceChannelPeerState getPeerStateIce() {
-		return EnumVoiceChannelPeerState.LOADING;
-	}
-
-	public static EnumVoiceChannelPeerState getPeerStateInitial() {
-		return EnumVoiceChannelPeerState.LOADING;
 	}
 
 	public static EnumVoiceChannelReadyState getReadyState() {

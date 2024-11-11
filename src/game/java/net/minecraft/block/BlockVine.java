@@ -26,13 +26,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -44,7 +44,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockVine extends Block {
 	public static final PropertyBool UP = PropertyBool.create("up");
@@ -95,6 +95,7 @@ public class BlockVine extends Block {
 	/**
 	 * + Check whether this Block can be placed on the given side
 	 */
+	@Override
 	public boolean canPlaceBlockOnSide(World world, BlockPos blockpos, EnumFacing enumfacing) {
 		switch (enumfacing) {
 		case UP:
@@ -113,10 +114,12 @@ public class BlockVine extends Block {
 		return blockIn.isFullCube() && blockIn.blockMaterial.blocksMovement();
 	}
 
+	@Override
 	public int colorMultiplier(IBlockAccess iblockaccess, BlockPos blockpos, int var3) {
 		return iblockaccess.getBiomeGenForCoords(blockpos).getFoliageColorAtPos(blockpos);
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { UP, NORTH, EAST, SOUTH, WEST });
 	}
@@ -125,19 +128,23 @@ public class BlockVine extends Block {
 	 * + Get the actual Block state of this Block at the given position. This
 	 * applies properties not visible in the metadata, such as fence connections.
 	 */
+	@Override
 	public IBlockState getActualState(IBlockState iblockstate, IBlockAccess iblockaccess, BlockPos blockpos) {
 		return iblockstate.withProperty(UP,
 				Boolean.valueOf(iblockaccess.getBlockState(blockpos.up()).getBlock().isBlockNormalCube()));
 	}
 
+	@Override
 	public int getBlockColor() {
 		return ColorizerFoliage.getFoliageColorBasic();
 	}
 
+	@Override
 	public EnumWorldBlockLayer getBlockLayer() {
 		return EnumWorldBlockLayer.CUTOUT;
 	}
 
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox(World var1, BlockPos var2, IBlockState var3) {
 		return null;
 	}
@@ -145,6 +152,7 @@ public class BlockVine extends Block {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
 		return null;
 	}
@@ -152,6 +160,7 @@ public class BlockVine extends Block {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
 		if (((Boolean) iblockstate.getValue(SOUTH)).booleanValue()) {
@@ -173,6 +182,7 @@ public class BlockVine extends Block {
 		return i;
 	}
 
+	@Override
 	public int getRenderColor(IBlockState var1) {
 		return ColorizerFoliage.getFoliageColorBasic();
 	}
@@ -180,12 +190,14 @@ public class BlockVine extends Block {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(SOUTH, Boolean.valueOf((i & 1) > 0))
 				.withProperty(WEST, Boolean.valueOf((i & 2) > 0)).withProperty(NORTH, Boolean.valueOf((i & 4) > 0))
 				.withProperty(EAST, Boolean.valueOf((i & 8) > 0));
 	}
 
+	@Override
 	public void harvestBlock(World world, EntityPlayer entityplayer, BlockPos blockpos, IBlockState iblockstate,
 			TileEntity tileentity) {
 		if (!world.isRemote && entityplayer.getCurrentEquippedItem() != null
@@ -198,6 +210,7 @@ public class BlockVine extends Block {
 
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -206,6 +219,7 @@ public class BlockVine extends Block {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
@@ -214,6 +228,7 @@ public class BlockVine extends Block {
 	 * + Whether this Block can be replaced directly by other blocks (true for e.g.
 	 * tall grass)
 	 */
+	@Override
 	public boolean isReplaceable(World var1, BlockPos var2) {
 		return true;
 	}
@@ -222,6 +237,7 @@ public class BlockVine extends Block {
 	 * + Called by ItemBlocks just before a block is actually set in the world, to
 	 * allow for adjustments to the IBlockstate
 	 */
+	@Override
 	public IBlockState onBlockPlaced(World var1, BlockPos var2, EnumFacing enumfacing, float var4, float var5,
 			float var6, int var7, EntityLivingBase var8) {
 		IBlockState iblockstate = this.getDefaultState().withProperty(UP, Boolean.valueOf(false))
@@ -235,6 +251,7 @@ public class BlockVine extends Block {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block var4) {
 		if (!world.isRemote && !this.recheckGrownSides(world, blockpos, iblockstate)) {
 			this.dropBlockAsItem(world, blockpos, iblockstate, 0);
@@ -246,6 +263,7 @@ public class BlockVine extends Block {
 	/**
 	 * + Returns the quantity of items to drop on block destruction.
 	 */
+	@Override
 	public int quantityDropped(EaglercraftRandom var1) {
 		return 0;
 	}
@@ -279,6 +297,7 @@ public class BlockVine extends Block {
 		}
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
 		float f = 0.0625F;
 		float f1 = 1.0F;
@@ -343,10 +362,12 @@ public class BlockVine extends Block {
 	/**
 	 * + Sets the block's bounds for rendering it as an item
 	 */
+	@Override
 	public void setBlockBoundsForItemRender() {
 		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
 	}
 
+	@Override
 	public void updateTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom random) {
 		if (!world.isRemote) {
 			if (world.rand.nextInt(4) == 0) {
@@ -354,10 +375,11 @@ public class BlockVine extends Block {
 				int i = 5;
 				boolean flag = false;
 
+				BlockPos tmp = new BlockPos(0, 0, 0);
 				label62: for (int j = -b0; j <= b0; ++j) {
 					for (int k = -b0; k <= b0; ++k) {
 						for (int l = -1; l <= 1; ++l) {
-							if (world.getBlockState(blockpos.add(j, l, k)).getBlock() == this) {
+							if (world.getBlockState(blockpos.add(j, l, k, tmp)).getBlock() == this) {
 								--i;
 								if (i <= 0) {
 									flag = true;
@@ -370,7 +392,6 @@ public class BlockVine extends Block {
 
 				EnumFacing enumfacing1 = EnumFacing.random(random);
 				BlockPos blockpos2 = blockpos.up();
-				BlockPos tmp = new BlockPos(0, 0, 0);
 				if (enumfacing1 == EnumFacing.UP && blockpos.getY() < 255 && world.isAirBlock(blockpos2)) {
 					if (!flag) {
 						IBlockState iblockstate3 = iblockstate;
@@ -396,7 +417,7 @@ public class BlockVine extends Block {
 				} else if (enumfacing1.getAxis().isHorizontal()
 						&& !((Boolean) iblockstate.getValue(getPropertyFor(enumfacing1))).booleanValue()) {
 					if (!flag) {
-						BlockPos blockpos4 = blockpos.offset(enumfacing1);
+						BlockPos blockpos4 = blockpos.offsetEvenFaster(enumfacing1, blockpos2);
 						Block block1 = world.getBlockState(blockpos4).getBlock();
 						if (block1.blockMaterial == Material.air) {
 							EnumFacing enumfacing2 = enumfacing1.rotateY();
@@ -421,7 +442,7 @@ public class BlockVine extends Block {
 									world.getBlockState(blockpos.offsetEvenFaster(enumfacing4, tmp)).getBlock())) {
 								world.setBlockState(blockpos1, this.getDefaultState().withProperty(
 										getPropertyFor(enumfacing1.getOpposite()), Boolean.valueOf(true)), 2);
-							} else if (this.canPlaceOn(world.getBlockState(blockpos4.up()).getBlock())) {
+							} else if (this.canPlaceOn(world.getBlockState(blockpos4.up(tmp)).getBlock())) {
 								world.setBlockState(blockpos4, this.getDefaultState(), 2);
 							}
 						} else if (block1.blockMaterial.isOpaque() && block1.isFullCube()) {
@@ -432,7 +453,7 @@ public class BlockVine extends Block {
 					}
 				} else {
 					if (blockpos.getY() > 1) {
-						BlockPos blockpos3 = blockpos.down();
+						BlockPos blockpos3 = blockpos.down(blockpos2);
 						IBlockState iblockstate1 = world.getBlockState(blockpos3);
 						Block block = iblockstate1.getBlock();
 						EnumFacing[] facings = EnumFacing.Plane.HORIZONTAL.facingsArray;

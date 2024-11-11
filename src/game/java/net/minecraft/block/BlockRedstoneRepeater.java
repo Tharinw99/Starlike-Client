@@ -20,13 +20,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,7 +38,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockRedstoneRepeater extends BlockRedstoneDiode {
 	public static final PropertyBool LOCKED = PropertyBool.create("locked");
@@ -50,15 +50,18 @@ public class BlockRedstoneRepeater extends BlockRedstoneDiode {
 				.withProperty(DELAY, Integer.valueOf(1)).withProperty(LOCKED, Boolean.valueOf(false)));
 	}
 
+	@Override
 	public void breakBlock(World world, BlockPos blockpos, IBlockState iblockstate) {
 		super.breakBlock(world, blockpos, iblockstate);
 		this.notifyNeighbors(world, blockpos, iblockstate);
 	}
 
+	@Override
 	protected boolean canPowerSide(Block block) {
 		return isRedstoneRepeaterBlockID(block);
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { FACING, DELAY, LOCKED });
 	}
@@ -67,14 +70,17 @@ public class BlockRedstoneRepeater extends BlockRedstoneDiode {
 	 * + Get the actual Block state of this Block at the given position. This
 	 * applies properties not visible in the metadata, such as fence connections.
 	 */
+	@Override
 	public IBlockState getActualState(IBlockState iblockstate, IBlockAccess iblockaccess, BlockPos blockpos) {
 		return iblockstate.withProperty(LOCKED, Boolean.valueOf(this.isLocked(iblockaccess, blockpos, iblockstate)));
 	}
 
+	@Override
 	protected int getDelay(IBlockState iblockstate) {
 		return ((Integer) iblockstate.getValue(DELAY)).intValue() * 2;
 	}
 
+	@Override
 	public Item getItem(World var1, BlockPos var2) {
 		return Items.repeater;
 	}
@@ -82,6 +88,7 @@ public class BlockRedstoneRepeater extends BlockRedstoneDiode {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
 		return Items.repeater;
 	}
@@ -89,6 +96,7 @@ public class BlockRedstoneRepeater extends BlockRedstoneDiode {
 	/**
 	 * + Gets the localized name of this block. Used for the statistics page.
 	 */
+	@Override
 	public String getLocalizedName() {
 		return StatCollector.translateToLocal("item.diode.name");
 	}
@@ -96,6 +104,7 @@ public class BlockRedstoneRepeater extends BlockRedstoneDiode {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
 		i = i | ((EnumFacing) iblockstate.getValue(FACING)).getHorizontalIndex();
@@ -103,6 +112,7 @@ public class BlockRedstoneRepeater extends BlockRedstoneDiode {
 		return i;
 	}
 
+	@Override
 	protected IBlockState getPoweredState(IBlockState iblockstate) {
 		Integer integer = (Integer) iblockstate.getValue(DELAY);
 		Boolean obool = (Boolean) iblockstate.getValue(LOCKED);
@@ -114,11 +124,13 @@ public class BlockRedstoneRepeater extends BlockRedstoneDiode {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(FACING, EnumFacing.getHorizontal(i))
 				.withProperty(LOCKED, Boolean.valueOf(false)).withProperty(DELAY, Integer.valueOf(1 + (i >> 2)));
 	}
 
+	@Override
 	protected IBlockState getUnpoweredState(IBlockState iblockstate) {
 		Integer integer = (Integer) iblockstate.getValue(DELAY);
 		Boolean obool = (Boolean) iblockstate.getValue(LOCKED);
@@ -127,10 +139,12 @@ public class BlockRedstoneRepeater extends BlockRedstoneDiode {
 				.withProperty(LOCKED, obool);
 	}
 
+	@Override
 	public boolean isLocked(IBlockAccess iblockaccess, BlockPos blockpos, IBlockState iblockstate) {
 		return this.getPowerOnSides(iblockaccess, blockpos, iblockstate) > 0;
 	}
 
+	@Override
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState iblockstate, EntityPlayer entityplayer,
 			EnumFacing var5, float var6, float var7, float var8) {
 		if (!entityplayer.capabilities.allowEdit) {
@@ -141,6 +155,7 @@ public class BlockRedstoneRepeater extends BlockRedstoneDiode {
 		}
 	}
 
+	@Override
 	public void randomDisplayTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom random) {
 		if (this.isRepeaterPowered) {
 			EnumFacing enumfacing = (EnumFacing) iblockstate.getValue(FACING);

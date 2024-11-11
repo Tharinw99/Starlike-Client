@@ -55,7 +55,7 @@ public final class LittleEndianDataInputStream extends FilterInputStream impleme
 	/**
 	 * Reads a byte from the input stream checking that the end of file (EOF) has
 	 * not been encountered.
-	 * 
+	 *
 	 * @return byte read from input
 	 * @throws IOException  if an error is encountered while reading
 	 * @throws EOFException if the end of file (EOF) is encountered.

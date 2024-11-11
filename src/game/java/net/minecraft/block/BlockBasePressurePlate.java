@@ -15,13 +15,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,7 +33,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class BlockBasePressurePlate extends Block {
 	protected BlockBasePressurePlate(Material materialIn) {
@@ -46,6 +46,7 @@ public abstract class BlockBasePressurePlate extends Block {
 		this.setTickRandomly(true);
 	}
 
+	@Override
 	public void breakBlock(World world, BlockPos blockpos, IBlockState iblockstate) {
 		if (this.getRedstoneStrength(iblockstate) > 0) {
 			this.updateNeighbors(world, blockpos);
@@ -59,6 +60,7 @@ public abstract class BlockBasePressurePlate extends Block {
 				|| worldIn.getBlockState(pos).getBlock() instanceof BlockFence;
 	}
 
+	@Override
 	public boolean canPlaceBlockAt(World world, BlockPos blockpos) {
 		return this.canBePlacedOn(world, blockpos.down());
 	}
@@ -67,20 +69,24 @@ public abstract class BlockBasePressurePlate extends Block {
 	 * + Can this block provide power. Only wire currently seems to have this change
 	 * based on its state.
 	 */
+	@Override
 	public boolean canProvidePower() {
 		return true;
 	}
 
 	protected abstract int computeRedstoneStrength(World var1, BlockPos var2);
 
+	@Override
 	public boolean func_181623_g() {
 		return true;
 	}
 
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox(World var1, BlockPos var2, IBlockState var3) {
 		return null;
 	}
 
+	@Override
 	public int getMobilityFlag() {
 		return 1;
 	}
@@ -97,14 +103,17 @@ public abstract class BlockBasePressurePlate extends Block {
 				(double) pos.getY() + 0.25D, (double) ((float) (pos.getZ() + 1) - 0.125F));
 	}
 
+	@Override
 	public int getStrongPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side) {
 		return side == EnumFacing.UP ? this.getRedstoneStrength(state) : 0;
 	}
 
+	@Override
 	public int getWeakPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side) {
 		return this.getRedstoneStrength(state);
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -113,10 +122,12 @@ public abstract class BlockBasePressurePlate extends Block {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
 
+	@Override
 	public boolean isPassable(IBlockAccess var1, BlockPos var2) {
 		return true;
 	}
@@ -124,6 +135,7 @@ public abstract class BlockBasePressurePlate extends Block {
 	/**
 	 * + Called When an Entity Collided with the Block
 	 */
+	@Override
 	public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
 		if (!worldIn.isRemote) {
 			int i = this.getRedstoneStrength(state);
@@ -136,6 +148,7 @@ public abstract class BlockBasePressurePlate extends Block {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block var4) {
 		if (!this.canBePlacedOn(world, blockpos.down())) {
 			this.dropBlockAsItem(world, blockpos, iblockstate, 0);
@@ -148,9 +161,11 @@ public abstract class BlockBasePressurePlate extends Block {
 	 * + Called randomly when setTickRandomly is set to true (used by e.g. crops to
 	 * grow, etc.)
 	 */
+	@Override
 	public void randomTick(World worldIn, BlockPos pos, IBlockState state, EaglercraftRandom random) {
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
 		this.setBlockBoundsBasedOnState0(iblockaccess.getBlockState(blockpos));
 	}
@@ -169,6 +184,7 @@ public abstract class BlockBasePressurePlate extends Block {
 	/**
 	 * + Sets the block's bounds for rendering it as an item
 	 */
+	@Override
 	public void setBlockBoundsForItemRender() {
 		float f = 0.5F;
 		float f1 = 0.125F;
@@ -181,6 +197,7 @@ public abstract class BlockBasePressurePlate extends Block {
 	/**
 	 * + How many world ticks before ticking
 	 */
+	@Override
 	public int tickRate(World worldIn) {
 		return 20;
 	}
@@ -221,6 +238,7 @@ public abstract class BlockBasePressurePlate extends Block {
 
 	}
 
+	@Override
 	public void updateTick(World worldIn, BlockPos pos, IBlockState state, EaglercraftRandom rand) {
 		if (!worldIn.isRemote) {
 			int i = this.getRedstoneStrength(state);

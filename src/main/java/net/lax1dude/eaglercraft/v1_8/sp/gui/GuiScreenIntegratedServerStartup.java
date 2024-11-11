@@ -13,7 +13,7 @@ import net.minecraft.client.resources.I18n;
 
 /**
  * Copyright (c) 2023-2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -25,7 +25,7 @@ import net.minecraft.client.resources.I18n;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiScreenIntegratedServerStartup extends GuiScreen {
 
@@ -47,6 +47,7 @@ public class GuiScreenIntegratedServerStartup extends GuiScreen {
 		this.singleThread = singleThread;
 	}
 
+	@Override
 	protected void actionPerformed(GuiButton parGuiButton) {
 		if (parGuiButton.id == 0) {
 			SingleplayerServerController.killWorker();
@@ -54,10 +55,12 @@ public class GuiScreenIntegratedServerStartup extends GuiScreen {
 		}
 	}
 
+	@Override
 	public boolean canCloseGui() {
 		return false;
 	}
 
+	@Override
 	public void drawScreen(int i, int j, float f) {
 		this.drawBackground(0);
 		String txt = I18n.format("singleplayer.integratedStartup");
@@ -67,6 +70,7 @@ public class GuiScreenIntegratedServerStartup extends GuiScreen {
 		super.drawScreen(i, j, f);
 	}
 
+	@Override
 	public void initGui() {
 		this.buttonList.clear();
 		this.buttonList.add(cancelButton = new GuiButton(0, this.width / 2 - 100, this.height / 3 + 50,
@@ -74,6 +78,7 @@ public class GuiScreenIntegratedServerStartup extends GuiScreen {
 		cancelButton.visible = false;
 	}
 
+	@Override
 	public void updateScreen() {
 		++counter;
 		if (counter == 2) {

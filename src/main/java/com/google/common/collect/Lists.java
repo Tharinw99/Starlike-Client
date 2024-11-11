@@ -583,7 +583,7 @@ public final class Lists {
 	 * each of the given lists in order; the "n-ary
 	 * <a href="http://en.wikipedia.org/wiki/Cartesian_product">Cartesian
 	 * product</a>" of the lists. For example:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *
@@ -606,7 +606,7 @@ public final class Lists {
 	 * <p>
 	 * The result is guaranteed to be in the "traditional", lexicographical order
 	 * for Cartesian products that you would get from nesting for loops:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *
@@ -654,7 +654,7 @@ public final class Lists {
 	 * each of the given lists in order; the "n-ary
 	 * <a href="http://en.wikipedia.org/wiki/Cartesian_product">Cartesian
 	 * product</a>" of the lists. For example:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *
@@ -677,7 +677,7 @@ public final class Lists {
 	 * <p>
 	 * The result is guaranteed to be in the "traditional", lexicographical order
 	 * for Cartesian products that you would get from nesting for loops:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *

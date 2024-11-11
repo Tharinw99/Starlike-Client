@@ -24,13 +24,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -42,7 +42,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockTrapDoor extends Block {
 	public static enum DoorHalf implements IStringSerializable {
@@ -54,10 +54,12 @@ public class BlockTrapDoor extends Block {
 			this.name = name;
 		}
 
+		@Override
 		public String getName() {
 			return this.name;
 		}
 
+		@Override
 		public String toString() {
 			return this.name;
 		}
@@ -118,6 +120,7 @@ public class BlockTrapDoor extends Block {
 	/**
 	 * + Check whether this Block can be placed on the given side
 	 */
+	@Override
 	public boolean canPlaceBlockOnSide(World world, BlockPos blockpos, EnumFacing enumfacing) {
 		return !enumfacing.getAxis().isVertical()
 				&& isValidSupportBlock(world.getBlockState(blockpos.offset(enumfacing.getOpposite())).getBlock());
@@ -127,19 +130,23 @@ public class BlockTrapDoor extends Block {
 	 * + Ray traces through the blocks collision from start vector to end vector
 	 * returning a ray trace hit.
 	 */
+	@Override
 	public MovingObjectPosition collisionRayTrace(World world, BlockPos blockpos, Vec3 vec3, Vec3 vec31) {
 		this.setBlockBoundsBasedOnState(world, blockpos);
 		return super.collisionRayTrace(world, blockpos, vec3, vec31);
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { FACING, OPEN, HALF });
 	}
 
+	@Override
 	public EnumWorldBlockLayer getBlockLayer() {
 		return EnumWorldBlockLayer.CUTOUT;
 	}
 
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox(World world, BlockPos blockpos, IBlockState iblockstate) {
 		this.setBlockBoundsBasedOnState(world, blockpos);
 		return super.getCollisionBoundingBox(world, blockpos, iblockstate);
@@ -148,6 +155,7 @@ public class BlockTrapDoor extends Block {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
 		i = i | getMetaForFacing((EnumFacing) iblockstate.getValue(FACING));
@@ -162,6 +170,7 @@ public class BlockTrapDoor extends Block {
 		return i;
 	}
 
+	@Override
 	public AxisAlignedBB getSelectedBoundingBox(World world, BlockPos blockpos) {
 		this.setBlockBoundsBasedOnState(world, blockpos);
 		return super.getSelectedBoundingBox(world, blockpos);
@@ -170,12 +179,14 @@ public class BlockTrapDoor extends Block {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(FACING, getFacing(i))
 				.withProperty(OPEN, Boolean.valueOf((i & 4) != 0))
 				.withProperty(HALF, (i & 8) == 0 ? BlockTrapDoor.DoorHalf.BOTTOM : BlockTrapDoor.DoorHalf.TOP);
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -184,14 +195,17 @@ public class BlockTrapDoor extends Block {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
 
+	@Override
 	public boolean isPassable(IBlockAccess iblockaccess, BlockPos blockpos) {
 		return !((Boolean) iblockaccess.getBlockState(blockpos).getValue(OPEN)).booleanValue();
 	}
 
+	@Override
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState iblockstate, EntityPlayer entityplayer,
 			EnumFacing var5, float var6, float var7, float var8) {
 		if (this.blockMaterial == Material.iron) {
@@ -209,6 +223,7 @@ public class BlockTrapDoor extends Block {
 	 * + Called by ItemBlocks just before a block is actually set in the world, to
 	 * allow for adjustments to the IBlockstate
 	 */
+	@Override
 	public IBlockState onBlockPlaced(World var1, BlockPos var2, EnumFacing enumfacing, float var4, float f, float var6,
 			int var7, EntityLivingBase var8) {
 		IBlockState iblockstate = this.getDefaultState();
@@ -224,6 +239,7 @@ public class BlockTrapDoor extends Block {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block block) {
 		if (!world.isRemote) {
 			BlockPos blockpos1 = blockpos.offset(((EnumFacing) iblockstate.getValue(FACING)).getOpposite());
@@ -243,6 +259,7 @@ public class BlockTrapDoor extends Block {
 		}
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
 		this.setBounds(iblockaccess.getBlockState(blockpos));
 	}
@@ -250,6 +267,7 @@ public class BlockTrapDoor extends Block {
 	/**
 	 * + Sets the block's bounds for rendering it as an item
 	 */
+	@Override
 	public void setBlockBoundsForItemRender() {
 		float f = 0.1875F;
 		this.setBlockBounds(0.0F, 0.40625F, 0.0F, 1.0F, 0.59375F, 1.0F);

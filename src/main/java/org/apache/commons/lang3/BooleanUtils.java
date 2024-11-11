@@ -32,7 +32,7 @@ import org.apache.commons.lang3.math.NumberUtils;
  * <p>
  * #ThreadSafe#
  * </p>
- * 
+ *
  * @since 2.0
  */
 public class BooleanUtils {
@@ -110,7 +110,7 @@ public class BooleanUtils {
 
 	/**
 	 * Returns a new array of possible values (like an enum would).
-	 * 
+	 *
 	 * @return a new array of possible values (like an enum would).
 	 * @since 3.12.0
 	 */
@@ -281,7 +281,7 @@ public class BooleanUtils {
 
 	/**
 	 * Returns a new array of possible values (like an enum would).
-	 * 
+	 *
 	 * @return a new array of possible values (like an enum would).
 	 * @since 3.12.0
 	 */

@@ -10,13 +10,13 @@ import net.minecraft.world.biome.BiomeGenBase;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@ import net.minecraft.world.biome.BiomeGenBase;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ChunkProviderSettings {
 	public static class Factory {
@@ -147,6 +147,7 @@ public class ChunkProviderSettings {
 			this.func_177863_a();
 		}
 
+		@Override
 		public boolean equals(Object object) {
 			if (this == object) {
 				return true;
@@ -442,6 +443,7 @@ public class ChunkProviderSettings {
 			return new ChunkProviderSettings(this);
 		}
 
+		@Override
 		public int hashCode() {
 			int i = this.coordinateScale != 0.0F ? Float.floatToIntBits(this.coordinateScale) : 0;
 			i = 31 * i + (this.heightScale != 0.0F ? Float.floatToIntBits(this.heightScale) : 0);
@@ -525,12 +527,14 @@ public class ChunkProviderSettings {
 			return i;
 		}
 
+		@Override
 		public String toString() {
 			return JSONTypeProvider.serialize(this).toString();
 		}
 	}
 
 	public static class Serializer implements JSONTypeCodec<ChunkProviderSettings.Factory, JSONObject> {
+		@Override
 		public ChunkProviderSettings.Factory deserialize(JSONObject jsonobject) throws JSONException {
 			ChunkProviderSettings.Factory chunkprovidersettings$factory = new ChunkProviderSettings.Factory();
 
@@ -599,7 +603,7 @@ public class ChunkProviderSettings {
 						chunkprovidersettings$factory.useLavaOceans);
 				chunkprovidersettings$factory.fixedBiome = jsonobject.optInt("fixedBiome",
 						chunkprovidersettings$factory.fixedBiome);
-				if (chunkprovidersettings$factory.fixedBiome < 38 && chunkprovidersettings$factory.fixedBiome >= -1) {
+				if (chunkprovidersettings$factory.fixedBiome < 39 && chunkprovidersettings$factory.fixedBiome >= -1) {
 					if (chunkprovidersettings$factory.fixedBiome >= BiomeGenBase.hell.biomeID) {
 						chunkprovidersettings$factory.fixedBiome += 2;
 					}
@@ -706,6 +710,7 @@ public class ChunkProviderSettings {
 			return chunkprovidersettings$factory;
 		}
 
+		@Override
 		public JSONObject serialize(ChunkProviderSettings.Factory parFactory) throws JSONException {
 			JSONObject jsonobject = new JSONObject();
 			jsonobject.put("coordinateScale", Float.valueOf(parFactory.coordinateScale));

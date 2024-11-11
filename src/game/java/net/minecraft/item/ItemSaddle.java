@@ -8,13 +8,13 @@ import net.minecraft.entity.player.EntityPlayer;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -26,7 +26,7 @@ import net.minecraft.entity.player.EntityPlayer;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ItemSaddle extends Item {
 	public ItemSaddle() {
@@ -38,6 +38,7 @@ public class ItemSaddle extends Item {
 	 * + Current implementations of this method in child classes do not use the
 	 * entry argument beside ev. They just raise the damage on the stack.
 	 */
+	@Override
 	public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
 		this.itemInteractionForEntity(stack, (EntityPlayer) null, target);
 		return true;
@@ -47,6 +48,7 @@ public class ItemSaddle extends Item {
 	 * + Returns true if the item can be used on the given entity, e.g. shears on
 	 * sheep.
 	 */
+	@Override
 	public boolean itemInteractionForEntity(ItemStack itemstack, EntityPlayer var2, EntityLivingBase entitylivingbase) {
 		if (entitylivingbase instanceof EntityPig) {
 			EntityPig entitypig = (EntityPig) entitylivingbase;

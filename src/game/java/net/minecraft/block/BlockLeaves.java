@@ -19,13 +19,13 @@ import net.minecraft.world.biome.BiomeColorHelper;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -37,7 +37,7 @@ import net.minecraft.world.biome.BiomeColorHelper;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class BlockLeaves extends BlockLeavesBase {
 	public static final PropertyBool DECAYABLE = PropertyBool.create("decayable");
@@ -55,6 +55,7 @@ public abstract class BlockLeaves extends BlockLeavesBase {
 		this.setStepSound(soundTypeGrass);
 	}
 
+	@Override
 	public void breakBlock(World world, BlockPos blockpos, IBlockState var3) {
 		byte b0 = 1;
 		int i = b0 + 1;
@@ -79,6 +80,7 @@ public abstract class BlockLeaves extends BlockLeavesBase {
 
 	}
 
+	@Override
 	public int colorMultiplier(IBlockAccess iblockaccess, BlockPos blockpos, int var3) {
 		return BiomeColorHelper.getFoliageColorAtPos(iblockaccess, blockpos);
 	}
@@ -94,6 +96,7 @@ public abstract class BlockLeaves extends BlockLeavesBase {
 	/**
 	 * + Spawns this Block's drops into the World as EntityItems.
 	 */
+	@Override
 	public void dropBlockAsItemWithChance(World world, BlockPos blockpos, IBlockState iblockstate, float var4, int i) {
 		if (!world.isRemote) {
 			int j = this.getSaplingDropChance(iblockstate);
@@ -121,10 +124,12 @@ public abstract class BlockLeaves extends BlockLeavesBase {
 		}
 	}
 
+	@Override
 	public int getBlockColor() {
 		return ColorizerFoliage.getFoliageColor(0.5D, 1.0D);
 	}
 
+	@Override
 	public EnumWorldBlockLayer getBlockLayer() {
 		return this.isTransparent ? EnumWorldBlockLayer.CUTOUT_MIPPED : EnumWorldBlockLayer.SOLID;
 	}
@@ -132,10 +137,12 @@ public abstract class BlockLeaves extends BlockLeavesBase {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
 		return Item.getItemFromBlock(Blocks.sapling);
 	}
 
+	@Override
 	public int getRenderColor(IBlockState var1) {
 		return ColorizerFoliage.getFoliageColorBasic();
 	}
@@ -150,10 +157,12 @@ public abstract class BlockLeaves extends BlockLeavesBase {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return !this.fancyGraphics;
 	}
 
+	@Override
 	public boolean isVisuallyOpaque() {
 		return false;
 	}
@@ -161,10 +170,12 @@ public abstract class BlockLeaves extends BlockLeavesBase {
 	/**
 	 * + Returns the quantity of items to drop on block destruction.
 	 */
+	@Override
 	public int quantityDropped(EaglercraftRandom random) {
 		return random.nextInt(20) == 0 ? 1 : 0;
 	}
 
+	@Override
 	public void randomDisplayTick(World world, BlockPos blockpos, IBlockState var3, EaglercraftRandom random) {
 		if (world.canLightningStrike(blockpos.up()) && !World.doesBlockHaveSolidTopSurface(world, blockpos.down())
 				&& random.nextInt(15) == 1) {
@@ -186,6 +197,7 @@ public abstract class BlockLeaves extends BlockLeavesBase {
 		this.iconIndex = fancy ? 0 : 1;
 	}
 
+	@Override
 	public void updateTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom var4) {
 		if (!world.isRemote) {
 			if (((Boolean) iblockstate.getValue(CHECK_DECAY)).booleanValue()
@@ -203,7 +215,7 @@ public abstract class BlockLeaves extends BlockLeavesBase {
 				}
 
 				if (world.isAreaLoaded(new BlockPos(j - i, k - i, l - i), new BlockPos(j + i, k + i, l + i))) {
-					BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+					BlockPos blockpos$mutableblockpos = new BlockPos();
 
 					for (int k1 = -b0; k1 <= b0; ++k1) {
 						for (int l1 = -b0; l1 <= b0; ++l1) {

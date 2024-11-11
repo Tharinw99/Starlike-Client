@@ -13,7 +13,7 @@ import net.minecraft.util.ResourceLocation;
 
 /**
  * Copyright (c) 2022 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -25,7 +25,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EaglerFontRenderer extends FontRenderer {
 
@@ -74,6 +74,7 @@ public class EaglerFontRenderer extends FontRenderer {
 		return true;
 	}
 
+	@Override
 	public int drawString(String text, float x, float y, int color, boolean dropShadow) {
 		if (text == null || text.length() == 0) {
 			this.posX = x + (dropShadow ? 1 : 0);
@@ -98,6 +99,7 @@ public class EaglerFontRenderer extends FontRenderer {
 		return (int) this.posX;
 	}
 
+	@Override
 	protected void renderStringAtPos(String parString1, boolean parFlag) {
 		if (parString1 == null)
 			return;
@@ -221,11 +223,15 @@ public class EaglerFontRenderer extends FontRenderer {
 			if (hasStrike) {
 				GlStateManager.color(0.25f, 0.25f, 0.25f, 1.0f);
 				GlStateManager.translate(1.0f, 1.0f, 0.0f);
+				GlStateManager.disableTexture2D();
 				tessellator.draw();
 				GlStateManager.translate(-1.0f, -1.0f, 0.0f);
 				GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+				GlStateManager.enableTexture2D();
 				InstancedFontRenderer.render(8, 8, texScale, texScale, true);
+				GlStateManager.disableTexture2D();
 				EaglercraftGPU.renderAgain();
+				GlStateManager.enableTexture2D();
 			} else {
 				GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 				InstancedFontRenderer.render(8, 8, texScale, texScale, true);
@@ -233,7 +239,9 @@ public class EaglerFontRenderer extends FontRenderer {
 		} else {
 			GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 			if (hasStrike) {
+				GlStateManager.disableTexture2D();
 				tessellator.draw();
+				GlStateManager.enableTexture2D();
 			}
 			InstancedFontRenderer.render(8, 8, texScale, texScale, false);
 		}

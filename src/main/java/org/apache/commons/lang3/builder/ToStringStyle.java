@@ -56,7 +56,7 @@ import org.apache.commons.lang3.StringUtils;
  * If you want to format the output of certain objects, such as dates, you must
  * create a subclass and override a method.
  * </p>
- * 
+ *
  * <pre>
  * public class MyStyle extends ToStringStyle {
  * 	protected void appendDetail(StringBuffer buffer, String fieldName, Object value) {
@@ -391,7 +391,7 @@ public abstract class ToStringStyle implements Serializable {
 			/*
 			 * if (fieldName == null) { throw new UnsupportedOperationException(
 			 * "Field names are mandatory when using JsonToStringStyle"); }
-			 * 
+			 *
 			 * super.appendFieldStart(buffer, FIELD_NAME_QUOTE +
 			 * StringEscapeUtils.escapeJson(fieldName) + FIELD_NAME_QUOTE);
 			 */
@@ -586,7 +586,7 @@ public abstract class ToStringStyle implements Serializable {
 		 * <p>
 		 * Ensure <code>Singleton</ode> after serialization.
 		 * </p>
-		 * 
+		 *
 		 * @return the singleton
 		 */
 		private Object readResolve() {
@@ -631,7 +631,7 @@ public abstract class ToStringStyle implements Serializable {
 		 * <p>
 		 * Ensure <code>Singleton</ode> after serialization.
 		 * </p>
-		 * 
+		 *
 		 * @return the singleton
 		 */
 		private Object readResolve() {

@@ -31,13 +31,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -49,7 +49,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityWitch extends EntityMob implements IRangedAttackMob {
 	private static final EaglercraftUUID MODIFIER_UUID = EaglercraftUUID
@@ -75,6 +75,7 @@ public class EntityWitch extends EntityMob implements IRangedAttackMob {
 		this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityPlayer.class, true));
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(26.0D);
@@ -84,6 +85,7 @@ public class EntityWitch extends EntityMob implements IRangedAttackMob {
 	/**
 	 * + Reduces damage, depending on potions
 	 */
+	@Override
 	protected float applyPotionDamageCalculations(DamageSource damagesource, float f) {
 		f = super.applyPotionDamageCalculations(damagesource, f);
 		if (damagesource.getEntity() == this) {
@@ -100,6 +102,7 @@ public class EntityWitch extends EntityMob implements IRangedAttackMob {
 	/**
 	 * + Attack the specified entity using a ranged attack.
 	 */
+	@Override
 	public void attackEntityWithRangedAttack(EntityLivingBase entitylivingbase, float var2) {
 		if (!this.getAggressive()) {
 			EntityPotion entitypotion = new EntityPotion(this.worldObj, this, 32732);
@@ -126,6 +129,7 @@ public class EntityWitch extends EntityMob implements IRangedAttackMob {
 	/**
 	 * + Drop 0-2 items of this living's type
 	 */
+	@Override
 	protected void dropFewItems(boolean var1, int i) {
 		int j = this.rand.nextInt(3) + 1;
 
@@ -143,6 +147,7 @@ public class EntityWitch extends EntityMob implements IRangedAttackMob {
 
 	}
 
+	@Override
 	protected void entityInit() {
 		super.entityInit();
 		this.getDataWatcher().addObject(21, Byte.valueOf((byte) 0));
@@ -158,10 +163,12 @@ public class EntityWitch extends EntityMob implements IRangedAttackMob {
 	/**
 	 * + Returns the sound this mob makes on death.
 	 */
+	@Override
 	protected String getDeathSound() {
 		return null;
 	}
 
+	@Override
 	public float getEyeHeight() {
 		return 1.62F;
 	}
@@ -169,6 +176,7 @@ public class EntityWitch extends EntityMob implements IRangedAttackMob {
 	/**
 	 * + Returns the sound this mob makes when it is hurt.
 	 */
+	@Override
 	protected String getHurtSound() {
 		return null;
 	}
@@ -176,10 +184,12 @@ public class EntityWitch extends EntityMob implements IRangedAttackMob {
 	/**
 	 * + Returns the sound this mob makes while it's alive.
 	 */
+	@Override
 	protected String getLivingSound() {
 		return null;
 	}
 
+	@Override
 	public void handleStatusUpdate(byte b0) {
 		if (b0 == 15) {
 			for (int i = 0; i < this.rand.nextInt(35) + 10; ++i) {
@@ -199,6 +209,7 @@ public class EntityWitch extends EntityMob implements IRangedAttackMob {
 	 * required. For example, zombies and skeletons use this to react to sunlight
 	 * and start to burn.
 	 */
+	@Override
 	public void onLivingUpdate() {
 		if (!this.worldObj.isRemote) {
 			if (this.getAggressive()) {

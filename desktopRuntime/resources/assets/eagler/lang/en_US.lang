@@ -412,7 +412,7 @@ eaglercraft.singleplayer.demo.create.create.tooltip=Play the Minecraft 1.8 demo 
 eaglercraft.singleplayer.demo.create.join=Join Shared World
 eaglercraft.singleplayer.demo.create.join.tooltip=Join someone else's world and play multiplayer
 
-eaglercraft.createWorld.seedNote=Note: Vanilla seeds now work!
+eaglercraft.createWorld.seedNote=Note: Vanilla seeds work
 
 eaglercraft.singleplayer.oldseedwarning.title=Old World Detected!
 eaglercraft.singleplayer.oldseedwarning.msg1=Please use EaglercraftX u32 or older to "Re-Create" this world
@@ -626,6 +626,29 @@ eaglercraft.options.recordingNote.text0=If the recorded video does not play,
 eaglercraft.options.recordingNote.text1=try opening the file in your browser
 
 eaglercraft.touch.interact.entity=Interact
+
+eaglercraft.options.badVideoSettingsDetected.title=Issues Detected
+eaglercraft.options.badVideoSettingsDetected.0=Some of your video settings may be causing
+eaglercraft.options.badVideoSettingsDetected.1=the game to lag excessively
+eaglercraft.options.badVideoSettingsDetected.vsync.0=VSync is disabled, some browsers require
+eaglercraft.options.badVideoSettingsDetected.vsync.1=VSync to be enabled to hint when the
+eaglercraft.options.badVideoSettingsDetected.vsync.2=framebuffer has updated. If the game feels
+eaglercraft.options.badVideoSettingsDetected.vsync.3=significantly slower than is indicated by
+eaglercraft.options.badVideoSettingsDetected.vsync.4=the FPS counter, you should enable VSync.
+eaglercraft.options.badVideoSettingsDetected.renderDistance.0=Render distance is %d chunks, most devices
+eaglercraft.options.badVideoSettingsDetected.renderDistance.1=lag when the render distance is greater
+eaglercraft.options.badVideoSettingsDetected.renderDistance.2=than 4 chunks
+eaglercraft.options.badVideoSettingsDetected.frameLimit.0=Framerate limit is set to %d
+eaglercraft.options.badVideoSettingsDetected.fixSettings=Fix Settings
+eaglercraft.options.badVideoSettingsDetected.continueAnyway=Continue Anyway
+eaglercraft.options.badVideoSettingsDetected.doNotShowAgain=Do Not Show Again
+
+eaglercraft.options.vsyncReEnabled.title=Issues Detected
+eaglercraft.options.vsyncReEnabled.0=You are using the WASM-GC client
+eaglercraft.options.vsyncReEnabled.1=VSync has been automatically re-enabled
+eaglercraft.options.vsyncReEnabled.2=Using the WASM-GC version of EaglercraftX without
+eaglercraft.options.vsyncReEnabled.3=VSync enabled causes bad input lag, sorry!
+eaglercraft.options.vsyncReEnabled.continue=Continue
 
 eaglercraft.addServer.hideAddr=Hide Addr
 eaglercraft.addServer.enableCookies=Cookies

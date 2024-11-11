@@ -26,13 +26,13 @@ import net.minecraft.world.biome.BiomeGenBase;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -44,7 +44,7 @@ import net.minecraft.world.biome.BiomeGenBase;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockBed extends BlockDirectional {
 	public static enum EnumPartType implements IStringSerializable {
@@ -56,10 +56,12 @@ public class BlockBed extends BlockDirectional {
 			this.name = name;
 		}
 
+		@Override
 		public String getName() {
 			return this.name;
 		}
 
+		@Override
 		public String toString() {
 			return this.name;
 		}
@@ -118,6 +120,7 @@ public class BlockBed extends BlockDirectional {
 		this.setBedBounds();
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { FACING, PART, OCCUPIED });
 	}
@@ -125,6 +128,7 @@ public class BlockBed extends BlockDirectional {
 	/**
 	 * + Spawns this Block's drops into the World as EntityItems.
 	 */
+	@Override
 	public void dropBlockAsItemWithChance(World world, BlockPos blockpos, IBlockState iblockstate, float f, int var5) {
 		if (iblockstate.getValue(PART) == BlockBed.EnumPartType.FOOT) {
 			super.dropBlockAsItemWithChance(world, blockpos, iblockstate, f, 0);
@@ -136,6 +140,7 @@ public class BlockBed extends BlockDirectional {
 	 * + Get the actual Block state of this Block at the given position. This
 	 * applies properties not visible in the metadata, such as fence connections.
 	 */
+	@Override
 	public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
 		if (state.getValue(PART) == BlockBed.EnumPartType.FOOT) {
 			IBlockState iblockstate = worldIn.getBlockState(pos.offset((EnumFacing) state.getValue(FACING)));
@@ -147,10 +152,12 @@ public class BlockBed extends BlockDirectional {
 		return state;
 	}
 
+	@Override
 	public EnumWorldBlockLayer getBlockLayer() {
 		return EnumWorldBlockLayer.CUTOUT;
 	}
 
+	@Override
 	public Item getItem(World var1, BlockPos var2) {
 		return Items.bed;
 	}
@@ -158,6 +165,7 @@ public class BlockBed extends BlockDirectional {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState iblockstate, EaglercraftRandom var2, int var3) {
 		return iblockstate.getValue(PART) == BlockBed.EnumPartType.HEAD ? null : Items.bed;
 	}
@@ -165,6 +173,7 @@ public class BlockBed extends BlockDirectional {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
 		i = i | ((EnumFacing) iblockstate.getValue(FACING)).getHorizontalIndex();
@@ -178,6 +187,7 @@ public class BlockBed extends BlockDirectional {
 		return i;
 	}
 
+	@Override
 	public int getMobilityFlag() {
 		return 1;
 	}
@@ -197,6 +207,7 @@ public class BlockBed extends BlockDirectional {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		EnumFacing enumfacing = EnumFacing.getHorizontal(i);
 		return (i & 8) > 0
@@ -206,6 +217,7 @@ public class BlockBed extends BlockDirectional {
 						enumfacing);
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -214,10 +226,12 @@ public class BlockBed extends BlockDirectional {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
 
+	@Override
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState iblockstate, EntityPlayer entityplayer,
 			EnumFacing var5, float var6, float var7, float var8) {
 		if (world.isRemote) {
@@ -289,6 +303,7 @@ public class BlockBed extends BlockDirectional {
 		}
 	}
 
+	@Override
 	public void onBlockHarvested(World worldIn, BlockPos pos, IBlockState state, EntityPlayer player) {
 		if (player.capabilities.isCreativeMode && state.getValue(PART) == BlockBed.EnumPartType.HEAD) {
 			BlockPos blockpos = pos.offset(((EnumFacing) state.getValue(FACING)).getOpposite());
@@ -302,6 +317,7 @@ public class BlockBed extends BlockDirectional {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block var4) {
 		EnumFacing enumfacing = (EnumFacing) iblockstate.getValue(FACING);
 		if (iblockstate.getValue(PART) == BlockBed.EnumPartType.HEAD) {
@@ -321,6 +337,7 @@ public class BlockBed extends BlockDirectional {
 		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.5625F, 1.0F);
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess var1, BlockPos var2) {
 		this.setBedBounds();
 	}

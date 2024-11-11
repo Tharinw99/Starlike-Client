@@ -256,7 +256,7 @@ public class StopWatch {
 	 * <p>
 	 * Constructor.
 	 * </p>
-	 * 
+	 *
 	 * @param message A message for string presentation.
 	 * @since 3.10
 	 */

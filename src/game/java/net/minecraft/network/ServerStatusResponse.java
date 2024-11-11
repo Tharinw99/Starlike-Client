@@ -13,13 +13,13 @@ import net.minecraft.util.IChatComponent;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -31,18 +31,20 @@ import net.minecraft.util.IChatComponent;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ServerStatusResponse {
 	public static class MinecraftProtocolVersionIdentifier {
 		public static class Serializer
 				implements JSONTypeCodec<ServerStatusResponse.MinecraftProtocolVersionIdentifier, JSONObject> {
+			@Override
 			public ServerStatusResponse.MinecraftProtocolVersionIdentifier deserialize(JSONObject jsonobject)
 					throws JSONException {
 				return new ServerStatusResponse.MinecraftProtocolVersionIdentifier(jsonobject.getString("name"),
 						jsonobject.getInt("protocol"));
 			}
 
+			@Override
 			public JSONObject serialize(
 					ServerStatusResponse.MinecraftProtocolVersionIdentifier serverstatusresponse$minecraftprotocolversionidentifier) {
 				JSONObject jsonobject = new JSONObject();
@@ -73,6 +75,7 @@ public class ServerStatusResponse {
 
 	public static class PlayerCountData {
 		public static class Serializer implements JSONTypeCodec<ServerStatusResponse.PlayerCountData, JSONObject> {
+			@Override
 			public ServerStatusResponse.PlayerCountData deserialize(JSONObject jsonobject) throws JSONException {
 				ServerStatusResponse.PlayerCountData serverstatusresponse$playercountdata = new ServerStatusResponse.PlayerCountData(
 						jsonobject.getInt("max"), jsonobject.getInt("online"));
@@ -95,6 +98,7 @@ public class ServerStatusResponse {
 				return serverstatusresponse$playercountdata;
 			}
 
+			@Override
 			public JSONObject serialize(ServerStatusResponse.PlayerCountData serverstatusresponse$playercountdata)
 					throws JSONException {
 				JSONObject jsonobject = new JSONObject();
@@ -147,6 +151,7 @@ public class ServerStatusResponse {
 	}
 
 	public static class Serializer implements JSONTypeCodec<ServerStatusResponse, JSONObject> {
+		@Override
 		public ServerStatusResponse deserialize(JSONObject jsonobject) throws JSONException {
 			ServerStatusResponse serverstatusresponse = new ServerStatusResponse();
 			if (jsonobject.has("description")) {
@@ -173,6 +178,7 @@ public class ServerStatusResponse {
 			return serverstatusresponse;
 		}
 
+		@Override
 		public JSONObject serialize(ServerStatusResponse serverstatusresponse) {
 			JSONObject jsonobject = new JSONObject();
 			if (serverstatusresponse.getServerDescription() != null) {

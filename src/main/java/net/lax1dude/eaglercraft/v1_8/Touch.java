@@ -5,7 +5,7 @@ import net.lax1dude.eaglercraft.v1_8.internal.PlatformInput;
 
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -17,7 +17,7 @@ import net.lax1dude.eaglercraft.v1_8.internal.PlatformInput;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class Touch {
 
@@ -65,14 +65,6 @@ public class Touch {
 		return PlatformInput.touchGetEventTouchRadiusMixed(pointId);
 	}
 
-	public static float getEventTouchRadiusX(int pointId) {
-		return PlatformInput.touchGetEventTouchRadiusX(pointId);
-	}
-
-	public static float getEventTouchRadiusY(int pointId) {
-		return PlatformInput.touchGetEventTouchRadiusY(pointId);
-	}
-
 	public static int getEventTouchX(int pointId) {
 		return PlatformInput.touchGetEventTouchX(pointId);
 	}
@@ -107,14 +99,6 @@ public class Touch {
 
 	public static float touchPointRadiusMixed(int pointId) {
 		return PlatformInput.touchRadiusMixed(pointId);
-	}
-
-	public static float touchPointRadiusX(int pointId) {
-		return PlatformInput.touchRadiusX(pointId);
-	}
-
-	public static float touchPointRadiusY(int pointId) {
-		return PlatformInput.touchRadiusY(pointId);
 	}
 
 	public static int touchPointUID(int pointId) {

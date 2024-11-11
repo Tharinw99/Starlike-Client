@@ -28,7 +28,7 @@ import com.google.common.math.IntMath;
 
 /**
  * Implementation of {@link Lists#cartesianProduct(List)}.
- * 
+ *
  * @author Louis Wasserman
  */
 @GwtCompatible

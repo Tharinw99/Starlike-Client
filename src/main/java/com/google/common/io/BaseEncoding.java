@@ -64,7 +64,7 @@ import com.google.common.io.GwtWorkarounds.CharOutput;
  *
  * <p>
  * returns the string {@code "MZXW6==="}, and
- * 
+ *
  * <pre>
  * {
  * 	&#64;code

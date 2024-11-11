@@ -27,7 +27,7 @@ import com.google.common.primitives.Longs;
 
 /**
  * A utility for performing a chained comparison statement. For example:
- * 
+ *
  * <pre>
  *    {@code
  *

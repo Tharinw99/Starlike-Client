@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "normal": {
-            "model": "starlike:head_chiseled_deepslate"
-        }
+  "variants": {
+    "normal": {
+      "model": "starlike:head_chiseled_deepslate"
     }
+  }
 }

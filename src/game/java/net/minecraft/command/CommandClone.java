@@ -16,18 +16,18 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
-import net.starlikeclient.StarlikeSettings;
+import net.starlikeclient.StarlikeClient;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -39,7 +39,7 @@ import net.starlikeclient.StarlikeSettings;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class CommandClone extends CommandBase {
 
@@ -58,6 +58,7 @@ public class CommandClone extends CommandBase {
 	/**
 	 * + Return a list of options when the user types TAB
 	 */
+	@Override
 	public List<String> addTabCompletionOptions(ICommandSender var1, String[] astring, BlockPos blockpos) {
 		return astring.length > 0
 				&& astring.length <= 3
@@ -82,6 +83,7 @@ public class CommandClone extends CommandBase {
 	/**
 	 * + Gets the name of the command
 	 */
+	@Override
 	public String getCommandName() {
 		return "clone";
 	}
@@ -89,6 +91,7 @@ public class CommandClone extends CommandBase {
 	/**
 	 * + Gets the usage string for the command.
 	 */
+	@Override
 	public String getCommandUsage(ICommandSender var1) {
 		return "commands.clone.usage";
 	}
@@ -96,6 +99,7 @@ public class CommandClone extends CommandBase {
 	/**
 	 * + Return the required permission level for this command.
 	 */
+	@Override
 	public int getRequiredPermissionLevel() {
 		return 2;
 	}
@@ -103,6 +107,7 @@ public class CommandClone extends CommandBase {
 	/**
 	 * + Callback when the command is invoked
 	 */
+	@Override
 	public void processCommand(ICommandSender parICommandSender, String[] parArrayOfString) throws CommandException {
 		if (parArrayOfString.length < 9) {
 			throw new WrongUsageException("commands.clone.usage", new Object[0]);
@@ -115,9 +120,9 @@ public class CommandClone extends CommandBase {
 			StructureBoundingBox structureboundingbox1 = new StructureBoundingBox(blockpos2,
 					blockpos2.add(structureboundingbox.func_175896_b()));
 			int i = structureboundingbox.getXSize() * structureboundingbox.getYSize() * structureboundingbox.getZSize();
-			if (i > StarlikeSettings.commandModificationBlockLimit) {
+			if (i > StarlikeClient.Config.Commands.commandModificationBlockLimit) {
 				throw new CommandException("commands.clone.tooManyBlocks", new Object[] { Integer.valueOf(i),
-						Integer.valueOf(StarlikeSettings.commandModificationBlockLimit) });
+						Integer.valueOf(StarlikeClient.Config.Commands.commandModificationBlockLimit) });
 			} else {
 				boolean flag = false;
 				Block block = null;

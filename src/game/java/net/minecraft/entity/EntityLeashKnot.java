@@ -15,13 +15,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,7 +33,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityLeashKnot extends EntityHanging {
 	public static EntityLeashKnot createKnot(World worldIn, BlockPos fence) {
@@ -76,18 +76,22 @@ public class EntityLeashKnot extends EntityHanging {
 				this.posZ - 0.1875D, this.posX + 0.1875D, this.posY + 0.25D + 0.125D, this.posZ + 0.1875D));
 	}
 
+	@Override
 	protected void entityInit() {
 		super.entityInit();
 	}
 
+	@Override
 	public float getEyeHeight() {
 		return -0.0625F;
 	}
 
+	@Override
 	public int getHeightPixels() {
 		return 9;
 	}
 
+	@Override
 	public int getWidthPixels() {
 		return 9;
 	}
@@ -95,6 +99,7 @@ public class EntityLeashKnot extends EntityHanging {
 	/**
 	 * + First layer of player interaction
 	 */
+	@Override
 	public boolean interactFirst(EntityPlayer entityplayer) {
 		ItemStack itemstack = entityplayer.getHeldItem();
 		boolean flag = false;
@@ -137,6 +142,7 @@ public class EntityLeashKnot extends EntityHanging {
 	 * and comparing it to its average edge length * 64 * renderDistanceWeight Args:
 	 * distance
 	 */
+	@Override
 	public boolean isInRangeToRenderDist(double d0) {
 		return d0 < 1024.0D;
 	}
@@ -144,12 +150,14 @@ public class EntityLeashKnot extends EntityHanging {
 	/**
 	 * + Called when this entity is broken. Entity parameter may be null.
 	 */
+	@Override
 	public void onBroken(Entity var1) {
 	}
 
 	/**
 	 * + checks to make sure painting can be placed there
 	 */
+	@Override
 	public boolean onValidSurface() {
 		return this.worldObj.getBlockState(this.hangingPosition).getBlock() instanceof BlockFence;
 	}
@@ -157,18 +165,21 @@ public class EntityLeashKnot extends EntityHanging {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound var1) {
 	}
 
 	/**
 	 * + Updates facing and bounding box based on it
 	 */
+	@Override
 	public void updateFacingWithBoundingBox(EnumFacing var1) {
 	}
 
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound var1) {
 	}
 
@@ -178,6 +189,7 @@ public class EntityLeashKnot extends EntityHanging {
 	 * on disk. Ridden entities return false here as they are saved with their
 	 * rider.
 	 */
+	@Override
 	public boolean writeToNBTOptional(NBTTagCompound var1) {
 		return false;
 	}

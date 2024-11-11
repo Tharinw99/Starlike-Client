@@ -105,7 +105,7 @@ public class SourceLWJGLOpenAL extends Source {
 	/**
 	 * Constructor: Creates a new streaming source that will be directly fed with
 	 * raw audio data.
-	 * 
+	 *
 	 * @param listenerPosition FloatBuffer containing the listener's 3D coordinates.
 	 * @param audioFormat      Format that the data will be in.
 	 * @param priority         Setting this to true will prevent other sounds from
@@ -130,7 +130,7 @@ public class SourceLWJGLOpenAL extends Source {
 
 	/**
 	 * Constructor: Creates a new source using the specified parameters.
-	 * 
+	 *
 	 * @param listenerPosition FloatBuffer containing the listener's 3D coordinates.
 	 * @param myBuffer         OpenAL IntBuffer sound-buffer identifier to use for a
 	 *                         new normal source.
@@ -169,7 +169,7 @@ public class SourceLWJGLOpenAL extends Source {
 
 	/**
 	 * Constructor: Creates a new source matching the specified source.
-	 * 
+	 *
 	 * @param listenerPosition FloatBuffer containing the listener's 3D coordinates.
 	 * @param myBuffer         OpenAL IntBuffer sound-buffer identifier to use for a
 	 *                         new normal source.
@@ -227,7 +227,7 @@ public class SourceLWJGLOpenAL extends Source {
 	/**
 	 * Changes the peripheral information about the source using the specified
 	 * parameters.
-	 * 
+	 *
 	 * @param listenerPosition FloatBuffer containing the listener's 3D coordinates.
 	 * @param myBuffer         OpenAL IntBuffer sound-buffer identifier to use for a
 	 *                         new normal source.
@@ -263,7 +263,7 @@ public class SourceLWJGLOpenAL extends Source {
 
 	/**
 	 * Checks for OpenAL errors, and prints a message if there is an error.
-	 * 
+	 *
 	 * @return True if there was an error, False if not.
 	 */
 	private boolean checkALError() {
@@ -316,7 +316,7 @@ public class SourceLWJGLOpenAL extends Source {
 	 * this source. This method has no effect on non-streaming sources. This method
 	 * is used internally by SoundSystem, and it is unlikely that the user will ever
 	 * need to use it.
-	 * 
+	 *
 	 * @return True if there was something in the queue.
 	 */
 	@Override
@@ -387,7 +387,7 @@ public class SourceLWJGLOpenAL extends Source {
 
 	/**
 	 * Plays the source on the specified channel.
-	 * 
+	 *
 	 * @param c Channel to play on.
 	 */
 	@Override
@@ -532,7 +532,7 @@ public class SourceLWJGLOpenAL extends Source {
 
 	/**
 	 * Queues up the initial stream-buffers for the stream.
-	 * 
+	 *
 	 * @return False if the end of the stream was reached.
 	 */
 	@Override
@@ -575,7 +575,7 @@ public class SourceLWJGLOpenAL extends Source {
 
 	/**
 	 * Sets this source's attenuation model.
-	 * 
+	 *
 	 * @param model Attenuation model to use.
 	 */
 	@Override
@@ -601,7 +601,7 @@ public class SourceLWJGLOpenAL extends Source {
 	/**
 	 * Sets this source's fade distance or rolloff factor, depending on the
 	 * attenuation model.
-	 * 
+	 *
 	 * @param dr New value for fade distance or rolloff factor.
 	 */
 	@Override
@@ -621,7 +621,7 @@ public class SourceLWJGLOpenAL extends Source {
 
 	/**
 	 * Sets whether this source should loop or only play once.
-	 * 
+	 *
 	 * @param lp True or false.
 	 */
 	@Override
@@ -641,7 +641,7 @@ public class SourceLWJGLOpenAL extends Source {
 
 	/**
 	 * Manually sets this source's pitch.
-	 * 
+	 *
 	 * @param value A float value ( 0.5f - 2.0f ).
 	 */
 	@Override
@@ -652,7 +652,7 @@ public class SourceLWJGLOpenAL extends Source {
 
 	/**
 	 * Moves the source to the specified position.
-	 * 
+	 *
 	 * @param x X coordinate to move to.
 	 * @param y Y coordinate to move to.
 	 * @param z Z coordinate to move to.
@@ -683,7 +683,7 @@ public class SourceLWJGLOpenAL extends Source {
 
 	/**
 	 * Sets this source's velocity, for use in Doppler effect.
-	 * 
+	 *
 	 * @param x Velocity along world x-axis.
 	 * @param y Velocity along world y-axis.
 	 * @param z Velocity along world z-axis.

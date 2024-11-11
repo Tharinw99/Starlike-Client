@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "normal": {
-            "model": "starlike:calcite_tiles"
-        }
+  "variants": {
+    "normal": {
+      "model": "starlike:calcite_tiles"
     }
+  }
 }

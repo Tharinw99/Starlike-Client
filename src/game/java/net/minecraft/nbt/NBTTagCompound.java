@@ -17,13 +17,13 @@ import net.minecraft.util.ReportedException;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -35,7 +35,7 @@ import net.minecraft.util.ReportedException;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class NBTTagCompound extends NBTBase {
 	private static String readKey(DataInput input, NBTSizeTracker sizeTracker) throws IOException {
@@ -75,6 +75,7 @@ public class NBTTagCompound extends NBTBase {
 	/**
 	 * + Creates a clone of the tag.
 	 */
+	@Override
 	public NBTBase copy() {
 		NBTTagCompound nbttagcompound = new NBTTagCompound();
 
@@ -92,11 +93,13 @@ public class NBTTagCompound extends NBTBase {
 		CrashReport crashreport = CrashReport.makeCrashReport(ex, "Reading NBT data");
 		CrashReportCategory crashreportcategory = crashreport.makeCategoryDepth("Corrupt NBT tag", 1);
 		crashreportcategory.addCrashSectionCallable("Tag type found", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return NBTBase.NBT_TYPES[((NBTBase) NBTTagCompound.this.tagMap.get(key)).getId()];
 			}
 		});
 		crashreportcategory.addCrashSectionCallable("Tag type expected", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return NBTBase.NBT_TYPES[expectedType];
 			}
@@ -105,6 +108,7 @@ public class NBTTagCompound extends NBTBase {
 		return crashreport;
 	}
 
+	@Override
 	public boolean equals(Object object) {
 		if (super.equals(object)) {
 			NBTTagCompound nbttagcompound = (NBTTagCompound) object;
@@ -185,6 +189,7 @@ public class NBTTagCompound extends NBTBase {
 	/**
 	 * + Gets the type byte for the tag.
 	 */
+	@Override
 	public byte getId() {
 		return (byte) 10;
 	}
@@ -229,6 +234,18 @@ public class NBTTagCompound extends NBTBase {
 			return !this.hasKey(key, 99) ? 0L : ((NBTBase.NBTPrimitive) this.tagMap.get(key)).getLong();
 		} catch (ClassCastException var3) {
 			return 0L;
+		}
+	}
+
+	/**
+	 * + Retrieves an long array using the specified key, or a zero-length array if
+	 * no such key was stored.
+	 */
+	public long[] getLongArray(String key) {
+		try {
+			return !this.hasKey(key, 12) ? new long[0] : ((NBTTagLongArray) this.tagMap.get(key)).getLongArray();
+		} catch (ClassCastException classcastexception) {
+			throw new ReportedException(this.createCrashReport(key, 12, classcastexception));
 		}
 	}
 
@@ -287,6 +304,7 @@ public class NBTTagCompound extends NBTBase {
 		}
 	}
 
+	@Override
 	public int hashCode() {
 		return super.hashCode() ^ this.tagMap.hashCode();
 	}
@@ -321,6 +339,7 @@ public class NBTTagCompound extends NBTBase {
 	/**
 	 * + Return whether this compound has no tags.
 	 */
+	@Override
 	public boolean hasNoTags() {
 		return this.tagMap.isEmpty();
 	}
@@ -347,6 +366,7 @@ public class NBTTagCompound extends NBTBase {
 
 	}
 
+	@Override
 	void read(DataInput parDataInput, int parInt1, NBTSizeTracker parNBTSizeTracker) throws IOException {
 		parNBTSizeTracker.read(384L);
 		if (parInt1 > 512) {
@@ -439,6 +459,14 @@ public class NBTTagCompound extends NBTBase {
 	}
 
 	/**
+	 * + Stores a new NBTTagLongArray with the given array as data into the map with
+	 * the given string key.
+	 */
+	public void setLongArray(String key, long[] value) {
+		this.tagMap.put(key, new NBTTagLongArray(value));
+	}
+
+	/**
 	 * + Stores a new NBTTagShort with the given short value into the map with the
 	 * given string key.
 	 */
@@ -462,6 +490,7 @@ public class NBTTagCompound extends NBTBase {
 		this.tagMap.put(key, value);
 	}
 
+	@Override
 	public String toString() {
 		StringBuilder stringbuilder = new StringBuilder("{");
 
@@ -480,6 +509,7 @@ public class NBTTagCompound extends NBTBase {
 	 * + Write the actual data contents of the tag, implemented in NBT extension
 	 * classes
 	 */
+	@Override
 	void write(DataOutput parDataOutput) throws IOException {
 		for (String s : this.tagMap.keySet()) {
 			NBTBase nbtbase = (NBTBase) this.tagMap.get(s);

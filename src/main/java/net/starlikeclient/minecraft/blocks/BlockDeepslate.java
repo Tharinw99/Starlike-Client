@@ -17,6 +17,7 @@ public class BlockDeepslate extends Block {
 		this.setCreativeTab(CreativeTabs.tabStarlike);
 	}
 
+	@Override
 	public Item getItemDropped(IBlockState iblockstate, EaglercraftRandom var2, int var3) {
 		return this == Blocks.deepslate ? Item.getItemFromBlock(Blocks.cobbled_deepslate) : Item.getItemFromBlock(this);
 	}

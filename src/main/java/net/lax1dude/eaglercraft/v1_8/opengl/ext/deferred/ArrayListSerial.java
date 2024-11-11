@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 /**
  * Copyright (c) 2023 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -16,7 +16,7 @@ import java.util.ArrayList;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ArrayListSerial<E> extends ArrayList<E> implements ListSerial<E> {
 
@@ -31,22 +31,27 @@ public class ArrayListSerial<E> extends ArrayList<E> implements ListSerial<E> {
 		super(initialSize);
 	}
 
+	@Override
 	public boolean eaglerCheck() {
 		return mark != getEaglerSerial();
 	}
 
+	@Override
 	public void eaglerIncrSerial() {
 		++modCountEagler;
 	}
 
+	@Override
 	public void eaglerResetCheck() {
 		mark = getEaglerSerial();
 	}
 
+	@Override
 	public int getEaglerSerial() {
 		return (modCount << 8) + modCountEagler;
 	}
 
+	@Override
 	public E set(int index, E element) {
 		++modCountEagler;
 		return super.set(index, element);

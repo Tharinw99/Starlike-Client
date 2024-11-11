@@ -10,40 +10,25 @@ import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 
 /**
  * Copyright (c) 2023-2024 lax1dude, ayunami2000. All Rights Reserved.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class FixWebMDurationJS {
 
-	private static final Logger logger = LogManager.getLogger("FixWebMDurationJS");
-
-	private static JSObject fixWebMDurationHandle = null;
-
-	@JSBody(params = {}, script = "return typeof window.ysFixWebmDuration !== \"undefined\"")
-	private static native boolean isOldScriptStillLoaded();
-
-	public static void checkOldScriptStillLoaded() {
-		if(isOldScriptStillLoaded()) {
-			logger.error("The \"fix-webm-duration.js\" script is no longer required for EaglercraftX 1.8 u20 and up, it can be safely removed from this page");
-		}
-	}
-
-	public static void getRecUrl(Event e, int duration, RecUrlHandler cb, LogMsgHandler logger) {
-		checkOldScriptStillLoaded();
-		if(fixWebMDurationHandle == null) {
-			fixWebMDurationHandle = register();
-		}
-		getRecUrlImpl(fixWebMDurationHandle, e, duration, cb, logger);
+	@JSFunctor
+	public static interface LogMsgHandler extends JSObject {
+		void onMsg(String url);
 	}
 
 	@JSFunctor
@@ -51,36 +36,55 @@ public class FixWebMDurationJS {
 		void onUrl(String url);
 	}
 
-	@JSFunctor
-	public static interface LogMsgHandler extends JSObject {
-		void onMsg(String url);
+	private static final Logger logger = LogManager.getLogger("FixWebMDurationJS");
+
+	private static JSObject fixWebMDurationHandle = null;
+
+	public static void checkOldScriptStillLoaded() {
+		if (isOldScriptStillLoaded()) {
+			logger.error(
+					"The \"fix-webm-duration.js\" script is no longer required for EaglercraftX 1.8 u20 and up, it can be safely removed from this page");
+		}
 	}
 
-	@JSBody(params = { "lib", "e", "duration", "cb", "lgg" }, script = "lib(e.data, duration, function(b) { cb(URL.createObjectURL(b)); }, { logger: lgg });")
-	private static native void getRecUrlImpl(JSObject lib, Event e, int duration, RecUrlHandler cb, LogMsgHandler logger);
+	public static void getRecUrl(Event e, int duration, RecUrlHandler cb, LogMsgHandler logger) {
+		checkOldScriptStillLoaded();
+		if (fixWebMDurationHandle == null) {
+			fixWebMDurationHandle = register();
+		}
+		getRecUrlImpl(fixWebMDurationHandle, e, duration, cb, logger);
+	}
+
+	@JSBody(params = { "lib", "e", "duration", "cb",
+			"lgg" }, script = "lib(e.data, duration, function(b) { cb(URL.createObjectURL(b)); }, { logger: lgg });")
+	private static native void getRecUrlImpl(JSObject lib, Event e, int duration, RecUrlHandler cb,
+			LogMsgHandler logger);
+
+	@JSBody(params = {}, script = "return typeof window.ysFixWebmDuration !== \"undefined\"")
+	private static native boolean isOldScriptStillLoaded();
 
 	/*
 	 * The MIT license (for fix-webm-duration)
-	 * 
+	 *
 	 * Copyright (c) 2018 Yury Sitnikov
-	 * 
+	 *
 	 * Permission is hereby granted, free of charge, to any person obtaining a copy
 	 * of this software and associated documentation files (the "Software"), to deal
 	 * in the Software without restriction, including without limitation the rights
 	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 	 * copies of the Software, and to permit persons to whom the Software is
 	 * furnished to do so, subject to the following conditions:
-	 * 
+	 *
 	 * The above copyright notice and this permission notice shall be included in
 	 * all copies or substantial portions of the Software.
-	 * 
+	 *
 	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-	 * THE SOFTWARE.
+	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+	 * SOFTWARE.
 	 */
 
 	@JSBody(params = {}, script = "var m=function(a,b){a.prototype=Object.create(b.prototype);a.prototype.constructor=a};var e=function(a,b){this.name=a||\"Unknown\";this.type=b||\"Unknown\"};var l=function(a,b){e.call(this,a,b||\"Uint\")};var k=function(a,b){e.call(this,a,b||\"Float\")};var h=function(a,b){e.call(this,a,b||\"Container\")};var n=function(a){h.call(this,\"File\",\"File\");"

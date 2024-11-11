@@ -1,5 +1,5 @@
 {
-    "variants": {
-        "normal": { "model": "starlike:smithing_table" }
-    }
+  "variants": {
+    "normal": { "model": "starlike:smithing_table" }
+  }
 }

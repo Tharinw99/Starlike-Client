@@ -11,13 +11,13 @@ import net.minecraft.util.MathHelper;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,7 +29,7 @@ import net.minecraft.util.MathHelper;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class SlotFurnaceOutput extends Slot {
 	private EntityPlayer thePlayer;
@@ -44,6 +44,7 @@ public class SlotFurnaceOutput extends Slot {
 	 * + Decrease the size of the stack in slot (first int arg) by the amount of the
 	 * second int arg. Returns the new stack.
 	 */
+	@Override
 	public ItemStack decrStackSize(int i) {
 		if (this.getHasStack()) {
 			this.field_75228_b += Math.min(i, this.getStack().stackSize);
@@ -56,6 +57,7 @@ public class SlotFurnaceOutput extends Slot {
 	 * + Check if the stack is a valid item for this slot. Always true beside for
 	 * the armor slots.
 	 */
+	@Override
 	public boolean isItemValid(ItemStack var1) {
 		return false;
 	}
@@ -65,6 +67,7 @@ public class SlotFurnaceOutput extends Slot {
 	 * ore and wood. Typically increases an internal count then calls
 	 * onCrafting(item).
 	 */
+	@Override
 	protected void onCrafting(ItemStack stack) {
 		stack.onCrafting(this.thePlayer.worldObj, this.thePlayer, this.field_75228_b);
 		if (!this.thePlayer.worldObj.isRemote) {
@@ -106,11 +109,13 @@ public class SlotFurnaceOutput extends Slot {
 	 * ore and wood. Typically increases an internal count then calls
 	 * onCrafting(item).
 	 */
+	@Override
 	protected void onCrafting(ItemStack stack, int amount) {
 		this.field_75228_b += amount;
 		this.onCrafting(stack);
 	}
 
+	@Override
 	public void onPickupFromSlot(EntityPlayer entityplayer, ItemStack itemstack) {
 		this.onCrafting(itemstack);
 		super.onPickupFromSlot(entityplayer, itemstack);

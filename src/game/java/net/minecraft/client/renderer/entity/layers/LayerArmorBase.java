@@ -31,13 +31,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -49,7 +49,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class LayerArmorBase<T extends ModelBase> implements LayerRenderer<EntityLivingBase> {
 	protected static final ResourceLocation ENCHANTED_ITEM_GLINT_RES = new ResourceLocation(
@@ -69,6 +69,7 @@ public abstract class LayerArmorBase<T extends ModelBase> implements LayerRender
 		this.initArmor();
 	}
 
+	@Override
 	public void doRenderLayer(EntityLivingBase entitylivingbaseIn, float partialTicks, float scale, float parFloat3,
 			float parFloat4, float parFloat5, float parFloat6, float parFloat7) {
 		this.renderLayer(entitylivingbaseIn, partialTicks, scale, parFloat3, parFloat4, parFloat5, parFloat6, parFloat7,
@@ -281,6 +282,7 @@ public abstract class LayerArmorBase<T extends ModelBase> implements LayerRender
 		}
 	}
 
+	@Override
 	public boolean shouldCombineTextures() {
 		return false;
 	}

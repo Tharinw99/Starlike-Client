@@ -13,13 +13,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -31,7 +31,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class BlockLog extends BlockRotatedPillar {
 	public static enum EnumAxis implements IStringSerializable {
@@ -56,10 +56,12 @@ public abstract class BlockLog extends BlockRotatedPillar {
 			this.name = name;
 		}
 
+		@Override
 		public String getName() {
 			return this.name;
 		}
 
+		@Override
 		public String toString() {
 			return this.name;
 		}
@@ -74,10 +76,13 @@ public abstract class BlockLog extends BlockRotatedPillar {
 	public BlockLog() {
 		super(Material.wood);
 		this.setCreativeTab(CreativeTabs.tabBlock);
-		this.setHardness(2.0F);
+		this.setHardness(5F);
+		this.setResistance(5F);
 		this.setStepSound(soundTypeWood);
+
 	}
 
+	@Override
 	public void breakBlock(World world, BlockPos blockpos, IBlockState var3) {
 		byte b0 = 4;
 		int i = b0 + 1;
@@ -98,6 +103,7 @@ public abstract class BlockLog extends BlockRotatedPillar {
 	 * + Called by ItemBlocks just before a block is actually set in the world, to
 	 * allow for adjustments to the IBlockstate
 	 */
+	@Override
 	public IBlockState onBlockPlaced(World world, BlockPos blockpos, EnumFacing enumfacing, float f, float f1, float f2,
 			int i, EntityLivingBase entitylivingbase) {
 		return super.onBlockPlaced(world, blockpos, enumfacing, f, f1, f2, i, entitylivingbase).withProperty(LOG_AXIS,

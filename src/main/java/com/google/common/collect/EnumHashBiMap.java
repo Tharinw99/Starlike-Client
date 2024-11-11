@@ -35,7 +35,7 @@ import com.google.common.annotations.GwtIncompatible;
  * a {@code HashMap} instance for values-to-keys. Null keys are not permitted,
  * but null values are. An {@code EnumHashBiMap} and its inverse are both
  * serializable.
- * 
+ *
  * <p>
  * See the Guava User Guide article on <a href=
  * "http://code.google.com/p/guava-libraries/wiki/NewCollectionTypesExplained#BiMap">

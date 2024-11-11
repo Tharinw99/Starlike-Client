@@ -5,13 +5,13 @@ import net.minecraft.entity.EntityLiving;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -23,7 +23,7 @@ import net.minecraft.entity.EntityLiving;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityAIOpenDoor extends EntityAIDoorInteract {
 	boolean closeDoor;
@@ -38,6 +38,7 @@ public class EntityAIOpenDoor extends EntityAIDoorInteract {
 	/**
 	 * + Returns whether an in-progress EntityAIBase should continue executing
 	 */
+	@Override
 	public boolean continueExecuting() {
 		return this.closeDoor && this.closeDoorTemporisation > 0 && super.continueExecuting();
 	}
@@ -45,6 +46,7 @@ public class EntityAIOpenDoor extends EntityAIDoorInteract {
 	/**
 	 * + Resets the task
 	 */
+	@Override
 	public void resetTask() {
 		if (this.closeDoor) {
 			this.doorBlock.toggleDoor(this.theEntity.worldObj, this.doorPosition, false);
@@ -55,6 +57,7 @@ public class EntityAIOpenDoor extends EntityAIDoorInteract {
 	/**
 	 * + Execute a one shot task or start executing a continuous task
 	 */
+	@Override
 	public void startExecuting() {
 		this.closeDoorTemporisation = 20;
 		this.doorBlock.toggleDoor(this.theEntity.worldObj, this.doorPosition, true);
@@ -63,6 +66,7 @@ public class EntityAIOpenDoor extends EntityAIDoorInteract {
 	/**
 	 * + Updates the task
 	 */
+	@Override
 	public void updateTask() {
 		--this.closeDoorTemporisation;
 		super.updateTask();

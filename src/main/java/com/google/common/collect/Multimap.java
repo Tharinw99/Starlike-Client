@@ -58,7 +58,7 @@ import com.google.common.annotations.GwtCompatible;
  *
  * <p>
  * The following code:
- * 
+ *
  * <pre>
  * {
  * 	&#64;code
@@ -75,7 +75,7 @@ import com.google.common.annotations.GwtCompatible;
  * </pre>
  *
  * ... produces output such as:
- * 
+ *
  * <pre>
  *    {@code
  *
@@ -161,7 +161,7 @@ import com.google.common.annotations.GwtCompatible;
  * multimaps.
  *
  * <h3>Other Notes</h3>
- * 
+ *
  * <p>
  * As with {@code Map}, the behavior of a {@code Multimap} is not specified if
  * key objects already present in the multimap change in a manner that affects
@@ -333,16 +333,16 @@ public interface Multimap<K, V> {
 	 * Stores a key-value pair in this multimap for each of {@code values}, all
 	 * using the same key, {@code key}. Equivalent to (but expected to be more
 	 * efficient than):
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
-	 * 
+	 *
 	 * for (V value : values) {
 	 * 	put(key, value);
 	 * }
 	 * }
 	 * </pre>
-	 * 
+	 *
 	 * <p>
 	 * In particular, this is a no-op if {@code values} is empty.
 	 *
@@ -369,7 +369,7 @@ public interface Multimap<K, V> {
 
 	/**
 	 * Removes all values associated with the key {@code key}.
-	 * 
+	 *
 	 * <p>
 	 * Once this method returns, {@code key} will not be mapped to any values, so it
 	 * will not appear in {@link #keySet()}, {@link #asMap()}, or any other views.
@@ -383,7 +383,7 @@ public interface Multimap<K, V> {
 	/**
 	 * Stores a collection of values with the same key, replacing any existing
 	 * values for that key.
-	 * 
+	 *
 	 * <p>
 	 * If {@code values} is empty, this is equivalent to {@link #removeAll(Object)
 	 * removeAll(key)}.

@@ -20,13 +20,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,7 +38,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class EntityFireball extends Entity {
 	private int xTile = -1;
@@ -96,6 +96,7 @@ public abstract class EntityFireball extends Entity {
 	/**
 	 * + Called when the entity is attacked.
 	 */
+	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float var2) {
 		if (this.isEntityInvulnerable(damagesource)) {
 			return false;
@@ -127,28 +128,34 @@ public abstract class EntityFireball extends Entity {
 	 * + Returns true if other Entities should be prevented from moving through this
 	 * Entity.
 	 */
+	@Override
 	public boolean canBeCollidedWith() {
 		return true;
 	}
 
+	@Override
 	protected void entityInit() {
 	}
 
 	/**
 	 * + Gets how bright this entity is.
 	 */
+	@Override
 	public float getBrightness(float var1) {
 		return 1.0F;
 	}
 
+	@Override
 	public int getBrightnessForRender(float var1) {
 		return 15728880;
 	}
 
+	@Override
 	public float getCollisionBorderSize() {
 		return 1.0F;
 	}
 
+	@Override
 	protected float getEaglerDynamicLightsValueSimple(float partialTicks) {
 		return 1.0f;
 	}
@@ -166,6 +173,7 @@ public abstract class EntityFireball extends Entity {
 	 * and comparing it to its average edge length * 64 * renderDistanceWeight Args:
 	 * distance
 	 */
+	@Override
 	public boolean isInRangeToRenderDist(double d0) {
 		double d1 = this.getEntityBoundingBox().getAverageEdgeLength() * 4.0D;
 		if (Double.isNaN(d1)) {
@@ -181,6 +189,7 @@ public abstract class EntityFireball extends Entity {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		if (this.worldObj.isRemote || (this.shootingEntity == null || !this.shootingEntity.isDead)
 				&& this.worldObj.isBlockLoaded(new BlockPos(this))) {
@@ -304,6 +313,7 @@ public abstract class EntityFireball extends Entity {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		this.xTile = nbttagcompound.getShort("xTile");
 		this.yTile = nbttagcompound.getShort("yTile");
@@ -329,6 +339,7 @@ public abstract class EntityFireball extends Entity {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		nbttagcompound.setShort("xTile", (short) this.xTile);
 		nbttagcompound.setShort("yTile", (short) this.yTile);

@@ -15,13 +15,13 @@ import net.minecraft.util.IStringSerializable;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,7 +33,7 @@ import net.minecraft.util.IStringSerializable;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockStoneBrick extends Block {
 	public static enum EnumType implements IStringSerializable {
@@ -73,6 +73,7 @@ public class BlockStoneBrick extends Block {
 			return this.meta;
 		}
 
+		@Override
 		public String getName() {
 			return this.name;
 		}
@@ -81,6 +82,7 @@ public class BlockStoneBrick extends Block {
 			return this.unlocalizedName;
 		}
 
+		@Override
 		public String toString() {
 			return this.name;
 		}
@@ -103,6 +105,7 @@ public class BlockStoneBrick extends Block {
 		this.setCreativeTab(CreativeTabs.tabBlock);
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { VARIANT });
 	}
@@ -112,6 +115,7 @@ public class BlockStoneBrick extends Block {
 	 * when the block gets destroyed. It returns the metadata of the dropped item
 	 * based on the old metadata of the block.
 	 */
+	@Override
 	public int damageDropped(IBlockState iblockstate) {
 		return ((BlockStoneBrick.EnumType) iblockstate.getValue(VARIANT)).getMetadata();
 	}
@@ -119,6 +123,7 @@ public class BlockStoneBrick extends Block {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		return ((BlockStoneBrick.EnumType) iblockstate.getValue(VARIANT)).getMetadata();
 	}
@@ -126,6 +131,7 @@ public class BlockStoneBrick extends Block {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(VARIANT, BlockStoneBrick.EnumType.byMetadata(i));
 	}
@@ -134,6 +140,7 @@ public class BlockStoneBrick extends Block {
 	 * + returns a list of blocks with the same ID, but different meta (eg: wood
 	 * returns 4 blocks)
 	 */
+	@Override
 	public void getSubBlocks(Item item, CreativeTabs var2, List<ItemStack> list) {
 		BlockStoneBrick.EnumType[] types = BlockStoneBrick.EnumType.META_LOOKUP;
 		for (int i = 0; i < types.length; ++i) {

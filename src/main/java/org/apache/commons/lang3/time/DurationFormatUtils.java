@@ -76,7 +76,7 @@ import org.apache.commons.lang3.Validate;
  * repeated to ensure that the field occupies a certain minimum size. Values
  * will be left-padded with 0 unless padding is disabled in the method
  * invocation.
- * 
+ *
  * @since 2.1
  */
 public class DurationFormatUtils {

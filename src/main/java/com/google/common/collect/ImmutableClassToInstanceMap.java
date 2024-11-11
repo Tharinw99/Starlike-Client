@@ -37,7 +37,7 @@ public final class ImmutableClassToInstanceMap<B> extends ForwardingMap<Class<? 
 
 	/**
 	 * A builder for creating immutable class-to-instance maps. Example:
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 * 	&#64;code

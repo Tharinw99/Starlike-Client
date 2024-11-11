@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "normal": {
-            "model": "starlike:oxidized_chiseled_copper"
-        }
+  "variants": {
+    "normal": {
+      "model": "starlike:oxidized_chiseled_copper"
     }
+  }
 }

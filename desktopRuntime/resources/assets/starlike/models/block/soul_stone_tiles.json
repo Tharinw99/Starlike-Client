@@ -1,6 +1,6 @@
 {
-    "parent": "block/cube_all",
-    "textures": {
-        "all": "starlike:blocks/soul_stone_tiles"
-    }
+  "parent": "block/cube_all",
+  "textures": {
+    "all": "starlike:blocks/soul_stone_tiles"
+  }
 }

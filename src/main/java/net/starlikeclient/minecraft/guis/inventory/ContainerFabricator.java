@@ -48,10 +48,11 @@ public class ContainerFabricator extends Container {
 		this.onCraftMatrixChanged(this.craftMatrix);
 	}
 
+	@Override
 	public boolean canInteractWith(EntityPlayer entityplayer) {
 		return this.worldObj.getBlockState(this.pos).getBlock() != Blocks.fabricator ? false
-				: entityplayer.getDistanceSq((double) this.pos.getX() + 0.5D, (double) this.pos.getY() + 0.5D,
-						(double) this.pos.getZ() + 0.5D) <= 64.0D;
+				: entityplayer.getDistanceSq(this.pos.getX() + 0.5D, this.pos.getY() + 0.5D,
+						this.pos.getZ() + 0.5D) <= 64.0D;
 	}
 
 	/**
@@ -59,6 +60,7 @@ public class ContainerFabricator extends Container {
 	 * (double-click) code. The stack passed in is null for the initial slot that
 	 * was double-clicked.
 	 */
+	@Override
 	public boolean canMergeSlot(ItemStack itemstack, Slot slot) {
 		return slot.inventory != this.craftResult && super.canMergeSlot(itemstack, slot);
 	}
@@ -66,6 +68,7 @@ public class ContainerFabricator extends Container {
 	/**
 	 * + Called when the container is closed.
 	 */
+	@Override
 	public void onContainerClosed(EntityPlayer entityplayer) {
 		super.onContainerClosed(entityplayer);
 		if (!this.worldObj.isRemote) {
@@ -81,6 +84,7 @@ public class ContainerFabricator extends Container {
 	/**
 	 * + Callback for when the crafting matrix is changed.
 	 */
+	@Override
 	public void onCraftMatrixChanged(IInventory var1) {
 		this.craftResult.setInventorySlotContents(0,
 				FabricatorManager.getInstance().findMatchingRecipe(this.craftMatrix, this.worldObj));
@@ -89,9 +93,10 @@ public class ContainerFabricator extends Container {
 	/**
 	 * + Take a stack from the specified inventory slot.
 	 */
+	@Override
 	public ItemStack transferStackInSlot(EntityPlayer entityplayer, int i) {
 		ItemStack itemstack = null;
-		Slot slot = (Slot) this.inventorySlots.get(i);
+		Slot slot = this.inventorySlots.get(i);
 		if (slot != null && slot.getHasStack()) {
 			ItemStack itemstack1 = slot.getStack();
 			itemstack = itemstack1.copy();

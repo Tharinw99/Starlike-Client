@@ -1,6 +1,15 @@
 package com.jcraft.jorbis;
 
 class Util {
+	static int icount(int v) {
+		int ret = 0;
+		while (v != 0) {
+			ret += (v & 1);
+			v >>>= 1;
+		}
+		return (ret);
+	}
+
 	static int ilog(int v) {
 		int ret = 0;
 		while (v != 0) {
@@ -14,15 +23,6 @@ class Util {
 		int ret = 0;
 		while (v > 1) {
 			ret++;
-			v >>>= 1;
-		}
-		return (ret);
-	}
-
-	static int icount(int v) {
-		int ret = 0;
-		while (v != 0) {
-			ret += (v & 1);
 			v >>>= 1;
 		}
 		return (ret);

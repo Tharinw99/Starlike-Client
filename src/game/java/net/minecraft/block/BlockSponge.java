@@ -26,13 +26,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -44,7 +44,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockSponge extends Block {
 	public static final PropertyBool WET = PropertyBool.create("wet");
@@ -92,6 +92,7 @@ public class BlockSponge extends Block {
 		return i > 0;
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { WET });
 	}
@@ -101,6 +102,7 @@ public class BlockSponge extends Block {
 	 * when the block gets destroyed. It returns the metadata of the dropped item
 	 * based on the old metadata of the block.
 	 */
+	@Override
 	public int damageDropped(IBlockState iblockstate) {
 		return ((Boolean) iblockstate.getValue(WET)).booleanValue() ? 1 : 0;
 	}
@@ -108,6 +110,7 @@ public class BlockSponge extends Block {
 	/**
 	 * + Gets the localized name of this block. Used for the statistics page.
 	 */
+	@Override
 	public String getLocalizedName() {
 		return StatCollector.translateToLocal(this.getUnlocalizedName() + ".dry.name");
 	}
@@ -115,6 +118,7 @@ public class BlockSponge extends Block {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		return ((Boolean) iblockstate.getValue(WET)).booleanValue() ? 1 : 0;
 	}
@@ -122,6 +126,7 @@ public class BlockSponge extends Block {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(WET, Boolean.valueOf((i & 1) == 1));
 	}
@@ -130,11 +135,13 @@ public class BlockSponge extends Block {
 	 * + returns a list of blocks with the same ID, but different meta (eg: wood
 	 * returns 4 blocks)
 	 */
+	@Override
 	public void getSubBlocks(Item item, CreativeTabs var2, List<ItemStack> list) {
 		list.add(new ItemStack(item, 1, 0));
 		list.add(new ItemStack(item, 1, 1));
 	}
 
+	@Override
 	public void onBlockAdded(World world, BlockPos blockpos, IBlockState iblockstate) {
 		this.tryAbsorb(world, blockpos, iblockstate);
 	}
@@ -142,11 +149,13 @@ public class BlockSponge extends Block {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block block) {
 		this.tryAbsorb(world, blockpos, iblockstate);
 		super.onNeighborBlockChange(world, blockpos, iblockstate, block);
 	}
 
+	@Override
 	public void randomDisplayTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom random) {
 		if (((Boolean) iblockstate.getValue(WET)).booleanValue()) {
 			EnumFacing enumfacing = EnumFacing.random(random);

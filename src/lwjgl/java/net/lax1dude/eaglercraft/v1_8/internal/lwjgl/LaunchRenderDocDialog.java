@@ -22,7 +22,7 @@ import javax.swing.border.EmptyBorder;
 
 /**
  * Copyright (c) 2022 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -34,7 +34,7 @@ import javax.swing.border.EmptyBorder;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class LaunchRenderDocDialog extends JDialog {
 
@@ -85,6 +85,7 @@ public class LaunchRenderDocDialog extends JDialog {
 				okButton.setPreferredSize(new Dimension(60, 20));
 				okButton.setMargin(new Insets(0, 0, 0, 0));
 				okButton.addActionListener(new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						LaunchRenderDocDialog.this.setVisible(false);
 					}
@@ -98,6 +99,7 @@ public class LaunchRenderDocDialog extends JDialog {
 				cancelButton.setPreferredSize(new Dimension(60, 20));
 				cancelButton.setMargin(new Insets(0, 0, 0, 0));
 				cancelButton.addActionListener(new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						System.exit(0);
 					}

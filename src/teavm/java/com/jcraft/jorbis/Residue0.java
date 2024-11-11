@@ -1,24 +1,24 @@
 /* -*-mode:java; c-basic-offset:2; indent-tabs-mode:nil -*- */
 /* JOrbis
  * Copyright (C) 2000 ymnk, JCraft,Inc.
- *  
+ *
  * Written by: 2000 ymnk<ymnk@jcraft.com>
- *   
- * Many thanks to 
- *   Monty <monty@xiph.org> and 
+ *
+ * Many thanks to
+ *   Monty <monty@xiph.org> and
  *   The XIPHOPHORUS Company http://www.xiph.org/ .
  * JOrbis has been based on their awesome works, Vorbis codec.
- *   
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public License
  * as published by the Free Software Foundation; either version 2 of
  * the License, or (at your option) any later version.
-   
+
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -26,135 +26,49 @@
 
 package com.jcraft.jorbis;
 
-import com.jcraft.jogg.*;
+import com.jcraft.jogg.Buffer;
 
 class Residue0 extends FuncResidue {
-	void pack(Object vr, Buffer opb) {
-		InfoResidue0 info = (InfoResidue0) vr;
-		int acc = 0;
-		opb.write(info.begin, 24);
-		opb.write(info.end, 24);
+	class InfoResidue0 {
+		// block-partitioned VQ coded straight residue
+		int begin;
+		int end;
 
-		opb.write(info.grouping - 1, 24); /*
-											 * residue vectors to group and code with a partitioned book
-											 */
-		opb.write(info.partitions - 1, 6); /* possible partition choices */
-		opb.write(info.groupbook, 8); /* group huffman book */
+		// first stage (lossless partitioning)
+		int grouping; // group n vectors per partition
+		int partitions; // possible codebooks for a partition
+		int groupbook; // huffbook for partitioning
+		int[] secondstages = new int[64]; // expanded out to pointers in lookup
+		int[] booklist = new int[256]; // list of second stage books
 
-		/*
-		 * secondstages is a bitmask; as encoding progresses pass by pass, a bitmask of
-		 * one indicates this partition class has bits to write this pass
-		 */
-		for (int j = 0; j < info.partitions; j++) {
-			int i = info.secondstages[j];
-			if (Util.ilog(i) > 3) {
-				/* yes, this is a minor hack due to not thinking ahead */
-				opb.write(i, 3);
-				opb.write(1, 1);
-				opb.write(i >>> 3, 5);
-			} else {
-				opb.write(i, 4); /* trailing zero */
-			}
-			acc += Util.icount(i);
-		}
-		for (int j = 0; j < acc; j++) {
-			opb.write(info.booklist[j], 8);
-		}
+		// encode-only heuristic settings
+		float[] entmax = new float[64]; // book entropy threshholds
+		float[] ampmax = new float[64]; // book amp threshholds
+		int[] subgrp = new int[64]; // book heuristic subgroup size
+		int[] blimit = new int[64]; // subgroup position limits
 	}
 
-	Object unpack(Info vi, Buffer opb) {
-		int acc = 0;
-		InfoResidue0 info = new InfoResidue0();
-		info.begin = opb.read(24);
-		info.end = opb.read(24);
-		info.grouping = opb.read(24) + 1;
-		info.partitions = opb.read(6) + 1;
-		info.groupbook = opb.read(8);
+	class LookResidue0 {
+		InfoResidue0 info;
+		int map;
 
-		for (int j = 0; j < info.partitions; j++) {
-			int cascade = opb.read(3);
-			if (opb.read(1) != 0) {
-				cascade |= (opb.read(5) << 3);
-			}
-			info.secondstages[j] = cascade;
-			acc += Util.icount(cascade);
-		}
+		int parts;
+		int stages;
+		CodeBook[] fullbooks;
+		CodeBook phrasebook;
+		int[][] partbooks;
 
-		for (int j = 0; j < acc; j++) {
-			info.booklist[j] = opb.read(8);
-		}
+		int partvals;
+		int[][] decodemap;
 
-		if (info.groupbook >= vi.books) {
-			free_info(info);
-			return (null);
-		}
-
-		for (int j = 0; j < acc; j++) {
-			if (info.booklist[j] >= vi.books) {
-				free_info(info);
-				return (null);
-			}
-		}
-		return (info);
-	}
-
-	Object look(DspState vd, InfoMode vm, Object vr) {
-		InfoResidue0 info = (InfoResidue0) vr;
-		LookResidue0 look = new LookResidue0();
-		int acc = 0;
-		int dim;
-		int maxstage = 0;
-		look.info = info;
-		look.map = vm.mapping;
-
-		look.parts = info.partitions;
-		look.fullbooks = vd.fullbooks;
-		look.phrasebook = vd.fullbooks[info.groupbook];
-
-		dim = look.phrasebook.dim;
-
-		look.partbooks = new int[look.parts][];
-
-		for (int j = 0; j < look.parts; j++) {
-			int i = info.secondstages[j];
-			int stages = Util.ilog(i);
-			if (stages != 0) {
-				if (stages > maxstage)
-					maxstage = stages;
-				look.partbooks[j] = new int[stages];
-				for (int k = 0; k < stages; k++) {
-					if ((i & (1 << k)) != 0) {
-						look.partbooks[j][k] = info.booklist[acc++];
-					}
-				}
-			}
-		}
-
-		look.partvals = (int) Math.rint(Math.pow(look.parts, dim));
-		look.stages = maxstage;
-		look.decodemap = new int[look.partvals][];
-		for (int j = 0; j < look.partvals; j++) {
-			int val = j;
-			int mult = look.partvals / look.parts;
-			look.decodemap[j] = new int[dim];
-
-			for (int k = 0; k < dim; k++) {
-				int deco = val / mult;
-				val -= deco * mult;
-				mult /= look.parts;
-				look.decodemap[j][k] = deco;
-			}
-		}
-		return (look);
-	}
-
-	void free_info(Object i) {
-	}
-
-	void free_look(Object i) {
+		int postbits;
+		int phrasebits;
+		int frames;
 	}
 
 	private static int[][][] _01inverse_partword = new int[2][][]; // _01inverse is synchronized for
+
+	static int[][] _2inverse_partword = null;
 
 	// re-using partword
 	synchronized static int _01inverse(Block vb, Object vl, float[][] in, int ch, int decodepart) {
@@ -223,8 +137,6 @@ class Residue0 extends FuncResidue {
 		return (0);
 	}
 
-	static int[][] _2inverse_partword = null;
-
 	synchronized static int _2inverse(Block vb, Object vl, float[][] in, int ch) {
 		int i, k, l, s;
 		LookResidue0 look = (LookResidue0) vl;
@@ -273,6 +185,15 @@ class Residue0 extends FuncResidue {
 		return (0);
 	}
 
+	@Override
+	void free_info(Object i) {
+	}
+
+	@Override
+	void free_look(Object i) {
+	}
+
+	@Override
 	int inverse(Block vb, Object vl, float[][] in, int[] nonzero, int ch) {
 		int used = 0;
 		for (int i = 0; i < ch; i++) {
@@ -286,41 +207,126 @@ class Residue0 extends FuncResidue {
 			return (0);
 	}
 
-	class LookResidue0 {
-		InfoResidue0 info;
-		int map;
+	@Override
+	Object look(DspState vd, InfoMode vm, Object vr) {
+		InfoResidue0 info = (InfoResidue0) vr;
+		LookResidue0 look = new LookResidue0();
+		int acc = 0;
+		int dim;
+		int maxstage = 0;
+		look.info = info;
+		look.map = vm.mapping;
 
-		int parts;
-		int stages;
-		CodeBook[] fullbooks;
-		CodeBook phrasebook;
-		int[][] partbooks;
+		look.parts = info.partitions;
+		look.fullbooks = vd.fullbooks;
+		look.phrasebook = vd.fullbooks[info.groupbook];
 
-		int partvals;
-		int[][] decodemap;
+		dim = look.phrasebook.dim;
 
-		int postbits;
-		int phrasebits;
-		int frames;
+		look.partbooks = new int[look.parts][];
+
+		for (int j = 0; j < look.parts; j++) {
+			int i = info.secondstages[j];
+			int stages = Util.ilog(i);
+			if (stages != 0) {
+				if (stages > maxstage)
+					maxstage = stages;
+				look.partbooks[j] = new int[stages];
+				for (int k = 0; k < stages; k++) {
+					if ((i & (1 << k)) != 0) {
+						look.partbooks[j][k] = info.booklist[acc++];
+					}
+				}
+			}
+		}
+
+		look.partvals = (int) Math.rint(Math.pow(look.parts, dim));
+		look.stages = maxstage;
+		look.decodemap = new int[look.partvals][];
+		for (int j = 0; j < look.partvals; j++) {
+			int val = j;
+			int mult = look.partvals / look.parts;
+			look.decodemap[j] = new int[dim];
+
+			for (int k = 0; k < dim; k++) {
+				int deco = val / mult;
+				val -= deco * mult;
+				mult /= look.parts;
+				look.decodemap[j][k] = deco;
+			}
+		}
+		return (look);
 	}
 
-	class InfoResidue0 {
-		// block-partitioned VQ coded straight residue
-		int begin;
-		int end;
+	@Override
+	void pack(Object vr, Buffer opb) {
+		InfoResidue0 info = (InfoResidue0) vr;
+		int acc = 0;
+		opb.write(info.begin, 24);
+		opb.write(info.end, 24);
 
-		// first stage (lossless partitioning)
-		int grouping; // group n vectors per partition
-		int partitions; // possible codebooks for a partition
-		int groupbook; // huffbook for partitioning
-		int[] secondstages = new int[64]; // expanded out to pointers in lookup
-		int[] booklist = new int[256]; // list of second stage books
+		opb.write(info.grouping - 1, 24); /*
+											 * residue vectors to group and code with a partitioned book
+											 */
+		opb.write(info.partitions - 1, 6); /* possible partition choices */
+		opb.write(info.groupbook, 8); /* group huffman book */
 
-		// encode-only heuristic settings
-		float[] entmax = new float[64]; // book entropy threshholds
-		float[] ampmax = new float[64]; // book amp threshholds
-		int[] subgrp = new int[64]; // book heuristic subgroup size
-		int[] blimit = new int[64]; // subgroup position limits
+		/*
+		 * secondstages is a bitmask; as encoding progresses pass by pass, a bitmask of
+		 * one indicates this partition class has bits to write this pass
+		 */
+		for (int j = 0; j < info.partitions; j++) {
+			int i = info.secondstages[j];
+			if (Util.ilog(i) > 3) {
+				/* yes, this is a minor hack due to not thinking ahead */
+				opb.write(i, 3);
+				opb.write(1, 1);
+				opb.write(i >>> 3, 5);
+			} else {
+				opb.write(i, 4); /* trailing zero */
+			}
+			acc += Util.icount(i);
+		}
+		for (int j = 0; j < acc; j++) {
+			opb.write(info.booklist[j], 8);
+		}
+	}
+
+	@Override
+	Object unpack(Info vi, Buffer opb) {
+		int acc = 0;
+		InfoResidue0 info = new InfoResidue0();
+		info.begin = opb.read(24);
+		info.end = opb.read(24);
+		info.grouping = opb.read(24) + 1;
+		info.partitions = opb.read(6) + 1;
+		info.groupbook = opb.read(8);
+
+		for (int j = 0; j < info.partitions; j++) {
+			int cascade = opb.read(3);
+			if (opb.read(1) != 0) {
+				cascade |= (opb.read(5) << 3);
+			}
+			info.secondstages[j] = cascade;
+			acc += Util.icount(cascade);
+		}
+
+		for (int j = 0; j < acc; j++) {
+			info.booklist[j] = opb.read(8);
+		}
+
+		if (info.groupbook >= vi.books) {
+			free_info(info);
+			return (null);
+		}
+
+		for (int j = 0; j < acc; j++) {
+			if (info.booklist[j] >= vi.books) {
+				free_info(info);
+				return (null);
+			}
+		}
+		return (info);
 	}
 
 }

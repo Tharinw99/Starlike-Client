@@ -64,7 +64,7 @@ public abstract class ImmutableSortedMap<K, V> extends ImmutableSortedMapFauxver
 	/**
 	 * A builder for creating immutable sorted map instances, especially {@code
 	 * public static final} maps ("constant maps"). Example:
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 * 	&#64;code

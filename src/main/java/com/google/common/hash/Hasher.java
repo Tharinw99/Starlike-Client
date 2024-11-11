@@ -41,7 +41,7 @@ import com.google.common.annotations.Beta;
  * inserted, and the order in which they were inserted, not how those bytes were
  * chunked into discrete put() operations. For example, the following three
  * expressions all generate colliding hash codes:
- * 
+ *
  * <pre>
  *    {@code
  *

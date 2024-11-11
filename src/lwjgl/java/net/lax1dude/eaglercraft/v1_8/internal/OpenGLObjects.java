@@ -2,7 +2,7 @@ package net.lax1dude.eaglercraft.v1_8.internal;
 
 /**
  * Copyright (c) 2022-2023 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -14,7 +14,7 @@ package net.lax1dude.eaglercraft.v1_8.internal;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 class OpenGLObjects {
 
@@ -31,6 +31,7 @@ class OpenGLObjects {
 			PlatformOpenGL._wglDeleteVertexArrays(this);
 		}
 
+		@Override
 		public int hashCode() {
 			return ptr;
 		}
@@ -50,6 +51,7 @@ class OpenGLObjects {
 			PlatformOpenGL._wglDeleteBuffers(this);
 		}
 
+		@Override
 		public int hashCode() {
 			return ptr;
 		}
@@ -69,6 +71,7 @@ class OpenGLObjects {
 			PlatformOpenGL._wglDeleteFramebuffer(this);
 		}
 
+		@Override
 		public int hashCode() {
 			return ptr;
 		}
@@ -88,6 +91,7 @@ class OpenGLObjects {
 			PlatformOpenGL._wglDeleteProgram(this);
 		}
 
+		@Override
 		public int hashCode() {
 			return ptr;
 		}
@@ -107,6 +111,7 @@ class OpenGLObjects {
 			PlatformOpenGL._wglDeleteQueries(this);
 		}
 
+		@Override
 		public int hashCode() {
 			return ptr;
 		}
@@ -126,6 +131,7 @@ class OpenGLObjects {
 			PlatformOpenGL._wglDeleteRenderbuffer(this);
 		}
 
+		@Override
 		public int hashCode() {
 			return ptr;
 		}
@@ -145,6 +151,7 @@ class OpenGLObjects {
 			PlatformOpenGL._wglDeleteShader(this);
 		}
 
+		@Override
 		public int hashCode() {
 			return ptr;
 		}
@@ -164,6 +171,7 @@ class OpenGLObjects {
 			PlatformOpenGL._wglDeleteTextures(this);
 		}
 
+		@Override
 		public int hashCode() {
 			return ptr;
 		}
@@ -182,6 +190,7 @@ class OpenGLObjects {
 		public void free() {
 		}
 
+		@Override
 		public int hashCode() {
 			return ptr;
 		}

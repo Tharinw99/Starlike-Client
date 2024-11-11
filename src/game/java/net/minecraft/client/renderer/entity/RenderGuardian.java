@@ -22,13 +22,13 @@ import net.minecraft.util.Vec3;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -40,7 +40,7 @@ import net.minecraft.util.Vec3;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class RenderGuardian extends RenderLiving<EntityGuardian> {
 	private static final ResourceLocation GUARDIAN_TEXTURE = new ResourceLocation("textures/entity/guardian.png");
@@ -63,6 +63,7 @@ public class RenderGuardian extends RenderLiving<EntityGuardian> {
 	 * func_76986_a(T entity, double d, double d1, double d2, float f, float f1).
 	 * But JAD is pre 1.5 so doe
 	 */
+	@Override
 	public void doRender(EntityGuardian entityguardian, double d0, double d1, double d2, float f, float f1) {
 		if (this.field_177115_a != ((ModelGuardian) this.mainModel).func_178706_a()) {
 			this.mainModel = new ModelGuardian();
@@ -165,6 +166,7 @@ public class RenderGuardian extends RenderLiving<EntityGuardian> {
 	 * + Returns the location of an entity's texture. Doesn't seem to be called
 	 * unless you call Render.bindEntityTexture.
 	 */
+	@Override
 	protected ResourceLocation getEntityTexture(EntityGuardian entityguardian) {
 		return entityguardian.isElder() ? GUARDIAN_ELDER_TEXTURE : GUARDIAN_TEXTURE;
 	}
@@ -173,6 +175,7 @@ public class RenderGuardian extends RenderLiving<EntityGuardian> {
 	 * + Allows the render to do any OpenGL state modifications necessary before the
 	 * model is rendered. Args: entityLiving, partialTickTime
 	 */
+	@Override
 	protected void preRenderCallback(EntityGuardian entityguardian, float var2) {
 		if (entityguardian.isElder()) {
 			GlStateManager.scale(2.35F, 2.35F, 2.35F);
@@ -180,6 +183,7 @@ public class RenderGuardian extends RenderLiving<EntityGuardian> {
 
 	}
 
+	@Override
 	public boolean shouldRender(EntityGuardian entityguardian, ICamera icamera, double d0, double d1, double d2) {
 		if (super.shouldRender(entityguardian, icamera, d0, d1, d2)) {
 			return true;

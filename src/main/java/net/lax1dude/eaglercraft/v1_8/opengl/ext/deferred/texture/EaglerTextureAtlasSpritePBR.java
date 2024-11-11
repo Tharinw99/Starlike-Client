@@ -24,7 +24,7 @@ import net.minecraft.util.ResourceLocation;
 
 /**
  * Copyright (c) 2023 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -36,7 +36,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EaglerTextureAtlasSpritePBR extends EaglerTextureAtlasSprite {
 
@@ -60,6 +60,7 @@ public class EaglerTextureAtlasSpritePBR extends EaglerTextureAtlasSprite {
 		super(spriteName);
 	}
 
+	@Override
 	protected void allocateFrameTextureData(int index) {
 		for (int j = 0; j < 3; ++j) {
 			if (this.frameTextureDataPBR[j].size() <= index) {
@@ -70,6 +71,7 @@ public class EaglerTextureAtlasSpritePBR extends EaglerTextureAtlasSprite {
 		}
 	}
 
+	@Override
 	public void bakeAnimationCache() {
 		if (animationMetadata != null) {
 			for (int i = 0; i < 3; ++i) {
@@ -86,6 +88,7 @@ public class EaglerTextureAtlasSpritePBR extends EaglerTextureAtlasSprite {
 		}
 	}
 
+	@Override
 	public void clearFramesTextureData() {
 		for (int i = 0; i < 3; ++i) {
 			this.frameTextureDataPBR[i].clear();
@@ -96,6 +99,7 @@ public class EaglerTextureAtlasSpritePBR extends EaglerTextureAtlasSprite {
 		}
 	}
 
+	@Override
 	public void generateMipmaps(int level) {
 		List[] arraylist = new List[] { Lists.newArrayList(), Lists.newArrayList(), Lists.newArrayList() };
 
@@ -116,6 +120,7 @@ public class EaglerTextureAtlasSpritePBR extends EaglerTextureAtlasSprite {
 						crashreportcategory.addCrashSection("PBR Layer", Integer.valueOf(j));
 						crashreportcategory.addCrashSection("Frame index", Integer.valueOf(i));
 						crashreportcategory.addCrashSectionCallable("Frame sizes", new Callable<String>() {
+							@Override
 							public String call() throws Exception {
 								StringBuilder stringbuilder = new StringBuilder();
 
@@ -141,6 +146,7 @@ public class EaglerTextureAtlasSpritePBR extends EaglerTextureAtlasSprite {
 		this.bakeAnimationCache();
 	}
 
+	@Override
 	public int getFrameCount() {
 		return frameTextureDataPBR[0].size();
 	}
@@ -150,10 +156,12 @@ public class EaglerTextureAtlasSpritePBR extends EaglerTextureAtlasSprite {
 				frameTextureDataPBR[2].get(index) };
 	}
 
+	@Override
 	public int[][] getFrameTextureData(int index) {
 		return frameTextureDataPBR[0].get(index);
 	}
 
+	@Override
 	public void loadSprite(ImageData[] images, AnimationMetadataSection meta) throws IOException {
 		Throwable t = new UnsupportedOperationException(
 				"Cannot call regular loadSprite in PBR mode, use loadSpritePBR");
@@ -164,6 +172,7 @@ public class EaglerTextureAtlasSpritePBR extends EaglerTextureAtlasSprite {
 		}
 	}
 
+	@Override
 	public void loadSpritePBR(ImageData[][] imageDatas, AnimationMetadataSection meta, boolean dontAnimateNormals,
 			boolean dontAnimateMaterial) {
 		this.resetSprite();
@@ -244,6 +253,7 @@ public class EaglerTextureAtlasSpritePBR extends EaglerTextureAtlasSprite {
 		}
 	}
 
+	@Override
 	protected void resetSprite() {
 		this.animationMetadata = null;
 		this.setFramesTextureDataPBR(new List[] { Lists.newArrayList(), Lists.newArrayList(), Lists.newArrayList() });
@@ -257,6 +267,7 @@ public class EaglerTextureAtlasSpritePBR extends EaglerTextureAtlasSprite {
 		}
 	}
 
+	@Override
 	public void setFramesTextureData(List<int[][]> newFramesTextureData) {
 		Throwable t = new UnsupportedOperationException(
 				"Cannot call regular setFramesTextureData in PBR mode, use setFramesTextureDataPBR");
@@ -271,6 +282,7 @@ public class EaglerTextureAtlasSpritePBR extends EaglerTextureAtlasSprite {
 		frameTextureDataPBR = newFramesTextureData;
 	}
 
+	@Override
 	public String toString() {
 		return "EaglerTextureAtlasSpritePBR{name=\'" + this.iconName + '\'' + ", frameCount="
 				+ this.framesTextureData.size() + ", rotated=" + this.rotated + ", x=" + this.originX + ", y="
@@ -278,6 +290,7 @@ public class EaglerTextureAtlasSpritePBR extends EaglerTextureAtlasSprite {
 				+ this.maxU + ", v0=" + this.minV + ", v1=" + this.maxV + '}';
 	}
 
+	@Override
 	public void updateAnimation(IFramebufferGL[] fb) {
 		Throwable t = new UnsupportedOperationException(
 				"Cannot call regular updateAnimation in PBR mode, use updateAnimationPBR");
@@ -288,6 +301,7 @@ public class EaglerTextureAtlasSpritePBR extends EaglerTextureAtlasSprite {
 		}
 	}
 
+	@Override
 	public void updateAnimationPBR(IFramebufferGL[] copyColorFramebuffer, IFramebufferGL[] copyMaterialFramebuffer,
 			int materialTexOffset) {
 		if (animationCachePBR[0] == null || (!dontAnimateNormals && animationCachePBR[1] == null)

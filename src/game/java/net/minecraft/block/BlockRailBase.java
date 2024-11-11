@@ -22,13 +22,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -40,7 +40,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class BlockRailBase extends Block {
 	public static enum EnumRailDirection implements IStringSerializable {
@@ -79,6 +79,7 @@ public abstract class BlockRailBase extends Block {
 			return this.meta;
 		}
 
+		@Override
 		public String getName() {
 			return this.name;
 		}
@@ -88,6 +89,7 @@ public abstract class BlockRailBase extends Block {
 					|| this == ASCENDING_WEST;
 		}
 
+		@Override
 		public String toString() {
 			return this.name;
 		}
@@ -451,6 +453,7 @@ public abstract class BlockRailBase extends Block {
 		this.setCreativeTab(CreativeTabs.tabTransport);
 	}
 
+	@Override
 	public void breakBlock(World world, BlockPos blockpos, IBlockState iblockstate) {
 		super.breakBlock(world, blockpos, iblockstate);
 		if (((BlockRailBase.EnumRailDirection) iblockstate.getValue(this.getShapeProperty())).isAscending()) {
@@ -464,6 +467,7 @@ public abstract class BlockRailBase extends Block {
 
 	}
 
+	@Override
 	public boolean canPlaceBlockAt(World world, BlockPos blockpos) {
 		return World.doesBlockHaveSolidTopSurface(world, blockpos.down());
 	}
@@ -472,6 +476,7 @@ public abstract class BlockRailBase extends Block {
 	 * + Ray traces through the blocks collision from start vector to end vector
 	 * returning a ray trace hit.
 	 */
+	@Override
 	public MovingObjectPosition collisionRayTrace(World worldIn, BlockPos pos, Vec3 start, Vec3 end) {
 		this.setBlockBoundsBasedOnState(worldIn, pos);
 		return super.collisionRayTrace(worldIn, pos, start, end);
@@ -484,20 +489,24 @@ public abstract class BlockRailBase extends Block {
 						.func_180364_a(worldIn.isBlockPowered(parBlockPos), parFlag).getBlockState();
 	}
 
+	@Override
 	public EnumWorldBlockLayer getBlockLayer() {
 		return EnumWorldBlockLayer.CUTOUT;
 	}
 
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox(World var1, BlockPos var2, IBlockState var3) {
 		return null;
 	}
 
+	@Override
 	public int getMobilityFlag() {
 		return 0;
 	}
 
 	public abstract IProperty<BlockRailBase.EnumRailDirection> getShapeProperty();
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -506,10 +515,12 @@ public abstract class BlockRailBase extends Block {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
 
+	@Override
 	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
 		if (!worldIn.isRemote) {
 			state = this.func_176564_a(worldIn, pos, state, true);
@@ -522,6 +533,7 @@ public abstract class BlockRailBase extends Block {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block block) {
 		if (!world.isRemote) {
 			BlockRailBase.EnumRailDirection blockrailbase$enumraildirection = (BlockRailBase.EnumRailDirection) iblockstate
@@ -557,6 +569,7 @@ public abstract class BlockRailBase extends Block {
 	protected void onNeighborChangedInternal(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock) {
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
 		IBlockState iblockstate = iblockaccess.getBlockState(blockpos);
 		BlockRailBase.EnumRailDirection blockrailbase$enumraildirection = iblockstate.getBlock() == this

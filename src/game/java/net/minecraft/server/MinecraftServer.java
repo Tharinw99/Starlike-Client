@@ -39,7 +39,6 @@ import net.minecraft.util.ReportedException;
 import net.minecraft.util.Util;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.EnumDifficulty;
-import net.minecraft.world.MinecraftException;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldManager;
 import net.minecraft.world.WorldServer;
@@ -53,13 +52,13 @@ import net.minecraft.world.storage.WorldInfo;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -71,7 +70,7 @@ import net.minecraft.world.storage.WorldInfo;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class MinecraftServer implements Runnable, ICommandSender, IThreadListener {
 	private static final Logger logger = LogManager.getLogger();
@@ -152,6 +151,7 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
 	/**
 	 * + Send a chat message to the CommandSender
 	 */
+	@Override
 	public void addChatMessage(IChatComponent ichatcomponent) {
 		logger.info(ichatcomponent.getUnformattedText());
 	}
@@ -161,12 +161,14 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
 	 */
 	public CrashReport addServerInfoToCrashReport(CrashReport crashreport) {
 		crashreport.getCategory().addCrashSectionCallable("Profiler Position", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return "N/A (disabled)";
 			}
 		});
 		if (this.serverConfigManager != null) {
 			crashreport.getCategory().addCrashSectionCallable("Player Count", new Callable<String>() {
+				@Override
 				public String call() {
 					return MinecraftServer.this.serverConfigManager.getCurrentPlayerCount() + " / "
 							+ MinecraftServer.this.serverConfigManager.getMaxPlayers() + "; "
@@ -186,6 +188,7 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
 	 * + Returns {@code true} if the CommandSender is allowed to execute the
 	 * command, {@code false} if not
 	 */
+	@Override
 	public boolean canCommandSenderUseCommand(int var1, String var2) {
 		return true;
 	}
@@ -267,6 +270,7 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
 	/**
 	 * + Returns the entity associated with the command sender. MAY BE NULL!
 	 */
+	@Override
 	public Entity getCommandSenderEntity() {
 		return null;
 	}
@@ -288,6 +292,7 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
 	 * + Get the formatted ChatComponent that will be used for the sender's username
 	 * in chat
 	 */
+	@Override
 	public IChatComponent getDisplayName() {
 		return new ChatComponentText(this.getName());
 	}
@@ -310,6 +315,7 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
 	 * + Get the world, if available. <b>{@code null} is not allowed!</b> If you are
 	 * not an entity in the world, return the overworld
 	 */
+	@Override
 	public World getEntityWorld() {
 		return this.worldServers[0];
 	}
@@ -365,6 +371,7 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
 	 * + Gets the name of this command sender (usually username, but possibly
 	 * "Rcon")
 	 */
+	@Override
 	public String getName() {
 		return "Server";
 	}
@@ -387,6 +394,7 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
 	 * + Get the position in the world. <b>{@code null} is not allowed!</b> If you
 	 * are not an entity in the world, return the coordinates 0, 0, 0
 	 */
+	@Override
 	public BlockPos getPosition() {
 		return BlockPos.ORIGIN;
 	}
@@ -395,6 +403,7 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
 	 * + Get the position vector. <b>{@code null} is not allowed!</b> If you are not
 	 * an entity in the world, return 0.0D, 0.0D, 0.0D
 	 */
+	@Override
 	public Vec3 getPositionVector() {
 		return new Vec3(0.0D, 0.0D, 0.0D);
 	}
@@ -642,6 +651,7 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
 		this.nanoTimeSinceStatusRefresh = 0L;
 	}
 
+	@Override
 	public void run() {
 		try {
 			if (this.startServer()) {
@@ -720,11 +730,7 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
 								+ worldserver.provider.getDimensionName());
 					}
 
-					try {
-						worldserver.saveAllChunks(true, (IProgressUpdate) null);
-					} catch (MinecraftException minecraftexception) {
-						logger.warn(minecraftexception.getMessage());
-					}
+					worldserver.saveAllChunks(true, (IProgressUpdate) null);
 				}
 			}
 
@@ -735,6 +741,7 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
 	 * + Returns true if the command sender should be sent feedback about executed
 	 * commands
 	 */
+	@Override
 	public boolean sendCommandFeedback() {
 		/**
 		 * + Gets mcServer.
@@ -766,6 +773,7 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
 		this.canSpawnNPCs = spawnNpcs;
 	}
 
+	@Override
 	public void setCommandStat(CommandResultStats.Type var1, int var2) {
 	}
 

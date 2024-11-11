@@ -21,13 +21,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -39,7 +39,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class SimpleReloadableResourceManager implements IReloadableResourceManager {
 	private static final Logger logger = LogManager.getLogger();
@@ -58,6 +58,7 @@ public class SimpleReloadableResourceManager implements IReloadableResourceManag
 		this.setResourceDomains.clear();
 	}
 
+	@Override
 	public List<IResource> getAllResources(ResourceLocation parResourceLocation) throws IOException {
 		IResourceManager iresourcemanager = (IResourceManager) this.domainResourceManagers
 				.get(parResourceLocation.getResourceDomain());
@@ -68,6 +69,7 @@ public class SimpleReloadableResourceManager implements IReloadableResourceManag
 		}
 	}
 
+	@Override
 	public IResource getResource(ResourceLocation parResourceLocation) throws IOException {
 		IResourceManager iresourcemanager = (IResourceManager) this.domainResourceManagers
 				.get(parResourceLocation.getResourceDomain());
@@ -78,6 +80,7 @@ public class SimpleReloadableResourceManager implements IReloadableResourceManag
 		}
 	}
 
+	@Override
 	public Set<String> getResourceDomains() {
 		return this.setResourceDomains;
 	}
@@ -89,6 +92,7 @@ public class SimpleReloadableResourceManager implements IReloadableResourceManag
 
 	}
 
+	@Override
 	public void registerReloadListener(IResourceManagerReloadListener iresourcemanagerreloadlistener) {
 		this.reloadListeners.add(iresourcemanagerreloadlistener);
 		iresourcemanagerreloadlistener.onResourceManagerReload(this);
@@ -109,10 +113,12 @@ public class SimpleReloadableResourceManager implements IReloadableResourceManag
 
 	}
 
+	@Override
 	public void reloadResources(List<IResourcePack> list) {
 		this.clearResources();
 		logger.info("Reloading ResourceManager: "
 				+ joinerResourcePacks.join(Iterables.transform(list, new Function<IResourcePack, String>() {
+					@Override
 					public String apply(IResourcePack iresourcepack1) {
 						return iresourcepack1.getPackName();
 					}

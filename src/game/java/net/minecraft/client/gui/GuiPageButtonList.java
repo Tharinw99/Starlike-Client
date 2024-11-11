@@ -15,13 +15,13 @@ import net.minecraft.util.IntHashMap;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,7 +33,7 @@ import net.minecraft.util.IntHashMap;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiPageButtonList extends GuiListExtended {
 	public static class EditBoxEntry extends GuiPageButtonList.GuiListEntry {
@@ -82,6 +82,7 @@ public class GuiPageButtonList extends GuiListExtended {
 			this.field_178030_c = parGui2;
 		}
 
+		@Override
 		public void drawEntry(int var1, int var2, int i, int var4, int var5, int j, int k, boolean var8) {
 			this.func_178017_a(this.field_178029_b, i, j, k, false);
 			this.func_178017_a(this.field_178030_c, i, j, k, false);
@@ -176,6 +177,7 @@ public class GuiPageButtonList extends GuiListExtended {
 
 		}
 
+		@Override
 		public boolean mousePressed(int var1, int i, int j, int k, int var5, int var6) {
 			if (k != 0 && k != 12345)
 				return false;
@@ -187,6 +189,7 @@ public class GuiPageButtonList extends GuiListExtended {
 			return flag || flag1;
 		}
 
+		@Override
 		public void mouseReleased(int var1, int i, int j, int k, int var5, int var6) {
 			if (k != 0 && k != 12345)
 				return;
@@ -197,6 +200,7 @@ public class GuiPageButtonList extends GuiListExtended {
 				this.func_178016_b(this.field_178030_c, i, j, k);
 		}
 
+		@Override
 		public void setSelected(int var1, int var2, int i) {
 			this.func_178017_a(this.field_178029_b, i, 0, 0, true);
 			this.func_178017_a(this.field_178030_c, i, 0, 0, true);
@@ -551,6 +555,7 @@ public class GuiPageButtonList extends GuiListExtended {
 	/**
 	 * + Gets the IGuiListEntry object for the given index
 	 */
+	@Override
 	public GuiPageButtonList.GuiEntry getListEntry(int i) {
 		return (GuiPageButtonList.GuiEntry) this.field_178074_u.get(i);
 	}
@@ -558,14 +563,17 @@ public class GuiPageButtonList extends GuiListExtended {
 	/**
 	 * + Gets the width of the list
 	 */
+	@Override
 	public int getListWidth() {
 		return 400;
 	}
 
+	@Override
 	protected int getScrollBarX() {
 		return super.getScrollBarX() + 32;
 	}
 
+	@Override
 	public int getSize() {
 		return this.field_178074_u.size();
 	}
@@ -579,6 +587,7 @@ public class GuiPageButtonList extends GuiListExtended {
 		return false;
 	}
 
+	@Override
 	public boolean mouseClicked(int i, int j, int k) {
 		boolean flag = super.mouseClicked(i, j, k);
 		int l = this.getSlotIndexFromScreenCoords(i, j);

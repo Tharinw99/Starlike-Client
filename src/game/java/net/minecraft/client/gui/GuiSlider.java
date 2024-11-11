@@ -7,13 +7,13 @@ import net.minecraft.client.resources.I18n;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -25,7 +25,7 @@ import net.minecraft.client.resources.I18n;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiSlider extends GuiButton {
 	public interface FormatHelper {
@@ -85,10 +85,12 @@ public class GuiSlider extends GuiButton {
 	 * + Returns 0 if the button is disabled, 1 if the mouse is NOT hovering over
 	 * this button and 2 if it IS hovering over this button.
 	 */
+	@Override
 	protected int getHoverState(boolean var1) {
 		return 0;
 	}
 
+	@Override
 	public boolean isSliderTouchEvents() {
 		return true;
 	}
@@ -97,6 +99,7 @@ public class GuiSlider extends GuiButton {
 	 * + Fired when the mouse button is dragged. Equivalent of
 	 * MouseListener.mouseDragged(MouseEvent e).
 	 */
+	@Override
 	protected void mouseDragged(Minecraft var1, int i, int var3) {
 		if (this.visible) {
 			if (this.isMouseDown) {
@@ -125,6 +128,7 @@ public class GuiSlider extends GuiButton {
 	 * + Returns true if the mouse has been pressed on this control. Equivalent of
 	 * MouseListener.mousePressed(MouseEvent e).
 	 */
+	@Override
 	public boolean mousePressed(Minecraft minecraft, int i, int j) {
 		if (super.mousePressed(minecraft, i, j)) {
 			this.sliderPosition = (float) (i - (this.xPosition + 4)) / (float) (this.width - 8);
@@ -149,6 +153,7 @@ public class GuiSlider extends GuiButton {
 	 * + Fired when the mouse button is released. Equivalent of
 	 * MouseListener.mouseReleased(MouseEvent e).
 	 */
+	@Override
 	public void mouseReleased(int var1, int var2) {
 		this.isMouseDown = false;
 	}

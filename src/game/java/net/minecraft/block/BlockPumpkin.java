@@ -24,13 +24,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -42,10 +42,11 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockPumpkin extends BlockDirectional {
 	private static final Predicate<IBlockState> field_181085_Q = new Predicate<IBlockState>() {
+		@Override
 		public boolean apply(IBlockState iblockstate) {
 			return iblockstate != null
 					&& (iblockstate.getBlock() == Blocks.pumpkin || iblockstate.getBlock() == Blocks.lit_pumpkin);
@@ -68,11 +69,13 @@ public class BlockPumpkin extends BlockDirectional {
 				|| this.getGolemBasePattern().match(worldIn, pos) != null;
 	}
 
+	@Override
 	public boolean canPlaceBlockAt(World world, BlockPos blockpos) {
 		return world.getBlockState(blockpos).getBlock().blockMaterial.isReplaceable()
 				&& World.doesBlockHaveSolidTopSurface(world, blockpos.down());
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { FACING });
 	}
@@ -101,6 +104,7 @@ public class BlockPumpkin extends BlockDirectional {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		return ((EnumFacing) iblockstate.getValue(FACING)).getHorizontalIndex();
 	}
@@ -127,10 +131,12 @@ public class BlockPumpkin extends BlockDirectional {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(FACING, EnumFacing.getHorizontal(i));
 	}
 
+	@Override
 	public void onBlockAdded(World world, BlockPos blockpos, IBlockState iblockstate) {
 		super.onBlockAdded(world, blockpos, iblockstate);
 		this.trySpawnGolem(world, blockpos);
@@ -140,6 +146,7 @@ public class BlockPumpkin extends BlockDirectional {
 	 * + Called by ItemBlocks just before a block is actually set in the world, to
 	 * allow for adjustments to the IBlockstate
 	 */
+	@Override
 	public IBlockState onBlockPlaced(World var1, BlockPos var2, EnumFacing var3, float var4, float var5, float var6,
 			int var7, EntityLivingBase entitylivingbase) {
 		return this.getDefaultState().withProperty(FACING, entitylivingbase.getHorizontalFacing().getOpposite());

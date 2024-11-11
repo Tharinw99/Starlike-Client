@@ -24,11 +24,11 @@ import com.google.common.annotations.GwtCompatible;
 
 /**
  * Basic implementation of a {@link SortedSetMultimap} with a sorted key set.
- * 
+ *
  * This superclass allows {@code TreeMultimap} to override methods to return
  * navigable set and map types in non-GWT only, while GWT code will inherit the
  * SortedMap/SortedSet overrides.
- * 
+ *
  * @author Louis Wasserman
  */
 @GwtCompatible

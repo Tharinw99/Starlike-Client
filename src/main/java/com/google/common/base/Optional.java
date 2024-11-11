@@ -205,7 +205,7 @@ public abstract class Optional<T> implements Serializable {
 	 * overly restrictive. However, the ideal signature,
 	 * {@code public <S super T> S or(S)}, is not legal Java. As a result, some
 	 * sensible operations involving subtypes are compile errors:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *
@@ -225,7 +225,7 @@ public abstract class Optional<T> implements Serializable {
 	 * to {@code
 	 * Optional<Number>} (where {@code Number} is the desired output type) solves
 	 * the problem:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *

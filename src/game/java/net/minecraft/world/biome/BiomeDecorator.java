@@ -26,13 +26,13 @@ import net.minecraft.world.gen.feature.WorldGenerator;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -44,102 +44,102 @@ import net.minecraft.world.gen.feature.WorldGenerator;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BiomeDecorator {
 
-	protected World currentWorld;
-	protected EaglercraftRandom randomGenerator;
-	protected BlockPos field_180294_c;
-	protected ChunkProviderSettings chunkProviderSettings;
+	public World currentWorld;
+	public EaglercraftRandom randomGenerator;
+	public BlockPos field_180294_c;
+	public ChunkProviderSettings chunkProviderSettings;
 	/**
 	 * + The clay generator.
 	 */
-	protected WorldGenerator clayGen = new WorldGenClay(4);
+	public WorldGenerator clayGen = new WorldGenClay(4);
 	/**
 	 * + The sand generator.
 	 */
-	protected WorldGenerator sandGen = new WorldGenSand(Blocks.sand, 7);
+	public WorldGenerator sandGen = new WorldGenSand(Blocks.sand, 7);
 	/**
 	 * + The gravel generator.
 	 */
-	protected WorldGenerator gravelAsSandGen = new WorldGenSand(Blocks.gravel, 6);
-	protected WorldGenerator dirtGen;
-	protected WorldGenerator gravelGen;
-	protected WorldGenerator graniteGen;
-	protected WorldGenerator dioriteGen;
-	protected WorldGenerator andesiteGen;
-	protected WorldGenerator coalGen;
-	protected WorldGenerator ironGen;
-	protected WorldGenerator goldGen;
-	protected WorldGenerator redstoneGen;
-	protected WorldGenerator diamondGen;
-	protected WorldGenerator lapisGen;
-	protected WorldGenerator platinumGen;
-	protected WorldGenerator titaniumGen;
-	protected WorldGenerator copperGen;
-	protected WorldGenerator limestoneGen;
-	protected WorldGenerator tuffGen;
+	public WorldGenerator gravelAsSandGen = new WorldGenSand(Blocks.gravel, 6);
+	public WorldGenerator dirtGen;
+	public WorldGenerator gravelGen;
+	public WorldGenerator graniteGen;
+	public WorldGenerator dioriteGen;
+	public WorldGenerator andesiteGen;
+	public WorldGenerator coalGen;
+	public WorldGenerator ironGen;
+	public WorldGenerator goldGen;
+	public WorldGenerator redstoneGen;
+	public WorldGenerator diamondGen;
+	public WorldGenerator lapisGen;
+	public WorldGenerator platinumGen;
+	public WorldGenerator titaniumGen;
+	public WorldGenerator copperGen;
+	public WorldGenerator limestoneGen;
+	public WorldGenerator tuffGen;
 
-	protected WorldGenFlowers yellowFlowerGen = new WorldGenFlowers(Blocks.yellow_flower,
+	public WorldGenFlowers yellowFlowerGen = new WorldGenFlowers(Blocks.yellow_flower,
 			BlockFlower.EnumFlowerType.DANDELION);
 	/**
 	 * + Field that holds mushroomBrown WorldGenFlowers
 	 */
-	protected WorldGenerator mushroomBrownGen = new GeneratorBushFeature(Blocks.brown_mushroom);
+	public WorldGenerator mushroomBrownGen = new GeneratorBushFeature(Blocks.brown_mushroom);
 	/**
 	 * + Field that holds mushroomRed WorldGenFlowers
 	 */
-	protected WorldGenerator mushroomRedGen = new GeneratorBushFeature(Blocks.red_mushroom);
+	public WorldGenerator mushroomRedGen = new GeneratorBushFeature(Blocks.red_mushroom);
 	/**
 	 * + Field that holds big mushroom generator
 	 */
-	protected WorldGenerator bigMushroomGen = new WorldGenBigMushroom();
+	public WorldGenerator bigMushroomGen = new WorldGenBigMushroom();
 	/**
 	 * + Field that holds WorldGenReed
 	 */
-	protected WorldGenerator reedGen = new WorldGenReed();
+	public WorldGenerator reedGen = new WorldGenReed();
 	/**
 	 * + Field that holds WorldGenCactus
 	 */
-	protected WorldGenerator cactusGen = new WorldGenCactus();
+	public WorldGenerator cactusGen = new WorldGenCactus();
 	/**
 	 * + The water lily generation!
 	 */
-	protected WorldGenerator waterlilyGen = new WorldGenWaterlily();
-	protected int waterlilyPerChunk;
-	protected int treesPerChunk;
+	public WorldGenerator waterlilyGen = new WorldGenWaterlily();
+	public int waterlilyPerChunk;
+	public int treesPerChunk;
 	/**
 	 * + The number of yellow flower patches to generate per chunk. The game
 	 * generates much less than this number, since it attempts to generate them at a
 	 * random altitude.
 	 */
-	protected int flowersPerChunk = 2;
+	public int flowersPerChunk = 2;
 	/**
 	 * + The amount of tall grass to generate per chunk.
 	 */
-	protected int grassPerChunk = 1;
-	protected int deadBushPerChunk;
-	protected int mushroomsPerChunk;
-	protected int reedsPerChunk;
-	protected int cactiPerChunk;
+	public int grassPerChunk = 1;
+	public int deadBushPerChunk;
+	public int mushroomsPerChunk;
+	public int reedsPerChunk;
+	public int cactiPerChunk;
 	/**
 	 * + The number of sand patches to generate per chunk. Sand patches only
 	 * generate when part of it is underwater.
 	 */
-	protected int sandPerChunk = 1;
+	public int sandPerChunk = 1;
 	/**
 	 * + The number of sand patches to generate per chunk. Sand patches only
 	 * generate when part of it is underwater. There appear to be two separate
 	 * fields for this.
 	 */
-	protected int sandPerChunk2 = 3;
+	public int sandPerChunk2 = 3;
 	/**
 	 * + The number of clay patches to generate per chunk. Only generates when part
 	 * of it is underwater.
 	 */
-	protected int clayPerChunk = 1;
-	protected int bigMushroomsPerChunk;
+	public int clayPerChunk = 1;
+	public int bigMushroomsPerChunk;
 	/**
 	 * + True if decorator should generate surface lava & water
 	 */
@@ -195,7 +195,7 @@ public class BiomeDecorator {
 		}
 	}
 
-	protected void genDecorations(BiomeGenBase biomeGenBaseIn) {
+	public void genDecorations(BiomeGenBase biomeGenBaseIn) {
 		this.generateOres();
 
 		for (int i = 0; i < this.sandPerChunk2; ++i) {
@@ -412,7 +412,7 @@ public class BiomeDecorator {
 	/**
 	 * + Generates ores in the current chunk
 	 */
-	protected void generateOres() {
+	public void generateOres() {
 		this.genStandardOre1(this.chunkProviderSettings.gravelCount, this.gravelGen,
 				this.chunkProviderSettings.gravelMinHeight, this.chunkProviderSettings.gravelMaxHeight);
 		this.genStandardOre1(this.chunkProviderSettings.dioriteCount, this.dioriteGen,
@@ -448,7 +448,7 @@ public class BiomeDecorator {
 	/**
 	 * + Standard ore generation helper. Generates most ores.
 	 */
-	protected void genStandardOre1(int blockCount, WorldGenerator generator, int minHeight, int maxHeight) {
+	public void genStandardOre1(int blockCount, WorldGenerator generator, int minHeight, int maxHeight) {
 		if (maxHeight < minHeight) {
 			int i = minHeight;
 			minHeight = maxHeight;
@@ -472,7 +472,7 @@ public class BiomeDecorator {
 	/**
 	 * + Standard ore generation helper. Generates Lapis Lazuli.
 	 */
-	protected void genStandardOre2(int blockCount, WorldGenerator generator, int centerHeight, int spread) {
+	public void genStandardOre2(int blockCount, WorldGenerator generator, int centerHeight, int spread) {
 		for (int i = 0; i < blockCount; ++i) {
 			BlockPos blockpos = this.field_180294_c.add(this.randomGenerator.nextInt(16),
 					this.randomGenerator.nextInt(spread) + this.randomGenerator.nextInt(spread) + centerHeight - spread,

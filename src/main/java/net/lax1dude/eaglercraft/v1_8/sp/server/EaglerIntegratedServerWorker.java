@@ -60,7 +60,7 @@ import net.minecraft.world.WorldType;
 
 /**
  * Copyright (c) 2023-2024 lax1dude, ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -72,7 +72,7 @@ import net.minecraft.world.WorldType;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EaglerIntegratedServerWorker {
 
@@ -452,10 +452,22 @@ public class EaglerIntegratedServerWorker {
 				}
 			}
 		}
+		if (ServerPlatformSingleplayer.isTabAboutToCloseWASM() && !isServerStopped()) {
+			logger.info("Autosaving worlds because the tab is about to close!");
+			currentProcess.getConfigurationManager().saveAllPlayerData();
+			currentProcess.saveAllWorlds(false);
+		}
 	}
 
 	public static void reportTPS(List<String> texts) {
 		sendIPCPacket(new IPCPacket14StringList(IPCPacket14StringList.SERVER_TPS, texts));
+	}
+
+	public static void sendIntegratedServerCrashWASMCB(String stringValue, boolean terminated) {
+		sendIPCPacket(new IPCPacket15Crashed(stringValue));
+		if (terminated) {
+			sendIPCPacket(new IPCPacketFFProcessKeepAlive(IPCPacketFFProcessKeepAlive.EXITED));
+		}
 	}
 
 	public static void sendIPCPacket(IPCPacketBase ipc) {
@@ -491,6 +503,9 @@ public class EaglerIntegratedServerWorker {
 
 			// signal thread startup successful
 			sendIPCPacket(new IPCPacketFFProcessKeepAlive(0xFF));
+
+			ServerPlatformSingleplayer
+					.setCrashCallbackWASM(EaglerIntegratedServerWorker::sendIntegratedServerCrashWASMCB);
 
 			while (true) {
 				mainLoop(false);

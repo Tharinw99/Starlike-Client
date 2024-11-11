@@ -25,13 +25,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -43,7 +43,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockDaylightDetector extends BlockContainer {
 	public static final PropertyInteger POWER = PropertyInteger.create("power", 0, 15);
@@ -64,10 +64,12 @@ public class BlockDaylightDetector extends BlockContainer {
 	 * + Can this block provide power. Only wire currently seems to have this change
 	 * based on its state.
 	 */
+	@Override
 	public boolean canProvidePower() {
 		return true;
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { POWER });
 	}
@@ -76,10 +78,12 @@ public class BlockDaylightDetector extends BlockContainer {
 	 * + Returns a new instance of a block's tile entity class. Called on placing
 	 * the block.
 	 */
+	@Override
 	public TileEntity createNewTileEntity(World var1, int var2) {
 		return new TileEntityDaylightDetector();
 	}
 
+	@Override
 	public Item getItem(World var1, BlockPos var2) {
 		return Item.getItemFromBlock(Blocks.daylight_detector);
 	}
@@ -87,6 +91,7 @@ public class BlockDaylightDetector extends BlockContainer {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
 		return Item.getItemFromBlock(Blocks.daylight_detector);
 	}
@@ -94,6 +99,7 @@ public class BlockDaylightDetector extends BlockContainer {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		return ((Integer) iblockstate.getValue(POWER)).intValue();
 	}
@@ -102,6 +108,7 @@ public class BlockDaylightDetector extends BlockContainer {
 	 * + The type of render function called. 3 for standard block models, 2 for
 	 * TESR's, 1 for liquids, -1 is no render
 	 */
+	@Override
 	public int getRenderType() {
 		return 3;
 	}
@@ -109,6 +116,7 @@ public class BlockDaylightDetector extends BlockContainer {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(POWER, Integer.valueOf(i));
 	}
@@ -117,6 +125,7 @@ public class BlockDaylightDetector extends BlockContainer {
 	 * + returns a list of blocks with the same ID, but different meta (eg: wood
 	 * returns 4 blocks)
 	 */
+	@Override
 	public void getSubBlocks(Item item, CreativeTabs creativetabs, List<ItemStack> list) {
 		if (!this.inverted) {
 			super.getSubBlocks(item, creativetabs, list);
@@ -124,10 +133,12 @@ public class BlockDaylightDetector extends BlockContainer {
 
 	}
 
+	@Override
 	public int getWeakPower(IBlockAccess var1, BlockPos var2, IBlockState iblockstate, EnumFacing var4) {
 		return ((Integer) iblockstate.getValue(POWER)).intValue();
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -136,10 +147,12 @@ public class BlockDaylightDetector extends BlockContainer {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
 
+	@Override
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState iblockstate, EntityPlayer entityplayer,
 			EnumFacing enumfacing, float f, float f1, float f2) {
 		if (entityplayer.isAllowEdit()) {
@@ -161,6 +174,7 @@ public class BlockDaylightDetector extends BlockContainer {
 		}
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess var1, BlockPos var2) {
 		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.375F, 1.0F);
 	}

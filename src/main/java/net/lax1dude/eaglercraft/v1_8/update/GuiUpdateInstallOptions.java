@@ -8,7 +8,7 @@ import net.minecraft.client.resources.I18n;
 
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -20,7 +20,7 @@ import net.minecraft.client.resources.I18n;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiUpdateInstallOptions extends GuiScreen {
 
@@ -40,6 +40,7 @@ public class GuiUpdateInstallOptions extends GuiScreen {
 		enableCountdown = makeDefault;
 	}
 
+	@Override
 	public void actionPerformed(GuiButton btn) {
 		if (btn.id == 0) {
 			makeDefault = !makeDefault;
@@ -64,6 +65,7 @@ public class GuiUpdateInstallOptions extends GuiScreen {
 		}
 	}
 
+	@Override
 	public void drawScreen(int mx, int my, float partialTicks) {
 		this.drawDefaultBackground();
 		this.drawCenteredString(fontRendererObj, I18n.format("updateInstall.title"), this.width / 2, 40, 11184810);
@@ -73,6 +75,7 @@ public class GuiUpdateInstallOptions extends GuiScreen {
 		super.drawScreen(mx, my, partialTicks);
 	}
 
+	@Override
 	public void initGui() {
 		this.buttonList.clear();
 		this.buttonList.add(makeDefaultBtn = new GuiButton(0, this.width / 2 - 100, this.height / 6 + 46,

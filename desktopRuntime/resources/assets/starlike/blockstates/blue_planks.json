@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "normal": {
-            "model": "starlike:blue_planks"
-        }
+  "variants": {
+    "normal": {
+      "model": "starlike:blue_planks"
     }
+  }
 }

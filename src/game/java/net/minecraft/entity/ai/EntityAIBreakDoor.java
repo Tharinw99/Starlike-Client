@@ -8,13 +8,13 @@ import net.minecraft.world.EnumDifficulty;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -26,7 +26,7 @@ import net.minecraft.world.EnumDifficulty;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityAIBreakDoor extends EntityAIDoorInteract {
 	private int breakingTime;
@@ -39,6 +39,7 @@ public class EntityAIBreakDoor extends EntityAIDoorInteract {
 	/**
 	 * + Returns whether an in-progress EntityAIBase should continue executing
 	 */
+	@Override
 	public boolean continueExecuting() {
 		double d0 = this.theEntity.getDistanceSq(this.doorPosition);
 		boolean flag;
@@ -57,6 +58,7 @@ public class EntityAIBreakDoor extends EntityAIDoorInteract {
 	/**
 	 * + Resets the task
 	 */
+	@Override
 	public void resetTask() {
 		super.resetTask();
 		this.theEntity.worldObj.sendBlockBreakProgress(this.theEntity.getEntityId(), this.doorPosition, -1);
@@ -65,6 +67,7 @@ public class EntityAIBreakDoor extends EntityAIDoorInteract {
 	/**
 	 * + Returns whether the EntityAIBase should begin execution.
 	 */
+	@Override
 	public boolean shouldExecute() {
 		if (!super.shouldExecute()) {
 			return false;
@@ -79,6 +82,7 @@ public class EntityAIBreakDoor extends EntityAIDoorInteract {
 	/**
 	 * + Execute a one shot task or start executing a continuous task
 	 */
+	@Override
 	public void startExecuting() {
 		super.startExecuting();
 		this.breakingTime = 0;
@@ -87,6 +91,7 @@ public class EntityAIBreakDoor extends EntityAIDoorInteract {
 	/**
 	 * + Updates the task
 	 */
+	@Override
 	public void updateTask() {
 		super.updateTask();
 		if (this.theEntity.getRNG().nextInt(20) == 0) {

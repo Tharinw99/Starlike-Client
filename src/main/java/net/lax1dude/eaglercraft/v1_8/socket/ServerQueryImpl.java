@@ -10,14 +10,13 @@ import net.lax1dude.eaglercraft.v1_8.internal.EnumServerRateLimit;
 import net.lax1dude.eaglercraft.v1_8.internal.IServerQuery;
 import net.lax1dude.eaglercraft.v1_8.internal.IWebSocketClient;
 import net.lax1dude.eaglercraft.v1_8.internal.IWebSocketFrame;
-import net.lax1dude.eaglercraft.v1_8.internal.PlatformRuntime;
 import net.lax1dude.eaglercraft.v1_8.internal.QueryResponse;
 import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
 import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 
 /**
  * Copyright (c) 2022-2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,7 +28,7 @@ import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 class ServerQueryImpl implements IServerQuery {
 
@@ -135,7 +134,7 @@ class ServerQueryImpl implements IServerQuery {
 				IWebSocketFrame frame = lst.get(i);
 				alive = true;
 				if (pingTimer == -1) {
-					pingTimer = PlatformRuntime.steadyTimeMillis() - pingStart;
+					pingTimer = frame.getTimestamp() - pingStart;
 					if (pingTimer < 1) {
 						pingTimer = 1;
 					}

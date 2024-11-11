@@ -14,13 +14,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -32,10 +32,11 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityFirework {
 	public static class Factory implements IParticleFactory {
+		@Override
 		public EntityFX getEntityFX(int var1, World world, double d0, double d1, double d2, double d3, double d4,
 				double d5, int... var15) {
 			EntityFirework.SparkFX entityfirework$sparkfx = new EntityFirework.SparkFX(world, d0, d1, d2, d3, d4, d5,
@@ -51,6 +52,7 @@ public class EntityFirework {
 			this.particleMaxAge = 4;
 		}
 
+		@Override
 		public boolean renderAccelerated(IAcceleratedParticleEngine accelerator, Entity var2, float f, float f1,
 				float f2, float f3, float f4, float f5) {
 			accelerator.drawParticle(this, 64, 32, getBrightnessForRender(f), 64,
@@ -60,6 +62,7 @@ public class EntityFirework {
 			return true;
 		}
 
+		@Override
 		public void renderParticle(WorldRenderer worldrenderer, Entity var2, float f, float f1, float f2, float f3,
 				float f4, float f5) {
 			float f6 = 0.25F;
@@ -123,22 +126,27 @@ public class EntityFirework {
 			this.noClip = false;
 		}
 
+		@Override
 		public boolean canBePushed() {
 			return false;
 		}
 
+		@Override
 		public float getBrightness(float var1) {
 			return 1.0F;
 		}
 
+		@Override
 		public int getBrightnessForRender(float var1) {
 			return 15728880;
 		}
 
+		@Override
 		public AxisAlignedBB getCollisionBoundingBox() {
 			return null;
 		}
 
+		@Override
 		public void onUpdate() {
 			this.prevPosX = this.posX;
 			this.prevPosY = this.posY;
@@ -188,6 +196,7 @@ public class EntityFirework {
 
 		}
 
+		@Override
 		public void renderParticle(WorldRenderer worldrenderer, Entity entity, float f, float f1, float f2, float f3,
 				float f4, float f5) {
 			if (!this.twinkle || this.particleAge < this.particleMaxAge / 3
@@ -355,10 +364,12 @@ public class EntityFirework {
 					|| minecraft.getRenderViewEntity().getDistanceSq(this.posX, this.posY, this.posZ) >= 256.0D;
 		}
 
+		@Override
 		public int getFXLayer() {
 			return 0;
 		}
 
+		@Override
 		public void onUpdate() {
 			if (this.fireworkAge == 0 && this.fireworkExplosions != null) {
 				boolean flag = this.func_92037_i();
@@ -438,6 +449,7 @@ public class EntityFirework {
 
 		}
 
+		@Override
 		public void renderParticle(WorldRenderer var1, Entity var2, float var3, float var4, float var5, float var6,
 				float var7, float var8) {
 		}

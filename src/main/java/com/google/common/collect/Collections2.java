@@ -537,7 +537,7 @@ public final class Collections2 {
 	 *
 	 * <p>
 	 * Examples:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *

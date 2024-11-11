@@ -59,13 +59,13 @@ import net.minecraft.world.storage.WorldInfo;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -77,7 +77,7 @@ import net.minecraft.world.storage.WorldInfo;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class World implements IBlockAccess {
 	public static boolean doesBlockHaveSolidTopSurface(IBlockAccess blockAccess, BlockPos pos) {
@@ -224,11 +224,13 @@ public abstract class World implements IBlockAccess {
 		crashreportcategory.addCrashSection("Level name",
 				this.worldInfo == null ? "????" : this.worldInfo.getWorldName());
 		crashreportcategory.addCrashSectionCallable("All players", new Callable<String>() {
+			@Override
 			public String call() {
 				return World.this.playerEntities.size() + " total; " + World.this.playerEntities.toString();
 			}
 		});
 		crashreportcategory.addCrashSectionCallable("Chunk stats", new Callable<String>() {
+			@Override
 			public String call() {
 				return World.this.chunkProvider.makeString();
 			}
@@ -310,8 +312,9 @@ public abstract class World implements IBlockAccess {
 						return true;
 					}
 
-					boolean flag = this.isWater(pos.west()) && this.isWater(pos.east()) && this.isWater(pos.north())
-							&& this.isWater(pos.south());
+					BlockPos tmp = new BlockPos();
+					boolean flag = this.isWater(pos.west(tmp)) && this.isWater(pos.east(tmp))
+							&& this.isWater(pos.north(tmp)) && this.isWater(pos.south(tmp));
 					if (!flag) {
 						return true;
 					}
@@ -401,7 +404,7 @@ public abstract class World implements IBlockAccess {
 		int l = MathHelper.floor_double(bb.maxY);
 		int i1 = MathHelper.floor_double(bb.minZ);
 		int j1 = MathHelper.floor_double(bb.maxZ);
-		BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+		BlockPos blockpos$mutableblockpos = new BlockPos();
 
 		for (int k1 = i; k1 <= j; ++k1) {
 			for (int l1 = k; l1 <= l; ++l1) {
@@ -418,137 +421,124 @@ public abstract class World implements IBlockAccess {
 	}
 
 	public boolean checkLight(BlockPos pos) {
-		if (provider.getHasNoSky()) {
-			return this.checkLightFor(EnumSkyBlock.BLOCK, pos);
+		boolean flag = false;
+		if (!this.provider.getHasNoSky()) {
+			flag |= this.checkLightFor(EnumSkyBlock.SKY, pos);
 		}
-		return this.checkLightFor(EnumSkyBlock.SKY, pos) | this.checkLightFor(EnumSkyBlock.BLOCK, pos);
+
+		flag = flag | this.checkLightFor(EnumSkyBlock.BLOCK, pos);
+		return flag;
 	}
 
 	public boolean checkLightFor(EnumSkyBlock lightType, BlockPos pos) {
 		if (!this.isAreaLoaded(pos, 17, false)) {
 			return false;
-		}
-
-		int queueSize = 0;
-		int currentIndex = 0;
-
-		int baseX = pos.getX();
-		int baseY = pos.getY();
-		int baseZ = pos.getZ();
-
-		int currentLight = this.getLightFor(lightType, pos);
-		int computedLight = this.getRawLight(pos, lightType);
-		if (computedLight == currentLight) {
-			return true;
-		}
-
-		if (computedLight > currentLight) {
-			this.lightUpdateBlockList[queueSize++] = 133152;
 		} else {
-			this.lightUpdateBlockList[queueSize++] = 133152 | currentLight << 18;
+			int i = 0;
+			int j = 0;
+			int k = this.getLightFor(lightType, pos);
+			int l = this.getRawLight(pos, lightType);
+			int i1 = pos.getX();
+			int j1 = pos.getY();
+			int k1 = pos.getZ();
+			if (l > k) {
+				this.lightUpdateBlockList[j++] = 133152;
+			} else if (l < k) {
+				this.lightUpdateBlockList[j++] = 133152 | k << 18;
 
-			while (currentIndex < queueSize) {
-				int packed = this.lightUpdateBlockList[currentIndex++];
-				int relX = (packed & 63) - 32;
-				int relY = ((packed >> 6) & 63) - 32;
-				int relZ = ((packed >> 12) & 63) - 32;
-				int light = packed >> 18 & 15;
+				while (i < j) {
+					int l1 = this.lightUpdateBlockList[i++];
+					int i2 = (l1 & 63) - 32 + i1;
+					int j2 = (l1 >> 6 & 63) - 32 + j1;
+					int k2 = (l1 >> 12 & 63) - 32 + k1;
+					int l2 = l1 >> 18 & 15;
+					BlockPos blockpos = new BlockPos(i2, j2, k2);
+					int i3 = this.getLightFor(lightType, blockpos);
+					if (i3 == l2) {
+						this.setLightFor(lightType, blockpos, 0);
+						if (l2 > 0) {
+							int j3 = MathHelper.abs_int(i2 - i1);
+							int k3 = MathHelper.abs_int(j2 - j1);
+							int l3 = MathHelper.abs_int(k2 - k1);
+							if (j3 + k3 + l3 < 17) {
+								BlockPos blockpos$mutableblockpos = new BlockPos();
 
-				int worldX = relX + baseX;
-				int worldY = relY + baseY;
-				int worldZ = relZ + baseZ;
-
-				BlockPos blockPos = new BlockPos(worldX, worldY, worldZ);
-				int currentBlockLight = this.getLightFor(lightType, blockPos);
-
-				if (currentBlockLight == light) {
-					this.setLightFor(lightType, blockPos, 0);
-
-					if (light > 0) {
-						int manhattan = Math.abs(relX) + Math.abs(relY) + Math.abs(relZ);
-						if (manhattan < 17) {
-							BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
-							EnumFacing[] facings = EnumFacing.values();
-
-							for (EnumFacing facing : facings) {
-								int adjX = worldX + facing.getFrontOffsetX();
-								int adjY = worldY + facing.getFrontOffsetY();
-								int adjZ = worldZ + facing.getFrontOffsetZ();
-
-								mutablePos.func_181079_c(adjX, adjY, adjZ);
-
-								int opacity = Math.max(1, this.getBlockState(mutablePos).getBlock().getLightOpacity());
-								int neighborLight = this.getLightFor(lightType, mutablePos);
-
-								if (neighborLight == light - opacity && queueSize < this.lightUpdateBlockList.length) {
-									this.lightUpdateBlockList[queueSize++] = ((adjX - baseX + 32) & 63)
-											| ((adjY - baseY + 32) & 63) << 6 | ((adjZ - baseZ + 32) & 63) << 12
-											| (light - opacity) << 18;
+								EnumFacing[] facings = EnumFacing._VALUES;
+								for (int m = 0; m < facings.length; ++m) {
+									EnumFacing enumfacing = facings[m];
+									int i4 = i2 + enumfacing.getFrontOffsetX();
+									int j4 = j2 + enumfacing.getFrontOffsetY();
+									int k4 = k2 + enumfacing.getFrontOffsetZ();
+									blockpos$mutableblockpos.func_181079_c(i4, j4, k4);
+									int l4 = Math.max(1,
+											this.getBlockState(blockpos$mutableblockpos).getBlock().getLightOpacity());
+									i3 = this.getLightFor(lightType, blockpos$mutableblockpos);
+									if (i3 == l2 - l4 && j < this.lightUpdateBlockList.length) {
+										this.lightUpdateBlockList[j++] = i4 - i1 + 32 | j4 - j1 + 32 << 6
+												| k4 - k1 + 32 << 12 | l2 - l4 << 18;
+									}
 								}
+							}
+						}
+					}
+				}
+
+				i = 0;
+			}
+
+			while (i < j) {
+				int i5 = this.lightUpdateBlockList[i++];
+				int j5 = (i5 & 63) - 32 + i1;
+				int k5 = (i5 >> 6 & 63) - 32 + j1;
+				int l5 = (i5 >> 12 & 63) - 32 + k1;
+				BlockPos blockpos1 = new BlockPos(j5, k5, l5);
+				BlockPos tmp = new BlockPos(0, 0, 0);
+				int i6 = this.getLightFor(lightType, blockpos1);
+				int j6 = this.getRawLight(blockpos1, lightType);
+				if (j6 != i6) {
+					this.setLightFor(lightType, blockpos1, j6);
+					if (j6 > i6) {
+						int k6 = Math.abs(j5 - i1);
+						int l6 = Math.abs(k5 - j1);
+						int i7 = Math.abs(l5 - k1);
+						boolean flag = j < this.lightUpdateBlockList.length - 6;
+						if (k6 + l6 + i7 < 17 && flag) {
+							if (this.getLightFor(lightType, blockpos1.west(tmp)) < j6) {
+								this.lightUpdateBlockList[j++] = j5 - 1 - i1 + 32 + (k5 - j1 + 32 << 6)
+										+ (l5 - k1 + 32 << 12);
+							}
+
+							if (this.getLightFor(lightType, blockpos1.east(tmp)) < j6) {
+								this.lightUpdateBlockList[j++] = j5 + 1 - i1 + 32 + (k5 - j1 + 32 << 6)
+										+ (l5 - k1 + 32 << 12);
+							}
+
+							if (this.getLightFor(lightType, blockpos1.down(tmp)) < j6) {
+								this.lightUpdateBlockList[j++] = j5 - i1 + 32 + (k5 - 1 - j1 + 32 << 6)
+										+ (l5 - k1 + 32 << 12);
+							}
+
+							if (this.getLightFor(lightType, blockpos1.up(tmp)) < j6) {
+								this.lightUpdateBlockList[j++] = j5 - i1 + 32 + (k5 + 1 - j1 + 32 << 6)
+										+ (l5 - k1 + 32 << 12);
+							}
+
+							if (this.getLightFor(lightType, blockpos1.north(tmp)) < j6) {
+								this.lightUpdateBlockList[j++] = j5 - i1 + 32 + (k5 - j1 + 32 << 6)
+										+ (l5 - 1 - k1 + 32 << 12);
+							}
+
+							if (this.getLightFor(lightType, blockpos1.south(tmp)) < j6) {
+								this.lightUpdateBlockList[j++] = j5 - i1 + 32 + (k5 - j1 + 32 << 6)
+										+ (l5 + 1 - k1 + 32 << 12);
 							}
 						}
 					}
 				}
 			}
 
-			currentIndex = 0;
+			return true;
 		}
-
-		while (currentIndex < queueSize) {
-			int packed = this.lightUpdateBlockList[currentIndex++];
-			int relX = (packed & 63) - 32;
-			int relY = ((packed >> 6) & 63) - 32;
-			int relZ = ((packed >> 12) & 63) - 32;
-
-			int worldX = relX + baseX;
-			int worldY = relY + baseY;
-			int worldZ = relZ + baseZ;
-
-			BlockPos blockPos = new BlockPos(worldX, worldY, worldZ);
-			int currentBlockLight = this.getLightFor(lightType, blockPos);
-			int computedBlockLight = this.getRawLight(blockPos, lightType);
-
-			if (computedBlockLight != currentBlockLight) {
-				this.setLightFor(lightType, blockPos, computedBlockLight);
-
-				if (computedBlockLight > currentBlockLight) {
-					int manhattan = Math.abs(relX) + Math.abs(relY) + Math.abs(relZ);
-					if (manhattan < 17 && queueSize < this.lightUpdateBlockList.length - 6) {
-						if (this.getLightFor(lightType, blockPos.west()) < computedBlockLight) {
-							this.lightUpdateBlockList[queueSize++] = ((worldX - 1 - baseX + 32) & 63)
-									| ((worldY - baseY + 32) & 63) << 6 | ((worldZ - baseZ + 32) & 63) << 12;
-						}
-
-						if (this.getLightFor(lightType, blockPos.east()) < computedBlockLight) {
-							this.lightUpdateBlockList[queueSize++] = ((worldX + 1 - baseX + 32) & 63)
-									| ((worldY - baseY + 32) & 63) << 6 | ((worldZ - baseZ + 32) & 63) << 12;
-						}
-
-						if (this.getLightFor(lightType, blockPos.down()) < computedBlockLight) {
-							this.lightUpdateBlockList[queueSize++] = ((worldX - baseX + 32) & 63)
-									| ((worldY - 1 - baseY + 32) & 63) << 6 | ((worldZ - baseZ + 32) & 63) << 12;
-						}
-
-						if (this.getLightFor(lightType, blockPos.up()) < computedBlockLight) {
-							this.lightUpdateBlockList[queueSize++] = ((worldX - baseX + 32) & 63)
-									| ((worldY + 1 - baseY + 32) & 63) << 6 | ((worldZ - baseZ + 32) & 63) << 12;
-						}
-
-						if (this.getLightFor(lightType, blockPos.north()) < computedBlockLight) {
-							this.lightUpdateBlockList[queueSize++] = ((worldX - baseX + 32) & 63)
-									| ((worldY - baseY + 32) & 63) << 6 | ((worldZ - 1 - baseZ + 32) & 63) << 12;
-						}
-
-						if (this.getLightFor(lightType, blockPos.south()) < computedBlockLight) {
-							this.lightUpdateBlockList[queueSize++] = ((worldX - baseX + 32) & 63)
-									| ((worldY - baseY + 32) & 63) << 6 | ((worldZ + 1 - baseZ + 32) & 63) << 12;
-						}
-					}
-				}
-			}
-		}
-
-		return true;
 	}
 
 	/**
@@ -575,13 +565,6 @@ public abstract class World implements IBlockAccess {
 		}
 
 		return true;
-	}
-
-	/**
-	 * + Checks whether the session lock file was modified by another process
-	 */
-	public void checkSessionLock() throws MinecraftException {
-		this.saveHandler.checkSessionLock();
 	}
 
 	/**
@@ -633,6 +616,7 @@ public abstract class World implements IBlockAccess {
 	/**
 	 * + set by !chunk.getAreLevelsEmpty
 	 */
+	@Override
 	public boolean extendedLevelsInChunkCache() {
 		return false;
 	}
@@ -685,7 +669,7 @@ public abstract class World implements IBlockAccess {
 		int l = MathHelper.floor_double(bb.maxY + 1.0D);
 		int i1 = MathHelper.floor_double(bb.minZ);
 		int j1 = MathHelper.floor_double(bb.maxZ + 1.0D);
-		BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+		BlockPos blockpos$mutableblockpos = new BlockPos();
 
 		for (int k1 = i; k1 < j; ++k1) {
 			for (int l1 = i1; l1 < j1; ++l1) {
@@ -728,6 +712,7 @@ public abstract class World implements IBlockAccess {
 		return this.provider.getHasNoSky() ? 128 : 256;
 	}
 
+	@Override
 	public BiomeGenBase getBiomeGenForCoords(final BlockPos pos) {
 		if (this.isBlockLoaded(pos)) {
 			Chunk chunk = this.getChunkFromBlockCoords(pos);
@@ -738,6 +723,7 @@ public abstract class World implements IBlockAccess {
 				CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Getting biome");
 				CrashReportCategory crashreportcategory = crashreport.makeCategory("Coordinates of biome request");
 				crashreportcategory.addCrashSectionCallable("Location", new Callable<String>() {
+					@Override
 					public String call() throws Exception {
 						return CrashReportCategory
 								.getCoordinateInfo(new net.minecraft.util.BlockPos(pos.getX(), pos.getY(), pos.getZ()));
@@ -785,6 +771,7 @@ public abstract class World implements IBlockAccess {
 		}
 	}
 
+	@Override
 	public IBlockState getBlockState(BlockPos pos) {
 		if (!this.isValid(pos)) {
 			return Blocks.air.getDefaultState();
@@ -921,7 +908,7 @@ public abstract class World implements IBlockAccess {
 		boolean flag = entityIn.isOutsideBorder();
 		boolean flag1 = this.isInsideBorder(worldborder, entityIn);
 		IBlockState iblockstate = Blocks.stone.getDefaultState();
-		BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+		BlockPos blockpos$mutableblockpos = new BlockPos();
 
 		for (int k1 = i; k1 < j; ++k1) {
 			for (int l1 = i1; l1 < j1; ++l1) {
@@ -966,6 +953,7 @@ public abstract class World implements IBlockAccess {
 		return arraylist;
 	}
 
+	@Override
 	public int getCombinedLight(BlockPos pos, int lightValue) {
 		int i = this.getLightFromNeighborsFor(EnumSkyBlock.SKY, pos);
 		int j = this.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, pos);
@@ -1175,11 +1163,12 @@ public abstract class World implements IBlockAccess {
 	public int getLight(BlockPos pos, boolean checkNeighbors) {
 		if (pos.getX() >= -30000000 && pos.getZ() >= -30000000 && pos.getX() < 30000000 && pos.getZ() < 30000000) {
 			if (checkNeighbors && this.getBlockState(pos).getBlock().getUseNeighborBrightness()) {
-				int i1 = this.getLight(pos.up(), false);
-				int i = this.getLight(pos.east(), false);
-				int j = this.getLight(pos.west(), false);
-				int k = this.getLight(pos.south(), false);
-				int l = this.getLight(pos.north(), false);
+				BlockPos tmp = new BlockPos(0, 0, 0);
+				int i1 = this.getLight(pos.up(tmp), false);
+				int i = this.getLight(pos.east(tmp), false);
+				int j = this.getLight(pos.west(tmp), false);
+				int k = this.getLight(pos.south(tmp), false);
+				int l = this.getLight(pos.north(tmp), false);
 				if (i > i1) {
 					i1 = i;
 				}
@@ -1248,11 +1237,12 @@ public abstract class World implements IBlockAccess {
 			} else if (!this.isBlockLoaded(pos)) {
 				return type.defaultLightValue;
 			} else if (this.getBlockState(pos).getBlock().getUseNeighborBrightness()) {
-				int i1 = this.getLightFor(type, pos.up());
-				int i = this.getLightFor(type, pos.east());
-				int j = this.getLightFor(type, pos.west());
-				int k = this.getLightFor(type, pos.south());
-				int l = this.getLightFor(type, pos.north());
+				BlockPos tmp = new BlockPos();
+				int i1 = this.getLightFor(type, pos.up(tmp));
+				int i = this.getLightFor(type, pos.east(tmp));
+				int j = this.getLightFor(type, pos.west(tmp));
+				int k = this.getLightFor(type, pos.south(tmp));
+				int l = this.getLightFor(type, pos.north(tmp));
 				if (i > i1) {
 					i1 = i;
 				}
@@ -1512,27 +1502,28 @@ public abstract class World implements IBlockAccess {
 	 */
 	public int getStrongPower(BlockPos pos) {
 		int i = 0;
-		i = Math.max(i, this.getStrongPower(pos.down(), EnumFacing.DOWN));
+		BlockPos tmp = new BlockPos();
+		i = Math.max(i, this.getStrongPower(pos.down(tmp), EnumFacing.DOWN));
 		if (i >= 15) {
 			return i;
 		} else {
-			i = Math.max(i, this.getStrongPower(pos.up(), EnumFacing.UP));
+			i = Math.max(i, this.getStrongPower(pos.up(tmp), EnumFacing.UP));
 			if (i >= 15) {
 				return i;
 			} else {
-				i = Math.max(i, this.getStrongPower(pos.north(), EnumFacing.NORTH));
+				i = Math.max(i, this.getStrongPower(pos.north(tmp), EnumFacing.NORTH));
 				if (i >= 15) {
 					return i;
 				} else {
-					i = Math.max(i, this.getStrongPower(pos.south(), EnumFacing.SOUTH));
+					i = Math.max(i, this.getStrongPower(pos.south(tmp), EnumFacing.SOUTH));
 					if (i >= 15) {
 						return i;
 					} else {
-						i = Math.max(i, this.getStrongPower(pos.west(), EnumFacing.WEST));
+						i = Math.max(i, this.getStrongPower(pos.west(tmp), EnumFacing.WEST));
 						if (i >= 15) {
 							return i;
 						} else {
-							i = Math.max(i, this.getStrongPower(pos.east(), EnumFacing.EAST));
+							i = Math.max(i, this.getStrongPower(pos.east(tmp), EnumFacing.EAST));
 							return i >= 15 ? i : i;
 						}
 					}
@@ -1545,6 +1536,7 @@ public abstract class World implements IBlockAccess {
 	 * + Returns the single highest strong power out of all directions using
 	 * getStrongPower(BlockPos, EnumFacing)
 	 */
+	@Override
 	public int getStrongPower(BlockPos pos, EnumFacing direction) {
 		IBlockState iblockstate = this.getBlockState(pos);
 		return iblockstate.getBlock().getStrongPower(this, pos, iblockstate, direction);
@@ -1568,6 +1560,7 @@ public abstract class World implements IBlockAccess {
 				* this.getRainStrength(delta);
 	}
 
+	@Override
 	public TileEntity getTileEntity(BlockPos pos) {
 		if (!this.isValid(pos)) {
 			return null;
@@ -1657,6 +1650,7 @@ public abstract class World implements IBlockAccess {
 		return this.worldInfo.getWorldTime();
 	}
 
+	@Override
 	public WorldType getWorldType() {
 		return this.worldInfo.getTerrainType();
 	}
@@ -1677,7 +1671,7 @@ public abstract class World implements IBlockAccess {
 		} else {
 			boolean flag = false;
 			Vec3 vec3 = new Vec3(0.0D, 0.0D, 0.0D);
-			BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+			BlockPos blockpos$mutableblockpos = new BlockPos();
 
 			for (int k1 = i; k1 < j; ++k1) {
 				for (int l1 = k; l1 < l; ++l1) {
@@ -1727,7 +1721,7 @@ public abstract class World implements IBlockAccess {
 		int l = MathHelper.floor_double(bb.maxY + 1.0D);
 		int i1 = MathHelper.floor_double(bb.minZ);
 		int j1 = MathHelper.floor_double(bb.maxZ + 1.0D);
-		BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+		BlockPos blockpos$mutableblockpos = new BlockPos();
 
 		for (int k1 = i; k1 < j; ++k1) {
 			for (int l1 = k; l1 < l; ++l1) {
@@ -1757,6 +1751,7 @@ public abstract class World implements IBlockAccess {
 	 * this only checks to see if the blocks material is set to air, meaning it is
 	 * possible for non-vanilla blocks to still pass this check.
 	 */
+	@Override
 	public boolean isAirBlock(BlockPos pos) {
 		return this.getBlockState(pos).getBlock().getMaterial() == Material.air;
 	}
@@ -1771,7 +1766,7 @@ public abstract class World implements IBlockAccess {
 		int l = MathHelper.floor_double(bb.maxY);
 		int i1 = MathHelper.floor_double(bb.minZ);
 		int j1 = MathHelper.floor_double(bb.maxZ);
-		BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+		BlockPos blockpos$mutableblockpos = new BlockPos();
 
 		for (int k1 = i; k1 <= j; ++k1) {
 			for (int l1 = k; l1 <= l; ++l1) {
@@ -1912,12 +1907,13 @@ public abstract class World implements IBlockAccess {
 	}
 
 	public boolean isBlockPowered(BlockPos pos) {
-		return this.getRedstonePower(pos.down(), EnumFacing.DOWN) > 0 ? true
-				: (this.getRedstonePower(pos.up(), EnumFacing.UP) > 0 ? true
-						: (this.getRedstonePower(pos.north(), EnumFacing.NORTH) > 0 ? true
-								: (this.getRedstonePower(pos.south(), EnumFacing.SOUTH) > 0 ? true
-										: (this.getRedstonePower(pos.west(), EnumFacing.WEST) > 0 ? true
-												: this.getRedstonePower(pos.east(), EnumFacing.EAST) > 0))));
+		BlockPos tmp = new BlockPos(0, 0, 0);
+		return this.getRedstonePower(pos.down(tmp), EnumFacing.DOWN) > 0 ? true
+				: (this.getRedstonePower(pos.up(tmp), EnumFacing.UP) > 0 ? true
+						: (this.getRedstonePower(pos.north(tmp), EnumFacing.NORTH) > 0 ? true
+								: (this.getRedstonePower(pos.south(tmp), EnumFacing.SOUTH) > 0 ? true
+										: (this.getRedstonePower(pos.west(tmp), EnumFacing.WEST) > 0 ? true
+												: this.getRedstonePower(pos.east(tmp), EnumFacing.EAST) > 0))));
 	}
 
 	public boolean isBlockTickPending(BlockPos pos, Block blockType) {
@@ -1948,7 +1944,7 @@ public abstract class World implements IBlockAccess {
 		int i1 = MathHelper.floor_double(bb.minZ);
 		int j1 = MathHelper.floor_double(bb.maxZ + 1.0D);
 		if (this.isAreaLoaded(i, k, i1, j, l, j1, true)) {
-			BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+			BlockPos blockpos$mutableblockpos = new BlockPos();
 
 			for (int k1 = i; k1 < j; ++k1) {
 				for (int l1 = k; l1 < l; ++l1) {
@@ -1995,7 +1991,7 @@ public abstract class World implements IBlockAccess {
 		int l = MathHelper.floor_double(bb.maxY + 1.0D);
 		int i1 = MathHelper.floor_double(bb.minZ);
 		int j1 = MathHelper.floor_double(bb.maxZ + 1.0D);
-		BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+		BlockPos blockpos$mutableblockpos = new BlockPos();
 
 		for (int k1 = i; k1 < j; ++k1) {
 			for (int l1 = k; l1 < l; ++l1) {
@@ -2172,6 +2168,7 @@ public abstract class World implements IBlockAccess {
 				CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Exception while updating neighbours");
 				CrashReportCategory crashreportcategory = crashreport.makeCategory("Block being updated");
 				crashreportcategory.addCrashSectionCallable("Source block type", new Callable<String>() {
+					@Override
 					public String call() throws Exception {
 						try {
 							return HString.format("ID #%d (%s // %s)",
@@ -2756,7 +2753,7 @@ public abstract class World implements IBlockAccess {
 	public void setTileEntity(BlockPos pos, TileEntity tileEntityIn) {
 		if (tileEntityIn != null && !tileEntityIn.isInvalid()) {
 			if (this.processingLoadedTiles) {
-				tileEntityIn.setPos(pos);
+				tileEntityIn.setPos(new BlockPos(pos));
 				Iterator iterator = this.addedTileEntityList.iterator();
 
 				while (iterator.hasNext()) {

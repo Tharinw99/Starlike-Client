@@ -21,13 +21,13 @@ import net.minecraft.util.StringUtils;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -39,13 +39,14 @@ import net.minecraft.util.StringUtils;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class CommandMessage extends CommandBase {
 
 	/**
 	 * + Return a list of options when the user types TAB
 	 */
+	@Override
 	public List<String> addTabCompletionOptions(ICommandSender var1, String[] astring, BlockPos var3) {
 		return getListOfStringsMatchingLastWord(astring, MinecraftServer.getServer().getAllUsernames());
 	}
@@ -53,6 +54,7 @@ public class CommandMessage extends CommandBase {
 	/**
 	 * + Gets a list of aliases for this command
 	 */
+	@Override
 	public List<String> getCommandAliases() {
 		return Arrays.asList(new String[] { "w", "msg" });
 	}
@@ -60,6 +62,7 @@ public class CommandMessage extends CommandBase {
 	/**
 	 * + Gets the name of the command
 	 */
+	@Override
 	public String getCommandName() {
 		return "tell";
 	}
@@ -67,6 +70,7 @@ public class CommandMessage extends CommandBase {
 	/**
 	 * + Gets the usage string for the command.
 	 */
+	@Override
 	public String getCommandUsage(ICommandSender var1) {
 		return "commands.message.usage";
 	}
@@ -74,6 +78,7 @@ public class CommandMessage extends CommandBase {
 	/**
 	 * + Return the required permission level for this command.
 	 */
+	@Override
 	public int getRequiredPermissionLevel() {
 		return 0;
 	}
@@ -82,6 +87,7 @@ public class CommandMessage extends CommandBase {
 	 * + Return whether the specified command parameter index is a username
 	 * parameter.
 	 */
+	@Override
 	public boolean isUsernameIndex(String[] var1, int i) {
 		return i == 0;
 	}
@@ -89,6 +95,7 @@ public class CommandMessage extends CommandBase {
 	/**
 	 * + Callback when the command is invoked
 	 */
+	@Override
 	public void processCommand(ICommandSender parICommandSender, String[] parArrayOfString) throws CommandException {
 		if (parArrayOfString.length < 2) {
 			throw new WrongUsageException("commands.message.usage", new Object[0]);

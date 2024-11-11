@@ -19,13 +19,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -37,7 +37,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockNote extends BlockContainer {
 	private static final List<String> INSTRUMENTS = Lists
@@ -52,6 +52,7 @@ public class BlockNote extends BlockContainer {
 	 * + Returns a new instance of a block's tile entity class. Called on placing
 	 * the block.
 	 */
+	@Override
 	public TileEntity createNewTileEntity(World var1, int var2) {
 		return new TileEntityNote();
 	}
@@ -68,10 +69,12 @@ public class BlockNote extends BlockContainer {
 	 * + The type of render function called. 3 for standard block models, 2 for
 	 * TESR's, 1 for liquids, -1 is no render
 	 */
+	@Override
 	public int getRenderType() {
 		return 3;
 	}
 
+	@Override
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState var3, EntityPlayer entityplayer,
 			EnumFacing var5, float var6, float var7, float var8) {
 		if (world.isRemote) {
@@ -89,6 +92,7 @@ public class BlockNote extends BlockContainer {
 		}
 	}
 
+	@Override
 	public void onBlockClicked(World world, BlockPos blockpos, EntityPlayer entityplayer) {
 		if (!world.isRemote) {
 			TileEntity tileentity = world.getTileEntity(blockpos);
@@ -102,6 +106,7 @@ public class BlockNote extends BlockContainer {
 	/**
 	 * + Called on both Client and Server when World#addBlockEvent is called
 	 */
+	@Override
 	public boolean onBlockEventReceived(World world, BlockPos blockpos, IBlockState var3, int i, int j) {
 		float f = (float) Math.pow(2.0D, (double) (j - 12) / 12.0D);
 		world.playSoundEffect((double) blockpos.getX() + 0.5D, (double) blockpos.getY() + 0.5D,
@@ -114,6 +119,7 @@ public class BlockNote extends BlockContainer {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState var3, Block var4) {
 		boolean flag = world.isBlockPowered(blockpos);
 		TileEntity tileentity = world.getTileEntity(blockpos);

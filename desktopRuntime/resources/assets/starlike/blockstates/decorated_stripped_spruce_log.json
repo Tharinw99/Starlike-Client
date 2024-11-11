@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "normal": {
-            "model": "starlike:decorated_stripped_spruce_log"
-        }
+  "variants": {
+    "normal": {
+      "model": "starlike:decorated_stripped_spruce_log"
     }
+  }
 }

@@ -12,50 +12,92 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: "temurin"
-          java-version: "21"
-          cache: "gradle"
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
       - name: Validate Gradle Wrapper
-        uses: gradle/actions/wrapper-validation@v3
-      - name: Compile JavaScript
-        run: ./gradlew generateJavaScript
-      - name: Compile assets.epk
-        run: bash ./CompileEPK.sh
-      - name: Generate offline download
-        run: bash ./MakeOfflineDownload.sh
-      - name: Prepare web files
+        uses: gradle/actions/wrapper-validation@v4
+      - name: Compile client
         run: |
-          mkdir -p ${{ runner.temp }}/gh-pages
+          bash ./CompileEPK.sh &&
+          bash ./CompileJS.sh &&
+          bash ./MakeOfflineDownload.sh
+      - name: Compile client (WASM)
+        run: |
+          cd ./wasm_gc_teavm &&
+          bash ./CompileEPK.sh &&
+          bash ./CompileWASM.sh &&
+          bash ./CompileEagRuntimeJS.sh &&
+          bash ./CompileBootstrapJS.sh &&
+          bash ./CompileLoaderWASM.sh &&
+          bash ./MakeWASMClientBundle.sh &&
+          cd ..
+      - name: Prepare files
+        run: |
+          mkdir -p ${{ runner.temp }}/gh-pages &&
           cp -t ${{ runner.temp }}/gh-pages \
-            javascript/assets.epk \
-            javascript/classes.js \
-            javascript/classes.js.map \
-            javascript/index.html
-          cp javascript/Starlike_Client_Offline.html ${{ runner.temp }}/gh-pages/offline.html
+            ./LICENSE.md \
+            ./javascript/assets.epk \
+            ./javascript/assets.epw \
+            ./javascript/bootstrap.js \
+            ./javascript/classes.js \
+            ./javascript/classes.js.map \
+            ./javascript/index.html \
+            ./javascript/Starlike_Client_Offline.html \
+            ./javascript/Starlike_Client_Offline_WASM.html \
+            ./javascript/wasm.html
       - name: Upload web files
         continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
-          name: web
-          path: ${{ runner.temp }}/gh-pages/
+          name: Starlike_Client_Web
+          path: ${{ runner.temp }}/gh-pages
           retention-days: 1
           compression-level: 9
       - name: Upload offline download
         continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
-          name: offline
-          path: javascript/Starlike_Client_Offline.html
+          name: Starlike_Client_Offline
+          path: |
+            ${{ runner.temp }}/gh-pages/LICENSE.md
+            ${{ runner.temp }}/gh-pages/Starlike_Client_Offline.html
+            ${{ runner.temp }}/gh-pages/Starlike_Client_Offline_WASM.html
           retention-days: 1
           compression-level: 9
-      - name: Deploy to GitHub Pages
+      - name: Upload web files (WASM)
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: Starlike_Client_Web_WASM
+          path: |
+            ${{ runner.temp }}/gh-pages/LICENSE.md
+            ${{ runner.temp }}/gh-pages/assets.epw
+            ${{ runner.temp }}/gh-pages/bootstrap.js
+            ${{ runner.temp }}/gh-pages/Starlike_Client_Offline_WASM.html
+            ${{ runner.temp }}/gh-pages/wasm.html
+          retention-days: 1
+          compression-level: 9
+      - name: Upload offline download (WASM)
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: Starlike_Client_Offline_WASM
+          path: |
+            ${{ runner.temp }}/gh-pages/LICENSE.md
+            ${{ runner.temp }}/gh-pages/Starlike_Client_Offline_WASM.html
+          retention-days: 1
+          compression-level: 9
+      - name: Deploy to `gh-pages` branch
         if: github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ${{ runner.temp }}/gh-pages
-          cname: starlike.zumbiepig.dev
+          allow_empty_commit: true
           force_orphan: true
           user_name: 'github-actions[bot]'
           user_email: '41898282+github-actions[bot]@users.noreply.github.com'
           commit_message: 'github-actions: deploy'
+          # disable_nojekyll: true
+          cname: 'starlike.zumbiepig.dev'

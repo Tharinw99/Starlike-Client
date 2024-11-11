@@ -1387,7 +1387,7 @@ public final class Multimaps {
 	 *
 	 * <p>
 	 * For example,
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *
@@ -1401,7 +1401,7 @@ public final class Multimaps {
 	 *
 	 * <p>
 	 * prints
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *
@@ -1445,7 +1445,7 @@ public final class Multimaps {
 	 *
 	 * <p>
 	 * For example,
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *
@@ -1459,7 +1459,7 @@ public final class Multimaps {
 	 *
 	 * <p>
 	 * prints
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *
@@ -1725,7 +1725,7 @@ public final class Multimaps {
 	 * <p>
 	 * It is imperative that the user manually synchronize on the returned multimap
 	 * when accessing any of its collection views:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *
@@ -1806,7 +1806,7 @@ public final class Multimaps {
 	 * <p>
 	 * All other properties of the transformed multimap, such as iteration order,
 	 * are left intact. For example, the code:
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 * 	&#64;code
@@ -1871,7 +1871,7 @@ public final class Multimaps {
 	 * <p>
 	 * All other properties of the transformed multimap, such as iteration order,
 	 * are left intact. For example, the code:
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 * 	&#64;code
@@ -1936,7 +1936,7 @@ public final class Multimaps {
 	 * Returns a view of a {@code ListMultimap} where each value is transformed by a
 	 * function. All other properties of the multimap, such as iteration order, are
 	 * left intact. For example, the code:
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 * 	&#64;code
@@ -1991,7 +1991,7 @@ public final class Multimaps {
 	 * Returns a view of a multimap where each value is transformed by a function.
 	 * All other properties of the multimap, such as iteration order, are left
 	 * intact. For example, the code:
-	 * 
+	 *
 	 * <pre>
 	 * {
 	 * 	&#64;code

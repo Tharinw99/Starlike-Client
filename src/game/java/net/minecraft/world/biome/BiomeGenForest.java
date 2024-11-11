@@ -15,13 +15,13 @@ import net.minecraft.world.gen.feature.WorldGenForest;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,7 +33,7 @@ import net.minecraft.world.gen.feature.WorldGenForest;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BiomeGenForest extends BiomeGenBase {
 	protected static final WorldGenForest field_150629_aC = new WorldGenForest(false, true);
@@ -70,6 +70,7 @@ public class BiomeGenForest extends BiomeGenBase {
 
 	}
 
+	@Override
 	protected BiomeGenBase createMutatedBiome(final int i) {
 		if (this.biomeID == BiomeGenBase.forest.biomeID) {
 			BiomeGenForest biomegenforest = new BiomeGenForest(i, 1);
@@ -81,10 +82,12 @@ public class BiomeGenForest extends BiomeGenBase {
 		} else {
 			return this.biomeID != BiomeGenBase.birchForest.biomeID
 					&& this.biomeID != BiomeGenBase.birchForestHills.biomeID ? new BiomeGenMutated(i, this) {
+						@Override
 						public void decorate(World world, EaglercraftRandom random, BlockPos blockpos) {
 							this.baseBiome.decorate(world, random, blockpos);
 						}
 					} : new BiomeGenMutated(i, this) {
+						@Override
 						public WorldGenAbstractTree genBigTreeChance(EaglercraftRandom random) {
 							return random.nextBoolean() ? BiomeGenForest.field_150629_aC
 									: BiomeGenForest.field_150630_aD;
@@ -93,6 +96,7 @@ public class BiomeGenForest extends BiomeGenBase {
 		}
 	}
 
+	@Override
 	public void decorate(World world, EaglercraftRandom random, BlockPos blockpos) {
 		if (this.field_150632_aF == 3) {
 			for (int i = 0; i < 4; ++i) {
@@ -143,6 +147,7 @@ public class BiomeGenForest extends BiomeGenBase {
 		super.decorate(world, random, blockpos);
 	}
 
+	@Override
 	protected BiomeGenBase func_150557_a(int i, boolean flag) {
 		if (this.field_150632_aF == 2) {
 			this.field_150609_ah = 353825;
@@ -157,16 +162,19 @@ public class BiomeGenForest extends BiomeGenBase {
 		}
 	}
 
+	@Override
 	public WorldGenAbstractTree genBigTreeChance(EaglercraftRandom random) {
 		return (WorldGenAbstractTree) (this.field_150632_aF == 3 && random.nextInt(3) > 0 ? field_150631_aE
 				: (this.field_150632_aF != 2 && random.nextInt(5) != 0 ? this.worldGeneratorTrees : field_150630_aD));
 	}
 
+	@Override
 	public int getGrassColorAtPos(BlockPos blockpos) {
 		int i = super.getGrassColorAtPos(blockpos);
 		return this.field_150632_aF == 3 ? (i & 16711422) + 2634762 >> 1 : i;
 	}
 
+	@Override
 	public BlockFlower.EnumFlowerType pickRandomFlower(EaglercraftRandom random, BlockPos blockpos) {
 		if (this.field_150632_aF == 1) {
 			double d0 = MathHelper.clamp_double((1.0D + GRASS_COLOR_NOISE

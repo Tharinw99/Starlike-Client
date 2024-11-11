@@ -14,7 +14,7 @@ import paulscode.sound.codecs.CodecWav;
 
 /**
  * Copyright (c) 2022-2023 lax1dude, ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -26,7 +26,7 @@ import paulscode.sound.codecs.CodecWav;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class PlatformAudio {
 
@@ -60,21 +60,26 @@ public class PlatformAudio {
 		@Override
 		public void pause(boolean setPaused) {
 			if (setPaused) {
-				if (sndSystem.playing(sourceName)) {
+				if (!paused) {
 					sndSystem.pause(sourceName);
+					paused = true;
 				}
-				paused = true;
 			} else {
-				if (!sndSystem.playing(sourceName)) {
+				if (paused) {
 					sndSystem.play(sourceName);
+					paused = false;
 				}
-				paused = false;
 			}
 		}
 
 		@Override
 		public void pitch(float f) {
 			sndSystem.setPitch(sourceName, f);
+		}
+
+		@Override
+		public void repeat(boolean en) {
+			sndSystem.setLooping(sourceName, en);
 		}
 
 		@Override
@@ -116,8 +121,8 @@ public class PlatformAudio {
 		return sndSystem != null;
 	}
 
-	public static IAudioHandle beginPlayback(IAudioResource track, float x, float y, float z, float volume,
-			float pitch) {
+	public static IAudioHandle beginPlayback(IAudioResource track, float x, float y, float z, float volume, float pitch,
+			boolean repeat) {
 		if (sndSystem == null) {
 			return null;
 		}
@@ -133,12 +138,13 @@ public class PlatformAudio {
 		sndSystem.setTemporary(srcName, true);
 		sndSystem.setPitch(srcName, pitch);
 		sndSystem.setVolume(srcName, volume);
+		sndSystem.setLooping(srcName, repeat);
 		sndSystem.play(srcName);
 
 		return new PaulscodeAudioHandle(srcName);
 	}
 
-	public static IAudioHandle beginPlaybackStatic(IAudioResource track, float volume, float pitch) {
+	public static IAudioHandle beginPlaybackStatic(IAudioResource track, float volume, float pitch, boolean repeat) {
 		if (sndSystem == null) {
 			return null;
 		}
@@ -149,6 +155,7 @@ public class PlatformAudio {
 		sndSystem.setTemporary(srcName, true);
 		sndSystem.setPitch(srcName, pitch);
 		sndSystem.setVolume(srcName, volume);
+		sndSystem.setLooping(srcName, repeat);
 		sndSystem.play(srcName);
 
 		return new PaulscodeAudioHandle(srcName);
@@ -183,6 +190,7 @@ public class PlatformAudio {
 			SoundSystemConfig.setCodec("ogg", CodecJOrbis.class);
 			SoundSystemConfig.setCodec("wav", CodecWav.class);
 			SoundSystemConfig.setLogger(new SoundSystemLogger() {
+				@Override
 				public void errorMessage(String parString1, String parString2, int parInt1) {
 					if (!parString2.isEmpty()) {
 						logger.error("Error in class \"{}\"!", parString1);
@@ -190,12 +198,14 @@ public class PlatformAudio {
 					}
 				}
 
+				@Override
 				public void importantMessage(String parString1, int parInt1) {
 					if (!parString1.isEmpty()) {
 						logger.warn(parString1);
 					}
 				}
 
+				@Override
 				public void message(String parString1, int parInt1) {
 					if (!parString1.isEmpty()) {
 						logger.info(parString1);

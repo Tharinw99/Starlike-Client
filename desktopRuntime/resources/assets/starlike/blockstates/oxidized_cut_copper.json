@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "normal": {
-            "model": "starlike:oxidized_cut_copper"
-        }
+  "variants": {
+    "normal": {
+      "model": "starlike:oxidized_cut_copper"
     }
+  }
 }

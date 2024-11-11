@@ -7,13 +7,13 @@ import net.minecraft.entity.player.EntityPlayer;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -25,7 +25,7 @@ import net.minecraft.entity.player.EntityPlayer;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityAIWatchClosest extends EntityAIBase {
 	protected EntityLiving theWatcher;
@@ -56,6 +56,7 @@ public class EntityAIWatchClosest extends EntityAIBase {
 	/**
 	 * + Returns whether an in-progress EntityAIBase should continue executing
 	 */
+	@Override
 	public boolean continueExecuting() {
 		return !this.closestEntity.isEntityAlive() ? false
 				: (this.theWatcher.getDistanceSqToEntity(
@@ -66,6 +67,7 @@ public class EntityAIWatchClosest extends EntityAIBase {
 	/**
 	 * + Resets the task
 	 */
+	@Override
 	public void resetTask() {
 		this.closestEntity = null;
 	}
@@ -73,6 +75,7 @@ public class EntityAIWatchClosest extends EntityAIBase {
 	/**
 	 * + Returns whether the EntityAIBase should begin execution.
 	 */
+	@Override
 	public boolean shouldExecute() {
 		if (this.theWatcher.getRNG().nextFloat() >= this.chance) {
 			return false;
@@ -98,6 +101,7 @@ public class EntityAIWatchClosest extends EntityAIBase {
 	/**
 	 * + Execute a one shot task or start executing a continuous task
 	 */
+	@Override
 	public void startExecuting() {
 		this.lookTime = 40 + this.theWatcher.getRNG().nextInt(40);
 	}
@@ -105,6 +109,7 @@ public class EntityAIWatchClosest extends EntityAIBase {
 	/**
 	 * + Updates the task
 	 */
+	@Override
 	public void updateTask() {
 		this.theWatcher.getLookHelper().setLookPosition(this.closestEntity.posX,
 				this.closestEntity.posY + (double) this.closestEntity.getEyeHeight(), this.closestEntity.posZ, 10.0F,

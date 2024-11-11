@@ -31,7 +31,7 @@ import com.google.common.annotations.GwtIncompatible;
  * element, those instances are consecutive in the iteration order. If all
  * occurrences of an element are removed, after which that element is added to
  * the multiset, the element will appear at the end of the iteration.
- * 
+ *
  * <p>
  * See the Guava User Guide article on <a href=
  * "http://code.google.com/p/guava-libraries/wiki/NewCollectionTypesExplained#Multiset">

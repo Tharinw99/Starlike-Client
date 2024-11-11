@@ -22,13 +22,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -40,7 +40,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class BlockStoneSlabNew extends BlockSlab {
 	public static enum EnumType implements IStringSerializable {
@@ -83,6 +83,7 @@ public abstract class BlockStoneSlabNew extends BlockSlab {
 			return this.meta;
 		}
 
+		@Override
 		public String getName() {
 			return this.name;
 		}
@@ -94,6 +95,7 @@ public abstract class BlockStoneSlabNew extends BlockSlab {
 			return this.name;
 		}
 
+		@Override
 		public String toString() {
 			return this.name;
 		}
@@ -120,6 +122,7 @@ public abstract class BlockStoneSlabNew extends BlockSlab {
 		this.setCreativeTab(CreativeTabs.tabBlock);
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return this.isDouble() ? new BlockState(this, new IProperty[] { SEAMLESS, VARIANT })
 				: new BlockState(this, new IProperty[] { HALF, VARIANT });
@@ -130,10 +133,12 @@ public abstract class BlockStoneSlabNew extends BlockSlab {
 	 * when the block gets destroyed. It returns the metadata of the dropped item
 	 * based on the old metadata of the block.
 	 */
+	@Override
 	public int damageDropped(IBlockState iblockstate) {
 		return ((BlockStoneSlabNew.EnumType) iblockstate.getValue(VARIANT)).getMetadata();
 	}
 
+	@Override
 	public Item getItem(World var1, BlockPos var2) {
 		return Item.getItemFromBlock(Blocks.stone_slab2);
 	}
@@ -141,6 +146,7 @@ public abstract class BlockStoneSlabNew extends BlockSlab {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
 		return Item.getItemFromBlock(Blocks.stone_slab2);
 	}
@@ -148,6 +154,7 @@ public abstract class BlockStoneSlabNew extends BlockSlab {
 	/**
 	 * + Gets the localized name of this block. Used for the statistics page.
 	 */
+	@Override
 	public String getLocalizedName() {
 		return StatCollector.translateToLocal(this.getUnlocalizedName() + ".red_sandstone.name");
 	}
@@ -155,6 +162,7 @@ public abstract class BlockStoneSlabNew extends BlockSlab {
 	/**
 	 * + Get the MapColor for this Block and the given BlockState
 	 */
+	@Override
 	public MapColor getMapColor(IBlockState iblockstate) {
 		return ((BlockStoneSlabNew.EnumType) iblockstate.getValue(VARIANT)).func_181068_c();
 	}
@@ -162,6 +170,7 @@ public abstract class BlockStoneSlabNew extends BlockSlab {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
 		i = i | ((BlockStoneSlabNew.EnumType) iblockstate.getValue(VARIANT)).getMetadata();
@@ -179,6 +188,7 @@ public abstract class BlockStoneSlabNew extends BlockSlab {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		IBlockState iblockstate = this.getDefaultState().withProperty(VARIANT,
 				BlockStoneSlabNew.EnumType.byMetadata(i & 7));
@@ -196,6 +206,7 @@ public abstract class BlockStoneSlabNew extends BlockSlab {
 	 * + returns a list of blocks with the same ID, but different meta (eg: wood
 	 * returns 4 blocks)
 	 */
+	@Override
 	public void getSubBlocks(Item item, CreativeTabs var2, List<ItemStack> list) {
 		if (item != Item.getItemFromBlock(Blocks.double_stone_slab2)) {
 			BlockStoneSlabNew.EnumType[] types = BlockStoneSlabNew.EnumType.META_LOOKUP;
@@ -209,14 +220,17 @@ public abstract class BlockStoneSlabNew extends BlockSlab {
 	/**
 	 * + Returns the slab block name with the type associated with it
 	 */
+	@Override
 	public String getUnlocalizedName(int i) {
 		return super.getUnlocalizedName() + "." + BlockStoneSlabNew.EnumType.byMetadata(i).getUnlocalizedName();
 	}
 
+	@Override
 	public Object getVariant(ItemStack itemstack) {
 		return BlockStoneSlabNew.EnumType.byMetadata(itemstack.getMetadata() & 7);
 	}
 
+	@Override
 	public IProperty<?> getVariantProperty() {
 		return VARIANT;
 	}

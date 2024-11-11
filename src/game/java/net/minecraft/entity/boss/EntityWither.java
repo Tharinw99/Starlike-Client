@@ -42,13 +42,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -60,13 +60,14 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityWither extends EntityMob implements IBossDisplayData, IRangedAttackMob {
 	/**
 	 * + Selector used to determine the entities a wither boss should attack.
 	 */
 	private static final Predicate<Entity> attackEntitySelector = new Predicate<Entity>() {
+		@Override
 		public boolean apply(Entity entity) {
 			return entity instanceof EntityLivingBase
 					&& ((EntityLivingBase) entity).getCreatureAttribute() != EnumCreatureAttribute.UNDEAD;
@@ -107,9 +108,11 @@ public class EntityWither extends EntityMob implements IBossDisplayData, IRanged
 	/**
 	 * + adds a PotionEffect to the entity
 	 */
+	@Override
 	public void addPotionEffect(PotionEffect var1) {
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(300.0D);
@@ -120,6 +123,7 @@ public class EntityWither extends EntityMob implements IBossDisplayData, IRanged
 	/**
 	 * + Called when the entity is attacked.
 	 */
+	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float f) {
 		if (this.isEntityInvulnerable(damagesource)) {
 			return false;
@@ -158,6 +162,7 @@ public class EntityWither extends EntityMob implements IBossDisplayData, IRanged
 	/**
 	 * + Attack the specified entity using a ranged attack.
 	 */
+	@Override
 	public void attackEntityWithRangedAttack(EntityLivingBase entitylivingbase, float var2) {
 		this.launchWitherSkullToEntity(0, entitylivingbase);
 	}
@@ -165,6 +170,7 @@ public class EntityWither extends EntityMob implements IBossDisplayData, IRanged
 	/**
 	 * + Makes the entity despawn if requirements are reached
 	 */
+	@Override
 	protected void despawnEntity() {
 		this.entityAge = 0;
 	}
@@ -172,6 +178,7 @@ public class EntityWither extends EntityMob implements IBossDisplayData, IRanged
 	/**
 	 * + Drop 0-2 items of this living's type
 	 */
+	@Override
 	protected void dropFewItems(boolean var1, int var2) {
 		EntityItem entityitem = this.dropItem(Items.nether_star, 1);
 		if (entityitem != null) {
@@ -188,6 +195,7 @@ public class EntityWither extends EntityMob implements IBossDisplayData, IRanged
 
 	}
 
+	@Override
 	protected void entityInit() {
 		super.entityInit();
 		this.dataWatcher.addObject(17, Integer.valueOf(0));
@@ -196,6 +204,7 @@ public class EntityWither extends EntityMob implements IBossDisplayData, IRanged
 		this.dataWatcher.addObject(20, Integer.valueOf(0));
 	}
 
+	@Override
 	public void fall(float var1, float var2) {
 	}
 
@@ -249,6 +258,7 @@ public class EntityWither extends EntityMob implements IBossDisplayData, IRanged
 		}
 	}
 
+	@Override
 	public int getBrightnessForRender(float var1) {
 		return 15728880;
 	}
@@ -256,6 +266,7 @@ public class EntityWither extends EntityMob implements IBossDisplayData, IRanged
 	/**
 	 * + Get this Entity's EnumCreatureAttribute
 	 */
+	@Override
 	public EnumCreatureAttribute getCreatureAttribute() {
 		return EnumCreatureAttribute.UNDEAD;
 	}
@@ -263,10 +274,12 @@ public class EntityWither extends EntityMob implements IBossDisplayData, IRanged
 	/**
 	 * + Returns the sound this mob makes on death.
 	 */
+	@Override
 	protected String getDeathSound() {
 		return "mob.wither.death";
 	}
 
+	@Override
 	protected float getEaglerDynamicLightsValueSimple(float partialTicks) {
 		return 1.0f;
 	}
@@ -274,6 +287,7 @@ public class EntityWither extends EntityMob implements IBossDisplayData, IRanged
 	/**
 	 * + Returns the sound this mob makes when it is hurt.
 	 */
+	@Override
 	protected String getHurtSound() {
 		return "mob.wither.hurt";
 	}
@@ -285,6 +299,7 @@ public class EntityWither extends EntityMob implements IBossDisplayData, IRanged
 	/**
 	 * + Returns the sound this mob makes while it's alive.
 	 */
+	@Override
 	protected String getLivingSound() {
 		return "mob.wither.idle";
 	}
@@ -293,6 +308,7 @@ public class EntityWither extends EntityMob implements IBossDisplayData, IRanged
 	 * + Returns the current armor value as determined by a call to
 	 * InventoryPlayer.getTotalArmorValue
 	 */
+	@Override
 	public int getTotalArmorValue() {
 		return 4;
 	}
@@ -344,6 +360,7 @@ public class EntityWither extends EntityMob implements IBossDisplayData, IRanged
 	/**
 	 * + Called when a player mounts an entity. e.g. mounts a pig, mounts a boat.
 	 */
+	@Override
 	public void mountEntity(Entity var1) {
 		this.ridingEntity = null;
 	}
@@ -353,6 +370,7 @@ public class EntityWither extends EntityMob implements IBossDisplayData, IRanged
 	 * required. For example, zombies and skeletons use this to react to sunlight
 	 * and start to burn.
 	 */
+	@Override
 	public void onLivingUpdate() {
 		this.motionY *= 0.6000000238418579D;
 		if (!this.worldObj.isRemote && this.getWatchedTargetId(0) > 0) {
@@ -445,6 +463,7 @@ public class EntityWither extends EntityMob implements IBossDisplayData, IRanged
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		this.setInvulTime(nbttagcompound.getInteger("Invul"));
@@ -457,9 +476,11 @@ public class EntityWither extends EntityMob implements IBossDisplayData, IRanged
 	/**
 	 * + Sets the Entity inside a web block.
 	 */
+	@Override
 	public void setInWeb() {
 	}
 
+	@Override
 	protected void updateAITasks() {
 		if (this.getInvulTime() > 0) {
 			int j1 = this.getInvulTime() - 1;
@@ -592,6 +613,7 @@ public class EntityWither extends EntityMob implements IBossDisplayData, IRanged
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		nbttagcompound.setInteger("Invul", this.getInvulTime());

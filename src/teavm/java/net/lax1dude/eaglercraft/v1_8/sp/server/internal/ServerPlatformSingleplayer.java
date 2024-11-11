@@ -35,37 +35,25 @@ import net.lax1dude.eaglercraft.v1_8.internal.teavm.TeaVMUtils;
 import net.lax1dude.eaglercraft.v1_8.internal.vfs2.VFile2;
 import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
 import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
+import net.lax1dude.eaglercraft.v1_8.sp.server.IWASMCrashCallback;
 
 /**
  * Copyright (c) 2022-2024 lax1dude. All Rights Reserved.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ServerPlatformSingleplayer {
-
-	private static final Logger logger = LogManager.getLogger("ServerPlatformSingleplayer");
-
-	private static final LinkedList<IPCPacketData> messageQueue = new LinkedList<>();
-
-	private static boolean immediateContinueSupport = false;
-	private static MessageChannel immediateContinueChannel = null;
-	private static Runnable currentContinueHack = null;
-	private static final Object immediateContLock = new Object();
-	private static final JSString emptyJSString = JSString.valueOf("");
-	private static boolean singleThreadMode = false;
-	private static Consumer<IPCPacketData> singleThreadCB = null;
-
-	private static IEaglerFilesystem filesystem = null;
 
 	@JSFunctor
 	private static interface WorkerBinaryPacketHandler extends JSObject {
@@ -73,39 +61,158 @@ public class ServerPlatformSingleplayer {
 	}
 
 	private static class WorkerBinaryPacketHandlerImpl implements WorkerBinaryPacketHandler {
-		
+
+		@Override
 		public void onMessage(String channel, ArrayBuffer buf) {
-			if(channel == null) {
+			if (channel == null) {
 				logger.error("Recieved IPC packet with null channel");
 				return;
 			}
-			
-			if(buf == null) {
+
+			if (buf == null) {
 				logger.error("Recieved IPC packet with null buffer");
 				return;
 			}
-			
-			synchronized(messageQueue) {
+
+			synchronized (messageQueue) {
 				messageQueue.add(new IPCPacketData(channel, TeaVMUtils.wrapByteArrayBuffer(buf)));
 			}
 		}
-		
+
 	}
 
-	@JSBody(params = { "wb" }, script = "__eaglerXOnMessage = function(o) { wb(o.data.ch, o.data.dat); };")
-	private static native void registerPacketHandler(WorkerBinaryPacketHandler wb);
+	private static final Logger logger = LogManager.getLogger("ServerPlatformSingleplayer");
+	private static final LinkedList<IPCPacketData> messageQueue = new LinkedList<>();
+	private static boolean immediateContinueSupport = false;
+	private static MessageChannel immediateContinueChannel = null;
+	private static Runnable currentContinueHack = null;
+	private static final Object immediateContLock = new Object();
+	private static final JSString emptyJSString = JSString.valueOf("");
 
-	public static void register() {
-		registerPacketHandler(new WorkerBinaryPacketHandlerImpl());
+	private static boolean singleThreadMode = false;
+
+	private static Consumer<IPCPacketData> singleThreadCB = null;
+
+	private static IEaglerFilesystem filesystem = null;
+
+	private static void checkImmediateContinueSupport() {
+		try {
+			immediateContinueSupport = false;
+			if (!MessageChannel.supported()) {
+				logger.error(
+						"Fast immediate continue will be disabled for server context due to MessageChannel being unsupported");
+				return;
+			}
+			immediateContinueChannel = MessageChannel.create();
+			immediateContinueChannel.getPort1().addEventListener("message", new EventListener<MessageEvent>() {
+				@Override
+				public void handleEvent(MessageEvent evt) {
+					Runnable toRun;
+					synchronized (immediateContLock) {
+						toRun = currentContinueHack;
+						currentContinueHack = null;
+					}
+					if (toRun != null) {
+						toRun.run();
+					}
+				}
+			});
+			immediateContinueChannel.getPort1().start();
+			immediateContinueChannel.getPort2().start();
+			final boolean[] checkMe = new boolean[1];
+			checkMe[0] = false;
+			currentContinueHack = () -> {
+				checkMe[0] = true;
+			};
+			immediateContinueChannel.getPort2().postMessage(emptyJSString);
+			if (checkMe[0]) {
+				currentContinueHack = null;
+				if (immediateContinueChannel != null) {
+					safeShutdownChannel(immediateContinueChannel);
+				}
+				immediateContinueChannel = null;
+				logger.error(
+						"Fast immediate continue will be disabled for server context due to actually continuing immediately");
+				return;
+			}
+			EagUtils.sleep(10);
+			currentContinueHack = null;
+			if (!checkMe[0]) {
+				if (immediateContinueChannel != null) {
+					safeShutdownChannel(immediateContinueChannel);
+				}
+				immediateContinueChannel = null;
+				logger.error(
+						"Fast immediate continue will be disabled for server context due to startup check failing");
+			} else {
+				immediateContinueSupport = true;
+			}
+		} catch (Throwable t) {
+			logger.error("Fast immediate continue will be disabled for server context due to exceptions");
+			immediateContinueSupport = false;
+			if (immediateContinueChannel != null) {
+				safeShutdownChannel(immediateContinueChannel);
+			}
+			immediateContinueChannel = null;
+		}
+	}
+
+	private static void dumpShims(Set<EnumES6Shims> shims) {
+		if (!shims.isEmpty()) {
+			logger.info("(Enabled {} shims: {})", shims.size(),
+					String.join(", ", Collections2.transform(shims, (shim) -> shim.shimDesc)));
+		}
+	}
+
+	public static IClientConfigAdapter getClientConfigAdapter() {
+		return TeaVMClientConfigAdapter.instance;
+	}
+
+	public static IEaglerFilesystem getWorldsDatabase() {
+		return filesystem;
+	}
+
+	public static void immediateContinue() {
+		if (singleThreadMode) {
+			PlatformRuntime.immediateContinue();
+		} else {
+			if (immediateContinueSupport) {
+				immediateContinueTeaVM();
+			} else {
+				EagUtils.sleep(0);
+			}
+		}
+	}
+
+	@Async
+	private static native void immediateContinueTeaVM();
+
+	private static void immediateContinueTeaVM(final AsyncCallback<Void> cb) {
+		synchronized (immediateContLock) {
+			if (currentContinueHack != null) {
+				cb.error(new IllegalStateException(
+						"Worker thread is already waiting for an immediate continue callback!"));
+				return;
+			}
+			currentContinueHack = () -> {
+				cb.complete(null);
+			};
+			try {
+				immediateContinueChannel.getPort2().postMessage(emptyJSString);
+			} catch (Throwable t) {
+				logger.error("Caught error posting immediate continue, using setTimeout instead");
+				Window.setTimeout(() -> cb.complete(null), 0);
+			}
+		}
 	}
 
 	public static void initializeContext() {
 		singleThreadMode = false;
 		singleThreadCB = null;
 		ES6ShimStatus shimStatus = ES6ShimStatus.getRuntimeStatus();
-		if(shimStatus != null) {
+		if (shimStatus != null) {
 			EnumES6ShimStatus stat = shimStatus.getStatus();
-			switch(stat) {
+			switch (stat) {
 			case STATUS_ERROR:
 			case STATUS_DISABLED_ERRORS:
 				logger.error("ES6 Shim Status: {}", stat.statusDesc);
@@ -126,17 +233,13 @@ public class ServerPlatformSingleplayer {
 				break;
 			}
 		}
-		
+
 		TeaVMBlobURLManager.initialize();
-		
+
 		checkImmediateContinueSupport();
-		
+
 		filesystem = Filesystem.getHandleFor(getClientConfigAdapter().getWorldsDB());
 		VFile2.setPrimaryFilesystem(filesystem);
-	}
-
-	public static IEaglerFilesystem getWorldsDatabase() {
-		return filesystem;
 	}
 
 	public static void initializeContextSingleThread(Consumer<IPCPacketData> packetSendCallback) {
@@ -145,28 +248,19 @@ public class ServerPlatformSingleplayer {
 		filesystem = Filesystem.getHandleFor(getClientConfigAdapter().getWorldsDB());
 	}
 
-	private static void dumpShims(Set<EnumES6Shims> shims) {
-		if(!shims.isEmpty()) {
-			logger.info("(Enabled {} shims: {})", shims.size(), String.join(", ", Collections2.transform(shims, (shim) -> shim.shimDesc)));
-		}
+	public static boolean isSingleThreadMode() {
+		return singleThreadMode;
 	}
 
-	@JSBody(params = { "ch", "dat" }, script = "postMessage({ ch: ch, dat : dat });")
-	public static native void sendPacketTeaVM(String channel, ArrayBuffer arr);
-
-	public static void sendPacket(IPCPacketData packet) {
-		if(singleThreadMode) {
-			singleThreadCB.accept(packet);
-		}else {
-			sendPacketTeaVM(packet.channel, TeaVMUtils.unwrapArrayBuffer(packet.contents));
-		}
+	public static boolean isTabAboutToCloseWASM() {
+		return false;
 	}
 
 	public static List<IPCPacketData> recieveAllPacket() {
-		synchronized(messageQueue) {
-			if(messageQueue.size() == 0) {
+		synchronized (messageQueue) {
+			if (messageQueue.size() == 0) {
 				return null;
-			}else {
+			} else {
 				List<IPCPacketData> ret = new ArrayList<>(messageQueue);
 				messageQueue.clear();
 				return ret;
@@ -174,121 +268,43 @@ public class ServerPlatformSingleplayer {
 		}
 	}
 
-	public static IClientConfigAdapter getClientConfigAdapter() {
-		return TeaVMClientConfigAdapter.instance;
-	}
-
-	private static void checkImmediateContinueSupport() {
-		try {
-			immediateContinueSupport = false;
-			if(!MessageChannel.supported()) {
-				logger.error("Fast immediate continue will be disabled for server context due to MessageChannel being unsupported");
-				return;
-			}
-			immediateContinueChannel = MessageChannel.create();
-			immediateContinueChannel.getPort1().addEventListener("message", new EventListener<MessageEvent>() {
-				@Override
-				public void handleEvent(MessageEvent evt) {
-					Runnable toRun;
-					synchronized(immediateContLock) {
-						toRun = currentContinueHack;
-						currentContinueHack = null;
-					}
-					if(toRun != null) {
-						toRun.run();
-					}
-				}
-			});
-			immediateContinueChannel.getPort1().start();
-			immediateContinueChannel.getPort2().start();
-			final boolean[] checkMe = new boolean[1];
-			checkMe[0] = false;
-			currentContinueHack = () -> {
-				checkMe[0] = true;
-			};
-			immediateContinueChannel.getPort2().postMessage(emptyJSString);
-			if(checkMe[0]) {
-				currentContinueHack = null;
-				if(immediateContinueChannel != null) {
-					safeShutdownChannel(immediateContinueChannel);
-				}
-				immediateContinueChannel = null;
-				logger.error("Fast immediate continue will be disabled for server context due to actually continuing immediately");
-				return;
-			}
-			EagUtils.sleep(10);
-			currentContinueHack = null;
-			if(!checkMe[0]) {
-				if(immediateContinueChannel != null) {
-					safeShutdownChannel(immediateContinueChannel);
-				}
-				immediateContinueChannel = null;
-				logger.error("Fast immediate continue will be disabled for server context due to startup check failing");
-			}else {
-				immediateContinueSupport = true;
-			}
-		}catch(Throwable t) {
-			logger.error("Fast immediate continue will be disabled for server context due to exceptions");
-			immediateContinueSupport = false;
-			if(immediateContinueChannel != null) {
-				safeShutdownChannel(immediateContinueChannel);
-			}
-			immediateContinueChannel = null;
+	public static void recievePacketSingleThreadTeaVM(IPCPacketData pkt) {
+		synchronized (messageQueue) {
+			messageQueue.add(pkt);
 		}
 	}
+
+	public static void register() {
+		registerPacketHandler(new WorkerBinaryPacketHandlerImpl());
+	}
+
+	@JSBody(params = { "wb" }, script = "__eaglerXOnMessage = function(o) { wb(o.data.ch, o.data.dat); };")
+	private static native void registerPacketHandler(WorkerBinaryPacketHandler wb);
 
 	private static void safeShutdownChannel(MessageChannel chan) {
 		try {
 			chan.getPort1().close();
-		}catch(Throwable tt) {
+		} catch (Throwable tt) {
 		}
 		try {
 			chan.getPort2().close();
-		}catch(Throwable tt) {
+		} catch (Throwable tt) {
 		}
 	}
 
-	public static void immediateContinue() {
-		if(singleThreadMode) {
-			PlatformRuntime.immediateContinue();
-		}else {
-			if(immediateContinueSupport) {
-				immediateContinueTeaVM();
-			}else {
-				EagUtils.sleep(0);
-			}
+	public static void sendPacket(IPCPacketData packet) {
+		if (singleThreadMode) {
+			singleThreadCB.accept(packet);
+		} else {
+			sendPacketTeaVM(packet.channel, TeaVMUtils.unwrapArrayBuffer(packet.contents));
 		}
 	}
 
-	@Async
-	private static native void immediateContinueTeaVM();
-	
-	private static void immediateContinueTeaVM(final AsyncCallback<Void> cb) {
-		synchronized(immediateContLock) {
-			if(currentContinueHack != null) {
-				cb.error(new IllegalStateException("Worker thread is already waiting for an immediate continue callback!"));
-				return;
-			}
-			currentContinueHack = () -> {
-				cb.complete(null);
-			};
-			try {
-				immediateContinueChannel.getPort2().postMessage(emptyJSString);
-			}catch(Throwable t) {
-				logger.error("Caught error posting immediate continue, using setTimeout instead");
-				Window.setTimeout(() -> cb.complete(null), 0);
-			}
-		}
-	}
+	@JSBody(params = { "ch", "dat" }, script = "postMessage({ ch: ch, dat : dat });")
+	public static native void sendPacketTeaVM(String channel, ArrayBuffer arr);
 
-	public static boolean isSingleThreadMode() {
-		return singleThreadMode;
-	}
+	public static void setCrashCallbackWASM(IWASMCrashCallback callback) {
 
-	public static void recievePacketSingleThreadTeaVM(IPCPacketData pkt) {
-		synchronized(messageQueue) {
-			messageQueue.add(pkt);
-		}
 	}
 
 }

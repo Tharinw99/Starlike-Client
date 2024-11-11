@@ -23,13 +23,13 @@ import net.minecraft.world.biome.BiomeGenBase;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -41,7 +41,7 @@ import net.minecraft.world.biome.BiomeGenBase;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class StructureOceanMonument extends MapGenStructure {
 	public static class StartMonument extends StructureStart {
@@ -56,11 +56,13 @@ public class StructureOceanMonument extends MapGenStructure {
 			this.func_175789_b(worldIn, parRandom, parInt1, parInt2);
 		}
 
+		@Override
 		public void func_175787_b(ChunkCoordIntPair pair) {
 			super.func_175787_b(pair);
 			this.field_175791_c.add(pair);
 		}
 
+		@Override
 		public boolean func_175788_a(ChunkCoordIntPair pair) {
 			return this.field_175791_c.contains(pair) ? false : super.func_175788_a(pair);
 		}
@@ -80,6 +82,7 @@ public class StructureOceanMonument extends MapGenStructure {
 			this.field_175790_d = true;
 		}
 
+		@Override
 		public void generateStructure(World worldIn, EaglercraftRandom rand, StructureBoundingBox structurebb) {
 			if (!this.field_175790_d) {
 				this.components.clear();
@@ -89,6 +92,7 @@ public class StructureOceanMonument extends MapGenStructure {
 			super.generateStructure(worldIn, rand, structurebb);
 		}
 
+		@Override
 		public void readFromNBT(NBTTagCompound tagCompound) {
 			super.readFromNBT(tagCompound);
 			if (tagCompound.hasKey("Processed", 9)) {
@@ -103,6 +107,7 @@ public class StructureOceanMonument extends MapGenStructure {
 
 		}
 
+		@Override
 		public void writeToNBT(NBTTagCompound tagCompound) {
 			super.writeToNBT(tagCompound);
 			NBTTagList nbttaglist = new NBTTagList();
@@ -150,6 +155,7 @@ public class StructureOceanMonument extends MapGenStructure {
 
 	}
 
+	@Override
 	protected boolean canSpawnStructureAtCoords(int i, int j) {
 		int k = i;
 		int l = j;
@@ -190,10 +196,12 @@ public class StructureOceanMonument extends MapGenStructure {
 		return field_175803_h;
 	}
 
+	@Override
 	public String getStructureName() {
 		return "Monument";
 	}
 
+	@Override
 	protected StructureStart getStructureStart(int i, int j) {
 		return new StructureOceanMonument.StartMonument(this.worldObj, this.rand, i, j);
 	}

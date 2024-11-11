@@ -7,13 +7,13 @@ import net.minecraft.world.gen.ChunkProviderSettings;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -25,11 +25,12 @@ import net.minecraft.world.gen.ChunkProviderSettings;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GenLayerBiome extends GenLayer {
 	private BiomeGenBase[] field_151623_c = new BiomeGenBase[] { BiomeGenBase.desert, BiomeGenBase.desert,
-			BiomeGenBase.desert, BiomeGenBase.savanna, BiomeGenBase.savanna, BiomeGenBase.plains };
+			BiomeGenBase.desert, BiomeGenBase.savanna, BiomeGenBase.savanna, BiomeGenBase.plains,
+			BiomeGenBase.enderForest };
 	private BiomeGenBase[] field_151621_d = new BiomeGenBase[] { BiomeGenBase.forest, BiomeGenBase.roofedForest,
 			BiomeGenBase.extremeHills, BiomeGenBase.plains, BiomeGenBase.birchForest, BiomeGenBase.swampland };
 	private BiomeGenBase[] field_151622_e = new BiomeGenBase[] { BiomeGenBase.forest, BiomeGenBase.extremeHills,
@@ -43,7 +44,8 @@ public class GenLayerBiome extends GenLayer {
 		this.parent = parGenLayer;
 		if (parWorldType == WorldType.DEFAULT_1_1) {
 			this.field_151623_c = new BiomeGenBase[] { BiomeGenBase.desert, BiomeGenBase.forest,
-					BiomeGenBase.extremeHills, BiomeGenBase.swampland, BiomeGenBase.plains, BiomeGenBase.taiga };
+					BiomeGenBase.extremeHills, BiomeGenBase.swampland, BiomeGenBase.plains, BiomeGenBase.taiga,
+					BiomeGenBase.enderForest };
 			this.field_175973_g = null;
 		} else if (parWorldType == WorldType.CUSTOMIZED) {
 			this.field_175973_g = ChunkProviderSettings.Factory.jsonToFactory(parString1).func_177864_b();
@@ -58,6 +60,7 @@ public class GenLayerBiome extends GenLayer {
 	 * interpreted as temperatures, rainfall amounts, or biomeList[] indices based
 	 * on the particular GenLayer subclass.
 	 */
+	@Override
 	public int[] getInts(int i, int j, int k, int l) {
 		int[] aint = this.parent.getInts(i, j, k, l);
 		int[] aint1 = IntCache.getIntCache(k * l);

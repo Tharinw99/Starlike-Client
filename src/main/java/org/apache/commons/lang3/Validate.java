@@ -51,7 +51,7 @@ import net.lax1dude.eaglercraft.v1_8.JDKBackports;
  * <p>
  * #ThreadSafe#
  * </p>
- * 
+ *
  * @see java.lang.String#format(String, Object...)
  * @since 2.0
  */

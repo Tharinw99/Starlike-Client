@@ -1,10 +1,10 @@
 {
-    "variants": {
-        "variant=oak": { "model": "starlike:oak_mosaic" },
-        "variant=spruce": { "model": "starlike:spruce_mosaic" },
-        "variant=birch": { "model": "starlike:birch_mosaic" },
-        "variant=jungle": { "model": "starlike:jungle_mosaic" },
-        "variant=acacia": { "model": "starlike:acacia_mosaic" },
-        "variant=dark_oak": { "model": "starlike:dark_oak_mosaic" }
-    }
+  "variants": {
+    "variant=oak": { "model": "starlike:oak_mosaic" },
+    "variant=spruce": { "model": "starlike:spruce_mosaic" },
+    "variant=birch": { "model": "starlike:birch_mosaic" },
+    "variant=jungle": { "model": "starlike:jungle_mosaic" },
+    "variant=acacia": { "model": "starlike:acacia_mosaic" },
+    "variant=dark_oak": { "model": "starlike:dark_oak_mosaic" }
+  }
 }

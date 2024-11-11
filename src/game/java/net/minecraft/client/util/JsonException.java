@@ -11,13 +11,13 @@ import com.google.common.collect.Lists;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,7 +29,7 @@ import com.google.common.collect.Lists;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class JsonException extends IOException {
 	public static class Entry {
@@ -49,6 +49,7 @@ public class JsonException extends IOException {
 			this.field_151375_b.add(0, parString1);
 		}
 
+		@Override
 		public String toString() {
 			return this.field_151376_a != null
 					? (!this.field_151375_b.isEmpty() ? this.field_151376_a + " " + this.func_151372_b()
@@ -94,6 +95,7 @@ public class JsonException extends IOException {
 		this.field_151383_a.add(0, new JsonException.Entry());
 	}
 
+	@Override
 	public String getMessage() {
 		return "Invalid " + ((JsonException.Entry) this.field_151383_a.get(this.field_151383_a.size() - 1)).toString()
 				+ ": " + this.field_151382_b;

@@ -31,13 +31,13 @@ import net.minecraft.world.biome.WorldChunkManager;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -49,7 +49,7 @@ import net.minecraft.world.biome.WorldChunkManager;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class StructureVillagePieces {
 	public static class Church extends StructureVillagePieces.Village {
@@ -75,6 +75,7 @@ public class StructureVillagePieces {
 			this.boundingBox = parStructureBoundingBox;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			if (this.field_143015_k < 0) {
@@ -194,6 +195,7 @@ public class StructureVillagePieces {
 			return true;
 		}
 
+		@Override
 		protected int func_180779_c(int var1, int var2) {
 			return 2;
 		}
@@ -232,6 +234,7 @@ public class StructureVillagePieces {
 			this.cropTypeD = this.func_151559_a(rand);
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			if (this.field_143015_k < 0) {
@@ -317,6 +320,7 @@ public class StructureVillagePieces {
 			}
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			super.readStructureFromNBT(nbttagcompound);
 			this.cropTypeA = Block.getBlockById(nbttagcompound.getInteger("CA"));
@@ -325,6 +329,7 @@ public class StructureVillagePieces {
 			this.cropTypeD = Block.getBlockById(nbttagcompound.getInteger("CD"));
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			super.writeStructureToNBT(nbttagcompound);
 			nbttagcompound.setInteger("CA", Block.blockRegistry.getIDForObject(this.cropTypeA));
@@ -363,6 +368,7 @@ public class StructureVillagePieces {
 			this.cropTypeB = this.func_151560_a(rand);
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			if (this.field_143015_k < 0) {
@@ -428,12 +434,14 @@ public class StructureVillagePieces {
 			}
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			super.readStructureFromNBT(nbttagcompound);
 			this.cropTypeA = Block.getBlockById(nbttagcompound.getInteger("CA"));
 			this.cropTypeB = Block.getBlockById(nbttagcompound.getInteger("CB"));
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			super.writeStructureToNBT(nbttagcompound);
 			nbttagcompound.setInteger("CA", Block.blockRegistry.getIDForObject(this.cropTypeA));
@@ -464,6 +472,7 @@ public class StructureVillagePieces {
 			this.boundingBox = parStructureBoundingBox;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			if (this.field_143015_k < 0) {
@@ -571,6 +580,9 @@ public class StructureVillagePieces {
 					3, 4, structureboundingbox);
 			this.placeDoorCurrentPosition(world, structureboundingbox, random, 6, 1, 5,
 					EnumFacing.getHorizontal(this.getMetadataWithOffset(Blocks.oak_door, 1)));
+			this.setBlockState(world, Blocks.air.getDefaultState(), 6, 3, 5, structureboundingbox);
+			this.setBlockState(world, Blocks.air.getDefaultState(), 6, 3, 4, structureboundingbox);
+			this.setBlockState(world, Blocks.air.getDefaultState(), 6, 3, 6, structureboundingbox);
 
 			for (int i1 = 0; i1 < 5; ++i1) {
 				for (int j1 = 0; j1 < 9; ++j1) {
@@ -584,6 +596,7 @@ public class StructureVillagePieces {
 			return true;
 		}
 
+		@Override
 		protected int func_180779_c(int i, int j) {
 			return i == 0 ? 4 : super.func_180779_c(i, j);
 		}
@@ -612,6 +625,7 @@ public class StructureVillagePieces {
 			this.boundingBox = parStructureBoundingBox;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			if (this.field_143015_k < 0) {
@@ -731,6 +745,7 @@ public class StructureVillagePieces {
 			return true;
 		}
 
+		@Override
 		protected int func_180779_c(int parInt1, int parInt2) {
 			return 1;
 		}
@@ -780,6 +795,7 @@ public class StructureVillagePieces {
 			this.boundingBox = parStructureBoundingBox;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			if (this.field_143015_k < 0) {
@@ -793,14 +809,18 @@ public class StructureVillagePieces {
 
 			this.fillWithBlocks(world, structureboundingbox, 0, 1, 0, 9, 4, 6, Blocks.air.getDefaultState(),
 					Blocks.air.getDefaultState(), false);
+
 			this.fillWithBlocks(world, structureboundingbox, 0, 0, 0, 9, 0, 6, Blocks.cobblestone.getDefaultState(),
 					Blocks.cobblestone.getDefaultState(), false);
+
 			this.fillWithBlocks(world, structureboundingbox, 0, 4, 0, 9, 4, 6, Blocks.cobblestone.getDefaultState(),
 					Blocks.cobblestone.getDefaultState(), false);
+
 			this.fillWithBlocks(world, structureboundingbox, 0, 5, 0, 9, 5, 6, Blocks.stone_slab.getDefaultState(),
 					Blocks.stone_slab.getDefaultState(), false);
 			this.fillWithBlocks(world, structureboundingbox, 1, 5, 1, 8, 5, 5, Blocks.air.getDefaultState(),
 					Blocks.air.getDefaultState(), false);
+
 			this.fillWithBlocks(world, structureboundingbox, 1, 1, 0, 2, 3, 0, Blocks.planks.getDefaultState(),
 					Blocks.planks.getDefaultState(), false);
 			this.fillWithBlocks(world, structureboundingbox, 0, 1, 0, 0, 4, 0, Blocks.log.getDefaultState(),
@@ -809,6 +829,7 @@ public class StructureVillagePieces {
 					Blocks.log.getDefaultState(), false);
 			this.fillWithBlocks(world, structureboundingbox, 0, 1, 6, 0, 4, 6, Blocks.log.getDefaultState(),
 					Blocks.log.getDefaultState(), false);
+
 			this.setBlockState(world, Blocks.planks.getDefaultState(), 3, 3, 1, structureboundingbox);
 			this.fillWithBlocks(world, structureboundingbox, 3, 1, 2, 3, 3, 2, Blocks.planks.getDefaultState(),
 					Blocks.planks.getDefaultState(), false);
@@ -830,41 +851,6 @@ public class StructureVillagePieces {
 			this.setBlockState(world, Blocks.iron_bars.getDefaultState(), 9, 2, 4, structureboundingbox);
 			this.fillWithBlocks(world, structureboundingbox, 7, 2, 4, 8, 2, 5, Blocks.air.getDefaultState(),
 					Blocks.air.getDefaultState(), false);
-			this.setBlockState(world, Blocks.cobblestone.getDefaultState(), 6, 1, 3, structureboundingbox);
-			this.setBlockState(world, Blocks.furnace.getDefaultState(), 6, 2, 3, structureboundingbox);
-			this.setBlockState(world, Blocks.furnace.getDefaultState(), 6, 3, 3, structureboundingbox);
-			this.setBlockState(world, Blocks.double_stone_slab.getDefaultState(), 8, 1, 1, structureboundingbox);
-			this.setBlockState(world, Blocks.glass_pane.getDefaultState(), 0, 2, 2, structureboundingbox);
-			this.setBlockState(world, Blocks.glass_pane.getDefaultState(), 0, 2, 4, structureboundingbox);
-			this.setBlockState(world, Blocks.glass_pane.getDefaultState(), 2, 2, 6, structureboundingbox);
-			this.setBlockState(world, Blocks.glass_pane.getDefaultState(), 4, 2, 6, structureboundingbox);
-			this.setBlockState(world, Blocks.oak_fence.getDefaultState(), 2, 1, 4, structureboundingbox);
-			this.setBlockState(world, Blocks.wooden_pressure_plate.getDefaultState(), 2, 2, 4, structureboundingbox);
-			this.setBlockState(world, Blocks.planks.getDefaultState(), 1, 1, 5, structureboundingbox);
-			this.setBlockState(world,
-					Blocks.oak_stairs.getStateFromMeta(this.getMetadataWithOffset(Blocks.oak_stairs, 3)), 2, 1, 5,
-					structureboundingbox);
-			this.setBlockState(world,
-					Blocks.oak_stairs.getStateFromMeta(this.getMetadataWithOffset(Blocks.oak_stairs, 1)), 1, 1, 4,
-					structureboundingbox);
-			if (!this.hasMadeChest && structureboundingbox.isVecInside(
-					new BlockPos(this.getXWithOffset(5, 5), this.getYWithOffset(1), this.getZWithOffset(5, 5)))) {
-				this.hasMadeChest = true;
-				this.generateChestContents(world, structureboundingbox, random, 5, 1, 5, villageBlacksmithChestContents,
-						3 + random.nextInt(6));
-			}
-
-			for (int i = 6; i <= 8; ++i) {
-				if (this.getBlockStateFromPos(world, i, 0, -1, structureboundingbox).getBlock()
-						.getMaterial() == Material.air
-						&& this.getBlockStateFromPos(world, i, -1, -1, structureboundingbox).getBlock()
-								.getMaterial() != Material.air) {
-					this.setBlockState(world,
-							Blocks.stone_stairs.getStateFromMeta(this.getMetadataWithOffset(Blocks.stone_stairs, 3)), i,
-							0, -1, structureboundingbox);
-				}
-			}
-
 			for (int k = 0; k < 7; ++k) {
 				for (int j = 0; j < 10; ++j) {
 					this.clearCurrentPositionBlocksUpwards(world, j, 6, k, structureboundingbox);
@@ -872,20 +858,103 @@ public class StructureVillagePieces {
 							structureboundingbox);
 				}
 			}
+			// ** Basement section **
 
-			this.spawnVillagers(world, structureboundingbox, 7, 1, 1, 1);
+			this.fillWithBlocks(world, structureboundingbox, 0, -4, 0, 9, -4, 6, Blocks.air.getDefaultState(),
+					Blocks.air.getDefaultState(), false);
+
+			this.fillWithBlocks(world, structureboundingbox, 0, -3, 0, 9, -1, 6, Blocks.air.getDefaultState(),
+					Blocks.air.getDefaultState(), false);
+
+			this.fillWithBlocks(world, structureboundingbox, 0, -4, 0, 9, -4, 6, Blocks.cobblestone.getDefaultState(),
+					Blocks.cobblestone.getDefaultState(), false);
+			this.setBlockState(world, Blocks.cobblestone.getDefaultState(), 7, 0, -1, structureboundingbox);
+			this.setBlockState(world, Blocks.cobblestone.getDefaultState(), 8, 0, -1, structureboundingbox);
+			this.setBlockState(world, Blocks.cobblestone.getDefaultState(), 9, 0, -1, structureboundingbox);
+
+			this.setBlockState(world,
+					Blocks.oak_stairs.getStateFromMeta(this.getMetadataWithOffset(Blocks.oak_stairs, 2)), 8, 0, 0,
+					structureboundingbox);
+			this.setBlockState(world, Blocks.bookshelf.getDefaultState(), 8, -1, 0, structureboundingbox);
+			this.setBlockState(world, Blocks.bookshelf.getDefaultState(), 8, -2, 0, structureboundingbox);
+
+			this.setBlockState(world,
+					Blocks.oak_stairs.getStateFromMeta(this.getMetadataWithOffset(Blocks.oak_stairs, 2)), 8, -1, 1,
+					structureboundingbox);
+			this.setBlockState(world, Blocks.air.getDefaultState(), 8, 0, 1, structureboundingbox);
+			this.setBlockState(world, Blocks.bookshelf.getDefaultState(), 8, -2, 1, structureboundingbox);
+			this.setBlockState(world, Blocks.bookshelf.getDefaultState(), 8, -3, 1, structureboundingbox);
+
+			this.setBlockState(world,
+					Blocks.oak_stairs.getStateFromMeta(this.getMetadataWithOffset(Blocks.oak_stairs, 2)), 8, -2, 2,
+					structureboundingbox);
+			this.setBlockState(world, Blocks.air.getDefaultState(), 8, 0, 2, structureboundingbox);
+			this.setBlockState(world, Blocks.air.getDefaultState(), 8, -1, 2, structureboundingbox);
+			this.setBlockState(world, Blocks.bookshelf.getDefaultState(), 8, -3, 2, structureboundingbox);
+
+			this.setBlockState(world,
+					Blocks.oak_stairs.getStateFromMeta(this.getMetadataWithOffset(Blocks.oak_stairs, 2)), 8, -3, 3,
+					structureboundingbox);
+			this.setBlockState(world, Blocks.air.getDefaultState(), 8, 0, 3, structureboundingbox);
+			this.setBlockState(world, Blocks.air.getDefaultState(), 8, -1, 3, structureboundingbox);
+
+			this.setBlockState(world, Blocks.chest.getDefaultState(), 2, -3, 1, structureboundingbox);
+			this.setBlockState(world, Blocks.chest.getDefaultState(), 3, -3, 1, structureboundingbox);
+			this.setBlockState(world, Blocks.sea_lantern.getDefaultState(), 2, -4, 1, structureboundingbox);
+			this.setBlockState(world, Blocks.sea_lantern.getDefaultState(), 3, -4, 1, structureboundingbox);
+			this.setBlockState(world, Blocks.smithing_table.getDefaultState(), 4, -3, 1, structureboundingbox);
+
+			this.setBlockState(world, Blocks.furnace.getDefaultState(), 1, -3, 2, structureboundingbox);
+			this.setBlockState(world, Blocks.anvil.getDefaultState(), 1, -3, 3, structureboundingbox);
+			this.setBlockState(world, Blocks.anvil.getDefaultState(), 1, -3, 4, structureboundingbox);
+			this.setBlockState(world, Blocks.furnace.getDefaultState(), 1, -3, 5, structureboundingbox);
+
+			this.fillWithBlocks(world, structureboundingbox, 0, -3, 0, 0, -1, 6,
+					Blocks.limestone_tiles.getDefaultState(), Blocks.limestone_tiles.getDefaultState(), false);
+
+			this.fillWithBlocks(world, structureboundingbox, 9, -3, 0, 9, -1, 6,
+					Blocks.limestone_tiles.getDefaultState(), Blocks.limestone_tiles.getDefaultState(), false);
+
+			this.fillWithBlocks(world, structureboundingbox, 0, -3, 0, 9, -1, 0,
+					Blocks.limestone_tiles.getDefaultState(), Blocks.limestone_tiles.getDefaultState(), false);
+
+			this.fillWithBlocks(world, structureboundingbox, 0, -3, 6, 9, -1, 6,
+					Blocks.limestone_tiles.getDefaultState(), Blocks.limestone_tiles.getDefaultState(), false);
+
+			this.setBlockState(world, Blocks.polished_diorite_brick.getDefaultState(), 1, -3, 1, structureboundingbox);
+			this.setBlockState(world, Blocks.polished_diorite_brick.getDefaultState(), 1, -2, 1, structureboundingbox);
+			this.setBlockState(world, Blocks.polished_diorite_brick.getDefaultState(), 1, -1, 1, structureboundingbox);
+			this.setBlockState(world, Blocks.polished_diorite_brick.getDefaultState(), 1, -1, 2, structureboundingbox);
+			this.setBlockState(world, Blocks.polished_diorite_brick.getDefaultState(), 1, -1, 3, structureboundingbox);
+			this.setBlockState(world, Blocks.polished_diorite_brick.getDefaultState(), 1, -1, 4, structureboundingbox);
+			this.setBlockState(world, Blocks.polished_diorite_brick.getDefaultState(), 1, -1, 5, structureboundingbox);
+			this.setBlockState(world, Blocks.polished_diorite_brick.getDefaultState(), 1, -1, 1, structureboundingbox);
+			this.setBlockState(world, Blocks.polished_diorite_brick.getDefaultState(), 1, -1, 1, structureboundingbox);
+			this.setBlockState(world, Blocks.polished_diorite_brick.getDefaultState(), 2, -1, 1, structureboundingbox);
+			this.setBlockState(world, Blocks.polished_diorite_brick.getDefaultState(), 3, -1, 1, structureboundingbox);
+			this.setBlockState(world, Blocks.polished_diorite_brick.getDefaultState(), 4, -1, 1, structureboundingbox);
+			this.setBlockState(world, Blocks.polished_diorite_brick.getDefaultState(), 5, -1, 1, structureboundingbox);
+			this.setBlockState(world, Blocks.polished_diorite_brick.getDefaultState(), 6, -1, 1, structureboundingbox);
+			this.setBlockState(world, Blocks.polished_diorite_brick.getDefaultState(), 7, -1, 1, structureboundingbox);
+
+			this.setBlockState(world, Blocks.oak_fence.getDefaultState(), 8, -3, 5, structureboundingbox);
+			this.setBlockState(world, Blocks.redstone_torch.getDefaultState(), 8, -2, 5, structureboundingbox);
+
 			return true;
 		}
 
+		@Override
 		protected int func_180779_c(int var1, int var2) {
 			return 3;
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			super.readStructureFromNBT(nbttagcompound);
 			this.hasMadeChest = nbttagcompound.getBoolean("Chest");
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			super.writeStructureToNBT(nbttagcompound);
 			nbttagcompound.setBoolean("Chest", this.hasMadeChest);
@@ -915,6 +984,7 @@ public class StructureVillagePieces {
 			this.boundingBox = parStructureBoundingBox;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			if (this.field_143015_k < 0) {
@@ -1094,6 +1164,7 @@ public class StructureVillagePieces {
 			this.isRoofAccessible = rand.nextBoolean();
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			if (this.field_143015_k < 0) {
@@ -1193,11 +1264,13 @@ public class StructureVillagePieces {
 			return true;
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			super.readStructureFromNBT(nbttagcompound);
 			this.isRoofAccessible = nbttagcompound.getBoolean("Terrace");
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			super.writeStructureToNBT(nbttagcompound);
 			nbttagcompound.setBoolean("Terrace", this.isRoofAccessible);
@@ -1232,6 +1305,7 @@ public class StructureVillagePieces {
 			this.length = Math.max(parStructureBoundingBox.getXSize(), parStructureBoundingBox.getZSize());
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			IBlockState iblockstate = this.func_175847_a(Blocks.gravel.getDefaultState());
@@ -1251,6 +1325,7 @@ public class StructureVillagePieces {
 			return true;
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
 				EaglercraftRandom random) {
 			boolean flag = false;
@@ -1325,11 +1400,13 @@ public class StructureVillagePieces {
 
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			super.readStructureFromNBT(nbttagcompound);
 			this.length = nbttagcompound.getInteger("Length");
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			super.writeStructureToNBT(nbttagcompound);
 			nbttagcompound.setInteger("Length", this.length);
@@ -1415,6 +1492,7 @@ public class StructureVillagePieces {
 			this.boundingBox = parStructureBoundingBox;
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			if (this.field_143015_k < 0) {
@@ -1471,6 +1549,7 @@ public class StructureVillagePieces {
 
 		}
 
+		@Override
 		protected void fillWithBlocks(World world, StructureBoundingBox structureboundingbox, int i, int j, int k,
 				int l, int i1, int j1, IBlockState iblockstate, IBlockState iblockstate1, boolean flag) {
 			IBlockState iblockstate2 = this.func_175847_a(iblockstate);
@@ -1521,7 +1600,7 @@ public class StructureVillagePieces {
 		protected int getAverageGroundLevel(World worldIn, StructureBoundingBox parStructureBoundingBox) {
 			int i = 0;
 			int j = 0;
-			BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+			BlockPos blockpos$mutableblockpos = new BlockPos();
 
 			for (int k = this.boundingBox.minZ; k <= this.boundingBox.maxZ; ++k) {
 				for (int l = this.boundingBox.minX; l <= this.boundingBox.maxX; ++l) {
@@ -1593,18 +1672,21 @@ public class StructureVillagePieces {
 			return null;
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			this.field_143015_k = nbttagcompound.getInteger("HPos");
 			this.villagersSpawned = nbttagcompound.getInteger("VCount");
 			this.isDesertVillage = nbttagcompound.getBoolean("Desert");
 		}
 
+		@Override
 		protected void replaceAirAndLiquidDownwards(World world, IBlockState iblockstate, int i, int j, int k,
 				StructureBoundingBox structureboundingbox) {
 			IBlockState iblockstate1 = this.func_175847_a(iblockstate);
 			super.replaceAirAndLiquidDownwards(world, iblockstate1, i, j, k, structureboundingbox);
 		}
 
+		@Override
 		protected void setBlockState(World world, IBlockState iblockstate, int i, int j, int k,
 				StructureBoundingBox structureboundingbox) {
 			IBlockState iblockstate1 = this.func_175847_a(iblockstate);
@@ -1634,6 +1716,7 @@ public class StructureVillagePieces {
 			}
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			nbttagcompound.setInteger("HPos", this.field_143015_k);
 			nbttagcompound.setInteger("VCount", this.villagersSpawned);
@@ -1659,6 +1742,7 @@ public class StructureVillagePieces {
 
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			if (this.field_143015_k < 0) {
@@ -1699,6 +1783,7 @@ public class StructureVillagePieces {
 			return true;
 		}
 
+		@Override
 		public void buildComponent(StructureComponent structurecomponent, List<StructureComponent> list,
 				EaglercraftRandom random) {
 			StructureVillagePieces.func_176069_e((StructureVillagePieces.Start) structurecomponent, list, random,
@@ -1745,6 +1830,7 @@ public class StructureVillagePieces {
 			this.tablePosition = rand.nextInt(3);
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			if (this.field_143015_k < 0) {
@@ -1760,6 +1846,8 @@ public class StructureVillagePieces {
 					Blocks.air.getDefaultState(), false);
 			this.fillWithBlocks(world, structureboundingbox, 0, 0, 0, 3, 0, 4, Blocks.cobblestone.getDefaultState(),
 					Blocks.cobblestone.getDefaultState(), false);
+			this.fillWithBlocks(world, structureboundingbox, 1, 1, 1, 3, 5, 4, Blocks.air.getDefaultState(),
+					Blocks.air.getDefaultState(), false);
 			this.fillWithBlocks(world, structureboundingbox, 1, 0, 1, 2, 0, 3, Blocks.dirt.getDefaultState(),
 					Blocks.dirt.getDefaultState(), false);
 			if (this.isTallHouse) {
@@ -1830,12 +1918,14 @@ public class StructureVillagePieces {
 			return true;
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			super.readStructureFromNBT(nbttagcompound);
 			this.tablePosition = nbttagcompound.getInteger("T");
 			this.isTallHouse = nbttagcompound.getBoolean("C");
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			super.writeStructureToNBT(nbttagcompound);
 			nbttagcompound.setInteger("T", this.tablePosition);

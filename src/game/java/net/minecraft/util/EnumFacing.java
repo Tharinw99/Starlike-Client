@@ -12,13 +12,13 @@ import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,7 +30,7 @@ import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public enum EnumFacing implements IStringSerializable {
 	DOWN(0, 1, -1, "down", EnumFacing.AxisDirection.NEGATIVE, EnumFacing.Axis.Y, new Vec3i(0, -1, 0)),
@@ -68,10 +68,12 @@ public enum EnumFacing implements IStringSerializable {
 			this.plane = plane;
 		}
 
+		@Override
 		public boolean apply(EnumFacing enumfacing) {
 			return enumfacing != null && enumfacing.getAxis() == this;
 		}
 
+		@Override
 		public String getName() {
 			return this.name;
 		}
@@ -95,6 +97,7 @@ public enum EnumFacing implements IStringSerializable {
 			return this.plane == EnumFacing.Plane.VERTICAL;
 		}
 
+		@Override
 		public String toString() {
 			return this.name;
 		}
@@ -117,6 +120,7 @@ public enum EnumFacing implements IStringSerializable {
 			return this.offset;
 		}
 
+		@Override
 		public String toString() {
 			return this.description;
 		}
@@ -140,6 +144,7 @@ public enum EnumFacing implements IStringSerializable {
 			this.facingsArray = facingsArray;
 		}
 
+		@Override
 		public boolean apply(EnumFacing enumfacing) {
 			return enumfacing != null && enumfacing.getAxis().getPlane() == this;
 		}
@@ -148,6 +153,7 @@ public enum EnumFacing implements IStringSerializable {
 			return facingsArray;
 		}
 
+		@Override
 		public Iterator<EnumFacing> iterator() {
 			return Iterators.forArray(facingsArray);
 		}
@@ -332,6 +338,7 @@ public enum EnumFacing implements IStringSerializable {
 		return this.index;
 	}
 
+	@Override
 	public String getName() {
 		return this.name;
 	}
@@ -461,6 +468,7 @@ public enum EnumFacing implements IStringSerializable {
 		}
 	}
 
+	@Override
 	public String toString() {
 		return this.name;
 	}

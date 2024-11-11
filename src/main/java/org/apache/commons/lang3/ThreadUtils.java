@@ -95,7 +95,7 @@ public class ThreadUtils {
 
 		/**
 		 * Evaluates this predicate on the given threadgroup.
-		 * 
+		 *
 		 * @param threadGroup the threadgroup
 		 * @return {@code true} if the threadGroup matches the predicate, otherwise
 		 *         {@code false}
@@ -138,7 +138,7 @@ public class ThreadUtils {
 
 		/**
 		 * Evaluates this predicate on the given thread.
-		 * 
+		 *
 		 * @param thread the thread
 		 * @return {@code true} if the thread matches the predicate, otherwise
 		 *         {@code false}

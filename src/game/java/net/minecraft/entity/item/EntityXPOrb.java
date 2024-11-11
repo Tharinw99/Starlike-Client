@@ -13,13 +13,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -31,7 +31,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityXPOrb extends Entity {
 	/**
@@ -82,6 +82,7 @@ public class EntityXPOrb extends Entity {
 	/**
 	 * + Called when the entity is attacked.
 	 */
+	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float f) {
 		if (this.isEntityInvulnerable(damagesource)) {
 			return false;
@@ -99,6 +100,7 @@ public class EntityXPOrb extends Entity {
 	/**
 	 * + If returns false, the item will not inflict any damage against entities.
 	 */
+	@Override
 	public boolean canAttackWithItem() {
 		return false;
 	}
@@ -107,6 +109,7 @@ public class EntityXPOrb extends Entity {
 	 * + returns if this entity triggers Block.onEntityWalking on the blocks they
 	 * walk on. used for spiders and wolves to prevent them from trampling crops
 	 */
+	@Override
 	protected boolean canTriggerWalking() {
 		return false;
 	}
@@ -115,13 +118,16 @@ public class EntityXPOrb extends Entity {
 	 * + Will deal the specified amount of damage to the entity if the entity isn't
 	 * immune to fire damage. Args: amountDamage
 	 */
+	@Override
 	protected void dealFireDamage(int i) {
 		this.attackEntityFrom(DamageSource.inFire, (float) i);
 	}
 
+	@Override
 	protected void entityInit() {
 	}
 
+	@Override
 	public int getBrightnessForRender(float f) {
 		float f1 = 0.5F;
 		f1 = MathHelper.clamp_float(f1, 0.0F, 1.0F);
@@ -136,6 +142,7 @@ public class EntityXPOrb extends Entity {
 		return j | k << 16;
 	}
 
+	@Override
 	protected float getEaglerDynamicLightsValueSimple(float partialTicks) {
 		return 0.25f;
 	}
@@ -168,6 +175,7 @@ public class EntityXPOrb extends Entity {
 	 * + Returns if this entity is in water and will end up adding the waters
 	 * velocity to the entity
 	 */
+	@Override
 	public boolean handleWaterMovement() {
 		return this.worldObj.handleMaterialAcceleration(this.getEntityBoundingBox(), Material.water, this);
 	}
@@ -175,6 +183,7 @@ public class EntityXPOrb extends Entity {
 	/**
 	 * + Called by a player entity when they collide with an entity
 	 */
+	@Override
 	public void onCollideWithPlayer(EntityPlayer entityplayer) {
 		if (!this.worldObj.isRemote) {
 			if (this.delayBeforeCanPickup == 0 && entityplayer.xpCooldown == 0) {
@@ -192,6 +201,7 @@ public class EntityXPOrb extends Entity {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		super.onUpdate();
 		if (this.delayBeforeCanPickup > 0) {
@@ -264,12 +274,14 @@ public class EntityXPOrb extends Entity {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		this.xpOrbHealth = nbttagcompound.getShort("Health") & 255;
 		this.xpOrbAge = nbttagcompound.getShort("Age");
 		this.xpValue = nbttagcompound.getShort("Value");
 	}
 
+	@Override
 	protected void renderDynamicLightsEaglerAt(double entityX, double entityY, double entityZ, double renderX,
 			double renderY, double renderZ, float partialTicks, boolean isInFrustum) {
 		super.renderDynamicLightsEaglerAt(entityX, entityY, entityZ, renderX, renderY, renderZ, partialTicks,
@@ -284,6 +296,7 @@ public class EntityXPOrb extends Entity {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		nbttagcompound.setShort("Health", (short) ((byte) this.xpOrbHealth));
 		nbttagcompound.setShort("Age", (short) this.xpOrbAge);

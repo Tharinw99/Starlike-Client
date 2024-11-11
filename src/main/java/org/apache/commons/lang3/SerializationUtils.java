@@ -49,7 +49,7 @@ import net.lax1dude.eaglercraft.v1_8.EaglerInputStream;
  * <p>
  * #ThreadSafe#
  * </p>
- * 
+ *
  * @since 1.0
  */
 public class SerializationUtils {
@@ -89,7 +89,7 @@ public class SerializationUtils {
 
 		/**
 		 * Constructor.
-		 * 
+		 *
 		 * @param in          The {@code InputStream}.
 		 * @param classLoader classloader to use
 		 * @throws IOException if an I/O error occurs while reading stream header.
@@ -103,7 +103,7 @@ public class SerializationUtils {
 		/**
 		 * Overridden version that uses the parameterized {@code ClassLoader} or the
 		 * {@code ClassLoader} of the current {@code Thread} to resolve the class.
-		 * 
+		 *
 		 * @param desc An instance of class {@code ObjectStreamClass}.
 		 * @return A {@code Class} object corresponding to {@code desc}.
 		 * @throws IOException            Any of the usual Input/Output exceptions.
@@ -308,7 +308,7 @@ public class SerializationUtils {
 	 * This constructor is public to permit tools that require a JavaBean instance
 	 * to operate.
 	 * </p>
-	 * 
+	 *
 	 * @since 2.0
 	 */
 	public SerializationUtils() {

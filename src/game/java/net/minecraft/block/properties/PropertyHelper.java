@@ -5,13 +5,13 @@ import com.google.common.base.Objects;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -23,7 +23,7 @@ import com.google.common.base.Objects;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class PropertyHelper<T extends Comparable<T>> implements IProperty<T> {
 	private final Class<T> valueClass;
@@ -34,6 +34,7 @@ public abstract class PropertyHelper<T extends Comparable<T>> implements IProper
 		this.name = name;
 	}
 
+	@Override
 	public boolean equals(Object object) {
 		if (this == object) {
 			return true;
@@ -45,6 +46,7 @@ public abstract class PropertyHelper<T extends Comparable<T>> implements IProper
 		}
 	}
 
+	@Override
 	public String getName() {
 		return this.name;
 	}
@@ -52,14 +54,17 @@ public abstract class PropertyHelper<T extends Comparable<T>> implements IProper
 	/**
 	 * + The class of the values of this property
 	 */
+	@Override
 	public Class<T> getValueClass() {
 		return this.valueClass;
 	}
 
+	@Override
 	public int hashCode() {
 		return 31 * this.valueClass.hashCode() + this.name.hashCode();
 	}
 
+	@Override
 	public String toString() {
 		return Objects.toStringHelper(this).add("name", this.name).add("clazz", this.valueClass)
 				.add("values", this.getAllowedValues()).toString();

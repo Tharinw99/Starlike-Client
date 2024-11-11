@@ -27,13 +27,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -45,7 +45,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ComponentScatteredFeaturePieces {
 	public static class DesertPyramid extends ComponentScatteredFeaturePieces.Feature {
@@ -69,6 +69,7 @@ public class ComponentScatteredFeaturePieces {
 			super(parRandom, parInt1, 64, parInt2, 21, 15, 21);
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			this.fillWithBlocks(world, structureboundingbox, 0, -4, 0, this.scatteredFeatureSizeX - 1, 0,
@@ -440,6 +441,7 @@ public class ComponentScatteredFeaturePieces {
 			return true;
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			super.readStructureFromNBT(nbttagcompound);
 			this.field_74940_h[0] = nbttagcompound.getBoolean("hasPlacedChest0");
@@ -448,6 +450,7 @@ public class ComponentScatteredFeaturePieces {
 			this.field_74940_h[3] = nbttagcompound.getBoolean("hasPlacedChest3");
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			super.writeStructureToNBT(nbttagcompound);
 			nbttagcompound.setBoolean("hasPlacedChest0", this.field_74940_h[0]);
@@ -492,7 +495,7 @@ public class ComponentScatteredFeaturePieces {
 			} else {
 				int i = 0;
 				int j = 0;
-				BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+				BlockPos blockpos$mutableblockpos = new BlockPos();
 
 				for (int k = this.boundingBox.minZ; k <= this.boundingBox.maxZ; ++k) {
 					for (int l = this.boundingBox.minX; l <= this.boundingBox.maxX; ++l) {
@@ -515,6 +518,7 @@ public class ComponentScatteredFeaturePieces {
 			}
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			this.scatteredFeatureSizeX = nbttagcompound.getInteger("Width");
 			this.scatteredFeatureSizeY = nbttagcompound.getInteger("Height");
@@ -522,6 +526,7 @@ public class ComponentScatteredFeaturePieces {
 			this.field_74936_d = nbttagcompound.getInteger("HPos");
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			nbttagcompound.setInteger("Width", this.scatteredFeatureSizeX);
 			nbttagcompound.setInteger("Height", this.scatteredFeatureSizeY);
@@ -535,6 +540,7 @@ public class ComponentScatteredFeaturePieces {
 			private Stones() {
 			}
 
+			@Override
 			public void selectBlocks(EaglercraftRandom rand, int x, int y, int z, boolean parFlag) {
 				if (rand.nextFloat() < 0.4F) {
 					this.blockstate = Blocks.cobblestone.getDefaultState();
@@ -572,6 +578,7 @@ public class ComponentScatteredFeaturePieces {
 			super(parRandom, parInt1, 64, parInt2, 12, 10, 15);
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom random,
 				StructureBoundingBox structureboundingbox) {
 			if (!this.func_74935_a(world, structureboundingbox, 0)) {
@@ -851,6 +858,7 @@ public class ComponentScatteredFeaturePieces {
 			}
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			super.readStructureFromNBT(nbttagcompound);
 			this.field_74947_h = nbttagcompound.getBoolean("placedMainChest");
@@ -859,6 +867,7 @@ public class ComponentScatteredFeaturePieces {
 			this.field_74946_k = nbttagcompound.getBoolean("placedTrap2");
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			super.writeStructureToNBT(nbttagcompound);
 			nbttagcompound.setBoolean("placedMainChest", this.field_74947_h);
@@ -878,6 +887,7 @@ public class ComponentScatteredFeaturePieces {
 			super(parRandom, parInt1, 64, parInt2, 7, 7, 9);
 		}
 
+		@Override
 		public boolean addComponentParts(World world, EaglercraftRandom var2,
 				StructureBoundingBox structureboundingbox) {
 			if (!this.func_74935_a(world, structureboundingbox, 0)) {
@@ -962,11 +972,13 @@ public class ComponentScatteredFeaturePieces {
 			}
 		}
 
+		@Override
 		protected void readStructureFromNBT(NBTTagCompound nbttagcompound) {
 			super.readStructureFromNBT(nbttagcompound);
 			this.hasWitch = nbttagcompound.getBoolean("Witch");
 		}
 
+		@Override
 		protected void writeStructureToNBT(NBTTagCompound nbttagcompound) {
 			super.writeStructureToNBT(nbttagcompound);
 			nbttagcompound.setBoolean("Witch", this.hasWitch);

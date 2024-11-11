@@ -24,13 +24,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -42,7 +42,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockPortal extends BlockBreakable {
 	public static class Size {
@@ -190,6 +190,7 @@ public class BlockPortal extends BlockBreakable {
 		this.setTickRandomly(true);
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { AXIS });
 	}
@@ -264,14 +265,17 @@ public class BlockPortal extends BlockBreakable {
 		}
 	}
 
+	@Override
 	public EnumWorldBlockLayer getBlockLayer() {
 		return EnumWorldBlockLayer.TRANSLUCENT;
 	}
 
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox(World var1, BlockPos var2, IBlockState var3) {
 		return null;
 	}
 
+	@Override
 	public Item getItem(World var1, BlockPos var2) {
 		return null;
 	}
@@ -279,6 +283,7 @@ public class BlockPortal extends BlockBreakable {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		return getMetaForAxis((EnumFacing.Axis) iblockstate.getValue(AXIS));
 	}
@@ -286,10 +291,12 @@ public class BlockPortal extends BlockBreakable {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(AXIS, (i & 3) == 2 ? EnumFacing.Axis.Z : EnumFacing.Axis.X);
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -297,6 +304,7 @@ public class BlockPortal extends BlockBreakable {
 	/**
 	 * + Called When an Entity Collided with the Block
 	 */
+	@Override
 	public void onEntityCollidedWithBlock(World var1, BlockPos blockpos, IBlockState var3, Entity entity) {
 		if (entity.ridingEntity == null && entity.riddenByEntity == null) {
 			entity.func_181015_d(blockpos);
@@ -307,6 +315,7 @@ public class BlockPortal extends BlockBreakable {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block var4) {
 		EnumFacing.Axis enumfacing$axis = (EnumFacing.Axis) iblockstate.getValue(AXIS);
 		if (enumfacing$axis == EnumFacing.Axis.X) {
@@ -329,10 +338,12 @@ public class BlockPortal extends BlockBreakable {
 	/**
 	 * + Returns the quantity of items to drop on block destruction.
 	 */
+	@Override
 	public int quantityDropped(EaglercraftRandom var1) {
 		return 0;
 	}
 
+	@Override
 	public void randomDisplayTick(World world, BlockPos blockpos, IBlockState var3, EaglercraftRandom random) {
 		if (random.nextInt(100) == 0) {
 			world.playSound((double) blockpos.getX() + 0.5D, (double) blockpos.getY() + 0.5D,
@@ -361,6 +372,7 @@ public class BlockPortal extends BlockBreakable {
 
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
 		EnumFacing.Axis enumfacing$axis = (EnumFacing.Axis) iblockaccess.getBlockState(blockpos).getValue(AXIS);
 		float f = 0.125F;
@@ -376,6 +388,7 @@ public class BlockPortal extends BlockBreakable {
 		this.setBlockBounds(0.5F - f, 0.0F, 0.5F - f1, 0.5F + f, 1.0F, 0.5F + f1);
 	}
 
+	@Override
 	public boolean shouldSideBeRendered(IBlockAccess iblockaccess, BlockPos blockpos, EnumFacing enumfacing) {
 		EnumFacing.Axis enumfacing$axis = null;
 		IBlockState iblockstate = iblockaccess.getBlockState(blockpos);
@@ -411,6 +424,7 @@ public class BlockPortal extends BlockBreakable {
 						: (flag5 && enumfacing == EnumFacing.NORTH ? true : flag5 && enumfacing == EnumFacing.SOUTH));
 	}
 
+	@Override
 	public void updateTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom random) {
 		super.updateTick(world, blockpos, iblockstate, random);
 		if (world.provider.isSurfaceWorld() && world.getGameRules().getBoolean("doMobSpawning")

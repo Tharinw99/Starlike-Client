@@ -12,6 +12,7 @@ import net.lax1dude.eaglercraft.v1_8.EagUtils;
 import net.lax1dude.eaglercraft.v1_8.internal.PlatformWebRTC;
 import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
 import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
+import net.lax1dude.eaglercraft.v1_8.sp.SingleplayerServerController;
 import net.lax1dude.eaglercraft.v1_8.sp.relay.RelayManager;
 import net.lax1dude.eaglercraft.v1_8.sp.relay.RelayServerSocket;
 import net.lax1dude.eaglercraft.v1_8.sp.relay.pkt.RelayPacket;
@@ -26,7 +27,7 @@ import net.lax1dude.eaglercraft.v1_8.sp.relay.pkt.RelayPacketFFErrorCode;
 
 /**
  * Copyright (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,7 +39,7 @@ import net.lax1dude.eaglercraft.v1_8.sp.relay.pkt.RelayPacketFFErrorCode;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class LANServerController {
 
@@ -139,7 +140,7 @@ public class LANServerController {
 					}
 				}
 				EagUtils.sleep(50);
-			} while (EagRuntime.steadyTimeMillis() - millis < 1000l);
+			} while (EagRuntime.steadyTimeMillis() - millis < 2500l);
 			logger.info("Relay [{}] relay provide ICE servers timeout", sock.getURI());
 			closeLAN();
 			return null;
@@ -157,7 +158,10 @@ public class LANServerController {
 			while ((pkt = lanRelaySocket.readPacket()) != null) {
 				if (pkt instanceof RelayPacket02NewClient) {
 					RelayPacket02NewClient ipkt = (RelayPacket02NewClient) pkt;
-					if (clients.containsKey(ipkt.clientId)) {
+					if (!SingleplayerServerController.isChannelNameAllowed(ipkt.clientId)) {
+						logger.error("Relay [{}] relay tried to open disallowed channel name: '{}'",
+								lanRelaySocket.getURI(), ipkt.clientId);
+					} else if (clients.containsKey(ipkt.clientId)) {
 						logger.error("Relay [{}] relay provided duplicate client '{}'", lanRelaySocket.getURI(),
 								ipkt.clientId);
 					} else {

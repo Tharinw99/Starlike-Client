@@ -23,13 +23,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -41,7 +41,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class TeleportToTeam implements ISpectatorMenuView, ISpectatorMenuObject {
 	class TeamSelectionObject implements ISpectatorMenuObject {
@@ -76,14 +76,17 @@ public class TeleportToTeam implements ISpectatorMenuView, ISpectatorMenuObject 
 
 		}
 
+		@Override
 		public void func_178661_a(SpectatorMenu spectatormenu) {
 			spectatormenu.func_178647_a(new TeleportToPlayer(this.field_178675_d));
 		}
 
+		@Override
 		public boolean func_178662_A_() {
 			return !this.field_178675_d.isEmpty();
 		}
 
+		@Override
 		public void func_178663_a(float f, int i) {
 			int j = -1;
 			String s = FontRenderer.getFormatFromString(this.field_178676_b.getColorPrefix());
@@ -104,6 +107,7 @@ public class TeleportToTeam implements ISpectatorMenuView, ISpectatorMenuObject 
 			Gui.drawScaledCustomSizeModalRect(2, 2, 40.0F, 8.0F, 8, 8, 12, 12, 64.0F, 64.0F);
 		}
 
+		@Override
 		public IChatComponent getSpectatorName() {
 			return new ChatComponentText(this.field_178676_b.getTeamName());
 		}
@@ -120,10 +124,12 @@ public class TeleportToTeam implements ISpectatorMenuView, ISpectatorMenuObject 
 
 	}
 
+	@Override
 	public void func_178661_a(SpectatorMenu spectatormenu) {
 		spectatormenu.func_178647_a(this);
 	}
 
+	@Override
 	public boolean func_178662_A_() {
 		for (int i = 0, l = this.field_178672_a.size(); i < l; ++i) {
 			if (this.field_178672_a.get(i).func_178662_A_()) {
@@ -134,19 +140,23 @@ public class TeleportToTeam implements ISpectatorMenuView, ISpectatorMenuObject 
 		return false;
 	}
 
+	@Override
 	public void func_178663_a(float var1, int var2) {
 		Minecraft.getMinecraft().getTextureManager().bindTexture(GuiSpectator.field_175269_a);
 		Gui.drawModalRectWithCustomSizedTexture(0, 0, 16.0F, 0.0F, 16, 16, 256.0F, 256.0F);
 	}
 
+	@Override
 	public List<ISpectatorMenuObject> func_178669_a() {
 		return this.field_178672_a;
 	}
 
+	@Override
 	public IChatComponent func_178670_b() {
 		return new ChatComponentText("Select a team to teleport to");
 	}
 
+	@Override
 	public IChatComponent getSpectatorName() {
 		return new ChatComponentText("Teleport to team member");
 	}

@@ -10,13 +10,13 @@ import net.minecraft.world.gen.feature.WorldGenBigMushroom;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@ import net.minecraft.world.gen.feature.WorldGenBigMushroom;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockMushroom extends BlockBush implements IGrowable {
 	protected BlockMushroom() {
@@ -37,6 +37,7 @@ public class BlockMushroom extends BlockBush implements IGrowable {
 		this.setTickRandomly(true);
 	}
 
+	@Override
 	public boolean canBlockStay(World world, BlockPos blockpos, IBlockState var3) {
 		if (blockpos.getY() >= 0 && blockpos.getY() < 256) {
 			IBlockState iblockstate = world.getBlockState(blockpos.down());
@@ -52,10 +53,12 @@ public class BlockMushroom extends BlockBush implements IGrowable {
 	/**
 	 * + Whether this IGrowable can grow
 	 */
+	@Override
 	public boolean canGrow(World var1, BlockPos var2, IBlockState var3, boolean var4) {
 		return true;
 	}
 
+	@Override
 	public boolean canPlaceBlockAt(World world, BlockPos blockpos) {
 		return super.canPlaceBlockAt(world, blockpos) && this.canBlockStay(world, blockpos, this.getDefaultState());
 	}
@@ -63,10 +66,12 @@ public class BlockMushroom extends BlockBush implements IGrowable {
 	/**
 	 * + is the block grass, dirt or farmland
 	 */
+	@Override
 	protected boolean canPlaceBlockOn(Block block) {
 		return block.isFullBlock();
 	}
 
+	@Override
 	public boolean canUseBonemeal(World var1, EaglercraftRandom random, BlockPos var3, IBlockState var4) {
 		return (double) random.nextFloat() < 0.4D;
 	}
@@ -88,10 +93,12 @@ public class BlockMushroom extends BlockBush implements IGrowable {
 		}
 	}
 
+	@Override
 	public void grow(World world, EaglercraftRandom random, BlockPos blockpos, IBlockState iblockstate) {
 		this.generateBigMushroom(world, blockpos, iblockstate, random);
 	}
 
+	@Override
 	public void updateTick(World world, BlockPos blockpos, IBlockState var3, EaglercraftRandom random) {
 		if (random.nextInt(25) == 0) {
 			int i = 5;

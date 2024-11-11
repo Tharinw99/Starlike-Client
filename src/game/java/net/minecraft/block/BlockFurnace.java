@@ -24,13 +24,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -42,7 +42,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockFurnace extends BlockContainer {
 	public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
@@ -80,6 +80,7 @@ public class BlockFurnace extends BlockContainer {
 		this.isBurning = isBurning;
 	}
 
+	@Override
 	public void breakBlock(World world, BlockPos blockpos, IBlockState iblockstate) {
 		if (!keepInventory) {
 			TileEntity tileentity = world.getTileEntity(blockpos);
@@ -92,6 +93,7 @@ public class BlockFurnace extends BlockContainer {
 		super.breakBlock(world, blockpos, iblockstate);
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { FACING });
 	}
@@ -100,14 +102,17 @@ public class BlockFurnace extends BlockContainer {
 	 * + Returns a new instance of a block's tile entity class. Called on placing
 	 * the block.
 	 */
+	@Override
 	public TileEntity createNewTileEntity(World var1, int var2) {
 		return new TileEntityFurnace();
 	}
 
+	@Override
 	public int getComparatorInputOverride(World world, BlockPos blockpos) {
 		return Container.calcRedstone(world.getTileEntity(blockpos));
 	}
 
+	@Override
 	public Item getItem(World var1, BlockPos var2) {
 		return Item.getItemFromBlock(Blocks.furnace);
 	}
@@ -115,6 +120,7 @@ public class BlockFurnace extends BlockContainer {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
 		return Item.getItemFromBlock(Blocks.furnace);
 	}
@@ -122,6 +128,7 @@ public class BlockFurnace extends BlockContainer {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		return ((EnumFacing) iblockstate.getValue(FACING)).getIndex();
 	}
@@ -130,6 +137,7 @@ public class BlockFurnace extends BlockContainer {
 	 * + The type of render function called. 3 for standard block models, 2 for
 	 * TESR's, 1 for liquids, -1 is no render
 	 */
+	@Override
 	public int getRenderType() {
 		return 3;
 	}
@@ -138,6 +146,7 @@ public class BlockFurnace extends BlockContainer {
 	 * + Possibly modify the given BlockState before rendering it on an Entity
 	 * (Minecarts, Endermen, ...)
 	 */
+	@Override
 	public IBlockState getStateForEntityRender(IBlockState var1) {
 		return this.getDefaultState().withProperty(FACING, EnumFacing.SOUTH);
 	}
@@ -145,6 +154,7 @@ public class BlockFurnace extends BlockContainer {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		EnumFacing enumfacing = EnumFacing.getFront(i);
 		if (enumfacing.getAxis() == EnumFacing.Axis.Y) {
@@ -154,10 +164,12 @@ public class BlockFurnace extends BlockContainer {
 		return this.getDefaultState().withProperty(FACING, enumfacing);
 	}
 
+	@Override
 	public boolean hasComparatorInputOverride() {
 		return true;
 	}
 
+	@Override
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState var3, EntityPlayer entityplayer,
 			EnumFacing var5, float var6, float var7, float var8) {
 		if (world.isRemote) {
@@ -173,6 +185,7 @@ public class BlockFurnace extends BlockContainer {
 		}
 	}
 
+	@Override
 	public void onBlockAdded(World world, BlockPos blockpos, IBlockState iblockstate) {
 		this.setDefaultFacing(world, blockpos, iblockstate);
 	}
@@ -181,6 +194,7 @@ public class BlockFurnace extends BlockContainer {
 	 * + Called by ItemBlocks just before a block is actually set in the world, to
 	 * allow for adjustments to the IBlockstate
 	 */
+	@Override
 	public IBlockState onBlockPlaced(World var1, BlockPos var2, EnumFacing var3, float var4, float var5, float var6,
 			int var7, EntityLivingBase entitylivingbase) {
 		return this.getDefaultState().withProperty(FACING, entitylivingbase.getHorizontalFacing().getOpposite());
@@ -190,6 +204,7 @@ public class BlockFurnace extends BlockContainer {
 	 * + Called by ItemBlocks after a block is set in the world, to allow post-place
 	 * logic
 	 */
+	@Override
 	public void onBlockPlacedBy(World world, BlockPos blockpos, IBlockState iblockstate,
 			EntityLivingBase entitylivingbase, ItemStack itemstack) {
 		world.setBlockState(blockpos,
@@ -203,6 +218,7 @@ public class BlockFurnace extends BlockContainer {
 
 	}
 
+	@Override
 	public void randomDisplayTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom random) {
 		if (this.isBurning) {
 			EnumFacing enumfacing = (EnumFacing) iblockstate.getValue(FACING);

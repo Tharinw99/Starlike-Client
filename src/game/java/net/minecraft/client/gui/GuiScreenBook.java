@@ -33,13 +33,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -51,7 +51,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiScreenBook extends GuiScreenVisualViewport {
 	static class NextPageButton extends GuiButton {
@@ -62,6 +62,7 @@ public class GuiScreenBook extends GuiScreenVisualViewport {
 			this.field_146151_o = parFlag;
 		}
 
+		@Override
 		public void drawButton(Minecraft minecraft, int i, int j) {
 			if (this.visible) {
 				boolean flag = i >= this.xPosition && j >= this.yPosition && i < this.xPosition + this.width
@@ -135,6 +136,7 @@ public class GuiScreenBook extends GuiScreenVisualViewport {
 	 * + Called by the controls from the buttonList when activated. (Mouse pressed
 	 * for buttons)
 	 */
+	@Override
 	protected void actionPerformed(GuiButton parGuiButton) {
 		if (parGuiButton.enabled) {
 			if (parGuiButton.id == 0) {
@@ -174,10 +176,12 @@ public class GuiScreenBook extends GuiScreenVisualViewport {
 		}
 	}
 
+	@Override
 	public boolean blockPTTKey() {
 		return this.bookIsUnsigned;
 	}
 
+	@Override
 	public void drawScreen0(int i, int j, float f) {
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 		this.mc.getTextureManager().bindTexture(bookGuiTextures);
@@ -302,6 +306,7 @@ public class GuiScreenBook extends GuiScreenVisualViewport {
 	/**
 	 * + Executes the click event specified by the given chat component
 	 */
+	@Override
 	public boolean handleComponentClick(IChatComponent ichatcomponent) {
 		ClickEvent clickevent = ichatcomponent == null ? null : ichatcomponent.getChatStyle().getChatClickEvent();
 		if (clickevent == null) {
@@ -336,6 +341,7 @@ public class GuiScreenBook extends GuiScreenVisualViewport {
 	 * when the GUI is displayed and when the window resizes, the buttonList is
 	 * cleared beforehand.
 	 */
+	@Override
 	public void initGui() {
 		this.buttonList.clear();
 		Keyboard.enableRepeatEvents(true);
@@ -365,6 +371,7 @@ public class GuiScreenBook extends GuiScreenVisualViewport {
 	 * the equivalent of KeyListener.keyTyped(KeyEvent e). Args : character
 	 * (character on the key), keyCode (lwjgl Keyboard key code)
 	 */
+	@Override
 	protected void keyTyped(char parChar1, int parInt1) {
 		if (this.bookIsUnsigned) {
 			if (this.bookGettingSigned) {
@@ -432,6 +439,7 @@ public class GuiScreenBook extends GuiScreenVisualViewport {
 		}
 	}
 
+	@Override
 	protected void mouseClicked0(int parInt1, int parInt2, int parInt3) {
 		if (parInt3 == 0) {
 			IChatComponent ichatcomponent = this.func_175385_b(parInt1, parInt2);
@@ -446,6 +454,7 @@ public class GuiScreenBook extends GuiScreenVisualViewport {
 	/**
 	 * + Called when the screen is unloaded. Used to disable keyboard repeat events
 	 */
+	@Override
 	public void onGuiClosed() {
 		Keyboard.enableRepeatEvents(false);
 	}
@@ -541,6 +550,7 @@ public class GuiScreenBook extends GuiScreenVisualViewport {
 
 	}
 
+	@Override
 	public void updateScreen0() {
 		super.updateScreen0();
 		++this.updateCount;

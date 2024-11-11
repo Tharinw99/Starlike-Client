@@ -13,13 +13,13 @@ import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -31,7 +31,7 @@ import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class NBTTagList extends NBTBase {
 	private static final Logger LOGGER = LogManager.getLogger();
@@ -66,6 +66,7 @@ public class NBTTagList extends NBTBase {
 	/**
 	 * + Creates a clone of the tag.
 	 */
+	@Override
 	public NBTBase copy() {
 		NBTTagList nbttaglist = new NBTTagList();
 		nbttaglist.tagType = this.tagType;
@@ -78,6 +79,7 @@ public class NBTTagList extends NBTBase {
 		return nbttaglist;
 	}
 
+	@Override
 	public boolean equals(Object object) {
 		if (super.equals(object)) {
 			NBTTagList nbttaglist = (NBTTagList) object;
@@ -129,6 +131,7 @@ public class NBTTagList extends NBTBase {
 	/**
 	 * + Gets the type byte for the tag.
 	 */
+	@Override
 	public byte getId() {
 		return (byte) 9;
 	}
@@ -158,6 +161,7 @@ public class NBTTagList extends NBTBase {
 		return this.tagType;
 	}
 
+	@Override
 	public int hashCode() {
 		return super.hashCode() ^ this.tagList.hashCode();
 	}
@@ -165,10 +169,12 @@ public class NBTTagList extends NBTBase {
 	/**
 	 * + Return whether this compound has no tags.
 	 */
+	@Override
 	public boolean hasNoTags() {
 		return this.tagList.isEmpty();
 	}
 
+	@Override
 	void read(DataInput parDataInput, int parInt1, NBTSizeTracker parNBTSizeTracker) throws IOException {
 		parNBTSizeTracker.read(296L);
 		if (parInt1 > 512) {
@@ -226,6 +232,7 @@ public class NBTTagList extends NBTBase {
 		return this.tagList.size();
 	}
 
+	@Override
 	public String toString() {
 		StringBuilder stringbuilder = new StringBuilder("[");
 
@@ -244,6 +251,7 @@ public class NBTTagList extends NBTBase {
 	 * + Write the actual data contents of the tag, implemented in NBT extension
 	 * classes
 	 */
+	@Override
 	void write(DataOutput parDataOutput) throws IOException {
 		if (!this.tagList.isEmpty()) {
 			this.tagType = ((NBTBase) this.tagList.get(0)).getId();

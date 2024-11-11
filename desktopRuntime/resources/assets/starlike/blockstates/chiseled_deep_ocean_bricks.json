@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "normal": {
-            "model": "starlike:chiseled_deep_ocean_bricks"
-        }
+  "variants": {
+    "normal": {
+      "model": "starlike:chiseled_deep_ocean_bricks"
     }
+  }
 }

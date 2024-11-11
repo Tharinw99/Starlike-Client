@@ -49,17 +49,19 @@ import net.minecraft.world.gen.feature.WorldGenSwamp;
 import net.minecraft.world.gen.feature.WorldGenTallGrass;
 import net.minecraft.world.gen.feature.WorldGenTrees;
 import net.minecraft.world.gen.feature.WorldGenerator;
+import net.starlikeclient.minecraft.entities.entity.EntityWatcher;
+import net.starlikeclient.minecraft.world.biome.BiomeGenEnderForest;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -71,7 +73,7 @@ import net.minecraft.world.gen.feature.WorldGenerator;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class BiomeGenBase {
 	public static class Height {
@@ -101,6 +103,7 @@ public abstract class BiomeGenBase {
 			this.maxGroupCount = groupCountMax;
 		}
 
+		@Override
 		public String toString() {
 			return this.entityClass.getSimpleName() + "*(" + this.minGroupCount + "-" + this.maxGroupCount + "):"
 					+ this.itemWeight;
@@ -173,6 +176,7 @@ public abstract class BiomeGenBase {
 	public static BiomeGenBase mesa;
 	public static BiomeGenBase mesaPlateau_F;
 	public static BiomeGenBase mesaPlateau;
+	public static BiomeGenBase enderForest;
 
 	public static BiomeGenBase field_180279_ad;
 	protected static NoiseGeneratorPerlin temperatureNoise;
@@ -253,6 +257,9 @@ public abstract class BiomeGenBase {
 				.setHeight(height_HighPlateaus);
 		mesaPlateau = (new BiomeGenMesa(39, false, false)).setColor(13274213).setBiomeName("Mesa Plateau")
 				.setHeight(height_HighPlateaus);
+		enderForest = (new BiomeGenEnderForest(40, 3)).setColor(4215066).setBiomeName("Ender Forest")
+				.setHeight(height_LowHills).func_150563_c(0x800080);
+		;
 
 		field_180279_ad = ocean;
 
@@ -344,7 +351,7 @@ public abstract class BiomeGenBase {
 	public int waterColorMultiplier;
 	public BiomeDecorator theBiomeDecorator;
 	public List<BiomeGenBase.SpawnListEntry> spawnableMonsterList;
-	protected List<BiomeGenBase.SpawnListEntry> spawnableCreatureList;
+	public List<BiomeGenBase.SpawnListEntry> spawnableCreatureList;
 	protected List<BiomeGenBase.SpawnListEntry> spawnableWaterCreatureList;
 
 	protected List<BiomeGenBase.SpawnListEntry> spawnableCaveCreatureList;
@@ -389,9 +396,12 @@ public abstract class BiomeGenBase {
 		this.spawnableMonsterList.add(new BiomeGenBase.SpawnListEntry(EntityCreeper.class, 100, 4, 4));
 		this.spawnableMonsterList.add(new BiomeGenBase.SpawnListEntry(EntitySlime.class, 100, 4, 4));
 		this.spawnableMonsterList.add(new BiomeGenBase.SpawnListEntry(EntityEnderman.class, 10, 1, 4));
+		this.spawnableMonsterList.add(new BiomeGenBase.SpawnListEntry(EntityWatcher.class, 10, 4, 4));
+
 		this.spawnableMonsterList.add(new BiomeGenBase.SpawnListEntry(EntityWitch.class, 5, 1, 1));
 		this.spawnableWaterCreatureList.add(new BiomeGenBase.SpawnListEntry(EntitySquid.class, 10, 4, 4));
 		this.spawnableCaveCreatureList.add(new BiomeGenBase.SpawnListEntry(EntityBat.class, 10, 8, 8));
+
 	}
 
 	/**
@@ -454,7 +464,7 @@ public abstract class BiomeGenBase {
 		int k = (int) (parDouble1 / 3.0D + 3.0D + rand.nextDouble() * 0.25D);
 		int l = parInt1 & 15;
 		int i1 = parInt2 & 15;
-		BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+		BlockPos blockpos$mutableblockpos = new BlockPos();
 
 		for (int j1 = 255; j1 >= 0; --j1) {
 			if (j1 <= rand.nextInt(5)) {

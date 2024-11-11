@@ -9,7 +9,7 @@ import net.minecraft.client.resources.I18n;
 
 /**
  * Copyright (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -21,7 +21,7 @@ import net.minecraft.client.resources.I18n;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiScreenLANConnect extends GuiScreen {
 
@@ -36,6 +36,7 @@ public class GuiScreenLANConnect extends GuiScreen {
 		this.relaysButton = new GuiNetworkSettingsButton(this);
 	}
 
+	@Override
 	protected void actionPerformed(GuiButton par1GuiButton) {
 		if (par1GuiButton.id == 1) {
 			mc.displayGuiScreen(parent);
@@ -44,6 +45,7 @@ public class GuiScreenLANConnect extends GuiScreen {
 		}
 	}
 
+	@Override
 	public void drawScreen(int xx, int yy, float pt) {
 		this.drawDefaultBackground();
 		this.drawCenteredString(this.fontRendererObj, I18n.format("selectServer.direct"), this.width / 2,
@@ -64,6 +66,7 @@ public class GuiScreenLANConnect extends GuiScreen {
 		codeTextField.fireInputEvent(event, param);
 	}
 
+	@Override
 	public void initGui() {
 		Keyboard.enableRepeatEvents(true);
 		this.buttonList.clear();
@@ -79,6 +82,7 @@ public class GuiScreenLANConnect extends GuiScreen {
 		this.buttonList.get(0).enabled = this.codeTextField.getText().trim().length() > 0;
 	}
 
+	@Override
 	protected void keyTyped(char par1, int par2) {
 		if (this.codeTextField.textboxKeyTyped(par1, par2)) {
 			((GuiButton) this.buttonList.get(0)).enabled = this.codeTextField.getText().trim().length() > 0;
@@ -87,12 +91,14 @@ public class GuiScreenLANConnect extends GuiScreen {
 		}
 	}
 
+	@Override
 	protected void mouseClicked(int par1, int par2, int par3) {
 		super.mouseClicked(par1, par2, par3);
 		this.codeTextField.mouseClicked(par1, par2, par3);
 		this.relaysButton.mouseClicked(par1, par2, par3);
 	}
 
+	@Override
 	public void onGuiClosed() {
 		Keyboard.enableRepeatEvents(false);
 		lastCode = this.codeTextField.getText().trim();
@@ -103,6 +109,7 @@ public class GuiScreenLANConnect extends GuiScreen {
 		return codeTextField.isFocused();
 	}
 
+	@Override
 	public void updateScreen() {
 		this.codeTextField.updateCursorCounter();
 	}

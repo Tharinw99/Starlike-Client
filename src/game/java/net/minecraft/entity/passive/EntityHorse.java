@@ -46,13 +46,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -64,7 +64,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityHorse extends EntityAnimal implements IInvBasic {
 	public static class GroupData implements IEntityLivingData {
@@ -78,6 +78,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 	}
 
 	private static final Predicate<Entity> horseBreedingSelector = new Predicate<Entity>() {
+		@Override
 		public boolean apply(Entity entity) {
 			return entity instanceof EntityHorse && ((EntityHorse) entity).isBreeding();
 		}
@@ -150,10 +151,12 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 		this.initHorseChest();
 	}
 
+	@Override
 	public boolean allowLeashing() {
 		return !this.isUndead() && super.allowLeashing();
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getAttributeMap().registerAttribute(horseJumpStrength);
@@ -164,6 +167,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 	/**
 	 * + Called when the entity is attacked.
 	 */
+	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float f) {
 		Entity entity = damagesource.getEntity();
 		return this.riddenByEntity != null && this.riddenByEntity.equals(entity) ? false
@@ -174,6 +178,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 	 * + Returns true if this entity should push and be pushed by other entities
 	 * when colliding.
 	 */
+	@Override
 	public boolean canBePushed() {
 		return this.riddenByEntity == null;
 	}
@@ -198,6 +203,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 	/**
 	 * + Returns true if the mob is currently able to mate with the specified mob.
 	 */
+	@Override
 	public boolean canMateWith(EntityAnimal entityanimal) {
 		if (entityanimal == this) {
 			return false;
@@ -222,6 +228,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 		return this.getHorseType() == 0;
 	}
 
+	@Override
 	public EntityAgeable createChild(EntityAgeable entityageable) {
 		EntityHorse entityhorse = (EntityHorse) entityageable;
 		EntityHorse entityhorse1 = new EntityHorse(this.worldObj);
@@ -296,6 +303,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 		}
 	}
 
+	@Override
 	protected void entityInit() {
 		super.entityInit();
 		this.dataWatcher.addObject(16, Integer.valueOf(0));
@@ -305,6 +313,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 		this.dataWatcher.addObject(22, Integer.valueOf(0));
 	}
 
+	@Override
 	public void fall(float f, float f1) {
 		if (f > 1.0F) {
 			this.playSound("mob.horse.land", 0.4F, 1.0F);
@@ -350,6 +359,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 
 	}
 
+	@Override
 	protected void func_142017_o(float f) {
 		if (f > 6.0F && this.isEatingHaystack()) {
 			this.setEatingHaystack(false);
@@ -372,6 +382,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 	 * + Checks if the entity's current position is a valid location to spawn this
 	 * entity.
 	 */
+	@Override
 	public boolean getCanSpawnHere() {
 		this.prepareChunkForSpawn();
 		return super.getCanSpawnHere();
@@ -406,6 +417,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 	/**
 	 * + Returns the sound this mob makes on death.
 	 */
+	@Override
 	protected String getDeathSound() {
 		this.openHorseMouth();
 		int i = this.getHorseType();
@@ -414,12 +426,14 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 						: (i != 1 && i != 2 ? "mob.horse.death" : "mob.horse.donkey.death"));
 	}
 
+	@Override
 	protected Item getDropItem() {
 		boolean flag = this.rand.nextInt(4) == 0;
 		int i = this.getHorseType();
 		return i == 4 ? Items.bone : (i == 3 ? (flag ? null : Items.rotten_flesh) : Items.leather);
 	}
 
+	@Override
 	public float getEyeHeight() {
 		return this.height;
 	}
@@ -487,6 +501,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 	/**
 	 * + Returns the sound this mob makes when it is hurt.
 	 */
+	@Override
 	protected String getHurtSound() {
 		this.openHorseMouth();
 		if (this.rand.nextInt(3) == 0) {
@@ -501,6 +516,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 	/**
 	 * + Returns the sound this mob makes while it's alive.
 	 */
+	@Override
 	protected String getLivingSound() {
 		this.openHorseMouth();
 		if (this.rand.nextInt(10) == 0 && !this.isMovementBlocked()) {
@@ -516,6 +532,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 	/**
 	 * + Will return how many at most can spawn in a chunk at once.
 	 */
+	@Override
 	public int getMaxSpawnedInChunk() {
 		return 6;
 	}
@@ -555,6 +572,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 	 * + Gets the name of this command sender (usually username, but possibly
 	 * "Rcon")
 	 */
+	@Override
 	public String getName() {
 		return getNameImpl(false);
 	}
@@ -580,6 +598,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 		}
 	}
 
+	@Override
 	public String getNameProfanityFilter() {
 		return getNameImpl(true);
 	}
@@ -598,6 +617,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 	/**
 	 * + Returns the volume for the sounds this mob makes.
 	 */
+	@Override
 	protected float getSoundVolume() {
 		return 0.8F;
 	}
@@ -606,6 +626,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 	 * + Get number of ticks, at least during which the living entity will be
 	 * silent.
 	 */
+	@Override
 	public int getTalkInterval() {
 		return 400;
 	}
@@ -618,6 +639,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 	 * + Returns the current armor value as determined by a call to
 	 * InventoryPlayer.getTotalArmorValue
 	 */
+	@Override
 	public int getTotalArmorValue() {
 		return armorValues[this.getHorseArmorIndexSynced()];
 	}
@@ -630,6 +652,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 		return this.horseTexturesArray;
 	}
 
+	@Override
 	public void handleStatusUpdate(byte b0) {
 		if (b0 == 7) {
 			this.spawnHorseParticles(true);
@@ -671,6 +694,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 	 * + Called when a player interacts with a mob. e.g. gets milk from a cow, gets
 	 * into the saddle on a pig.
 	 */
+	@Override
 	public boolean interact(EntityPlayer entityplayer) {
 		ItemStack itemstack = entityplayer.inventory.getCurrentItem();
 		if (itemstack != null && itemstack.getItem() == Items.spawn_egg) {
@@ -821,6 +845,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 	 * + Checks if the parameter is an item which this animal can be fed to breed it
 	 * (wheat, carrots or seeds depending on the animal type)
 	 */
+	@Override
 	public boolean isBreedingItem(ItemStack var1) {
 		return false;
 	}
@@ -844,6 +869,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 	/**
 	 * + Dead and sleeping entities cannot move
 	 */
+	@Override
 	protected boolean isMovementBlocked() {
 		return this.riddenByEntity != null && this.isHorseSaddled() ? true
 				: this.isEatingHaystack() || this.isRearing();
@@ -852,6 +878,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 	/**
 	 * + returns true if this entity is by a ladder, false otherwise
 	 */
+	@Override
 	public boolean isOnLadder() {
 		return false;
 	}
@@ -911,6 +938,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 	/**
 	 * + Moves the entity based on the specified heading. Args: strafe, forward
 	 */
+	@Override
 	public void moveEntityWithHeading(float f, float f1) {
 		if (this.riddenByEntity != null && this.riddenByEntity instanceof EntityLivingBase && this.isHorseSaddled()) {
 			this.prevRotationYaw = this.rotationYaw = this.riddenByEntity.rotationYaw;
@@ -982,6 +1010,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 	/**
 	 * + Called when the mob's health reaches 0.
 	 */
+	@Override
 	public void onDeath(DamageSource damagesource) {
 		super.onDeath(damagesource);
 		if (!this.worldObj.isRemote) {
@@ -995,6 +1024,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 	 * spawner, natural spawning etc, but not called when entity is reloaded from
 	 * nbt. Mainly used for initializing attributes and inventory
 	 */
+	@Override
 	public IEntityLivingData onInitialSpawn(DifficultyInstance difficultyinstance,
 			IEntityLivingData ientitylivingdata) {
 		ientitylivingdata = super.onInitialSpawn(difficultyinstance, ientitylivingdata);
@@ -1050,6 +1080,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 	 * + Called by InventoryBasic.onInventoryChanged() on a array that is never
 	 * filled.
 	 */
+	@Override
 	public void onInventoryChanged(InventoryBasic var1) {
 		int i = this.getHorseArmorIndexSynced();
 		boolean flag = this.isHorseSaddled();
@@ -1073,6 +1104,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 	 * required. For example, zombies and skeletons use this to react to sunlight
 	 * and start to burn.
 	 */
+	@Override
 	public void onLivingUpdate() {
 		if (this.rand.nextInt(200) == 0) {
 			this.func_110210_cH();
@@ -1110,6 +1142,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		super.onUpdate();
 		if (this.worldObj.isRemote && this.dataWatcher.hasObjectChanged()) {
@@ -1199,6 +1232,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 
 	}
 
+	@Override
 	protected void playStepSound(BlockPos blockpos, Block block) {
 		Block.SoundType block$soundtype = block.stepSound;
 		if (this.worldObj.getBlockState(blockpos.up()).getBlock() == Blocks.snow_layer) {
@@ -1239,6 +1273,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		super.readEntityFromNBT(nbttagcompound);
 		this.setEatingHaystack(nbttagcompound.getBoolean("EatingHaystack"));
@@ -1302,6 +1337,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 		this.updateHorseSlots();
 	}
 
+	@Override
 	public boolean replaceItemInInventory(int i, ItemStack itemstack) {
 		if (i == 499 && this.canCarryChest()) {
 			if (itemstack == null && this.isChested()) {
@@ -1351,6 +1387,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 		this.setHorseWatchableBoolean(8, chested);
 	}
 
+	@Override
 	public void setEating(boolean flag) {
 		this.setHorseWatchableBoolean(32, flag);
 	}
@@ -1476,6 +1513,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 	 * + "Sets the scale for an ageable entity according to the boolean parameter,
 	 * which says if it's a child."
 	 */
+	@Override
 	public void setScaleForAge(boolean flag) {
 		if (flag) {
 			this.setScale(this.getHorseSize());
@@ -1528,6 +1566,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 
 	}
 
+	@Override
 	public void updateRiderPosition() {
 		super.updateRiderPosition();
 		if (this.prevRearingAmount > 0.0F) {
@@ -1548,6 +1587,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		super.writeEntityToNBT(nbttagcompound);
 		nbttagcompound.setBoolean("EatingHaystack", this.isEatingHaystack());

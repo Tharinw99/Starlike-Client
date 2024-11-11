@@ -27,13 +27,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -45,7 +45,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class TileEntityHopper extends TileEntityLockable implements IHopper, ITickable {
 	private static boolean canCombine(ItemStack stack1, ItemStack stack2) {
@@ -306,6 +306,7 @@ public class TileEntityHopper extends TileEntityLockable implements IHopper, ITi
 
 	private int transferCooldown = -1;
 
+	@Override
 	public void clear() {
 		for (int i = 0; i < this.inventory.length; ++i) {
 			this.inventory[i] = null;
@@ -313,9 +314,11 @@ public class TileEntityHopper extends TileEntityLockable implements IHopper, ITi
 
 	}
 
+	@Override
 	public void closeInventory(EntityPlayer var1) {
 	}
 
+	@Override
 	public Container createContainer(InventoryPlayer inventoryplayer, EntityPlayer entityplayer) {
 		return new ContainerHopper(inventoryplayer, this, entityplayer);
 	}
@@ -324,6 +327,7 @@ public class TileEntityHopper extends TileEntityLockable implements IHopper, ITi
 	 * + Removes up to a specified number of items from an inventory slot and
 	 * returns them in a new stack.
 	 */
+	@Override
 	public ItemStack decrStackSize(int i, int j) {
 		if (this.inventory[i] != null) {
 			if (this.inventory[i].stackSize <= j) {
@@ -343,14 +347,17 @@ public class TileEntityHopper extends TileEntityLockable implements IHopper, ITi
 		}
 	}
 
+	@Override
 	public int getField(int var1) {
 		return 0;
 	}
 
+	@Override
 	public int getFieldCount() {
 		return 0;
 	}
 
+	@Override
 	public String getGuiID() {
 		return "minecraft:hopper";
 	}
@@ -373,6 +380,7 @@ public class TileEntityHopper extends TileEntityLockable implements IHopper, ITi
 	 * + Returns the maximum stack size for a inventory slot. Seems to always be 64,
 	 * possibly will be extended.
 	 */
+	@Override
 	public int getInventoryStackLimit() {
 		return 64;
 	}
@@ -381,6 +389,7 @@ public class TileEntityHopper extends TileEntityLockable implements IHopper, ITi
 	 * + Gets the name of this command sender (usually username, but possibly
 	 * "Rcon")
 	 */
+	@Override
 	public String getName() {
 		return this.hasCustomName() ? this.customName : "container.hopper";
 	}
@@ -388,6 +397,7 @@ public class TileEntityHopper extends TileEntityLockable implements IHopper, ITi
 	/**
 	 * + Returns the number of slots in the inventory.
 	 */
+	@Override
 	public int getSizeInventory() {
 		return this.inventory.length;
 	}
@@ -395,6 +405,7 @@ public class TileEntityHopper extends TileEntityLockable implements IHopper, ITi
 	/**
 	 * + Returns the stack in the given slot.
 	 */
+	@Override
 	public ItemStack getStackInSlot(int i) {
 		return this.inventory[i];
 	}
@@ -402,6 +413,7 @@ public class TileEntityHopper extends TileEntityLockable implements IHopper, ITi
 	/**
 	 * + Gets the world X position for this hopper entity.
 	 */
+	@Override
 	public double getXPos() {
 		return (double) this.pos.getX() + 0.5D;
 	}
@@ -409,6 +421,7 @@ public class TileEntityHopper extends TileEntityLockable implements IHopper, ITi
 	/**
 	 * + Gets the world Y position for this hopper entity.
 	 */
+	@Override
 	public double getYPos() {
 		return (double) this.pos.getY() + 0.5D;
 	}
@@ -416,6 +429,7 @@ public class TileEntityHopper extends TileEntityLockable implements IHopper, ITi
 	/**
 	 * + Gets the world Z position for this hopper entity.
 	 */
+	@Override
 	public double getZPos() {
 		return (double) this.pos.getZ() + 0.5D;
 	}
@@ -423,6 +437,7 @@ public class TileEntityHopper extends TileEntityLockable implements IHopper, ITi
 	/**
 	 * + Returns true if this thing is named
 	 */
+	@Override
 	public boolean hasCustomName() {
 		return this.customName != null && this.customName.length() > 0;
 	}
@@ -480,6 +495,7 @@ public class TileEntityHopper extends TileEntityLockable implements IHopper, ITi
 	 * + Returns true if automation is allowed to insert the given stack (ignoring
 	 * stack size) into the given slot.
 	 */
+	@Override
 	public boolean isItemValidForSlot(int var1, ItemStack var2) {
 		return true;
 	}
@@ -492,6 +508,7 @@ public class TileEntityHopper extends TileEntityLockable implements IHopper, ITi
 	 * + Do not make give this method the name canInteractWith because it clashes
 	 * with Container
 	 */
+	@Override
 	public boolean isUseableByPlayer(EntityPlayer entityplayer) {
 		return this.worldObj.getTileEntity(this.pos) != this ? false
 				: entityplayer.getDistanceSq((double) this.pos.getX() + 0.5D, (double) this.pos.getY() + 0.5D,
@@ -502,6 +519,7 @@ public class TileEntityHopper extends TileEntityLockable implements IHopper, ITi
 	 * + For tile entities, ensures the chunk containing the tile entity is saved to
 	 * disk later - the game won't think it hasn't changed and skip it.
 	 */
+	@Override
 	public void markDirty() {
 		super.markDirty();
 	}
@@ -510,9 +528,11 @@ public class TileEntityHopper extends TileEntityLockable implements IHopper, ITi
 		return this.transferCooldown <= 1;
 	}
 
+	@Override
 	public void openInventory(EntityPlayer var1) {
 	}
 
+	@Override
 	public void readFromNBT(NBTTagCompound nbttagcompound) {
 		super.readFromNBT(nbttagcompound);
 		NBTTagList nbttaglist = nbttagcompound.getTagList("Items", 10);
@@ -536,6 +556,7 @@ public class TileEntityHopper extends TileEntityLockable implements IHopper, ITi
 	/**
 	 * + Removes a stack from the given slot and returns it.
 	 */
+	@Override
 	public ItemStack removeStackFromSlot(int i) {
 		if (this.inventory[i] != null) {
 			ItemStack itemstack = this.inventory[i];
@@ -550,6 +571,7 @@ public class TileEntityHopper extends TileEntityLockable implements IHopper, ITi
 		this.customName = customNameIn;
 	}
 
+	@Override
 	public void setField(int var1, int var2) {
 	}
 
@@ -557,6 +579,7 @@ public class TileEntityHopper extends TileEntityLockable implements IHopper, ITi
 	 * + Sets the given item stack to the specified slot in the inventory (can be
 	 * crafting or armor sections).
 	 */
+	@Override
 	public void setInventorySlotContents(int i, ItemStack itemstack) {
 		this.inventory[i] = itemstack;
 		if (itemstack != null && itemstack.stackSize > this.getInventoryStackLimit()) {
@@ -600,6 +623,7 @@ public class TileEntityHopper extends TileEntityLockable implements IHopper, ITi
 	/**
 	 * + Like the old updateEntity(), except more generic.
 	 */
+	@Override
 	public void update() {
 		if (this.worldObj != null && !this.worldObj.isRemote) {
 			--this.transferCooldown;
@@ -636,6 +660,7 @@ public class TileEntityHopper extends TileEntityLockable implements IHopper, ITi
 		}
 	}
 
+	@Override
 	public void writeToNBT(NBTTagCompound nbttagcompound) {
 		super.writeToNBT(nbttagcompound);
 		NBTTagList nbttaglist = new NBTTagList();

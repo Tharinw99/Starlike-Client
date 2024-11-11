@@ -22,13 +22,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -40,7 +40,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityBoat extends Entity {
 	private boolean isBoatEmpty;
@@ -77,6 +77,7 @@ public class EntityBoat extends Entity {
 	/**
 	 * + Called when the entity is attacked.
 	 */
+	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float f) {
 		if (this.isEntityInvulnerable(damagesource)) {
 			return false;
@@ -114,6 +115,7 @@ public class EntityBoat extends Entity {
 	 * + Returns true if other Entities should be prevented from moving through this
 	 * Entity.
 	 */
+	@Override
 	public boolean canBeCollidedWith() {
 		return !this.isDead;
 	}
@@ -122,6 +124,7 @@ public class EntityBoat extends Entity {
 	 * + Returns true if this entity should push and be pushed by other entities
 	 * when colliding.
 	 */
+	@Override
 	public boolean canBePushed() {
 		return true;
 	}
@@ -130,10 +133,12 @@ public class EntityBoat extends Entity {
 	 * + returns if this entity triggers Block.onEntityWalking on the blocks they
 	 * walk on. used for spiders and wolves to prevent them from trampling crops
 	 */
+	@Override
 	protected boolean canTriggerWalking() {
 		return false;
 	}
 
+	@Override
 	protected void entityInit() {
 		this.dataWatcher.addObject(17, Integer.valueOf(0));
 		this.dataWatcher.addObject(18, Integer.valueOf(1));
@@ -143,6 +148,7 @@ public class EntityBoat extends Entity {
 	/**
 	 * + Returns the collision bounding box for this entity
 	 */
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox() {
 		return this.getEntityBoundingBox();
 	}
@@ -152,6 +158,7 @@ public class EntityBoat extends Entity {
 	 * blocks. This enables the entity to be pushable on contact, like boats or
 	 * minecarts.
 	 */
+	@Override
 	public AxisAlignedBB getCollisionBox(Entity entity) {
 		return entity.getEntityBoundingBox();
 	}
@@ -174,6 +181,7 @@ public class EntityBoat extends Entity {
 	 * + Returns the Y offset from the entity's position for any entity riding this
 	 * one.
 	 */
+	@Override
 	public double getMountedYOffset() {
 		return -0.3D;
 	}
@@ -188,6 +196,7 @@ public class EntityBoat extends Entity {
 	/**
 	 * + First layer of player interaction
 	 */
+	@Override
 	public boolean interactFirst(EntityPlayer entityplayer) {
 		if (this.riddenByEntity != null && this.riddenByEntity instanceof EntityPlayer
 				&& this.riddenByEntity != entityplayer) {
@@ -204,6 +213,7 @@ public class EntityBoat extends Entity {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		super.onUpdate();
 		if (this.getTimeSinceHit() > 0) {
@@ -415,6 +425,7 @@ public class EntityBoat extends Entity {
 	 * + Setups the entity to do the hurt animation. Only used by packets in
 	 * multiplayer.
 	 */
+	@Override
 	public void performHurtAnimation() {
 		this.setForwardDirection(-this.getForwardDirection());
 		this.setTimeSinceHit(10);
@@ -424,6 +435,7 @@ public class EntityBoat extends Entity {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	protected void readEntityFromNBT(NBTTagCompound var1) {
 	}
 
@@ -448,6 +460,7 @@ public class EntityBoat extends Entity {
 		this.isBoatEmpty = parFlag;
 	}
 
+	@Override
 	public void setPositionAndRotation2(double d0, double d1, double d2, float f, float f1, int i, boolean flag) {
 		if (flag && this.riddenByEntity != null) {
 			this.prevPosX = this.posX = d0;
@@ -496,12 +509,14 @@ public class EntityBoat extends Entity {
 	/**
 	 * + Sets the velocity to the args. Args: x, y, z
 	 */
+	@Override
 	public void setVelocity(double d0, double d1, double d2) {
 		this.velocityX = this.motionX = d0;
 		this.velocityY = this.motionY = d1;
 		this.velocityZ = this.motionZ = d2;
 	}
 
+	@Override
 	protected void updateFallState(double d0, boolean flag, Block var4, BlockPos var5) {
 		if (flag) {
 			if (this.fallDistance > 3.0F) {
@@ -528,6 +543,7 @@ public class EntityBoat extends Entity {
 
 	}
 
+	@Override
 	public void updateRiderPosition() {
 		if (this.riddenByEntity != null) {
 			double d0 = Math.cos((double) this.rotationYaw * 3.141592653589793D / 180.0D) * 0.4D;
@@ -540,6 +556,7 @@ public class EntityBoat extends Entity {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	protected void writeEntityToNBT(NBTTagCompound var1) {
 	}
 }

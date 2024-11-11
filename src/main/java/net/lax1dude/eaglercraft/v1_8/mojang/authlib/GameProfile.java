@@ -10,7 +10,7 @@ import net.lax1dude.eaglercraft.v1_8.EaglercraftUUID;
 
 /**
  * Copyright (c) 2022 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -22,7 +22,7 @@ import net.lax1dude.eaglercraft.v1_8.EaglercraftUUID;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GameProfile {
 
@@ -46,6 +46,7 @@ public class GameProfile {
 		this.properties = properties;
 	}
 
+	@Override
 	public boolean equals(Object o) {
 		if (this == o)
 			return true;
@@ -78,6 +79,7 @@ public class GameProfile {
 		return textures;
 	}
 
+	@Override
 	public int hashCode() {
 		int result = (this.id != null) ? this.id.hashCode() : 0;
 		result = 31 * result + ((this.name != null) ? this.name.hashCode() : 0);
@@ -92,6 +94,7 @@ public class GameProfile {
 		return false;
 	}
 
+	@Override
 	public String toString() {
 		return (new ToStringBuilder(this)).append("id", this.id).append("name", this.name).append("legacy", false)
 				.toString();

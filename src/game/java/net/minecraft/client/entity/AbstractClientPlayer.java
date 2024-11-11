@@ -23,13 +23,13 @@ import net.minecraft.world.WorldSettings;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -41,7 +41,7 @@ import net.minecraft.world.WorldSettings;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class AbstractClientPlayer extends EntityPlayer {
 	private NetworkPlayerInfo playerInfo;
@@ -60,6 +60,7 @@ public abstract class AbstractClientPlayer extends EntityPlayer {
 		super(worldIn, playerProfile);
 	}
 
+	@Override
 	public IChatComponent getDisplayNameProfanityFilter() {
 		ChatComponentText chatcomponenttext = new ChatComponentText(
 				ScorePlayerTeam.formatPlayerName(this.getTeam(), this.getNameProfanityFilter()));
@@ -117,6 +118,7 @@ public abstract class AbstractClientPlayer extends EntityPlayer {
 				: networkplayerinfo.getLocationSkin();
 	}
 
+	@Override
 	public String getNameProfanityFilter() {
 		if (Minecraft.getMinecraft().isEnableProfanityFilter()) {
 			if (nameProfanityFilter == null) {
@@ -162,6 +164,7 @@ public abstract class AbstractClientPlayer extends EntityPlayer {
 	/**
 	 * + Returns true if the player is in spectator mode.
 	 */
+	@Override
 	public boolean isSpectator() {
 		NetworkPlayerInfo networkplayerinfo = Minecraft.getMinecraft().getNetHandler()
 				.getPlayerInfo(this.getGameProfile().getId());

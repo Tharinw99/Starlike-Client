@@ -4,9 +4,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,8 +31,6 @@ import java.math.BigInteger;
 import java.math.MathContext;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.text.DateFormatSymbols;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -2109,12 +2107,7 @@ public final class HFormatter implements Closeable, Flushable {
 			}
 
 			if (null == lineSeparator) {
-				lineSeparator = AccessController.doPrivileged(new PrivilegedAction<String>() {
-
-					public String run() {
-						return System.getProperty("line.separator"); //$NON-NLS-1$
-					}
-				});
+				lineSeparator = System.getProperty("line.separator");
 			}
 			return lineSeparator;
 		}
@@ -2252,11 +2245,11 @@ public final class HFormatter implements Closeable, Flushable {
 
 	/**
 	 * Constructs a {@code Formatter}.
-	 * 
+	 *
 	 * The output is written to a {@code StringBuilder} which can be acquired by
 	 * invoking {@link #out()} and whose content can be obtained by calling
 	 * {@code toString()}.
-	 * 
+	 *
 	 * The {@code Locale} for the {@code Formatter} is the default {@code Locale}.
 	 */
 	public HFormatter() {
@@ -2266,9 +2259,9 @@ public final class HFormatter implements Closeable, Flushable {
 	/**
 	 * Constructs a {@code Formatter} whose output will be written to the specified
 	 * {@code Appendable}.
-	 * 
+	 *
 	 * The locale for the {@code Formatter} is the default {@code Locale}.
-	 * 
+	 *
 	 * @param a the output destination of the {@code Formatter}. If {@code a} is
 	 *          {@code null}, then a {@code StringBuilder} will be used.
 	 */
@@ -2279,7 +2272,7 @@ public final class HFormatter implements Closeable, Flushable {
 	/**
 	 * Constructs a {@code Formatter} with the specified {@code Locale} and whose
 	 * output will be written to the specified {@code Appendable}.
-	 * 
+	 *
 	 * @param a the output destination of the {@code Formatter}. If {@code a} is
 	 *          {@code null}, then a {@code StringBuilder} will be used.
 	 * @param l the {@code Locale} of the {@code Formatter}. If {@code l} is
@@ -2297,11 +2290,11 @@ public final class HFormatter implements Closeable, Flushable {
 	/**
 	 * Constructs a {@code Formatter} whose output is written to the specified
 	 * {@code File}.
-	 * 
+	 *
 	 * The charset of the {@code Formatter} is the default charset.
-	 * 
+	 *
 	 * The {@code Locale} for the {@code Formatter} is the default {@code Locale}.
-	 * 
+	 *
 	 * @param file the {@code File} that is used as the output destination for the
 	 *             {@code Formatter}. The {@code File} will be truncated to zero
 	 *             size if the {@code File} exists, or else a new {@code File} will
@@ -2322,9 +2315,9 @@ public final class HFormatter implements Closeable, Flushable {
 	/**
 	 * Constructs a {@code Formatter} with the given charset, and whose output is
 	 * written to the specified {@code File}.
-	 * 
+	 *
 	 * The {@code Locale} for the {@code Formatter} is the default {@code Locale}.
-	 * 
+	 *
 	 * @param file the {@code File} that is used as the output destination for the
 	 *             {@code Formatter}. The {@code File} will be truncated to zero
 	 *             size if the {@code File} exists, or else a new {@code File} will
@@ -2349,7 +2342,7 @@ public final class HFormatter implements Closeable, Flushable {
 	/**
 	 * Constructs a {@code Formatter} with the given {@code Locale} and charset, and
 	 * whose output is written to the specified {@code File}.
-	 * 
+	 *
 	 * @param file the {@code File} that is used as the output destination for the
 	 *             {@code Formatter}. The {@code File} will be truncated to zero
 	 *             size if the {@code File} exists, or else a new {@code File} will
@@ -2388,11 +2381,11 @@ public final class HFormatter implements Closeable, Flushable {
 
 	/**
 	 * Constructs a {@code Formatter} with the specified {@code Locale}.
-	 * 
+	 *
 	 * The output is written to a {@code StringBuilder} which can be acquired by
 	 * invoking {@link #out()} and whose content can be obtained by calling
 	 * {@code toString()}.
-	 * 
+	 *
 	 * @param l the {@code Locale} of the {@code Formatter}. If {@code l} is
 	 *          {@code null}, then no localization will be used.
 	 */
@@ -2403,11 +2396,11 @@ public final class HFormatter implements Closeable, Flushable {
 	/**
 	 * Constructs a {@code Formatter} whose output is written to the specified
 	 * {@code OutputStream}.
-	 * 
+	 *
 	 * The charset of the {@code Formatter} is the default charset.
-	 * 
+	 *
 	 * The {@code Locale} for the {@code Formatter} is the default {@code Locale}.
-	 * 
+	 *
 	 * @param os the stream to be used as the destination of the {@code Formatter}.
 	 */
 	public HFormatter(OutputStream os) {
@@ -2419,9 +2412,9 @@ public final class HFormatter implements Closeable, Flushable {
 	/**
 	 * Constructs a {@code Formatter} with the given charset, and whose output is
 	 * written to the specified {@code OutputStream}.
-	 * 
+	 *
 	 * The {@code Locale} for the {@code Formatter} is the default {@code Locale}.
-	 * 
+	 *
 	 * @param os  the stream to be used as the destination of the {@code Formatter}.
 	 * @param csn the name of the charset for the {@code Formatter}.
 	 * @throws UnsupportedEncodingException if the charset with the specified name
@@ -2435,7 +2428,7 @@ public final class HFormatter implements Closeable, Flushable {
 	/**
 	 * Constructs a {@code Formatter} with the given {@code Locale} and charset, and
 	 * whose output is written to the specified {@code OutputStream}.
-	 * 
+	 *
 	 * @param os  the stream to be used as the destination of the {@code Formatter}.
 	 * @param csn the name of the charset for the {@code Formatter}.
 	 * @param l   the {@code Locale} of the {@code Formatter}. If {@code l} is
@@ -2454,11 +2447,11 @@ public final class HFormatter implements Closeable, Flushable {
 	/**
 	 * Constructs a {@code Formatter} whose output is written to the specified
 	 * {@code PrintStream}.
-	 * 
+	 *
 	 * The charset of the {@code Formatter} is the default charset.
-	 * 
+	 *
 	 * The {@code Locale} for the {@code Formatter} is the default {@code Locale}.
-	 * 
+	 *
 	 * @param ps the {@code PrintStream} used as destination of the
 	 *           {@code Formatter}. If {@code ps} is {@code null}, then a
 	 *           {@code NullPointerException} will be raised.
@@ -2473,11 +2466,11 @@ public final class HFormatter implements Closeable, Flushable {
 
 	/**
 	 * Constructs a {@code Formatter} whose output is written to the specified file.
-	 * 
+	 *
 	 * The charset of the {@code Formatter} is the default charset.
-	 * 
+	 *
 	 * The {@code Locale} for the {@code Formatter} is the default {@code Locale}.
-	 * 
+	 *
 	 * @param fileName the filename of the file that is used as the output
 	 *                 destination for the {@code Formatter}. The file will be
 	 *                 truncated to zero size if the file exists, or else a new file
@@ -2498,9 +2491,9 @@ public final class HFormatter implements Closeable, Flushable {
 
 	/**
 	 * Constructs a {@code Formatter} whose output is written to the specified file.
-	 * 
+	 *
 	 * The {@code Locale} for the {@code Formatter} is the default {@code Locale}.
-	 * 
+	 *
 	 * @param fileName the filename of the file that is used as the output
 	 *                 destination for the {@code Formatter}. The file will be
 	 *                 truncated to zero size if the file exists, or else a new file
@@ -2526,7 +2519,7 @@ public final class HFormatter implements Closeable, Flushable {
 	/**
 	 * Constructs a {@code Formatter} with the given {@code Locale} and charset, and
 	 * whose output is written to the specified file.
-	 * 
+	 *
 	 * @param fileName the filename of the file that is used as the output
 	 *                 destination for the {@code Formatter}. The file will be
 	 *                 truncated to zero size if the file exists, or else a new file
@@ -2562,14 +2555,15 @@ public final class HFormatter implements Closeable, Flushable {
 	/**
 	 * Closes the {@code Formatter}. If the output destination is {@link Closeable},
 	 * then the method {@code close()} will be called on that destination.
-	 * 
+	 *
 	 * If the {@code Formatter} has been closed, then calling the this method will
 	 * have no effect.
-	 * 
+	 *
 	 * Any method but the {@link #ioException()} that is called after the
 	 * {@code Formatter} has been closed will raise a
 	 * {@code FormatterClosedException}.
 	 */
+	@Override
 	public void close() {
 		closed = true;
 		try {
@@ -2586,9 +2580,10 @@ public final class HFormatter implements Closeable, Flushable {
 	 * Flushes the {@code Formatter}. If the output destination is
 	 * {@link Flushable}, then the method {@code flush()} will be called on that
 	 * destination.
-	 * 
+	 *
 	 * @throws FormatterClosedException if the {@code Formatter} has been closed.
 	 */
+	@Override
 	public void flush() {
 		checkClosed();
 		if (out instanceof Flushable) {
@@ -2602,7 +2597,7 @@ public final class HFormatter implements Closeable, Flushable {
 
 	/**
 	 * Writes a formatted string to the output destination of the {@code Formatter}.
-	 * 
+	 *
 	 * @param l      the {@code Locale} used in the method. If {@code locale} is
 	 *               {@code null}, then no localization will be applied. This
 	 *               parameter does not influence the {@code Locale} specified
@@ -2661,7 +2656,7 @@ public final class HFormatter implements Closeable, Flushable {
 
 	/**
 	 * Writes a formatted string to the output destination of the {@code Formatter}.
-	 * 
+	 *
 	 * @param format a format string.
 	 * @param args   the arguments list used in the {@code format()} method. If
 	 *               there are more arguments than those specified by the format
@@ -2704,7 +2699,7 @@ public final class HFormatter implements Closeable, Flushable {
 	 * destination. If the {@code append()} method of the destination does not throw
 	 * {@code IOException}s, the {@code ioException()} method will always return
 	 * {@code null}.
-	 * 
+	 *
 	 * @return the last {@code IOException} thrown by the {@code Formatter}'s output
 	 *         destination.
 	 */
@@ -2714,7 +2709,7 @@ public final class HFormatter implements Closeable, Flushable {
 
 	/**
 	 * Returns the {@code Locale} of the {@code Formatter}.
-	 * 
+	 *
 	 * @return the {@code Locale} for the {@code Formatter} or {@code null} for no
 	 *         {@code Locale}.
 	 * @throws FormatterClosedException if the {@code Formatter} has been closed.
@@ -2726,7 +2721,7 @@ public final class HFormatter implements Closeable, Flushable {
 
 	/**
 	 * Returns the output destination of the {@code Formatter}.
-	 * 
+	 *
 	 * @return the output destination of the {@code Formatter}.
 	 * @throws FormatterClosedException if the {@code Formatter} has been closed.
 	 */
@@ -2738,7 +2733,7 @@ public final class HFormatter implements Closeable, Flushable {
 	/**
 	 * Returns the content by calling the {@code toString()} method of the output
 	 * destination.
-	 * 
+	 *
 	 * @return the content by calling the {@code toString()} method of the output
 	 *         destination.
 	 * @throws FormatterClosedException if the {@code Formatter} has been closed.

@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "normal": {
-            "model": "starlike:cobbled_soul_stone"
-        }
+  "variants": {
+    "normal": {
+      "model": "starlike:cobbled_soul_stone"
     }
+  }
 }

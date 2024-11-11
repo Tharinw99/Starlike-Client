@@ -26,13 +26,13 @@ import net.minecraft.util.IChatComponent;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -44,7 +44,7 @@ import net.minecraft.util.IChatComponent;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class PacketBuffer extends ByteBuf {
 	/**
@@ -67,90 +67,112 @@ public class PacketBuffer extends ByteBuf {
 		this.buf = wrapped;
 	}
 
+	@Override
 	public byte[] array() {
 		return this.buf.array();
 	}
 
+	@Override
 	public int arrayOffset() {
 		return this.buf.arrayOffset();
 	}
 
+	@Override
 	public int bytesBefore(byte parByte1) {
 		return this.buf.bytesBefore(parByte1);
 	}
 
+	@Override
 	public int bytesBefore(int i, byte b0) {
 		return this.buf.bytesBefore(i, b0);
 	}
 
+	@Override
 	public int bytesBefore(int i, int j, byte b0) {
 		return this.buf.bytesBefore(i, j, b0);
 	}
 
+	@Override
 	public int capacity() {
 		return this.buf.capacity();
 	}
 
+	@Override
 	public ByteBuf capacity(int i) {
 		return this.buf.capacity(i);
 	}
 
+	@Override
 	public ByteBuf clear() {
 		return this.buf.clear();
 	}
 
+	@Override
 	public int compareTo(ByteBuf bytebuf) {
 		return this.buf.compareTo(bytebuf);
 	}
 
+	@Override
 	public ByteBuf copy() {
 		return this.buf.copy();
 	}
 
+	@Override
 	public ByteBuf copy(int i, int j) {
 		return this.buf.copy(i, j);
 	}
 
+	@Override
 	public ByteBuf discardReadBytes() {
 		return this.buf.discardReadBytes();
 	}
 
+	@Override
 	public ByteBuf discardSomeReadBytes() {
 		return this.buf.discardSomeReadBytes();
 	}
 
+	@Override
 	public ByteBuf duplicate() {
 		return this.buf.duplicate();
 	}
 
+	@Override
 	public ByteBuf ensureWritable(int parInt1) {
 		return this.buf.ensureWritable(parInt1);
 	}
 
+	@Override
 	public int ensureWritable(int i, boolean flag) {
 		return this.buf.ensureWritable(i, flag);
 	}
 
+	@Override
 	public boolean equals(Object object) {
 		return this.buf.equals(object);
 	}
 
+	@Override
 	public boolean getBoolean(int parInt1) {
 		return this.buf.getBoolean(parInt1);
 	}
 
+	@Override
 	public byte getByte(int parInt1) {
 		return this.buf.getByte(parInt1);
 	}
 
+	@Override
 	public ByteBuf getBytes(int i, byte[] abyte) {
 		return this.buf.getBytes(i, abyte);
 	}
 
+	@Override
 	public ByteBuf getBytes(int i, byte[] abyte, int j, int k) {
 		return this.buf.getBytes(i, abyte, j, k);
 	}
 
+	@Override
 	public ByteBuf getBytes(int parInt1, ByteBuf parByteBuf) {
 		if (parByteBuf instanceof PacketBuffer) {
 			return this.buf.getBytes(parInt1, ((PacketBuffer) parByteBuf).buf);
@@ -159,6 +181,7 @@ public class PacketBuffer extends ByteBuf {
 		}
 	}
 
+	@Override
 	public ByteBuf getBytes(int i, ByteBuf bytebuf, int j) {
 		if (bytebuf instanceof PacketBuffer) {
 			return this.buf.getBytes(i, ((PacketBuffer) bytebuf).buf, j);
@@ -167,6 +190,7 @@ public class PacketBuffer extends ByteBuf {
 		}
 	}
 
+	@Override
 	public ByteBuf getBytes(int i, ByteBuf bytebuf, int j, int k) {
 		if (bytebuf instanceof PacketBuffer) {
 			return this.buf.getBytes(i, ((PacketBuffer) bytebuf).buf, j, k);
@@ -175,146 +199,182 @@ public class PacketBuffer extends ByteBuf {
 		}
 	}
 
+	@Override
 	public ByteBuf getBytes(int i, ByteBuffer bytebuffer) {
 		return this.buf.getBytes(i, bytebuffer);
 	}
 
+	@Override
 	public ByteBuf getBytes(int parInt1, OutputStream parOutputStream, int parInt2) throws IOException {
 		return this.buf.getBytes(parInt1, parOutputStream, parInt2);
 	}
 
+	@Override
 	public char getChar(int parInt1) {
 		return this.buf.getChar(parInt1);
 	}
 
+	@Override
 	public double getDouble(int parInt1) {
 		return this.buf.getDouble(parInt1);
 	}
 
+	@Override
 	public float getFloat(int parInt1) {
 		return this.buf.getFloat(parInt1);
 	}
 
+	@Override
 	public int getInt(int parInt1) {
 		return this.buf.getInt(parInt1);
 	}
 
+	@Override
 	public long getLong(int parInt1) {
 		return this.buf.getLong(parInt1);
 	}
 
+	@Override
 	public int getMedium(int parInt1) {
 		return this.buf.getMedium(parInt1);
 	}
 
+	@Override
 	public short getShort(int parInt1) {
 		return this.buf.getShort(parInt1);
 	}
 
+	@Override
 	public short getUnsignedByte(int parInt1) {
 		return this.buf.getUnsignedByte(parInt1);
 	}
 
+	@Override
 	public long getUnsignedInt(int parInt1) {
 		return this.buf.getUnsignedInt(parInt1);
 	}
 
+	@Override
 	public int getUnsignedMedium(int parInt1) {
 		return this.buf.getUnsignedMedium(parInt1);
 	}
 
+	@Override
 	public int getUnsignedShort(int parInt1) {
 		return this.buf.getUnsignedShort(parInt1);
 	}
 
+	@Override
 	public boolean hasArray() {
 		return this.buf.hasArray();
 	}
 
+	@Override
 	public int hashCode() {
 		return this.buf.hashCode();
 	}
 
+	@Override
 	public boolean hasMemoryAddress() {
 		return this.buf.hasMemoryAddress();
 	}
 
+	@Override
 	public int indexOf(int parInt1, int parInt2, byte parByte1) {
 		return this.buf.indexOf(parInt1, parInt2, parByte1);
 	}
 
+	@Override
 	public ByteBuffer internalNioBuffer(int parInt1, int parInt2) {
 		return this.buf.internalNioBuffer(parInt1, parInt2);
 	}
 
+	@Override
 	public boolean isDirect() {
 		return this.buf.isDirect();
 	}
 
+	@Override
 	public boolean isReadable() {
 		return this.buf.isReadable();
 	}
 
+	@Override
 	public boolean isReadable(int i) {
 		return this.buf.isReadable(i);
 	}
 
+	@Override
 	public boolean isWritable() {
 		return this.buf.isWritable();
 	}
 
+	@Override
 	public boolean isWritable(int i) {
 		return this.buf.isWritable(i);
 	}
 
+	@Override
 	public ByteBuf markReaderIndex() {
 		return this.buf.markReaderIndex();
 	}
 
+	@Override
 	public ByteBuf markWriterIndex() {
 		return this.buf.markWriterIndex();
 	}
 
+	@Override
 	public int maxCapacity() {
 		return this.buf.maxCapacity();
 	}
 
+	@Override
 	public int maxWritableBytes() {
 		return this.buf.maxWritableBytes();
 	}
 
+	@Override
 	public long memoryAddress() {
 		return this.buf.memoryAddress();
 	}
 
+	@Override
 	public ByteBuffer nioBuffer() {
 		return this.buf.nioBuffer();
 	}
 
+	@Override
 	public ByteBuffer nioBuffer(int i, int j) {
 		return this.buf.nioBuffer(i, j);
 	}
 
+	@Override
 	public int nioBufferCount() {
 		return this.buf.nioBufferCount();
 	}
 
+	@Override
 	public ByteBuffer[] nioBuffers() {
 		return this.buf.nioBuffers();
 	}
 
+	@Override
 	public ByteBuffer[] nioBuffers(int i, int j) {
 		return this.buf.nioBuffers(i, j);
 	}
 
+	@Override
 	public ByteOrder order() {
 		return this.buf.order();
 	}
 
+	@Override
 	public ByteBuf order(ByteOrder byteorder) {
 		return this.buf.order(byteorder);
 	}
 
+	@Override
 	public int readableBytes() {
 		return this.buf.readableBytes();
 	}
@@ -323,10 +383,12 @@ public class PacketBuffer extends ByteBuf {
 		return BlockPos.fromLong(this.readLong());
 	}
 
+	@Override
 	public boolean readBoolean() {
 		return this.buf.readBoolean();
 	}
 
+	@Override
 	public byte readByte() {
 		return this.buf.readByte();
 	}
@@ -337,14 +399,17 @@ public class PacketBuffer extends ByteBuf {
 		return abyte;
 	}
 
+	@Override
 	public ByteBuf readBytes(byte[] abyte) {
 		return this.buf.readBytes(abyte);
 	}
 
+	@Override
 	public ByteBuf readBytes(byte[] abyte, int i, int j) {
 		return this.buf.readBytes(abyte, i, j);
 	}
 
+	@Override
 	public ByteBuf readBytes(ByteBuf bytebuf) {
 		if (bytebuf instanceof PacketBuffer) {
 			return this.buf.readBytes(((PacketBuffer) bytebuf).buf);
@@ -353,6 +418,7 @@ public class PacketBuffer extends ByteBuf {
 		}
 	}
 
+	@Override
 	public ByteBuf readBytes(ByteBuf bytebuf, int i) {
 		if (bytebuf instanceof PacketBuffer) {
 			return this.buf.readBytes(((PacketBuffer) bytebuf).buf, i);
@@ -361,6 +427,7 @@ public class PacketBuffer extends ByteBuf {
 		}
 	}
 
+	@Override
 	public ByteBuf readBytes(ByteBuf bytebuf, int i, int j) {
 		if (bytebuf instanceof PacketBuffer) {
 			return this.buf.readBytes(((PacketBuffer) bytebuf).buf, i, j);
@@ -369,18 +436,22 @@ public class PacketBuffer extends ByteBuf {
 		}
 	}
 
+	@Override
 	public ByteBuf readBytes(ByteBuffer bytebuffer) {
 		return this.buf.readBytes(bytebuffer);
 	}
 
+	@Override
 	public ByteBuf readBytes(int parInt1) {
 		return this.buf.readBytes(parInt1);
 	}
 
+	@Override
 	public ByteBuf readBytes(OutputStream parOutputStream, int parInt1) throws IOException {
 		return this.buf.readBytes(parOutputStream, parInt1);
 	}
 
+	@Override
 	public char readChar() {
 		return this.buf.readChar();
 	}
@@ -389,6 +460,7 @@ public class PacketBuffer extends ByteBuf {
 		return IChatComponent.Serializer.jsonToComponent(this.readStringFromBuffer(32767));
 	}
 
+	@Override
 	public double readDouble() {
 		return this.buf.readDouble();
 	}
@@ -397,18 +469,22 @@ public class PacketBuffer extends ByteBuf {
 		return (T) ((Enum[]) enumClass.getEnumConstants())[this.readVarIntFromBuffer()];
 	}
 
+	@Override
 	public int readerIndex() {
 		return this.buf.readerIndex();
 	}
 
+	@Override
 	public ByteBuf readerIndex(int i) {
 		return this.buf.readerIndex(i);
 	}
 
+	@Override
 	public float readFloat() {
 		return this.buf.readFloat();
 	}
 
+	@Override
 	public int readInt() {
 		return this.buf.readInt();
 	}
@@ -429,10 +505,12 @@ public class PacketBuffer extends ByteBuf {
 		return itemstack;
 	}
 
+	@Override
 	public long readLong() {
 		return this.buf.readLong();
 	}
 
+	@Override
 	public int readMedium() {
 		return this.buf.readMedium();
 	}
@@ -451,10 +529,12 @@ public class PacketBuffer extends ByteBuf {
 		}
 	}
 
+	@Override
 	public short readShort() {
 		return this.buf.readShort();
 	}
 
+	@Override
 	public ByteBuf readSlice(int parInt1) {
 		return this.buf.readSlice(parInt1);
 	}
@@ -481,18 +561,22 @@ public class PacketBuffer extends ByteBuf {
 		}
 	}
 
+	@Override
 	public short readUnsignedByte() {
 		return this.buf.readUnsignedByte();
 	}
 
+	@Override
 	public long readUnsignedInt() {
 		return this.buf.readUnsignedInt();
 	}
 
+	@Override
 	public int readUnsignedMedium() {
 		return this.buf.readUnsignedMedium();
 	}
 
+	@Override
 	public int readUnsignedShort() {
 		return this.buf.readUnsignedShort();
 	}
@@ -544,34 +628,42 @@ public class PacketBuffer extends ByteBuf {
 		return i;
 	}
 
+	@Override
 	public ByteBuf resetReaderIndex() {
 		return this.buf.resetReaderIndex();
 	}
 
+	@Override
 	public ByteBuf resetWriterIndex() {
 		return this.buf.resetWriterIndex();
 	}
 
+	@Override
 	public ByteBuf setBoolean(int parInt1, boolean parFlag) {
 		return this.buf.setBoolean(parInt1, parFlag);
 	}
 
+	@Override
 	public ByteBuf setByte(int parInt1, int parInt2) {
 		return this.buf.setByte(parInt1, parInt2);
 	}
 
+	@Override
 	public ByteBuf setBytes(int i, byte[] abyte) {
 		return this.buf.setBytes(i, abyte);
 	}
 
+	@Override
 	public ByteBuf setBytes(int i, byte[] abyte, int j, int k) {
 		return this.buf.setBytes(i, abyte, j, k);
 	}
 
+	@Override
 	public ByteBuf setBytes(int parInt1, ByteBuf parByteBuf) {
 		return this.buf.setBytes(parInt1, parByteBuf);
 	}
 
+	@Override
 	public ByteBuf setBytes(int i, ByteBuf bytebuf, int j) {
 		if (bytebuf instanceof PacketBuffer) {
 			return this.buf.setBytes(i, ((PacketBuffer) bytebuf).buf, j);
@@ -580,6 +672,7 @@ public class PacketBuffer extends ByteBuf {
 		}
 	}
 
+	@Override
 	public ByteBuf setBytes(int i, ByteBuf bytebuf, int j, int k) {
 		if (bytebuf instanceof PacketBuffer) {
 			return this.buf.setBytes(i, ((PacketBuffer) bytebuf).buf, j, k);
@@ -588,78 +681,97 @@ public class PacketBuffer extends ByteBuf {
 		}
 	}
 
+	@Override
 	public ByteBuf setBytes(int i, ByteBuffer bytebuffer) {
 		return this.buf.setBytes(i, bytebuffer);
 	}
 
+	@Override
 	public int setBytes(int parInt1, InputStream parInputStream, int parInt2) throws IOException {
 		return this.buf.setBytes(parInt1, parInputStream, parInt2);
 	}
 
+	@Override
 	public ByteBuf setChar(int parInt1, int parInt2) {
 		return this.buf.setChar(parInt1, parInt2);
 	}
 
+	@Override
 	public ByteBuf setDouble(int parInt1, double parDouble1) {
 		return this.buf.setDouble(parInt1, parDouble1);
 	}
 
+	@Override
 	public ByteBuf setFloat(int parInt1, float parFloat1) {
 		return this.buf.setFloat(parInt1, parFloat1);
 	}
 
+	@Override
 	public ByteBuf setIndex(int parInt1, int parInt2) {
 		return this.buf.setIndex(parInt1, parInt2);
 	}
 
+	@Override
 	public ByteBuf setInt(int parInt1, int parInt2) {
 		return this.buf.setInt(parInt1, parInt2);
 	}
 
+	@Override
 	public ByteBuf setLong(int parInt1, long parLong1) {
 		return this.buf.setLong(parInt1, parLong1);
 	}
 
+	@Override
 	public ByteBuf setMedium(int parInt1, int parInt2) {
 		return this.buf.setMedium(parInt1, parInt2);
 	}
 
+	@Override
 	public ByteBuf setShort(int parInt1, int parInt2) {
 		return this.buf.setShort(parInt1, parInt2);
 	}
 
+	@Override
 	public ByteBuf setZero(int parInt1, int parInt2) {
 		return this.buf.setZero(parInt1, parInt2);
 	}
 
+	@Override
 	public ByteBuf skipBytes(int parInt1) {
 		return this.buf.skipBytes(parInt1);
 	}
 
+	@Override
 	public ByteBuf slice() {
 		return this.buf.slice();
 	}
 
+	@Override
 	public ByteBuf slice(int i, int j) {
 		return this.buf.slice(i, j);
 	}
 
+	@Override
 	public String toString() {
 		return this.buf.toString();
 	}
 
+	@Override
 	public String toString(Charset charset) {
 		return this.buf.toString(charset);
 	}
 
+	@Override
 	public String toString(int i, int j, Charset charset) {
 		return this.buf.toString(i, j, charset);
 	}
 
+	@Override
 	public ByteBuf unwrap() {
 		return this.buf.unwrap();
 	}
 
+	@Override
 	public int writableBytes() {
 		return this.buf.writableBytes();
 	}
@@ -668,10 +780,12 @@ public class PacketBuffer extends ByteBuf {
 		this.writeLong(pos.toLong());
 	}
 
+	@Override
 	public ByteBuf writeBoolean(boolean parFlag) {
 		return this.buf.writeBoolean(parFlag);
 	}
 
+	@Override
 	public ByteBuf writeByte(int parInt1) {
 		return this.buf.writeByte(parInt1);
 	}
@@ -681,14 +795,17 @@ public class PacketBuffer extends ByteBuf {
 		this.writeBytes(array);
 	}
 
+	@Override
 	public ByteBuf writeBytes(byte[] abyte) {
 		return this.buf.writeBytes(abyte);
 	}
 
+	@Override
 	public ByteBuf writeBytes(byte[] abyte, int i, int j) {
 		return this.buf.writeBytes(abyte, i, j);
 	}
 
+	@Override
 	public ByteBuf writeBytes(ByteBuf parByteBuf) {
 		if (parByteBuf instanceof PacketBuffer) {
 			return this.buf.writeBytes(((PacketBuffer) parByteBuf).buf);
@@ -697,6 +814,7 @@ public class PacketBuffer extends ByteBuf {
 		}
 	}
 
+	@Override
 	public ByteBuf writeBytes(ByteBuf bytebuf, int i) {
 		if (bytebuf instanceof PacketBuffer) {
 			return this.buf.writeBytes(((PacketBuffer) bytebuf).buf, i);
@@ -705,6 +823,7 @@ public class PacketBuffer extends ByteBuf {
 		}
 	}
 
+	@Override
 	public ByteBuf writeBytes(ByteBuf bytebuf, int i, int j) {
 		if (bytebuf instanceof PacketBuffer) {
 			return this.buf.writeBytes(((PacketBuffer) bytebuf).buf, i, j);
@@ -713,14 +832,17 @@ public class PacketBuffer extends ByteBuf {
 		}
 	}
 
+	@Override
 	public ByteBuf writeBytes(ByteBuffer bytebuffer) {
 		return this.buf.writeBytes(bytebuffer);
 	}
 
+	@Override
 	public int writeBytes(InputStream parInputStream, int parInt1) throws IOException {
 		return this.buf.writeBytes(parInputStream, parInt1);
 	}
 
+	@Override
 	public ByteBuf writeChar(int parInt1) {
 		return this.buf.writeChar(parInt1);
 	}
@@ -729,6 +851,7 @@ public class PacketBuffer extends ByteBuf {
 		this.writeString(IChatComponent.Serializer.componentToJson(component));
 	}
 
+	@Override
 	public ByteBuf writeDouble(double parDouble1) {
 		return this.buf.writeDouble(parDouble1);
 	}
@@ -737,10 +860,12 @@ public class PacketBuffer extends ByteBuf {
 		this.writeVarIntToBuffer(value.ordinal());
 	}
 
+	@Override
 	public ByteBuf writeFloat(float parFloat1) {
 		return this.buf.writeFloat(parFloat1);
 	}
 
+	@Override
 	public ByteBuf writeInt(int parInt1) {
 		return this.buf.writeInt(parInt1);
 	}
@@ -765,10 +890,12 @@ public class PacketBuffer extends ByteBuf {
 
 	}
 
+	@Override
 	public ByteBuf writeLong(long parLong1) {
 		return this.buf.writeLong(parLong1);
 	}
 
+	@Override
 	public ByteBuf writeMedium(int parInt1) {
 		return this.buf.writeMedium(parInt1);
 	}
@@ -789,14 +916,17 @@ public class PacketBuffer extends ByteBuf {
 
 	}
 
+	@Override
 	public int writerIndex() {
 		return this.buf.writerIndex();
 	}
 
+	@Override
 	public ByteBuf writerIndex(int i) {
 		return this.buf.writerIndex(i);
 	}
 
+	@Override
 	public ByteBuf writeShort(int parInt1) {
 		return this.buf.writeShort(parInt1);
 	}
@@ -842,6 +972,7 @@ public class PacketBuffer extends ByteBuf {
 		this.writeByte((int) value);
 	}
 
+	@Override
 	public ByteBuf writeZero(int parInt1) {
 		return this.buf.writeZero(parInt1);
 	}

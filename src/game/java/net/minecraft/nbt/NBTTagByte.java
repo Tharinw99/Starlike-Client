@@ -7,13 +7,13 @@ import java.io.IOException;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -25,7 +25,7 @@ import java.io.IOException;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class NBTTagByte extends NBTBase.NBTPrimitive {
 	private byte data;
@@ -40,10 +40,12 @@ public class NBTTagByte extends NBTBase.NBTPrimitive {
 	/**
 	 * + Creates a clone of the tag.
 	 */
+	@Override
 	public NBTBase copy() {
 		return new NBTTagByte(this.data);
 	}
 
+	@Override
 	public boolean equals(Object object) {
 		if (super.equals(object)) {
 			NBTTagByte nbttagbyte = (NBTTagByte) object;
@@ -53,14 +55,17 @@ public class NBTTagByte extends NBTBase.NBTPrimitive {
 		}
 	}
 
+	@Override
 	public byte getByte() {
 		return this.data;
 	}
 
+	@Override
 	public double getDouble() {
 		return (double) this.data;
 	}
 
+	@Override
 	public float getFloat() {
 		return (float) this.data;
 	}
@@ -68,31 +73,38 @@ public class NBTTagByte extends NBTBase.NBTPrimitive {
 	/**
 	 * + Gets the type byte for the tag.
 	 */
+	@Override
 	public byte getId() {
 		return (byte) 1;
 	}
 
+	@Override
 	public int getInt() {
 		return this.data;
 	}
 
+	@Override
 	public long getLong() {
 		return (long) this.data;
 	}
 
+	@Override
 	public short getShort() {
 		return (short) this.data;
 	}
 
+	@Override
 	public int hashCode() {
 		return super.hashCode() ^ this.data;
 	}
 
+	@Override
 	void read(DataInput parDataInput, int parInt1, NBTSizeTracker parNBTSizeTracker) throws IOException {
 		parNBTSizeTracker.read(72L);
 		this.data = parDataInput.readByte();
 	}
 
+	@Override
 	public String toString() {
 		return "" + this.data + "b";
 	}
@@ -101,6 +113,7 @@ public class NBTTagByte extends NBTBase.NBTPrimitive {
 	 * + Write the actual data contents of the tag, implemented in NBT extension
 	 * classes
 	 */
+	@Override
 	void write(DataOutput parDataOutput) throws IOException {
 		parDataOutput.writeByte(this.data);
 	}

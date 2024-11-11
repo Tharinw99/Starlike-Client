@@ -20,7 +20,7 @@ package com.google.common.collect;
  * "Overrides" the {@link ImmutableSet} static methods that lack
  * {@link ImmutableSortedSet} equivalents with deprecated, exception-throwing
  * versions. This prevents accidents like the following:
- * 
+ *
  * <pre>
  *    {@code
  *
@@ -164,7 +164,7 @@ abstract class ImmutableSortedSetFauxverideShim<E> extends ImmutableSet<E> {
 	 * with that version and with any other compilers that interpret the JLS
 	 * similarly, there is no definition of copyOf() here, and the definition in
 	 * ImmutableSortedSet matches that in ImmutableSet.
-	 * 
+	 *
 	 * The result is that ImmutableSortedSet.copyOf() may be called on
 	 * non-Comparable elements. We have not discovered a better solution. In
 	 * retrospect, the static factory methods should have gone in a separate class

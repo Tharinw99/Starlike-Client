@@ -15,13 +15,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,7 +33,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityAIFollowOwner extends EntityAIBase {
 	private EntityTameable thePet;
@@ -62,6 +62,7 @@ public class EntityAIFollowOwner extends EntityAIBase {
 	/**
 	 * + Returns whether an in-progress EntityAIBase should continue executing
 	 */
+	@Override
 	public boolean continueExecuting() {
 		return !this.petPathfinder.noPath()
 				&& this.thePet.getDistanceSqToEntity(this.theOwner) > (double) (this.maxDist * this.maxDist)
@@ -77,6 +78,7 @@ public class EntityAIFollowOwner extends EntityAIBase {
 	/**
 	 * + Resets the task
 	 */
+	@Override
 	public void resetTask() {
 		this.theOwner = null;
 		this.petPathfinder.clearPathEntity();
@@ -86,6 +88,7 @@ public class EntityAIFollowOwner extends EntityAIBase {
 	/**
 	 * + Returns whether the EntityAIBase should begin execution.
 	 */
+	@Override
 	public boolean shouldExecute() {
 		EntityLivingBase entitylivingbase = this.thePet.getOwner();
 		if (entitylivingbase == null) {
@@ -105,6 +108,7 @@ public class EntityAIFollowOwner extends EntityAIBase {
 	/**
 	 * + Execute a one shot task or start executing a continuous task
 	 */
+	@Override
 	public void startExecuting() {
 		this.field_75343_h = 0;
 		this.field_75344_i = ((PathNavigateGround) this.thePet.getNavigator()).getAvoidsWater();
@@ -114,6 +118,7 @@ public class EntityAIFollowOwner extends EntityAIBase {
 	/**
 	 * + Updates the task
 	 */
+	@Override
 	public void updateTask() {
 		this.thePet.getLookHelper().setLookPositionWithEntity(this.theOwner, 10.0F,
 				(float) this.thePet.getVerticalFaceSpeed());

@@ -24,6 +24,7 @@ import javax.annotation.meta.When;
 public @interface RegEx {
 	static class Checker implements TypeQualifierValidator<RegEx> {
 
+		@Override
 		public When forConstantValue(RegEx annotation, Object value) {
 			if (!(value instanceof String))
 				return When.NEVER;

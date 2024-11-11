@@ -16,13 +16,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -34,7 +34,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockOre extends Block {
 	public BlockOre() {
@@ -51,6 +51,7 @@ public class BlockOre extends Block {
 	 * when the block gets destroyed. It returns the metadata of the dropped item
 	 * based on the old metadata of the block.
 	 */
+	@Override
 	public int damageDropped(IBlockState var1) {
 		return this == Blocks.lapis_ore ? EnumDyeColor.BLUE.getDyeDamage() : 0;
 	}
@@ -58,6 +59,7 @@ public class BlockOre extends Block {
 	/**
 	 * + Spawns this Block's drops into the World as EntityItems.
 	 */
+	@Override
 	public void dropBlockAsItemWithChance(World world, BlockPos blockpos, IBlockState iblockstate, float f, int i) {
 		super.dropBlockAsItemWithChance(world, blockpos, iblockstate, f, i);
 		if (this.getItemDropped(iblockstate, world.rand, i) != Item.getItemFromBlock(this)) {
@@ -79,6 +81,7 @@ public class BlockOre extends Block {
 
 	}
 
+	@Override
 	public int getDamageValue(World var1, BlockPos var2) {
 		return 0;
 	}
@@ -86,6 +89,7 @@ public class BlockOre extends Block {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
 		return this == Blocks.coal_ore ? Items.coal
 				: (this == Blocks.diamond_ore ? Items.diamond
@@ -99,6 +103,7 @@ public class BlockOre extends Block {
 	/**
 	 * + Returns the quantity of items to drop on block destruction.
 	 */
+	@Override
 	public int quantityDropped(EaglercraftRandom random) {
 		return this == Blocks.lapis_ore ? 4 + random.nextInt(5) : 1;
 	}
@@ -106,6 +111,7 @@ public class BlockOre extends Block {
 	/**
 	 * + Get the quantity dropped based on the given fortune level
 	 */
+	@Override
 	public int quantityDroppedWithBonus(int i, EaglercraftRandom random) {
 		if (i > 0 && Item.getItemFromBlock(this) != this
 				.getItemDropped((IBlockState) this.getBlockState().getValidStates().iterator().next(), random, i)) {

@@ -21,13 +21,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -39,7 +39,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class CommandBlockLogic implements ICommandSender {
 	/**
@@ -65,6 +65,7 @@ public abstract class CommandBlockLogic implements ICommandSender {
 	/**
 	 * + Send a chat message to the CommandSender
 	 */
+	@Override
 	public void addChatMessage(IChatComponent ichatcomponent) {
 		if (this.trackOutput && this.getEntityWorld() != null && !this.getEntityWorld().isRemote) {
 			this.lastOutput = (new ChatComponentText("[" + timestampFormat.format(new Date()) + "] "))
@@ -78,6 +79,7 @@ public abstract class CommandBlockLogic implements ICommandSender {
 	 * + Returns {@code true} if the CommandSender is allowed to execute the
 	 * command, {@code false} if not
 	 */
+	@Override
 	public boolean canCommandSenderUseCommand(int i, String var2) {
 		return i <= 2;
 	}
@@ -101,6 +103,7 @@ public abstract class CommandBlockLogic implements ICommandSender {
 	 * + Get the formatted ChatComponent that will be used for the sender's username
 	 * in chat
 	 */
+	@Override
 	public IChatComponent getDisplayName() {
 		return new ChatComponentText(this.getName());
 	}
@@ -116,6 +119,7 @@ public abstract class CommandBlockLogic implements ICommandSender {
 	 * + Gets the name of this command sender (usually username, but possibly
 	 * "Rcon")
 	 */
+	@Override
 	public String getName() {
 		return this.customName;
 	}
@@ -152,6 +156,7 @@ public abstract class CommandBlockLogic implements ICommandSender {
 	 * + Returns true if the command sender should be sent feedback about executed
 	 * commands
 	 */
+	@Override
 	public boolean sendCommandFeedback() {
 		MinecraftServer minecraftserver = MinecraftServer.getServer();
 		return minecraftserver == null
@@ -166,6 +171,7 @@ public abstract class CommandBlockLogic implements ICommandSender {
 		this.successCount = 0;
 	}
 
+	@Override
 	public void setCommandStat(CommandResultStats.Type commandresultstats$type, int i) {
 		this.resultStats.func_179672_a(this, commandresultstats$type, i);
 	}
@@ -202,11 +208,13 @@ public abstract class CommandBlockLogic implements ICommandSender {
 				CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Executing command block");
 				CrashReportCategory crashreportcategory = crashreport.makeCategory("Command to be executed");
 				crashreportcategory.addCrashSectionCallable("Command", new Callable<String>() {
+					@Override
 					public String call() throws Exception {
 						return CommandBlockLogic.this.getCommand();
 					}
 				});
 				crashreportcategory.addCrashSectionCallable("Name", new Callable<String>() {
+					@Override
 					public String call() throws Exception {
 						return CommandBlockLogic.this.getName();
 					}

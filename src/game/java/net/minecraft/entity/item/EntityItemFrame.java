@@ -19,13 +19,13 @@ import net.minecraft.world.storage.MapData;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -37,7 +37,7 @@ import net.minecraft.world.storage.MapData;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityItemFrame extends EntityHanging {
 	/**
@@ -59,6 +59,7 @@ public class EntityItemFrame extends EntityHanging {
 	/**
 	 * + Called when the entity is attacked.
 	 */
+	@Override
 	public boolean attackEntityFrom(DamageSource damagesource, float f) {
 		if (this.isEntityInvulnerable(damagesource)) {
 			return false;
@@ -98,6 +99,7 @@ public class EntityItemFrame extends EntityHanging {
 		}
 	}
 
+	@Override
 	protected void entityInit() {
 		this.getDataWatcher().addObjectByDataType(8, 5);
 		this.getDataWatcher().addObject(9, Byte.valueOf((byte) 0));
@@ -115,6 +117,7 @@ public class EntityItemFrame extends EntityHanging {
 		return this.getDisplayedItem() == null ? 0 : this.getRotation() % 8 + 1;
 	}
 
+	@Override
 	public float getCollisionBorderSize() {
 		return 0.0F;
 	}
@@ -123,6 +126,7 @@ public class EntityItemFrame extends EntityHanging {
 		return this.getDataWatcher().getWatchableObjectItemStack(8);
 	}
 
+	@Override
 	protected float getEaglerDynamicLightsValueSimple(float partialTicks) {
 		float f = super.getEaglerDynamicLightsValueSimple(partialTicks);
 		ItemStack itm = this.getDisplayedItem();
@@ -136,6 +140,7 @@ public class EntityItemFrame extends EntityHanging {
 		return f;
 	}
 
+	@Override
 	public int getHeightPixels() {
 		return 12;
 	}
@@ -147,6 +152,7 @@ public class EntityItemFrame extends EntityHanging {
 		return this.getDataWatcher().getWatchableObjectByte(9);
 	}
 
+	@Override
 	public int getWidthPixels() {
 		return 12;
 	}
@@ -154,6 +160,7 @@ public class EntityItemFrame extends EntityHanging {
 	/**
 	 * + First layer of player interaction
 	 */
+	@Override
 	public boolean interactFirst(EntityPlayer entityplayer) {
 		if (this.getDisplayedItem() == null) {
 			ItemStack itemstack = entityplayer.getHeldItem();
@@ -176,6 +183,7 @@ public class EntityItemFrame extends EntityHanging {
 	 * and comparing it to its average edge length * 64 * renderDistanceWeight Args:
 	 * distance
 	 */
+	@Override
 	public boolean isInRangeToRenderDist(double d0) {
 		double d1 = 16.0D;
 		d1 = d1 * 64.0D * this.renderDistanceWeight;
@@ -185,6 +193,7 @@ public class EntityItemFrame extends EntityHanging {
 	/**
 	 * + Called when this entity is broken. Entity parameter may be null.
 	 */
+	@Override
 	public void onBroken(Entity entity) {
 		this.dropItemOrSelf(entity, true);
 	}
@@ -192,6 +201,7 @@ public class EntityItemFrame extends EntityHanging {
 	/**
 	 * + (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
 		NBTTagCompound nbttagcompound1 = nbttagcompound.getCompoundTag("Item");
 		if (nbttagcompound1 != null && !nbttagcompound1.hasNoTags()) {
@@ -224,6 +234,7 @@ public class EntityItemFrame extends EntityHanging {
 		}
 	}
 
+	@Override
 	protected void renderDynamicLightsEaglerAt(double entityX, double entityY, double entityZ, double renderX,
 			double renderY, double renderZ, float partialTicks, boolean isInFrustum) {
 		super.renderDynamicLightsEaglerAt(entityX, entityY, entityZ, renderX, renderY, renderZ, partialTicks,
@@ -257,6 +268,7 @@ public class EntityItemFrame extends EntityHanging {
 	/**
 	 * + (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		if (this.getDisplayedItem() != null) {
 			nbttagcompound.setTag("Item", this.getDisplayedItem().writeToNBT(new NBTTagCompound()));

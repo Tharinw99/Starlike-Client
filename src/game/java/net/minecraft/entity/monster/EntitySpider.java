@@ -30,13 +30,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -48,7 +48,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntitySpider extends EntityMob {
 	static class AISpiderAttack extends EntityAIAttackOnCollide {
@@ -56,6 +56,7 @@ public class EntitySpider extends EntityMob {
 			super(parEntitySpider, targetClass, 1.0D, true);
 		}
 
+		@Override
 		public boolean continueExecuting() {
 			float f = this.attacker.getBrightness(1.0F);
 			if (f >= 0.5F && this.attacker.getRNG().nextInt(100) == 0) {
@@ -66,6 +67,7 @@ public class EntitySpider extends EntityMob {
 			}
 		}
 
+		@Override
 		protected double func_179512_a(EntityLivingBase entitylivingbase) {
 			return (double) (4.0F + entitylivingbase.width);
 		}
@@ -76,6 +78,7 @@ public class EntitySpider extends EntityMob {
 			super(parEntitySpider, classTarget, true);
 		}
 
+		@Override
 		public boolean shouldExecute() {
 			float f = this.taskOwner.getBrightness(1.0F);
 			return f >= 0.5F ? false : super.shouldExecute();
@@ -115,6 +118,7 @@ public class EntitySpider extends EntityMob {
 		this.targetTasks.addTask(3, new EntitySpider.AISpiderTarget(this, EntityIronGolem.class));
 	}
 
+	@Override
 	protected void applyEntityAttributes() {
 		super.applyEntityAttributes();
 		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(16.0D);
@@ -124,6 +128,7 @@ public class EntitySpider extends EntityMob {
 	/**
 	 * + Drop 0-2 items of this living's type
 	 */
+	@Override
 	protected void dropFewItems(boolean flag, int i) {
 		super.dropFewItems(flag, i);
 		if (flag && (this.rand.nextInt(3) == 0 || this.rand.nextInt(1 + i) > 0)) {
@@ -132,6 +137,7 @@ public class EntitySpider extends EntityMob {
 
 	}
 
+	@Override
 	protected void entityInit() {
 		super.entityInit();
 		this.dataWatcher.addObject(16, Byte.valueOf((byte) 0));
@@ -140,6 +146,7 @@ public class EntitySpider extends EntityMob {
 	/**
 	 * + Get this Entity's EnumCreatureAttribute
 	 */
+	@Override
 	public EnumCreatureAttribute getCreatureAttribute() {
 		return EnumCreatureAttribute.ARTHROPOD;
 	}
@@ -147,14 +154,17 @@ public class EntitySpider extends EntityMob {
 	/**
 	 * + Returns the sound this mob makes on death.
 	 */
+	@Override
 	protected String getDeathSound() {
 		return "mob.spider.death";
 	}
 
+	@Override
 	protected Item getDropItem() {
 		return Items.string;
 	}
 
+	@Override
 	public float getEyeHeight() {
 		return 0.65F;
 	}
@@ -162,6 +172,7 @@ public class EntitySpider extends EntityMob {
 	/**
 	 * + Returns the sound this mob makes when it is hurt.
 	 */
+	@Override
 	protected String getHurtSound() {
 		return "mob.spider.say";
 	}
@@ -169,6 +180,7 @@ public class EntitySpider extends EntityMob {
 	/**
 	 * + Returns the sound this mob makes while it's alive.
 	 */
+	@Override
 	protected String getLivingSound() {
 		return "mob.spider.say";
 	}
@@ -177,6 +189,7 @@ public class EntitySpider extends EntityMob {
 	 * + Returns the Y offset from the entity's position for any entity riding this
 	 * one.
 	 */
+	@Override
 	public double getMountedYOffset() {
 		return (double) (this.height * 0.5F);
 	}
@@ -184,6 +197,7 @@ public class EntitySpider extends EntityMob {
 	/**
 	 * + Returns new PathNavigateGround instance
 	 */
+	@Override
 	protected PathNavigate getNewNavigator(World world) {
 		return new PathNavigateClimber(this, world);
 	}
@@ -199,10 +213,12 @@ public class EntitySpider extends EntityMob {
 	/**
 	 * + returns true if this entity is by a ladder, false otherwise
 	 */
+	@Override
 	public boolean isOnLadder() {
 		return this.isBesideClimbableBlock();
 	}
 
+	@Override
 	public boolean isPotionApplicable(PotionEffect potioneffect) {
 		return potioneffect.getPotionID() == Potion.poison.id ? false : super.isPotionApplicable(potioneffect);
 	}
@@ -212,6 +228,7 @@ public class EntitySpider extends EntityMob {
 	 * spawner, natural spawning etc, but not called when entity is reloaded from
 	 * nbt. Mainly used for initializing attributes and inventory
 	 */
+	@Override
 	public IEntityLivingData onInitialSpawn(DifficultyInstance difficultyinstance,
 			IEntityLivingData ientitylivingdata) {
 		ientitylivingdata = super.onInitialSpawn(difficultyinstance, ientitylivingdata);
@@ -244,6 +261,7 @@ public class EntitySpider extends EntityMob {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		super.onUpdate();
 		if (!this.worldObj.isRemote) {
@@ -252,6 +270,7 @@ public class EntitySpider extends EntityMob {
 
 	}
 
+	@Override
 	protected void playStepSound(BlockPos var1, Block var2) {
 		this.playSound("mob.spider.step", 0.15F, 1.0F);
 	}
@@ -274,6 +293,7 @@ public class EntitySpider extends EntityMob {
 	/**
 	 * + Sets the Entity inside a web block.
 	 */
+	@Override
 	public void setInWeb() {
 	}
 }

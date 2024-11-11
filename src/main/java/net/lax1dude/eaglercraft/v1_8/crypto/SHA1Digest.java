@@ -1,9 +1,9 @@
 /*
  * Copyright (c) 2000-2021 The Legion of the Bouncy Castle Inc. (https://www.bouncycastle.org)
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
- * and associated documentation files (the "Software"), to deal in the Software without restriction, 
- * including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+ * and associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
  * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
  * subject to the following conditions:
  *
@@ -16,7 +16,7 @@
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
- * 
+ *
  */
 
 package net.lax1dude.eaglercraft.v1_8.crypto;
@@ -104,6 +104,7 @@ public class SHA1Digest extends GeneralDigest {
 		return (u ^ v ^ w);
 	}
 
+	@Override
 	protected void processBlock() {
 		//
 		// expand 16 word block into 80 word block.
@@ -188,6 +189,7 @@ public class SHA1Digest extends GeneralDigest {
 		}
 	}
 
+	@Override
 	protected void processLength(long bitLength) {
 		if (xOff > 14) {
 			processBlock();
@@ -197,6 +199,7 @@ public class SHA1Digest extends GeneralDigest {
 		X[15] = (int) (bitLength & 0xffffffff);
 	}
 
+	@Override
 	protected void processWord(byte[] in, int inOff) {
 		X[xOff++] = ((in[inOff] & 0xff) << 24) | ((in[inOff + 1] & 0xff) << 16) | ((in[inOff + 2] & 0xff) << 8)
 				| ((in[inOff + 3] & 0xff));
@@ -209,6 +212,7 @@ public class SHA1Digest extends GeneralDigest {
 	/**
 	 * reset the chaining variables
 	 */
+	@Override
 	public void reset() {
 		super.reset();
 

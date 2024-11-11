@@ -16,13 +16,13 @@ import net.minecraft.world.pathfinder.WalkNodeProcessor;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -34,7 +34,7 @@ import net.minecraft.world.pathfinder.WalkNodeProcessor;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityAIControlledByPlayer extends EntityAIBase {
 	private final EntityLiving thisEntity;
@@ -83,6 +83,7 @@ public class EntityAIControlledByPlayer extends EntityAIBase {
 	/**
 	 * + Resets the task
 	 */
+	@Override
 	public void resetTask() {
 		this.speedBoosted = false;
 		this.currentSpeed = 0.0F;
@@ -91,6 +92,7 @@ public class EntityAIControlledByPlayer extends EntityAIBase {
 	/**
 	 * + Returns whether the EntityAIBase should begin execution.
 	 */
+	@Override
 	public boolean shouldExecute() {
 		return this.thisEntity.isEntityAlive() && this.thisEntity.riddenByEntity != null
 				&& this.thisEntity.riddenByEntity instanceof EntityPlayer
@@ -100,6 +102,7 @@ public class EntityAIControlledByPlayer extends EntityAIBase {
 	/**
 	 * + Execute a one shot task or start executing a continuous task
 	 */
+	@Override
 	public void startExecuting() {
 		this.currentSpeed = 0.0F;
 	}
@@ -107,6 +110,7 @@ public class EntityAIControlledByPlayer extends EntityAIBase {
 	/**
 	 * + Updates the task
 	 */
+	@Override
 	public void updateTask() {
 		EntityPlayer entityplayer = (EntityPlayer) this.thisEntity.riddenByEntity;
 		EntityCreature entitycreature = (EntityCreature) this.thisEntity;

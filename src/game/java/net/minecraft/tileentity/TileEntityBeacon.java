@@ -32,13 +32,13 @@ import net.minecraft.util.ITickable;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -50,7 +50,7 @@ import net.minecraft.util.ITickable;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class TileEntityBeacon extends TileEntityLockable implements ITickable, IInventory {
 	public static class BeamSegment {
@@ -126,13 +126,16 @@ public class TileEntityBeacon extends TileEntityLockable implements ITickable, I
 
 	}
 
+	@Override
 	public void clear() {
 		this.payment = null;
 	}
 
+	@Override
 	public void closeInventory(EntityPlayer player) {
 	}
 
+	@Override
 	public Container createContainer(InventoryPlayer inventoryplayer, EntityPlayer var2) {
 		return new ContainerBeacon(inventoryplayer, this);
 	}
@@ -141,6 +144,7 @@ public class TileEntityBeacon extends TileEntityLockable implements ITickable, I
 	 * + Removes up to a specified number of items from an inventory slot and
 	 * returns them in a new stack.
 	 */
+	@Override
 	public ItemStack decrStackSize(int index, int count) {
 		if (index == 0 && this.payment != null) {
 			if (count >= this.payment.stackSize) {
@@ -176,12 +180,14 @@ public class TileEntityBeacon extends TileEntityLockable implements ITickable, I
 	 * used to sync tile entity data from the server to the client easily. For
 	 * example this is used by signs to synchronise the text to be displayed.
 	 */
+	@Override
 	public Packet getDescriptionPacket() {
 		NBTTagCompound nbttagcompound = new NBTTagCompound();
 		this.writeToNBT(nbttagcompound);
 		return new S35PacketUpdateTileEntity(this.pos, 3, nbttagcompound);
 	}
 
+	@Override
 	public int getField(int parInt1) {
 		switch (parInt1) {
 		case 0:
@@ -195,10 +201,12 @@ public class TileEntityBeacon extends TileEntityLockable implements ITickable, I
 		}
 	}
 
+	@Override
 	public int getFieldCount() {
 		return 3;
 	}
 
+	@Override
 	public String getGuiID() {
 		return "minecraft:beacon";
 	}
@@ -207,10 +215,12 @@ public class TileEntityBeacon extends TileEntityLockable implements ITickable, I
 	 * + Returns the maximum stack size for a inventory slot. Seems to always be 64,
 	 * possibly will be extended.
 	 */
+	@Override
 	public int getInventoryStackLimit() {
 		return 1;
 	}
 
+	@Override
 	public double getMaxRenderDistanceSquared() {
 		return 65536.0D;
 	}
@@ -219,6 +229,7 @@ public class TileEntityBeacon extends TileEntityLockable implements ITickable, I
 	 * + Gets the name of this command sender (usually username, but possibly
 	 * "Rcon")
 	 */
+	@Override
 	public String getName() {
 		return this.hasCustomName() ? this.customName : "container.beacon";
 	}
@@ -226,6 +237,7 @@ public class TileEntityBeacon extends TileEntityLockable implements ITickable, I
 	/**
 	 * + Returns the number of slots in the inventory.
 	 */
+	@Override
 	public int getSizeInventory() {
 		return 1;
 	}
@@ -233,6 +245,7 @@ public class TileEntityBeacon extends TileEntityLockable implements ITickable, I
 	/**
 	 * + Returns the stack in the given slot.
 	 */
+	@Override
 	public ItemStack getStackInSlot(int index) {
 		return index == 0 ? this.payment : null;
 	}
@@ -240,6 +253,7 @@ public class TileEntityBeacon extends TileEntityLockable implements ITickable, I
 	/**
 	 * + Returns true if this thing is named
 	 */
+	@Override
 	public boolean hasCustomName() {
 		return this.customName != null && this.customName.length() > 0;
 	}
@@ -248,6 +262,7 @@ public class TileEntityBeacon extends TileEntityLockable implements ITickable, I
 	 * + Returns true if automation is allowed to insert the given stack (ignoring
 	 * stack size) into the given slot.
 	 */
+	@Override
 	public boolean isItemValidForSlot(int index, ItemStack stack) {
 		return stack.getItem() == Items.netherite_ingot || stack.getItem() == Items.emerald
 				|| stack.getItem() == Items.diamond || stack.getItem() == Items.gold_ingot
@@ -258,15 +273,18 @@ public class TileEntityBeacon extends TileEntityLockable implements ITickable, I
 	 * + Do not make give this method the name canInteractWith because it clashes
 	 * with Container
 	 */
+	@Override
 	public boolean isUseableByPlayer(EntityPlayer player) {
 		return this.worldObj.getTileEntity(this.pos) != this ? false
 				: player.getDistanceSq((double) this.pos.getX() + 0.5D, (double) this.pos.getY() + 0.5D,
 						(double) this.pos.getZ() + 0.5D) <= 64.0D;
 	}
 
+	@Override
 	public void openInventory(EntityPlayer player) {
 	}
 
+	@Override
 	public void readFromNBT(NBTTagCompound nbttagcompound) {
 		super.readFromNBT(nbttagcompound);
 		this.primaryEffect = this.func_183001_h(nbttagcompound.getInteger("Primary"));
@@ -274,6 +292,7 @@ public class TileEntityBeacon extends TileEntityLockable implements ITickable, I
 		this.levels = nbttagcompound.getInteger("Levels");
 	}
 
+	@Override
 	public boolean receiveClientEvent(int id, int type) {
 		if (id == 1) {
 			this.updateBeacon();
@@ -286,6 +305,7 @@ public class TileEntityBeacon extends TileEntityLockable implements ITickable, I
 	/**
 	 * + Removes a stack from the given slot and returns it.
 	 */
+	@Override
 	public ItemStack removeStackFromSlot(int index) {
 		if (index == 0 && this.payment != null) {
 			ItemStack itemstack = this.payment;
@@ -296,6 +316,7 @@ public class TileEntityBeacon extends TileEntityLockable implements ITickable, I
 		}
 	}
 
+	@Override
 	public void setField(int id, int value) {
 		switch (id) {
 		case 0:
@@ -314,6 +335,7 @@ public class TileEntityBeacon extends TileEntityLockable implements ITickable, I
 	 * + Sets the given item stack to the specified slot in the inventory (can be
 	 * crafting or armor sections).
 	 */
+	@Override
 	public void setInventorySlotContents(int index, ItemStack stack) {
 		if (index == 0) {
 			this.payment = stack;
@@ -350,6 +372,7 @@ public class TileEntityBeacon extends TileEntityLockable implements ITickable, I
 	/**
 	 * + Like the old updateEntity(), except more generic.
 	 */
+	@Override
 	public void update() {
 		if (this.worldObj.getTotalWorldTime() % 80L == 0L) {
 			this.updateBeacon();
@@ -374,7 +397,7 @@ public class TileEntityBeacon extends TileEntityLockable implements ITickable, I
 				EntitySheep.func_175513_a(EnumDyeColor.WHITE));
 		this.beamSegments.add(tileentitybeacon$beamsegment);
 		boolean flag = true;
-		BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+		BlockPos blockpos$mutableblockpos = new BlockPos();
 
 		for (int i1 = k + 1; i1 < 256; ++i1) {
 			IBlockState iblockstate = this.worldObj.getBlockState(blockpos$mutableblockpos.func_181079_c(j, i1, l));
@@ -454,6 +477,7 @@ public class TileEntityBeacon extends TileEntityLockable implements ITickable, I
 
 	}
 
+	@Override
 	public void writeToNBT(NBTTagCompound nbttagcompound) {
 		super.writeToNBT(nbttagcompound);
 		nbttagcompound.setInteger("Primary", this.primaryEffect);

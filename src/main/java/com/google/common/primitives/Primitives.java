@@ -97,7 +97,7 @@ public final class Primitives {
 	/**
 	 * Returns the corresponding primitive type of {@code type} if it is a wrapper
 	 * type; otherwise returns {@code type} itself. Idempotent.
-	 * 
+	 *
 	 * <pre>
 	 *     unwrap(Integer.class) == int.class
 	 *     unwrap(int.class) == int.class
@@ -116,7 +116,7 @@ public final class Primitives {
 	/**
 	 * Returns the corresponding wrapper type of {@code type} if it is a primitive
 	 * type; otherwise returns {@code type} itself. Idempotent.
-	 * 
+	 *
 	 * <pre>
 	 *     wrap(int.class) == Integer.class
 	 *     wrap(Integer.class) == Integer.class

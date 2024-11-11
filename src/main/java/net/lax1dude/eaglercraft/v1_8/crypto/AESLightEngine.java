@@ -1,9 +1,9 @@
 /*
  * Copyright (c) 2000-2021 The Legion of the Bouncy Castle Inc. (https://www.bouncycastle.org)
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
- * and associated documentation files (the "Software"), to deal in the Software without restriction, 
- * including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+ * and associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
  * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
  * subject to the following conditions:
  *
@@ -16,7 +16,7 @@
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
- * 
+ *
  */
 
 package net.lax1dude.eaglercraft.v1_8.crypto;
@@ -139,12 +139,12 @@ public class AESLightEngine {
 	/*
 	 * The following defines provide alternative definitions of FFmulX that might
 	 * give improved performance if a fast 32-bit multiply is not available.
-	 * 
+	 *
 	 * private int FFmulX(int x) { int u = x & m1; u |= (u >> 1); return ((x & m2)
 	 * << 1) ^ ((u >>> 3) | (u >>> 6)); } private static final int m4 = 0x1b1b1b1b;
 	 * private int FFmulX(int x) { int u = x & m1; return ((x & m2) << 1) ^ ((u - (u
 	 * >>> 7)) & m4); }
-	 * 
+	 *
 	 */
 
 	public static void intToLittleEndian(int n, byte[] bs, int off) {

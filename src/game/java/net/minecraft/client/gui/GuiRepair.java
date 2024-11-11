@@ -24,13 +24,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -42,7 +42,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiRepair extends GuiContainer implements ICrafting {
 	private static final ResourceLocation anvilResource = new ResourceLocation("textures/gui/container/anvil.png");
@@ -56,6 +56,7 @@ public class GuiRepair extends GuiContainer implements ICrafting {
 		this.anvil = (ContainerRepair) this.inventorySlots;
 	}
 
+	@Override
 	public boolean blockPTTKey() {
 		return nameField.isFocused();
 	}
@@ -63,6 +64,7 @@ public class GuiRepair extends GuiContainer implements ICrafting {
 	/**
 	 * + Args : renderPartialTicks, mouseX, mouseY
 	 */
+	@Override
 	protected void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 		this.mc.getTextureManager().bindTexture(anvilResource);
@@ -82,6 +84,7 @@ public class GuiRepair extends GuiContainer implements ICrafting {
 	 * + Draw the foreground layer for the GuiContainer (everything in front of the
 	 * items). Args : mouseX, mouseY
 	 */
+	@Override
 	protected void drawGuiContainerForegroundLayer(int var1, int var2) {
 		GlStateManager.disableLighting();
 		GlStateManager.disableBlend();
@@ -123,6 +126,7 @@ public class GuiRepair extends GuiContainer implements ICrafting {
 	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
 	 * renderPartialTicks
 	 */
+	@Override
 	public void drawScreen(int i, int j, float f) {
 		super.drawScreen(i, j, f);
 		GlStateManager.disableLighting();
@@ -135,6 +139,7 @@ public class GuiRepair extends GuiContainer implements ICrafting {
 		nameField.fireInputEvent(event, param);
 	}
 
+	@Override
 	public void func_175173_a(Container parContainer, IInventory parIInventory) {
 	}
 
@@ -143,6 +148,7 @@ public class GuiRepair extends GuiContainer implements ICrafting {
 	 * when the GUI is displayed and when the window resizes, the buttonList is
 	 * cleared beforehand.
 	 */
+	@Override
 	public void initGui() {
 		super.initGui();
 		Keyboard.enableRepeatEvents(true);
@@ -162,6 +168,7 @@ public class GuiRepair extends GuiContainer implements ICrafting {
 	 * the equivalent of KeyListener.keyTyped(KeyEvent e). Args : character
 	 * (character on the key), keyCode (lwjgl Keyboard key code)
 	 */
+	@Override
 	protected void keyTyped(char parChar1, int parInt1) {
 		if (this.nameField.textboxKeyTyped(parChar1, parInt1)) {
 			this.renameItem();
@@ -174,6 +181,7 @@ public class GuiRepair extends GuiContainer implements ICrafting {
 	/**
 	 * + Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
 	 */
+	@Override
 	protected void mouseClicked(int parInt1, int parInt2, int parInt3) {
 		super.mouseClicked(parInt1, parInt2, parInt3);
 		this.nameField.mouseClicked(parInt1, parInt2, parInt3);
@@ -182,6 +190,7 @@ public class GuiRepair extends GuiContainer implements ICrafting {
 	/**
 	 * + Called when the screen is unloaded. Used to disable keyboard repeat events
 	 */
+	@Override
 	public void onGuiClosed() {
 		super.onGuiClosed();
 		Keyboard.enableRepeatEvents(false);
@@ -207,6 +216,7 @@ public class GuiRepair extends GuiContainer implements ICrafting {
 	 * int identifies which variable to update, and the second contains the new
 	 * value. Both are truncated to shorts in non-local SMP.
 	 */
+	@Override
 	public void sendProgressBarUpdate(Container containerIn, int varToUpdate, int newValue) {
 	}
 
@@ -215,6 +225,7 @@ public class GuiRepair extends GuiContainer implements ICrafting {
 	 * doesn't have to match the actual contents of that slot. Args: Container, slot
 	 * number, slot contents
 	 */
+	@Override
 	public void sendSlotContents(Container containerToSend, int slotInd, ItemStack stack) {
 		if (slotInd == 0) {
 			this.nameField.setText(stack == null ? "" : stack.getDisplayName());
@@ -234,6 +245,7 @@ public class GuiRepair extends GuiContainer implements ICrafting {
 	/**
 	 * + update the crafting window inventory with the items in the list
 	 */
+	@Override
 	public void updateCraftingInventory(Container containerToSend, List<ItemStack> itemsList) {
 		this.sendSlotContents(containerToSend, 0, containerToSend.getSlot(0).getStack());
 	}

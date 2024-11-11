@@ -23,13 +23,13 @@ import net.minecraft.world.WorldSettings;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -41,11 +41,12 @@ import net.minecraft.world.WorldSettings;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class TeleportToPlayer implements ISpectatorMenuView, ISpectatorMenuObject {
 	private static final Ordering<NetworkPlayerInfo> field_178674_a = Ordering
 			.from(new Comparator<NetworkPlayerInfo>() {
+				@Override
 				public int compare(NetworkPlayerInfo networkplayerinfo, NetworkPlayerInfo networkplayerinfo1) {
 					return ComparisonChain.start().compare(networkplayerinfo.getGameProfile().getId(),
 							networkplayerinfo1.getGameProfile().getId()).result();
@@ -70,27 +71,33 @@ public class TeleportToPlayer implements ISpectatorMenuView, ISpectatorMenuObjec
 
 	}
 
+	@Override
 	public void func_178661_a(SpectatorMenu spectatormenu) {
 		spectatormenu.func_178647_a(this);
 	}
 
+	@Override
 	public boolean func_178662_A_() {
 		return !this.field_178673_b.isEmpty();
 	}
 
+	@Override
 	public void func_178663_a(float var1, int var2) {
 		Minecraft.getMinecraft().getTextureManager().bindTexture(GuiSpectator.field_175269_a);
 		Gui.drawModalRectWithCustomSizedTexture(0, 0, 0.0F, 0.0F, 16, 16, 256.0F, 256.0F);
 	}
 
+	@Override
 	public List<ISpectatorMenuObject> func_178669_a() {
 		return this.field_178673_b;
 	}
 
+	@Override
 	public IChatComponent func_178670_b() {
 		return new ChatComponentText("Select a player to teleport to");
 	}
 
+	@Override
 	public IChatComponent getSpectatorName() {
 		return new ChatComponentText("Teleport to player");
 	}

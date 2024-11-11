@@ -21,7 +21,7 @@ package com.google.common.collect;
  *
  * <pre>
  *    {@code
- * 
+ *
  *   List<Object> objects = ...;
  *   // Sort them:
  *   Set<Object> sorted = ImmutableSortedMultiset.copyOf(objects);

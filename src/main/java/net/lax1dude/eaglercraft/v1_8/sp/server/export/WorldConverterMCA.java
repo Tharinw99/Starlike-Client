@@ -27,7 +27,7 @@ import net.minecraft.world.storage.WorldInfo;
 
 /**
  * Copyright (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -39,7 +39,7 @@ import net.minecraft.world.storage.WorldInfo;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class WorldConverterMCA {
 
@@ -207,7 +207,6 @@ public class WorldConverterMCA {
 			ZipEntry f = null;
 			int lastProgUpdate = 0;
 			int prog = 0;
-			byte[] bb = new byte[16384];
 			while ((f = zis.getNextEntry()) != null) {
 				if (f.getName().contains("__MACOSX/"))
 					continue;
@@ -226,7 +225,7 @@ public class WorldConverterMCA {
 						j += k;
 					}
 				} else {
-					b = EaglerInputStream.inputStreamToBytes(zis);
+					b = EaglerInputStream.inputStreamToBytesNoClose(zis);
 				}
 				String fileName = f.getName().substring(folderPrefixOffset);
 				if (fileName.equals("level.dat") || fileName.equals("level.dat_old")) {

@@ -17,13 +17,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -35,7 +35,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockRedstoneOre extends Block {
 	private final boolean isOn;
@@ -57,6 +57,7 @@ public class BlockRedstoneOre extends Block {
 
 	}
 
+	@Override
 	protected ItemStack createStackedBlock(IBlockState var1) {
 		return new ItemStack(Blocks.redstone_ore);
 	}
@@ -64,6 +65,7 @@ public class BlockRedstoneOre extends Block {
 	/**
 	 * + Spawns this Block's drops into the World as EntityItems.
 	 */
+	@Override
 	public void dropBlockAsItemWithChance(World world, BlockPos blockpos, IBlockState iblockstate, float f, int i) {
 		super.dropBlockAsItemWithChance(world, blockpos, iblockstate, f, i);
 		if (this.getItemDropped(iblockstate, world.rand, i) != Item.getItemFromBlock(this)) {
@@ -76,16 +78,19 @@ public class BlockRedstoneOre extends Block {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
 		return Items.redstone;
 	}
 
+	@Override
 	public boolean onBlockActivated(World world, BlockPos blockpos, IBlockState iblockstate, EntityPlayer entityplayer,
 			EnumFacing enumfacing, float f, float f1, float f2) {
 		this.activate(world, blockpos);
 		return super.onBlockActivated(world, blockpos, iblockstate, entityplayer, enumfacing, f, f1, f2);
 	}
 
+	@Override
 	public void onBlockClicked(World world, BlockPos blockpos, EntityPlayer entityplayer) {
 		this.activate(world, blockpos);
 		super.onBlockClicked(world, blockpos, entityplayer);
@@ -95,6 +100,7 @@ public class BlockRedstoneOre extends Block {
 	 * + Triggered whenever an entity collides with this block (enters into the
 	 * block)
 	 */
+	@Override
 	public void onEntityCollidedWithBlock(World world, BlockPos blockpos, Entity entity) {
 		this.activate(world, blockpos);
 		super.onEntityCollidedWithBlock(world, blockpos, entity);
@@ -103,6 +109,7 @@ public class BlockRedstoneOre extends Block {
 	/**
 	 * + Returns the quantity of items to drop on block destruction.
 	 */
+	@Override
 	public int quantityDropped(EaglercraftRandom random) {
 		return 4 + random.nextInt(2);
 	}
@@ -110,10 +117,12 @@ public class BlockRedstoneOre extends Block {
 	/**
 	 * + Get the quantity dropped based on the given fortune level
 	 */
+	@Override
 	public int quantityDroppedWithBonus(int i, EaglercraftRandom random) {
 		return this.quantityDropped(random) + random.nextInt(i + 1);
 	}
 
+	@Override
 	public void randomDisplayTick(World world, BlockPos blockpos, IBlockState var3, EaglercraftRandom var4) {
 		if (this.isOn) {
 			this.spawnParticles(world, blockpos);
@@ -164,10 +173,12 @@ public class BlockRedstoneOre extends Block {
 	/**
 	 * + How many world ticks before ticking
 	 */
+	@Override
 	public int tickRate(World var1) {
 		return 30;
 	}
 
+	@Override
 	public void updateTick(World world, BlockPos blockpos, IBlockState var3, EaglercraftRandom var4) {
 		if (this == Blocks.lit_redstone_ore) {
 			world.setBlockState(blockpos, Blocks.redstone_ore.getDefaultState());

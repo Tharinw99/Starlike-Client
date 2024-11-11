@@ -107,18 +107,19 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ReportedException;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.starlikeclient.StarlikeClient;
 import net.starlikeclient.minecraft.init.EntitiesStarlike;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -130,7 +131,7 @@ import net.starlikeclient.minecraft.init.EntitiesStarlike;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class RenderManager {
 	public static void setupLightmapCoords(Entity entity, float partialTicks) {
@@ -285,6 +286,14 @@ public class RenderManager {
 
 	public boolean doRenderEntity(Entity entity, double x, double y, double z, float entityYaw, float partialTicks,
 			boolean parFlag) {
+		if (entity.shouldCull) {
+			Render render = getEntityRenderObject(entity);
+			if (render.canRenderName(entity) && StarlikeClient.Config.Culling.renderNameTagsOnCulledEntities) {
+				render.renderLivingLabel(entity, entity.getDisplayName().getFormattedText(), x, y, z, 64);
+			}
+			return false;
+		}
+
 		Render render = null;
 
 		try {

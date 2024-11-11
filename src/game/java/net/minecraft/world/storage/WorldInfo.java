@@ -14,13 +14,13 @@ import net.minecraft.world.WorldType;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -32,7 +32,7 @@ import net.minecraft.world.WorldType;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class WorldInfo {
 	public static final EnumDifficulty DEFAULT_DIFFICULTY = EnumDifficulty.NORMAL;
@@ -253,11 +253,13 @@ public class WorldInfo {
 	 */
 	public void addToCrashReport(CrashReportCategory category) {
 		category.addCrashSectionCallable("Level seed", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return String.valueOf(WorldInfo.this.getSeed());
 			}
 		});
 		category.addCrashSectionCallable("Level generator", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return HString.format("ID %02d - %s, ver %d. Features enabled: %b",
 						new Object[] { Integer.valueOf(WorldInfo.this.terrainType.getWorldTypeID()),
@@ -267,28 +269,33 @@ public class WorldInfo {
 			}
 		});
 		category.addCrashSectionCallable("Level generator options", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return WorldInfo.this.generatorOptions;
 			}
 		});
 		category.addCrashSectionCallable("Level spawn location", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return CrashReportCategory.getCoordinateInfo((double) WorldInfo.this.spawnX,
 						(double) WorldInfo.this.spawnY, (double) WorldInfo.this.spawnZ);
 			}
 		});
 		category.addCrashSectionCallable("Level time", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return HString.format("%d game time, %d day time", new Object[] {
 						Long.valueOf(WorldInfo.this.totalTime), Long.valueOf(WorldInfo.this.worldTime) });
 			}
 		});
 		category.addCrashSectionCallable("Level dimension", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return String.valueOf(WorldInfo.this.dimension);
 			}
 		});
 		category.addCrashSectionCallable("Level storage version", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				String s = "Unknown?";
 
@@ -308,6 +315,7 @@ public class WorldInfo {
 			}
 		});
 		category.addCrashSectionCallable("Level weather", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return HString.format("Rain time: %d (now: %b), thunder time: %d (now: %b)",
 						new Object[] { Integer.valueOf(WorldInfo.this.rainTime),
@@ -316,6 +324,7 @@ public class WorldInfo {
 			}
 		});
 		category.addCrashSectionCallable("Level game mode", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return HString.format("Game mode: %s (ID %d). Hardcore: %b. Cheats: %b", new Object[] {
 						WorldInfo.this.theGameType.getName(), Integer.valueOf(WorldInfo.this.theGameType.getID()),

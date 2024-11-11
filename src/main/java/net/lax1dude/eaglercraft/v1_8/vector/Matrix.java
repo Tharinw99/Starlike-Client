@@ -59,7 +59,7 @@ public abstract class Matrix implements Serializable {
 
 	/**
 	 * Invert this matrix
-	 * 
+	 *
 	 * @return this
 	 */
 	public abstract Matrix invert();
@@ -84,21 +84,21 @@ public abstract class Matrix implements Serializable {
 
 	/**
 	 * Negate this matrix
-	 * 
+	 *
 	 * @return this
 	 */
 	public abstract Matrix negate();
 
 	/**
 	 * Set this matrix to be the identity matrix.
-	 * 
+	 *
 	 * @return this
 	 */
 	public abstract Matrix setIdentity();
 
 	/**
 	 * Set this matrix to 0.
-	 * 
+	 *
 	 * @return this
 	 */
 	public abstract Matrix setZero();
@@ -106,7 +106,7 @@ public abstract class Matrix implements Serializable {
 	/**
 	 * Store this matrix in a float buffer. The matrix is stored in column major
 	 * (openGL) order.
-	 * 
+	 *
 	 * @param buf The buffer to store this matrix in
 	 * @return this
 	 */
@@ -115,7 +115,7 @@ public abstract class Matrix implements Serializable {
 	/**
 	 * Store this matrix in a float buffer. The matrix is stored in row major
 	 * (maths) order.
-	 * 
+	 *
 	 * @param buf The buffer to store this matrix in
 	 * @return this
 	 */
@@ -123,7 +123,7 @@ public abstract class Matrix implements Serializable {
 
 	/**
 	 * Transpose this matrix
-	 * 
+	 *
 	 * @return this
 	 */
 	public abstract Matrix transpose();

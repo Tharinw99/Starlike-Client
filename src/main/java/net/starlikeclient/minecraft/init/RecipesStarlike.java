@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.starlikeclient.minecraft.blocks.BlockMosaic;
+import net.starlikeclient.minecraft.crafting.RecipesBackpackUpgrade;
 import net.starlikeclient.minecraft.guis.crafting.SmithingManager;
 
 public class RecipesStarlike {
@@ -60,10 +61,11 @@ public class RecipesStarlike {
 						new ItemStack(Items.netherite_scrap, 1), new ItemStack(Items.netherite_scrap, 1),
 						new ItemStack(Items.gold_ingot, 1), new ItemStack(Items.gold_ingot, 1),
 						new ItemStack(Items.gold_ingot, 1), new ItemStack(Items.gold_ingot, 1) });
-		e.addRecipe(new ItemStack(Items.chisel, 1), new Object[] { "#", "/", "/", Character.valueOf('#'),
-				Items.steel, Character.valueOf('/'), Items.stick });
-		e.addRecipe(new ItemStack(Blocks.smithing_table), new Object[] { "//", "##", "##", Character.valueOf('/'),
+		e.addRecipe(new ItemStack(Items.chisel, 1), new Object[] { "#", "/", "/", Character.valueOf('#'), Items.steel,
+				Character.valueOf('/'), Items.stick });
+		e.addRecipe(new ItemStack(Blocks.smithing_table, 1), new Object[] { "//", "##", "##", Character.valueOf('/'),
 				Items.iron_ingot, Character.valueOf('#'), Blocks.planks });
+		e.addRecipe(new RecipesBackpackUpgrade());
 
 		// Copper
 		e.addRecipe(new ItemStack(Blocks.copper_block, 1),

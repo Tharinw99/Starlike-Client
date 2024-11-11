@@ -9,13 +9,13 @@ import net.minecraft.util.BlockPos;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@ import net.minecraft.util.BlockPos;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class WorldChunkManagerHell extends WorldChunkManager {
 	private BiomeGenBase biomeGenerator;
@@ -41,10 +41,12 @@ public class WorldChunkManagerHell extends WorldChunkManager {
 	/**
 	 * + checks given Chunk's Biomes against List of allowed ones
 	 */
+	@Override
 	public boolean areBiomesViable(int var1, int var2, int var3, List<BiomeGenBase> list) {
 		return list.contains(this.biomeGenerator);
 	}
 
+	@Override
 	public BlockPos findBiomePosition(int i, int j, int k, List<BiomeGenBase> list, EaglercraftRandom random) {
 		return list.contains(this.biomeGenerator)
 				? new BlockPos(i - k + random.nextInt(k * 2 + 1), 0, j - k + random.nextInt(k * 2 + 1))
@@ -56,6 +58,7 @@ public class WorldChunkManagerHell extends WorldChunkManager {
 	 * width, length, cacheFlag (if false, don't check biomeCache to avoid infinite
 	 * loop in BiomeCacheBlock)
 	 */
+	@Override
 	public BiomeGenBase[] getBiomeGenAt(BiomeGenBase[] abiomegenbase, int i, int j, int k, int l, boolean var6) {
 		return this.loadBlockGeneratorData(abiomegenbase, i, j, k, l);
 	}
@@ -63,6 +66,7 @@ public class WorldChunkManagerHell extends WorldChunkManager {
 	/**
 	 * + Returns the biome generator
 	 */
+	@Override
 	public BiomeGenBase getBiomeGenerator(BlockPos var1) {
 		return this.biomeGenerator;
 	}
@@ -70,6 +74,7 @@ public class WorldChunkManagerHell extends WorldChunkManager {
 	/**
 	 * + Returns an array of biomes for the location input.
 	 */
+	@Override
 	public BiomeGenBase[] getBiomesForGeneration(BiomeGenBase[] abiomegenbase, int var2, int var3, int i, int j) {
 		if (abiomegenbase == null || abiomegenbase.length < i * j) {
 			abiomegenbase = new BiomeGenBase[i * j];
@@ -83,6 +88,7 @@ public class WorldChunkManagerHell extends WorldChunkManager {
 	 * + Returns a list of rainfall values for the specified blocks. Args:
 	 * listToReuse, x, z, width, length.
 	 */
+	@Override
 	public float[] getRainfall(float[] afloat, int var2, int var3, int i, int j) {
 		if (afloat == null || afloat.length < i * j) {
 			afloat = new float[i * j];
@@ -97,6 +103,7 @@ public class WorldChunkManagerHell extends WorldChunkManager {
 	 * temperature and humidity onto the WorldChunkManager Args: oldBiomeList, x, z,
 	 * width, depth
 	 */
+	@Override
 	public BiomeGenBase[] loadBlockGeneratorData(BiomeGenBase[] abiomegenbase, int var2, int var3, int i, int j) {
 		if (abiomegenbase == null || abiomegenbase.length < i * j) {
 			abiomegenbase = new BiomeGenBase[i * j];

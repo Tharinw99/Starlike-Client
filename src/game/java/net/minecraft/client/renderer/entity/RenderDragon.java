@@ -25,13 +25,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -43,7 +43,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class RenderDragon extends RenderLiving<EntityDragon> {
 	private static final ResourceLocation enderDragonCrystalBeamTextures = new ResourceLocation(
@@ -69,6 +69,7 @@ public class RenderDragon extends RenderLiving<EntityDragon> {
 	 * func_76986_a(T entity, double d, double d1, double d2, float f, float f1).
 	 * But JAD is pre 1.5 so doe
 	 */
+	@Override
 	public void doRender(EntityDragon entitydragon, double d0, double d1, double d2, float f, float f1) {
 		BossStatus.setBossStatus(entitydragon, false);
 		super.doRender(entitydragon, d0, d1, d2, f, f1);
@@ -133,6 +134,7 @@ public class RenderDragon extends RenderLiving<EntityDragon> {
 	 * + Returns the location of an entity's texture. Doesn't seem to be called
 	 * unless you call Render.bindEntityTexture.
 	 */
+	@Override
 	protected ResourceLocation getEntityTexture(EntityDragon var1) {
 		return enderDragonTextures;
 	}
@@ -140,6 +142,7 @@ public class RenderDragon extends RenderLiving<EntityDragon> {
 	/**
 	 * + Renders the model in RenderLiving
 	 */
+	@Override
 	protected void renderModel(EntityDragon entitydragon, float f, float f1, float f2, float f3, float f4, float f5) {
 		if (DeferredStateManager.isDeferredRenderer()) {
 			if (entitydragon.deathTicks > 0) {
@@ -192,6 +195,7 @@ public class RenderDragon extends RenderLiving<EntityDragon> {
 
 	}
 
+	@Override
 	protected void rotateCorpse(EntityDragon entitydragon, float var2, float var3, float f) {
 		float f1 = (float) entitydragon.getMovementOffsets(7, f)[0];
 		float f2 = (float) (entitydragon.getMovementOffsets(5, f)[1] - entitydragon.getMovementOffsets(10, f)[1]);

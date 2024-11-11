@@ -23,7 +23,7 @@ import com.google.common.base.Predicate;
 
 /**
  * An interface for all filtered multimap types.
- * 
+ *
  * @author Louis Wasserman
  */
 @GwtCompatible

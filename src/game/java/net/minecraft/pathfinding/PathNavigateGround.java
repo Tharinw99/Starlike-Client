@@ -15,13 +15,13 @@ import net.minecraft.world.pathfinder.WalkNodeProcessor;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,7 +33,7 @@ import net.minecraft.world.pathfinder.WalkNodeProcessor;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class PathNavigateGround extends PathNavigate {
 	protected WalkNodeProcessor nodeProcessor;
@@ -46,6 +46,7 @@ public class PathNavigateGround extends PathNavigate {
 	/**
 	 * + If on ground or swimming and can swim
 	 */
+	@Override
 	protected boolean canNavigate() {
 		return this.theEntity.onGround || this.getCanSwim() && this.isInLiquid() || this.theEntity.isRiding()
 				&& this.theEntity instanceof EntityZombie && this.theEntity.ridingEntity instanceof EntityChicken;
@@ -63,6 +64,7 @@ public class PathNavigateGround extends PathNavigate {
 		return this.nodeProcessor.getEnterDoors();
 	}
 
+	@Override
 	protected Vec3 getEntityPosition() {
 		return new Vec3(this.theEntity.posX, (double) this.getPathablePosY(), this.theEntity.posZ);
 	}
@@ -94,6 +96,7 @@ public class PathNavigateGround extends PathNavigate {
 		}
 	}
 
+	@Override
 	protected PathFinder getPathFinder() {
 		this.nodeProcessor = new WalkNodeProcessor();
 		this.nodeProcessor.setEnterDoors(true);
@@ -105,6 +108,7 @@ public class PathNavigateGround extends PathNavigate {
 	 * straight line between the two points. Args: pos1, pos2, entityXSize,
 	 * entityYSize, entityZSize
 	 */
+	@Override
 	protected boolean isDirectPathBetweenPoints(Vec3 posVec31, Vec3 posVec32, int sizeX, int sizeY, int sizeZ) {
 		int i = MathHelper.floor_double(posVec31.xCoord);
 		int j = MathHelper.floor_double(posVec31.zCoord);
@@ -172,7 +176,7 @@ public class PathNavigateGround extends PathNavigate {
 	 */
 	private boolean isPositionClear(int parInt1, int parInt2, int parInt3, int parInt4, int parInt5, int parInt6,
 			Vec3 parVec3_1, double parDouble1, double parDouble2) {
-		for (BlockPos blockpos : BlockPos.getAllInBox(new BlockPos(parInt1, parInt2, parInt3),
+		for (BlockPos blockpos : BlockPos.getAllInBoxMutable(new BlockPos(parInt1, parInt2, parInt3),
 				new BlockPos(parInt1 + parInt4 - 1, parInt2 + parInt5 - 1, parInt3 + parInt6 - 1))) {
 			double d0 = (double) blockpos.getX() + 0.5D - parVec3_1.xCoord;
 			double d1 = (double) blockpos.getZ() + 0.5D - parVec3_1.zCoord;
@@ -227,6 +231,7 @@ public class PathNavigateGround extends PathNavigate {
 	/**
 	 * + Trims path data from the end to the first sun covered block
 	 */
+	@Override
 	protected void removeSunnyPath() {
 		super.removeSunnyPath();
 		if (this.shouldAvoidSun) {

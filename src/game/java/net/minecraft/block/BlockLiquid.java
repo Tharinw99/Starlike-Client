@@ -24,13 +24,13 @@ import net.minecraft.world.biome.BiomeColorHelper;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -42,7 +42,7 @@ import net.minecraft.world.biome.BiomeColorHelper;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class BlockLiquid extends Block {
 	public static final PropertyInteger LEVEL = PropertyInteger.create("level", 0, 15);
@@ -92,6 +92,7 @@ public abstract class BlockLiquid extends Block {
 		this.setTickRandomly(true);
 	}
 
+	@Override
 	public boolean canCollideCheck(IBlockState iblockstate, boolean flag) {
 		return flag && ((Integer) iblockstate.getValue(LEVEL)).intValue() == 0;
 	}
@@ -129,11 +130,13 @@ public abstract class BlockLiquid extends Block {
 		return false;
 	}
 
+	@Override
 	public int colorMultiplier(IBlockAccess iblockaccess, BlockPos blockpos, int var3) {
 		return this.blockMaterial == Material.water ? BiomeColorHelper.getWaterColorAtPos(iblockaccess, blockpos)
 				: 16777215;
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { LEVEL });
 	}
@@ -153,6 +156,7 @@ public abstract class BlockLiquid extends Block {
 		return false;
 	}
 
+	@Override
 	public EnumWorldBlockLayer getBlockLayer() {
 		return this.blockMaterial == Material.water
 				? (DeferredStateManager.isRenderingRealisticWater() ? EnumWorldBlockLayer.REALISTIC_WATER
@@ -160,6 +164,7 @@ public abstract class BlockLiquid extends Block {
 				: EnumWorldBlockLayer.SOLID;
 	}
 
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox(World var1, BlockPos var2, IBlockState var3) {
 		return null;
 	}
@@ -213,6 +218,7 @@ public abstract class BlockLiquid extends Block {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState var1, EaglercraftRandom var2, int var3) {
 		return null;
 	}
@@ -226,10 +232,12 @@ public abstract class BlockLiquid extends Block {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		return ((Integer) iblockstate.getValue(LEVEL)).intValue();
 	}
 
+	@Override
 	public int getMixedBrightnessForBlock(IBlockAccess iblockaccess, BlockPos blockpos) {
 		int i = iblockaccess.getCombinedLight(blockpos, 0);
 		int j = iblockaccess.getCombinedLight(blockpos.up(), 0);
@@ -244,6 +252,7 @@ public abstract class BlockLiquid extends Block {
 	 * + The type of render function called. 3 for standard block models, 2 for
 	 * TESR's, 1 for liquids, -1 is no render
 	 */
+	@Override
 	public int getRenderType() {
 		return 1;
 	}
@@ -251,6 +260,7 @@ public abstract class BlockLiquid extends Block {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(LEVEL, Integer.valueOf(i));
 	}
@@ -258,6 +268,7 @@ public abstract class BlockLiquid extends Block {
 	/**
 	 * + Whether this Block is solid on the given Side
 	 */
+	@Override
 	public boolean isBlockSolid(IBlockAccess iblockaccess, BlockPos blockpos, EnumFacing enumfacing) {
 		Material material = iblockaccess.getBlockState(blockpos).getBlock().getMaterial();
 		return material == this.blockMaterial ? false
@@ -265,6 +276,7 @@ public abstract class BlockLiquid extends Block {
 						: (material == Material.ice ? false : super.isBlockSolid(iblockaccess, blockpos, enumfacing)));
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -273,18 +285,22 @@ public abstract class BlockLiquid extends Block {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
 
+	@Override
 	public boolean isPassable(IBlockAccess var1, BlockPos var2) {
 		return this.blockMaterial != Material.lava;
 	}
 
+	@Override
 	public Vec3 modifyAcceleration(World world, BlockPos blockpos, Entity var3, Vec3 vec3) {
 		return vec3.add(this.getFlowVector(world, blockpos));
 	}
 
+	@Override
 	public void onBlockAdded(World world, BlockPos blockpos, IBlockState iblockstate) {
 		this.checkForMixing(world, blockpos, iblockstate);
 	}
@@ -292,6 +308,7 @@ public abstract class BlockLiquid extends Block {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block var4) {
 		this.checkForMixing(world, blockpos, iblockstate);
 	}
@@ -299,10 +316,12 @@ public abstract class BlockLiquid extends Block {
 	/**
 	 * + Returns the quantity of items to drop on block destruction.
 	 */
+	@Override
 	public int quantityDropped(EaglercraftRandom var1) {
 		return 0;
 	}
 
+	@Override
 	public void randomDisplayTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom random) {
 		double d0 = (double) blockpos.getX();
 		double d1 = (double) blockpos.getY();
@@ -355,6 +374,7 @@ public abstract class BlockLiquid extends Block {
 
 	}
 
+	@Override
 	public boolean shouldSideBeRendered(IBlockAccess iblockaccess, BlockPos blockpos, EnumFacing enumfacing) {
 		return iblockaccess.getBlockState(blockpos).getBlock().getMaterial() == this.blockMaterial ? false
 				: (enumfacing == EnumFacing.UP ? true : super.shouldSideBeRendered(iblockaccess, blockpos, enumfacing));
@@ -363,6 +383,7 @@ public abstract class BlockLiquid extends Block {
 	/**
 	 * + How many world ticks before ticking
 	 */
+	@Override
 	public int tickRate(World world) {
 		return this.blockMaterial == Material.water ? 5
 				: (this.blockMaterial == Material.lava ? (world.provider.getHasNoSky() ? 10 : 30) : 0);

@@ -21,7 +21,7 @@ import net.minecraft.network.NetHandlerPlayServer;
 
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -33,7 +33,7 @@ import net.minecraft.network.NetHandlerPlayServer;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ServerV4MessageHandler implements GameMessageHandler {
 
@@ -45,11 +45,13 @@ public class ServerV4MessageHandler implements GameMessageHandler {
 		this.server = (EaglerMinecraftServer) netHandler.serverController;
 	}
 
+	@Override
 	public void handleClient(CPacketGetOtherCapeEAG packet) {
 		server.getCapeService().processGetOtherCape(new EaglercraftUUID(packet.uuidMost, packet.uuidLeast),
 				netHandler.playerEntity);
 	}
 
+	@Override
 	public void handleClient(CPacketGetOtherClientUUIDV4EAG packet) {
 		EntityPlayerMP player = server.getConfigurationManager()
 				.getPlayerByUUID(new EaglercraftUUID(packet.playerUUIDMost, packet.playerUUIDLeast));
@@ -61,20 +63,24 @@ public class ServerV4MessageHandler implements GameMessageHandler {
 		}
 	}
 
+	@Override
 	public void handleClient(CPacketGetOtherSkinEAG packet) {
 		server.getSkinService().processPacketGetOtherSkin(new EaglercraftUUID(packet.uuidMost, packet.uuidLeast),
 				netHandler.playerEntity);
 	}
 
+	@Override
 	public void handleClient(CPacketGetSkinByURLEAG packet) {
 		server.getSkinService().processPacketGetOtherSkin(new EaglercraftUUID(packet.uuidMost, packet.uuidLeast),
 				packet.url, netHandler.playerEntity);
 	}
 
+	@Override
 	public void handleClient(CPacketInstallSkinSPEAG packet) {
 		server.getSkinService().processPacketInstallNewSkin(packet.customSkin, netHandler.playerEntity);
 	}
 
+	@Override
 	public void handleClient(CPacketVoiceSignalConnectEAG packet) {
 		IntegratedVoiceService voiceSvc = server.getVoiceService();
 		if (voiceSvc != null) {
@@ -82,6 +88,7 @@ public class ServerV4MessageHandler implements GameMessageHandler {
 		}
 	}
 
+	@Override
 	public void handleClient(CPacketVoiceSignalDescEAG packet) {
 		IntegratedVoiceService voiceSvc = server.getVoiceService();
 		if (voiceSvc != null) {
@@ -90,6 +97,7 @@ public class ServerV4MessageHandler implements GameMessageHandler {
 		}
 	}
 
+	@Override
 	public void handleClient(CPacketVoiceSignalDisconnectPeerV4EAG packet) {
 		IntegratedVoiceService voiceSvc = server.getVoiceService();
 		if (voiceSvc != null) {
@@ -98,6 +106,7 @@ public class ServerV4MessageHandler implements GameMessageHandler {
 		}
 	}
 
+	@Override
 	public void handleClient(CPacketVoiceSignalDisconnectV4EAG packet) {
 		IntegratedVoiceService voiceSvc = server.getVoiceService();
 		if (voiceSvc != null) {
@@ -105,6 +114,7 @@ public class ServerV4MessageHandler implements GameMessageHandler {
 		}
 	}
 
+	@Override
 	public void handleClient(CPacketVoiceSignalICEEAG packet) {
 		IntegratedVoiceService voiceSvc = server.getVoiceService();
 		if (voiceSvc != null) {
@@ -113,6 +123,7 @@ public class ServerV4MessageHandler implements GameMessageHandler {
 		}
 	}
 
+	@Override
 	public void handleClient(CPacketVoiceSignalRequestEAG packet) {
 		IntegratedVoiceService voiceSvc = server.getVoiceService();
 		if (voiceSvc != null) {

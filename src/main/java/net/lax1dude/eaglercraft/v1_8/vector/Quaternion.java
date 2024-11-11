@@ -138,7 +138,7 @@ public class Quaternion extends Vector implements ReadableVector4f {
 
 	/**
 	 * Scale the source quaternion by scale and put the result in the destination
-	 * 
+	 *
 	 * @param scale The amount to scale by
 	 * @param src   The source quaternion
 	 * @param dest  The destination quaternion, or null if a new quaternion is to be
@@ -183,7 +183,7 @@ public class Quaternion extends Vector implements ReadableVector4f {
 
 	/**
 	 * Set the given quaternion to the multiplication identity.
-	 * 
+	 *
 	 * @param q The quaternion
 	 * @return q
 	 */
@@ -227,6 +227,7 @@ public class Quaternion extends Vector implements ReadableVector4f {
 	 *
 	 * @see org.lwjgl.vector.ReadableVector3f#getW()
 	 */
+	@Override
 	public float getW() {
 		return w;
 	}
@@ -234,6 +235,7 @@ public class Quaternion extends Vector implements ReadableVector4f {
 	/**
 	 * @return x
 	 */
+	@Override
 	public final float getX() {
 		return x;
 	}
@@ -241,6 +243,7 @@ public class Quaternion extends Vector implements ReadableVector4f {
 	/**
 	 * @return y
 	 */
+	@Override
 	public final float getY() {
 		return y;
 	}
@@ -250,6 +253,7 @@ public class Quaternion extends Vector implements ReadableVector4f {
 	 *
 	 * @see org.lwjgl.vector.ReadableVector3f#getZ()
 	 */
+	@Override
 	public float getZ() {
 		return z;
 	}
@@ -257,15 +261,17 @@ public class Quaternion extends Vector implements ReadableVector4f {
 	/**
 	 * @return the length squared of the quaternion
 	 */
+	@Override
 	public float lengthSquared() {
 		return x * x + y * y + z * z + w * w;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.lwjgl.util.vector.Vector#load(java.nio.FloatBuffer)
 	 */
+	@Override
 	public Vector load(FloatBuffer buf) {
 		x = buf.get();
 		y = buf.get();
@@ -277,6 +283,7 @@ public class Quaternion extends Vector implements ReadableVector4f {
 	/**
 	 * Calculate the conjugate of this quaternion
 	 */
+	@Override
 	public Vector negate() {
 		return negate(this, this);
 	}
@@ -307,6 +314,7 @@ public class Quaternion extends Vector implements ReadableVector4f {
 	 *
 	 * @see org.lwjgl.vector.Vector#scale(float)
 	 */
+	@Override
 	public Vector scale(float scale) {
 		return scale(scale, this, this);
 	}
@@ -443,7 +451,7 @@ public class Quaternion extends Vector implements ReadableVector4f {
 
 	/**
 	 * Set this quaternion to the multiplication identity.
-	 * 
+	 *
 	 * @return this
 	 */
 	public Quaternion setIdentity() {
@@ -488,9 +496,10 @@ public class Quaternion extends Vector implements ReadableVector4f {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.lwjgl.util.vector.ReadableVector#store(java.nio.FloatBuffer)
 	 */
+	@Override
 	public Vector store(FloatBuffer buf) {
 		buf.put(x);
 		buf.put(y);
@@ -500,6 +509,7 @@ public class Quaternion extends Vector implements ReadableVector4f {
 		return this;
 	}
 
+	@Override
 	public String toString() {
 		return "Quaternion: " + x + " " + y + " " + z + " " + w;
 	}

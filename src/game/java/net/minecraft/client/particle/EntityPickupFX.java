@@ -11,13 +11,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,7 +29,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EntityPickupFX extends EntityFX {
 	private Entity field_174840_a;
@@ -48,6 +48,7 @@ public class EntityPickupFX extends EntityFX {
 		this.field_174841_aA = parFloat1;
 	}
 
+	@Override
 	public int getFXLayer() {
 		return 3;
 	}
@@ -55,6 +56,7 @@ public class EntityPickupFX extends EntityFX {
 	/**
 	 * + Called to update the entity's position/logic.
 	 */
+	@Override
 	public void onUpdate() {
 		++this.age;
 		if (this.age == this.maxAge) {
@@ -66,6 +68,7 @@ public class EntityPickupFX extends EntityFX {
 	/**
 	 * + Renders the particle
 	 */
+	@Override
 	public void renderParticle(WorldRenderer var1, Entity var2, float f, float var4, float var5, float var6, float var7,
 			float var8) {
 		float f1 = ((float) this.age + f) / (float) this.maxAge;

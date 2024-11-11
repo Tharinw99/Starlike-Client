@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 /**
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -18,7 +18,7 @@ import java.util.Arrays;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class EaglerOutputStream extends OutputStream {
 
@@ -36,6 +36,7 @@ public class EaglerOutputStream extends OutputStream {
 		buf = new byte[size];
 	}
 
+	@Override
 	public void close() throws IOException {
 	}
 
@@ -63,12 +64,14 @@ public class EaglerOutputStream extends OutputStream {
 		return Arrays.copyOf(buf, count);
 	}
 
+	@Override
 	public void write(byte b[], int off, int len) {
 		ensureCapacity(count + len);
 		System.arraycopy(b, off, buf, count, len);
 		count += len;
 	}
 
+	@Override
 	public void write(int b) {
 		ensureCapacity(count + 1);
 		buf[count] = (byte) b;

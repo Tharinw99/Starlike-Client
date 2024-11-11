@@ -20,13 +20,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,7 +38,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ContainerEnchantment extends Container {
 	public IInventory tableInventory;
@@ -55,10 +55,12 @@ public class ContainerEnchantment extends Container {
 
 	public ContainerEnchantment(InventoryPlayer playerInv, World worldIn, BlockPos pos) {
 		this.tableInventory = new InventoryBasic("Enchant", true, 2) {
+			@Override
 			public int getInventoryStackLimit() {
 				return 64;
 			}
 
+			@Override
 			public void markDirty() {
 				super.markDirty();
 				ContainerEnchantment.this.onCraftMatrixChanged(this);
@@ -71,15 +73,18 @@ public class ContainerEnchantment extends Container {
 		this.position = pos;
 		this.xpSeed = playerInv.player.getXPSeed();
 		this.addSlotToContainer(new Slot(this.tableInventory, 0, 15, 47) {
+			@Override
 			public int getSlotStackLimit() {
 				return 1;
 			}
 
+			@Override
 			public boolean isItemValid(ItemStack var1) {
 				return true;
 			}
 		});
 		this.addSlotToContainer(new Slot(this.tableInventory, 1, 35, 47) {
+			@Override
 			public boolean isItemValid(ItemStack itemstack) {
 				return itemstack.getItem() == Items.dye
 						&& EnumDyeColor.byDyeDamage(itemstack.getMetadata()) == EnumDyeColor.BLUE;
@@ -98,6 +103,7 @@ public class ContainerEnchantment extends Container {
 
 	}
 
+	@Override
 	public boolean canInteractWith(EntityPlayer entityplayer) {
 		return this.worldPointer.getBlockState(this.position).getBlock() != Blocks.enchanting_table ? false
 				: entityplayer.getDistanceSq((double) this.position.getX() + 0.5D, (double) this.position.getY() + 0.5D,
@@ -107,6 +113,7 @@ public class ContainerEnchantment extends Container {
 	/**
 	 * + Looks for changes made in the container, sends them to every listener.
 	 */
+	@Override
 	public void detectAndSendChanges() {
 		super.detectAndSendChanges();
 
@@ -127,6 +134,7 @@ public class ContainerEnchantment extends Container {
 	 * + Handles the given Button-click on the server, currently only used by
 	 * enchanting. Name is for legacy.
 	 */
+	@Override
 	public boolean enchantItem(EntityPlayer entityplayer, int i) {
 		ItemStack itemstack = this.tableInventory.getStackInSlot(0);
 		ItemStack itemstack1 = this.tableInventory.getStackInSlot(1);
@@ -192,6 +200,7 @@ public class ContainerEnchantment extends Container {
 	/**
 	 * + Called when the container is closed.
 	 */
+	@Override
 	public void onContainerClosed(EntityPlayer entityplayer) {
 		super.onContainerClosed(entityplayer);
 		if (!this.worldPointer.isRemote) {
@@ -208,6 +217,7 @@ public class ContainerEnchantment extends Container {
 		}
 	}
 
+	@Override
 	public void onCraftGuiOpened(ICrafting icrafting) {
 		super.onCraftGuiOpened(icrafting);
 		icrafting.sendProgressBarUpdate(this, 0, this.enchantLevels[0]);
@@ -222,6 +232,7 @@ public class ContainerEnchantment extends Container {
 	/**
 	 * + Callback for when the crafting matrix is changed.
 	 */
+	@Override
 	public void onCraftMatrixChanged(IInventory iinventory) {
 		if (iinventory == this.tableInventory) {
 			ItemStack itemstack = iinventory.getStackInSlot(0);
@@ -306,6 +317,7 @@ public class ContainerEnchantment extends Container {
 	/**
 	 * + Take a stack from the specified inventory slot.
 	 */
+	@Override
 	public ItemStack transferStackInSlot(EntityPlayer entityplayer, int i) {
 		ItemStack itemstack = null;
 		Slot slot = (Slot) this.inventorySlots.get(i);
@@ -357,6 +369,7 @@ public class ContainerEnchantment extends Container {
 		return itemstack;
 	}
 
+	@Override
 	public void updateProgressBar(int i, int j) {
 		if (i >= 0 && i <= 2) {
 			this.enchantLevels[i] = j;

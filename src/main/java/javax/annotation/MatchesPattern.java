@@ -21,6 +21,7 @@ import javax.annotation.meta.When;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MatchesPattern {
 	static class Checker implements TypeQualifierValidator<MatchesPattern> {
+		@Override
 		public When forConstantValue(MatchesPattern annotation, Object value) {
 			Pattern p = Pattern.compile(annotation.value(), annotation.flags());
 			if (p.matcher(((String) value)).matches())

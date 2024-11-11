@@ -20,13 +20,13 @@ import net.minecraft.util.ReportedException;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,7 +38,7 @@ import net.minecraft.util.ReportedException;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class InventoryPlayer implements IInventory {
 	/**
@@ -57,6 +57,7 @@ public class InventoryPlayer implements IInventory {
 	 * + An array of 4 item stacks containing the currently worn armor pieces.
 	 */
 	public ItemStack[] armorInventory = new ItemStack[4];
+
 	public int currentItem;
 	public EntityPlayer player;
 	private ItemStack itemStack;
@@ -110,6 +111,7 @@ public class InventoryPlayer implements IInventory {
 						Integer.valueOf(Item.getIdFromItem(itemStackIn.getItem())));
 				crashreportcategory.addCrashSection("Item data", Integer.valueOf(itemStackIn.getMetadata()));
 				crashreportcategory.addCrashSectionCallable("Item name", new Callable<String>() {
+					@Override
 					public String call() throws Exception {
 						return itemStackIn.getDisplayName();
 					}
@@ -160,6 +162,7 @@ public class InventoryPlayer implements IInventory {
 
 	}
 
+	@Override
 	public void clear() {
 		for (int i = 0; i < this.mainInventory.length; ++i) {
 			this.mainInventory[i] = null;
@@ -168,7 +171,6 @@ public class InventoryPlayer implements IInventory {
 		for (int j = 0; j < this.armorInventory.length; ++j) {
 			this.armorInventory[j] = null;
 		}
-
 	}
 
 	/**
@@ -251,6 +253,7 @@ public class InventoryPlayer implements IInventory {
 		return i;
 	}
 
+	@Override
 	public void closeInventory(EntityPlayer var1) {
 	}
 
@@ -282,7 +285,6 @@ public class InventoryPlayer implements IInventory {
 		for (int j = 0; j < this.armorInventory.length; ++j) {
 			this.armorInventory[j] = ItemStack.copyItemStack(playerInventory.armorInventory[j]);
 		}
-
 		this.currentItem = playerInventory.currentItem;
 	}
 
@@ -323,8 +325,10 @@ public class InventoryPlayer implements IInventory {
 	 * + Removes up to a specified number of items from an inventory slot and
 	 * returns them in a new stack.
 	 */
+	@Override
 	public ItemStack decrStackSize(int i, int j) {
 		ItemStack[] aitemstack = this.mainInventory;
+
 		if (i >= this.mainInventory.length) {
 			aitemstack = this.armorInventory;
 			i -= this.mainInventory.length;
@@ -340,7 +344,6 @@ public class InventoryPlayer implements IInventory {
 				if (aitemstack[i].stackSize == 0) {
 					aitemstack[i] = null;
 				}
-
 				return itemstack;
 			}
 		} else {
@@ -379,15 +382,18 @@ public class InventoryPlayer implements IInventory {
 	 * + Get the formatted ChatComponent that will be used for the sender's username
 	 * in chat
 	 */
+	@Override
 	public IChatComponent getDisplayName() {
 		return (IChatComponent) (this.hasCustomName() ? new ChatComponentText(this.getName())
 				: new ChatComponentTranslation(this.getName(), new Object[0]));
 	}
 
+	@Override
 	public int getField(int var1) {
 		return 0;
 	}
 
+	@Override
 	public int getFieldCount() {
 		return 0;
 	}
@@ -430,6 +436,7 @@ public class InventoryPlayer implements IInventory {
 	 * + Returns the maximum stack size for a inventory slot. Seems to always be 64,
 	 * possibly will be extended.
 	 */
+	@Override
 	public int getInventoryStackLimit() {
 		return 64;
 	}
@@ -445,6 +452,7 @@ public class InventoryPlayer implements IInventory {
 	 * + Gets the name of this command sender (usually username, but possibly
 	 * "Rcon")
 	 */
+	@Override
 	public String getName() {
 		return "container.inventory";
 	}
@@ -452,6 +460,7 @@ public class InventoryPlayer implements IInventory {
 	/**
 	 * + Returns the number of slots in the inventory.
 	 */
+	@Override
 	public int getSizeInventory() {
 		return this.mainInventory.length + 4;
 	}
@@ -459,6 +468,7 @@ public class InventoryPlayer implements IInventory {
 	/**
 	 * + Returns the stack in the given slot.
 	 */
+	@Override
 	public ItemStack getStackInSlot(int i) {
 		ItemStack[] aitemstack = this.mainInventory;
 		if (i >= aitemstack.length) {
@@ -498,6 +508,7 @@ public class InventoryPlayer implements IInventory {
 	/**
 	 * + Returns true if this thing is named
 	 */
+	@Override
 	public boolean hasCustomName() {
 		return false;
 	}
@@ -533,6 +544,7 @@ public class InventoryPlayer implements IInventory {
 	 * + Returns true if automation is allowed to insert the given stack (ignoring
 	 * stack size) into the given slot.
 	 */
+	@Override
 	public boolean isItemValidForSlot(int var1, ItemStack var2) {
 		return true;
 	}
@@ -541,6 +553,7 @@ public class InventoryPlayer implements IInventory {
 	 * + Do not make give this method the name canInteractWith because it clashes
 	 * with Container
 	 */
+	@Override
 	public boolean isUseableByPlayer(EntityPlayer entityplayer) {
 		return this.player.isDead ? false : entityplayer.getDistanceSqToEntity(this.player) <= 64.0D;
 	}
@@ -549,10 +562,12 @@ public class InventoryPlayer implements IInventory {
 	 * + For tile entities, ensures the chunk containing the tile entity is saved to
 	 * disk later - the game won't think it hasn't changed and skip it.
 	 */
+	@Override
 	public void markDirty() {
 		this.inventoryChanged = true;
 	}
 
+	@Override
 	public void openInventory(EntityPlayer var1) {
 	}
 
@@ -584,6 +599,7 @@ public class InventoryPlayer implements IInventory {
 	/**
 	 * + Removes a stack from the given slot and returns it.
 	 */
+	@Override
 	public ItemStack removeStackFromSlot(int i) {
 		ItemStack[] aitemstack = this.mainInventory;
 		if (i >= this.mainInventory.length) {
@@ -630,6 +646,7 @@ public class InventoryPlayer implements IInventory {
 		}
 	}
 
+	@Override
 	public void setField(int var1, int var2) {
 	}
 
@@ -637,6 +654,7 @@ public class InventoryPlayer implements IInventory {
 	 * + Sets the given item stack to the specified slot in the inventory (can be
 	 * crafting or armor sections).
 	 */
+	@Override
 	public void setInventorySlotContents(int i, ItemStack itemstack) {
 		ItemStack[] aitemstack = this.mainInventory;
 		if (i >= aitemstack.length) {

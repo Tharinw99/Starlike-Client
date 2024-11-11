@@ -17,13 +17,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -35,7 +35,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockLadder extends Block {
 	public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
@@ -50,6 +50,7 @@ public class BlockLadder extends Block {
 		return worldIn.getBlockState(pos.offset(facing.getOpposite())).getBlock().isNormalCube();
 	}
 
+	@Override
 	public boolean canPlaceBlockAt(World world, BlockPos blockpos) {
 		return world.getBlockState(blockpos.west()).getBlock().isNormalCube() ? true
 				: (world.getBlockState(blockpos.east()).getBlock().isNormalCube() ? true
@@ -57,14 +58,17 @@ public class BlockLadder extends Block {
 								: world.getBlockState(blockpos.south()).getBlock().isNormalCube()));
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { FACING });
 	}
 
+	@Override
 	public EnumWorldBlockLayer getBlockLayer() {
 		return EnumWorldBlockLayer.CUTOUT;
 	}
 
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox(World world, BlockPos blockpos, IBlockState iblockstate) {
 		this.setBlockBoundsBasedOnState(world, blockpos);
 		return super.getCollisionBoundingBox(world, blockpos, iblockstate);
@@ -73,10 +77,12 @@ public class BlockLadder extends Block {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		return ((EnumFacing) iblockstate.getValue(FACING)).getIndex();
 	}
 
+	@Override
 	public AxisAlignedBB getSelectedBoundingBox(World world, BlockPos blockpos) {
 		this.setBlockBoundsBasedOnState(world, blockpos);
 		return super.getSelectedBoundingBox(world, blockpos);
@@ -85,6 +91,7 @@ public class BlockLadder extends Block {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		EnumFacing enumfacing = EnumFacing.getFront(i);
 		if (enumfacing.getAxis() == EnumFacing.Axis.Y) {
@@ -94,6 +101,7 @@ public class BlockLadder extends Block {
 		return this.getDefaultState().withProperty(FACING, enumfacing);
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -102,6 +110,7 @@ public class BlockLadder extends Block {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
@@ -110,6 +119,7 @@ public class BlockLadder extends Block {
 	 * + Called by ItemBlocks just before a block is actually set in the world, to
 	 * allow for adjustments to the IBlockstate
 	 */
+	@Override
 	public IBlockState onBlockPlaced(World world, BlockPos blockpos, EnumFacing enumfacing, float var4, float var5,
 			float var6, int var7, EntityLivingBase var8) {
 		if (enumfacing.getAxis().isHorizontal() && this.canBlockStay(world, blockpos, enumfacing)) {
@@ -130,6 +140,7 @@ public class BlockLadder extends Block {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block block) {
 		EnumFacing enumfacing = (EnumFacing) iblockstate.getValue(FACING);
 		if (!this.canBlockStay(world, blockpos, enumfacing)) {
@@ -140,6 +151,7 @@ public class BlockLadder extends Block {
 		super.onNeighborBlockChange(world, blockpos, iblockstate, block);
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
 		IBlockState iblockstate = iblockaccess.getBlockState(blockpos);
 		if (iblockstate.getBlock() == this) {

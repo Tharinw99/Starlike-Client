@@ -17,7 +17,7 @@ import net.minecraft.world.storage.WorldInfo;
 
 /**
  * Copyright (c) 2022-2024 lax1dude, ayunami2000. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,7 +29,7 @@ import net.minecraft.world.storage.WorldInfo;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class WorldConverterEPK {
 
@@ -38,11 +38,10 @@ public class WorldConverterEPK {
 	public static byte[] exportWorld(String worldName) {
 		String realWorldName = worldName;
 		String worldOwner = "UNKNOWN";
-		String splitter = new String(new char[] { (char) 253, (char) 233, (char) 233 });
-		if (worldName.contains(splitter)) {
-			int i = worldName.lastIndexOf(splitter);
-			worldOwner = worldName.substring(i + 3);
-			realWorldName = worldName.substring(0, i);
+		int j = worldName.lastIndexOf(new String(new char[] { (char) 253, (char) 233, (char) 233 }));
+		if (j != -1) {
+			worldOwner = worldName.substring(j + 3);
+			realWorldName = worldName.substring(0, j);
 		}
 		VFile2 worldDir = EaglerIntegratedServerWorker.saveFormat.getSaveLoader(realWorldName, false)
 				.getWorldDirectory();

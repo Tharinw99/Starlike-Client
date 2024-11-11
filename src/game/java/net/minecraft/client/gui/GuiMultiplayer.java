@@ -26,17 +26,18 @@ import net.minecraft.client.multiplayer.ServerList;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
+import net.starlikeclient.StarlikeClient;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -48,7 +49,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
 	private static final Logger logger = LogManager.getLogger();
@@ -92,6 +93,7 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
 	 * + Called by the controls from the buttonList when activated. (Mouse pressed
 	 * for buttons)
 	 */
+	@Override
 	protected void actionPerformed(GuiButton parGuiButton) {
 		if (parGuiButton.enabled) {
 			GuiListExtended.IGuiListEntry guilistextended$iguilistentry = this.serverListSelector.func_148193_k() < 0
@@ -144,6 +146,7 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
 		this.directConnect = false;
 	}
 
+	@Override
 	public void confirmClicked(boolean flag, int var2) {
 		GuiListExtended.IGuiListEntry guilistextended$iguilistentry = this.serverListSelector.func_148193_k() < 0 ? null
 				: this.serverListSelector.getListEntry(this.serverListSelector.func_148193_k());
@@ -236,13 +239,13 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
 		this.buttonList.add(this.btnEditServer = new GuiButton(7, this.width / 2 - 154, this.height - 28, 70, 20,
 				I18n.format("selectServer.edit", new Object[0])) {
 			{
-				enabled = false;
+				enabled = StarlikeClient.Config.Features.enableMultiplayer;
 			}
 		});
 		this.buttonList.add(this.btnDeleteServer = new GuiButton(2, this.width / 2 - 74, this.height - 28, 70, 20,
 				I18n.format("selectServer.delete", new Object[0])) {
 			{
-				enabled = false;
+				enabled = StarlikeClient.Config.Features.enableMultiplayer;
 			}
 		});
 		this.buttonList.add(this.btnSelectServer = new GuiButton(1, this.width / 2 - 154, this.height - 52, 100, 20,
@@ -252,7 +255,7 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
 		this.buttonList.add(new GuiButton(3, this.width / 2 + 4 + 50, this.height - 52, 100, 20,
 				I18n.format("selectServer.add", new Object[0])) {
 			{
-				enabled = false;
+				enabled = StarlikeClient.Config.Features.enableMultiplayer;
 			}
 		});
 		this.buttonList.add(new GuiButton(8, this.width / 2 + 4, this.height - 28, 70, 20,
@@ -284,6 +287,7 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
 	 * + Draws the screen and all the components in it. Args : mouseX, mouseY,
 	 * renderPartialTicks
 	 */
+	@Override
 	public void drawScreen(int i, int j, float f) {
 		this.hoveringText = null;
 		this.drawDefaultBackground();
@@ -338,11 +342,13 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
 	/**
 	 * + Handles mouse input.
 	 */
+	@Override
 	public void handleMouseInput() throws IOException {
 		super.handleMouseInput();
 		this.serverListSelector.handleMouseInput();
 	}
 
+	@Override
 	public void handleTouchInput() throws IOException {
 		super.handleTouchInput();
 		this.serverListSelector.handleTouchInput();
@@ -353,6 +359,7 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
 	 * when the GUI is displayed and when the window resizes, the buttonList is
 	 * cleared beforehand.
 	 */
+	@Override
 	public void initGui() {
 		Keyboard.enableRepeatEvents(true);
 		this.buttonList.clear();
@@ -365,9 +372,8 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
 			this.serverListSelector.func_148195_a(this.savedServerList);
 			if (lanServerList == null) {
 				lanServerList = new LANServerList();
-			} else {
-				lanServerList.forceRefresh();
 			}
+			lanServerList.forceRefresh();
 		} else {
 			this.serverListSelector.setDimensions(this.width, this.height, 32, this.height - 64);
 		}
@@ -380,6 +386,7 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
 	 * the equivalent of KeyListener.keyTyped(KeyEvent e). Args : character
 	 * (character on the key), keyCode (lwjgl Keyboard key code)
 	 */
+	@Override
 	protected void keyTyped(char parChar1, int parInt1) {
 		int i = this.serverListSelector.func_148193_k();
 		GuiListExtended.IGuiListEntry guilistextended$iguilistentry = i < 0 ? null
@@ -431,6 +438,7 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
 	/**
 	 * + Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
 	 */
+	@Override
 	protected void mouseClicked(int parInt1, int parInt2, int parInt3) {
 		relaysButton.mouseClicked(parInt1, parInt2, parInt3);
 		super.mouseClicked(parInt1, parInt2, parInt3);
@@ -448,6 +456,7 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
 	 * + Called when a mouse button is released. Args : mouseX, mouseY,
 	 * releaseButton
 	 */
+	@Override
 	protected void mouseReleased(int i, int j, int k) {
 		super.mouseReleased(i, j, k);
 		this.serverListSelector.mouseReleased(i, j, k);
@@ -456,6 +465,7 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
 	/**
 	 * + Called when the screen is unloaded. Used to disable keyboard repeat events
 	 */
+	@Override
 	public void onGuiClosed() {
 		Keyboard.enableRepeatEvents(false);
 	}
@@ -488,6 +498,7 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
 	/**
 	 * + Called from the main game loop to update the screen.
 	 */
+	@Override
 	public void updateScreen() {
 		super.updateScreen();
 		this.savedServerList.updateServerPing();

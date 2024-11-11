@@ -1,24 +1,24 @@
 /* -*-mode:java; c-basic-offset:2; indent-tabs-mode:nil -*- */
 /* JOrbis
  * Copyright (C) 2000 ymnk, JCraft,Inc.
- *  
+ *
  * Written by: 2000 ymnk<ymnk@jcraft.com>
- *   
- * Many thanks to 
- *   Monty <monty@xiph.org> and 
+ *
+ * Many thanks to
+ *   Monty <monty@xiph.org> and
  *   The XIPHOPHORUS Company http://www.xiph.org/ .
  * JOrbis has been based on their awesome works, Vorbis codec.
- *   
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public License
  * as published by the Free Software Foundation; either version 2 of
  * the License, or (at your option) any later version.
-   
+
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -56,42 +56,8 @@ public class Page {
 	public int body;
 	public int body_len;
 
-	int version() {
-		return header_base[header + 4] & 0xff;
-	}
-
-	int continued() {
-		return (header_base[header + 5] & 0x01);
-	}
-
 	public int bos() {
 		return (header_base[header + 5] & 0x02);
-	}
-
-	public int eos() {
-		return (header_base[header + 5] & 0x04);
-	}
-
-	public long granulepos() {
-		long foo = header_base[header + 13] & 0xff;
-		foo = (foo << 8) | (header_base[header + 12] & 0xff);
-		foo = (foo << 8) | (header_base[header + 11] & 0xff);
-		foo = (foo << 8) | (header_base[header + 10] & 0xff);
-		foo = (foo << 8) | (header_base[header + 9] & 0xff);
-		foo = (foo << 8) | (header_base[header + 8] & 0xff);
-		foo = (foo << 8) | (header_base[header + 7] & 0xff);
-		foo = (foo << 8) | (header_base[header + 6] & 0xff);
-		return (foo);
-	}
-
-	public int serialno() {
-		return (header_base[header + 14] & 0xff) | ((header_base[header + 15] & 0xff) << 8)
-				| ((header_base[header + 16] & 0xff) << 16) | ((header_base[header + 17] & 0xff) << 24);
-	}
-
-	int pageno() {
-		return (header_base[header + 18] & 0xff) | ((header_base[header + 19] & 0xff) << 8)
-				| ((header_base[header + 20] & 0xff) << 16) | ((header_base[header + 21] & 0xff) << 24);
 	}
 
 	void checksum() {
@@ -107,6 +73,10 @@ public class Page {
 		header_base[header + 23] = (byte) (crc_reg >>> 8);
 		header_base[header + 24] = (byte) (crc_reg >>> 16);
 		header_base[header + 25] = (byte) (crc_reg >>> 24);
+	}
+
+	int continued() {
+		return (header_base[header + 5] & 0x01);
 	}
 
 	public Page copy() {
@@ -125,6 +95,36 @@ public class Page {
 		p.body_base = tmp;
 		p.body = 0;
 		return p;
+	}
+
+	public int eos() {
+		return (header_base[header + 5] & 0x04);
+	}
+
+	public long granulepos() {
+		long foo = header_base[header + 13] & 0xff;
+		foo = (foo << 8) | (header_base[header + 12] & 0xff);
+		foo = (foo << 8) | (header_base[header + 11] & 0xff);
+		foo = (foo << 8) | (header_base[header + 10] & 0xff);
+		foo = (foo << 8) | (header_base[header + 9] & 0xff);
+		foo = (foo << 8) | (header_base[header + 8] & 0xff);
+		foo = (foo << 8) | (header_base[header + 7] & 0xff);
+		foo = (foo << 8) | (header_base[header + 6] & 0xff);
+		return (foo);
+	}
+
+	int pageno() {
+		return (header_base[header + 18] & 0xff) | ((header_base[header + 19] & 0xff) << 8)
+				| ((header_base[header + 20] & 0xff) << 16) | ((header_base[header + 21] & 0xff) << 24);
+	}
+
+	public int serialno() {
+		return (header_base[header + 14] & 0xff) | ((header_base[header + 15] & 0xff) << 8)
+				| ((header_base[header + 16] & 0xff) << 16) | ((header_base[header + 17] & 0xff) << 24);
+	}
+
+	int version() {
+		return header_base[header + 4] & 0xff;
 	}
 
 }

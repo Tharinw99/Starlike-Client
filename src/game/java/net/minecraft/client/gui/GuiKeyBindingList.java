@@ -13,13 +13,13 @@ import net.minecraft.util.EnumChatFormatting;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -31,7 +31,7 @@ import net.minecraft.util.EnumChatFormatting;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class GuiKeyBindingList extends GuiListExtended {
 	public class CategoryEntry implements GuiListExtended.IGuiListEntry {
@@ -43,19 +43,23 @@ public class GuiKeyBindingList extends GuiListExtended {
 			this.labelWidth = GuiKeyBindingList.this.mc.fontRendererObj.getStringWidth(this.labelText);
 		}
 
+		@Override
 		public void drawEntry(int var1, int var2, int i, int var4, int j, int var6, int var7, boolean var8) {
 			GuiKeyBindingList.this.mc.fontRendererObj.drawString(this.labelText,
 					GuiKeyBindingList.this.mc.currentScreen.width / 2 - this.labelWidth / 2,
 					i + j - GuiKeyBindingList.this.mc.fontRendererObj.FONT_HEIGHT - 1, 16777215);
 		}
 
+		@Override
 		public boolean mousePressed(int var1, int var2, int var3, int var4, int var5, int var6) {
 			return false;
 		}
 
+		@Override
 		public void mouseReleased(int var1, int var2, int var3, int var4, int var5, int var6) {
 		}
 
+		@Override
 		public void setSelected(int var1, int var2, int var3) {
 		}
 	}
@@ -74,6 +78,7 @@ public class GuiKeyBindingList extends GuiListExtended {
 			this.btnReset = new GuiButton(0, 0, 0, 50, 20, I18n.format("controls.reset", new Object[0]));
 		}
 
+		@Override
 		public void drawEntry(int var1, int i, int j, int var4, int k, int l, int i1, boolean var8) {
 			boolean flag = GuiKeyBindingList.this.field_148191_k.buttonId == this.keybinding;
 			GuiKeyBindingList.this.mc.fontRendererObj.drawString(this.keyDesc,
@@ -109,6 +114,7 @@ public class GuiKeyBindingList extends GuiListExtended {
 			this.btnChangeKeyBinding.drawButton(GuiKeyBindingList.this.mc, l, i1);
 		}
 
+		@Override
 		public boolean mousePressed(int var1, int i, int j, int var4, int var5, int var6) {
 			if (var4 != 0 && var4 != 12345)
 				return false;
@@ -128,6 +134,7 @@ public class GuiKeyBindingList extends GuiListExtended {
 			}
 		}
 
+		@Override
 		public void mouseReleased(int var1, int i, int j, int var4, int var5, int var6) {
 			if (var4 != 0 && var4 != 12345)
 				return;
@@ -138,6 +145,7 @@ public class GuiKeyBindingList extends GuiListExtended {
 				this.btnReset.mouseReleased(i, j);
 		}
 
+		@Override
 		public void setSelected(int var1, int var2, int var3) {
 		}
 	}
@@ -180,6 +188,7 @@ public class GuiKeyBindingList extends GuiListExtended {
 	/**
 	 * + Gets the IGuiListEntry object for the given index
 	 */
+	@Override
 	public GuiListExtended.IGuiListEntry getListEntry(int i) {
 		return this.listEntries[i];
 	}
@@ -187,14 +196,17 @@ public class GuiKeyBindingList extends GuiListExtended {
 	/**
 	 * + Gets the width of the list
 	 */
+	@Override
 	public int getListWidth() {
 		return super.getListWidth() + 32;
 	}
 
+	@Override
 	protected int getScrollBarX() {
 		return super.getScrollBarX() + 15;
 	}
 
+	@Override
 	protected int getSize() {
 		return this.listEntries.length;
 	}

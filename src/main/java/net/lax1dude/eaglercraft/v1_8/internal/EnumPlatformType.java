@@ -2,7 +2,7 @@ package net.lax1dude.eaglercraft.v1_8.internal;
 
 /**
  * Copyright (c) 2022 lax1dude. All Rights Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -14,10 +14,10 @@ package net.lax1dude.eaglercraft.v1_8.internal;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public enum EnumPlatformType {
-	DESKTOP("Desktop"), JAVASCRIPT("JavaScript"), ASM("ASM");
+	DESKTOP("Desktop"), JAVASCRIPT("JS"), WASM_GC("WASM-GC");
 
 	private final String name;
 
@@ -29,6 +29,7 @@ public enum EnumPlatformType {
 		return name;
 	}
 
+	@Override
 	public String toString() {
 		return name;
 	}

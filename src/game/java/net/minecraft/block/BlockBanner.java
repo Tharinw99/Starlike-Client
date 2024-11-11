@@ -24,13 +24,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -42,7 +42,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockBanner extends BlockContainer {
 	public static class BlockBannerHanging extends BlockBanner {
@@ -50,14 +50,17 @@ public class BlockBanner extends BlockContainer {
 			this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
 		}
 
+		@Override
 		protected BlockState createBlockState() {
 			return new BlockState(this, new IProperty[] { FACING });
 		}
 
+		@Override
 		public int getMetaFromState(IBlockState iblockstate) {
 			return ((EnumFacing) iblockstate.getValue(FACING)).getIndex();
 		}
 
+		@Override
 		public IBlockState getStateFromMeta(int i) {
 			EnumFacing enumfacing = EnumFacing.getFront(i);
 			if (enumfacing.getAxis() == EnumFacing.Axis.Y) {
@@ -67,6 +70,7 @@ public class BlockBanner extends BlockContainer {
 			return this.getDefaultState().withProperty(FACING, enumfacing);
 		}
 
+		@Override
 		public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block block) {
 			EnumFacing enumfacing = (EnumFacing) iblockstate.getValue(FACING);
 			if (!world.getBlockState(blockpos.offset(enumfacing.getOpposite())).getBlock().getMaterial().isSolid()) {
@@ -77,6 +81,7 @@ public class BlockBanner extends BlockContainer {
 			super.onNeighborBlockChange(world, blockpos, iblockstate, block);
 		}
 
+		@Override
 		public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
 			EnumFacing enumfacing = (EnumFacing) iblockaccess.getBlockState(blockpos).getValue(FACING);
 			float f = 0.0F;
@@ -108,18 +113,22 @@ public class BlockBanner extends BlockContainer {
 			this.setDefaultState(this.blockState.getBaseState().withProperty(ROTATION, Integer.valueOf(0)));
 		}
 
+		@Override
 		protected BlockState createBlockState() {
 			return new BlockState(this, new IProperty[] { ROTATION });
 		}
 
+		@Override
 		public int getMetaFromState(IBlockState iblockstate) {
 			return ((Integer) iblockstate.getValue(ROTATION)).intValue();
 		}
 
+		@Override
 		public IBlockState getStateFromMeta(int i) {
 			return this.getDefaultState().withProperty(ROTATION, Integer.valueOf(i));
 		}
 
+		@Override
 		public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock) {
 			if (!worldIn.getBlockState(pos.down()).getBlock().getMaterial().isSolid()) {
 				this.dropBlockAsItem(worldIn, pos, state, 0);
@@ -141,6 +150,7 @@ public class BlockBanner extends BlockContainer {
 		this.setBlockBounds(0.5F - f, 0.0F, 0.5F - f, 0.5F + f, f1, 0.5F + f);
 	}
 
+	@Override
 	public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
 		return !this.func_181087_e(worldIn, pos) && super.canPlaceBlockAt(worldIn, pos);
 	}
@@ -149,6 +159,7 @@ public class BlockBanner extends BlockContainer {
 	 * + Returns a new instance of a block's tile entity class. Called on placing
 	 * the block.
 	 */
+	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
 		return new TileEntityBanner();
 	}
@@ -156,6 +167,7 @@ public class BlockBanner extends BlockContainer {
 	/**
 	 * + Spawns this Block's drops into the World as EntityItems.
 	 */
+	@Override
 	public void dropBlockAsItemWithChance(World world, BlockPos blockpos, IBlockState iblockstate, float f, int i) {
 		TileEntity tileentity = world.getTileEntity(blockpos);
 		if (tileentity instanceof TileEntityBanner) {
@@ -174,14 +186,17 @@ public class BlockBanner extends BlockContainer {
 
 	}
 
+	@Override
 	public boolean func_181623_g() {
 		return true;
 	}
 
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox(World var1, BlockPos var2, IBlockState var3) {
 		return null;
 	}
 
+	@Override
 	public Item getItem(World worldIn, BlockPos pos) {
 		return Items.banner;
 	}
@@ -189,6 +204,7 @@ public class BlockBanner extends BlockContainer {
 	/**
 	 * + Get the Item that this Block should drop when harvested.
 	 */
+	@Override
 	public Item getItemDropped(IBlockState state, EaglercraftRandom rand, int fortune) {
 		return Items.banner;
 	}
@@ -196,15 +212,18 @@ public class BlockBanner extends BlockContainer {
 	/**
 	 * + Gets the localized name of this block. Used for the statistics page.
 	 */
+	@Override
 	public String getLocalizedName() {
 		return StatCollector.translateToLocal("item.banner.white.name");
 	}
 
+	@Override
 	public AxisAlignedBB getSelectedBoundingBox(World worldIn, BlockPos pos) {
 		this.setBlockBoundsBasedOnState(worldIn, pos);
 		return super.getSelectedBoundingBox(worldIn, pos);
 	}
 
+	@Override
 	public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, TileEntity te) {
 		if (te instanceof TileEntityBanner) {
 			TileEntityBanner tileentitybanner = (TileEntityBanner) te;
@@ -220,6 +239,7 @@ public class BlockBanner extends BlockContainer {
 
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -228,10 +248,12 @@ public class BlockBanner extends BlockContainer {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
 
+	@Override
 	public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
 		return true;
 	}

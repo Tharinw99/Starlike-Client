@@ -17,13 +17,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -35,7 +35,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ItemFirework extends Item {
 
@@ -43,6 +43,7 @@ public class ItemFirework extends Item {
 	 * + allows items to add custom lines of information to the mouseover
 	 * description
 	 */
+	@Override
 	public void addInformation(ItemStack itemstack, EntityPlayer var2, List<String> list, boolean var4) {
 		if (itemstack.hasTagCompound()) {
 			NBTTagCompound nbttagcompound = itemstack.getTagCompound().getCompoundTag("Fireworks");
@@ -75,6 +76,7 @@ public class ItemFirework extends Item {
 	/**
 	 * + Called when a Block is right-clicked with this Item
 	 */
+	@Override
 	public boolean onItemUse(ItemStack itemstack, EntityPlayer entityplayer, World world, BlockPos blockpos,
 			EnumFacing var5, float f, float f1, float f2) {
 		if (!world.isRemote) {
@@ -92,6 +94,7 @@ public class ItemFirework extends Item {
 		}
 	}
 
+	@Override
 	public boolean shouldUseOnTouchEagler(ItemStack itemStack) {
 		return true;
 	}

@@ -20,13 +20,13 @@ import net.minecraft.util.EnumChatFormatting;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,7 +38,7 @@ import net.minecraft.util.EnumChatFormatting;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class CommandHandler implements ICommandManager {
 
@@ -61,6 +61,7 @@ public class CommandHandler implements ICommandManager {
 	 */
 	private final Set<ICommand> commandSet = Sets.newHashSet();
 
+	@Override
 	public int executeCommand(ICommandSender sender, String rawCommand) {
 		rawCommand = rawCommand.trim();
 		if (rawCommand.startsWith("/")) {
@@ -109,6 +110,7 @@ public class CommandHandler implements ICommandManager {
 		return j;
 	}
 
+	@Override
 	public Map<String, ICommand> getCommands() {
 		return this.commandMap;
 	}
@@ -116,6 +118,7 @@ public class CommandHandler implements ICommandManager {
 	/**
 	 * + returns all commands that the commandSender can use
 	 */
+	@Override
 	public List<ICommand> getPossibleCommands(ICommandSender sender) {
 		ArrayList arraylist = Lists.newArrayList();
 
@@ -128,6 +131,7 @@ public class CommandHandler implements ICommandManager {
 		return arraylist;
 	}
 
+	@Override
 	public List<String> getTabCompletionOptions(ICommandSender sender, String input, BlockPos pos) {
 		String[] astring = input.split(" ", -1);
 		String s = astring[0];

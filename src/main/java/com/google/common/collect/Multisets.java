@@ -744,7 +744,7 @@ public final class Multisets {
 	 * removes all occurrences of elements that appear in
 	 * {@code occurrencesToRemove}. However, this operation <i>is</i> equivalent to,
 	 * albeit more efficient than, the following:
-	 * 
+	 *
 	 * <pre>
 	 *    {@code
 	 *

@@ -1,5 +1,5 @@
 {
-    "variants": {
-        "normal": { "model": "starlike:uranium_block" }
-    }
+  "variants": {
+    "normal": { "model": "starlike:uranium_block" }
+  }
 }

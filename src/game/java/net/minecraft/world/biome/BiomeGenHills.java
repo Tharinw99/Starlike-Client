@@ -14,13 +14,13 @@ import net.minecraft.world.gen.feature.WorldGenerator;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -32,7 +32,7 @@ import net.minecraft.world.gen.feature.WorldGenerator;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BiomeGenHills extends BiomeGenBase {
 
@@ -55,10 +55,12 @@ public class BiomeGenHills extends BiomeGenBase {
 
 	}
 
+	@Override
 	protected BiomeGenBase createMutatedBiome(int i) {
 		return (new BiomeGenHills(i, false)).mutateHills(this);
 	}
 
+	@Override
 	public void decorate(World world, EaglercraftRandom random, BlockPos blockpos) {
 		super.decorate(world, random, blockpos);
 		int i = 3 + random.nextInt(6);
@@ -82,10 +84,12 @@ public class BiomeGenHills extends BiomeGenBase {
 
 	}
 
+	@Override
 	public WorldGenAbstractTree genBigTreeChance(EaglercraftRandom random) {
 		return (WorldGenAbstractTree) (random.nextInt(3) > 0 ? this.field_150634_aD : super.genBigTreeChance(random));
 	}
 
+	@Override
 	public void genTerrainBlocks(World world, EaglercraftRandom random, ChunkPrimer chunkprimer, int i, int j,
 			double d0) {
 		this.topBlock = Blocks.grass.getDefaultState();

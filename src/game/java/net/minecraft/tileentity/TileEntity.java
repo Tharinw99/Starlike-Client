@@ -22,13 +22,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -40,7 +40,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public abstract class TileEntity {
 	private static final Logger logger = LogManager.getLogger();
@@ -97,7 +97,8 @@ public abstract class TileEntity {
 				tileentity = (TileEntity) oclass.get();
 			}
 		} catch (Exception exception) {
-			logger.error("Could not create TileEntity", exception);
+			logger.error("Could not create TileEntity");
+			logger.error(exception);
 		}
 
 		if (tileentity != null) {
@@ -110,6 +111,7 @@ public abstract class TileEntity {
 	}
 
 	protected World worldObj;
+
 	protected BlockPos pos = BlockPos.ORIGIN;
 
 	protected boolean tileEntityInvalid;
@@ -118,8 +120,11 @@ public abstract class TileEntity {
 
 	protected Block blockType;
 
+	public boolean shouldCull = false;
+
 	public void addInfoToCrashReport(CrashReportCategory reportCategory) {
 		reportCategory.addCrashSectionCallable("Name", new Callable<String>() {
+			@Override
 			public String call() throws Exception {
 				return (String) TileEntity.classToNameMap.get(TileEntity.this.getClass()) + " // "
 						+ TileEntity.this.getClass().getName();
@@ -128,6 +133,7 @@ public abstract class TileEntity {
 		if (this.worldObj != null) {
 			CrashReportCategory.addBlockInfo(reportCategory, this.pos, this.getBlockType(), this.getBlockMetadata());
 			reportCategory.addCrashSectionCallable("Actual block type", new Callable<String>() {
+				@Override
 				public String call() throws Exception {
 					int i = Block
 							.getIdFromBlock(TileEntity.this.worldObj.getBlockState(TileEntity.this.pos).getBlock());
@@ -142,6 +148,7 @@ public abstract class TileEntity {
 				}
 			});
 			reportCategory.addCrashSectionCallable("Actual block data value", new Callable<String>() {
+				@Override
 				public String call() throws Exception {
 					IBlockState iblockstate = TileEntity.this.worldObj.getBlockState(TileEntity.this.pos);
 					int i = iblockstate.getBlock().getMetaFromState(iblockstate);

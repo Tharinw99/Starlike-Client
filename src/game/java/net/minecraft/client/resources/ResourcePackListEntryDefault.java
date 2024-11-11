@@ -16,13 +16,13 @@ import net.minecraft.util.ResourceLocation;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -34,7 +34,7 @@ import net.minecraft.util.ResourceLocation;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class ResourcePackListEntryDefault extends ResourcePackListEntry {
 	private static final Logger logger = LogManager.getLogger();
@@ -56,22 +56,27 @@ public class ResourcePackListEntryDefault extends ResourcePackListEntry {
 				dynamictexture);
 	}
 
+	@Override
 	protected boolean func_148307_h() {
 		return false;
 	}
 
+	@Override
 	protected boolean func_148308_f() {
 		return false;
 	}
 
+	@Override
 	protected boolean func_148309_e() {
 		return false;
 	}
 
+	@Override
 	protected boolean func_148310_d() {
 		return false;
 	}
 
+	@Override
 	protected String func_148311_a() {
 		try {
 			PackMetadataSection packmetadatasection = (PackMetadataSection) this.field_148320_d
@@ -88,18 +93,22 @@ public class ResourcePackListEntryDefault extends ResourcePackListEntry {
 		return EnumChatFormatting.RED + "Missing " + "pack.mcmeta" + " :(";
 	}
 
+	@Override
 	protected String func_148312_b() {
 		return "Default";
 	}
 
+	@Override
 	protected void func_148313_c() {
 		this.mc.getTextureManager().bindTexture(this.resourcePackIcon);
 	}
 
+	@Override
 	protected boolean func_148314_g() {
 		return false;
 	}
 
+	@Override
 	protected int func_183019_a() {
 		return 1;
 	}

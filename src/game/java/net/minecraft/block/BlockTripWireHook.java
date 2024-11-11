@@ -23,13 +23,13 @@ import net.minecraft.world.World;
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
  * code.
- * 
+ *
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
- * 
+ *
  * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
  * Reserved.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -41,7 +41,7 @@ import net.minecraft.world.World;
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  */
 public class BlockTripWireHook extends Block {
 	public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
@@ -58,6 +58,7 @@ public class BlockTripWireHook extends Block {
 		this.setTickRandomly(true);
 	}
 
+	@Override
 	public void breakBlock(World world, BlockPos blockpos, IBlockState iblockstate) {
 		boolean flag = ((Boolean) iblockstate.getValue(ATTACHED)).booleanValue();
 		boolean flag1 = ((Boolean) iblockstate.getValue(POWERED)).booleanValue();
@@ -74,6 +75,7 @@ public class BlockTripWireHook extends Block {
 		super.breakBlock(world, blockpos, iblockstate);
 	}
 
+	@Override
 	public boolean canPlaceBlockAt(World world, BlockPos blockpos) {
 		EnumFacing[] facings = EnumFacing.Plane.HORIZONTAL.facingsArray;
 		BlockPos tmp = new BlockPos(0, 0, 0);
@@ -89,6 +91,7 @@ public class BlockTripWireHook extends Block {
 	/**
 	 * + Check whether this Block can be placed on the given side
 	 */
+	@Override
 	public boolean canPlaceBlockOnSide(World world, BlockPos blockpos, EnumFacing enumfacing) {
 		return enumfacing.getAxis().isHorizontal()
 				&& world.getBlockState(blockpos.offset(enumfacing.getOpposite())).getBlock().isNormalCube();
@@ -98,6 +101,7 @@ public class BlockTripWireHook extends Block {
 	 * + Can this block provide power. Only wire currently seems to have this change
 	 * based on its state.
 	 */
+	@Override
 	public boolean canProvidePower() {
 		return true;
 	}
@@ -112,6 +116,7 @@ public class BlockTripWireHook extends Block {
 		}
 	}
 
+	@Override
 	protected BlockState createBlockState() {
 		return new BlockState(this, new IProperty[] { FACING, POWERED, ATTACHED, SUSPENDED });
 	}
@@ -217,15 +222,18 @@ public class BlockTripWireHook extends Block {
 	 * + Get the actual Block state of this Block at the given position. This
 	 * applies properties not visible in the metadata, such as fence connections.
 	 */
+	@Override
 	public IBlockState getActualState(IBlockState iblockstate, IBlockAccess iblockaccess, BlockPos blockpos) {
 		return iblockstate.withProperty(SUSPENDED,
 				Boolean.valueOf(!World.doesBlockHaveSolidTopSurface(iblockaccess, blockpos.down())));
 	}
 
+	@Override
 	public EnumWorldBlockLayer getBlockLayer() {
 		return EnumWorldBlockLayer.CUTOUT_MIPPED;
 	}
 
+	@Override
 	public AxisAlignedBB getCollisionBoundingBox(World var1, BlockPos var2, IBlockState var3) {
 		return null;
 	}
@@ -233,6 +241,7 @@ public class BlockTripWireHook extends Block {
 	/**
 	 * + Convert the BlockState into the correct metadata value
 	 */
+	@Override
 	public int getMetaFromState(IBlockState iblockstate) {
 		int i = 0;
 		i = i | ((EnumFacing) iblockstate.getValue(FACING)).getHorizontalIndex();
@@ -250,21 +259,25 @@ public class BlockTripWireHook extends Block {
 	/**
 	 * + Convert the given metadata into a BlockState for this Block
 	 */
+	@Override
 	public IBlockState getStateFromMeta(int i) {
 		return this.getDefaultState().withProperty(FACING, EnumFacing.getHorizontal(i & 3))
 				.withProperty(POWERED, Boolean.valueOf((i & 8) > 0))
 				.withProperty(ATTACHED, Boolean.valueOf((i & 4) > 0));
 	}
 
+	@Override
 	public int getStrongPower(IBlockAccess var1, BlockPos var2, IBlockState iblockstate, EnumFacing enumfacing) {
 		return !((Boolean) iblockstate.getValue(POWERED)).booleanValue() ? 0
 				: (iblockstate.getValue(FACING) == enumfacing ? 15 : 0);
 	}
 
+	@Override
 	public int getWeakPower(IBlockAccess var1, BlockPos var2, IBlockState iblockstate, EnumFacing var4) {
 		return ((Boolean) iblockstate.getValue(POWERED)).booleanValue() ? 15 : 0;
 	}
 
+	@Override
 	public boolean isFullCube() {
 		return false;
 	}
@@ -273,6 +286,7 @@ public class BlockTripWireHook extends Block {
 	 * + Used to determine ambient occlusion and culling when rebuilding chunks for
 	 * render
 	 */
+	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
@@ -281,6 +295,7 @@ public class BlockTripWireHook extends Block {
 	 * + Called by ItemBlocks just before a block is actually set in the world, to
 	 * allow for adjustments to the IBlockstate
 	 */
+	@Override
 	public IBlockState onBlockPlaced(World var1, BlockPos var2, EnumFacing enumfacing, float var4, float var5,
 			float var6, int var7, EntityLivingBase var8) {
 		IBlockState iblockstate = this.getDefaultState().withProperty(POWERED, Boolean.valueOf(false))
@@ -296,6 +311,7 @@ public class BlockTripWireHook extends Block {
 	 * + Called by ItemBlocks after a block is set in the world, to allow post-place
 	 * logic
 	 */
+	@Override
 	public void onBlockPlacedBy(World world, BlockPos blockpos, IBlockState iblockstate, EntityLivingBase var4,
 			ItemStack var5) {
 		this.func_176260_a(world, blockpos, iblockstate, false, false, -1, (IBlockState) null);
@@ -304,6 +320,7 @@ public class BlockTripWireHook extends Block {
 	/**
 	 * + Called when a neighboring block changes.
 	 */
+	@Override
 	public void onNeighborBlockChange(World world, BlockPos blockpos, IBlockState iblockstate, Block block) {
 		if (block != this) {
 			if (this.checkForDrop(world, blockpos, iblockstate)) {
@@ -321,9 +338,11 @@ public class BlockTripWireHook extends Block {
 	 * + Called randomly when setTickRandomly is set to true (used by e.g. crops to
 	 * grow, etc.)
 	 */
+	@Override
 	public void randomTick(World var1, BlockPos var2, IBlockState var3, EaglercraftRandom var4) {
 	}
 
+	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess iblockaccess, BlockPos blockpos) {
 		float f = 0.1875F;
 		switch ((EnumFacing) iblockaccess.getBlockState(blockpos).getValue(FACING)) {
@@ -342,6 +361,7 @@ public class BlockTripWireHook extends Block {
 
 	}
 
+	@Override
 	public void updateTick(World world, BlockPos blockpos, IBlockState iblockstate, EaglercraftRandom var4) {
 		this.func_176260_a(world, blockpos, iblockstate, false, true, -1, (IBlockState) null);
 	}
