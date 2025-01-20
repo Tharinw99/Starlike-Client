@@ -85,6 +85,9 @@ public class ChunkProviderHell implements IChunkProvider {
 	double[] noiseData4;
 	double[] noiseData5;
 
+	private final WorldGenerator uraniumOreGen = new WorldGenMinable(Blocks.uranium_ore.getDefaultState(), 4,
+			BlockHelper.forBlock(Blocks.netherrack));
+
 	public ChunkProviderHell(World worldIn, boolean parFlag, long parLong1) {
 		this.worldObj = worldIn;
 		this.field_177466_i = parFlag;
@@ -390,6 +393,11 @@ public class ChunkProviderHell implements IChunkProvider {
 			this.field_177465_A.generate(this.worldObj, this.hellRNG, blockpos.add(this.hellRNG.nextInt(16) + 8,
 					this.hellRNG.nextInt(128), this.hellRNG.nextInt(16) + 8));
 		}
+
+	  for (int k1 = 0; k1 < 8; ++k1) {
+	    this.uraniumOreGen.generate(this.worldObj, this.hellRNG, blockpos.add(this.hellRNG.nextInt(16),
+			this.hellRNG.nextInt(108) + 10, this.hellRNG.nextInt(16)));
+	  }
 
 		for (int k1 = 0; k1 < 16; ++k1) {
 			this.field_177467_w.generate(this.worldObj, this.hellRNG,

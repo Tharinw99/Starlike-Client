@@ -10,7 +10,7 @@ public class EaglercraftVersion {
 	/// Customize these to fit your fork:
 	
 	public static final String projectForkName = "Starlike Client";
-	public static final String projectForkVersion = "0.1";
+	public static final String projectForkVersion = "0.1.1";
 	public static final String projectForkVendor = "SpeedSlicer & zumbiepig";
 	
 	public static final String projectForkURL = "";
@@ -28,7 +28,7 @@ public class EaglercraftVersion {
 	
 	// Updating configuration
 	
-	public static final boolean enableUpdateService = true;
+	public static final boolean enableUpdateService = false;
 
 	public static final String updateBundlePackageName = "net.lax1dude.eaglercraft.v1_8.client";
 	public static final int updateBundlePackageVersionInt = 37;
@@ -49,7 +49,7 @@ public class EaglercraftVersion {
 	
 	// Miscellaneous variables:
 
-	public static final String mainMenuStringA = "Minecraft 1.8.8";
+	public static final String mainMenuStringA = "Minecraft 1.8.8*";
 	public static final String mainMenuStringB = projectOriginName + " " +
 			projectOriginRevision + "-" + projectOriginVersion + " ultimate";
 	public static final String mainMenuStringC = "";
@@ -67,6 +67,6 @@ public class EaglercraftVersion {
 
 	public static final boolean forceDemoMode = false;
 
-	public static final String localStorageNamespace = "_eaglercraftX";
+	public static final String localStorageNamespace = "_eaglercraftX_starlike";
 
 }

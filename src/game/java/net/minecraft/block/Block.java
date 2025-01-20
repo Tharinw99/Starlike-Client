@@ -1546,17 +1546,33 @@ public class Block {
 				.setStepSound(soundTypeWood).setUnlocalizedName("doorAcacia").disableStats());
 		registerBlock(197, (String) "dark_oak_door", (new BlockDoor(Material.wood)).setHardness(3.0F)
 				.setStepSound(soundTypeWood).setUnlocalizedName("doorDarkOak").disableStats());
-		registerBlock(198, (String) "iron_grate",
-				(new Block(Material.iron, MapColor.ironColor)).setHardness(5.0F).setResistance(10.0F)
-						.setStepSound(soundTypeMetal).setUnlocalizedName("ironGrate")
+		registerBlock(198, (String) "starlike:iron_grate",
+				(new Block(Material.iron, MapColor.ironColor))
+						.setHardness(5.0F)
+						.setResistance(10.0F)
+						.setStepSound(soundTypeMetal)
+						.setUnlocalizedName("iron_grate")
 						.setCreativeTab(CreativeTabs.tabBlock));
-		registerBlock(199, (String) "platinum_ore", (new BlockOre()).setHardness(50.0F).setResistance(2000.0F)
-				.setStepSound(soundTypePiston).setUnlocalizedName("orePlatinum"));
-		registerBlock(200, (String) "platinum_block",
-				(new Block(Material.iron, MapColor.ironColor)).setHardness(5.0F).setResistance(10.0F)
-						.setStepSound(soundTypeMetal).setUnlocalizedName("platinum_block")
+		registerBlock(199, (String) "starlike:platinum_ore",
+				(new BlockOre())
+						.setHardness(50.0F)
+						.setResistance(2000.0F)
+						.setStepSound(soundTypePiston)
+						.setUnlocalizedName("platinum_ore"));
+		registerBlock(200, (String) "starlike:platinum_block",
+				(new Block(Material.iron, MapColor.ironColor))
+						.setHardness(5.0F)
+						.setResistance(10.0F)
+						.setStepSound(soundTypeMetal)
+						.setUnlocalizedName("platinum_block")
 						.setCreativeTab(CreativeTabs.tabBlock));
-		
+		registerBlock(201, (String) "starlike:uranium_ore",
+				(new BlockOre())
+						.setHardness(50.0F)
+						.setResistance(2000.0F)
+						.setStepSound(soundTypePiston)
+						.setUnlocalizedName("uranium_ore"));
+
 		blockRegistry.validateKey();
 
 		for (Block block13 : blockRegistry) {

@@ -1,0 +1,5 @@
+{
+    "variants": {
+        "normal": { "model": "starlike:uranium_ore" }
+    }
+}

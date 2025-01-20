@@ -223,6 +223,7 @@ public class Items {
 	public static Item platinum_ingot;
 	public static Item platinum_sword;
 	public static Item platinum_pickaxe;
+	public static Item normal_drill;
 
 	private static Item getRegisteredItem(String name) {
 		return (Item) Item.itemRegistry.getObject(new ResourceLocation(name));
@@ -419,10 +420,10 @@ public class Items {
 			prismarine_shard = getRegisteredItem("prismarine_shard");
 			prismarine_crystals = getRegisteredItem("prismarine_crystals");
 			banner = getRegisteredItem("banner");
-			platinum_ingot = getRegisteredItem("platinum_ingot");
-			platinum_sword = getRegisteredItem("platinum_sword");
-			platinum_pickaxe = getRegisteredItem("platinum_pickaxe");
-
+			platinum_ingot = getRegisteredItem("starlike:platinum_ingot");
+			platinum_sword = getRegisteredItem("starlike:platinum_sword");
+			platinum_pickaxe = getRegisteredItem("starlike:platinum_pickaxe");
+			normal_drill = getRegisteredItem("starlike:normal_drill");
 		}
 	}
 }

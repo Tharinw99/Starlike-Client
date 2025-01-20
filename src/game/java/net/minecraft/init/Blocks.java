@@ -256,6 +256,7 @@ public class Blocks {
 	public static Block iron_grate;
 	public static Block platinum_ore;
 	public static Block platinum_block;
+	public static Block uranium_ore;
 
 	/**+
 	 * Returns the Block in the blockRegistry with the specified
@@ -467,10 +468,10 @@ public class Blocks {
 			red_sandstone_stairs = getRegisteredBlock("red_sandstone_stairs");
 			double_stone_slab2 = (BlockSlab) getRegisteredBlock("double_stone_slab2");
 			stone_slab2 = (BlockSlab) getRegisteredBlock("stone_slab2");
-			iron_grate = getRegisteredBlock("iron_grate");
-			platinum_ore = getRegisteredBlock("platinum_ore");
-			platinum_block = getRegisteredBlock("platinum_block");
-
+			iron_grate = getRegisteredBlock("starlike:iron_grate");
+			platinum_ore = getRegisteredBlock("starlike:platinum_ore");
+			platinum_block = getRegisteredBlock("starlike:platinum_block");
+			uranium_ore = getRegisteredBlock("starlike:uranium_ore");
 		}
 	}
 }

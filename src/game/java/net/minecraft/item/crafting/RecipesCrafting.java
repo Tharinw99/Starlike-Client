@@ -126,22 +126,25 @@ public class RecipesCrafting {
 						Character.valueOf('I'), new ItemStack(Items.dye, 1, EnumDyeColor.BLACK.getDyeDamage()) });
 		parCraftingManager.addRecipe(new ItemStack(Blocks.sea_lantern, 1, 0), new Object[] { "SCS", "CCC", "SCS",
 				Character.valueOf('S'), Items.prismarine_shard, Character.valueOf('C'), Items.prismarine_crystals });
-		parCraftingManager.addRecipe(new ItemStack(Blocks.iron_grate, 16, 0), new Object[] { "SSS", "S S", "SSS",
-				Character.valueOf('S'), Items.iron_ingot});
+		parCraftingManager.addRecipe(new ItemStack(Blocks.iron_grate, 16, 0), new Object[] { 
+				"SSS", 
+				"S S", 
+				"SSS",
+				Character.valueOf('S'), Items.iron_ingot
+		});
 		parCraftingManager.addRecipe(new ItemStack(Items.platinum_sword, 1), new Object[] { 
-			    " P ", 
-			    " P ", 
-			    " B ", 
-			    Character.valueOf('P'), Items.platinum_ingot, 
-			    Character.valueOf('B'), Items.blaze_rod 
-			});
+			  " P ", 
+			  " P ", 
+			  " B ", 
+			  Character.valueOf('P'), Items.platinum_ingot, 
+			  Character.valueOf('B'), Items.blaze_rod 
+		});
 		parCraftingManager.addRecipe(new ItemStack(Items.platinum_pickaxe, 1), new Object[] { 
-			    "PPP", 
-			    " B ", 
-			    " B ", 
-			    Character.valueOf('P'), Items.platinum_ingot, 
-			    Character.valueOf('B'), Items.blaze_rod 
-			});
-
+			  "PPP", 
+			  " B ", 
+			  " B ", 
+			  Character.valueOf('P'), Items.platinum_ingot, 
+			  Character.valueOf('B'), Items.blaze_rod 
+		});
 	}
 }

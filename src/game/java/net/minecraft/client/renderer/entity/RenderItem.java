@@ -788,8 +788,6 @@ public class RenderItem implements IResourceManagerReloadListener {
 		this.registerBlock(Blocks.ice, "ice");
 		this.registerBlock(Blocks.iron_bars, "iron_bars");
 		this.registerBlock(Blocks.iron_block, "iron_block");
-		this.registerBlock(Blocks.iron_grate, "iron_grate");
-
 		this.registerBlock(Blocks.iron_ore, "iron_ore");
 		this.registerBlock(Blocks.iron_trapdoor, "iron_trapdoor");
 		this.registerBlock(Blocks.jukebox, "jukebox");
@@ -1095,13 +1093,14 @@ public class RenderItem implements IResourceManagerReloadListener {
 		this.registerBlock(Blocks.red_mushroom_block, BlockHugeMushroom.EnumType.ALL_INSIDE.getMetadata(),
 				"red_mushroom_block");
 		this.registerBlock(Blocks.dragon_egg, "dragon_egg");
-		this.registerBlock(Blocks.platinum_ore, "platinum_ore");
-		this.registerBlock(Blocks.platinum_block, "platinum_block");
-
-		this.registerItem(Items.platinum_ingot, "platinum_ingot");
-		this.registerItem(Items.platinum_sword, "platinum_sword");
-		this.registerItem(Items.platinum_pickaxe, "platinum_pickaxe");
-
+		this.registerBlock(Blocks.iron_grate, "starlike:iron_grate");
+		this.registerBlock(Blocks.platinum_ore, "starlike:platinum_ore");
+		this.registerBlock(Blocks.platinum_block, "starlike:platinum_block");
+		this.registerItem(Items.platinum_ingot, "starlike:platinum_ingot");
+		this.registerItem(Items.platinum_sword, "starlike:platinum_sword");
+		this.registerItem(Items.platinum_pickaxe, "starlike:platinum_pickaxe");
+		this.registerBlock(Blocks.uranium_ore, "starlike:uranium_ore");
+		this.registerItem(Items.normal_drill, "starlike:normal_drill");
 	}
 
 	public void onResourceManagerReload(IResourceManager var1) {

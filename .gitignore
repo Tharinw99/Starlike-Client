@@ -1,7 +1,5 @@
 .gradle
 .settings
-.classpath
-.project
 build
 bin
 proxyServer/bin
@@ -19,3 +17,4 @@ javascript/assets.epk
 javascript/classes.js
 javascript/classes.js.map
 javascript/Starlike_Client_Offline.html
+/.metadata/

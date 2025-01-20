@@ -735,6 +735,7 @@ public class Item {
 						.setUnlocalizedName("stoneSlab2"));
 		registerItemBlock(Blocks.platinum_ore);
 		registerItemBlock(Blocks.platinum_block);
+		registerItemBlock(Blocks.uranium_ore);
 
 		registerItem(256, (String) "iron_shovel",
 				(new ItemSpade(Item.ToolMaterial.IRON)).setUnlocalizedName("shovelIron"));
@@ -1035,12 +1036,19 @@ public class Item {
 		registerItem(430, (String) "acacia_door", (new ItemDoor(Blocks.acacia_door)).setUnlocalizedName("doorAcacia"));
 		registerItem(431, (String) "dark_oak_door",
 				(new ItemDoor(Blocks.dark_oak_door)).setUnlocalizedName("doorDarkOak"));
-		registerItem(432, (String) "platinum_ingot",
-				(new Item()).setUnlocalizedName("platinumIngot").setCreativeTab(CreativeTabs.tabMaterials));
-		registerItem(433, (String) "platinum_sword",
-				(new ItemSword(Item.ToolMaterial.PLATINUM)).setUnlocalizedName("swordPlatinum"));
-		registerItem(444, (String) "platinum_pickaxe",
-				(new ItemPickaxe(Item.ToolMaterial.PLATINUM)).setUnlocalizedName("pickaxePlatinum"));
+		registerItem(432, (String) "starlike:platinum_ingot",
+    		(new Item())
+        		.setUnlocalizedName("platinum_ingot")
+        		.setCreativeTab(CreativeTabs.tabMaterials));
+		registerItem(433, (String) "starlike:platinum_sword",
+    		(new ItemSword(Item.ToolMaterial.PLATINUM))
+        		.setUnlocalizedName("platinum_sword"));
+		registerItem(444, (String) "starlike:platinum_pickaxe",
+    		(new ItemPickaxe(Item.ToolMaterial.PLATINUM))
+        		.setUnlocalizedName("platinum_pickaxe"));
+		registerItem(445, (String) "starlike:normal_drill",
+	    	(new ItemPickaxe(Item.ToolMaterial.NORMAL_DRILL))
+	        	.setUnlocalizedName("normal_drill"));
 		registerItem(2256, (String) "record_13", (new ItemRecord("13")).setUnlocalizedName("record"));
 		registerItem(2257, (String) "record_cat", (new ItemRecord("cat")).setUnlocalizedName("record"));
 		registerItem(2258, (String) "record_blocks", (new ItemRecord("blocks")).setUnlocalizedName("record"));
@@ -1080,8 +1088,13 @@ public class Item {
 	}
 
 	public static enum ToolMaterial {
-		WOOD(0, 59, 2.0F, 0.0F, 15), STONE(1, 131, 4.0F, 1.0F, 5), IRON(2, 250, 6.0F, 2.0F, 14),
-		EMERALD(3, 1561, 8.0F, 3.0F, 10), GOLD(0, 32, 12.0F, 0.0F, 22),PLATINUM(3, 2000, 20.0F, 4.0F, 12), DRILL(4, 2000, 100.0F, 4.0F, 14);
+		WOOD(0, 59, 2.0F, 0.0F, 15),
+		STONE(1, 131, 4.0F, 1.0F, 5),
+		IRON(2, 250, 6.0F, 2.0F, 14),
+		EMERALD(3, 1561, 8.0F, 3.0F, 10),
+		GOLD(0, 32, 12.0F, 0.0F, 22),
+		PLATINUM(3, 3501, 10.0F, 4.0F, 12),
+		NORMAL_DRILL(3, 6000, 100.0F, 4.0F, 14);
 
 		private final int harvestLevel;
 		private final int maxUses;
