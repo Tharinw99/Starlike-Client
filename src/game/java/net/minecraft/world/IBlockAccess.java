@@ -13,7 +13,7 @@ import net.minecraft.world.biome.BiomeGenBase;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -35,11 +35,15 @@ public interface IBlockAccess {
 	 */
 	boolean extendedLevelsInChunkCache();
 
+	int getBiomeColorForCoords(BlockPos var1, int index);
+
 	BiomeGenBase getBiomeGenForCoords(BlockPos var1);
 
 	IBlockState getBlockState(BlockPos var1);
 
 	int getCombinedLight(BlockPos var1, int var2);
+
+	int getLightFor(final EnumSkyBlock lightType, final BlockPos blockPos);
 
 	int getStrongPower(BlockPos var1, EnumFacing var2);
 

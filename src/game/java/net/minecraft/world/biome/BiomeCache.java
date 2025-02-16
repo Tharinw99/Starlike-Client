@@ -2,10 +2,11 @@ package net.minecraft.world.biome;
 
 import java.util.List;
 
+import com.carrotsearch.hppc.LongObjectHashMap;
+import com.carrotsearch.hppc.LongObjectMap;
 import com.google.common.collect.Lists;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.LongHashMap;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
@@ -14,7 +15,7 @@ import net.minecraft.util.LongHashMap;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -56,7 +57,7 @@ public class BiomeCache {
 	 * + The map of keys to BiomeCacheBlocks. Keys are based on the chunk x, z
 	 * coordinates as (x | z << 32).
 	 */
-	private LongHashMap<BiomeCache.Block> cacheMap = new LongHashMap();
+	private LongObjectMap<BiomeCache.Block> cacheMap = new LongObjectHashMap<>();
 
 	/**
 	 * + The list of cached BiomeCacheBlocks
@@ -78,7 +79,7 @@ public class BiomeCache {
 			this.lastCleanupTime = i;
 
 			for (int k = 0; k < this.cache.size(); ++k) {
-				BiomeCache.Block biomecache$block = (BiomeCache.Block) this.cache.get(k);
+				BiomeCache.Block biomecache$block = this.cache.get(k);
 				long l = i - biomecache$block.lastAccessTime;
 				if (l > 30000L || l < 0L) {
 					this.cache.remove(k--);
@@ -103,10 +104,10 @@ public class BiomeCache {
 		x = x >> 4;
 		z = z >> 4;
 		long i = (long) x & 4294967295L | ((long) z & 4294967295L) << 32;
-		BiomeCache.Block biomecache$block = (BiomeCache.Block) this.cacheMap.getValueByKey(i);
+		BiomeCache.Block biomecache$block = this.cacheMap.get(i);
 		if (biomecache$block == null) {
 			biomecache$block = new BiomeCache.Block(x, z);
-			this.cacheMap.add(i, biomecache$block);
+			this.cacheMap.put(i, biomecache$block);
 			this.cache.add(biomecache$block);
 		}
 

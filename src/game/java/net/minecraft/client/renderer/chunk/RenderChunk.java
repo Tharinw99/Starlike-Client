@@ -1,7 +1,5 @@
 package net.minecraft.client.renderer.chunk;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_MODELVIEW_MATRIX;
-
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -9,7 +7,6 @@ import java.util.Set;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import net.lax1dude.eaglercraft.v1_8.opengl.GlStateManager;
 import net.lax1dude.eaglercraft.v1_8.opengl.VertexFormat;
 import net.lax1dude.eaglercraft.v1_8.opengl.WorldRenderer;
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.DeferredStateManager;
@@ -37,7 +34,7 @@ import net.minecraft.world.World;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -66,7 +63,6 @@ public class RenderChunk {
 	private ChunkCompileTaskGenerator compileTask = null;
 	private final Set<TileEntity> field_181056_j = Sets.newHashSet();
 	private final int index;
-	private final float[] modelviewMatrix = new float[16];
 	public AxisAlignedBB boundingBox;
 	private int frameIndex = -1;
 	private boolean needsUpdate = true;
@@ -112,17 +108,6 @@ public class RenderChunk {
 		return this.position;
 	}
 
-	private void initModelviewMatrix() {
-		GlStateManager.pushMatrix();
-		GlStateManager.loadIdentity();
-		float f = 1.000001F;
-		GlStateManager.translate(-8.0F, -8.0F, -8.0F);
-		GlStateManager.scale(f, f, f);
-		GlStateManager.translate(8.0F, 8.0F, 8.0F);
-		GlStateManager.getFloat(GL_MODELVIEW_MATRIX, this.modelviewMatrix);
-		GlStateManager.popMatrix();
-	}
-
 	public boolean isNeedsUpdate() {
 		return this.needsUpdate;
 	}
@@ -139,10 +124,6 @@ public class RenderChunk {
 		this.compileTask = new ChunkCompileTaskGenerator(this, ChunkCompileTaskGenerator.Type.RESORT_TRANSPARENCY);
 		this.compileTask.setCompiledChunk(this.compiledChunk);
 		return this.compileTask;
-	}
-
-	public void multModelviewMatrix() {
-		GlStateManager.multMatrix(this.modelviewMatrix);
 	}
 
 	private void postRenderBlocks(EnumWorldBlockLayer layer, float x, float y, float z, WorldRenderer worldRendererIn,
@@ -311,8 +292,6 @@ public class RenderChunk {
 		for (int i = 0; i < facings.length; ++i) {
 			this.field_181702_p.put(facings[i], pos.offset(facings[i], 16));
 		}
-
-		this.initModelviewMatrix();
 	}
 
 	public void stopCompileTask() {

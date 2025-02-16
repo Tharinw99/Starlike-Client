@@ -20,7 +20,7 @@ import net.minecraft.client.resources.model.ModelResourceLocation;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -37,7 +37,7 @@ import net.minecraft.client.resources.model.ModelResourceLocation;
  *
  */
 public class BlockStateMapper {
-	private Map<Block, IStateMapper> blockStateMap = Maps.newIdentityHashMap();
+	public Map<Block, IStateMapper> blockStateMap = Maps.newIdentityHashMap();
 	private Set<Block> setBuiltInBlocks = Sets.newIdentityHashSet();
 
 	public Map<IBlockState, ModelResourceLocation> putAllStateModelLocations() {

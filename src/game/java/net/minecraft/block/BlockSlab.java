@@ -28,7 +28,7 @@ import net.minecraft.world.World;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -95,6 +95,18 @@ public abstract class BlockSlab extends Block {
 			AxisAlignedBB axisalignedbb, List<AxisAlignedBB> list, Entity entity) {
 		this.setBlockBoundsBasedOnState(world, blockpos);
 		super.addCollisionBoxesToList(world, blockpos, iblockstate, axisalignedbb, list, entity);
+	}
+
+	@Override
+	public boolean alfheim$useNeighborBrightness(final IBlockState blockState, final EnumFacing facing,
+			final IBlockAccess blockAccess, final BlockPos blockPos) {
+		if (isFullCube())
+			return false;
+
+		if (facing.getAxis() != EnumFacing.Axis.Y)
+			return true;
+
+		return facing == (blockState.getValue(HALF) == EnumBlockHalf.TOP ? EnumFacing.DOWN : EnumFacing.UP);
 	}
 
 	@Override

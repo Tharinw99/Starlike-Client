@@ -19,7 +19,7 @@ import net.minecraft.util.Vec3i;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -336,7 +336,7 @@ public class FaceBakery {
 		}
 		stride = 7;
 
-		return new BakedQuad(aint, aint2, face.tintIndex, enumfacing);
+		return new BakedQuad(aint, aint2, face.tintIndex, enumfacing, sprite);
 	}
 
 	private int[] makeQuadVertexData(BlockPartFace partFace, EaglerTextureAtlasSprite sprite, EnumFacing facing,

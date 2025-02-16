@@ -12,7 +12,7 @@ import net.minecraft.world.chunk.NibbleArray;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -36,6 +36,8 @@ public class ExtendedBlockStorage {
 	private NibbleArray blocklightArray;
 	private NibbleArray skylightArray;
 
+	private int alfheim$lightRefCount = -1;
+
 	public ExtendedBlockStorage(int y, boolean storeSkylight) {
 		this.yBase = y;
 		this.data = new char[4096];
@@ -44,6 +46,17 @@ public class ExtendedBlockStorage {
 			this.skylightArray = new NibbleArray();
 		}
 
+	}
+
+	private boolean alfheim$checkLightArrayEqual(final NibbleArray storage, final byte targetValue) {
+		if (storage == null)
+			return true;
+
+		for (final byte currentByte : storage.getData())
+			if (currentByte != targetValue)
+				return false;
+
+		return true;
 	}
 
 	public IBlockState get(int x, int y, int z) {
@@ -121,7 +134,19 @@ public class ExtendedBlockStorage {
 	 * its internal reference count.
 	 */
 	public boolean isEmpty() {
-		return this.blockRefCount == 0;
+		if (blockRefCount != 0)
+			return false;
+
+		// -1 indicates the lightRefCount needs to be re-calculated
+		if (alfheim$lightRefCount == -1) {
+			if (alfheim$checkLightArrayEqual(skylightArray, (byte) 255)
+					&& alfheim$checkLightArrayEqual(blocklightArray, (byte) 0))
+				alfheim$lightRefCount = 0; // Lighting is trivial, don't send to clients
+			else
+				alfheim$lightRefCount = 1; // Lighting is not trivial, send to clients
+		}
+
+		return alfheim$lightRefCount == 0;
 	}
 
 	public void removeInvalidBlocks() {
@@ -171,6 +196,7 @@ public class ExtendedBlockStorage {
 	 */
 	public void setBlocklightArray(NibbleArray newBlocklightArray) {
 		this.blocklightArray = newBlocklightArray;
+		alfheim$lightRefCount = -1;
 	}
 
 	public void setData(char[] dataArray) {
@@ -182,6 +208,7 @@ public class ExtendedBlockStorage {
 	 */
 	public void setExtBlocklightValue(int x, int y, int z, int value) {
 		this.blocklightArray.set(x, y, z, value);
+		alfheim$lightRefCount = -1;
 	}
 
 	/**
@@ -189,6 +216,7 @@ public class ExtendedBlockStorage {
 	 */
 	public void setExtSkylightValue(int x, int y, int z, int value) {
 		this.skylightArray.set(x, y, z, value);
+		alfheim$lightRefCount = -1;
 	}
 
 	/**
@@ -197,5 +225,6 @@ public class ExtendedBlockStorage {
 	 */
 	public void setSkylightArray(NibbleArray newSkylightArray) {
 		this.skylightArray = newSkylightArray;
+		alfheim$lightRefCount = -1;
 	}
 }

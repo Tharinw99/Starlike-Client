@@ -11,7 +11,7 @@ import net.lax1dude.eaglercraft.v1_8.opengl.WorldVertexBufferUploader;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -29,8 +29,8 @@ import net.lax1dude.eaglercraft.v1_8.opengl.WorldVertexBufferUploader;
  */
 public class Tessellator {
 	public static final int GL_TRIANGLES = RealOpenGLEnums.GL_TRIANGLES;
-	public static final int GL_TRIANGLE_STRIP = RealOpenGLEnums.GL_TRIANGLE_STRIP;
 
+	public static final int GL_TRIANGLE_STRIP = RealOpenGLEnums.GL_TRIANGLE_STRIP;
 	public static final int GL_TRIANGLE_FAN = RealOpenGLEnums.GL_TRIANGLE_FAN;
 	public static final int GL_QUADS = RealOpenGLEnums.GL_QUADS;
 	public static final int GL_LINES = RealOpenGLEnums.GL_LINES;
@@ -47,8 +47,6 @@ public class Tessellator {
 
 	private WorldRenderer worldRenderer;
 
-	private WorldVertexBufferUploader vboUploader = new WorldVertexBufferUploader();
-
 	public Tessellator(int bufferSize) {
 		this.worldRenderer = new WorldRenderer(bufferSize);
 	}
@@ -59,7 +57,7 @@ public class Tessellator {
 	 */
 	public void draw() {
 		this.worldRenderer.finishDrawing();
-		this.vboUploader.func_181679_a(this.worldRenderer);
+		WorldVertexBufferUploader.func_181679_a(this.worldRenderer);
 	}
 
 	public WorldRenderer getWorldRenderer() {

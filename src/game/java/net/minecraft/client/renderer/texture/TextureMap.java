@@ -11,12 +11,13 @@ import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_TEXTURE_2D
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 
+import com.carrotsearch.hppc.IntIndexedContainer;
+import com.carrotsearch.hppc.cursors.IntCursor;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -41,6 +42,10 @@ import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ReportedException;
 import net.minecraft.util.ResourceLocation;
+import net.optifine.BetterGrass;
+import net.optifine.ConnectedTextures;
+import net.optifine.CustomItems;
+import net.optifine.util.CounterInt;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
@@ -49,7 +54,7 @@ import net.minecraft.util.ResourceLocation;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -83,9 +88,10 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
 	private int height;
 	private boolean isEaglerPBRMode = false;
 	public int eaglerPBRMaterialTexture = -1;
-
 	private boolean hasAllocatedEaglerPBRMaterialTexture = false;
+
 	private boolean isGLES2 = false;
+	private CounterInt counterIndexInMap;
 
 	private IFramebufferGL[] copyColorFramebuffer = null;
 	private IFramebufferGL[] copyMaterialFramebuffer = null;
@@ -103,14 +109,19 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
 		this.basePath = parString1;
 		this.iconCreator = iconCreatorIn;
 		this.isGLES2 = EaglercraftGPU.checkOpenGLESVersion() == 200;
+		this.counterIndexInMap = new CounterInt(0);
 	}
 
 	private ResourceLocation completeResourceLocation(ResourceLocation location, int parInt1) {
-		return parInt1 == 0
-				? new ResourceLocation(location.getResourceDomain(),
-						HString.format("%s/%s%s", new Object[] { this.basePath, location.getResourcePath(), ".png" }))
-				: new ResourceLocation(location.getResourceDomain(), HString.format("%s/mipmaps/%s.%d%s",
-						new Object[] { this.basePath, location.getResourcePath(), Integer.valueOf(parInt1), ".png" }));
+		return isAbsoluteLocation(location)
+				? new ResourceLocation(location.getResourceDomain(), location.getResourcePath() + ".png")
+				: (parInt1 == 0
+						? new ResourceLocation(location.getResourceDomain(),
+								HString.format("%s/%s%s",
+										new Object[] { this.basePath, location.getResourcePath(), ".png" }))
+						: new ResourceLocation(location.getResourceDomain(),
+								HString.format("%s/mipmaps/%s.%d%s", new Object[] { this.basePath,
+										location.getResourcePath(), Integer.valueOf(parInt1), ".png" })));
 	}
 
 	@Override
@@ -149,12 +160,21 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
 		return textureatlassprite;
 	}
 
+	public int getCountRegisteredSprites() {
+		return this.counterIndexInMap.getValue();
+	}
+
 	public int getHeight() {
 		return height;
 	}
 
 	public EaglerTextureAtlasSprite getMissingSprite() {
 		return isEaglerPBRMode ? missingImagePBR : missingImage;
+	}
+
+	public EaglerTextureAtlasSprite getSpriteSafe(String iconName) {
+		ResourceLocation resourcelocation = new ResourceLocation(iconName);
+		return this.mapRegisteredSprites.get(resourcelocation.toString());
 	}
 
 	public int getWidth() {
@@ -168,6 +188,8 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
 		int[][] aint1 = new int[this.mipmapLevels + 1][];
 		aint1[0] = aint;
 		this.missingImage.setFramesTextureData(Lists.newArrayList(new int[][][] { aint1 }));
+		int idx = this.counterIndexInMap.nextValue();
+		this.missingImage.setIndexInMap(idx);
 		this.missingImagePBR.setIconWidth(16);
 		this.missingImagePBR.setIconHeight(16);
 		int[][][] aint2 = new int[3][this.mipmapLevels + 1][];
@@ -184,11 +206,23 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
 		aint2[2][0] = missingMaterial;
 		this.missingImagePBR.setFramesTextureDataPBR(new List[] { Lists.newArrayList(new int[][][] { aint2[0] }),
 				Lists.newArrayList(new int[][][] { aint2[1] }), Lists.newArrayList(new int[][][] { aint2[2] }) });
+		this.missingImagePBR.setIndexInMap(idx);
+	}
+
+	private boolean isAbsoluteLocation(ResourceLocation p_isAbsoluteLocation_1_) {
+		String s = p_isAbsoluteLocation_1_.getResourcePath();
+		return this.isAbsoluteLocationPath(s);
+	}
+
+	private boolean isAbsoluteLocationPath(String p_isAbsoluteLocationPath_1_) {
+		String s = p_isAbsoluteLocationPath_1_.toLowerCase();
+		return s.startsWith("mcpatcher/") || s.startsWith("optifine/");
 	}
 
 	public void loadSprites(IResourceManager resourceManager, IIconCreator parIIconCreator) {
 		destroyAnimationCaches();
 		this.mapRegisteredSprites.clear();
+		this.counterIndexInMap.reset();
 		parIIconCreator.registerSprites(this);
 		this.initMissingImage();
 		this.deleteGlTexture();
@@ -203,6 +237,9 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
 	}
 
 	public void loadTextureAtlas(IResourceManager resourceManager) {
+		ConnectedTextures.updateIcons(this);
+		CustomItems.updateIcons(this);
+		BetterGrass.updateIcons(this);
 		int i = Minecraft.getGLMaximumTextureSize();
 		Stitcher stitcher = new Stitcher(i, i, true, 0, this.mipmapLevels);
 		this.mapUploadedSprites.clear();
@@ -248,6 +285,7 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
 
 		for (Entry entry : this.mapRegisteredSprites.entrySet()) {
 			EaglerTextureAtlasSprite textureatlassprite = (EaglerTextureAtlasSprite) entry.getValue();
+			textureatlassprite.updateIndexInMap(this.counterIndexInMap);
 			ResourceLocation resourcelocation = new ResourceLocation(textureatlassprite.getIconName());
 			ResourceLocation resourcelocation1 = this.completeResourceLocation(resourcelocation, 0);
 
@@ -270,7 +308,7 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
 					}
 					if (abufferedimageMaterial[0] == null) {
 						abufferedimageMaterial[0] = PBRTextureMapUtils.generateMaterialTextureFor(
-								((EaglerTextureAtlasSprite) (entry.getValue())).getIconName());
+								textureatlassprite.getIconName(), textureatlassprite.optifineBaseTextureName);
 						dontAnimateMaterial = true;
 					}
 					PBRTextureMapUtils.unifySizes(0, abufferedimageColor, abufferedimageNormal, abufferedimageMaterial);
@@ -278,7 +316,7 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
 					TextureMetadataSection texturemetadatasection = (TextureMetadataSection) iresource
 							.getMetadata("texture");
 					if (texturemetadatasection != null) {
-						List list = texturemetadatasection.getListMipmaps();
+						IntIndexedContainer list = texturemetadatasection.getListMipmaps();
 						if (!list.isEmpty()) {
 							int l = abufferedimageColor[0].width;
 							int i1 = abufferedimageColor[0].height;
@@ -287,11 +325,8 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
 										"Unable to load extra miplevels, source-texture is not power of two");
 							}
 						}
-
-						Iterator iterator = list.iterator();
-
-						while (iterator.hasNext()) {
-							int i2 = ((Integer) iterator.next()).intValue();
+						for (IntCursor cur : list) {
+							int i2 = cur.value;
 							if (i2 > 0 && i2 < abufferedimageColor.length - 1 && abufferedimageColor[i2] == null) {
 								ResourceLocation resourcelocation2 = this.completeResourceLocation(resourcelocation,
 										i2);
@@ -309,7 +344,8 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
 									}
 									if (abufferedimageMaterial[i2] == null) {
 										abufferedimageMaterial[i2] = PBRTextureMapUtils.generateMaterialTextureFor(
-												((EaglerTextureAtlasSprite) (entry.getValue())).getIconName());
+												textureatlassprite.getIconName(),
+												textureatlassprite.optifineBaseTextureName);
 									}
 									PBRTextureMapUtils.unifySizes(i2, abufferedimageColor, abufferedimageNormal,
 											abufferedimageMaterial);
@@ -363,7 +399,7 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
 				TextureMetadataSection texturemetadatasection = (TextureMetadataSection) iresource
 						.getMetadata("texture");
 				if (texturemetadatasection != null) {
-					List list = texturemetadatasection.getListMipmaps();
+					IntIndexedContainer list = texturemetadatasection.getListMipmaps();
 					if (!list.isEmpty()) {
 						int l = abufferedimage[0].width;
 						int i1 = abufferedimage[0].height;
@@ -373,10 +409,8 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
 						}
 					}
 
-					Iterator iterator = list.iterator();
-
-					while (iterator.hasNext()) {
-						int i2 = ((Integer) iterator.next()).intValue();
+					for (IntCursor cur : list) {
+						int i2 = cur.value;
 						if (i2 > 0 && i2 < abufferedimage.length - 1 && abufferedimage[i2] == null) {
 							ResourceLocation resourcelocation2 = this.completeResourceLocation(resourcelocation, i2);
 
@@ -546,18 +580,24 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
 	}
 
 	public EaglerTextureAtlasSprite registerSprite(ResourceLocation location) {
+		return registerSprite(location, null);
+	}
+
+	public EaglerTextureAtlasSprite registerSprite(ResourceLocation location, String locationOptifineBase) {
 		if (location == null) {
 			throw new IllegalArgumentException("Location cannot be null!");
 		} else {
 			EaglerTextureAtlasSprite textureatlassprite = (EaglerTextureAtlasSprite) this.mapRegisteredSprites
-					.get(location);
+					.get(location.toString());
 			if (textureatlassprite == null) {
 				if (isEaglerPBRMode) {
 					textureatlassprite = EaglerTextureAtlasSpritePBR.makeAtlasSprite(location);
 				} else {
 					textureatlassprite = EaglerTextureAtlasSprite.makeAtlasSprite(location);
 				}
+				textureatlassprite.optifineBaseTextureName = locationOptifineBase;
 				this.mapRegisteredSprites.put(location.toString(), textureatlassprite);
+				textureatlassprite.updateIndexInMap(this.counterIndexInMap);
 			}
 
 			return textureatlassprite;
@@ -599,16 +639,40 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
 
 	public void updateAnimations() {
 		if (isEaglerPBRMode) {
-			for (int i = 0, l = this.listAnimatedSprites.size(); i < l; ++i) {
-				this.listAnimatedSprites.get(i).updateAnimationPBR(copyColorFramebuffer, copyMaterialFramebuffer,
-						height);
+			for (int j = 0, l = this.listAnimatedSprites.size(); j < l; ++j) {
+				this.listAnimatedSprites.get(j).updateAnimationPBR();
+			}
+			for (int i = 0; i < copyColorFramebuffer.length; ++i) {
+				int w = width >> i;
+				int h = height >> i;
+				_wglBindFramebuffer(_GL_FRAMEBUFFER, copyColorFramebuffer[i]);
+				GlStateManager.viewport(0, 0, w, h);
+				for (int j = 0, l = this.listAnimatedSprites.size(); j < l; ++j) {
+					this.listAnimatedSprites.get(j).copyAnimationFramePBR(0, w, h, i);
+				}
+				_wglBindFramebuffer(_GL_FRAMEBUFFER, copyMaterialFramebuffer[i]);
+				h <<= 1;
+				GlStateManager.viewport(0, 0, w, h);
+				for (int j = 0, l = this.listAnimatedSprites.size(); j < l; ++j) {
+					this.listAnimatedSprites.get(j).copyAnimationFramePBR(1, w, h, i);
+				}
 			}
 			_wglBindFramebuffer(_GL_FRAMEBUFFER, null);
 			return;
 		}
 
-		for (int i = 0, l = this.listAnimatedSprites.size(); i < l; ++i) {
-			this.listAnimatedSprites.get(i).updateAnimation(copyColorFramebuffer);
+		for (int j = 0, l = this.listAnimatedSprites.size(); j < l; ++j) {
+			this.listAnimatedSprites.get(j).updateAnimation();
+		}
+
+		for (int i = 0; i < copyColorFramebuffer.length; ++i) {
+			int w = width >> i;
+			int h = height >> i;
+			_wglBindFramebuffer(_GL_FRAMEBUFFER, copyColorFramebuffer[i]);
+			GlStateManager.viewport(0, 0, w, h);
+			for (int j = 0, l = this.listAnimatedSprites.size(); j < l; ++j) {
+				this.listAnimatedSprites.get(j).copyAnimationFrame(w, h, i);
+			}
 		}
 
 		_wglBindFramebuffer(_GL_FRAMEBUFFER, null);

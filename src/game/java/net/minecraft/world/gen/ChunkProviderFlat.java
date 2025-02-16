@@ -33,7 +33,7 @@ import net.minecraft.world.gen.structure.StructureOceanMonument;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -146,6 +146,16 @@ public class ChunkProviderFlat implements IChunkProvider {
 	@Override
 	public boolean func_177460_a(IChunkProvider var1, Chunk var2, int var3, int var4) {
 		return false;
+	}
+
+	@Override
+	public Chunk getLoadedChunk(int var1, int var2) {
+		/**
+		 * + Will return back a chunk, if it doesn't exist and its not a MP client it
+		 * will generates all the blocks for the specified chunk from the map seed and
+		 * chunk seed
+		 */
+		return provideChunk(var1, var2);
 	}
 
 	@Override

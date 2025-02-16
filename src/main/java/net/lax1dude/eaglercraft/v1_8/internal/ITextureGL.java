@@ -18,4 +18,10 @@ package net.lax1dude.eaglercraft.v1_8.internal;
  */
 public interface ITextureGL extends IObjectGL {
 
+	int getHeight();
+
+	int getWidth();
+
+	void setCacheSize(int w, int h);
+
 }

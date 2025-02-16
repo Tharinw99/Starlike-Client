@@ -110,6 +110,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.util.Vec3i;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.biome.BiomeGenBase;
+import net.optifine.Config;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
@@ -118,7 +119,7 @@ import net.minecraft.world.biome.BiomeGenBase;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -137,6 +138,8 @@ import net.minecraft.world.biome.BiomeGenBase;
 public class EntityRenderer implements IResourceManagerReloadListener {
 	private static final Logger logger = LogManager.getLogger();
 	private static final ResourceLocation locationRainPng = new ResourceLocation("textures/environment/rain.png");
+	private static final ResourceLocation locationRainDeferredPng = new ResourceLocation(
+			"eagler:glsl/deferred/rain.png");
 	private static final ResourceLocation locationSnowPng = new ResourceLocation("textures/environment/snow.png");
 	public static boolean anaglyphEnable;
 	public static int anaglyphField;
@@ -251,9 +254,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 	private float fogColor2;
 	private float fogColor1;
 	private int debugViewDirection = 0;
-
 	private boolean debugView = false;
-
 	private double cameraZoom = 1.0D;
 
 	private double cameraYaw;
@@ -271,6 +272,8 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 	private float eagPartialTicks = 0.0f;
 
 	public float currentProjMatrixFOV = 0.0f;
+
+	private boolean initializedOF = false;
 
 	private int shadowFrameIndex = 0;
 
@@ -427,7 +430,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 //		System.out.println(builder.toString());
 
 		float waveTimer = (float) ((EagRuntime.steadyTimeMillis() % 600000l) * 0.001);
-		DeferredStateManager.setWaterWindOffset(0.0f, 0.0f, waveTimer, waveTimer);
+		DeferredStateManager.setWaterWindOffset(waveTimer * 0.25f, waveTimer * 0.13f, waveTimer * 1.45f, waveTimer);
 
 		float blockWaveDistX = (float) (d0 - blockWaveOffsetX);
 		float blockWaveDistY = (float) (d1 - blockWaveOffsetY);
@@ -1062,7 +1065,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 					+ mc.theWorld.getThunderStrength(partialTicks) * 5.0f;
 			ds *= MathHelper.clamp_float(6.0f - DeferredStateManager.getSunHeight() * 17.0f, 1.0f, 3.0f);
 			if (conf.is_rendering_lightShafts) {
-				ds *= Math.max(2.0f - Math.abs(DeferredStateManager.getSunHeight()) * 5.0f, 1.0f);
+				ds *= Math.max(2.5f - Math.abs(DeferredStateManager.getSunHeight()) * 5.0f, 2.5f);
 			}
 			DeferredStateManager.enableFogExp(ds, true, 1.0f, 1.0f, 1.0f, 1.0f, ff, ff, ff, 1.0f);
 		}
@@ -1160,6 +1163,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 			for (int i = 0, l = lst.size(); i < l; ++i) {
 				lst.get(i).draw(ShadersRenderPassFuture.PassType.MAIN);
 			}
+			DeferredStateManager.forwardCallbackGBuffer.reset();
 			GlStateManager.matrixMode(GL_PROJECTION);
 			GlStateManager.popMatrix();
 			GlStateManager.matrixMode(GL_MODELVIEW);
@@ -1231,6 +1235,10 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 	}
 
 	public void func_181560_a(float parFloat1, long parLong1) {
+		if (!initializedOF) {
+			Config.frameInitHook();
+			initializedOF = true;
+		}
 		boolean flag = Display.isActive() || mc.gameSettings.touchscreen;
 		if (!flag && this.mc.gameSettings.pauseOnLostFocus
 				&& (!this.mc.gameSettings.touchscreen || !PointerInputAbstraction.getVCursorButtonDown(1))) {
@@ -1717,7 +1725,8 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 			GlStateManager.matrixMode(GL_MODELVIEW);
 			GlStateManager.pushMatrix();
 			this.setupFog(0, partialTicks);
-			renderGlobalIn.renderClouds(partialTicks, pass);
+			// renderGlobalIn.renderClouds(partialTicks, pass);
+			renderGlobalIn.cloudRenderer.renderClouds(partialTicks, pass);
 			GlStateManager.disableFog();
 			GlStateManager.popMatrix();
 			GlStateManager.matrixMode(GL_PROJECTION);
@@ -1927,8 +1936,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 
 									b1 = 0;
 									this.mc.getTextureManager()
-											.bindTexture(df ? new ResourceLocation("eagler:glsl/deferred/rain.png")
-													: locationRainPng);
+											.bindTexture(df ? locationRainDeferredPng : locationRainPng);
 									if (df) {
 										DeferredStateManager.setRoughnessConstant(0.5f);
 										DeferredStateManager.setMetalnessConstant(0.05f);
@@ -2310,7 +2318,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 	 * + sets up projection, view effects, camera position/rotation
 	 */
 	private void setupCameraTransform(float partialTicks, int pass) {
-		this.farPlaneDistance = (float) (this.mc.gameSettings.renderDistanceChunks * 16);
+		this.farPlaneDistance = (float) (this.mc.gameSettings.renderDistanceChunks * 16 + 16);
 		GlStateManager.matrixMode(GL_PROJECTION);
 		GlStateManager.loadIdentity();
 		float f = 0.07F;

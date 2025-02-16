@@ -1,9 +1,11 @@
 package net.lax1dude.eaglercraft.v1_8.touch_gui;
 
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
+
+import com.carrotsearch.hppc.IntObjectHashMap;
+import com.carrotsearch.hppc.IntObjectMap;
+import com.carrotsearch.hppc.cursors.ObjectCursor;
 
 import net.lax1dude.eaglercraft.v1_8.Touch;
 import net.lax1dude.eaglercraft.v1_8.touch_gui.EnumTouchControl.TouchAction;
@@ -28,7 +30,7 @@ import net.minecraft.client.gui.ScaledResolution;
  */
 public class TouchControls {
 
-	public static final Map<Integer, TouchControlInput> touchControls = new HashMap<>();
+	public static final IntObjectMap<TouchControlInput> touchControls = new IntObjectHashMap<>();
 	protected static Set<EnumTouchControl> touchControlPressed = EnumSet.noneOf(EnumTouchControl.class);
 
 	protected static boolean isSneakToggled = false;
@@ -41,7 +43,8 @@ public class TouchControls {
 		if (!touchControls.isEmpty()) {
 			Set<EnumTouchControl> newPressed = EnumSet.noneOf(EnumTouchControl.class);
 			TouchOverlayRenderer renderer = Minecraft.getMinecraft().touchOverlayRenderer;
-			for (TouchControlInput input : touchControls.values()) {
+			for (ObjectCursor<TouchControlInput> input_ : touchControls.values()) {
+				TouchControlInput input = input_.value;
 				TouchAction action = input.control.getAction();
 				if (action != null) {
 					action.call(input.control, input.x, input.y);

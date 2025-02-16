@@ -30,6 +30,7 @@ import net.minecraft.util.RegistryNamespacedDefaultedByKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 import net.minecraft.util.Vec3;
+import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -42,7 +43,7 @@ import net.starlikeclient.minecraft.init.ItemsStarlike;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -820,6 +821,44 @@ public class Block {
 			list.add(axisalignedbb);
 		}
 
+	}
+
+	public int alfheim$getLightFor(final IBlockState blockState, final IBlockAccess blockAccess,
+			final EnumSkyBlock lightType, final BlockPos blockPos) {
+		int lightLevel = blockAccess.getLightFor(lightType, blockPos);
+
+		if (lightLevel == 15)
+			return lightLevel;
+
+		if (!getUseNeighborBrightness())
+			return lightLevel;
+
+		BlockPos tmp = new BlockPos();
+		EnumFacing[] facings = EnumFacing._VALUES;
+		for (int i = 0, l = facings.length; i < l; ++i) {
+			EnumFacing facing = facings[i];
+			if (alfheim$useNeighborBrightness(blockState, facing, blockAccess, blockPos)) {
+				int opacity = 0;
+				final int neighborLightLevel = blockAccess.getLightFor(lightType,
+						blockPos.offsetEvenFaster(facing, tmp));
+
+				if (opacity == 0
+						&& (lightType != EnumSkyBlock.SKY || neighborLightLevel != EnumSkyBlock.SKY.defaultLightValue))
+					opacity = 1;
+
+				lightLevel = Math.max(lightLevel, neighborLightLevel - opacity);
+
+				if (lightLevel == 15)
+					return lightLevel;
+			}
+		}
+
+		return lightLevel;
+	}
+
+	public boolean alfheim$useNeighborBrightness(final IBlockState blockState, final EnumFacing facing,
+			final IBlockAccess blockAccess, final BlockPos blockPos) {
+		return facing == EnumFacing.UP;
 	}
 
 	public void breakBlock(World var1, BlockPos var2, IBlockState var3) {

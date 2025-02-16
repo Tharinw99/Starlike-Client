@@ -35,7 +35,7 @@ import net.minecraft.world.World;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -162,6 +162,13 @@ public class BlockStairs extends Block {
 		}
 
 		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
+	}
+
+	@Override
+	public boolean alfheim$useNeighborBrightness(final IBlockState blockState, final EnumFacing facing,
+			final IBlockAccess blockAccess, final BlockPos blockPos) {
+		return facing == (blockState.getValue(HALF) == EnumHalf.TOP ? EnumFacing.DOWN : EnumFacing.UP)
+				|| facing == blockState.getValue(FACING).getOpposite();
 	}
 
 	@Override

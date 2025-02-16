@@ -1,9 +1,9 @@
 package net.minecraft.entity.item;
 
 import java.util.List;
-import java.util.Map;
 
-import com.google.common.collect.Maps;
+import com.carrotsearch.hppc.IntObjectHashMap;
+import com.carrotsearch.hppc.IntObjectMap;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
@@ -40,7 +40,7 @@ import net.minecraft.world.WorldServer;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -62,18 +62,17 @@ public abstract class EntityMinecart extends Entity implements IWorldNameable {
 		TNT(3, "MinecartTNT"), SPAWNER(4, "MinecartSpawner"), HOPPER(5, "MinecartHopper"),
 		COMMAND_BLOCK(6, "MinecartCommandBlock");
 
-		private static final Map<Integer, EntityMinecart.EnumMinecartType> ID_LOOKUP = Maps.newHashMap();
+		private static final IntObjectMap<EntityMinecart.EnumMinecartType> ID_LOOKUP = new IntObjectHashMap<>();
 		static {
 			EntityMinecart.EnumMinecartType[] types = values();
 			for (int i = 0; i < types.length; ++i) {
-				ID_LOOKUP.put(Integer.valueOf(types[i].getNetworkID()), types[i]);
+				ID_LOOKUP.put(types[i].getNetworkID(), types[i]);
 			}
 
 		}
 
 		public static EntityMinecart.EnumMinecartType byNetworkID(int id) {
-			EntityMinecart.EnumMinecartType entityminecart$enumminecarttype = (EntityMinecart.EnumMinecartType) ID_LOOKUP
-					.get(Integer.valueOf(id));
+			EntityMinecart.EnumMinecartType entityminecart$enumminecarttype = ID_LOOKUP.get(id);
 			return entityminecart$enumminecarttype == null ? RIDEABLE : entityminecart$enumminecarttype;
 		}
 

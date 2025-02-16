@@ -785,6 +785,15 @@ public class PlatformInput {
 		return windowWidth;
 	}
 
+	private static void handleWindowFocus() {
+		if (!isWindowFocused) {
+			PlatformRuntime.logger.warn(
+					"Detected mouse input while the window was not focused, setting the window focused so the client doesn't pause");
+			isWindowFocused = true;
+		}
+		isMouseOverWindow = true;
+	}
+
 	@JSBody(params = {
 			"fallback" }, script = "if(window.navigator.userActivation){return window.navigator.userActivation.hasBeenActive;}else{return fallback;}")
 	public static native boolean hasBeenActiveTeaVM(boolean fallback);
@@ -858,6 +867,8 @@ public class PlatformInput {
 		parent.addEventListener("contextmenu", contextmenu = new EventListener<MouseEvent>() {
 			@Override
 			public void handleEvent(MouseEvent evt) {
+				if (evt.getTarget() == ClientMain.integratedServerCrashPanel)
+					return;
 				evt.preventDefault();
 				evt.stopPropagation();
 			}
@@ -867,6 +878,7 @@ public class PlatformInput {
 			public void handleEvent(MouseEvent evt) {
 				evt.preventDefault();
 				evt.stopPropagation();
+				handleWindowFocus();
 				if (tryGrabCursorHook())
 					return;
 				int b = evt.getButton();
@@ -942,6 +954,7 @@ public class PlatformInput {
 			public void handleEvent(TouchEvent evt) {
 				evt.preventDefault();
 				evt.stopPropagation();
+				handleWindowFocus();
 				SortedTouchEvent sorted = new SortedTouchEvent(evt, touchUIDMapperCreate);
 				currentTouchState = sorted;
 				List<OffsetTouch> lst = sorted.getEventTouches();
@@ -1014,8 +1027,10 @@ public class PlatformInput {
 		win.addEventListener("keydown", keydown = new EventListener<KeyboardEvent>() {
 			@Override
 			public void handleEvent(KeyboardEvent evt) {
-				evt.preventDefault();
-				evt.stopPropagation();
+				if (!ClientMain.integratedServerCrashPanelShowing) {
+					evt.preventDefault();
+					evt.stopPropagation();
+				}
 				if (!enableRepeatEvents && evt.isRepeat())
 					return;
 				LegacyKeycodeTranslator.LegacyKeycode keyCode = null;
@@ -1072,8 +1087,10 @@ public class PlatformInput {
 		win.addEventListener("keyup", keyup = new EventListener<KeyboardEvent>() {
 			@Override
 			public void handleEvent(KeyboardEvent evt) {
-				evt.preventDefault();
-				evt.stopPropagation();
+				if (!ClientMain.integratedServerCrashPanelShowing) {
+					evt.preventDefault();
+					evt.stopPropagation();
+				}
 				LegacyKeycodeTranslator.LegacyKeycode keyCode = null;
 				if (keyCodeTranslatorMap != null && hasCodeVar(evt)) {
 					keyCode = keyCodeTranslatorMap.get(evt.getCode());

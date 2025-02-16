@@ -15,6 +15,7 @@ import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGenBuffe
 import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglTexImage2D;
 import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglTexParameteri;
 import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniform1f;
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniform1i;
 import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniform2f;
 import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniform3f;
 import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniform4f;
@@ -41,7 +42,6 @@ import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_NEAREST;
 import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_NONE;
 import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ONE;
 import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ONE_MINUS_CONSTANT_ALPHA;
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ONE_MINUS_DST_ALPHA;
 import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ONE_MINUS_SRC_ALPHA;
 import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_PROJECTION;
 import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_RED;
@@ -132,6 +132,7 @@ import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.program.PipelineShaderP
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.program.PipelineShaderRealisticWaterControl;
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.program.PipelineShaderRealisticWaterNoise;
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.program.PipelineShaderRealisticWaterNormalMap;
+import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.program.PipelineShaderRealisticWaterNormalsMix;
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.program.PipelineShaderReprojControl;
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.program.PipelineShaderReprojSSR;
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.program.PipelineShaderSSAOGenerate;
@@ -141,6 +142,7 @@ import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.program.PipelineShaderS
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.program.PipelineShaderSkyboxRender;
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.program.PipelineShaderSkyboxRenderEnd;
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.program.PipelineShaderTonemap;
+import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.program.ShaderMissingException;
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.texture.MetalsLUT;
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.texture.TemperaturesLUT;
 import net.lax1dude.eaglercraft.v1_8.vector.Matrix3f;
@@ -482,7 +484,6 @@ public class EaglerDeferredPipeline {
 	public int tonemapOutputTexture = -1;
 	public PipelineShaderSSAOGenerate shader_ssao_generate = null;
 	private int reprojectionTexWidth = -1;
-
 	private int reprojectionTexHeight = -1;
 
 	public PipelineShaderGBufferCombine shader_deferred_combine = null;
@@ -490,15 +491,16 @@ public class EaglerDeferredPipeline {
 	public int brdfTexture = -1;
 
 	public PipelineShaderLightingSun shader_lighting_sun = null;
-	public PipelineShaderShadowsSun shader_shadows_sun = null;
 
+	public PipelineShaderShadowsSun shader_shadows_sun = null;
 	public PipelineShaderLightShaftsSample shader_light_shafts_sample = null;
+
 	public PipelineShaderTonemap shader_post_tonemap = null;
 	public PipelineShaderLensDistortion shader_post_lens_distort = null;
 	public PipelineShaderPostExposureAvg shader_post_exposure_avg = null;
 	public PipelineShaderPostExposureAvg shader_post_exposure_avg_luma = null;
-
 	public PipelineShaderPostExposureFinal shader_post_exposure_final = null;
+
 	public PipelineShaderBloomBrightPass shader_post_bloom_bright = null;
 	public PipelineShaderBloomBlurPass shader_post_bloom_blur = null;
 	public PipelineShaderLensSunOcclusion shader_lens_sun_occlusion = null;
@@ -518,6 +520,7 @@ public class EaglerDeferredPipeline {
 	public PipelineShaderRealisticWaterControl shader_realistic_water_control = null;
 	public PipelineShaderRealisticWaterNoise shader_realistic_water_noise = null;
 	public PipelineShaderRealisticWaterNormalMap shader_realistic_water_normals = null;
+	public PipelineShaderRealisticWaterNormalsMix shader_realistic_water_normals_mix = null;
 	public PipelineShaderHandDepthMask shader_hand_depth_mask = null;
 	public PipelineShaderFXAA shader_post_fxaa = null;
 	public SkyboxRenderer skybox = null;
@@ -718,6 +721,15 @@ public class EaglerDeferredPipeline {
 		GlStateManager.setActiveTexture(GL_TEXTURE10);
 		GlStateManager.bindTexture(skyIrradianceTexture);
 		GlStateManager.setActiveTexture(GL_TEXTURE0);
+		GlStateManager.disableDepth();
+		GlStateManager.disableBlend();
+		GlStateManager.depthMask(false);
+		GlStateManager.bindTexture(envMapSkyTexture);
+		GlStateManager.viewport(0, 0, 128, 256);
+		TextureCopyUtil.blitTexture();
+		GlStateManager.depthMask(true);
+		GlStateManager.enableBlend();
+		GlStateManager.enableDepth();
 		DeferredStateManager.checkGLError("Post: beginDrawEnvMap()");
 	}
 
@@ -762,7 +774,7 @@ public class EaglerDeferredPipeline {
 	public void beginDrawEnvMapTranslucent() {
 		DeferredStateManager.checkGLError("Pre: beginDrawEnvMapTranslucent()");
 		GlStateManager.enableBlend();
-		GlStateManager.tryBlendFuncSeparate(GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA, GL_ONE);
+		GlStateManager.tryBlendFuncSeparate(GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_ZERO, GL_ONE);
 		bindEnvMapBlockTexture();
 		DeferredStateManager.checkGLError("Post: beginDrawEnvMapTranslucent()");
 	}
@@ -786,6 +798,8 @@ public class EaglerDeferredPipeline {
 		GlStateManager.clear(GL_DEPTH_BUFFER_BIT);
 		GlStateManager.enableDepth();
 		DeferredStateManager.setDefaultMaterialConstants();
+		DeferredStateManager.disableFog();
+		updateForwardRenderWorldLightingData();
 		DeferredStateManager.checkGLError("Post: beginDrawHandOverlay()");
 	}
 
@@ -1515,39 +1529,44 @@ public class EaglerDeferredPipeline {
 						matrixCopyBuffer);
 				_wglUniform1f(shader_reproject_ssr.uniforms.u_sampleStep1f, 0.125f);
 
-				DrawUtils.drawStandardQuad2D(); // sample 1
+				if (shader_reproject_ssr.uniforms.u_sampleDelta1i != null) {
+					_wglUniform1i(shader_reproject_ssr.uniforms.u_sampleDelta1i, 5);
+					DrawUtils.drawStandardQuad2D();
+				} else {
+					DrawUtils.drawStandardQuad2D(); // sample 1
 
-				_wglBindFramebuffer(_GL_FRAMEBUFFER, reprojectionSSRFramebuffer[0]);
-				GlStateManager.setActiveTexture(GL_TEXTURE3);
-				GlStateManager.bindTexture(reprojectionSSRHitVector[1]);
-				GlStateManager.setActiveTexture(GL_TEXTURE2);
-				GlStateManager.bindTexture(reprojectionSSRTexture[1]);
+					_wglBindFramebuffer(_GL_FRAMEBUFFER, reprojectionSSRFramebuffer[0]);
+					GlStateManager.setActiveTexture(GL_TEXTURE3);
+					GlStateManager.bindTexture(reprojectionSSRHitVector[1]);
+					GlStateManager.setActiveTexture(GL_TEXTURE2);
+					GlStateManager.bindTexture(reprojectionSSRTexture[1]);
 
-				DrawUtils.drawStandardQuad2D(); // sample 2
+					DrawUtils.drawStandardQuad2D(); // sample 2
 
-				_wglBindFramebuffer(_GL_FRAMEBUFFER, reprojectionSSRFramebuffer[1]);
-				GlStateManager.setActiveTexture(GL_TEXTURE3);
-				GlStateManager.bindTexture(reprojectionSSRHitVector[0]);
-				GlStateManager.setActiveTexture(GL_TEXTURE2);
-				GlStateManager.bindTexture(reprojectionSSRTexture[0]);
+					_wglBindFramebuffer(_GL_FRAMEBUFFER, reprojectionSSRFramebuffer[1]);
+					GlStateManager.setActiveTexture(GL_TEXTURE3);
+					GlStateManager.bindTexture(reprojectionSSRHitVector[0]);
+					GlStateManager.setActiveTexture(GL_TEXTURE2);
+					GlStateManager.bindTexture(reprojectionSSRTexture[0]);
 
-				DrawUtils.drawStandardQuad2D(); // sample 3
+					DrawUtils.drawStandardQuad2D(); // sample 3
 
-				_wglBindFramebuffer(_GL_FRAMEBUFFER, reprojectionSSRFramebuffer[0]);
-				GlStateManager.setActiveTexture(GL_TEXTURE3);
-				GlStateManager.bindTexture(reprojectionSSRHitVector[1]);
-				GlStateManager.setActiveTexture(GL_TEXTURE2);
-				GlStateManager.bindTexture(reprojectionSSRTexture[1]);
+					_wglBindFramebuffer(_GL_FRAMEBUFFER, reprojectionSSRFramebuffer[0]);
+					GlStateManager.setActiveTexture(GL_TEXTURE3);
+					GlStateManager.bindTexture(reprojectionSSRHitVector[1]);
+					GlStateManager.setActiveTexture(GL_TEXTURE2);
+					GlStateManager.bindTexture(reprojectionSSRTexture[1]);
 
-				DrawUtils.drawStandardQuad2D(); // sample 4
+					DrawUtils.drawStandardQuad2D(); // sample 4
 
-				_wglBindFramebuffer(_GL_FRAMEBUFFER, reprojectionSSRFramebuffer[1]);
-				GlStateManager.setActiveTexture(GL_TEXTURE3);
-				GlStateManager.bindTexture(reprojectionSSRHitVector[0]);
-				GlStateManager.setActiveTexture(GL_TEXTURE2);
-				GlStateManager.bindTexture(reprojectionSSRTexture[0]);
+					_wglBindFramebuffer(_GL_FRAMEBUFFER, reprojectionSSRFramebuffer[1]);
+					GlStateManager.setActiveTexture(GL_TEXTURE3);
+					GlStateManager.bindTexture(reprojectionSSRHitVector[0]);
+					GlStateManager.setActiveTexture(GL_TEXTURE2);
+					GlStateManager.bindTexture(reprojectionSSRTexture[0]);
 
-				DrawUtils.drawStandardQuad2D(); // sample 5
+					DrawUtils.drawStandardQuad2D(); // sample 5
+				}
 
 				DeferredStateManager
 						.checkGLError("combineGBuffersAndIlluminate(): RUN SCREENSPACE REFLECTIONS ALGORITHM");
@@ -2262,6 +2281,10 @@ public class EaglerDeferredPipeline {
 			shader_realistic_water_normals.destroy();
 			shader_realistic_water_normals = null;
 		}
+		if (shader_realistic_water_normals_mix != null) {
+			shader_realistic_water_normals_mix.destroy();
+			shader_realistic_water_normals_mix = null;
+		}
 		if (shader_post_fxaa != null) {
 			shader_post_fxaa.destroy();
 			shader_post_fxaa = null;
@@ -2920,14 +2943,24 @@ public class EaglerDeferredPipeline {
 
 		_wglBindFramebuffer(_GL_FRAMEBUFFER, realisticWaterCombinedNormalsFramebuffer);
 		GlStateManager.viewport(0, 0, currentWidth, currentHeight);
-		GlStateManager.bindTexture(gBufferNormalsTexture);
-		TextureCopyUtil.blitTexture();
+		if (shader_realistic_water_normals_mix != null) {
+			GlStateManager.disableBlend();
+			GlStateManager.setActiveTexture(GL_TEXTURE1);
+			GlStateManager.bindTexture(realisticWaterMaskTexture);
+			GlStateManager.setActiveTexture(GL_TEXTURE0);
+			GlStateManager.bindTexture(gBufferNormalsTexture);
+			shader_realistic_water_normals_mix.useProgram();
+			DrawUtils.drawStandardQuad2D();
+		} else {
+			GlStateManager.bindTexture(gBufferNormalsTexture);
+			TextureCopyUtil.blitTexture();
 
-		GlStateManager.bindTexture(realisticWaterMaskTexture);
-		GlStateManager.enableBlend();
-		GlStateManager.tryBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
-		TextureCopyUtil.blitTexture();
-		GlStateManager.disableBlend();
+			GlStateManager.bindTexture(realisticWaterMaskTexture);
+			GlStateManager.enableBlend();
+			GlStateManager.tryBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
+			TextureCopyUtil.blitTexture();
+			GlStateManager.disableBlend();
+		}
 
 		DeferredStateManager.checkGLError("endDrawRealisticWaterMask(): COMBINE NORMALS");
 
@@ -3036,39 +3069,44 @@ public class EaglerDeferredPipeline {
 		_wglUniformMatrix4x2fv(shader_reproject_ssr.uniforms.u_lastInverseProjMatrix4x2f, false, matrixCopyBuffer);
 		_wglUniform1f(shader_reproject_ssr.uniforms.u_sampleStep1f, 0.5f);
 
-		DrawUtils.drawStandardQuad2D(); // sample 1
+		if (shader_reproject_ssr.uniforms.u_sampleDelta1i != null) {
+			_wglUniform1i(shader_reproject_ssr.uniforms.u_sampleDelta1i, 5);
+			DrawUtils.drawStandardQuad2D();
+		} else {
+			DrawUtils.drawStandardQuad2D(); // sample 1
 
-		_wglBindFramebuffer(_GL_FRAMEBUFFER, realisticWaterSSRFramebuffer[0]);
-		GlStateManager.setActiveTexture(GL_TEXTURE3);
-		GlStateManager.bindTexture(realisticWaterControlHitVectorTexture[1]);
-		GlStateManager.setActiveTexture(GL_TEXTURE2);
-		GlStateManager.bindTexture(realisticWaterControlReflectionTexture[1]);
+			_wglBindFramebuffer(_GL_FRAMEBUFFER, realisticWaterSSRFramebuffer[0]);
+			GlStateManager.setActiveTexture(GL_TEXTURE3);
+			GlStateManager.bindTexture(realisticWaterControlHitVectorTexture[1]);
+			GlStateManager.setActiveTexture(GL_TEXTURE2);
+			GlStateManager.bindTexture(realisticWaterControlReflectionTexture[1]);
 
-		DrawUtils.drawStandardQuad2D(); // sample 2
+			DrawUtils.drawStandardQuad2D(); // sample 2
 
-		_wglBindFramebuffer(_GL_FRAMEBUFFER, realisticWaterSSRFramebuffer[1]);
-		GlStateManager.setActiveTexture(GL_TEXTURE3);
-		GlStateManager.bindTexture(realisticWaterControlHitVectorTexture[0]);
-		GlStateManager.setActiveTexture(GL_TEXTURE2);
-		GlStateManager.bindTexture(realisticWaterControlReflectionTexture[0]);
+			_wglBindFramebuffer(_GL_FRAMEBUFFER, realisticWaterSSRFramebuffer[1]);
+			GlStateManager.setActiveTexture(GL_TEXTURE3);
+			GlStateManager.bindTexture(realisticWaterControlHitVectorTexture[0]);
+			GlStateManager.setActiveTexture(GL_TEXTURE2);
+			GlStateManager.bindTexture(realisticWaterControlReflectionTexture[0]);
 
-		DrawUtils.drawStandardQuad2D(); // sample 3
+			DrawUtils.drawStandardQuad2D(); // sample 3
 
-		_wglBindFramebuffer(_GL_FRAMEBUFFER, realisticWaterSSRFramebuffer[0]);
-		GlStateManager.setActiveTexture(GL_TEXTURE3);
-		GlStateManager.bindTexture(realisticWaterControlHitVectorTexture[1]);
-		GlStateManager.setActiveTexture(GL_TEXTURE2);
-		GlStateManager.bindTexture(realisticWaterControlReflectionTexture[1]);
+			_wglBindFramebuffer(_GL_FRAMEBUFFER, realisticWaterSSRFramebuffer[0]);
+			GlStateManager.setActiveTexture(GL_TEXTURE3);
+			GlStateManager.bindTexture(realisticWaterControlHitVectorTexture[1]);
+			GlStateManager.setActiveTexture(GL_TEXTURE2);
+			GlStateManager.bindTexture(realisticWaterControlReflectionTexture[1]);
 
-		DrawUtils.drawStandardQuad2D(); // sample 4
+			DrawUtils.drawStandardQuad2D(); // sample 4
 
-		_wglBindFramebuffer(_GL_FRAMEBUFFER, realisticWaterSSRFramebuffer[1]);
-		GlStateManager.setActiveTexture(GL_TEXTURE3);
-		GlStateManager.bindTexture(realisticWaterControlHitVectorTexture[0]);
-		GlStateManager.setActiveTexture(GL_TEXTURE2);
-		GlStateManager.bindTexture(realisticWaterControlReflectionTexture[0]);
+			_wglBindFramebuffer(_GL_FRAMEBUFFER, realisticWaterSSRFramebuffer[1]);
+			GlStateManager.setActiveTexture(GL_TEXTURE3);
+			GlStateManager.bindTexture(realisticWaterControlHitVectorTexture[0]);
+			GlStateManager.setActiveTexture(GL_TEXTURE2);
+			GlStateManager.bindTexture(realisticWaterControlReflectionTexture[0]);
 
-		DrawUtils.drawStandardQuad2D(); // sample 5
+			DrawUtils.drawStandardQuad2D(); // sample 5
+		}
 
 		DeferredStateManager.checkGLError("endDrawRealisticWaterMask(): RUN SCREENSPACE REFLECTIONS ALGORITHM");
 
@@ -3712,6 +3750,12 @@ public class EaglerDeferredPipeline {
 			shader_realistic_water_normals = PipelineShaderRealisticWaterNormalMap.compile();
 			shader_realistic_water_normals.loadUniforms();
 			_wglUniform2f(shader_realistic_water_normals.uniforms.u_sampleOffset2f, 0.00390625f, 0.00390625f);
+			try {
+				shader_realistic_water_normals_mix = PipelineShaderRealisticWaterNormalsMix.compile();
+				shader_realistic_water_normals_mix.loadUniforms();
+			} catch (ShaderMissingException exx) {
+				shader_realistic_water_normals_mix = null;
+			}
 			if (!config.is_rendering_raytracing) {
 				shader_reproject_ssr = PipelineShaderReprojSSR.compile();
 				shader_reproject_ssr.loadUniforms();
@@ -4304,7 +4348,7 @@ public class EaglerDeferredPipeline {
 		double distX = worldX - reprojectionOriginCoordinateX;
 		double distY = worldY - reprojectionOriginCoordinateY;
 		double distZ = worldZ - reprojectionOriginCoordinateZ;
-		if (distX * distX + distY * distY + distZ * distZ > 48.0 * 48.0) {
+		if (distX * distX + distY * distY + distZ * distZ > 72.0 * 72.0) {
 			reprojectionOriginCoordinateX = worldX;
 			reprojectionOriginCoordinateY = worldY;
 			reprojectionOriginCoordinateZ = worldZ;
@@ -4319,7 +4363,7 @@ public class EaglerDeferredPipeline {
 		}
 		distX = worldX - cloudRenderOriginCoordinateX;
 		distZ = worldZ - cloudRenderOriginCoordinateZ;
-		if (distX * distX + distZ * distZ > 256.0 * 256.0) {
+		if (distX * distX + distZ * distZ > 384.0 * 384.0) {
 			cloudRenderOriginCoordinateX = worldX;
 			cloudRenderOriginCoordinateZ = worldZ;
 			cloudRenderViewerOffsetX = 0.0f;

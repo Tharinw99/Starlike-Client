@@ -37,9 +37,11 @@ import org.teavm.platform.PlatformRunnable;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
+import com.jcraft.jzlib.Deflater;
 import com.jcraft.jzlib.DeflaterOutputStream;
 import com.jcraft.jzlib.GZIPInputStream;
 import com.jcraft.jzlib.GZIPOutputStream;
+import com.jcraft.jzlib.Inflater;
 import com.jcraft.jzlib.InflaterInputStream;
 
 import net.lax1dude.eaglercraft.v1_8.EagRuntime;
@@ -719,6 +721,23 @@ public class PlatformRuntime {
 		return currentThreadName;
 	}
 
+	@SuppressWarnings("deprecation")
+	public static int deflateFull(byte[] input, int inputOff, int inputLen, byte[] output, int outputOff, int outputLen)
+			throws IOException {
+		Deflater df = new Deflater();
+		df.setInput(input, inputOff, inputLen, false);
+		df.setOutput(output, outputOff, outputLen);
+		df.init(5);
+		int c;
+		do {
+			c = df.deflate(4);
+			if (c != 0 && c != 1) {
+				throw new IOException("Deflater failed! Code " + c);
+			}
+		} while (c != 1);
+		return (int) df.getTotalOut();
+	}
+
 	public static void destroy() {
 		logger.fatal("Game tried to destroy the context! Browser runtime can't do that");
 	}
@@ -917,11 +936,21 @@ public class PlatformRuntime {
 	}
 
 	public static String getGLRenderer() {
-		return PlatformOpenGL._wglGetString(RealOpenGLEnums.GL_RENDERER);
+		String ret = PlatformOpenGL._wglGetString(RealOpenGLEnums.GL_RENDERER);
+		if (ret != null) {
+			return ret;
+		} else {
+			return "null";
+		}
 	}
 
 	public static String getGLVersion() {
-		return PlatformOpenGL._wglGetString(RealOpenGLEnums.GL_VERSION);
+		String ret = PlatformOpenGL._wglGetString(RealOpenGLEnums.GL_VERSION);
+		if (ret != null) {
+			return ret;
+		} else {
+			return "null";
+		}
 	}
 
 	@JSBody(params = { "win" }, script = "if((typeof location.origin === \"string\") && location.origin.length > 0) {"
@@ -1075,6 +1104,22 @@ public class PlatformRuntime {
 				}
 			}
 		}
+	}
+
+	@SuppressWarnings("deprecation")
+	public static int inflateFull(byte[] input, int inputOff, int inputLen, byte[] output, int outputOff, int outputLen)
+			throws IOException {
+		Inflater df = new Inflater();
+		df.setInput(input, inputOff, inputLen, false);
+		df.setOutput(output, outputOff, outputLen);
+		int c;
+		do {
+			c = df.inflate(0);
+			if (c != 0 && c != 1) {
+				throw new IOException("Inflater failed! Code " + c);
+			}
+		} while (c != 1);
+		return (int) df.getTotalOut();
 	}
 
 	private static boolean isDataURL(String url) {

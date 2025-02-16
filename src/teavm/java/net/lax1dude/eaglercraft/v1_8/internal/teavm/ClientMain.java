@@ -90,7 +90,9 @@ public class ClientMain {
 	private static String webGLCrashStringCache = null;
 	private static String shimsCrashStringCache = null;
 
-	private static HTMLElement integratedServerCrashPanel = null;
+	public static HTMLElement integratedServerCrashPanel = null;
+
+	public static boolean integratedServerCrashPanelShowing = false;
 
 	public static void _main() {
 		if (getRunningFlag()) {
@@ -458,6 +460,7 @@ public class ClientMain {
 		if (integratedServerCrashPanel != null) {
 			integratedServerCrashPanel.getStyle().setProperty("display", "none");
 		}
+		integratedServerCrashPanelShowing = false;
 	}
 
 	public static void removeErrorHandler(Window win) {
@@ -749,6 +752,7 @@ public class ClientMain {
 		style.setProperty("width", "" + ((w / s) - 20) + "px");
 		style.setProperty("height", "" + ((h / s) - 20) + "px");
 		style.setProperty("display", "block");
+		integratedServerCrashPanelShowing = true;
 	}
 
 }

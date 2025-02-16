@@ -1,9 +1,8 @@
 package net.minecraft.world;
 
-import java.util.Iterator;
-import java.util.List;
-
-import com.google.common.collect.Lists;
+import com.carrotsearch.hppc.LongArrayList;
+import com.carrotsearch.hppc.LongObjectHashMap;
+import com.carrotsearch.hppc.LongObjectMap;
 
 import net.lax1dude.eaglercraft.v1_8.EaglercraftRandom;
 import net.minecraft.block.BlockPortal;
@@ -13,7 +12,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.LongHashMap;
 import net.minecraft.util.MathHelper;
 
 /**
@@ -23,7 +21,7 @@ import net.minecraft.util.MathHelper;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -54,13 +52,13 @@ public class Teleporter {
 	/**
 	 * + Stores successful portal placement locations for rapid lookup.
 	 */
-	private final LongHashMap<Teleporter.PortalPosition> destinationCoordinateCache = new LongHashMap();
+	private final LongObjectMap<Teleporter.PortalPosition> destinationCoordinateCache = new LongObjectHashMap<>();
 
 	/**
 	 * + A list of valid keys for the destinationCoordainteCache. These are based on
 	 * the X & Z of the players initial location.
 	 */
-	private final List<Long> destinationCoordinateKeys = Lists.newArrayList();
+	private final LongArrayList destinationCoordinateKeys = new LongArrayList();
 
 	public Teleporter(WorldServer worldIn) {
 		this.worldServerInstance = worldIn;
@@ -250,9 +248,8 @@ public class Teleporter {
 		boolean flag1 = true;
 		Object object = BlockPos.ORIGIN;
 		long k = ChunkCoordIntPair.chunkXZ2Int(i, j);
-		if (this.destinationCoordinateCache.containsItem(k)) {
-			Teleporter.PortalPosition teleporter$portalposition = (Teleporter.PortalPosition) this.destinationCoordinateCache
-					.getValueByKey(k);
+		if (this.destinationCoordinateCache.containsKey(k)) {
+			Teleporter.PortalPosition teleporter$portalposition = this.destinationCoordinateCache.get(k);
 			d0 = 0.0D;
 			object = teleporter$portalposition;
 			teleporter$portalposition.lastUpdateTime = this.worldServerInstance.getTotalWorldTime();
@@ -286,7 +283,7 @@ public class Teleporter {
 
 		if (d0 >= 0.0D) {
 			if (flag1) {
-				this.destinationCoordinateCache.add(k,
+				this.destinationCoordinateCache.put(k,
 						new Teleporter.PortalPosition((BlockPos) object, this.worldServerInstance.getTotalWorldTime()));
 				this.destinationCoordinateKeys.add(Long.valueOf(k));
 			}
@@ -387,16 +384,14 @@ public class Teleporter {
 	 */
 	public void removeStalePortalLocations(long worldTime) {
 		if (worldTime % 100L == 0L) {
-			Iterator iterator = this.destinationCoordinateKeys.iterator();
 			long i = worldTime - 300L;
 
-			while (iterator.hasNext()) {
-				Long olong = (Long) iterator.next();
-				Teleporter.PortalPosition teleporter$portalposition = (Teleporter.PortalPosition) this.destinationCoordinateCache
-						.getValueByKey(olong.longValue());
+			for (int j = 0; j < destinationCoordinateKeys.size(); ++j) {
+				long olong = destinationCoordinateKeys.get(j);
+				Teleporter.PortalPosition teleporter$portalposition = this.destinationCoordinateCache.get(olong);
 				if (teleporter$portalposition == null || teleporter$portalposition.lastUpdateTime < i) {
-					iterator.remove();
-					this.destinationCoordinateCache.remove(olong.longValue());
+					destinationCoordinateKeys.removeAt(j--);
+					this.destinationCoordinateCache.remove(olong);
 				}
 			}
 		}

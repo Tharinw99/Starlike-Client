@@ -16,57 +16,75 @@ package net.lax1dude.eaglercraft.v1_8.internal.buffer;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
-public interface IntBuffer extends Buffer {
+public abstract class IntBuffer implements Buffer {
 
 	@Override
-	int[] array();
+	public abstract int[] array();
 
 	@Override
-	IntBuffer clear();
-
-	IntBuffer duplicate();
+	public abstract int capacity();
 
 	@Override
-	IntBuffer flip();
+	public abstract IntBuffer clear();
 
-	int get();
-
-	int get(int index);
-
-	IntBuffer get(int[] dst);
-
-	IntBuffer get(int[] dst, int offset, int length);
-
-	int getElement(int index);
+	public abstract IntBuffer duplicate();
 
 	@Override
-	boolean isDirect();
+	public abstract IntBuffer flip();
+
+	public abstract int get();
+
+	public abstract int get(int index);
+
+	public abstract IntBuffer get(int[] dst);
+
+	public abstract IntBuffer get(int[] dst, int offset, int length);
+
+	public abstract int getElement(int index);
 
 	@Override
-	IntBuffer limit(int newLimit);
+	public abstract boolean hasArray();
 
 	@Override
-	IntBuffer mark();
+	public abstract boolean hasRemaining();
 
 	@Override
-	IntBuffer position(int newPosition);
-
-	IntBuffer put(int b);
-
-	IntBuffer put(int index, int b);
-
-	IntBuffer put(int[] src);
-
-	IntBuffer put(int[] src, int offset, int length);
-
-	IntBuffer put(IntBuffer src);
-
-	void putElement(int index, int value);
+	public abstract boolean isDirect();
 
 	@Override
-	IntBuffer reset();
+	public abstract int limit();
 
 	@Override
-	IntBuffer rewind();
+	public abstract IntBuffer limit(int newLimit);
+
+	@Override
+	public abstract IntBuffer mark();
+
+	@Override
+	public abstract int position();
+
+	@Override
+	public abstract IntBuffer position(int newPosition);
+
+	public abstract IntBuffer put(int b);
+
+	public abstract IntBuffer put(int index, int b);
+
+	public abstract IntBuffer put(int[] src);
+
+	public abstract IntBuffer put(int[] src, int offset, int length);
+
+	public abstract IntBuffer put(IntBuffer src);
+
+	public abstract void putElement(int index, int value);
+
+	@Override
+	public abstract int remaining();
+
+	@Override
+	public abstract IntBuffer reset();
+
+	@Override
+	public abstract IntBuffer rewind();
 
 }

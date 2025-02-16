@@ -1,14 +1,13 @@
 package net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.texture;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import com.carrotsearch.hppc.cursors.IntCursor;
 import com.google.common.collect.Lists;
 
 import net.lax1dude.eaglercraft.v1_8.HString;
-import net.lax1dude.eaglercraft.v1_8.internal.IFramebufferGL;
 import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
 import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 import net.lax1dude.eaglercraft.v1_8.minecraft.EaglerTextureAtlasSprite;
@@ -56,6 +55,8 @@ public class EaglerTextureAtlasSpritePBR extends EaglerTextureAtlasSprite {
 
 	public boolean dontAnimateMaterial = true;
 
+	protected IAnimCopyFunction currentAnimUpdaterPBR = null;
+
 	public EaglerTextureAtlasSpritePBR(String spriteName) {
 		super(spriteName);
 	}
@@ -95,6 +96,30 @@ public class EaglerTextureAtlasSpritePBR extends EaglerTextureAtlasSprite {
 			if (this.animationCachePBR[i] != null) {
 				this.animationCachePBR[i].free();
 				this.animationCachePBR[i] = null;
+			}
+		}
+	}
+
+	@Override
+	public void copyAnimationFrame(int mapWidth, int mapHeight, int mapLevel) {
+		Throwable t = new UnsupportedOperationException(
+				"Cannot call regular copyAnimationFrame in PBR mode, use updateAnimationPBR");
+		try {
+			throw t;
+		} catch (Throwable tt) {
+			logger.error(t);
+		}
+	}
+
+	@Override
+	public void copyAnimationFramePBR(int pass, int mapWidth, int mapHeight, int mapLevel) {
+		if (pass == 0) {
+			if (currentAnimUpdater != null) {
+				currentAnimUpdater.updateAnimation(mapWidth, mapHeight, mapLevel);
+			}
+		} else {
+			if (currentAnimUpdaterPBR != null) {
+				currentAnimUpdaterPBR.updateAnimation(mapWidth, mapHeight, mapLevel);
 			}
 		}
 	}
@@ -222,10 +247,8 @@ public class EaglerTextureAtlasSpritePBR extends EaglerTextureAtlasSprite {
 			int l = i;
 			this.height = this.width;
 			if (meta.getFrameCount() > 0) {
-				Iterator iterator = meta.getFrameIndexSet().iterator();
-
-				while (iterator.hasNext()) {
-					int i1 = ((Integer) iterator.next()).intValue();
+				for (IntCursor cur : meta.getFrameIndexSet()) {
+					int i1 = cur.value;
 					if (i1 >= j1) {
 						throw new RuntimeException("invalid frameindex " + i1);
 					}
@@ -291,7 +314,7 @@ public class EaglerTextureAtlasSpritePBR extends EaglerTextureAtlasSprite {
 	}
 
 	@Override
-	public void updateAnimation(IFramebufferGL[] fb) {
+	public void updateAnimation() {
 		Throwable t = new UnsupportedOperationException(
 				"Cannot call regular updateAnimation in PBR mode, use updateAnimationPBR");
 		try {
@@ -302,8 +325,7 @@ public class EaglerTextureAtlasSpritePBR extends EaglerTextureAtlasSprite {
 	}
 
 	@Override
-	public void updateAnimationPBR(IFramebufferGL[] copyColorFramebuffer, IFramebufferGL[] copyMaterialFramebuffer,
-			int materialTexOffset) {
+	public void updateAnimationPBR() {
 		if (animationCachePBR[0] == null || (!dontAnimateNormals && animationCachePBR[1] == null)
 				|| (!dontAnimateMaterial && animationCachePBR[2] == null)) {
 			throw new IllegalStateException("Animation cache for '" + this.iconName + "' was never baked!");
@@ -317,14 +339,28 @@ public class EaglerTextureAtlasSpritePBR extends EaglerTextureAtlasSprite {
 			this.tickCounter = 0;
 			int k = this.animationMetadata.getFrameIndex(this.frameCounter);
 			if (i != k && k >= 0 && k < this.frameTextureDataPBR[0].size()) {
-				animationCachePBR[0].copyFrameLevelsToTex2D(k, this.originX, this.originY, this.width, this.height,
-						copyColorFramebuffer);
-				if (!dontAnimateNormals)
-					animationCachePBR[1].copyFrameLevelsToTex2D(k, this.originX, this.originY, this.width, this.height,
-							copyMaterialFramebuffer);
-				if (!dontAnimateMaterial)
-					animationCachePBR[2].copyFrameLevelsToTex2D(k, this.originX, this.originY + materialTexOffset,
-							this.width, this.height, copyMaterialFramebuffer);
+				currentAnimUpdater = (mapWidth, mapHeight, mapLevel) -> {
+					animationCachePBR[0].copyFrameToTex2D(k, mapLevel, this.originX >> mapLevel,
+							this.originY >> mapLevel, this.width >> mapLevel, this.height >> mapLevel, mapWidth,
+							mapHeight);
+				};
+				if (!dontAnimateNormals || !dontAnimateMaterial) {
+					currentAnimUpdaterPBR = (mapWidth, mapHeight, mapLevel) -> {
+						if (!dontAnimateNormals)
+							animationCachePBR[1].copyFrameToTex2D(k, mapLevel, this.originX >> mapLevel,
+									this.originY >> mapLevel, this.width >> mapLevel, this.height >> mapLevel, mapWidth,
+									mapHeight);
+						if (!dontAnimateMaterial)
+							animationCachePBR[2].copyFrameToTex2D(k, mapLevel, this.originX >> mapLevel,
+									(this.originY >> mapLevel) + (mapHeight >> 1), this.width >> mapLevel,
+									this.height >> mapLevel, mapWidth, mapHeight);
+					};
+				} else {
+					currentAnimUpdaterPBR = null;
+				}
+			} else {
+				currentAnimUpdater = null;
+				currentAnimUpdaterPBR = null;
 			}
 		} else if (this.animationMetadata.isInterpolate()) {
 			float f = 1.0f
@@ -334,15 +370,32 @@ public class EaglerTextureAtlasSpritePBR extends EaglerTextureAtlasSprite {
 					: this.animationMetadata.getFrameCount();
 			int k = this.animationMetadata.getFrameIndex((this.frameCounter + 1) % j);
 			if (i != k && k >= 0 && k < this.frameTextureDataPBR[0].size()) {
-				animationCachePBR[0].copyInterpolatedFrameLevelsToTex2D(i, k, f, this.originX, this.originY, this.width,
-						this.height, copyColorFramebuffer);
-				if (!dontAnimateNormals)
-					animationCachePBR[1].copyInterpolatedFrameLevelsToTex2D(i, k, f, this.originX, this.originY,
-							this.width, this.height, copyMaterialFramebuffer);
-				if (!dontAnimateMaterial)
-					animationCachePBR[2].copyInterpolatedFrameLevelsToTex2D(i, k, f, this.originX,
-							this.originY + materialTexOffset, this.width, this.height, copyMaterialFramebuffer);
+				currentAnimUpdater = (mapWidth, mapHeight, mapLevel) -> {
+					animationCachePBR[0].copyInterpolatedFrameToTex2D(i, k, f, mapLevel, this.originX >> mapLevel,
+							this.originY >> mapLevel, this.width >> mapLevel, this.height >> mapLevel, mapWidth,
+							mapHeight);
+				};
+				if (!dontAnimateNormals || !dontAnimateMaterial) {
+					currentAnimUpdaterPBR = (mapWidth, mapHeight, mapLevel) -> {
+						if (!dontAnimateNormals)
+							animationCachePBR[1].copyInterpolatedFrameToTex2D(i, k, f, mapLevel,
+									this.originX >> mapLevel, this.originY >> mapLevel, this.width >> mapLevel,
+									this.height >> mapLevel, mapWidth, mapHeight);
+						if (!dontAnimateMaterial)
+							animationCachePBR[2].copyInterpolatedFrameToTex2D(i, k, f, mapLevel,
+									this.originX >> mapLevel, (this.originY >> mapLevel) + (mapHeight >> 1),
+									this.width >> mapLevel, this.height >> mapLevel, mapWidth, mapHeight);
+					};
+				} else {
+					currentAnimUpdaterPBR = null;
+				}
+			} else {
+				currentAnimUpdater = null;
+				currentAnimUpdaterPBR = null;
 			}
+		} else {
+			currentAnimUpdater = null;
+			currentAnimUpdaterPBR = null;
 		}
 	}
 

@@ -1,7 +1,7 @@
 package net.lax1dude.eaglercraft.v1_8.internal.buffer;
 
 /**
- * Copyright (c) 2022 lax1dude. All Rights Reserved.
+ * Copyright (c) 2022-2025 lax1dude. All Rights Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -16,57 +16,75 @@ package net.lax1dude.eaglercraft.v1_8.internal.buffer;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
-public interface FloatBuffer extends Buffer {
+public abstract class FloatBuffer implements Buffer {
 
 	@Override
-	float[] array();
+	public abstract float[] array();
 
 	@Override
-	FloatBuffer clear();
-
-	FloatBuffer duplicate();
+	public abstract int capacity();
 
 	@Override
-	FloatBuffer flip();
+	public abstract FloatBuffer clear();
 
-	float get();
-
-	FloatBuffer get(float[] dst);
-
-	FloatBuffer get(float[] dst, int offset, int length);
-
-	float get(int index);
-
-	float getElement(int index);
+	public abstract FloatBuffer duplicate();
 
 	@Override
-	boolean isDirect();
+	public abstract FloatBuffer flip();
+
+	public abstract float get();
+
+	public abstract FloatBuffer get(float[] dst);
+
+	public abstract FloatBuffer get(float[] dst, int offset, int length);
+
+	public abstract float get(int index);
+
+	public abstract float getElement(int index);
 
 	@Override
-	FloatBuffer limit(int newLimit);
+	public abstract boolean hasArray();
 
 	@Override
-	FloatBuffer mark();
+	public abstract boolean hasRemaining();
 
 	@Override
-	FloatBuffer position(int newPosition);
-
-	FloatBuffer put(float b);
-
-	FloatBuffer put(float[] src);
-
-	FloatBuffer put(float[] src, int offset, int length);
-
-	FloatBuffer put(FloatBuffer src);
-
-	FloatBuffer put(int index, float b);
-
-	void putElement(int index, float value);
+	public abstract boolean isDirect();
 
 	@Override
-	FloatBuffer reset();
+	public abstract int limit();
 
 	@Override
-	FloatBuffer rewind();
+	public abstract FloatBuffer limit(int newLimit);
+
+	@Override
+	public abstract FloatBuffer mark();
+
+	@Override
+	public abstract int position();
+
+	@Override
+	public abstract FloatBuffer position(int newPosition);
+
+	public abstract FloatBuffer put(float b);
+
+	public abstract FloatBuffer put(float[] src);
+
+	public abstract FloatBuffer put(float[] src, int offset, int length);
+
+	public abstract FloatBuffer put(FloatBuffer src);
+
+	public abstract FloatBuffer put(int index, float b);
+
+	public abstract void putElement(int index, float value);
+
+	@Override
+	public abstract int remaining();
+
+	@Override
+	public abstract FloatBuffer reset();
+
+	@Override
+	public abstract FloatBuffer rewind();
 
 }

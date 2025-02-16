@@ -24,7 +24,7 @@ import net.minecraft.world.chunk.IChunkProvider;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -181,6 +181,16 @@ public class ChunkProviderEnd implements IChunkProvider {
 			}
 		}
 
+	}
+
+	@Override
+	public Chunk getLoadedChunk(int var1, int var2) {
+		/**
+		 * + Will return back a chunk, if it doesn't exist and its not a MP client it
+		 * will generates all the blocks for the specified chunk from the map seed and
+		 * chunk seed
+		 */
+		return provideChunk(var1, var2);
 	}
 
 	@Override

@@ -4,7 +4,7 @@ import net.lax1dude.unsafememcpy.UnsafeMemcpy;
 import net.lax1dude.unsafememcpy.UnsafeUtils;
 
 /**
- * Copyright (c) 2022-2024 lax1dude. All Rights Reserved.
+ * Copyright (c) 2022-2025 lax1dude. All Rights Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -19,7 +19,7 @@ import net.lax1dude.unsafememcpy.UnsafeUtils;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
-public class EaglerLWJGLIntBuffer implements IntBuffer {
+public class EaglerLWJGLIntBuffer extends IntBuffer {
 
 	private static final int SHIFT = 2;
 	final long address;

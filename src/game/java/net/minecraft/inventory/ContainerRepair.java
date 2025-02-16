@@ -1,9 +1,10 @@
 package net.minecraft.inventory;
 
-import java.util.Iterator;
-import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
+
+import com.carrotsearch.hppc.IntIntMap;
+import com.carrotsearch.hppc.cursors.IntCursor;
+import com.carrotsearch.hppc.cursors.IntIntCursor;
 
 import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
 import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
@@ -28,7 +29,7 @@ import net.minecraft.world.World;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -272,7 +273,7 @@ public class ContainerRepair extends Container {
 		} else {
 			ItemStack itemstack1 = itemstack.copy();
 			ItemStack itemstack2 = this.inputSlots.getStackInSlot(1);
-			Map map = EnchantmentHelper.getEnchantments(itemstack1);
+			IntIntMap map = EnchantmentHelper.getEnchantments(itemstack1);
 			boolean flag7 = false;
 			j = j + itemstack.getRepairCost() + (itemstack2 == null ? 0 : itemstack2.getRepairCost());
 			this.materialCost = 0;
@@ -320,17 +321,14 @@ public class ContainerRepair extends Container {
 						}
 					}
 
-					Map map1 = EnchantmentHelper.getEnchantments(itemstack2);
-					Iterator iterator1 = map1.keySet().iterator();
+					IntIntMap map1 = EnchantmentHelper.getEnchantments(itemstack2);
 
-					while (iterator1.hasNext()) {
-						int i3 = ((Integer) iterator1.next()).intValue();
+					for (IntIntCursor cur : map1) {
+						int i3 = cur.key;
 						Enchantment enchantment = Enchantment.getEnchantmentById(i3);
 						if (enchantment != null) {
-							int k3 = map.containsKey(Integer.valueOf(i3))
-									? ((Integer) map.get(Integer.valueOf(i3))).intValue()
-									: 0;
-							int l1 = ((Integer) map1.get(Integer.valueOf(i3))).intValue();
+							int k3 = map.getOrDefault(i3, 0);
+							int l1 = cur.value;
 							int i4;
 							if (k3 == l1) {
 								++l1;
@@ -346,10 +344,8 @@ public class ContainerRepair extends Container {
 								flag8 = true;
 							}
 
-							Iterator iterator = map.keySet().iterator();
-
-							while (iterator.hasNext()) {
-								int i2 = ((Integer) iterator.next()).intValue();
+							for (IntCursor curr : map.keys()) {
+								int i2 = curr.value;
 								if (i2 != i3 && !enchantment.canApplyTogether(Enchantment.getEnchantmentById(i2))) {
 									flag8 = false;
 									++i;
@@ -361,7 +357,7 @@ public class ContainerRepair extends Container {
 									l1 = enchantment.getMaxLevel();
 								}
 
-								map.put(Integer.valueOf(i3), Integer.valueOf(l1));
+								map.put(i3, l1);
 								int l3 = 0;
 								switch (enchantment.getWeight()) {
 								case 1:

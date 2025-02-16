@@ -2,6 +2,8 @@ package net.minecraft.client.gui;
 
 import java.util.List;
 
+import com.carrotsearch.hppc.IntObjectHashMap;
+import com.carrotsearch.hppc.IntObjectMap;
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -10,7 +12,6 @@ import com.google.common.collect.Lists;
 import net.lax1dude.eaglercraft.v1_8.PointerInputAbstraction;
 import net.lax1dude.eaglercraft.v1_8.minecraft.EnumInputEvent;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.IntHashMap;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
@@ -19,7 +20,7 @@ import net.minecraft.util.IntHashMap;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -279,7 +280,7 @@ public class GuiPageButtonList extends GuiListExtended {
 
 	private final List<GuiPageButtonList.GuiEntry> field_178074_u = Lists.newArrayList();
 
-	private final IntHashMap<Gui> field_178073_v = new IntHashMap();
+	private final IntObjectMap<Gui> field_178073_v = new IntObjectHashMap<>();
 
 	private final List<GuiTextField> field_178072_w = Lists.newArrayList();
 
@@ -314,9 +315,9 @@ public class GuiPageButtonList extends GuiListExtended {
 			GuiPageButtonList.GuiListEntry guipagebuttonlist$guilistentry = this.field_178078_x[this.field_178077_y][i];
 			GuiPageButtonList.GuiListEntry guipagebuttonlist$guilistentry1 = i < this.field_178078_x[this.field_178077_y].length
 					- 1 ? this.field_178078_x[this.field_178077_y][i + 1] : null;
-			Gui gui = (Gui) this.field_178073_v.lookup(guipagebuttonlist$guilistentry.func_178935_b());
+			Gui gui = this.field_178073_v.get(guipagebuttonlist$guilistentry.func_178935_b());
 			Gui gui1 = guipagebuttonlist$guilistentry1 != null
-					? (Gui) this.field_178073_v.lookup(guipagebuttonlist$guilistentry1.func_178935_b())
+					? this.field_178073_v.get(guipagebuttonlist$guilistentry1.func_178935_b())
 					: null;
 			GuiPageButtonList.GuiEntry guipagebuttonlist$guientry = new GuiPageButtonList.GuiEntry(gui, gui1);
 			this.field_178074_u.add(guipagebuttonlist$guientry);
@@ -357,21 +358,21 @@ public class GuiPageButtonList extends GuiListExtended {
 		GuiListEntry[] etr = this.field_178078_x[parInt1];
 		for (int i = 0; i < etr.length; ++i) {
 			if (etr[i] != null) {
-				this.func_178066_a((Gui) this.field_178073_v.lookup(etr[i].func_178935_b()), false);
+				this.func_178066_a(this.field_178073_v.get(etr[i].func_178935_b()), false);
 			}
 		}
 
 		etr = this.field_178078_x[parInt2];
 		for (int i = 0; i < etr.length; ++i) {
 			if (etr[i] != null) {
-				this.func_178066_a((Gui) this.field_178073_v.lookup(etr[i].func_178935_b()), true);
+				this.func_178066_a(this.field_178073_v.get(etr[i].func_178935_b()), true);
 			}
 		}
 
 	}
 
 	public Gui func_178061_c(int parInt1) {
-		return (Gui) this.field_178073_v.lookup(parInt1);
+		return this.field_178073_v.get(parInt1);
 	}
 
 	public void func_178062_a(char parChar1, int parInt1) {
@@ -504,14 +505,14 @@ public class GuiPageButtonList extends GuiListExtended {
 				GuiPageButtonList.GuiEntry guipagebuttonlist$guientry = new GuiPageButtonList.GuiEntry(gui, gui1);
 				this.field_178074_u.add(guipagebuttonlist$guientry);
 				if (guipagebuttonlist$guilistentry != null && gui != null) {
-					this.field_178073_v.addKey(guipagebuttonlist$guilistentry.func_178935_b(), gui);
+					this.field_178073_v.put(guipagebuttonlist$guilistentry.func_178935_b(), gui);
 					if (gui instanceof GuiTextField) {
 						this.field_178072_w.add((GuiTextField) gui);
 					}
 				}
 
 				if (guipagebuttonlist$guilistentry1 != null && gui1 != null) {
-					this.field_178073_v.addKey(guipagebuttonlist$guilistentry1.func_178935_b(), gui1);
+					this.field_178073_v.put(guipagebuttonlist$guilistentry1.func_178935_b(), gui1);
 					if (gui1 instanceof GuiTextField) {
 						this.field_178072_w.add((GuiTextField) gui1);
 					}

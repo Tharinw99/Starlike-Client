@@ -1,17 +1,17 @@
 package net.lax1dude.eaglercraft.v1_8.minecraft;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import com.carrotsearch.hppc.cursors.IntCursor;
 import com.google.common.collect.Lists;
 
 import net.lax1dude.eaglercraft.v1_8.HString;
-import net.lax1dude.eaglercraft.v1_8.internal.IFramebufferGL;
 import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
 import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 import net.lax1dude.eaglercraft.v1_8.opengl.ImageData;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureClock;
 import net.minecraft.client.renderer.texture.TextureCompass;
 import net.minecraft.client.renderer.texture.TextureUtil;
@@ -21,9 +21,10 @@ import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.util.ReportedException;
 import net.minecraft.util.ResourceLocation;
+import net.optifine.util.CounterInt;
 
 /**
- * Copyright (c) 2022 lax1dude. All Rights Reserved.
+ * Copyright (c) 2022-2025 lax1dude. All Rights Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -40,8 +41,11 @@ import net.minecraft.util.ResourceLocation;
  */
 public class EaglerTextureAtlasSprite {
 
-	private static final Logger logger = LogManager.getLogger("EaglerTextureAtlasSprite");
+	protected static interface IAnimCopyFunction {
+		void updateAnimation(int mapWidth, int mapHeight, int mapLevel);
+	}
 
+	private static final Logger logger = LogManager.getLogger("EaglerTextureAtlasSprite");
 	protected static String locationNameClock = "builtin/clock";
 	protected static String locationNameCompass = "builtin/compass";
 
@@ -93,7 +97,13 @@ public class EaglerTextureAtlasSprite {
 
 	protected int tickCounter;
 
+	private int indexInMap = -1;
+
 	protected TextureAnimationCache animationCache = null;
+
+	public String optifineBaseTextureName = null;
+
+	protected IAnimCopyFunction currentAnimUpdater = null;
 
 	public EaglerTextureAtlasSprite(String spriteName) {
 		this.iconName = spriteName;
@@ -125,6 +135,21 @@ public class EaglerTextureAtlasSprite {
 		}
 	}
 
+	public void copyAnimationFrame(int mapWidth, int mapHeight, int mapLevel) {
+		if (currentAnimUpdater != null) {
+			currentAnimUpdater.updateAnimation(mapWidth, mapHeight, mapLevel);
+		}
+	}
+
+	public void copyAnimationFramePBR(int pass, int width, int height, int level) {
+		Throwable t = new UnsupportedOperationException("PBR is not enabled");
+		try {
+			throw t;
+		} catch (Throwable tt) {
+			logger.error(t);
+		}
+	}
+
 	public void copyFrom(EaglerTextureAtlasSprite atlasSpirit) {
 		this.originX = atlasSpirit.originX;
 		this.originY = atlasSpirit.originY;
@@ -135,6 +160,9 @@ public class EaglerTextureAtlasSprite {
 		this.maxU = atlasSpirit.maxU;
 		this.minV = atlasSpirit.minV;
 		this.maxV = atlasSpirit.maxV;
+		if (atlasSpirit != Minecraft.getMinecraft().getTextureMapBlocks().getMissingSprite()) {
+			this.indexInMap = atlasSpirit.indexInMap;
+		}
 	}
 
 	public void generateMipmaps(int level) {
@@ -195,6 +223,10 @@ public class EaglerTextureAtlasSprite {
 		return this.width;
 	}
 
+	public int getIndexInMap() {
+		return this.indexInMap;
+	}
+
 	public float getInterpolatedU(double u) {
 		float f = this.maxU - this.minU;
 		return this.minU + f * (float) u / 16.0F;
@@ -227,6 +259,16 @@ public class EaglerTextureAtlasSprite {
 
 	public int getOriginY() {
 		return this.originY;
+	}
+
+	public double getSpriteU16(float p_getSpriteU16_1_) {
+		float f = this.maxU - this.minU;
+		return (double) ((p_getSpriteU16_1_ - this.minU) / f * 16.0F);
+	}
+
+	public double getSpriteV16(float p_getSpriteV16_1_) {
+		float f = this.maxV - this.minV;
+		return (double) ((p_getSpriteV16_1_ - this.minV) / f * 16.0F);
 	}
 
 	public boolean hasAnimationMetadata() {
@@ -281,10 +323,8 @@ public class EaglerTextureAtlasSprite {
 			int l = i;
 			this.height = this.width;
 			if (meta.getFrameCount() > 0) {
-				Iterator<Integer> iterator = meta.getFrameIndexSet().iterator();
-
-				while (iterator.hasNext()) {
-					int i1 = iterator.next().intValue();
+				for (IntCursor cur : meta.getFrameIndexSet()) {
+					int i1 = cur.value;
 					if (i1 >= j1) {
 						throw new RuntimeException("invalid frameindex " + i1);
 					}
@@ -342,6 +382,10 @@ public class EaglerTextureAtlasSprite {
 		this.width = newWidth;
 	}
 
+	public void setIndexInMap(int p_setIndexInMap_1_) {
+		this.indexInMap = p_setIndexInMap_1_;
+	}
+
 	@Override
 	public String toString() {
 		return "TextureAtlasSprite{name=\'" + this.iconName + '\'' + ", frameCount=" + this.framesTextureData.size()
@@ -350,7 +394,7 @@ public class EaglerTextureAtlasSprite {
 				+ this.minV + ", v1=" + this.maxV + '}';
 	}
 
-	public void updateAnimation(IFramebufferGL[] copyColorFramebuffer) {
+	public void updateAnimation() {
 		if (animationCache == null) {
 			throw new IllegalStateException("Animation cache for '" + this.iconName + "' was never baked!");
 		}
@@ -363,8 +407,12 @@ public class EaglerTextureAtlasSprite {
 			this.tickCounter = 0;
 			int k = this.animationMetadata.getFrameIndex(this.frameCounter);
 			if (i != k && k >= 0 && k < this.framesTextureData.size()) {
-				animationCache.copyFrameLevelsToTex2D(k, this.originX, this.originY, this.width, this.height,
-						copyColorFramebuffer);
+				currentAnimUpdater = (mapWidth, mapHeight, mapLevel) -> {
+					animationCache.copyFrameToTex2D(k, mapLevel, this.originX >> mapLevel, this.originY >> mapLevel,
+							this.width >> mapLevel, this.height >> mapLevel, mapWidth, mapHeight);
+				};
+			} else {
+				currentAnimUpdater = null;
 			}
 		} else if (this.animationMetadata.isInterpolate()) {
 			float f = 1.0f
@@ -374,19 +422,31 @@ public class EaglerTextureAtlasSprite {
 					: this.animationMetadata.getFrameCount();
 			int k = this.animationMetadata.getFrameIndex((this.frameCounter + 1) % j);
 			if (i != k && k >= 0 && k < this.framesTextureData.size()) {
-				animationCache.copyInterpolatedFrameLevelsToTex2D(i, k, f, this.originX, this.originY, this.width,
-						this.height, copyColorFramebuffer);
+				currentAnimUpdater = (mapWidth, mapHeight, mapLevel) -> {
+					animationCache.copyInterpolatedFrameToTex2D(i, k, f, mapLevel, this.originX >> mapLevel,
+							this.originY >> mapLevel, this.width >> mapLevel, this.height >> mapLevel, mapWidth,
+							mapHeight);
+				};
+			} else {
+				currentAnimUpdater = null;
 			}
+		} else {
+			currentAnimUpdater = null;
 		}
 	}
 
-	public void updateAnimationPBR(IFramebufferGL[] copyColorFramebuffer, IFramebufferGL[] copyMaterialFramebuffer,
-			int materialTexOffset) {
+	public void updateAnimationPBR() {
 		Throwable t = new UnsupportedOperationException("PBR is not enabled");
 		try {
 			throw t;
 		} catch (Throwable tt) {
 			logger.error(t);
+		}
+	}
+
+	public void updateIndexInMap(CounterInt p_updateIndexInMap_1_) {
+		if (this.indexInMap < 0) {
+			this.indexInMap = p_updateIndexInMap_1_.nextValue();
 		}
 	}
 }

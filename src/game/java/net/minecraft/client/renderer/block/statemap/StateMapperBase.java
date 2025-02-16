@@ -17,7 +17,7 @@ import net.minecraft.client.resources.model.ModelResourceLocation;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -34,11 +34,7 @@ import net.minecraft.client.resources.model.ModelResourceLocation;
  *
  */
 public abstract class StateMapperBase implements IStateMapper {
-	protected Map<IBlockState, ModelResourceLocation> mapStateModelLocations = Maps.newLinkedHashMap();
-
-	protected abstract ModelResourceLocation getModelResourceLocation(IBlockState var1);
-
-	public String getPropertyString(Map<IProperty, Comparable> parMap) {
+	public static String getPropertyString(Map<IProperty, Comparable> parMap) {
 		StringBuilder stringbuilder = new StringBuilder();
 
 		for (Entry entry : parMap.entrySet()) {
@@ -59,6 +55,10 @@ public abstract class StateMapperBase implements IStateMapper {
 
 		return stringbuilder.toString();
 	}
+
+	protected Map<IBlockState, ModelResourceLocation> mapStateModelLocations = Maps.newLinkedHashMap();
+
+	protected abstract ModelResourceLocation getModelResourceLocation(IBlockState var1);
 
 	@Override
 	public Map<IBlockState, ModelResourceLocation> putStateModelLocations(Block blockIn) {

@@ -253,19 +253,23 @@ public class TextureCopyUtil {
 		DrawUtils.drawStandardQuad2D();
 	}
 
+	@Deprecated
 	public static void blitTextureDepthUsingViewports(int srcX, int srcY, int dstX, int dstY, int w, int h) {
 		blitTextureDepthUsingViewports(0, srcX, srcY, w, h, dstX, dstY, w, h);
 	}
 
+	@Deprecated
 	public static void blitTextureDepthUsingViewports(int lvl, int srcX, int srcY, int dstX, int dstY, int w, int h) {
 		blitTextureDepthUsingViewports(lvl, srcX, srcY, w, h, dstX, dstY, w, h);
 	}
 
+	@Deprecated
 	public static void blitTextureDepthUsingViewports(int srcX, int srcY, int srcW, int srcH, int dstX, int dstY,
 			int dstW, int dstH) {
 		blitTextureDepthUsingViewports(0, srcX, srcY, srcW, srcH, dstX, dstY, dstW, dstH);
 	}
 
+	@Deprecated
 	public static void blitTextureDepthUsingViewports(int lvl, int srcX, int srcY, int srcW, int srcH, int dstX,
 			int dstY, int dstW, int dstH) {
 		TextureCopyShader shaderObj = getShaderObj(isAligned, true);
@@ -290,19 +294,23 @@ public class TextureCopyUtil {
 		DrawUtils.drawStandardQuad2D();
 	}
 
+	@Deprecated
 	public static void blitTextureUsingViewports(int srcX, int srcY, int dstX, int dstY, int w, int h) {
 		blitTextureUsingViewports(0, srcX, srcY, w, h, dstX, dstY, w, h);
 	}
 
+	@Deprecated
 	public static void blitTextureUsingViewports(int lvl, int srcX, int srcY, int dstX, int dstY, int w, int h) {
 		blitTextureUsingViewports(lvl, srcX, srcY, w, h, dstX, dstY, w, h);
 	}
 
+	@Deprecated
 	public static void blitTextureUsingViewports(int srcX, int srcY, int srcW, int srcH, int dstX, int dstY, int dstW,
 			int dstH) {
 		blitTextureUsingViewports(0, srcX, srcY, srcW, srcH, dstX, dstY, dstW, dstH);
 	}
 
+	@Deprecated
 	public static void blitTextureUsingViewports(int lvl, int srcX, int srcY, int srcW, int srcH, int dstX, int dstY,
 			int dstW, int dstH) {
 		TextureCopyShader shaderObj = getShaderObj(isAligned, false);
@@ -398,6 +406,7 @@ public class TextureCopyUtil {
 			textureBlitDepthAligned.destroy();
 			textureBlitDepthAligned = null;
 		}
+		SpriteLevelMixer.destroy();
 	}
 
 	public static void disableAlign() {
@@ -457,6 +466,8 @@ public class TextureCopyUtil {
 		if (EaglercraftGPU.checkOpenGLESVersion() == 200) {
 			vshSourceLayout = VSHInputLayoutParser.getShaderInputs(vshSource);
 		}
+
+		SpriteLevelMixer.initialize(vshShader, vshSourceLayout);
 	}
 
 	public static void srcDstSize(int w, int h) {

@@ -24,6 +24,24 @@ import net.lax1dude.eaglercraft.v1_8.internal.PlatformRuntime;
  */
 public class EaglerZLIB {
 
+	public static int deflateFull(byte[] input, byte[] output) throws IOException {
+		return PlatformRuntime.deflateFull(input, 0, input.length, output, 0, output.length);
+	}
+
+	public static int deflateFull(byte[] input, int inputOff, int inputLen, byte[] output, int outputOff, int outputLen)
+			throws IOException {
+		return PlatformRuntime.deflateFull(input, inputOff, inputLen, output, outputOff, outputLen);
+	}
+
+	public static int inflateFull(byte[] input, byte[] output) throws IOException {
+		return PlatformRuntime.inflateFull(input, 0, input.length, output, 0, output.length);
+	}
+
+	public static int inflateFull(byte[] input, int inputOff, int inputLen, byte[] output, int outputOff, int outputLen)
+			throws IOException {
+		return PlatformRuntime.inflateFull(input, inputOff, inputLen, output, outputOff, outputLen);
+	}
+
 	public static OutputStream newDeflaterOutputStream(OutputStream os) throws IOException {
 		return PlatformRuntime.newDeflaterOutputStream(os);
 	}

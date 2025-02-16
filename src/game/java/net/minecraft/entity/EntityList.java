@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.carrotsearch.hppc.IntObjectHashMap;
+import com.carrotsearch.hppc.IntObjectMap;
+import com.carrotsearch.hppc.ObjectIntHashMap;
+import com.carrotsearch.hppc.ObjectIntMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -88,7 +92,7 @@ import net.starlikeclient.minecraft.init.EntitiesStarlike;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -126,14 +130,20 @@ public class EntityList {
 	private static final Map<String, EntityConstructor<? extends Entity>> stringToConstructorMapping = Maps
 			.newHashMap();
 	private static final Map<Class<? extends Entity>, String> classToStringMapping = Maps.newHashMap();
-	private static final Map<Integer, Class<? extends Entity>> idToClassMapping = Maps.newHashMap();
-	private static final Map<Integer, EntityConstructor<? extends Entity>> idToConstructorMapping = Maps.newHashMap();
-	private static final Map<Class<? extends Entity>, Integer> classToIDMapping = Maps.newHashMap();
+	private static final IntObjectMap<Class<? extends Entity>> idToClassMapping = new IntObjectHashMap<>();
+	private static final IntObjectMap<EntityConstructor<? extends Entity>> idToConstructorMapping = new IntObjectHashMap<>();
+	private static final ObjectIntMap<Class<? extends Entity>> classToIDMapping = new ObjectIntHashMap<>();
 	private static final Map<Class<? extends Entity>, EntityConstructor<? extends Entity>> classToConstructorMapping = Maps
 			.newHashMap();
-	private static final Map<String, Integer> stringToIDMapping = Maps.newHashMap();
+	/**
+	 * + provides a mapping between a string and an entity ID
+	 */
+	private static final ObjectIntMap<String> stringToIDMapping = new ObjectIntHashMap<>();
 
-	public static final Map<Integer, EntityList.EntityEggInfo> entityEggs = Maps.newLinkedHashMap();
+	/**
+	 * + This is a HashMap of the Creative Entity Eggs/Spawners.
+	 */
+	public static final IntObjectMap<EntityList.EntityEggInfo> entityEggs = new IntObjectHashMap<>();
 
 	static {
 		addMapping(EntityItem.class, EntityItem::new, "Item", 1);
@@ -216,7 +226,7 @@ public class EntityList {
 			EntityConstructor<? extends Entity> entityConstructor, String entityName, int id) {
 		if (stringToClassMapping.containsKey(entityName)) {
 			throw new IllegalArgumentException("ID is already registered: " + entityName);
-		} else if (idToClassMapping.containsKey(Integer.valueOf(id))) {
+		} else if (idToClassMapping.containsKey(id)) {
 			throw new IllegalArgumentException("ID is already registered: " + id);
 		} else if (id == 0) {
 			throw new IllegalArgumentException("Cannot register to reserved id: " + id);
@@ -226,11 +236,11 @@ public class EntityList {
 			stringToClassMapping.put(entityName, entityClass);
 			stringToConstructorMapping.put(entityName, entityConstructor);
 			classToStringMapping.put(entityClass, entityName);
-			idToClassMapping.put(Integer.valueOf(id), entityClass);
-			idToConstructorMapping.put(Integer.valueOf(id), entityConstructor);
-			classToIDMapping.put(entityClass, Integer.valueOf(id));
+			idToClassMapping.put(id, entityClass);
+			idToConstructorMapping.put(id, entityConstructor);
+			classToIDMapping.put(entityClass, id);
 			classToConstructorMapping.put(entityClass, entityConstructor);
-			stringToIDMapping.put(entityName, Integer.valueOf(id));
+			stringToIDMapping.put(entityName, id);
 		}
 	}
 
@@ -242,7 +252,7 @@ public class EntityList {
 			EntityConstructor<? extends Entity> entityConstructor, String entityName, int entityID, int baseColor,
 			int spotColor) {
 		addMapping(entityClass, entityConstructor, entityName, entityID);
-		entityEggs.put(Integer.valueOf(entityID), new EntityList.EntityEggInfo(entityID, baseColor, spotColor));
+		entityEggs.put(entityID, new EntityList.EntityEggInfo(entityID, baseColor, spotColor));
 	}
 
 	public static Entity createEntityByClass(Class<? extends Entity> entityClass, World worldIn) {
@@ -340,19 +350,19 @@ public class EntityList {
 	}
 
 	public static Class<? extends Entity> getClassFromID(int entityID) {
-		return (Class) idToClassMapping.get(Integer.valueOf(entityID));
+		return idToClassMapping.get(entityID);
 	}
 
 	public static EntityConstructor<? extends Entity> getConstructorFromID(int entityID) {
-		return idToConstructorMapping.get(Integer.valueOf(entityID));
+		return idToConstructorMapping.get(entityID);
 	}
 
 	/**
 	 * + gets the entityID of a specific entity
 	 */
 	public static int getEntityID(Entity entityIn) {
-		Integer integer = (Integer) classToIDMapping.get(entityIn.getClass());
-		return integer == null ? 0 : integer.intValue();
+		int integer = classToIDMapping.getOrDefault(entityIn.getClass(), -1);
+		return integer == -1 ? 0 : integer;
 	}
 
 	public static List<String> getEntityNameList() {
@@ -379,22 +389,22 @@ public class EntityList {
 	 * + Gets the string representation of a specific entity.
 	 */
 	public static String getEntityString(Entity entityIn) {
-		return (String) classToStringMapping.get(entityIn.getClass());
+		return classToStringMapping.get(entityIn.getClass());
 	}
 
 	/**
 	 * + Returns the ID assigned to it's string representation
 	 */
 	public static int getIDFromString(String entityName) {
-		Integer integer = (Integer) stringToIDMapping.get(entityName);
-		return integer == null ? 90 : integer.intValue();
+		int integer = stringToIDMapping.getOrDefault(entityName, -1);
+		return integer == -1 ? 90 : integer;
 	}
 
 	/**
 	 * + Finds the class using IDtoClassMapping and classToStringMapping
 	 */
 	public static String getStringFromID(int entityID) {
-		return (String) classToStringMapping.get(getClassFromID(entityID));
+		return classToStringMapping.get(getClassFromID(entityID));
 	}
 
 	public static boolean isStringEntityName(Entity entityIn, String entityName) {

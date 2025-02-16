@@ -9,7 +9,7 @@ import com.google.common.base.Objects;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -103,21 +103,21 @@ public class Vec3i implements Comparable<Vec3i> {
 	/**
 	 * + Get the X coordinate
 	 */
-	public int getX() {
+	public final int getX() {
 		return this.x;
 	}
 
 	/**
 	 * + Get the Y coordinate
 	 */
-	public int getY() {
+	public final int getY() {
 		return this.y;
 	}
 
 	/**
 	 * + Get the Z coordinate
 	 */
-	public int getZ() {
+	public final int getZ() {
 		return this.z;
 	}
 

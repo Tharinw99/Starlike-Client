@@ -24,7 +24,7 @@ import net.minecraft.util.IProgressUpdate;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -174,39 +174,37 @@ public class SaveFormatOld implements ISaveFormat {
 	@Override
 	public WorldInfo getWorldInfo(String saveName) {
 		VFile2 file1 = WorldsDB.newVFile(this.savesDirectory, saveName);
-		if (!file1.exists()) {
-			return null;
-		} else {
-			VFile2 file2 = WorldsDB.newVFile(file1, "level.dat");
-			if (file2.exists()) {
-				try {
-					NBTTagCompound nbttagcompound2;
-					try (InputStream is = file2.getInputStream()) {
-						nbttagcompound2 = CompressedStreamTools.readCompressed(is);
-					}
-					NBTTagCompound nbttagcompound3 = nbttagcompound2.getCompoundTag("Data");
-					return new WorldInfo(nbttagcompound3);
-				} catch (Exception exception1) {
-					logger.error("Exception reading " + file2, exception1);
+		VFile2 file2 = WorldsDB.newVFile(file1, "level.dat");
+		if (file2.exists()) {
+			try {
+				NBTTagCompound nbttagcompound2;
+				try (InputStream is = file2.getInputStream()) {
+					nbttagcompound2 = CompressedStreamTools.readCompressed(is);
 				}
+				NBTTagCompound nbttagcompound3 = nbttagcompound2.getCompoundTag("Data");
+				return new WorldInfo(nbttagcompound3);
+			} catch (Exception exception1) {
+				logger.error("Exception reading " + file2);
+				logger.error(exception1);
 			}
-
-			file2 = WorldsDB.newVFile(file1, "level.dat_old");
-			if (file2.exists()) {
-				try {
-					NBTTagCompound nbttagcompound;
-					try (InputStream is = file2.getInputStream()) {
-						nbttagcompound = CompressedStreamTools.readCompressed(is);
-					}
-					NBTTagCompound nbttagcompound1 = nbttagcompound.getCompoundTag("Data");
-					return new WorldInfo(nbttagcompound1);
-				} catch (Exception exception) {
-					logger.error("Exception reading " + file2, exception);
-				}
-			}
-
-			return null;
 		}
+
+		file2 = WorldsDB.newVFile(file1, "level.dat_old");
+		if (file2.exists()) {
+			try {
+				NBTTagCompound nbttagcompound;
+				try (InputStream is = file2.getInputStream()) {
+					nbttagcompound = CompressedStreamTools.readCompressed(is);
+				}
+				NBTTagCompound nbttagcompound1 = nbttagcompound.getCompoundTag("Data");
+				return new WorldInfo(nbttagcompound1);
+			} catch (Exception exception) {
+				logger.error("Exception reading " + file2);
+				logger.error(exception);
+			}
+		}
+
+		return null;
 	}
 
 	/**

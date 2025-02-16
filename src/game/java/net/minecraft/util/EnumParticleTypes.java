@@ -1,10 +1,10 @@
 package net.minecraft.util;
 
 import java.util.ArrayList;
-import java.util.Map;
 
+import com.carrotsearch.hppc.IntObjectHashMap;
+import com.carrotsearch.hppc.IntObjectMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
@@ -13,7 +13,7 @@ import com.google.common.collect.Maps;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -48,7 +48,7 @@ public enum EnumParticleTypes {
 
 	public static final EnumParticleTypes[] _VALUES = values();
 
-	private static final Map<Integer, EnumParticleTypes> PARTICLES = Maps.newHashMap();
+	private static final IntObjectMap<EnumParticleTypes> PARTICLES = new IntObjectHashMap<>();
 	private static final String[] PARTICLE_NAMES;
 	static {
 		ArrayList arraylist = Lists.newArrayList();
@@ -69,7 +69,7 @@ public enum EnumParticleTypes {
 	 * + Gets the relative EnumParticleTypes by id.
 	 */
 	public static EnumParticleTypes getParticleFromId(int particleId) {
-		return (EnumParticleTypes) PARTICLES.get(Integer.valueOf(particleId));
+		return PARTICLES.get(Integer.valueOf(particleId));
 	}
 
 	public static String[] getParticleNames() {

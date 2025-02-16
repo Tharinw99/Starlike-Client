@@ -1,7 +1,7 @@
 package net.lax1dude.eaglercraft.v1_8.internal.buffer;
 
 /**
- * Copyright (c) 2022 lax1dude. All Rights Reserved.
+ * Copyright (c) 2022-2025 lax1dude. All Rights Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -16,57 +16,75 @@ package net.lax1dude.eaglercraft.v1_8.internal.buffer;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
-public interface ShortBuffer extends Buffer {
+public abstract class ShortBuffer implements Buffer {
 
 	@Override
-	short[] array();
+	public abstract short[] array();
 
 	@Override
-	ShortBuffer clear();
-
-	ShortBuffer duplicate();
+	public abstract int capacity();
 
 	@Override
-	ShortBuffer flip();
+	public abstract ShortBuffer clear();
 
-	short get();
-
-	short get(int index);
-
-	ShortBuffer get(short[] dst);
-
-	ShortBuffer get(short[] dst, int offset, int length);
-
-	short getElement(int index);
+	public abstract ShortBuffer duplicate();
 
 	@Override
-	boolean isDirect();
+	public abstract ShortBuffer flip();
+
+	public abstract short get();
+
+	public abstract short get(int index);
+
+	public abstract ShortBuffer get(short[] dst);
+
+	public abstract ShortBuffer get(short[] dst, int offset, int length);
+
+	public abstract short getElement(int index);
 
 	@Override
-	ShortBuffer limit(int newLimit);
+	public abstract boolean hasArray();
 
 	@Override
-	ShortBuffer mark();
+	public abstract boolean hasRemaining();
 
 	@Override
-	ShortBuffer position(int newPosition);
-
-	ShortBuffer put(int index, short b);
-
-	ShortBuffer put(short b);
-
-	ShortBuffer put(short[] src);
-
-	ShortBuffer put(short[] src, int offset, int length);
-
-	ShortBuffer put(ShortBuffer src);
-
-	void putElement(int index, short value);
+	public abstract boolean isDirect();
 
 	@Override
-	ShortBuffer reset();
+	public abstract int limit();
 
 	@Override
-	ShortBuffer rewind();
+	public abstract ShortBuffer limit(int newLimit);
+
+	@Override
+	public abstract ShortBuffer mark();
+
+	@Override
+	public abstract int position();
+
+	@Override
+	public abstract ShortBuffer position(int newPosition);
+
+	public abstract ShortBuffer put(int index, short b);
+
+	public abstract ShortBuffer put(short b);
+
+	public abstract ShortBuffer put(short[] src);
+
+	public abstract ShortBuffer put(short[] src, int offset, int length);
+
+	public abstract ShortBuffer put(ShortBuffer src);
+
+	public abstract void putElement(int index, short value);
+
+	@Override
+	public abstract int remaining();
+
+	@Override
+	public abstract ShortBuffer reset();
+
+	@Override
+	public abstract ShortBuffer rewind();
 
 }

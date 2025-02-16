@@ -69,7 +69,7 @@ public class StarlikeClient {
 			/**
 			 * + Enables or disables joining Multiplayer servers from the main menu.
 			 */
-			public static final boolean enableMultiplayer = false;
+			public static final boolean enableMultiplayer = true;
 		}
 
 		/**
@@ -85,7 +85,7 @@ public class StarlikeClient {
 			 * + Snapshots use the format "YYwWWn", following Mojang's snapshot naming
 			 * convention.
 			 */
-			public static final String devBuildVersion = "0.4.0";
+			public static final String devBuildVersion = "0.4.1";
 
 			/**
 			 * + Release candidate version, set to -1 if not
@@ -100,7 +100,7 @@ public class StarlikeClient {
 			/**
 			 * + Version of the project fork, adds "-beta" if dev.
 			 */
-			public static final String projectForkVersion = "0.4.0"
+			public static final String projectForkVersion = "0.4.1"
 					+ (releaseCandidateVersion >= 0 ? ("-rc" + releaseCandidateVersion)
 							: isDevBuild ? ("-beta " + devBuildVersion) : "");
 

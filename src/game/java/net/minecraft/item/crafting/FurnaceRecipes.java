@@ -3,6 +3,9 @@ package net.minecraft.item.crafting;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.carrotsearch.hppc.ObjectFloatHashMap;
+import com.carrotsearch.hppc.ObjectFloatMap;
+import com.carrotsearch.hppc.cursors.ObjectFloatCursor;
 import com.google.common.collect.Maps;
 
 import net.minecraft.block.Block;
@@ -22,7 +25,7 @@ import net.starlikeclient.minecraft.init.RecipesStarlike;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -53,7 +56,11 @@ public class FurnaceRecipes {
 
 	private Map<ItemStack, ItemStack> smeltingList = Maps.newHashMap();
 
-	private Map<ItemStack, Float> experienceList = Maps.newHashMap();
+	/**
+	 * + A list which contains how many experience points each recipe output will
+	 * give.
+	 */
+	private ObjectFloatMap<ItemStack> experienceList = new ObjectFloatHashMap<>();
 
 	private FurnaceRecipes() {
 		this.addSmeltingRecipeForBlock(Blocks.iron_ore, new ItemStack(Items.iron_ingot), 0.7F);
@@ -103,7 +110,7 @@ public class FurnaceRecipes {
 	 */
 	public void addSmeltingRecipe(ItemStack input, ItemStack stack, float experience) {
 		this.smeltingList.put(input, stack);
-		this.experienceList.put(stack, Float.valueOf(experience));
+		this.experienceList.put(stack, experience);
 	}
 
 	/**
@@ -123,9 +130,9 @@ public class FurnaceRecipes {
 	}
 
 	public float getSmeltingExperience(ItemStack stack) {
-		for (Entry entry : this.experienceList.entrySet()) {
-			if (this.compareItemStacks(stack, (ItemStack) entry.getKey())) {
-				return ((Float) entry.getValue()).floatValue();
+		for (ObjectFloatCursor<ItemStack> entry : this.experienceList) {
+			if (this.compareItemStacks(stack, entry.key)) {
+				return entry.value;
 			}
 		}
 

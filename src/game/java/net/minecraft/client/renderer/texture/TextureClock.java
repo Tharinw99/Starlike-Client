@@ -1,6 +1,5 @@
 package net.minecraft.client.renderer.texture;
 
-import net.lax1dude.eaglercraft.v1_8.internal.IFramebufferGL;
 import net.lax1dude.eaglercraft.v1_8.minecraft.EaglerTextureAtlasSprite;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.MathHelper;
@@ -12,7 +11,7 @@ import net.minecraft.util.MathHelper;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -37,7 +36,7 @@ public class TextureClock extends EaglerTextureAtlasSprite {
 	}
 
 	@Override
-	public void updateAnimation(IFramebufferGL[] copyColorFramebuffer) {
+	public void updateAnimation() {
 		if (!this.framesTextureData.isEmpty()) {
 			Minecraft minecraft = Minecraft.getMinecraft();
 			double d0 = 0.0D;
@@ -71,10 +70,17 @@ public class TextureClock extends EaglerTextureAtlasSprite {
 
 			if (i != this.frameCounter) {
 				this.frameCounter = i;
-				animationCache.copyFrameLevelsToTex2D(this.frameCounter, this.originX, this.originY, this.width,
-						this.height, copyColorFramebuffer);
+				currentAnimUpdater = (mapWidth, mapHeight, mapLevel) -> {
+					animationCache.copyFrameToTex2D(this.frameCounter, mapLevel, this.originX >> mapLevel,
+							this.originY >> mapLevel, this.width >> mapLevel, this.height >> mapLevel, mapWidth,
+							mapHeight);
+				};
+			} else {
+				currentAnimUpdater = null;
 			}
 
+		} else {
+			currentAnimUpdater = null;
 		}
 	}
 

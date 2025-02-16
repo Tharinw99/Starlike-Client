@@ -48,9 +48,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
+import java.util.zip.DataFormatException;
+import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
 import javax.imageio.ImageIO;
@@ -490,6 +493,16 @@ public class PlatformRuntime {
 		return Thread.currentThread().getName();
 	}
 
+	public static int deflateFull(byte[] input, int inputOff, int inputLen, byte[] output, int outputOff, int outputLen)
+			throws IOException {
+		Deflater df = new Deflater();
+		df.setInput(input, inputOff, inputLen);
+		df.finish();
+		int i = df.deflate(output, outputOff, outputLen);
+		df.end();
+		return i;
+	}
+
 	public static void destroy() {
 		PlatformAudio.platformShutdown();
 		Filesystem.closeAllHandles();
@@ -601,6 +614,25 @@ public class PlatformRuntime {
 		// nope
 	}
 
+	public static boolean immediateContinueSupported() {
+		return false;
+	}
+
+	public static int inflateFull(byte[] input, int inputOff, int inputLen, byte[] output, int outputOff, int outputLen)
+			throws IOException {
+		Inflater df = new Inflater();
+		int i;
+		try {
+			df.setInput(input, inputOff, inputLen);
+			i = df.inflate(output, outputOff, outputLen);
+		} catch (DataFormatException ex) {
+			throw new IOException("Failed to inflate!", ex);
+		} finally {
+			df.end();
+		}
+		return i;
+	}
+
 	public static boolean isDebugRuntime() {
 		return true;
 	}
@@ -710,10 +742,6 @@ public class PlatformRuntime {
 			return;
 		}
 		PlatformRuntime.logger.fatal("Crash report was written to: {}", file2.getAbsolutePath());
-	}
-
-	public static boolean immediateContinueSupported() {
-		return false;
 	}
 
 }

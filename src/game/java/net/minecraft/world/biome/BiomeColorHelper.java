@@ -10,7 +10,7 @@ import net.minecraft.world.IBlockAccess;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -27,6 +27,7 @@ import net.minecraft.world.IBlockAccess;
  *
  */
 public class BiomeColorHelper {
+
 	interface ColorResolver {
 		int getColorAtPos(BiomeGenBase var1, BlockPos var2);
 	}
@@ -69,15 +70,25 @@ public class BiomeColorHelper {
 		return (i / 9 & 255) << 16 | (j / 9 & 255) << 8 | k / 9 & 255;
 	}
 
+	public static int getBiomeColorForCoordsOld(IBlockAccess parIBlockAccess, BlockPos parBlockPos, int index) {
+		if (index == 0) {
+			return func_180285_a(parIBlockAccess, parBlockPos, field_180291_a);
+		} else if (index == 1) {
+			return func_180285_a(parIBlockAccess, parBlockPos, field_180289_b);
+		} else {
+			return func_180285_a(parIBlockAccess, parBlockPos, field_180290_c);
+		}
+	}
+
 	public static int getFoliageColorAtPos(IBlockAccess parIBlockAccess, BlockPos parBlockPos) {
-		return func_180285_a(parIBlockAccess, parBlockPos, field_180289_b);
+		return parIBlockAccess.getBiomeColorForCoords(parBlockPos, 1);
 	}
 
 	public static int getGrassColorAtPos(IBlockAccess parIBlockAccess, BlockPos parBlockPos) {
-		return func_180285_a(parIBlockAccess, parBlockPos, field_180291_a);
+		return parIBlockAccess.getBiomeColorForCoords(parBlockPos, 0);
 	}
 
 	public static int getWaterColorAtPos(IBlockAccess parIBlockAccess, BlockPos parBlockPos) {
-		return func_180285_a(parIBlockAccess, parBlockPos, field_180290_c);
+		return parIBlockAccess.getBiomeColorForCoords(parBlockPos, 2);
 	}
 }

@@ -1,7 +1,7 @@
 package net.lax1dude.eaglercraft.v1_8.internal.buffer;
 
 /**
- * Copyright (c) 2022 lax1dude. All Rights Reserved.
+ * Copyright (c) 2022-2025 lax1dude. All Rights Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -16,96 +16,114 @@ package net.lax1dude.eaglercraft.v1_8.internal.buffer;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
-public interface ByteBuffer extends Buffer {
+public abstract class ByteBuffer implements Buffer {
 
 	@Override
-	byte[] array();
+	public abstract byte[] array();
 
-	FloatBuffer asFloatBuffer();
+	public abstract FloatBuffer asFloatBuffer();
 
-	IntBuffer asIntBuffer();
+	public abstract IntBuffer asIntBuffer();
 
-	ShortBuffer asShortBuffer();
-
-	@Override
-	ByteBuffer clear();
-
-	ByteBuffer duplicate();
+	public abstract ShortBuffer asShortBuffer();
 
 	@Override
-	ByteBuffer flip();
-
-	byte get();
-
-	ByteBuffer get(byte[] dst);
-
-	ByteBuffer get(byte[] dst, int offset, int length);
-
-	byte get(int index);
-
-	char getChar();
-
-	char getChar(int index);
-
-	float getFloat();
-
-	float getFloat(int index);
-
-	int getInt();
-
-	int getInt(int index);
-
-	long getLong();
-
-	long getLong(int index);
-
-	short getShort();
-
-	short getShort(int index);
+	public abstract int capacity();
 
 	@Override
-	ByteBuffer limit(int newLimit);
+	public abstract ByteBuffer clear();
+
+	public abstract ByteBuffer duplicate();
 
 	@Override
-	ByteBuffer mark();
+	public abstract ByteBuffer flip();
+
+	public abstract byte get();
+
+	public abstract ByteBuffer get(byte[] dst);
+
+	public abstract ByteBuffer get(byte[] dst, int offset, int length);
+
+	public abstract byte get(int index);
+
+	public abstract char getChar();
+
+	public abstract char getChar(int index);
+
+	public abstract float getFloat();
+
+	public abstract float getFloat(int index);
+
+	public abstract int getInt();
+
+	public abstract int getInt(int index);
+
+	public abstract long getLong();
+
+	public abstract long getLong(int index);
+
+	public abstract short getShort();
+
+	public abstract short getShort(int index);
 
 	@Override
-	ByteBuffer position(int newPosition);
-
-	ByteBuffer put(byte b);
-
-	ByteBuffer put(byte[] src);
-
-	ByteBuffer put(byte[] src, int offset, int length);
-
-	ByteBuffer put(ByteBuffer src);
-
-	ByteBuffer put(int index, byte b);
-
-	ByteBuffer putChar(char value);
-
-	ByteBuffer putChar(int index, char value);
-
-	ByteBuffer putFloat(float value);
-
-	ByteBuffer putFloat(int index, float value);
-
-	ByteBuffer putInt(int value);
-
-	ByteBuffer putInt(int index, int value);
-
-	ByteBuffer putLong(int index, long value);
-
-	ByteBuffer putLong(long value);
-
-	ByteBuffer putShort(int index, short value);
-
-	ByteBuffer putShort(short value);
+	public abstract boolean hasArray();
 
 	@Override
-	ByteBuffer reset();
+	public abstract boolean hasRemaining();
 
 	@Override
-	ByteBuffer rewind();
+	public abstract int limit();
+
+	@Override
+	public abstract ByteBuffer limit(int newLimit);
+
+	@Override
+	public abstract ByteBuffer mark();
+
+	@Override
+	public abstract int position();
+
+	@Override
+	public abstract ByteBuffer position(int newPosition);
+
+	public abstract ByteBuffer put(byte b);
+
+	public abstract ByteBuffer put(byte[] src);
+
+	public abstract ByteBuffer put(byte[] src, int offset, int length);
+
+	public abstract ByteBuffer put(ByteBuffer src);
+
+	public abstract ByteBuffer put(int index, byte b);
+
+	public abstract ByteBuffer putChar(char value);
+
+	public abstract ByteBuffer putChar(int index, char value);
+
+	public abstract ByteBuffer putFloat(float value);
+
+	public abstract ByteBuffer putFloat(int index, float value);
+
+	public abstract ByteBuffer putInt(int value);
+
+	public abstract ByteBuffer putInt(int index, int value);
+
+	public abstract ByteBuffer putLong(int index, long value);
+
+	public abstract ByteBuffer putLong(long value);
+
+	public abstract ByteBuffer putShort(int index, short value);
+
+	public abstract ByteBuffer putShort(short value);
+
+	@Override
+	public abstract int remaining();
+
+	@Override
+	public abstract ByteBuffer reset();
+
+	@Override
+	public abstract ByteBuffer rewind();
 
 }

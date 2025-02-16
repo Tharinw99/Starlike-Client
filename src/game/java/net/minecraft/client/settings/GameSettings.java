@@ -43,8 +43,10 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EnumPlayerModelParts;
 import net.minecraft.network.play.client.C15PacketClientSettings;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.EnumDifficulty;
+import net.optifine.CustomSky;
 
 /**
  * + This portion of EaglercraftX contains deobfuscated Minecraft 1.8 source
@@ -53,7 +55,7 @@ import net.minecraft.world.EnumDifficulty;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -108,7 +110,10 @@ public class GameSettings {
 		FNAW_SKINS("options.skinCustomisation.enableFNAWSkins", false, true),
 		EAGLER_VSYNC("options.vsync", false, true), EAGLER_DYNAMIC_LIGHTS("options.dynamicLights", false, true),
 		EAGLER_PROFANITY_FILTER("options.profanityFilterButton", false, true),
-		EAGLER_TOUCH_CONTROL_OPACITY("options.touchControlOpacity", true, false);
+		EAGLER_TOUCH_CONTROL_OPACITY("options.touchControlOpacity", true, false),
+		OF_CONNECTED_TEXTURES("options.connectedTexturesOF", false, false),
+		OF_BETTER_GRASS("options.betterGrassOF", false, false), OF_CUSTOM_SKIES("options.customSkiesOF", false, true),
+		OF_SMART_LEAVES("options.smartLeavesOF", false, true), OF_CUSTOM_ITEMS("options.customItemsOF", false, true);
 
 		public static GameSettings.Options getEnumOptions(int parInt1) {
 			for (GameSettings.Options gamesettings$options : values()) {
@@ -386,12 +391,18 @@ public class GameSettings {
 	public int screenRecordResolution = ScreenRecordingController.DEFAULT_RESOLUTION;
 
 	public int screenRecordAudioBitrate = ScreenRecordingController.DEFAULT_AUDIO_BITRATE;
-
 	public int screenRecordVideoBitrate = ScreenRecordingController.DEFAULT_VIDEO_BITRATE;
-
 	public float screenRecordGameVolume = ScreenRecordingController.DEFAULT_GAME_VOLUME;
-
 	public float screenRecordMicVolume = ScreenRecordingController.DEFAULT_MIC_VOLUME;
+	public int betterGrassOF = 0;
+
+	public int connectedTexturesOF = 1;
+
+	public boolean customSkyOF = true;
+
+	public boolean smartLeavesOF = false;
+
+	public boolean customItemsOF = true;
 
 	public GameSettings(Minecraft mcIn) {
 		this.mc = mcIn;
@@ -489,6 +500,11 @@ public class GameSettings {
 																																	* 100.0F)
 																																	+ "%")
 																															: "yee")))))))))))));
+		} else if (EagRuntime.getPlatformType() != EnumPlatformType.DESKTOP
+				&& parOptions == GameSettings.Options.EAGLER_VSYNC) {
+			boolean flag = this.getOptionOrdinalValue(parOptions);
+			return flag ? s + I18n.format("options.on", new Object[0])
+					: EnumChatFormatting.RED + s + I18n.format("options.off", new Object[0]);
 		} else if (parOptions.getEnumBoolean()) {
 			boolean flag = this.getOptionOrdinalValue(parOptions);
 			return flag ? s + I18n.format("options.on", new Object[0]) : s + I18n.format("options.off", new Object[0]);
@@ -516,6 +532,22 @@ public class GameSettings {
 				return s + I18n.format("options.on");
 			} else {
 				return s + I18n.format("options.off");
+			}
+		} else if (parOptions == GameSettings.Options.OF_CONNECTED_TEXTURES) {
+			if (this.connectedTexturesOF == 0) {
+				return s + I18n.format("options.off");
+			} else if (this.connectedTexturesOF == 1) {
+				return s + I18n.format("options.graphics.fast");
+			} else {
+				return s + I18n.format("options.graphics.fancy");
+			}
+		} else if (parOptions == GameSettings.Options.OF_BETTER_GRASS) {
+			if (this.betterGrassOF == 0) {
+				return s + I18n.format("options.off");
+			} else if (this.betterGrassOF == 1) {
+				return s + I18n.format("options.graphics.fast");
+			} else {
+				return s + I18n.format("options.graphics.fancy");
 			}
 		} else {
 			return s;
@@ -603,6 +635,12 @@ public class GameSettings {
 			return this.enableDynamicLights;
 		case EAGLER_PROFANITY_FILTER:
 			return this.enableProfanityFilter;
+		case OF_CUSTOM_SKIES:
+			return this.customSkyOF;
+		case OF_SMART_LEAVES:
+			return this.smartLeavesOF;
+		case OF_CUSTOM_ITEMS:
+			return this.customItemsOF;
 		default:
 			return false;
 		}
@@ -1004,6 +1042,26 @@ public class GameSettings {
 						hideVideoSettingsWarning = astring[1].equals("true");
 					}
 
+					if (astring[0].equals("betterGrassOF")) {
+						betterGrassOF = Integer.parseInt(astring[1]);
+					}
+
+					if (astring[0].equals("connectedTexturesOF")) {
+						connectedTexturesOF = Integer.parseInt(astring[1]);
+					}
+
+					if (astring[0].equals("customSkyOF")) {
+						customSkyOF = astring[1].equals("true");
+					}
+
+					if (astring[0].equals("smartLeavesOF")) {
+						smartLeavesOF = astring[1].equals("true");
+					}
+
+					if (astring[0].equals("customItemsOF")) {
+						customItemsOF = astring[1].equals("true");
+					}
+
 					deferredShaderConf.readOption(astring[0], astring[1]);
 				} catch (Exception var8) {
 					logger.warn("Skipping bad option: " + s);
@@ -1305,6 +1363,31 @@ public class GameSettings {
 			this.enableProfanityFilter = !this.enableProfanityFilter;
 		}
 
+		if (parOptions == GameSettings.Options.OF_CONNECTED_TEXTURES) {
+			this.connectedTexturesOF = (this.connectedTexturesOF + 1) % 3;
+			this.mc.renderGlobal.loadRenderers();
+		}
+
+		if (parOptions == GameSettings.Options.OF_BETTER_GRASS) {
+			this.betterGrassOF = (this.betterGrassOF + 1) % 3;
+			this.mc.renderGlobal.loadRenderers();
+		}
+
+		if (parOptions == GameSettings.Options.OF_CUSTOM_SKIES) {
+			this.customSkyOF = !this.customSkyOF;
+			CustomSky.update();
+		}
+
+		if (parOptions == GameSettings.Options.OF_SMART_LEAVES) {
+			this.smartLeavesOF = !this.smartLeavesOF;
+			this.mc.renderGlobal.loadRenderers();
+		}
+
+		if (parOptions == GameSettings.Options.OF_CUSTOM_ITEMS) {
+			this.customItemsOF = !this.customItemsOF;
+			this.mc.renderGlobal.loadRenderers();
+		}
+
 		this.saveOptions();
 	}
 
@@ -1424,6 +1507,11 @@ public class GameSettings {
 			printwriter.println("touchControlOpacity:" + this.touchControlOpacity);
 			printwriter.println("hideDefaultUsernameWarning:" + this.hideDefaultUsernameWarning);
 			printwriter.println("hideVideoSettingsWarning:" + this.hideVideoSettingsWarning);
+			printwriter.println("betterGrassOF:" + this.betterGrassOF);
+			printwriter.println("connectedTexturesOF:" + this.connectedTexturesOF);
+			printwriter.println("customSkyOF:" + this.customSkyOF);
+			printwriter.println("smartLeavesOF:" + this.smartLeavesOF);
+			printwriter.println("customItemsOF:" + this.customItemsOF);
 
 			for (KeyBinding keybinding : this.keyBindings) {
 				printwriter.println("key_" + keybinding.getKeyDescription() + ":" + keybinding.getKeyCode());

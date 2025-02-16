@@ -7,7 +7,7 @@ package net.minecraft.world.chunk;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -54,8 +54,8 @@ public class NibbleArray {
 	}
 
 	public int getFromIndex(int index) {
-		int i = this.getNibbleIndex(index);
-		return this.isLowerNibble(index) ? this.data[i] & 15 : this.data[i] >> 4 & 15;
+		int shift = (index & 1) << 2;
+		return data[index >> 1] >> shift & 15;
 	}
 
 	private int getNibbleIndex(int index) {
@@ -75,12 +75,8 @@ public class NibbleArray {
 	}
 
 	public void setIndex(int index, int value) {
-		int i = this.getNibbleIndex(index);
-		if (this.isLowerNibble(index)) {
-			this.data[i] = (byte) (this.data[i] & 240 | value & 15);
-		} else {
-			this.data[i] = (byte) (this.data[i] & 15 | (value & 15) << 4);
-		}
-
+		int i = index >> 1;
+		int shift = (index & 1) << 2;
+		data[i] = (byte) (data[i] & ~(15 << shift) | (value & 15) << shift);
 	}
 }

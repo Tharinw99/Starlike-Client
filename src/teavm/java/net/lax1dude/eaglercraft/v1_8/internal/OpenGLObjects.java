@@ -195,6 +195,8 @@ class OpenGLObjects {
 		private static int hashGen = 0;
 		final WebGLTexture ptr;
 		final int hash;
+		int width;
+		int height;
 
 		TextureGL(WebGLTexture ptr) {
 			this.ptr = ptr;
@@ -207,8 +209,24 @@ class OpenGLObjects {
 		}
 
 		@Override
+		public int getHeight() {
+			return height;
+		}
+
+		@Override
+		public int getWidth() {
+			return width;
+		}
+
+		@Override
 		public int hashCode() {
 			return hash;
+		}
+
+		@Override
+		public void setCacheSize(int w, int h) {
+			width = w;
+			height = h;
 		}
 
 	}

@@ -3,11 +3,15 @@ package net.minecraft.client.resources;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
 
 import net.lax1dude.eaglercraft.v1_8.EagRuntime;
+import net.lax1dude.eaglercraft.v1_8.minecraft.EaglerFolderResourcePack;
+import net.lax1dude.eaglercraft.v1_8.minecraft.ResourceIndex;
 import net.lax1dude.eaglercraft.v1_8.opengl.ImageData;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.data.IMetadataSection;
@@ -21,7 +25,7 @@ import net.minecraft.util.ResourceLocation;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -37,8 +41,32 @@ import net.minecraft.util.ResourceLocation;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
-public class DefaultResourcePack implements IResourcePack {
+public class DefaultResourcePack extends ResourceIndex implements IResourcePack {
 	public static final Set<String> defaultResourceDomains = ImmutableSet.of("minecraft", "eagler", "starlike");
+
+	private final Collection<String> propertyFilesIndex;
+
+	public DefaultResourcePack() {
+		String str = EagRuntime.getResourceString("/assets/minecraft/optifine/_property_files_index.json");
+		if (str != null) {
+			Collection<String> lst = EaglerFolderResourcePack.loadPropertyFileList(str);
+			if (lst != null) {
+				propertyFilesIndex = lst;
+				return;
+			}
+		}
+		propertyFilesIndex = Collections.emptyList();
+	}
+
+	@Override
+	protected Collection<String> getCITPotionsFiles0() {
+		return Collections.emptyList();
+	}
+
+	@Override
+	public ResourceIndex getEaglerFileIndex() {
+		return this;
+	}
 
 	@Override
 	public InputStream getInputStream(ResourceLocation parResourceLocation) throws IOException {
@@ -78,6 +106,11 @@ public class DefaultResourcePack implements IResourcePack {
 	@Override
 	public String getPackName() {
 		return "Default";
+	}
+
+	@Override
+	protected Collection<String> getPropertiesFiles0() {
+		return propertyFilesIndex;
 	}
 
 	@Override

@@ -28,7 +28,7 @@ import net.minecraft.world.World;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -79,6 +79,8 @@ public class Village {
 
 	private int numIronGolems;
 
+	private BlockPos[] positions = null;
+
 	public Village() {
 	}
 
@@ -103,6 +105,17 @@ public class Village {
 		this.centerHelper = this.centerHelper.add(doorInfo.getDoorBlockPos());
 		this.updateVillageRadiusAndCenter();
 		this.lastAddDoorTimestamp = doorInfo.getInsidePosY();
+	}
+
+	private void calculateNewCheckPositions() {
+		if (this.center == null || this.center.equals(BlockPos.ORIGIN)) {
+			this.positions = null;
+		} else {
+			this.positions = new BlockPos[] { this.center.add(-this.villageRadius, 0, -this.villageRadius),
+					this.center.add(-this.villageRadius, 0, this.villageRadius),
+					this.center.add(this.villageRadius, 0, -this.villageRadius),
+					this.center.add(this.villageRadius, 0, this.villageRadius), this.center };
+		}
 	}
 
 	/**
@@ -309,6 +322,15 @@ public class Village {
 		return this.getReputationForPlayer(parString1) <= -15;
 	}
 
+	public boolean isVillageAreaLoaded() {
+		for (int i = 0; this.positions != null && i < this.positions.length; i++) {
+			if (this.worldObj.isBlockLoaded(this.positions[i])) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private boolean isWoodDoor(BlockPos pos) {
 		Block block = this.worldObj.getBlockState(pos).getBlock();
 		return block instanceof BlockDoor ? block.getMaterial() == Material.wood : false;
@@ -350,6 +372,7 @@ public class Village {
 			}
 		}
 
+		calculateNewCheckPositions();
 	}
 
 	private void removeDeadAndOldAgressors() {
@@ -416,6 +439,9 @@ public class Village {
 	 * + Called periodically by VillageCollection
 	 */
 	public void tick(int parInt1) {
+		if (!isVillageAreaLoaded()) {
+			return;
+		}
 		this.tickCounter = parInt1;
 		this.removeDeadAndOutOfRangeDoors();
 		this.removeDeadAndOldAgressors();
@@ -478,6 +504,8 @@ public class Village {
 
 			this.villageRadius = Math.max(32, (int) Math.sqrt((double) j) + 1);
 		}
+
+		calculateNewCheckPositions();
 	}
 
 	/**

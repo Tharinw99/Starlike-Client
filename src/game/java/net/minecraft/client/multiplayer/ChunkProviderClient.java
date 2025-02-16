@@ -2,6 +2,8 @@ package net.minecraft.client.multiplayer;
 
 import java.util.List;
 
+import com.carrotsearch.hppc.LongObjectHashMap;
+import com.carrotsearch.hppc.LongObjectMap;
 import com.google.common.collect.Lists;
 
 import net.lax1dude.eaglercraft.v1_8.EagRuntime;
@@ -10,7 +12,6 @@ import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.IProgressUpdate;
-import net.minecraft.util.LongHashMap;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -25,7 +26,7 @@ import net.minecraft.world.chunk.IChunkProvider;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -48,7 +49,7 @@ public class ChunkProviderClient implements IChunkProvider {
 	 * + The mapping between ChunkCoordinates and Chunks that ChunkProviderClient
 	 * maintains.
 	 */
-	private LongHashMap<Chunk> chunkMapping = new LongHashMap();
+	private LongObjectMap<Chunk> chunkMapping = new LongObjectHashMap<>();
 	/**
 	 * + This may have been intended to be an iterable version of all currently
 	 * loaded chunks (MultiplayerChunkCache), with identical contents to
@@ -84,6 +85,11 @@ public class ChunkProviderClient implements IChunkProvider {
 	}
 
 	@Override
+	public Chunk getLoadedChunk(int var1, int var2) {
+		return this.chunkMapping.get(ChunkCoordIntPair.chunkXZ2Int(var1, var2));
+	}
+
+	@Override
 	public int getLoadedChunkCount() {
 		return this.chunkListing.size();
 	}
@@ -103,7 +109,7 @@ public class ChunkProviderClient implements IChunkProvider {
 	 */
 	public Chunk loadChunk(int parInt1, int parInt2) {
 		Chunk chunk = new Chunk(this.worldObj, parInt1, parInt2);
-		this.chunkMapping.add(ChunkCoordIntPair.chunkXZ2Int(parInt1, parInt2), chunk);
+		this.chunkMapping.put(ChunkCoordIntPair.chunkXZ2Int(parInt1, parInt2), chunk);
 		this.chunkListing.add(chunk);
 		chunk.setChunkLoaded(true);
 		return chunk;
@@ -114,7 +120,7 @@ public class ChunkProviderClient implements IChunkProvider {
 	 */
 	@Override
 	public String makeString() {
-		return "MultiplayerChunkCache: " + this.chunkMapping.getNumHashElements() + ", " + this.chunkListing.size();
+		return "MultiplayerChunkCache: " + this.chunkMapping.size() + ", " + this.chunkListing.size();
 	}
 
 	/**
@@ -141,7 +147,7 @@ public class ChunkProviderClient implements IChunkProvider {
 	 */
 	@Override
 	public Chunk provideChunk(int i, int j) {
-		Chunk chunk = (Chunk) this.chunkMapping.getValueByKey(ChunkCoordIntPair.chunkXZ2Int(i, j));
+		Chunk chunk = this.chunkMapping.get(ChunkCoordIntPair.chunkXZ2Int(i, j));
 		return chunk == null ? this.blankChunk : chunk;
 	}
 

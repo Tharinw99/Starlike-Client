@@ -161,6 +161,8 @@ class OpenGLObjects {
 	static class TextureGL implements ITextureGL {
 
 		final int ptr;
+		int width;
+		int height;
 
 		TextureGL(int ptr) {
 			this.ptr = ptr;
@@ -172,8 +174,24 @@ class OpenGLObjects {
 		}
 
 		@Override
+		public int getHeight() {
+			return height;
+		}
+
+		@Override
+		public int getWidth() {
+			return width;
+		}
+
+		@Override
 		public int hashCode() {
 			return ptr;
+		}
+
+		@Override
+		public void setCacheSize(int w, int h) {
+			width = w;
+			height = h;
 		}
 
 	}

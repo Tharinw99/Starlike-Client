@@ -1,6 +1,5 @@
 package net.minecraft.client.renderer;
 
-import net.lax1dude.eaglercraft.v1_8.internal.buffer.FloatBuffer;
 import net.lax1dude.eaglercraft.v1_8.opengl.GlStateManager;
 import net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.DeferredStateManager;
 import net.minecraft.util.Vec3;
@@ -12,7 +11,7 @@ import net.minecraft.util.Vec3;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -29,10 +28,6 @@ import net.minecraft.util.Vec3;
  *
  */
 public class RenderHelper {
-	/**
-	 * + Float buffer used to set OpenGL material colors
-	 */
-	private static FloatBuffer colorBuffer = GLAllocation.createDirectFloatBuffer(16);
 	private static final Vec3 LIGHT0_POS = (new Vec3(0.20000000298023224D, 1.0D, -0.699999988079071D)).normalize();
 	private static final Vec3 LIGHT1_POS = (new Vec3(-0.20000000298023224D, 1.0D, 0.699999988079071D)).normalize();
 
@@ -75,26 +70,5 @@ public class RenderHelper {
 			GlStateManager.setMCLightAmbient(0.4f, 0.4f, 0.4f);
 			GlStateManager.enableColorMaterial();
 		}
-	}
-
-	/**
-	 * + Update and return colorBuffer with the RGBA values passed as arguments
-	 */
-	private static FloatBuffer setColorBuffer(double parDouble1, double parDouble2, double parDouble3,
-			double parDouble4) {
-		/**
-		 * + Update and return colorBuffer with the RGBA values passed as arguments
-		 */
-		return setColorBuffer((float) parDouble1, (float) parDouble2, (float) parDouble3, (float) parDouble4);
-	}
-
-	/**
-	 * + Update and return colorBuffer with the RGBA values passed as arguments
-	 */
-	private static FloatBuffer setColorBuffer(float parFloat1, float parFloat2, float parFloat3, float parFloat4) {
-		colorBuffer.clear();
-		colorBuffer.put(parFloat1).put(parFloat2).put(parFloat3).put(parFloat4);
-		colorBuffer.flip();
-		return colorBuffer;
 	}
 }

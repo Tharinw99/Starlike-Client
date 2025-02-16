@@ -51,13 +51,20 @@ public class ShaderCompiler {
 
 	public static IShaderGL compileShader(String name, int stage, ResourceLocation filename, List<String> compileFlags)
 			throws ShaderCompileException {
-		return compileShader(name, stage, filename.toString(), ShaderSource.getSourceFor(filename), compileFlags);
+		String src = ShaderSource.getSourceFor(filename);
+		if (src == null) {
+			throw new ShaderMissingException(name, "File not found: " + filename);
+		}
+		return compileShader(name, stage, filename.toString(), src, compileFlags);
 	}
 
 	public static IShaderGL compileShader(String name, int stage, ResourceLocation filename, String... compileFlags)
 			throws ShaderCompileException {
-		return compileShader(name, stage, filename.toString(), ShaderSource.getSourceFor(filename),
-				Arrays.asList(compileFlags));
+		String src = ShaderSource.getSourceFor(filename);
+		if (src == null) {
+			throw new ShaderMissingException(name, "File not found: " + filename);
+		}
+		return compileShader(name, stage, filename.toString(), src, Arrays.asList(compileFlags));
 	}
 
 	public static IShaderGL compileShader(String name, int stage, String filename, String source,

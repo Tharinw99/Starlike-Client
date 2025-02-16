@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import com.carrotsearch.hppc.cursors.ObjectCursor;
 import com.google.common.collect.Sets;
 
 import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
@@ -68,7 +69,7 @@ import net.minecraft.world.storage.MapData;
  * Minecraft 1.8.8 bytecode is (c) 2015 Mojang AB. "Do not distribute!" Mod
  * Coder Pack v9.18 deobfuscation configs are (c) Copyright by the MCP Team
  *
- * EaglercraftX 1.8 patch files (c) 2022-2024 lax1dude, ayunami2000. All Rights
+ * EaglercraftX 1.8 patch files (c) 2022-2025 lax1dude, ayunami2000. All Rights
  * Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -242,11 +243,11 @@ public class EntityTrackerEntry {
 
 	}
 
-	public boolean func_180233_c(EntityPlayerMP playerMP) {
+	public boolean func_180233_c(EntityPlayerMP playerMP, int trackingDistanceMax) {
+		int i = trackingDistanceThreshold > trackingDistanceMax ? trackingDistanceMax : trackingDistanceThreshold;
 		double d0 = playerMP.posX - (double) (this.encodedPosX / 32);
 		double d1 = playerMP.posZ - (double) (this.encodedPosZ / 32);
-		return d0 >= (double) (-this.trackingDistanceThreshold) && d0 <= (double) this.trackingDistanceThreshold
-				&& d1 >= (double) (-this.trackingDistanceThreshold) && d1 <= (double) this.trackingDistanceThreshold
+		return d0 >= (double) (-i) && d0 <= (double) i && d1 >= (double) (-i) && d1 <= (double) i
 				&& this.trackedEntity.isSpectatedByPlayer(playerMP);
 	}
 
@@ -320,16 +321,16 @@ public class EntityTrackerEntry {
 
 	}
 
-	public void updatePlayerEntities(List<EntityPlayer> parList) {
+	public void updatePlayerEntities(List<EntityPlayer> parList, int trackingDistanceMax) {
 		for (int i = 0; i < parList.size(); ++i) {
-			this.updatePlayerEntity((EntityPlayerMP) parList.get(i));
+			this.updatePlayerEntity((EntityPlayerMP) parList.get(i), trackingDistanceMax);
 		}
 
 	}
 
-	public void updatePlayerEntity(EntityPlayerMP playerMP) {
+	public void updatePlayerEntity(EntityPlayerMP playerMP, int trackingDistanceMax) {
 		if (playerMP != this.trackedEntity) {
-			if (this.func_180233_c(playerMP)) {
+			if (this.func_180233_c(playerMP, trackingDistanceMax)) {
 				if (!this.trackingPlayers.contains(playerMP)
 						&& (this.isPlayerWatchingThisChunk(playerMP) || this.trackedEntity.forceSpawn)) {
 					this.trackingPlayers.add(playerMP);
@@ -394,12 +395,17 @@ public class EntityTrackerEntry {
 						}
 					}
 
+					this.lastHeadMotion = MathHelper
+							.floor_float(this.trackedEntity.getRotationYawHead() * 256.0F / 360.0F);
+					playerMP.playerNetServerHandler
+							.sendPacket(new S19PacketEntityHeadLook(this.trackedEntity, (byte) lastHeadMotion));
+
 					if (this.trackedEntity instanceof EntityLivingBase) {
 						EntityLivingBase entitylivingbase = (EntityLivingBase) this.trackedEntity;
 
-						for (PotionEffect potioneffect : entitylivingbase.getActivePotionEffects()) {
+						for (ObjectCursor<PotionEffect> potioneffect : entitylivingbase.getActivePotionEffects()) {
 							playerMP.playerNetServerHandler.sendPacket(
-									new S1DPacketEntityEffect(this.trackedEntity.getEntityId(), potioneffect));
+									new S1DPacketEntityEffect(this.trackedEntity.getEntityId(), potioneffect.value));
 						}
 					}
 				}
@@ -411,7 +417,7 @@ public class EntityTrackerEntry {
 		}
 	}
 
-	public void updatePlayerList(List<EntityPlayer> parList) {
+	public void updatePlayerList(List<EntityPlayer> parList, int trackingDistanceMax) {
 		this.playerEntitiesUpdated = false;
 		if (!this.firstUpdateDone || this.trackedEntity.getDistanceSq(this.lastTrackedEntityPosX,
 				this.lastTrackedEntityPosY, this.lastTrackedEntityPosZ) > 16.0D) {
@@ -420,7 +426,7 @@ public class EntityTrackerEntry {
 			this.lastTrackedEntityPosZ = this.trackedEntity.posZ;
 			this.firstUpdateDone = true;
 			this.playerEntitiesUpdated = true;
-			this.updatePlayerEntities(parList);
+			this.updatePlayerEntities(parList, trackingDistanceMax);
 		}
 
 		if (this.field_85178_v != this.trackedEntity.ridingEntity

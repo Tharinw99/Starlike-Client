@@ -1,9 +1,11 @@
 package net.lax1dude.eaglercraft.v1_8.internal.teavm;
 
+import org.teavm.jso.JSBody;
+
 import net.lax1dude.eaglercraft.v1_8.sp.server.internal.teavm.WorkerMain;
 
 /**
- * Copyright (c) 2022-2024 lax1dude. All Rights Reserved.
+ * Copyright (c) 2022-2025 lax1dude. All Rights Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -25,6 +27,7 @@ public class MainClass {
 	}
 
 	public static void main(String[] args) {
+		setStackTraceLimit();
 		if (args.length == 1) {
 			if ("_worker_process_".equalsIgnoreCase(args[0])) {
 				workerMain();
@@ -37,7 +40,11 @@ public class MainClass {
 		System.out.println("???");
 	}
 
+	@JSBody(script = "Error.stackTraceLimit = 1024;")
+	private static native void setStackTraceLimit();
+
 	private static void workerMain() {
 		WorkerMain._main();
 	}
+
 }
