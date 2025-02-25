@@ -1,17 +1,4 @@
-package net.lax1dude.eaglercraft.v1_8.sp.server.internal.lwjgl;
-
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Toolkit;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.ScrollPaneConstants;
-
-/**
+/*
  * Copyright (c) 2022-2024 lax1dude. All Rights Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -27,6 +14,19 @@ import javax.swing.ScrollPaneConstants;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
+package net.lax1dude.eaglercraft.v1_8.sp.server.internal.lwjgl;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
+import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.Color;
+
 public class CrashScreenPopup extends JFrame {
 
 	private static final long serialVersionUID = 1L;

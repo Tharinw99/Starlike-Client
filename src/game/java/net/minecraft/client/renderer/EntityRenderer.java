@@ -2414,7 +2414,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 				GlStateManager.setFogStart(f1 * 0.25F);
 				GlStateManager.setFogEnd(f1);
 			}
-			EaglercraftGPU.glFogi('\u855a', '\u855b');
+			// EaglercraftGPU.glFogi('\u855a', '\u855b');
 		} else if (this.cloudFog) {
 			GlStateManager.setFog(GL_EXP);
 			GlStateManager.setFogDensity(0.1F);
@@ -2443,8 +2443,6 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 				GlStateManager.setFogStart(f * 0.75F);
 				GlStateManager.setFogEnd(f);
 			}
-
-			EaglercraftGPU.glFogi('\u855a', '\u855b');
 
 			if (this.mc.theWorld.provider.doesXZShowFog((int) entity.posX, (int) entity.posZ)) {
 				GlStateManager.setFogStart(f * 0.05F);

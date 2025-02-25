@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2023 lax1dude. All Rights Reserved.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
 package net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred;
 
 import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglBufferData;
@@ -23,8 +39,8 @@ import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_UNSIGNED_B
 import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_UNSIGNED_SHORT;
 
 import net.lax1dude.eaglercraft.v1_8.EagRuntime;
-import net.lax1dude.eaglercraft.v1_8.internal.IBufferArrayGL;
 import net.lax1dude.eaglercraft.v1_8.internal.IBufferGL;
+import net.lax1dude.eaglercraft.v1_8.internal.IVertexArrayGL;
 import net.lax1dude.eaglercraft.v1_8.internal.buffer.ByteBuffer;
 import net.lax1dude.eaglercraft.v1_8.internal.buffer.FloatBuffer;
 import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
@@ -36,22 +52,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
 
-/**
- * Copyright (c) 2023 lax1dude. All Rights Reserved.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- */
 public class ForwardAcceleratedEffectRenderer extends AbstractAcceleratedEffectRenderer {
 
 	private static final Logger logger = LogManager.getLogger("ForwardAcceleratedEffectRenderer");
@@ -68,7 +68,7 @@ public class ForwardAcceleratedEffectRenderer extends AbstractAcceleratedEffectR
 	private boolean particlesHasOverflowed = false;
 	private PipelineShaderAccelParticleForward shaderProgram = null;
 
-	private IBufferArrayGL vertexArray = null;
+	private IVertexArrayGL vertexArray = null;
 
 	private IBufferGL vertexBuffer = null;
 
@@ -151,7 +151,7 @@ public class ForwardAcceleratedEffectRenderer extends AbstractAcceleratedEffectR
 				DeferredStateManager.passInverseViewMatrix);
 
 		EaglercraftGPU.bindGLArrayBuffer(instancesBuffer);
-		EaglercraftGPU.bindGLBufferArray(vertexArray);
+		EaglercraftGPU.bindGLVertexArray(vertexArray);
 
 		int p = particleBuffer.position();
 		int l = particleBuffer.limit();
@@ -207,7 +207,7 @@ public class ForwardAcceleratedEffectRenderer extends AbstractAcceleratedEffectR
 		verts.put(new float[] { -1.0f, -1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, -1.0f });
 		verts.flip();
 
-		EaglercraftGPU.bindGLBufferArray(vertexArray);
+		EaglercraftGPU.bindGLVertexArray(vertexArray);
 
 		EaglercraftGPU.bindGLArrayBuffer(vertexBuffer);
 		_wglBufferData(GL_ARRAY_BUFFER, verts, GL_STATIC_DRAW);

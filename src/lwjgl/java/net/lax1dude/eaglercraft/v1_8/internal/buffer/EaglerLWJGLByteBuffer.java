@@ -1,9 +1,4 @@
-package net.lax1dude.eaglercraft.v1_8.internal.buffer;
-
-import net.lax1dude.unsafememcpy.UnsafeMemcpy;
-import net.lax1dude.unsafememcpy.UnsafeUtils;
-
-/**
+/*
  * Copyright (c) 2022-2025 lax1dude. All Rights Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -19,6 +14,12 @@ import net.lax1dude.unsafememcpy.UnsafeUtils;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
+package net.lax1dude.eaglercraft.v1_8.internal.buffer;
+
+import net.lax1dude.unsafememcpy.UnsafeMemcpy;
+import net.lax1dude.unsafememcpy.UnsafeUtils;
+
 public class EaglerLWJGLByteBuffer extends ByteBuffer {
 
 	final long address;
@@ -220,13 +221,6 @@ public class EaglerLWJGLByteBuffer extends ByteBuffer {
 		return limit;
 	}
 
-	@Override
-	public ByteBuffer limit(int newLimit) {
-		if (newLimit < 0 || newLimit > capacity)
-			throw Buffer.makeIOOBE(newLimit);
-		limit = newLimit;
-		return this;
-	}
 
 	@Override
 	public ByteBuffer mark() {
@@ -239,13 +233,6 @@ public class EaglerLWJGLByteBuffer extends ByteBuffer {
 		return position;
 	}
 
-	@Override
-	public ByteBuffer position(int newPosition) {
-		if (newPosition < 0 || newPosition > limit)
-			throw Buffer.makeIOOBE(newPosition);
-		position = newPosition;
-		return this;
-	}
 
 	@Override
 	public ByteBuffer put(byte b) {
@@ -406,6 +393,20 @@ public class EaglerLWJGLByteBuffer extends ByteBuffer {
 	public ByteBuffer rewind() {
 		position = 0;
 		mark = -1;
+		return this;
+	}
+
+	@Override
+	public ByteBuffer limit(int newLimit) {
+		if(newLimit < 0 || newLimit > capacity) throw Buffer.makeIOOBE(newLimit);
+		limit = newLimit;
+		return this;
+	}
+
+	@Override
+	public ByteBuffer position(int newPosition) {
+		if(newPosition < 0 || newPosition > limit) throw Buffer.makeIOOBE(newPosition);
+		position = newPosition;
 		return this;
 	}
 

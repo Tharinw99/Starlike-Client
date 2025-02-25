@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2024 lax1dude. All Rights Reserved.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
 package net.lax1dude.eaglercraft.v1_8.boot_menu.teavm;
 
 import java.nio.charset.StandardCharsets;
@@ -8,9 +24,6 @@ import java.util.function.Consumer;
 
 import org.teavm.jso.dom.html.HTMLElement;
 
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
-
 import net.lax1dude.eaglercraft.v1_8.EagRuntime;
 import net.lax1dude.eaglercraft.v1_8.EagUtils;
 import net.lax1dude.eaglercraft.v1_8.EaglercraftUUID;
@@ -20,22 +33,6 @@ import net.lax1dude.eaglercraft.v1_8.internal.FileChooserResult;
 import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
 import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 
-/**
- * Copyright (c) 2024 lax1dude. All Rights Reserved.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- */
 public class MenuStateBoot extends MenuState {
 
 	private static class BootItem implements SelectionListController.ListItem, Runnable {
@@ -474,27 +471,26 @@ public class MenuStateBoot extends MenuState {
 												|| enumValue2 == EnumImportModeMenu.EAGLERCRAFT_EPK_FILE) {
 											filteredList = bootableClients;
 										} else {
-											filteredList = Lists
-													.newArrayList(Collections2.filter(bootableClients, (etr) -> {
-														switch (enumValue2) {
-														case EAGLERCRAFTX_1_8_OFFLINE:
-														case EAGLERCRAFT_1_5_OLD_OFFLINE:
-														case EAGLERCRAFT_BETA_B1_3_OFFLINE:
-														case PEYTONPLAYZ585_BETA_1_7_3:
-														case PEYTONPLAYZ585_ALPHA_1_2_6:
-														case PEYTONPLAYZ585_INDEV:
-															return etr.bootAdapter
-																	.getClientDataEntry().type == EnumClientFormatType.EAGLER_STANDARD_OFFLINE;
-														case EAGLERCRAFTX_1_8_SIGNED:
-															return etr.bootAdapter
-																	.getClientDataEntry().type == EnumClientFormatType.EAGLER_SIGNED_OFFLINE;
-														case EAGLERCRAFT_1_5_NEW_OFFLINE:
-															return etr.bootAdapter
-																	.getClientDataEntry().type == EnumClientFormatType.EAGLER_STANDARD_1_5_OFFLINE;
-														default:
-															return false;
-														}
-													}));
+											filteredList = bootableClients.stream().filter((etr) -> {
+												switch (enumValue2) {
+												case EAGLERCRAFTX_1_8_OFFLINE:
+												case EAGLERCRAFT_1_5_OLD_OFFLINE:
+												case EAGLERCRAFT_BETA_B1_3_OFFLINE:
+												case PEYTONPLAYZ585_BETA_1_7_3:
+												case PEYTONPLAYZ585_ALPHA_1_2_6:
+												case PEYTONPLAYZ585_INDEV:
+													return etr.bootAdapter
+															.getClientDataEntry().type == EnumClientFormatType.EAGLER_STANDARD_OFFLINE;
+												case EAGLERCRAFTX_1_8_SIGNED:
+													return etr.bootAdapter
+															.getClientDataEntry().type == EnumClientFormatType.EAGLER_SIGNED_OFFLINE;
+												case EAGLERCRAFT_1_5_NEW_OFFLINE:
+													return etr.bootAdapter
+															.getClientDataEntry().type == EnumClientFormatType.EAGLER_STANDARD_1_5_OFFLINE;
+												default:
+													return false;
+												}
+											}).toList();
 										}
 										if (filteredList.size() > 0) {
 											MenuStateBoot.this.changePopupState(null);

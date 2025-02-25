@@ -63,4 +63,9 @@ public class Tessellator {
 	public WorldRenderer getWorldRenderer() {
 		return this.worldRenderer;
 	}
+
+	public void uploadDisplayList(int displayList) {
+		this.worldRenderer.finishDrawing();
+		WorldVertexBufferUploader.uploadDisplayList(displayList, this.worldRenderer);
+	}
 }

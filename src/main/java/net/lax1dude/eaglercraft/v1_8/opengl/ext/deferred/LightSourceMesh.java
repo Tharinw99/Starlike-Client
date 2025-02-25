@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2023 lax1dude. All Rights Reserved.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
 package net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred;
 
 import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglBindBuffer;
@@ -24,29 +40,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import net.lax1dude.eaglercraft.v1_8.EagRuntime;
-import net.lax1dude.eaglercraft.v1_8.internal.IBufferArrayGL;
 import net.lax1dude.eaglercraft.v1_8.internal.IBufferGL;
+import net.lax1dude.eaglercraft.v1_8.internal.IVertexArrayGL;
 import net.lax1dude.eaglercraft.v1_8.internal.buffer.ByteBuffer;
 import net.lax1dude.eaglercraft.v1_8.opengl.EaglercraftGPU;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 
-/**
- * Copyright (c) 2023 lax1dude. All Rights Reserved.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- */
 public class LightSourceMesh {
 
 	public final ResourceLocation meshLocation;
@@ -54,7 +54,7 @@ public class LightSourceMesh {
 
 	private IBufferGL meshVBO = null;
 	private IBufferGL meshIBO = null;
-	private IBufferArrayGL meshVAO = null;
+	private IVertexArrayGL meshVAO = null;
 
 	private int meshIndexType = -1;
 	private int meshIndexCount = -1;
@@ -80,7 +80,7 @@ public class LightSourceMesh {
 	}
 
 	public void drawMeshVAO() {
-		EaglercraftGPU.bindGLBufferArray(meshVAO);
+		EaglercraftGPU.bindGLVertexArray(meshVAO);
 		_wglDrawElements(GL_TRIANGLES, meshIndexCount, meshIndexType, 0);
 	}
 
@@ -137,7 +137,7 @@ public class LightSourceMesh {
 			buf.flip();
 
 			meshVAO = _wglGenVertexArrays();
-			EaglercraftGPU.bindGLBufferArray(meshVAO);
+			EaglercraftGPU.bindGLVertexArray(meshVAO);
 
 			meshIBO = _wglGenBuffers();
 			_wglBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshIBO);

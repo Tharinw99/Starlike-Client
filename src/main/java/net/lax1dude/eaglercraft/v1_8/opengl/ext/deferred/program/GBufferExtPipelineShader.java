@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2023 lax1dude. All Rights Reserved.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
 package net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred.program;
 
 import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGetUniformBlockIndex;
@@ -8,22 +24,6 @@ import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglUniformB
 import net.lax1dude.eaglercraft.v1_8.internal.IProgramGL;
 import net.lax1dude.eaglercraft.v1_8.internal.IUniformGL;
 
-/**
- * Copyright (c) 2023 lax1dude. All Rights Reserved.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- */
 public class GBufferExtPipelineShader extends ShaderProgram<GBufferExtPipelineShader.Uniforms> {
 
 	public static class Uniforms implements IProgramUniforms {
@@ -33,9 +33,11 @@ public class GBufferExtPipelineShader extends ShaderProgram<GBufferExtPipelineSh
 		public float materialConstantsRoughness = -999.0f;
 		public float materialConstantsMetalness = -999.0f;
 		public float materialConstantsEmission = -999.0f;
+		public float materialConstantsSubsurfScattering = -999.0f;
 		public float materialConstantsUseEnvMap = -999.0f;
 
 		public IUniformGL u_materialConstants3f = null;
+		public IUniformGL u_materialConstants4f = null;
 		public IUniformGL u_useEnvMap1f = null;
 
 		public int constantBlock = -999;
@@ -85,6 +87,7 @@ public class GBufferExtPipelineShader extends ShaderProgram<GBufferExtPipelineSh
 		@Override
 		public void loadUniforms(IProgramGL prog) {
 			u_materialConstants3f = _wglGetUniformLocation(prog, "u_materialConstants3f");
+			u_materialConstants4f = _wglGetUniformLocation(prog, "u_materialConstants4f");
 			u_useEnvMap1f = _wglGetUniformLocation(prog, "u_useEnvMap1f");
 			u_blockConstant1f = _wglGetUniformLocation(prog, "u_blockConstant1f");
 			u_clipPlaneY1f = _wglGetUniformLocation(prog, "u_clipPlaneY1f");

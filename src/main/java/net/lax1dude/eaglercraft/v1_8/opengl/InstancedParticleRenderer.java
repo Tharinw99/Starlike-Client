@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2022-2024 lax1dude. All Rights Reserved.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
 package net.lax1dude.eaglercraft.v1_8.opengl;
 
 import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglAttachShader;
@@ -37,33 +53,17 @@ import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_UNSIGNED_S
 import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_VERTEX_SHADER;
 
 import net.lax1dude.eaglercraft.v1_8.EagRuntime;
-import net.lax1dude.eaglercraft.v1_8.internal.IBufferArrayGL;
 import net.lax1dude.eaglercraft.v1_8.internal.IBufferGL;
 import net.lax1dude.eaglercraft.v1_8.internal.IProgramGL;
 import net.lax1dude.eaglercraft.v1_8.internal.IShaderGL;
 import net.lax1dude.eaglercraft.v1_8.internal.IUniformGL;
+import net.lax1dude.eaglercraft.v1_8.internal.IVertexArrayGL;
 import net.lax1dude.eaglercraft.v1_8.internal.buffer.ByteBuffer;
 import net.lax1dude.eaglercraft.v1_8.internal.buffer.FloatBuffer;
 import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
 import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
 import net.lax1dude.eaglercraft.v1_8.vector.Matrix4f;
 
-/**
- * Copyright (c) 2022-2024 lax1dude. All Rights Reserved.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- */
 public class InstancedParticleRenderer {
 
 	private static final Logger logger = LogManager.getLogger("InstancedParticleRenderer");
@@ -89,7 +89,7 @@ public class InstancedParticleRenderer {
 	private static IUniformGL u_transformParam_3_4_f = null;
 	private static IUniformGL u_color4f = null;
 
-	private static IBufferArrayGL vertexArray = null;
+	private static IVertexArrayGL vertexArray = null;
 	private static IBufferGL vertexBuffer = null;
 
 	private static IBufferGL instancesBuffer = null;
@@ -172,7 +172,7 @@ public class InstancedParticleRenderer {
 		u_transformParam_3_4_f = null;
 		u_color4f = null;
 		if (vertexArray != null) {
-			EaglercraftGPU.destroyGLBufferArray(vertexArray);
+			EaglercraftGPU.destroyGLVertexArray(vertexArray);
 			vertexArray = null;
 		}
 		if (vertexBuffer != null) {
@@ -267,7 +267,7 @@ public class InstancedParticleRenderer {
 		_wglUniform1i(_wglGetUniformLocation(shaderProgram, "u_inputTexture"), 0);
 		_wglUniform1i(_wglGetUniformLocation(shaderProgram, "u_lightmapTexture"), 1);
 
-		vertexArray = EaglercraftGPU.createGLBufferArray();
+		vertexArray = EaglercraftGPU.createGLVertexArray();
 		vertexBuffer = _wglGenBuffers();
 		instancesBuffer = _wglGenBuffers();
 
@@ -275,7 +275,7 @@ public class InstancedParticleRenderer {
 		verts.put(new float[] { -1.0f, -1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, -1.0f });
 		verts.flip();
 
-		EaglercraftGPU.bindGLBufferArray(vertexArray);
+		EaglercraftGPU.bindGLVertexArray(vertexArray);
 
 		EaglercraftGPU.bindVAOGLArrayBufferNow(vertexBuffer);
 		_wglBufferData(GL_ARRAY_BUFFER, verts, GL_STATIC_DRAW);
@@ -371,7 +371,7 @@ public class InstancedParticleRenderer {
 		}
 
 		EaglercraftGPU.bindGLArrayBuffer(instancesBuffer);
-		EaglercraftGPU.bindGLBufferArray(vertexArray);
+		EaglercraftGPU.bindGLVertexArray(vertexArray);
 
 		int p = particleBuffer.position();
 		int l = particleBuffer.limit();
@@ -382,7 +382,7 @@ public class InstancedParticleRenderer {
 		particleBuffer.position(p);
 		particleBuffer.limit(l);
 
-		EaglercraftGPU.doDrawArraysInstanced(GL_TRIANGLES, 0, 6, particleCount);
+		EaglercraftGPU.drawArraysInstanced(GL_TRIANGLES, 0, 6, particleCount);
 	}
 
 	public static void stupidColorSetHack(IUniformGL color4f) {

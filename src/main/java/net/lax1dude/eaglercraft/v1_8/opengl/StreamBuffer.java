@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2023-2024 lax1dude. All Rights Reserved.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
 package net.lax1dude.eaglercraft.v1_8.opengl;
 
 import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglBufferData;
@@ -6,29 +22,13 @@ import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglGenBuffe
 import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ARRAY_BUFFER;
 import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_STREAM_DRAW;
 
-import net.lax1dude.eaglercraft.v1_8.internal.IBufferArrayGL;
 import net.lax1dude.eaglercraft.v1_8.internal.IBufferGL;
+import net.lax1dude.eaglercraft.v1_8.internal.IVertexArrayGL;
 
-/**
- * Copyright (c) 2023-2024 lax1dude. All Rights Reserved.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- */
 public class StreamBuffer {
 
 	public static interface IStreamBufferInitializer {
-		void initialize(IBufferArrayGL vertexArray, IBufferGL vertexBuffer);
+		void initialize(IVertexArrayGL vertexArray, IBufferGL vertexBuffer);
 	}
 
 	protected static class PoolInstance {
@@ -41,12 +41,12 @@ public class StreamBuffer {
 	public static class StreamBufferInstance {
 
 		protected PoolInstance poolInstance = null;
-		protected IBufferArrayGL vertexArray = null;
+		protected IVertexArrayGL vertexArray = null;
 
 		public boolean bindQuad16 = false;
 		public boolean bindQuad32 = false;
 
-		public IBufferArrayGL getVertexArray() {
+		public IVertexArrayGL getVertexArray() {
 			return vertexArray;
 		}
 
@@ -131,7 +131,7 @@ public class StreamBuffer {
 		for (int i = 0; i < buffers.length; ++i) {
 			StreamBufferInstance next = buffers[i];
 			if (next.vertexArray != null) {
-				EaglercraftGPU.destroyGLBufferArray(next.vertexArray);
+				EaglercraftGPU.destroyGLVertexArray(next.vertexArray);
 			}
 		}
 		buffers = new StreamBufferInstance[initialCount];
@@ -146,7 +146,7 @@ public class StreamBuffer {
 		StreamBufferInstance next = buffers[(currentBufferId++) % buffers.length];
 		resizeInstance(next.poolInstance, requiredMemory);
 		if (next.vertexArray == null) {
-			next.vertexArray = EaglercraftGPU.createGLBufferArray();
+			next.vertexArray = EaglercraftGPU.createGLVertexArray();
 			initializer.initialize(next.vertexArray, next.poolInstance.vertexBuffer);
 		}
 		return next;
@@ -166,7 +166,7 @@ public class StreamBuffer {
 						newArray[i] = buffers[i];
 					} else {
 						if (buffers[i].vertexArray != null) {
-							EaglercraftGPU.destroyGLBufferArray(buffers[i].vertexArray);
+							EaglercraftGPU.destroyGLVertexArray(buffers[i].vertexArray);
 						}
 					}
 				}

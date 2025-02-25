@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2024 lax1dude. All Rights Reserved.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
 package net.lax1dude.eaglercraft.v1_8;
 
 import java.util.HashMap;
@@ -12,22 +28,6 @@ import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 
-/**
- * Copyright (c) 2024 lax1dude. All Rights Reserved.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- */
 public class ClientUUIDLoadingCache {
 
 	private static class WaitingLookup {
@@ -59,6 +59,10 @@ public class ClientUUIDLoadingCache {
 	private static int requestId = 0;
 	private static long lastFlushReq = EagRuntime.steadyTimeMillis();
 	private static long lastFlushEvict = EagRuntime.steadyTimeMillis();
+	private static boolean ignoreNonEaglerPlayers = false;
+
+	private static final EaglercraftUUID MAGIC_DISABLE_NON_EAGLER_PLAYERS = new EaglercraftUUID(0xEEEEA64771094C4EL,
+			0x86E55B81D17E67EBL);
 
 	public static void evict(EaglercraftUUID clientId) {
 		evictedUUIDs.put(clientId, Long.valueOf(EagRuntime.steadyTimeMillis()));
@@ -91,16 +95,20 @@ public class ClientUUIDLoadingCache {
 			if (ret == null) {
 				Minecraft mc = Minecraft.getMinecraft();
 				if (mc != null && mc.thePlayer != null && mc.thePlayer.sendQueue.getEaglerMessageProtocol().ver >= 4) {
-					ret = PENDING_UUID;
-					EaglercraftUUID playerUUID = player.getUniqueID();
-					if (!waitingUUIDs.containsKey(playerUUID) && !evictedUUIDs.containsKey(playerUUID)) {
-						int reqID = ++requestId & 0x3FFF;
-						WaitingLookup newLookup = new WaitingLookup(reqID, playerUUID, EagRuntime.steadyTimeMillis(),
-								(AbstractClientPlayer) player);
-						waitingIDs.put(reqID, newLookup);
-						waitingUUIDs.put(playerUUID, newLookup);
-						mc.thePlayer.sendQueue.sendEaglerMessage(
-								new CPacketGetOtherClientUUIDV4EAG(reqID, newLookup.uuid.msb, newLookup.uuid.lsb));
+					if (ignoreNonEaglerPlayers && !player.getGameProfile().getTextures().eaglerPlayer) {
+						ret = VANILLA_UUID;
+					} else {
+						ret = PENDING_UUID;
+						EaglercraftUUID playerUUID = player.getUniqueID();
+						if (!waitingUUIDs.containsKey(playerUUID) && !evictedUUIDs.containsKey(playerUUID)) {
+							int reqID = ++requestId & 0x3FFF;
+							WaitingLookup newLookup = new WaitingLookup(reqID, playerUUID,
+									EagRuntime.steadyTimeMillis(), (AbstractClientPlayer) player);
+							waitingIDs.put(reqID, newLookup);
+							waitingUUIDs.put(playerUUID, newLookup);
+							mc.thePlayer.sendQueue.sendEaglerMessage(
+									new CPacketGetOtherClientUUIDV4EAG(reqID, newLookup.uuid.msb, newLookup.uuid.lsb));
+						}
 					}
 				}
 			}
@@ -119,9 +127,17 @@ public class ClientUUIDLoadingCache {
 			lookup.player.clientBrandUUIDCache = clientId;
 			waitingUUIDs.remove(lookup.uuid);
 		} else {
-			logger.warn("Unsolicited client brand UUID lookup response #{} recieved! (Brand UUID: {})", requestId,
-					clientId);
+			if (requestId == -1 && MAGIC_DISABLE_NON_EAGLER_PLAYERS.equals(clientId)) {
+				ignoreNonEaglerPlayers = true;
+			} else {
+				logger.warn("Unsolicited client brand UUID lookup response #{} recieved! (Brand UUID: {})", requestId,
+						clientId);
+			}
 		}
+	}
+
+	public static void resetFlags() {
+		ignoreNonEaglerPlayers = false;
 	}
 
 	public static void update() {

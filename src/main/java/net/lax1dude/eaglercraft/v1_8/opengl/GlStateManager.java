@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2022-2024 lax1dude. All Rights Reserved.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
 package net.lax1dude.eaglercraft.v1_8.opengl;
 
 import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglActiveTexture;
@@ -53,22 +69,6 @@ import net.lax1dude.eaglercraft.v1_8.vector.Vector3f;
 import net.lax1dude.eaglercraft.v1_8.vector.Vector4f;
 import net.minecraft.util.MathHelper;
 
-/**
- * Copyright (c) 2022-2024 lax1dude. All Rights Reserved.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- */
 public class GlStateManager {
 
 	public static enum TexGen {
@@ -167,11 +167,11 @@ public class GlStateManager {
 	static int viewportH = -1;
 
 	static int colorMaskBits = 15;
-	static float clearColorR = 0.0f;
-	static float clearColorG = 0.0f;
-	static float clearColorB = 0.0f;
+	static float clearColorR = -999.0f;
+	static float clearColorG = -999.0f;
+	static float clearColorB = -999.0f;
 
-	static float clearColorA = 1.0f;
+	static float clearColorA = -999.0f;
 
 	static float clearDepth = -999.0f;
 
@@ -315,7 +315,7 @@ public class GlStateManager {
 		mat.m03 = nm03;
 	}
 
-	public static final void alphaFunc(int func, float ref) {
+	public static void alphaFunc(int func, float ref) {
 		if (func != GL_GREATER) {
 			throw new UnsupportedOperationException("Only GL_GREATER alphaFunc is supported");
 		} else {
@@ -323,21 +323,21 @@ public class GlStateManager {
 		}
 	}
 
-	public static final void bindTexture(int texture) {
+	public static void bindTexture(int texture) {
 		if (texture != boundTexture[activeTexture]) {
 			_wglBindTexture(GL_TEXTURE_2D, EaglercraftGPU.mapTexturesGL.get(texture));
 			boundTexture[activeTexture] = texture;
 		}
 	}
 
-	public static final void bindTexture3D(int texture) {
+	public static void bindTexture3D(int texture) {
 		if (texture != boundTexture[activeTexture]) {
 			_wglBindTexture(GL_TEXTURE_3D, EaglercraftGPU.mapTexturesGL.get(texture));
 			boundTexture[activeTexture] = texture;
 		}
 	}
 
-	public static final void blendFunc(int srcFactor, int dstFactor) {
+	public static void blendFunc(int srcFactor, int dstFactor) {
 		if (stateEnableOverlayFramebufferBlending) {
 			tryBlendFuncSeparate(srcFactor, dstFactor, 0, 1);
 			return;
@@ -351,15 +351,15 @@ public class GlStateManager {
 		}
 	}
 
-	public static final void callList(int list) {
+	public static void callList(int list) {
 		EaglercraftGPU.glCallList(list);
 	}
 
-	public static final void clear(int mask) {
+	public static void clear(int mask) {
 		_wglClear(mask);
 	}
 
-	public static final void clearColor(float red, float green, float blue, float alpha) {
+	public static void clearColor(float red, float green, float blue, float alpha) {
 		if (red != clearColorR || green != clearColorG || blue != clearColorB || alpha != clearColorA) {
 			_wglClearColor(red, green, blue, alpha);
 			clearColorR = red;
@@ -369,7 +369,7 @@ public class GlStateManager {
 		}
 	}
 
-	public static final void clearDepth(float depth) {
+	public static void clearDepth(float depth) {
 		depth = 1.0f - depth;
 		if (depth != clearDepth) {
 			_wglClearDepth(depth);
@@ -377,7 +377,7 @@ public class GlStateManager {
 		}
 	}
 
-	public static final void color(float colorRed, float colorGreen, float colorBlue) {
+	public static void color(float colorRed, float colorGreen, float colorBlue) {
 		stateColorR = colorRed;
 		stateColorG = colorGreen;
 		stateColorB = colorBlue;
@@ -385,7 +385,7 @@ public class GlStateManager {
 		++stateColorSerial;
 	}
 
-	public static final void color(float colorRed, float colorGreen, float colorBlue, float colorAlpha) {
+	public static void color(float colorRed, float colorGreen, float colorBlue, float colorAlpha) {
 		stateColorR = colorRed;
 		stateColorG = colorGreen;
 		stateColorB = colorBlue;
@@ -393,11 +393,11 @@ public class GlStateManager {
 		++stateColorSerial;
 	}
 
-	public static final void colorLogicOp(int opcode) {
+	public static void colorLogicOp(int opcode) {
 
 	}
 
-	public static final void colorMask(boolean red, boolean green, boolean blue, boolean alpha) {
+	public static void colorMask(boolean red, boolean green, boolean blue, boolean alpha) {
 		int bits = (red ? 1 : 0) | (green ? 2 : 0) | (blue ? 4 : 0) | (alpha ? 8 : 0);
 		if (bits != colorMaskBits) {
 			_wglColorMask(red, green, blue, alpha);
@@ -405,19 +405,19 @@ public class GlStateManager {
 		}
 	}
 
-	public static final void cullFace(int mode) {
+	public static void cullFace(int mode) {
 		if (stateCullFace != mode) {
 			_wglCullFace(mode);
 			stateCullFace = mode;
 		}
 	}
 
-	public static final void deleteTexture(int texture) {
+	public static void deleteTexture(int texture) {
 		unbindTextureIfCached(texture);
 		_wglDeleteTextures(EaglercraftGPU.mapTexturesGL.free(texture));
 	}
 
-	public static final void depthFunc(int depthFunc) {
+	public static void depthFunc(int depthFunc) {
 		int rev = depthFunc;
 		switch (depthFunc) {
 		case GL_GREATER:
@@ -442,18 +442,18 @@ public class GlStateManager {
 		}
 	}
 
-	public static final void depthMask(boolean flagIn) {
+	public static void depthMask(boolean flagIn) {
 		if (flagIn != stateDepthMask) {
 			_wglDepthMask(flagIn);
 			stateDepthMask = flagIn;
 		}
 	}
 
-	public static final void disableAlpha() {
+	public static void disableAlpha() {
 		stateAlphaTest = false;
 	}
 
-	public static final void disableBlend() {
+	public static void disableBlend() {
 		if (stateBlend) {
 			if (stateGlobalBlend)
 				_wglDisable(GL_BLEND);
@@ -461,73 +461,73 @@ public class GlStateManager {
 		}
 	}
 
-	public static final void disableColorLogic() {
+	public static void disableColorLogic() {
 
 	}
 
-	public static final void disableColorMaterial() {
+	public static void disableColorMaterial() {
 		stateMaterial = false;
 	}
 
-	public static final void disableCull() {
+	public static void disableCull() {
 		if (stateCull) {
 			_wglDisable(GL_CULL_FACE);
 			stateCull = false;
 		}
 	}
 
-	public static final void disableDepth() {
+	public static void disableDepth() {
 		if (stateDepthTest) {
 			_wglDisable(GL_DEPTH_TEST);
 			stateDepthTest = false;
 		}
 	}
 
-	public static final void disableExtensionPipeline() {
+	public static void disableExtensionPipeline() {
 		stateUseExtensionPipeline = false;
 	}
 
-	public static final void disableFog() {
+	public static void disableFog() {
 		stateFog = false;
 	}
 
-	public static final void disableLighting() {
+	public static void disableLighting() {
 		stateLighting = false;
 	}
 
-	public static final void disableMCLight(int light) {
+	public static void disableMCLight(int light) {
 		stateLightsEnabled[stateLightsStackPointer][light] = false;
 		++stateLightingSerial[stateLightsStackPointer];
 	}
 
-	public static final void disableOverlayFramebufferBlending() {
+	public static void disableOverlayFramebufferBlending() {
 		stateEnableOverlayFramebufferBlending = false;
 	}
 
-	public static final void disablePolygonOffset() {
+	public static void disablePolygonOffset() {
 		if (statePolygonOffset) {
 			_wglDisable(GL_POLYGON_OFFSET_FILL);
 			statePolygonOffset = false;
 		}
 	}
 
-	public static final void disableRescaleNormal() {
+	public static void disableRescaleNormal() {
 
 	}
 
-	public static final void disableShaderBlendAdd() {
+	public static void disableShaderBlendAdd() {
 		stateEnableShaderBlendColor = false;
 	}
 
-	public static final void disableTexGen() {
+	public static void disableTexGen() {
 		stateTexGen = false;
 	}
 
-	public static final void disableTexture2D() {
+	public static void disableTexture2D() {
 		stateTexture[activeTexture] = false;
 	}
 
-	public static final void doPolygonOffset(float factor, float units) {
+	public static void doPolygonOffset(float factor, float units) {
 		if (factor != statePolygonOffsetFactor || units != statePolygonOffsetUnits) {
 			_wglPolygonOffset(-factor, units);
 			statePolygonOffsetFactor = factor;
@@ -535,7 +535,7 @@ public class GlStateManager {
 		}
 	}
 
-	public static final void eagPopStateForGLES2BlitHack() {
+	public static void eagPopStateForGLES2BlitHack() {
 		if (stateDepthTestStash) {
 			enableDepth();
 		} else {
@@ -553,17 +553,17 @@ public class GlStateManager {
 		}
 	}
 
-	public static final void eagPushStateForGLES2BlitHack() {
+	public static void eagPushStateForGLES2BlitHack() {
 		stateDepthTestStash = stateDepthTest;
 		stateCullStash = stateCull;
 		stateBlendStash = stateBlend;
 	}
 
-	public static final void enableAlpha() {
+	public static void enableAlpha() {
 		stateAlphaTest = true;
 	}
 
-	public static final void enableBlend() {
+	public static void enableBlend() {
 		if (!stateBlend) {
 			if (stateGlobalBlend)
 				_wglEnable(GL_BLEND);
@@ -571,42 +571,41 @@ public class GlStateManager {
 		}
 	}
 
-	public static final void enableColorLogic() {
+	public static void enableColorLogic() {
 		throw new UnsupportedOperationException("Color logic op is not supported in OpenGL ES!");
 	}
 
-	public static final void enableColorMaterial() {
+	public static void enableColorMaterial() {
 		stateMaterial = true;
 	}
 
-	public static final void enableCull() {
+	public static void enableCull() {
 		if (!stateCull) {
 			_wglEnable(GL_CULL_FACE);
 			stateCull = true;
 		}
 	}
 
-	public static final void enableDepth() {
+	public static void enableDepth() {
 		if (!stateDepthTest) {
 			_wglEnable(GL_DEPTH_TEST);
 			stateDepthTest = true;
 		}
 	}
 
-	public static final void enableExtensionPipeline() {
+	public static void enableExtensionPipeline() {
 		stateUseExtensionPipeline = true;
 	}
 
-	public static final void enableFog() {
+	public static void enableFog() {
 		stateFog = true;
 	}
 
-	public static final void enableLighting() {
+	public static void enableLighting() {
 		stateLighting = true;
 	}
 
-	public static final void enableMCLight(int light, float diffuse, double dirX, double dirY, double dirZ,
-			double dirW) {
+	public static void enableMCLight(int light, float diffuse, double dirX, double dirY, double dirZ, double dirW) {
 		if (dirW != 0.0)
 			throw new IllegalArgumentException("dirW must be 0.0!");
 		paramVector4.x = (float) dirX;
@@ -625,34 +624,34 @@ public class GlStateManager {
 		++stateLightingSerial[stateLightsStackPointer];
 	}
 
-	public static final void enableOverlayFramebufferBlending() {
+	public static void enableOverlayFramebufferBlending() {
 		stateEnableOverlayFramebufferBlending = true;
 	}
 
-	public static final void enablePolygonOffset() {
+	public static void enablePolygonOffset() {
 		if (!statePolygonOffset) {
 			_wglEnable(GL_POLYGON_OFFSET_FILL);
 			statePolygonOffset = true;
 		}
 	}
 
-	public static final void enableRescaleNormal() {
+	public static void enableRescaleNormal() {
 		// still not sure what this is for
 	}
 
-	public static final void enableShaderBlendAdd() {
+	public static void enableShaderBlendAdd() {
 		stateEnableShaderBlendColor = true;
 	}
 
-	public static final void enableTexGen() {
+	public static void enableTexGen() {
 		stateTexGen = true;
 	}
 
-	public static final void enableTexture2D() {
+	public static void enableTexture2D() {
 		stateTexture[activeTexture] = true;
 	}
 
-	public static final void func_179105_a(GlStateManager.TexGen coord, int plane, FloatBuffer vector) {
+	public static void func_179105_a(GlStateManager.TexGen coord, int plane, FloatBuffer vector) {
 		coord.plane = plane;
 		coord.vector.load(vector);
 		if (plane == GL_EYE_PLANE) {
@@ -663,7 +662,7 @@ public class GlStateManager {
 		++stateTexGenSerial;
 	}
 
-	public static final int generateTexture() {
+	public static int generateTexture() {
 		return EaglercraftGPU.mapTexturesGL.register(_wglGenTextures());
 	}
 
@@ -671,7 +670,7 @@ public class GlStateManager {
 		return boundTexture[activeTexture];
 	}
 
-	public static final void getFloat(int pname, float[] params) {
+	public static void getFloat(int pname, float[] params) {
 		switch (pname) {
 		case GL_MODELVIEW_MATRIX:
 			modelMatrixStack[modelMatrixStackPointer].store(params);
@@ -687,7 +686,7 @@ public class GlStateManager {
 		}
 	}
 
-	public static final void getFloat(int pname, FloatBuffer params) {
+	public static void getFloat(int pname, FloatBuffer params) {
 		switch (pname) {
 		case GL_MODELVIEW_MATRIX:
 			modelMatrixStack[modelMatrixStackPointer].store(params);
@@ -703,7 +702,7 @@ public class GlStateManager {
 		}
 	}
 
-	public static final void getMatrix(Matrix4f mat) {
+	public static void getMatrix(Matrix4f mat) {
 		switch (stateMatrixMode) {
 		case GL_MODELVIEW:
 			mat.load(modelMatrixStack[modelMatrixStackPointer]);
@@ -744,41 +743,41 @@ public class GlStateManager {
 		return mat;
 	}
 
-	public static final Matrix4f getModelViewReference() {
+	public static Matrix4f getModelViewReference() {
 		return modelMatrixStack[modelMatrixStackPointer];
 	}
 
-	public static final int getModelViewSerial() {
+	public static int getModelViewSerial() {
 		return modelMatrixStackAccessSerial[modelMatrixStackPointer];
 	}
 
-	public static final Matrix4f getProjectionReference() {
+	public static Matrix4f getProjectionReference() {
 		return projectionMatrixStack[projectionMatrixStackPointer];
 	}
 
-	public static final float getTexCoordX(int tex) {
+	public static float getTexCoordX(int tex) {
 		return textureCoordsX[tex];
 	}
 
-	public static final float getTexCoordY(int tex) {
+	public static float getTexCoordY(int tex) {
 		return textureCoordsY[tex];
 	}
 
-	public static final void globalDisableBlend() {
+	public static void globalDisableBlend() {
 		if (stateBlend) {
 			_wglDisable(GL_BLEND);
 		}
 		stateGlobalBlend = false;
 	}
 
-	public static final void globalEnableBlend() {
+	public static void globalEnableBlend() {
 		if (stateBlend) {
 			_wglEnable(GL_BLEND);
 		}
 		stateGlobalBlend = true;
 	}
 
-	public static final void gluLookAt(Vector3f eye, Vector3f center, Vector3f up) {
+	public static void gluLookAt(Vector3f eye, Vector3f center, Vector3f up) {
 		Matrix4f matrix = getMatrixIncr();
 		float x = center.x - eye.x;
 		float y = center.y - eye.y;
@@ -819,7 +818,7 @@ public class GlStateManager {
 		Matrix4f.mul(matrix, paramMatrix, matrix);
 	}
 
-	public static final void gluPerspective(float fovy, float aspect, float zNear, float zFar) {
+	public static void gluPerspective(float fovy, float aspect, float zNear, float zFar) {
 		Matrix4f matrix = getMatrixIncr();
 		float cotangent = (float) Math.cos(fovy * toRad * 0.5f) / (float) Math.sin(fovy * toRad * 0.5f);
 		paramMatrix.m00 = cotangent / aspect;
@@ -841,8 +840,8 @@ public class GlStateManager {
 		Matrix4f.mul(matrix, paramMatrix, matrix);
 	}
 
-	public static final void gluUnProject(float p1, float p2, float p3, float[] modelview, float[] projection,
-			int[] viewport, float[] objectcoords) {
+	public static void gluUnProject(float p1, float p2, float p3, float[] modelview, float[] projection, int[] viewport,
+			float[] objectcoords) {
 		unprojA.load(modelview);
 		unprojB.load(projection);
 		Matrix4f.mul(unprojA, unprojB, unprojB);
@@ -855,11 +854,11 @@ public class GlStateManager {
 		objectcoords[2] = unprojC.z / unprojC.w;
 	}
 
-	public static final boolean isExtensionPipeline() {
+	public static boolean isExtensionPipeline() {
 		return stateUseExtensionPipeline;
 	}
 
-	public static final void loadIdentity() {
+	public static void loadIdentity() {
 		switch (stateMatrixMode) {
 		case GL_MODELVIEW:
 		default:
@@ -877,7 +876,7 @@ public class GlStateManager {
 		}
 	}
 
-	public static final void loadMatrix(Matrix4f mat) {
+	public static void loadMatrix(Matrix4f mat) {
 		switch (stateMatrixMode) {
 		case GL_MODELVIEW:
 			modelMatrixStack[modelMatrixStackPointer].load(mat);
@@ -895,22 +894,22 @@ public class GlStateManager {
 		}
 	}
 
-	public static final void matrixMode(int mode) {
+	public static void matrixMode(int mode) {
 		stateMatrixMode = mode;
 	}
 
-	public static final void multMatrix(float[] matrix) {
+	public static void multMatrix(float[] matrix) {
 		paramMatrix.load(matrix);
 		Matrix4f mat = getMatrixIncr();
 		Matrix4f.mul(mat, paramMatrix, mat);
 	}
 
-	public static final void multMatrix(Matrix4f matrix) {
+	public static void multMatrix(Matrix4f matrix) {
 		Matrix4f mat = getMatrixIncr();
 		Matrix4f.mul(mat, matrix, mat);
 	}
 
-	public static final void ortho(double left, double right, double bottom, double top, double zNear, double zFar) {
+	public static void ortho(double left, double right, double bottom, double top, double zNear, double zFar) {
 		Matrix4f matrix = getMatrixIncr();
 		paramMatrix.m00 = 2.0f / (float) (right - left);
 		paramMatrix.m01 = 0.0f;
@@ -931,7 +930,7 @@ public class GlStateManager {
 		Matrix4f.mul(matrix, paramMatrix, matrix);
 	}
 
-	public static final void popLightCoords() {
+	public static void popLightCoords() {
 		if (stateLightsStackPointer > 0) {
 			--stateLightsStackPointer;
 		} else {
@@ -941,7 +940,7 @@ public class GlStateManager {
 		}
 	}
 
-	public static final void popMatrix() {
+	public static void popMatrix() {
 		switch (stateMatrixMode) {
 		case GL_MODELVIEW:
 		default:
@@ -994,7 +993,7 @@ public class GlStateManager {
 		}
 	}
 
-	public static final void pushLightCoords() {
+	public static void pushLightCoords() {
 		int push = stateLightsStackPointer + 1;
 		if (push < stateLightsStack.length) {
 			Vector4f[] copyFrom = stateLightsStack[stateLightsStackPointer];
@@ -1018,7 +1017,7 @@ public class GlStateManager {
 		}
 	}
 
-	public static final void pushMatrix() {
+	public static void pushMatrix() {
 		int push;
 		switch (stateMatrixMode) {
 		case GL_MODELVIEW:
@@ -1062,7 +1061,7 @@ public class GlStateManager {
 		}
 	}
 
-	public static final void quickBindTexture(int unit, int texture) {
+	public static void quickBindTexture(int unit, int texture) {
 		int unitBase = unit - GL_TEXTURE0;
 		if (texture != boundTexture[unitBase]) {
 			if (unitBase != activeTexture) {
@@ -1080,7 +1079,7 @@ public class GlStateManager {
 		FixedFunctionPipeline.flushCache();
 	}
 
-	public static final void resetColor() {
+	public static void resetColor() {
 		stateColorR = 1.0f;
 		stateColorG = 1.0f;
 		stateColorB = 1.0f;
@@ -1088,7 +1087,7 @@ public class GlStateManager {
 		++stateColorSerial;
 	}
 
-	public static final void rotate(float angle, float x, float y, float z) {
+	public static void rotate(float angle, float x, float y, float z) {
 		Matrix4f matrix = getMatrixIncr();
 		if (x == 0.0f) {
 			if (y == 0.0f) {
@@ -1107,7 +1106,7 @@ public class GlStateManager {
 		_glRotatef(matrix, toRad * angle, x, y, z);
 	}
 
-	public static final void rotateXYZ(float x, float y, float z) {
+	public static void rotateXYZ(float x, float y, float z) {
 		Matrix4f matrix = getMatrixIncr();
 		if (x != 0.0f)
 			_glRotatefX(matrix, toRad * x);
@@ -1117,7 +1116,7 @@ public class GlStateManager {
 			_glRotatefZ(matrix, toRad * z);
 	}
 
-	public static final void rotateXYZRad(float x, float y, float z) {
+	public static void rotateXYZRad(float x, float y, float z) {
 		Matrix4f matrix = getMatrixIncr();
 		if (x != 0.0f)
 			_glRotatefX(matrix, x);
@@ -1127,7 +1126,7 @@ public class GlStateManager {
 			_glRotatefZ(matrix, z);
 	}
 
-	public static final void rotateZYX(float x, float y, float z) {
+	public static void rotateZYX(float x, float y, float z) {
 		Matrix4f matrix = getMatrixIncr();
 		if (z != 0.0f)
 			_glRotatefZ(matrix, toRad * z);
@@ -1137,7 +1136,7 @@ public class GlStateManager {
 			_glRotatefX(matrix, toRad * x);
 	}
 
-	public static final void rotateZYXRad(float x, float y, float z) {
+	public static void rotateZYXRad(float x, float y, float z) {
 		Matrix4f matrix = getMatrixIncr();
 		if (z != 0.0f)
 			_glRotatefZ(matrix, z);
@@ -1147,7 +1146,7 @@ public class GlStateManager {
 			_glRotatefX(matrix, x);
 	}
 
-	public static final void scale(double x, double y, double z) {
+	public static void scale(double x, double y, double z) {
 		Matrix4f matrix = getMatrixIncr();
 		matrix.m00 *= x;
 		matrix.m01 *= x;
@@ -1163,7 +1162,7 @@ public class GlStateManager {
 		matrix.m23 *= z;
 	}
 
-	public static final void scale(float x, float y, float z) {
+	public static void scale(float x, float y, float z) {
 		Matrix4f matrix = getMatrixIncr();
 		matrix.m00 *= x;
 		matrix.m01 *= x;
@@ -1179,7 +1178,7 @@ public class GlStateManager {
 		matrix.m23 *= z;
 	}
 
-	public static final void setActiveTexture(int texture) {
+	public static void setActiveTexture(int texture) {
 		int textureIdx = texture - GL_TEXTURE0;
 		if (textureIdx != activeTexture) {
 			_wglActiveTexture(texture);
@@ -1187,7 +1186,7 @@ public class GlStateManager {
 		}
 	}
 
-	public static final void setBlendConstants(float r, float g, float b, float a) {
+	public static void setBlendConstants(float r, float g, float b, float a) {
 		if (r != blendConstantR || g != blendConstantG || b != blendConstantB || a != blendConstantA) {
 			_wglBlendColor(r, g, b, a);
 			blendConstantR = r;
@@ -1197,34 +1196,34 @@ public class GlStateManager {
 		}
 	}
 
-	public static final void setFog(int param) {
+	public static void setFog(int param) {
 		stateFogEXP = param == GL_EXP;
 		++stateFogSerial;
 	}
 
-	public static final void setFogDensity(float param) {
+	public static void setFogDensity(float param) {
 		stateFogDensity = param;
 		++stateFogSerial;
 	}
 
-	public static final void setFogEnd(float param) {
+	public static void setFogEnd(float param) {
 		stateFogEnd = param;
 		++stateFogSerial;
 	}
 
-	public static final void setFogStart(float param) {
+	public static void setFogStart(float param) {
 		stateFogStart = param;
 		++stateFogSerial;
 	}
 
-	public static final void setMCLightAmbient(float r, float g, float b) {
+	public static void setMCLightAmbient(float r, float g, float b) {
 		stateLightingAmbientR = r;
 		stateLightingAmbientG = g;
 		stateLightingAmbientB = b;
 		++stateLightingAmbientSerial;
 	}
 
-	public static final void setShaderBlendAdd(float r, float g, float b, float a) {
+	public static void setShaderBlendAdd(float r, float g, float b, float a) {
 		stateShaderBlendAddColorR = r;
 		stateShaderBlendAddColorG = g;
 		stateShaderBlendAddColorB = b;
@@ -1232,7 +1231,7 @@ public class GlStateManager {
 		++stateShaderBlendColorSerial;
 	}
 
-	public static final void setShaderBlendSrc(float r, float g, float b, float a) {
+	public static void setShaderBlendSrc(float r, float g, float b, float a) {
 		stateShaderBlendSrcColorR = r;
 		stateShaderBlendSrcColorG = g;
 		stateShaderBlendSrcColorB = b;
@@ -1249,28 +1248,28 @@ public class GlStateManager {
 		}
 	}
 
-	public static final void shadeModel(int mode) {
+	public static void shadeModel(int mode) {
 
 	}
 
-	public static final void texCoords2D(float x, float y) {
+	public static void texCoords2D(float x, float y) {
 		textureCoordsX[activeTexture] = x;
 		textureCoordsY[activeTexture] = y;
 		++textureCoordsAccessSerial[activeTexture];
 	}
 
-	public static final void texCoords2DDirect(int tex, float x, float y) {
+	public static void texCoords2DDirect(int tex, float x, float y) {
 		textureCoordsX[tex] = x;
 		textureCoordsY[tex] = y;
 		++textureCoordsAccessSerial[tex];
 	}
 
-	public static final void texGen(GlStateManager.TexGen coord, int source) {
+	public static void texGen(GlStateManager.TexGen coord, int source) {
 		coord.source = source;
 		++stateTexGenSerial;
 	}
 
-	public static final void transform(Vector4f vecIn, Vector4f vecOut) {
+	public static void transform(Vector4f vecIn, Vector4f vecOut) {
 		Matrix4f matrix;
 		switch (stateMatrixMode) {
 		case GL_MODELVIEW:
@@ -1287,7 +1286,7 @@ public class GlStateManager {
 		Matrix4f.transform(matrix, vecIn, vecOut);
 	}
 
-	public static final void translate(double x, double y, double z) {
+	public static void translate(double x, double y, double z) {
 		float _x = (float) x;
 		float _y = (float) y;
 		float _z = (float) z;
@@ -1298,7 +1297,7 @@ public class GlStateManager {
 		matrix.m33 = matrix.m03 * _x + matrix.m13 * _y + matrix.m23 * _z + matrix.m33;
 	}
 
-	public static final void translate(float x, float y, float z) {
+	public static void translate(float x, float y, float z) {
 		Matrix4f matrix = getMatrixIncr();
 		matrix.m30 = matrix.m00 * x + matrix.m10 * y + matrix.m20 * z + matrix.m30;
 		matrix.m31 = matrix.m01 * x + matrix.m11 * y + matrix.m21 * z + matrix.m31;
@@ -1306,8 +1305,7 @@ public class GlStateManager {
 		matrix.m33 = matrix.m03 * x + matrix.m13 * y + matrix.m23 * z + matrix.m33;
 	}
 
-	public static final void tryBlendFuncSeparate(int srcFactor, int dstFactor, int srcFactorAlpha,
-			int dstFactorAlpha) {
+	public static void tryBlendFuncSeparate(int srcFactor, int dstFactor, int srcFactorAlpha, int dstFactorAlpha) {
 		if (stateEnableOverlayFramebufferBlending) { // game overlay framebuffer in EntityRenderer.java
 			srcFactorAlpha = GL_ONE;
 			dstFactorAlpha = GL_ONE_MINUS_SRC_ALPHA;
@@ -1321,7 +1319,7 @@ public class GlStateManager {
 		}
 	}
 
-	static final void unbindTextureIfCached(int texture) {
+	static void unbindTextureIfCached(int texture) {
 		boolean f1, f2 = false;
 		for (int i = 0; i < boundTexture.length; ++i) {
 			if (boundTexture[i] == texture) {
@@ -1342,7 +1340,7 @@ public class GlStateManager {
 		}
 	}
 
-	public static final void viewport(int x, int y, int w, int h) {
+	public static void viewport(int x, int y, int w, int h) {
 		if (viewportX != x || viewportY != y || viewportW != w || viewportH != h) {
 			_wglViewport(x, y, w, h);
 			viewportX = x;

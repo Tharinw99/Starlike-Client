@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2022-2024 lax1dude. All Rights Reserved.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
 package net.lax1dude.eaglercraft.v1_8.opengl;
 
 import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglBufferData;
@@ -19,34 +35,18 @@ import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_VERTEX_SHA
 import java.util.List;
 
 import net.lax1dude.eaglercraft.v1_8.EagRuntime;
-import net.lax1dude.eaglercraft.v1_8.internal.IBufferArrayGL;
 import net.lax1dude.eaglercraft.v1_8.internal.IBufferGL;
 import net.lax1dude.eaglercraft.v1_8.internal.IShaderGL;
+import net.lax1dude.eaglercraft.v1_8.internal.IVertexArrayGL;
 import net.lax1dude.eaglercraft.v1_8.internal.buffer.FloatBuffer;
 
-/**
- * Copyright (c) 2022-2024 lax1dude. All Rights Reserved.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- */
 public class DrawUtils {
 
 	public static final String vertexShaderPath = "/assets/eagler/glsl/local.vsh";
 	public static final String vertexShaderPrecision = "precision highp float;\n";
 
-	public static IBufferArrayGL standardQuad2DVAO = null;
-	public static IBufferArrayGL standardQuad3DVAO = null;
+	public static IVertexArrayGL standardQuad2DVAO = null;
+	public static IVertexArrayGL standardQuad3DVAO = null;
 	public static IBufferGL standardQuadVBO = null;
 
 	public static IShaderGL vshLocal = null;
@@ -54,11 +54,11 @@ public class DrawUtils {
 
 	public static void destroy() {
 		if (standardQuad2DVAO != null) {
-			EaglercraftGPU.destroyGLBufferArray(standardQuad2DVAO);
+			EaglercraftGPU.destroyGLVertexArray(standardQuad2DVAO);
 			standardQuad2DVAO = null;
 		}
 		if (standardQuad3DVAO != null) {
-			EaglercraftGPU.destroyGLBufferArray(standardQuad3DVAO);
+			EaglercraftGPU.destroyGLVertexArray(standardQuad3DVAO);
 			standardQuad3DVAO = null;
 		}
 		if (standardQuadVBO != null) {
@@ -73,19 +73,19 @@ public class DrawUtils {
 	}
 
 	public static void drawStandardQuad2D() {
-		EaglercraftGPU.bindGLBufferArray(standardQuad2DVAO);
-		EaglercraftGPU.doDrawArrays(GL_TRIANGLES, 0, 6);
+		EaglercraftGPU.bindGLVertexArray(standardQuad2DVAO);
+		EaglercraftGPU.drawArrays(GL_TRIANGLES, 0, 6);
 	}
 
 	public static void drawStandardQuad3D() {
-		EaglercraftGPU.bindGLBufferArray(standardQuad3DVAO);
-		EaglercraftGPU.doDrawArrays(GL_TRIANGLES, 0, 6);
+		EaglercraftGPU.bindGLVertexArray(standardQuad3DVAO);
+		EaglercraftGPU.drawArrays(GL_TRIANGLES, 0, 6);
 	}
 
 	static void init() {
 		if (standardQuad2DVAO == null) {
-			standardQuad2DVAO = EaglercraftGPU.createGLBufferArray();
-			standardQuad3DVAO = EaglercraftGPU.createGLBufferArray();
+			standardQuad2DVAO = EaglercraftGPU.createGLVertexArray();
+			standardQuad3DVAO = EaglercraftGPU.createGLVertexArray();
 			standardQuadVBO = _wglGenBuffers();
 
 			FloatBuffer verts = EagRuntime.allocateFloatBuffer(18);
@@ -97,12 +97,12 @@ public class DrawUtils {
 			_wglBufferData(GL_ARRAY_BUFFER, verts, GL_STATIC_DRAW);
 			EagRuntime.freeFloatBuffer(verts);
 
-			EaglercraftGPU.bindGLBufferArray(standardQuad2DVAO);
+			EaglercraftGPU.bindGLVertexArray(standardQuad2DVAO);
 
 			EaglercraftGPU.enableVertexAttribArray(0);
 			EaglercraftGPU.vertexAttribPointer(0, 2, GL_FLOAT, false, 12, 0);
 
-			EaglercraftGPU.bindGLBufferArray(standardQuad3DVAO);
+			EaglercraftGPU.bindGLVertexArray(standardQuad3DVAO);
 
 			EaglercraftGPU.enableVertexAttribArray(0);
 			EaglercraftGPU.vertexAttribPointer(0, 3, GL_FLOAT, false, 12, 0);

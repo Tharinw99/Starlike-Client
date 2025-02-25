@@ -1065,9 +1065,6 @@ public class Minecraft implements IThreadListener {
 	public void launchIntegratedServer(String folderName, String worldName, WorldSettings worldSettingsIn) {
 		this.loadWorld((WorldClient) null);
 		renderManager.setEnableFNAWSkins(this.gameSettings.enableFNAWSkins);
-		session.reset();
-		EaglerProfile.clearServerSkinOverride();
-		PauseMenuCustomizeState.reset();
 		SingleplayerServerController.launchEaglercraftServer(folderName, gameSettings.difficulty.getDifficultyId(),
 				Math.max(gameSettings.renderDistanceChunks, 2), worldSettingsIn);
 		EagRuntime.setMCServerWindowGlobal("singleplayer");
@@ -1100,6 +1097,7 @@ public class Minecraft implements IThreadListener {
 			EaglerProfile.clearServerSkinOverride();
 			PauseMenuCustomizeState.reset();
 			ClientUUIDLoadingCache.flushRequestCache();
+			ClientUUIDLoadingCache.resetFlags();
 			WebViewOverlayController.setPacketSendCallback(null);
 
 			this.guiAchievement.clearAchievements();

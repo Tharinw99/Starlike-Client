@@ -328,7 +328,7 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
 	}
 
 	public boolean func_175394_b(ServerListEntryNormal parServerListEntryNormal, int parInt1) {
-		return parInt1 < this.savedServerList.countServers();
+		return parInt1 < this.savedServerList.countServers() - 1;
 	}
 
 	public ServerData getSelectedServer() {

@@ -1,9 +1,4 @@
-package net.lax1dude.eaglercraft.v1_8.internal;
-
-import net.lax1dude.eaglercraft.v1_8.EaglercraftUUID;
-import net.lax1dude.eaglercraft.v1_8.voice.EnumVoiceChannelReadyState;
-
-/**
+/*
  * Copyright (c) 2022-2024 ayunami2000. All Rights Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -19,15 +14,18 @@ import net.lax1dude.eaglercraft.v1_8.voice.EnumVoiceChannelReadyState;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
+package net.lax1dude.eaglercraft.v1_8.internal;
+
+import net.lax1dude.eaglercraft.v1_8.EaglercraftUUID;
+import net.lax1dude.eaglercraft.v1_8.voice.EnumVoiceChannelReadyState;
+
 public class PlatformVoiceClient {
 
 	public static void activateVoice(boolean talk) {
 
 	}
 
-	public static EnumVoiceChannelReadyState getReadyState() {
-		return EnumVoiceChannelReadyState.NONE;
-	}
 
 	public static void initialize() {
 
@@ -41,29 +39,17 @@ public class PlatformVoiceClient {
 		return false;
 	}
 
-	public static void mutePeer(EaglercraftUUID uuid, boolean mute) {
 
-	}
-
-	public static void resetPeerStates() {
-
-	}
 
 	public static void setICEServers(String[] servs) {
 
 	}
 
-	public static void setMicVolume(float f) {
-
-	}
 
 	public static void setVoiceListenVolume(float f) {
 
 	}
 
-	public static void setVoiceProximity(int prox) {
-
-	}
 
 	public static void setVoiceSpeakVolume(float f) {
 
@@ -91,6 +77,26 @@ public class PlatformVoiceClient {
 
 	public static void updateVoicePosition(EaglercraftUUID uuid, double x, double y, double z) {
 
+	}
+
+	public static void resetPeerStates() {
+		
+	}
+
+	public static void setVoiceProximity(int prox) {
+		
+	}
+
+	public static void setMicVolume(float f) {
+		
+	}
+
+	public static void mutePeer(EaglercraftUUID uuid, boolean mute) {
+		
+	}
+
+	public static EnumVoiceChannelReadyState getReadyState() {
+		return EnumVoiceChannelReadyState.NONE;
 	}
 
 }

@@ -1,6 +1,21 @@
+/*
+ * Copyright (c) 2025 lax1dude. All Rights Reserved.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
 package net.lax1dude.eaglercraft.v1_8.minecraft;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_COMPILE;
 import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_MODELVIEW;
 import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ONE_MINUS_SRC_ALPHA;
 import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_SRC_ALPHA;
@@ -21,22 +36,6 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 
-/**
- * Copyright (c) 2025 lax1dude. All Rights Reserved.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- */
 public class EaglerCloudRenderer {
 
 	private static final ResourceLocation locationCloudsPNG = new ResourceLocation("textures/environment/clouds.png");
@@ -50,12 +49,25 @@ public class EaglerCloudRenderer {
 
 	private static void generateFancyClouds(WorldRenderer worldrenderer, int mesh, boolean renderAbove,
 			boolean renderBelow) {
+		int xx = (mesh % 3) - 1;
+		int yy = (mesh / 3) - 1;
+		boolean center = xx == 0 && yy == 0 && renderAbove && renderBelow;
+
 		if (renderAbove) {
 			worldrenderer.pos(0.0f, 0.0f, 8.0f).tex(0.0f, 8.0f * 0.00390625F).color(0.7f, 0.7f, 0.7f, 1.0f).endVertex();
+			worldrenderer.pos(0.0f, 0.0f, 0.0f).tex(0.0f, 0.0f).color(0.7f, 0.7f, 0.7f, 1.0f).endVertex();
+			worldrenderer.pos(8.0f, 0.0f, 0.0f).tex(8.0f * 0.00390625f, 0.0f).color(0.7f, 0.7f, 0.7f, 1.0f).endVertex();
 			worldrenderer.pos(8.0f, 0.0f, 8.0f).tex(8.0f * 0.00390625f, 8.0f * 0.00390625f)
 					.color(0.7f, 0.7f, 0.7f, 1.0f).endVertex();
-			worldrenderer.pos(8.0f, 0.0f, 0.0f).tex(8.0f * 0.00390625f, 0.0f).color(0.7f, 0.7f, 0.7f, 1.0f).endVertex();
-			worldrenderer.pos(0.0f, 0.0f, 0.0f).tex(0.0f, 0.0f).color(0.7f, 0.7f, 0.7f, 1.0f).endVertex();
+			if (center) {
+				worldrenderer.pos(0.0f, 0.0f, 8.0f).tex(0.0f, 8.0f * 0.00390625F).color(0.7f, 0.7f, 0.7f, 1.0f)
+						.endVertex();
+				worldrenderer.pos(8.0f, 0.0f, 8.0f).tex(8.0f * 0.00390625f, 8.0f * 0.00390625f)
+						.color(0.7f, 0.7f, 0.7f, 1.0f).endVertex();
+				worldrenderer.pos(8.0f, 0.0f, 0.0f).tex(8.0f * 0.00390625f, 0.0f).color(0.7f, 0.7f, 0.7f, 1.0f)
+						.endVertex();
+				worldrenderer.pos(0.0f, 0.0f, 0.0f).tex(0.0f, 0.0f).color(0.7f, 0.7f, 0.7f, 1.0f).endVertex();
+			}
 		}
 
 		if (renderBelow) {
@@ -67,10 +79,17 @@ public class EaglerCloudRenderer {
 					.color(1.0f, 1.0f, 1.0f, 1.0f).endVertex();
 			worldrenderer.pos(0.0f, 4.0f - 9.765625E-4f, 0.0f).tex(0.0f, 0.0f).color(1.0f, 1.0f, 1.0f, 1.0f)
 					.endVertex();
+			if (center) {
+				worldrenderer.pos(0.0f, 4.0f - 9.765625E-4f, 8.0f).tex(0.0f, 8.0f * 0.00390625f)
+						.color(1.0f, 1.0f, 1.0f, 1.0f).endVertex();
+				worldrenderer.pos(0.0f, 4.0f - 9.765625E-4f, 0.0f).tex(0.0f, 0.0f).color(1.0f, 1.0f, 1.0f, 1.0f)
+						.endVertex();
+				worldrenderer.pos(8.0f, 4.0f - 9.765625E-4f, 0.0f).tex(8.0f * 0.00390625f, 0.0f)
+						.color(1.0f, 1.0f, 1.0f, 1.0f).endVertex();
+				worldrenderer.pos(8.0f, 4.0f - 9.765625E-4f, 8.0f).tex(8.0f * 0.00390625F, 8.0f * 0.00390625f)
+						.color(1.0f, 1.0f, 1.0f, 1.0f).endVertex();
+			}
 		}
-
-		int xx = (mesh % 3) - 1;
-		int yy = (mesh / 3) - 1;
 
 		if (xx != -1) {
 			for (int j1 = 0; j1 < 8; ++j1) {
@@ -82,6 +101,16 @@ public class EaglerCloudRenderer {
 						.endVertex();
 				worldrenderer.pos(j1, 0.0f, 0.0f).tex((j1 + 0.5f) * 0.00390625f, 0.0f).color(0.9f, 0.9f, 0.9f, 1.0f)
 						.endVertex();
+				if (center) {
+					worldrenderer.pos(j1, 0.0f, 8.0f).tex((j1 + 0.5f) * 0.00390625f, 8.0f * 0.00390625f)
+							.color(0.9f, 0.9f, 0.9f, 1.0f).endVertex();
+					worldrenderer.pos(j1, 0.0f, 0.0f).tex((j1 + 0.5f) * 0.00390625f, 0.0f).color(0.9f, 0.9f, 0.9f, 1.0f)
+							.endVertex();
+					worldrenderer.pos(j1, 4.0f, 0.0f).tex((j1 + 0.5f) * 0.00390625f, 0.0f).color(0.9f, 0.9f, 0.9f, 1.0f)
+							.endVertex();
+					worldrenderer.pos(j1, 4.0f, 8.0f).tex((j1 + 0.5f) * 0.00390625f, 8.0f * 0.00390625f)
+							.color(0.9f, 0.9f, 0.9f, 1.0f).endVertex();
+				}
 			}
 		}
 
@@ -89,12 +118,24 @@ public class EaglerCloudRenderer {
 			for (int k1 = 0; k1 < 8; ++k1) {
 				worldrenderer.pos(k1 + 1.0f - 9.765625E-4f, 0.0f, 8.0f)
 						.tex((k1 + 0.5f) * 0.00390625f, 8.0f * 0.00390625f).color(0.9f, 0.9f, 0.9f, 1.0f).endVertex();
-				worldrenderer.pos(k1 + 1.0f - 9.765625E-4f, 4.0f, 8.0f)
-						.tex((k1 + 0.5f) * 0.00390625f, 8.0f * 0.00390625f).color(0.9f, 0.9f, 0.9f, 1.0f).endVertex();
-				worldrenderer.pos(k1 + 1.0f - 9.765625E-4f, 4.0f, 0.0f).tex((k1 + 0.5f) * 0.00390625f, 0.0f)
-						.color(0.9f, 0.9f, 0.9f, 1.0f).endVertex();
 				worldrenderer.pos(k1 + 1.0f - 9.765625E-4f, 0.0f, 0.0f).tex((k1 + 0.5f) * 0.00390625f, 0.0f)
 						.color(0.9f, 0.9f, 0.9f, 1.0f).endVertex();
+				worldrenderer.pos(k1 + 1.0f - 9.765625E-4f, 4.0f, 0.0f).tex((k1 + 0.5f) * 0.00390625f, 0.0f)
+						.color(0.9f, 0.9f, 0.9f, 1.0f).endVertex();
+				worldrenderer.pos(k1 + 1.0f - 9.765625E-4f, 4.0f, 8.0f)
+						.tex((k1 + 0.5f) * 0.00390625f, 8.0f * 0.00390625f).color(0.9f, 0.9f, 0.9f, 1.0f).endVertex();
+				if (center) {
+					worldrenderer.pos(k1 + 1.0f - 9.765625E-4f, 0.0f, 8.0f)
+							.tex((k1 + 0.5f) * 0.00390625f, 8.0f * 0.00390625f).color(0.9f, 0.9f, 0.9f, 1.0f)
+							.endVertex();
+					worldrenderer.pos(k1 + 1.0f - 9.765625E-4f, 4.0f, 8.0f)
+							.tex((k1 + 0.5f) * 0.00390625f, 8.0f * 0.00390625f).color(0.9f, 0.9f, 0.9f, 1.0f)
+							.endVertex();
+					worldrenderer.pos(k1 + 1.0f - 9.765625E-4f, 4.0f, 0.0f).tex((k1 + 0.5f) * 0.00390625f, 0.0f)
+							.color(0.9f, 0.9f, 0.9f, 1.0f).endVertex();
+					worldrenderer.pos(k1 + 1.0f - 9.765625E-4f, 0.0f, 0.0f).tex((k1 + 0.5f) * 0.00390625f, 0.0f)
+							.color(0.9f, 0.9f, 0.9f, 1.0f).endVertex();
+				}
 			}
 		}
 
@@ -108,6 +149,16 @@ public class EaglerCloudRenderer {
 						.color(0.8f, 0.8f, 0.8f, 1.0f).endVertex();
 				worldrenderer.pos(0.0f, 0.0f, l1).tex(0.0f, (l1 + 0.5f) * 0.00390625f).color(0.8f, 0.8f, 0.8f, 1.0f)
 						.endVertex();
+				if (center) {
+					worldrenderer.pos(0.0f, 4.0f, l1).tex(0.0f, (l1 + 0.5f) * 0.00390625f).color(0.8f, 0.8f, 0.8f, 1.0f)
+							.endVertex();
+					worldrenderer.pos(0.0f, 0.0f, l1).tex(0.0f, (l1 + 0.5f) * 0.00390625f).color(0.8f, 0.8f, 0.8f, 1.0f)
+							.endVertex();
+					worldrenderer.pos(8.0f, 0.0f, l1).tex(8.0f * 0.00390625f, (l1 + 0.5f) * 0.00390625f)
+							.color(0.8f, 0.8f, 0.8f, 1.0f).endVertex();
+					worldrenderer.pos(8.0f, 4.0f, l1).tex(8.0f * 0.00390625f, (l1 + 0.5f) * 0.00390625f)
+							.color(0.8f, 0.8f, 0.8f, 1.0f).endVertex();
+				}
 			}
 		}
 
@@ -115,12 +166,24 @@ public class EaglerCloudRenderer {
 			for (int i2 = 0; i2 < 8; ++i2) {
 				worldrenderer.pos(0.0f, 4.0f, i2 + 1.0f - 9.765625E-4f).tex(0.0f, (i2 + 0.5f) * 0.00390625f)
 						.color(0.8f, 0.8f, 0.8f, 1.0f).endVertex();
-				worldrenderer.pos(8.0f, 4.0f, i2 + 1.0f - 9.765625E-4f)
-						.tex(8.0f * 0.00390625f, (i2 + 0.5f) * 0.00390625f).color(0.8f, 0.8f, 0.8f, 1.0f).endVertex();
-				worldrenderer.pos(8.0f, 0.0f, i2 + 1.0f - 9.765625E-4f)
-						.tex(8.0f * 0.00390625f, (i2 + 0.5f) * 0.00390625f).color(0.8f, 0.8f, 0.8f, 1.0f).endVertex();
 				worldrenderer.pos(0.0f, 0.0f, i2 + 1.0f - 9.765625E-4f).tex(0.0f, (i2 + 0.5f) * 0.00390625f)
 						.color(0.8f, 0.8f, 0.8f, 1.0f).endVertex();
+				worldrenderer.pos(8.0f, 0.0f, i2 + 1.0f - 9.765625E-4f)
+						.tex(8.0f * 0.00390625f, (i2 + 0.5f) * 0.00390625f).color(0.8f, 0.8f, 0.8f, 1.0f).endVertex();
+				worldrenderer.pos(8.0f, 4.0f, i2 + 1.0f - 9.765625E-4f)
+						.tex(8.0f * 0.00390625f, (i2 + 0.5f) * 0.00390625f).color(0.8f, 0.8f, 0.8f, 1.0f).endVertex();
+				if (center) {
+					worldrenderer.pos(0.0f, 4.0f, i2 + 1.0f - 9.765625E-4f).tex(0.0f, (i2 + 0.5f) * 0.00390625f)
+							.color(0.8f, 0.8f, 0.8f, 1.0f).endVertex();
+					worldrenderer.pos(8.0f, 4.0f, i2 + 1.0f - 9.765625E-4f)
+							.tex(8.0f * 0.00390625f, (i2 + 0.5f) * 0.00390625f).color(0.8f, 0.8f, 0.8f, 1.0f)
+							.endVertex();
+					worldrenderer.pos(8.0f, 0.0f, i2 + 1.0f - 9.765625E-4f)
+							.tex(8.0f * 0.00390625f, (i2 + 0.5f) * 0.00390625f).color(0.8f, 0.8f, 0.8f, 1.0f)
+							.endVertex();
+					worldrenderer.pos(0.0f, 0.0f, i2 + 1.0f - 9.765625E-4f).tex(0.0f, (i2 + 0.5f) * 0.00390625f)
+							.color(0.8f, 0.8f, 0.8f, 1.0f).endVertex();
+				}
 			}
 		}
 	}
@@ -155,12 +218,10 @@ public class EaglerCloudRenderer {
 				if (renderListFancy[i] == -1) {
 					renderListFancy[i] = EaglercraftGPU.glGenLists();
 				}
-				EaglercraftGPU.glNewList(renderListFancy[i], GL_COMPILE);
 				worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
 				generateFancyClouds(worldrenderer, i, newState != RENDER_STATE_FANCY_BELOW,
 						newState != RENDER_STATE_FANCY_ABOVE);
-				tessellator.draw();
-				EaglercraftGPU.glEndList();
+				tessellator.uploadDisplayList(renderListFancy[i]);
 			}
 		} else {
 			if (renderList == -1) {
@@ -172,15 +233,13 @@ public class EaglerCloudRenderer {
 					renderListFancy[i] = -1;
 				}
 			}
-			EaglercraftGPU.glNewList(renderList, GL_COMPILE);
 			worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
 			final double d = 4.8828125E-4;
 			worldrenderer.pos(-256.0f, 0.0f, 256.0f).tex(-256.0f * d, 256.0f * d).endVertex();
 			worldrenderer.pos(256.0f, 0.0f, 256.0f).tex(256.0f * d, 256.0f * d).endVertex();
 			worldrenderer.pos(256.0f, 0.0f, -256.0f).tex(256.0f * d, -256.0f * d).endVertex();
 			worldrenderer.pos(-256.0f, 0.0f, -256.0f).tex(-256.0f * d, -256.0f * d).endVertex();
-			tessellator.draw();
-			EaglercraftGPU.glEndList();
+			tessellator.uploadDisplayList(renderList);
 		}
 	}
 
@@ -236,7 +295,7 @@ public class EaglerCloudRenderer {
 		}
 
 		if (newState != RENDER_STATE_FAST) {
-			GlStateManager.disableCull();
+			GlStateManager.enableCull();
 			double d0 = this.mc.renderGlobal.getCloudCounter(partialTicks);
 			double d1 = (rve.prevPosX + (rve.posX - rve.prevPosX) * (double) partialTicks + d0 * 0.029999999329447746D)
 					/ 12.0D;
@@ -320,7 +379,7 @@ public class EaglerCloudRenderer {
 							yy = 1;
 						}
 
-						EaglercraftGPU.glCallList(renderListFancy[(yy + 1) * 3 + xx + 1]);
+						GlStateManager.callList(renderListFancy[(yy + 1) * 3 + xx + 1]);
 
 						GlStateManager.popMatrix();
 						GlStateManager.matrixMode(GL_MODELVIEW);
@@ -347,15 +406,15 @@ public class EaglerCloudRenderer {
 			GlStateManager.matrixMode(GL_TEXTURE);
 			GlStateManager.pushMatrix();
 			GlStateManager.translate(f8, f9, 0.0f);
-			EaglercraftGPU.glCallList(renderList);
+			GlStateManager.callList(renderList);
 			GlStateManager.popMatrix();
 			GlStateManager.matrixMode(GL_MODELVIEW);
 			GlStateManager.popMatrix();
+			GlStateManager.enableCull();
 		}
 
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 		GlStateManager.disableBlend();
-		GlStateManager.enableCull();
 	}
 
 }

@@ -1,28 +1,25 @@
-package net.lax1dude.eaglercraft.v1_8.boot_menu.teavm;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.teavm.jso.dom.html.HTMLElement;
-
-import com.google.common.collect.Collections2;
-
-/**
+/*
  * Copyright (c) 2024 lax1dude. All Rights Reserved.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
+package net.lax1dude.eaglercraft.v1_8.boot_menu.teavm;
+
+import java.util.List;
+
+import org.teavm.jso.dom.html.HTMLElement;
+
 public abstract class MenuPopupStateConfirmation<E> extends MenuState {
 
 	public static enum EnumYesNoHelper {
@@ -63,8 +60,7 @@ public abstract class MenuPopupStateConfirmation<E> extends MenuState {
 		this.title = title;
 		this.options = options;
 		this.popupController = new ConfirmationPopupController<SelectionItem>(
-				BootMenuMain.bootMenuDOM.popup_confirm_opts,
-				new ArrayList<SelectionItem>(Collections2.transform(options, SelectionItem::new))) {
+				BootMenuMain.bootMenuDOM.popup_confirm_opts, options.stream().map(SelectionItem::new).toList()) {
 			@Override
 			protected void optionSelected(SelectionItem item) {
 				MenuPopupStateConfirmation.this.selectCallback(item.enumValue);

@@ -207,7 +207,7 @@ public class Config {
 	}
 
 	public static boolean isCullFacesLeaves() {
-		return !gameSettings.fancyGraphics;
+		return !gameSettings.fancyGraphics || gameSettings.shaders;
 	}
 
 	public static boolean isCustomItems() {
@@ -240,11 +240,11 @@ public class Config {
 	}
 
 	public static boolean isTreesFancy() {
-		return gameSettings.fancyGraphics;
+		return gameSettings.fancyGraphics || gameSettings.shaders;
 	}
 
 	public static boolean isTreesSmart() {
-		return gameSettings.fancyGraphics && gameSettings.smartLeavesOF;
+		return (gameSettings.fancyGraphics || gameSettings.shaders) && gameSettings.smartLeavesOF;
 	}
 
 	public static double limit(double p_limit_0_, double p_limit_2_, double p_limit_4_) {

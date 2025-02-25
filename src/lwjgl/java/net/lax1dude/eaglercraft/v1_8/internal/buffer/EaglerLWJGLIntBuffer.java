@@ -1,9 +1,4 @@
-package net.lax1dude.eaglercraft.v1_8.internal.buffer;
-
-import net.lax1dude.unsafememcpy.UnsafeMemcpy;
-import net.lax1dude.unsafememcpy.UnsafeUtils;
-
-/**
+/*
  * Copyright (c) 2022-2025 lax1dude. All Rights Reserved.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -19,6 +14,12 @@ import net.lax1dude.unsafememcpy.UnsafeUtils;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
+package net.lax1dude.eaglercraft.v1_8.internal.buffer;
+
+import net.lax1dude.unsafememcpy.UnsafeMemcpy;
+import net.lax1dude.unsafememcpy.UnsafeUtils;
+
 public class EaglerLWJGLIntBuffer extends IntBuffer {
 
 	private static final int SHIFT = 2;
@@ -135,14 +136,6 @@ public class EaglerLWJGLIntBuffer extends IntBuffer {
 	}
 
 	@Override
-	public IntBuffer limit(int newLimit) {
-		if (newLimit < 0 || newLimit > capacity)
-			throw Buffer.makeIOOBE(newLimit);
-		limit = newLimit;
-		return this;
-	}
-
-	@Override
 	public IntBuffer mark() {
 		mark = position;
 		return this;
@@ -151,14 +144,6 @@ public class EaglerLWJGLIntBuffer extends IntBuffer {
 	@Override
 	public int position() {
 		return position;
-	}
-
-	@Override
-	public IntBuffer position(int newPosition) {
-		if (newPosition < 0 || newPosition > limit)
-			throw Buffer.makeIOOBE(newPosition);
-		position = newPosition;
-		return this;
 	}
 
 	@Override
@@ -242,6 +227,20 @@ public class EaglerLWJGLIntBuffer extends IntBuffer {
 	public IntBuffer rewind() {
 		position = 0;
 		mark = -1;
+		return this;
+	}
+
+	@Override
+	public IntBuffer limit(int newLimit) {
+		if(newLimit < 0 || newLimit > capacity) throw Buffer.makeIOOBE(newLimit);
+		limit = newLimit;
+		return this;
+	}
+
+	@Override
+	public IntBuffer position(int newPosition) {
+		if(newPosition < 0 || newPosition > limit) throw Buffer.makeIOOBE(newPosition);
+		position = newPosition;
 		return this;
 	}
 

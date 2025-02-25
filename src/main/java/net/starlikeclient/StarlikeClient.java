@@ -85,7 +85,7 @@ public class StarlikeClient {
 			 * + Snapshots use the format "YYwWWn", following Mojang's snapshot naming
 			 * convention.
 			 */
-			public static final String devBuildVersion = "0.4.1";
+			public static final String devBuildVersion = "0.4.2";
 
 			/**
 			 * + Release candidate version, set to -1 if not
@@ -100,7 +100,7 @@ public class StarlikeClient {
 			/**
 			 * + Version of the project fork, adds "-beta" if dev.
 			 */
-			public static final String projectForkVersion = "0.4.1"
+			public static final String projectForkVersion = "0.4.2"
 					+ (releaseCandidateVersion >= 0 ? ("-rc" + releaseCandidateVersion)
 							: isDevBuild ? ("-beta " + devBuildVersion) : "");
 

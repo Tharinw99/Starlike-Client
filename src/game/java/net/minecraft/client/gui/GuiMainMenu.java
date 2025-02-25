@@ -1,5 +1,7 @@
 package net.minecraft.client.gui;
 
+import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglBindFramebuffer;
+import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_COLOR_BUFFER_BIT;
 import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_LINEAR;
 import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_MODELVIEW;
 import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_ONE_MINUS_SRC_ALPHA;
@@ -31,6 +33,7 @@ import net.lax1dude.eaglercraft.v1_8.crypto.SHA1Digest;
 import net.lax1dude.eaglercraft.v1_8.internal.EnumCursorType;
 import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
 import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
+import net.lax1dude.eaglercraft.v1_8.minecraft.MainMenuSkyboxTexture;
 import net.lax1dude.eaglercraft.v1_8.opengl.EaglercraftGPU;
 import net.lax1dude.eaglercraft.v1_8.opengl.GlStateManager;
 import net.lax1dude.eaglercraft.v1_8.opengl.WorldRenderer;
@@ -46,7 +49,6 @@ import net.lax1dude.eaglercraft.v1_8.update.UpdateService;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.MathHelper;
@@ -86,7 +88,8 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
 	 * + Texture allocated for the current viewport of the main menu's panorama
 	 * background.
 	 */
-	private static DynamicTexture viewportTexture = null;
+	private static MainMenuSkyboxTexture viewportTexture = null;
+	private static MainMenuSkyboxTexture viewportTexture2 = null;
 	private static final ResourceLocation splashTexts = new ResourceLocation("texts/splashes.txt");
 	private static final ResourceLocation minecraftTitleTextures = new ResourceLocation(
 			"textures/gui/title/minecraft.png");
@@ -104,6 +107,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
 			new ResourceLocation("textures/gui/title/background/panorama_4.png"),
 			new ResourceLocation("textures/gui/title/background/panorama_5.png") };
 	private static ResourceLocation backgroundTexture = null;
+	private static ResourceLocation backgroundTexture2 = null;
 	private static GuiMainMenu instance = null;
 
 	public static void doResourceReloadHack() {
@@ -315,7 +319,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
 		GlStateManager.disableCull();
 		GlStateManager.depthMask(false);
 		GlStateManager.tryBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-		byte b0 = enableBlur ? (byte) 8 : (byte) 1;
+		byte b0 = enableBlur ? (byte) 4 : (byte) 1;
 
 		for (int i = 0; i < b0 * b0; ++i) {
 			GlStateManager.pushMatrix();
@@ -529,8 +533,10 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
 	@Override
 	public void initGui() {
 		if (viewportTexture == null) {
-			viewportTexture = new DynamicTexture(256, 256);
+			viewportTexture = new MainMenuSkyboxTexture(256, 256);
 			backgroundTexture = this.mc.getTextureManager().getDynamicTextureLocation("background", viewportTexture);
+			viewportTexture2 = new MainMenuSkyboxTexture(256, 256);
+			backgroundTexture2 = this.mc.getTextureManager().getDynamicTextureLocation("background", viewportTexture2);
 		}
 		this.updateCheckerOverlay.setResolution(mc, width, height);
 		Calendar calendar = Calendar.getInstance();
@@ -661,15 +667,42 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
 	 * + Renders the skybox in the main menu
 	 */
 	private void renderSkybox(int parInt1, int parInt2, float parFloat1) {
+		viewportTexture.bindFramebuffer();
 		GlStateManager.viewport(0, 0, 256, 256);
+		GlStateManager.clearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		GlStateManager.clear(GL_COLOR_BUFFER_BIT);
 		this.drawPanorama(parInt1, parInt2, parFloat1);
+		viewportTexture2.bindFramebuffer();
+		GlStateManager.clearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		GlStateManager.clear(GL_COLOR_BUFFER_BIT);
+		this.mc.getTextureManager().bindTexture(backgroundTexture);
 		this.rotateAndBlurSkybox(parFloat1);
+		viewportTexture.bindFramebuffer();
+		this.mc.getTextureManager().bindTexture(backgroundTexture2);
 		this.rotateAndBlurSkybox(parFloat1);
+		viewportTexture2.bindFramebuffer();
+		this.mc.getTextureManager().bindTexture(backgroundTexture);
 		this.rotateAndBlurSkybox(parFloat1);
+		viewportTexture.bindFramebuffer();
+		this.mc.getTextureManager().bindTexture(backgroundTexture2);
 		this.rotateAndBlurSkybox(parFloat1);
+		viewportTexture2.bindFramebuffer();
+		this.mc.getTextureManager().bindTexture(backgroundTexture);
 		this.rotateAndBlurSkybox(parFloat1);
+		viewportTexture.bindFramebuffer();
+		this.mc.getTextureManager().bindTexture(backgroundTexture2);
 		this.rotateAndBlurSkybox(parFloat1);
-		this.rotateAndBlurSkybox(parFloat1);
+
+		// Notch fucked up, the last iteration is not necessary, in the vanilla renderer
+		// it is unintentionally discarded and the previous iteration is used
+
+		// viewportTexture2.bindFramebuffer();
+		// this.mc.getTextureManager().bindTexture(backgroundTexture);
+		// this.rotateAndBlurSkybox(parFloat1);
+
+		_wglBindFramebuffer(0x8D40, null);
+
+		this.mc.getTextureManager().bindTexture(backgroundTexture);
 		GlStateManager.viewport(0, 0, this.mc.displayWidth, this.mc.displayHeight);
 		float f = this.width > this.height ? 120.0F / (float) this.width : 120.0F / (float) this.height;
 		float f1 = (float) this.height * f / 256.0F;
@@ -694,10 +727,9 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback {
 	 * + Rotate and blurs the skybox view in the main menu
 	 */
 	private void rotateAndBlurSkybox(float parFloat1) {
-		this.mc.getTextureManager().bindTexture(backgroundTexture);
 		EaglercraftGPU.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		EaglercraftGPU.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		EaglercraftGPU.glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, 256, 256);
+		// EaglercraftGPU.glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, 256, 256);
 		GlStateManager.enableBlend();
 		GlStateManager.tryBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 1, 0);
 		GlStateManager.colorMask(true, true, true, false);

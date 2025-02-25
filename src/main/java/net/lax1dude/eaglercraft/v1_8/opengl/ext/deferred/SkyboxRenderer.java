@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2023 lax1dude. All Rights Reserved.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
 package net.lax1dude.eaglercraft.v1_8.opengl.ext.deferred;
 
 import static net.lax1dude.eaglercraft.v1_8.internal.PlatformOpenGL._wglBindBuffer;
@@ -35,37 +51,21 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import net.lax1dude.eaglercraft.v1_8.EagRuntime;
-import net.lax1dude.eaglercraft.v1_8.internal.IBufferArrayGL;
 import net.lax1dude.eaglercraft.v1_8.internal.IBufferGL;
+import net.lax1dude.eaglercraft.v1_8.internal.IVertexArrayGL;
 import net.lax1dude.eaglercraft.v1_8.internal.buffer.ByteBuffer;
 import net.lax1dude.eaglercraft.v1_8.opengl.EaglercraftGPU;
 import net.lax1dude.eaglercraft.v1_8.opengl.GlStateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 
-/**
- * Copyright (c) 2023 lax1dude. All Rights Reserved.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- */
 public class SkyboxRenderer {
 
 	public final ResourceLocation skyboxLocation;
 
 	private IBufferGL skyboxVBO = null;
 	private IBufferGL skyboxIBO = null;
-	private IBufferArrayGL skyboxVAO = null;
+	private IVertexArrayGL skyboxVAO = null;
 	private int normalsLUT = -1;
 	private int atmosphereLUTWidth = -1;
 	private int atmosphereLUTHeight = -1;
@@ -104,18 +104,18 @@ public class SkyboxRenderer {
 	}
 
 	public void drawBottom() {
-		EaglercraftGPU.bindGLBufferArray(skyboxVAO);
+		EaglercraftGPU.bindGLVertexArray(skyboxVAO);
 		_wglDrawElements(GL_TRIANGLES, skyboxBottomIndexCount, skyboxIndexType,
 				skyboxBottomIndexOffset * skyboxIndexStride);
 	}
 
 	public void drawFull() {
-		EaglercraftGPU.bindGLBufferArray(skyboxVAO);
+		EaglercraftGPU.bindGLVertexArray(skyboxVAO);
 		_wglDrawElements(GL_TRIANGLES, skyboxIndexCount, skyboxIndexType, 0);
 	}
 
 	public void drawTop() {
-		EaglercraftGPU.bindGLBufferArray(skyboxVAO);
+		EaglercraftGPU.bindGLVertexArray(skyboxVAO);
 		_wglDrawElements(GL_TRIANGLES, skyboxTopIndexCount, skyboxIndexType, skyboxTopIndexOffset * skyboxIndexStride);
 	}
 
@@ -210,7 +210,7 @@ public class SkyboxRenderer {
 			buf.flip();
 
 			skyboxVAO = _wglGenVertexArrays();
-			EaglercraftGPU.bindGLBufferArray(skyboxVAO);
+			EaglercraftGPU.bindGLVertexArray(skyboxVAO);
 
 			skyboxIBO = _wglGenBuffers();
 			_wglBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxIBO);

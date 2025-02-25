@@ -1,14 +1,11 @@
 package net.lax1dude.eaglercraft.v1_8.minecraft;
 
-import static net.lax1dude.eaglercraft.v1_8.opengl.RealOpenGLEnums.GL_COMPILE;
-
 import java.util.LinkedList;
 import java.util.List;
 
 import net.lax1dude.eaglercraft.v1_8.EagRuntime;
 import net.lax1dude.eaglercraft.v1_8.log4j.LogManager;
 import net.lax1dude.eaglercraft.v1_8.log4j.Logger;
-import net.lax1dude.eaglercraft.v1_8.opengl.EaglercraftGPU;
 import net.lax1dude.eaglercraft.v1_8.opengl.WorldRenderer;
 import net.lax1dude.eaglercraft.v1_8.opengl.WorldVertexBufferUploader;
 import net.minecraft.client.Minecraft;
@@ -231,9 +228,7 @@ public class ChunkUpdateManager {
 	}
 
 	private void uploadDisplayList(WorldRenderer chunkRenderer, int parInt1, RenderChunk parRenderChunk) {
-		EaglercraftGPU.glNewList(parInt1, GL_COMPILE);
-		WorldVertexBufferUploader.func_181679_a(chunkRenderer);
-		EaglercraftGPU.glEndList();
+		WorldVertexBufferUploader.uploadDisplayList(parInt1, chunkRenderer);
 	}
 
 }
