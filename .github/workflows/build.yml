@@ -1,6 +1,5 @@
 name: Build
 on: [push, pull_request, workflow_dispatch]
-
 jobs:
   build:
     permissions:
@@ -9,85 +8,58 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
           cache: 'gradle'
+
       - name: Validate Gradle Wrapper
         uses: gradle/actions/wrapper-validation@v4
+
       - name: Compile client
         run: |
-          bash ./CompileEPK.sh &&
-          bash ./CompileJS.sh &&
-          bash ./MakeOfflineDownload.sh
+          bash ./CompileEPK.sh && bash ./CompileJS.sh && bash ./MakeOfflineDownload.sh
+
       - name: Compile client (WASM)
         run: |
-          cd ./wasm_gc_teavm &&
-          bash ./CompileEPK.sh &&
-          bash ./CompileWASM.sh &&
-          bash ./CompileEagRuntimeJS.sh &&
-          bash ./CompileBootstrapJS.sh &&
-          bash ./CompileLoaderWASM.sh &&
-          bash ./MakeWASMClientBundle.sh &&
+          cd ./wasm_gc_teavm
+          bash ./CompileEPK.sh
+          bash ./CompileWASM.sh
+          bash ./CompileEagRuntimeJS.sh
+          bash ./CompileBootstrapJS.sh
+          bash ./CompileLoaderWASM.sh
+          bash ./MakeWASMClientBundle.sh
           cd ..
+
       - name: Prepare files
         run: |
-          mkdir -p ${{ runner.temp }}/gh-pages &&
-          cp -t ${{ runner.temp }}/gh-pages \
-            ./LICENSE.md \
-            ./javascript/assets.epk \
-            ./javascript/assets.epw \
-            ./javascript/bootstrap.js \
-            ./javascript/classes.js \
-            ./javascript/classes.js.map \
-            ./javascript/index.html \
-            ./javascript/Starlike_Client_Offline.html \
-            ./javascript/Starlike_Client_Offline_WASM.html \
-            ./javascript/wasm.html
-      - name: Upload web files
+          mkdir -p ${{ runner.temp }}/gh-pages
+          
+          # Copy standard JS build files
+          cp ./LICENSE.md ${{ runner.temp }}/gh-pages/
+          cp ./javascript/assets.epk ${{ runner.temp }}/gh-pages/
+          cp ./javascript/classes.js ${{ runner.temp }}/gh-pages/
+          cp ./javascript/index.html ${{ runner.temp }}/gh-pages/
+          cp ./javascript/Starlike_Client_Offline.html ${{ runner.temp }}/gh-pages/
+          
+          # Safely copy WASM files from their output directories
+          cp ./wasm_gc_teavm/javascript/assets.epw ${{ runner.temp }}/gh-pages/ || true
+          cp ./wasm_gc_teavm/javascript/bootstrap.js ${{ runner.temp }}/gh-pages/ || true
+          cp ./wasm_gc_teavm/javascript/Starlike_Client_Offline_WASM.html ${{ runner.temp }}/gh-pages/ || true
+          cp ./wasm_gc_teavm/javascript/wasm.html ${{ runner.temp }}/gh-pages/ || true
+
+      - name: Upload Web Files
         continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
-          name: Starlike_Client_Web
+          name: Starlike_Client_Web_All
           path: ${{ runner.temp }}/gh-pages
           retention-days: 1
           compression-level: 9
-      - name: Upload offline download
-        continue-on-error: true
-        uses: actions/upload-artifact@v4
-        with:
-          name: Starlike_Client_Offline
-          path: |
-            ${{ runner.temp }}/gh-pages/LICENSE.md
-            ${{ runner.temp }}/gh-pages/Starlike_Client_Offline.html
-            ${{ runner.temp }}/gh-pages/Starlike_Client_Offline_WASM.html
-          retention-days: 1
-          compression-level: 9
-      - name: Upload web files (WASM)
-        continue-on-error: true
-        uses: actions/upload-artifact@v4
-        with:
-          name: Starlike_Client_Web_WASM
-          path: |
-            ${{ runner.temp }}/gh-pages/LICENSE.md
-            ${{ runner.temp }}/gh-pages/assets.epw
-            ${{ runner.temp }}/gh-pages/bootstrap.js
-            ${{ runner.temp }}/gh-pages/Starlike_Client_Offline_WASM.html
-            ${{ runner.temp }}/gh-pages/wasm.html
-          retention-days: 1
-          compression-level: 9
-      - name: Upload offline download (WASM)
-        continue-on-error: true
-        uses: actions/upload-artifact@v4
-        with:
-          name: Starlike_Client_Offline_WASM
-          path: |
-            ${{ runner.temp }}/gh-pages/LICENSE.md
-            ${{ runner.temp }}/gh-pages/Starlike_Client_Offline_WASM.html
-          retention-days: 1
-          compression-level: 9
+
       - name: Deploy to `gh-pages` branch
         if: github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v4
@@ -99,5 +71,3 @@ jobs:
           user_name: 'github-actions[bot]'
           user_email: '41898282+github-actions[bot]@users.noreply.github.com'
           commit_message: 'github-actions: deploy'
-          # disable_nojekyll: true
-          cname: 'starlike.zumbiepig.dev'
