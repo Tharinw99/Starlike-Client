@@ -37,17 +37,17 @@ jobs:
         run: |
           mkdir -p ${{ runner.temp }}/gh-pages
           
-          # Copy standard JS build files (from the main /javascript folder)
+          # Copy standard JS build files
           cp ./javascript/assets.epk ${{ runner.temp }}/gh-pages/
           cp ./javascript/classes.js ${{ runner.temp }}/gh-pages/
           cp ./javascript/index.html ${{ runner.temp }}/gh-pages/
           cp ./javascript/Starlike_Client_Offline.html ${{ runner.temp }}/gh-pages/
           
-          # Copy WASM files (from the /wasm_gc_teavm/javascript folder)
-          cp ./wasm_gc_teavm/javascript/assets.epw ${{ runner.temp }}/gh-pages/
-          cp ./wasm_gc_teavm/javascript/bootstrap.js ${{ runner.temp }}/gh-pages/
-          cp ./wasm_gc_teavm/javascript/Starlike_Client_Offline_WASM.html ${{ runner.temp }}/gh-pages/
-          cp ./wasm_gc_teavm/javascript/wasm.html ${{ runner.temp }}/gh-pages/
+          # Copy the WASM files from the main javascript folder where they were saved
+          cp ./javascript/assets.epw ${{ runner.temp }}/gh-pages/
+          cp ./javascript/bootstrap.js ${{ runner.temp }}/gh-pages/
+          cp ./javascript/Starlike_Client_Offline_WASM.html ${{ runner.temp }}/gh-pages/
+          cp ./javascript/wasm.html ${{ runner.temp }}/gh-pages/
 
       - name: Deploy to `gh-pages` branch
         if: github.ref == 'refs/heads/main'
@@ -58,5 +58,5 @@ jobs:
           allow_empty_commit: true
           force_orphan: true
           user_name: 'github-actions[bot]'
-          user_email: '41898282+github-actions[bot]@users.noreply.github.com'
+          user_email: '41898282+github-actions[bot]@://github.com'
           commit_message: 'github-actions: deploy'
